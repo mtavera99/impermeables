@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centro de Campaña Meta · Impermeables Moto</title>
+<style>
+  :root{
+    --bg:#0b0f19; --panel:#131a2a; --panel2:#1b2438; --line:#26324d;
+    --txt:#e8edf7; --muted:#9aa7c2; --blue:#2f81f7; --blue2:#4f9dff;
+    --yellow:#ffd21e; --green:#27d17f; --red:#ff4d5e; --purple:#a06bff;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue2);text-decoration:none}
+  .app{display:flex;min-height:100vh}
+  .side{width:260px;background:linear-gradient(180deg,#0d1424,#0b0f19);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+  .brand{padding:22px 20px;border-bottom:1px solid var(--line)}
+  .brand h1{font-size:17px;line-height:1.2}
+  .brand span{color:var(--yellow)}
+  .brand p{font-size:12px;color:var(--muted);margin-top:4px}
+  .nav{padding:12px 10px}
+  .nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:var(--muted);padding:11px 14px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;transition:.15s}
+  .nav button:hover{background:var(--panel2);color:var(--txt)}
+  .nav button.active{background:var(--blue);color:#fff}
+  .nav .ico{width:20px;text-align:center}
+  .main{flex:1;min-width:0}
+  .topbar{padding:14px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:rgba(11,15,25,.85);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20}
+  .topbar .pill{background:var(--green);color:#04110a;font-weight:800;font-size:12px;padding:5px 12px;border-radius:30px}
+  .wrap{padding:30px 26px;max-width:1000px;margin:0 auto}
+  section{display:none;animation:fade .25s ease}
+  section.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2.title{font-size:26px;margin-bottom:6px}
+  h2.title .em{color:var(--yellow)}
+  .sub{color:var(--muted);margin-bottom:22px;font-size:14px}
+  h3{font-size:17px;margin:26px 0 12px;display:flex;align-items:center;gap:8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:800px){.g2,.g3,.g4{grid-template-columns:1fr}.side{position:fixed;left:-260px;z-index:100;transition:.25s}.side.open{left:0}.menu-btn{display:block!important}}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .stat .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .stat .val{font-size:24px;font-weight:800;margin-top:6px}
+  .stat .val.g{color:var(--green)} .stat .val.y{color:var(--yellow)} .stat .val.b{color:var(--blue2)} .stat .val.r{color:var(--red)}
+  .stat small{color:var(--muted);font-size:11px}
+  .copybox{position:relative;background:#0a1120;border:1px solid var(--line);border-radius:10px;padding:16px 16px;margin:10px 0;white-space:pre-wrap;font-size:13.5px;color:#dbe4f5}
+  .copybtn{position:absolute;top:10px;right:10px;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer}
+  .copybtn:hover{background:var(--blue2)} .copybtn.ok{background:var(--green);color:#04110a}
+  .tag{display:inline-block;background:var(--panel2);border:1px solid var(--line);color:var(--blue2);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;margin:3px 4px 3px 0}
+  .tag.y{color:var(--yellow)} .tag.g{color:var(--green)} .tag.p{color:var(--purple)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  tr:last-child td{border-bottom:none}
+  .note{border-left:3px solid var(--yellow);background:rgba(255,210,30,.06);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;font-size:13.5px}
+  .note.r{border-color:var(--red);background:rgba(255,77,94,.07)}
+  .note.g{border-color:var(--green);background:rgba(39,209,127,.07)}
+  ul.clean{list-style:none;margin:8px 0}
+  ul.clean li{padding:7px 0 7px 26px;position:relative;font-size:14px;border-bottom:1px solid var(--line)}
+  ul.clean li:last-child{border-bottom:none}
+  ul.clean li:before{content:"→";position:absolute;left:0;color:var(--blue2);font-weight:800}
+  ul.check li:before{content:"✓";color:var(--green)}
+  .calc label{display:block;font-size:12px;color:var(--muted);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.03em}
+  .calc input[type=range]{width:100%}
+  .calc input[type=number]{width:100%;background:#0a1120;border:1px solid var(--line);color:var(--txt);padding:10px;border-radius:8px;font-size:15px}
+  .rangeval{color:var(--yellow);font-weight:800}
+  .big{font-size:34px;font-weight:900}
+  .step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .step:last-child{border:none}
+  .step .num{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .menu-btn{display:none;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 12px;cursor:pointer}
+  .foot{color:var(--muted);font-size:12px;text-align:center;padding:30px}
+  .kpi-good{color:var(--green);font-weight:700}.kpi-bad{color:var(--red);font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand">
+      <h1>⚡ Centro de Campaña <span>Meta</span></h1>
+      <p>Impermeables Moto · Kit de lanzamiento</p>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="active" data-t="resumen"><span class="ico">📊</span> Resumen del negocio</button>
+      <button data-t="calc"><span class="ico">🧮</span> Calculadora de ganancia</button>
+      <button data-t="estructura"><span class="ico">🏗️</span> Estructura de campaña</button>
+      <button data-t="audiencias"><span class="ico">🎯</span> Audiencias</button>
+      <button data-t="copies"><span class="ico">✍️</span> Copies (anuncios)</button>
+      <button data-t="creativos"><span class="ico">🎨</span> Creativos + prompts IA</button>
+      <button data-t="revision"><span class="ico">🖼️</span> Cuáles usar y corregir</button>
+      <button data-t="video"><span class="ico">🎬</span> Video + voz en off</button>
+      <button data-t="whatsapp"><span class="ico">💬</span> Cierre por WhatsApp</button>
+      <button data-t="escalar"><span class="ico">📈</span> Escalamiento y KPIs</button>
+      <button data-t="checklist"><span class="ico">✅</span> Checklist de lanzamiento</button>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-btn" onclick="document.getElementById('side').classList.toggle('open')">☰ Menú</button>
+      <strong id="crumb">Resumen del negocio</strong>
+      <span class="pill">CAMPAÑA LISTA PARA VENDER</span>
+    </div>
+    <div class="wrap">
+    <section id="resumen" class="show">
+      <h2 class="title">El negocio en <span class="em">números reales</span></h2>
+      <p class="sub">Modelo: precio de entrada agresivo $59.900 <strong>SIN envío</strong> (el cliente paga el envío según su ubicación) · pago contraentrega · meta de CPA $8.000–$10.000.</p>
+      <div class="grid g4">
+        <div class="stat"><div class="lbl">Precio de venta</div><div class="val y">$59.900</div><small>Entrada agresiva al mercado</small></div>
+        <div class="stat"><div class="lbl">Tu costo</div><div class="val">$34.000</div><small>Por conjunto (4 piezas)</small></div>
+        <div class="stat"><div class="lbl">Margen bruto</div><div class="val b">$25.900</div><small>Antes de publicidad</small></div>
+        <div class="stat"><div class="lbl">Ganancia por venta</div><div class="val g">$15.400</div><small>Con CPA $9.000 promedio</small></div>
+      </div>
+      <h3>💡 Por qué SÍ es rentable a $59.900</h3>
+      <div class="card">
+        <p>Como <strong>el cliente paga el envío</strong>, no cargas ese costo. Tu única variable grande es la publicidad. Si mantienes el CPA en la meta, cada venta deja utilidad sana:</p>
+        <table>
+          <tr><th>Concepto</th><th>Con CPA $8.000</th><th>Con CPA $10.000</th></tr>
+          <tr><td>Precio de venta</td><td>$59.900</td><td>$59.900</td></tr>
+          <tr><td>(–) Costo producto</td><td>$34.000</td><td>$34.000</td></tr>
+          <tr><td>(–) Empaque/etiqueta</td><td>$1.500</td><td>$1.500</td></tr>
+          <tr><td>(–) Publicidad (CPA)</td><td>$8.000</td><td>$10.000</td></tr>
+          <tr><td><strong>= Ganancia neta / venta</strong></td><td class="kpi-good">$16.400</td><td class="kpi-good">$14.400</td></tr>
+          <tr><td><strong>ROAS necesario</strong></td><td>7.5x</td><td>6.0x</td></tr>
+        </table>
+      </div>
+      <div class="grid g3">
+        <div class="stat"><div class="lbl">10 ventas/día</div><div class="val g">~$154.000</div><small>ganancia diaria neta</small></div>
+        <div class="stat"><div class="lbl">Al mes (300 ventas)</div><div class="val g">~$4.6M</div><small>utilidad estimada</small></div>
+        <div class="stat"><div class="lbl">Punto de equilibrio</div><div class="val y">CPA $24.400</div><small>arriba de esto, pierdes</small></div>
+      </div>
+      <div class="note r"><strong>⚠️ El riesgo #1 del contraentrega:</strong> los pedidos rechazados (el cliente no recibe). En Colombia puede ser 20–35%. Cada rechazo te cuesta el flete de ida y vuelta. <strong>Solución:</strong> confirma SIEMPRE el pedido por WhatsApp antes de despachar. Esto baja el rechazo a menos del 10%.</div>
+      <div class="note g"><strong>✅ Ventaja competitiva:</strong> la competencia vende igual a $56.999–$69.900 pero SIN termosellado real y cobrando zapatones aparte. Tú entras con <strong>4 piezas + termosellado + 6 colores</strong> al mismo precio.</div>
+      <h3>📌 Cómo usar esta app</h3>
+      <ul class="clean">
+        <li>Cada sección tiene el contenido <strong>listo para copiar</strong> (botón "Copiar").</li>
+        <li>Sigue el orden del menú: primero los números, luego campaña, audiencias y copies.</li>
+        <li>Al final tienes un <strong>checklist</strong> para lanzar sin olvidar nada.</li>
+      </ul>
+    </section>
+    <section id="calc">
+      <h2 class="title">Calculadora de <span class="em">ganancia</span></h2>
+      <p class="sub">Mueve los valores y mira en tiempo real si tu campaña es rentable.</p>
+      <div class="grid g2">
+        <div class="card calc">
+          <label>Precio de venta: <span class="rangeval" id="v_precio">$59.900</span></label>
+          <input type="range" id="precio" min="49900" max="129900" step="5000" value="59900" oninput="calc()">
+          <label>Costo del producto: <span class="rangeval" id="v_costo">$34.000</span></label>
+          <input type="range" id="costo" min="20000" max="45000" step="500" value="34000" oninput="calc()">
+          <label>CPA (costo por venta en Meta): <span class="rangeval" id="v_cpa">$9.000</span></label>
+          <input type="range" id="cpa" min="4000" max="30000" step="500" value="9000" oninput="calc()">
+          <label>Empaque + etiqueta: <span class="rangeval" id="v_emp">$1.500</span></label>
+          <input type="range" id="emp" min="0" max="6000" step="500" value="1500" oninput="calc()">
+          <label>Ventas por día: <span class="rangeval" id="v_ventas">10</span></label>
+          <input type="range" id="ventas" min="1" max="50" step="1" value="10" oninput="calc()">
+        </div>
+        <div class="card">
+          <div class="stat" style="margin-bottom:12px"><div class="lbl">Ganancia por venta</div><div class="val g big" id="o_gv">$15.400</div></div>
+          <div class="grid g2">
+            <div class="stat"><div class="lbl">Margen neto</div><div class="val b" id="o_margen">26%</div></div>
+            <div class="stat"><div class="lbl">ROAS actual</div><div class="val y" id="o_roas">6.7x</div></div>
+            <div class="stat"><div class="lbl">Ganancia / día</div><div class="val g" id="o_dia">$154.000</div></div>
+            <div class="stat"><div class="lbl">Ganancia / mes</div><div class="val g" id="o_mes">$4.6M</div></div>
+          </div>
+          <div class="note" id="o_msg" style="margin-top:14px"></div>
+        </div>
+      </div>
+      <div class="note"><strong>Regla de oro:</strong> mientras tu CPA esté por debajo de <strong>$24.400</strong> ganas dinero. Tu meta es $8.000–$10.000.</div>
+    </section>
+    <section id="estructura">
+      <h2 class="title">Estructura de <span class="em">campaña</span></h2>
+      <p class="sub">Cómo configurar la campaña en el Administrador de Anuncios de Meta.</p>
+      <h3>🎯 Configuración recomendada</h3>
+      <div class="card">
+        <table>
+          <tr><th>Elemento</th><th>Qué elegir</th></tr>
+          <tr><td>Objetivo</td><td><strong>Interacción → Mensajes de WhatsApp</strong></td></tr>
+          <tr><td>Optimización</td><td>Conversaciones iniciadas</td></tr>
+          <tr><td>Estructura</td><td>1 campaña · 2 conjuntos · 3 creativos c/u</td></tr>
+          <tr><td>Presupuesto</td><td>$18.000–$20.000 por conjunto/día (~$40.000/día)</td></tr>
+          <tr><td>Ubicaciones</td><td>Advantage+ (automáticas)</td></tr>
+          <tr><td>Destino</td><td>Tu WhatsApp Business</td></tr>
+        </table>
+      </div>
+      <h3>🪜 Paso a paso en Meta</h3>
+      <div class="card">
+        <div class="step"><div class="num">1</div><div>Entra a <strong>Meta Business Suite → Anuncios → Crear</strong>.</div></div>
+        <div class="step"><div class="num">2</div><div>Objetivo <strong>Interacción</strong> → <strong>"Mensajes de WhatsApp"</strong>.</div></div>
+        <div class="step"><div class="num">3</div><div>Nombra: <strong>"Impermeables · Prospección · [fecha]"</strong>.</div></div>
+        <div class="step"><div class="num">4</div><div>Crea <strong>2 conjuntos</strong> con audiencias distintas.</div></div>
+        <div class="step"><div class="num">5</div><div>Presupuesto por conjunto: <strong>$18.000–$20.000</strong>.</div></div>
+        <div class="step"><div class="num">6</div><div>Sube <strong>3 creativos por conjunto</strong> (1 video + 2 imágenes).</div></div>
+        <div class="step"><div class="num">7</div><div>Botón: <strong>"Enviar mensaje por WhatsApp"</strong>.</div></div>
+        <div class="step"><div class="num">8</div><div>Publica y deja correr <strong>3–4 días</strong> sin tocar.</div></div>
+      </div>
+    </section>
+    <section id="audiencias">
+      <h2 class="title">Audiencias <span class="em">ganadoras</span></h2>
+      <p class="sub">Empieza con 2 conjuntos de prospección.</p>
+      <h3>🟦 Conjunto 1 — Motociclistas</h3>
+      <div class="card">
+        <p><strong>Ubicación:</strong> ciudades con buena mensajería contraentrega.</p>
+        <span class="tag">Bogotá</span><span class="tag">Medellín</span><span class="tag">Cali</span><span class="tag">Barranquilla</span><span class="tag">Bucaramanga</span><span class="tag">Cúcuta</span><span class="tag">Pereira</span>
+        <p style="margin-top:12px"><strong>Edad:</strong> 20–55 · <strong>Género:</strong> Todos</p>
+        <p style="margin-top:8px"><strong>Intereses:</strong></p>
+        <span class="tag y">Motocicletas</span><span class="tag y">Yamaha</span><span class="tag y">Bajaj</span><span class="tag y">AKT</span><span class="tag y">Suzuki</span><span class="tag y">Honda motos</span><span class="tag y">Cascos de moto</span><span class="tag y">Accesorios para motocicletas</span>
+      </div>
+      <h3>🟩 Conjunto 2 — Domiciliarios</h3>
+      <div class="card">
+        <p>Quienes usan la moto para trabajar (compran más rápido):</p>
+        <span class="tag g">Rappi</span><span class="tag g">DiDi</span><span class="tag g">iFood</span><span class="tag g">Mensajería</span><span class="tag g">Domicilios</span><span class="tag g">Conductor de reparto</span>
+      </div>
+      <h3>🟪 Conjunto 3 — Público femenino (luego)</h3>
+      <div class="card">
+        <p>Tienes fucsia y morado: nicho poco atendido.</p>
+        <span class="tag p">Mujeres 20–50</span><span class="tag p">Interés: motocicletas</span><span class="tag p">Parrillera</span>
+      </div>
+      <h3>🔁 Retargeting y Lookalikes (fase 2)</h3>
+      <div class="card">
+        <ul class="clean">
+          <li><strong>Retargeting:</strong> vieron +25% del video o escribieron y no compraron.</li>
+          <li><strong>Lookalike 1–3%:</strong> desde tu lista de compradores. Al tener +100 clientes.</li>
+        </ul>
+      </div>
+    </section>
+    <section id="copies">
+      <h2 class="title">Copies de <span class="em">anuncios</span></h2>
+      <p class="sub">Listos para copiar. Prueba varios ángulos y deja ganar al de menor CPA.</p>
+      <h3>🔥 Copy 1 — Problema / Solución</h3>
+      <div class="copybox" data-copy>🏍️💧 ¿Otra vez llegaste empapado al trabajo?
+
+Con este conjunto impermeable para moto eso se acabó. Costura TERMOSELLADA de verdad: el agua NO se filtra por las puntadas.
+
+✅ 4 piezas: chaqueta + pantalón + zapatones + bolsa
+✅ Cintas reflectivas (te ven de noche)
+✅ 6 colores · Tallas S a 2XL
+
+💰 Solo $59.900 · Pago CONTRAENTREGA (pagas al recibir)
+👉 Escríbenos por WhatsApp y pide el tuyo hoy.</div>
+      <h3>🔥 Copy 2 — Combo / Valor</h3>
+      <div class="copybox" data-copy>Deja de comprar la chaqueta por un lado y los zapatones por otro. 🧥👖👢
+
+Llévate el CONJUNTO COMPLETO de una:
+🔹 Chaqueta impermeable
+🔹 Pantalón impermeable
+🔹 Zapatones cubre-botas
+🔹 Bolsa para guardarlo en tu moto
+
+Costura termosellada = 100% seco.
+6 colores · Tallas S a 2XL.
+
+Todo por $59.900. Pago contraentrega.
+👉 Pídelo por WhatsApp 👇</div>
+      <h3>🔥 Copy 3 — Precio / Urgencia</h3>
+      <div class="copybox" data-copy>⚡ OFERTA DE LANZAMIENTO ⚡
+
+Conjunto impermeable para moto (4 piezas) por solo $59.900.
+Mismo precio que uno sencillo… pero el tuyo es TERMOSELLADO y viene completo.
+
+🚚 Pago contraentrega en toda Colombia.
+🎨 Elige entre 6 colores.
+
+No manejes un día más mojado. Escríbenos ya por WhatsApp 👉</div>
+      <h3>🔥 Copy 4 — Seguridad / Reflectivo</h3>
+      <div class="copybox" data-copy>De noche, bajo lluvia, un motociclista casi no se ve. 🌧️🏍️
+
+Este impermeable trae CINTAS REFLECTIVAS que te hacen visible y te mantienen 100% seco con su costura termosellada.
+
+Conjunto completo de 4 piezas · 6 colores · Tallas S a 2XL.
+$59.900 · Pago contraentrega.
+
+Cuídate y llega seco. Escríbenos por WhatsApp 👇</div>
+    </section>
+    <section id="creativos">
+      <h2 class="title">Creativos + <span class="em">prompts de IA</span></h2>
+      <p class="sub">El creativo es el 80% del éxito. Mezcla video de ambiente (IA) con tomas reales de tu producto.</p>
+      <div class="note r"><strong>Regla honesta:</strong> el ambiente (lluvia, moto) con IA; el PRODUCTO real grábalo con tu celular. Así el cliente recibe lo que ve.</div>
+      <h3>🖼️ Imagen principal (clave alta)</h3>
+      <div class="copybox" data-copy>High-key advertising photography of a complete black motorcycle rain suit set: jacket, pants, waterproof shoe covers and carrying bag, neatly arranged in an elegant top-down flat lay. Minimalist premium aesthetic, bright infinite white background, soft diffused lighting, true-to-life colors, ultra sharp detail. Vertical 9:16, professional studio quality. No text.</div>
+      <h3>🌈 Imagen de los 6 colores</h3>
+      <div class="copybox" data-copy>High-key advertising photography of six identical motorcycle rain suits, one in each color: white, green, red, purple, fuchsia and yellow, arranged in a clean 2x3 grid flat lay top-down view. Bright infinite white background, soft diffused lighting, vivid true-to-life colors, ultra sharp. Vertical 9:16, studio quality. No text.</div>
+      <h3>🎥 Prompts Veo (9:16, ~8s c/u)</h3>
+      <div class="copybox" data-copy>CLIP 1 — Gancho: Cinematic slow-motion shot of a motorcyclist riding through heavy rain on a wet city street at dusk, water spraying from the tires, moody cinematic commercial style, camera tracking alongside the rider. Vertical 9:16. Audio: heavy rain, motorcycle engine, splashing water.</div>
+      <div class="copybox" data-copy>CLIP 2 — Beneficio: Extreme close-up macro of water droplets hitting black waterproof silicone fabric and rolling off without soaking in, glistening water beads, soft studio lighting, premium commercial style, slow motion. Vertical 9:16. Audio: gentle water droplets.</div>
+      <div class="copybox" data-copy>CLIP 3 — Confianza: Cinematic shot of a confident motorcyclist wearing a black waterproof rain suit with reflective strips, riding calmly through rain, looking dry and comfortable, urban background softly blurred, smooth camera movement. Vertical 9:16. Audio: steady rain, engine, city ambience.</div>
+    </section>
+    <section id="revision">
+      <h2 class="title">Creativos: <span class="em">cuáles usar y corregir</span></h2>
+      <p class="sub">Los mejores creativos y los cambios exactos para dejarlos perfectos.</p>
+      <div class="note g"><strong>✅ Modelo:</strong> $59.900 SIN envío. El cliente paga el envío. <strong>Ningún creativo debe decir "envío gratis".</strong></div>
+      <h3>🥇 ESTRELLA — Vertical "¡Olvídate de llegar mojado!"</h3>
+      <div class="card">
+        <p><span class="tag g">Reels · Stories · feed móvil</span></p>
+        <ul class="clean">
+          <li><strong>Marca:</strong> corrige "CYCLEE" y usa tu marca definitiva bien escrita.</li>
+          <li><strong>Tallas:</strong> "S a XL" → <strong>"S a 2XL"</strong>.</li>
+          <li><strong>Colores:</strong> solo los reales (blanco, verde, rojo, morado, fucsia, amarillo) → <strong>"6 colores"</strong>.</li>
+          <li><strong>Botón:</strong> "¡Compra aquí!" → <strong>"¡Pídelo por WhatsApp!"</strong>.</li>
+        </ul>
+      </div>
+      <h3>🥈 SECUNDARIO — Horizontal "¡No más viajes empapados!"</h3>
+      <div class="card">
+        <p><span class="tag">Imagen secundaria · feed de computador</span></p>
+        <ul class="clean">
+          <li><strong>QUITA "Envío gratis a todo Colombia".</strong></li>
+          <li><strong>Tallas:</strong> "S-XL" → <strong>"S a 2XL"</strong>.</li>
+          <li><strong>Colores:</strong> los 6 reales.</li>
+          <li><strong>Marca:</strong> la misma del estrella.</li>
+        </ul>
+      </div>
+      <h3>📏 Reglas universales</h3>
+      <div class="card">
+        <ul class="clean check">
+          <li>Una sola marca, bien escrita.</li>
+          <li>Tallas: siempre "S a 2XL".</li>
+          <li>Colores: los 6 reales.</li>
+          <li>Nunca "envío gratis".</li>
+          <li>CTA siempre hacia WhatsApp.</li>
+          <li>Versiones 9:16 y 1:1.</li>
+        </ul>
+      </div>
+    </section>
+    <section id="video">
+      <h2 class="title">Video + <span class="em">voz en off</span></h2>
+      <h3>🎬 Guion (20s)</h3>
+      <div class="card">
+        <table>
+          <tr><th>Tiempo</th><th>Imagen</th><th>Texto</th></tr>
+          <tr><td>0–3s</td><td>Motociclista bajo lluvia</td><td>¿Cansado de llegar mojado?</td></tr>
+          <tr><td>3–7s</td><td>Agua resbalando</td><td>Costura termosellada = 0 filtraciones</td></tr>
+          <tr><td>7–12s</td><td>Tus 4 piezas reales</td><td>Chaqueta + pantalón + zapatones + bolsa</td></tr>
+          <tr><td>12–16s</td><td>Los 6 colores</td><td>6 colores · Tallas S a 2XL</td></tr>
+          <tr><td>16–20s</td><td>Cierre</td><td>Pídelo hoy 👉 $59.900 contraentrega</td></tr>
+        </table>
+      </div>
+      <h3>🎙️ Voz en off (energética)</h3>
+      <div class="copybox" data-copy>¿Cansado de manejar bajo la lluvia y llegar empapado? Este impermeable tiene costura termosellada: el agua no se filtra. Y viene completo: chaqueta, pantalón, zapatones y hasta la bolsa. En seis colores y todas las tallas. Pídelo hoy por solo cincuenta y nueve mil novecientos, con pago contraentrega. ¡No dejes que la lluvia te detenga!</div>
+    </section>
+    <section id="whatsapp">
+      <h2 class="title">Cierre por <span class="em">WhatsApp</span></h2>
+      <p class="sub">Aquí se cierra la venta y se controla el rechazo. Responde en menos de 5 minutos.</p>
+      <h3>👋 Bienvenida (automático)</h3>
+      <div class="copybox" data-copy>¡Hola! 👋 Gracias por escribirnos.
+Tu conjunto impermeable para moto (chaqueta + pantalón + zapatones + bolsa) cuesta $59.900. El envío lo pagas aparte al recibir (contraentrega).
+
+Para tu pedido dime:
+1️⃣ Color (blanco, verde, rojo, morado, fucsia o amarillo)
+2️⃣ Talla (S, M, L, XL o 2XL)
+3️⃣ Ciudad y dirección
+4️⃣ Nombre y teléfono
+
+📦 ¡Lo despachamos hoy mismo!</div>
+      <h3>✅ Confirmación (anti-rechazo)</h3>
+      <div class="copybox" data-copy>Perfecto 🙌 Confirmo tu pedido:
+• Producto: Conjunto impermeable 4 piezas
+• Color: ___ · Talla: ___
+• Valor: $59.900 + envío contraentrega
+• Dirección: ___
+
+¿Todo correcto? Responde "SÍ CONFIRMO" y lo despacho hoy 🚚.</div>
+      <div class="note g"><strong>Clave:</strong> NO despaches sin el "SÍ CONFIRMO". Baja el rechazo de ~30% a menos del 10%.</div>
+    </section>
+    <section id="escalar">
+      <h2 class="title">Escalamiento y <span class="em">KPIs</span></h2>
+      <h3>📊 KPIs que vigilar</h3>
+      <div class="card">
+        <table>
+          <tr><th>Métrica</th><th>Bueno</th><th>Alerta</th></tr>
+          <tr><td>CTR</td><td class="kpi-good">&gt; 1.5%</td><td class="kpi-bad">&lt; 0.8%</td></tr>
+          <tr><td>Costo por conversación</td><td class="kpi-good">$1.500–$4.000</td><td class="kpi-bad">&gt; $6.000</td></tr>
+          <tr><td>Tasa de cierre</td><td class="kpi-good">&gt; 30%</td><td class="kpi-bad">< 15%</td></tr>
+          <tr><td>CPA</td><td class="kpi-good">$8.000–$10.000</td><td class="kpi-bad">> $24.000</td></tr>
+          <tr><td>Rechazo contraentrega</td><td class="kpi-good">&lt; 10%</td><td class="kpi-bad">> 25%</td></tr>
+        </table>
+      </div>
+      <h3>📈 Reglas de escalamiento</h3>
+      <div class="card">
+        <ul class="clean">
+          <li><strong>Días 1–4:</strong> no toques nada. Deja aprender a Meta.</li>
+          <li><strong>Si CPA en meta:</strong> sube presupuesto +20% cada 2–3 días.</li>
+          <li><strong>Creativo con CPA > 2x meta:</strong> apágalo.</li>
+          <li><strong>Renueva creativos</strong> cada 10–14 días.</li>
+        </ul>
+      </div>
+    </section>
+    <section id="checklist">
+      <h2 class="title">Checklist de <span class="em">lanzamiento</span></h2>
+      <p class="sub">Marca cada punto. (Se guarda en tu navegador.)</p>
+      <div class="card"><h3 style="margin-top:0">🧱 Fundación</h3>
+        <ul class="clean check">
+          <li data-ck>Instagram profesional</li>
+          <li data-ck>Página de Facebook</li>
+          <li data-ck>WhatsApp Business con bienvenida</li>
+          <li data-ck>Meta Business Suite conectado</li>
+          <li data-ck>Método de pago en Meta</li>
+        </ul>
+      </div>
+      <div class="card"><h3 style="margin-top:0">🎨 Creativos</h3>
+        <ul class="clean check">
+          <li data-ck>Video final (15–25s, 9:16)</li>
+          <li data-ck>Imagen clave alta</li>
+          <li data-ck>Imagen 6 colores</li>
+          <li data-ck>Fotos reales del producto</li>
+        </ul>
+      </div>
+      <div class="card"><h3 style="margin-top:0">🚀 Campaña</h3>
+        <ul class="clean check">
+          <li data-ck>Objetivo: Mensajes de WhatsApp</li>
+          <li data-ck>2 conjuntos de audiencia</li>
+          <li data-ck>Copies pegados</li>
+          <li data-ck>Presupuesto $18.000–$20.000/conjunto</li>
+          <li data-ck>Botón WhatsApp configurado</li>
+        </ul>
+      </div>
+      <div class="note g" id="ckprogress"><strong>Progreso: 0%</strong></div>
+    </section>
+    <div class="foot">Centro de Campaña Meta · Impermeables Moto · Hecho para vender.<br>Cifras estimadas para Colombia; optimiza con tus datos reales.</div>
+    </div>
+  </div>
+</div>
+<script>
+  const btns=document.querySelectorAll('#nav button');
+  const secs=document.querySelectorAll('section');
+  const crumb=document.getElementById('crumb');
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    btns.forEach(x=>x.classList.remove('active'));b.classList.add('active');
+    const t=b.dataset.t;secs.forEach(s=>s.classList.remove('show'));
+    document.getElementById(t).classList.add('show');
+    crumb.textContent=b.textContent.trim();
+    document.getElementById('side').classList.remove('open');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }));
+  document.querySelectorAll('[data-copy]').forEach(box=>{
+    const btn=document.createElement('button');btn.className='copybtn';btn.textContent='Copiar';
+    btn.onclick=()=>{const txt=box.innerText.replace('Copiar','').trim();
+      navigator.clipboard.writeText(txt).then(()=>{btn.textContent='¡Copiado!';btn.classList.add('ok');
+        setTimeout(()=>{btn.textContent='Copiar';btn.classList.remove('ok');},1500);});};
+    box.appendChild(btn);
+  });
+  const f=n=>'$'+n.toLocaleString('es-CO');
+  const fM=n=>'$'+(n/1000000).toFixed(1)+'M';
+  function calc(){
+    const precio=+precioEl.value,costo=+costoEl.value,cpa=+cpaEl.value,emp=+empEl.value,ventas=+ventasEl.value;
+    document.getElementById('v_precio').textContent=f(precio);
+    document.getElementById('v_costo').textContent=f(costo);
+    document.getElementById('v_cpa').textContent=f(cpa);
+    document.getElementById('v_emp').textContent=f(emp);
+    document.getElementById('v_ventas').textContent=ventas;
+    const gv=precio-costo-cpa-emp;const margen=Math.round(gv/precio*100);const roas=(precio/cpa);
+    document.getElementById('o_gv').textContent=f(gv);
+    document.getElementById('o_gv').style.color=gv>0?'var(--green)':'var(--red)';
+    document.getElementById('o_margen').textContent=margen+'%';
+    document.getElementById('o_roas').textContent=roas.toFixed(1)+'x';
+    document.getElementById('o_dia').textContent=f(gv*ventas);
+    document.getElementById('o_mes').textContent=fM(gv*ventas*30);
+    const msg=document.getElementById('o_msg');
+    if(gv<=0){msg.className='note r';msg.innerHTML='<strong>❌ Pérdida.</strong> Baja el CPA o sube el precio.';}
+    else if(cpa>15000){msg.className='note';msg.innerHTML='<strong>⚠️ Rentable pero ajustado.</strong> Optimiza para acercarte a $8.000–$10.000.';}
+    else{msg.className='note g';msg.innerHTML='<strong>✅ ¡Zona ganadora!</strong> Rentable y escalable.';}
+  }
+  const precioEl=document.getElementById('precio'),costoEl=document.getElementById('costo'),cpaEl=document.getElementById('cpa'),empEl=document.getElementById('emp'),ventasEl=document.getElementById('ventas');
+  calc();
+  const ckItems=document.querySelectorAll('[data-ck]');
+  function saveCk(){const state=[...ckItems].map(i=>i.classList.contains('done'));
+    localStorage.setItem('ck_meta',JSON.stringify(state));
+    const done=state.filter(Boolean).length;const pct=Math.round(done/state.length*100);
+    document.getElementById('ckprogress').innerHTML='<strong>Progreso: '+pct+'%</strong> — '+done+' de '+state.length+' listos.';}
+  const saved=JSON.parse(localStorage.getItem('ck_meta')||'[]');
+  ckItems.forEach((i,idx)=>{i.style.cursor='pointer';
+    if(saved[idx]){i.classList.add('done');i.style.opacity=.55;i.style.textDecoration='line-through';}
+    i.addEventListener('click',()=>{i.classList.toggle('done');const on=i.classList.contains('done');
+      i.style.opacity=on?.55:1;i.style.textDecoration=on?'line-through':'none';saveCk();});});
+  saveCk();
+</script>
+</body>
+</html>
