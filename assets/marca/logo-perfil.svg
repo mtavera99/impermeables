@@ -1,0 +1,57 @@
+<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0B3D91"/>
+      <stop offset="1" stop-color="#061A3F"/>
+    </linearGradient>
+    <linearGradient id="visor" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFD84D"/>
+      <stop offset="1" stop-color="#FFC300"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background (square + circle-safe) -->
+  <rect x="0" y="0" width="1080" height="1080" rx="200" fill="url(#bg)"/>
+
+  <!-- helmet emblem, centered -->
+  <g transform="translate(240,72) scale(1.5)">
+    <path d="M200 65
+             C 150 65, 110 95, 95 150
+             C 88 185, 88 215, 95 245
+             C 100 275, 115 302, 152 305
+             L 250 305
+             C 287 305, 316 285, 326 245
+             C 339 200, 335 128, 300 100
+             C 275 78, 240 65, 200 65 Z"
+          fill="#FFFFFF"/>
+    <path d="M112 150
+             L 252 140
+             C 264 139, 272 147, 272 159
+             L 272 176
+             C 272 188, 264 195, 252 196
+             L 116 202
+             C 105 202, 98 194, 98 183
+             L 98 168
+             C 98 158, 103 151, 112 150 Z"
+          fill="url(#visor)"/>
+    <path d="M118 250 L 235 250"
+          stroke="#0B3D91" stroke-width="10" stroke-linecap="round"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="540" y="700" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-weight="900"
+        font-size="122" letter-spacing="1">
+    <tspan fill="#FFFFFF">BIKER</tspan><tspan fill="#FFC300">PRO</tspan>
+  </text>
+
+  <!-- yellow accent underline -->
+  <rect x="410" y="726" width="260" height="8" rx="4" fill="#FFC300"/>
+
+  <!-- tagline -->
+  <text x="540" y="792" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-weight="700"
+        font-size="38" letter-spacing="8" fill="#9DB6E0">
+    TODO PARA TU MOTO
+  </text>
+</svg>

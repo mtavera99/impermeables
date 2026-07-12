@@ -1,0 +1,148 @@
+# Proyecto BikerPro — Plan Maestro y Contexto
+
+> **IMPORTANTE (para cualquier sesión de Kiro):** Este archivo es la memoria del proyecto.
+> Léelo completo antes de trabajar. Si un chat se daña, aquí está todo para continuar.
+> Mantenlo actualizado: cada vez que haya avances o nuevas métricas, edítalo.
+
+Última actualización: 2026-07-11
+
+---
+
+## 1. La marca
+
+- **Nombre:** BikerPro
+- **Instagram:** @bikerproco
+- **Facebook:** Página "BikerPro" (categoría: Accesorios)
+- **WhatsApp de ventas:** 313 861 5813 (Colombia, +57 313 861 5813)
+  - Link directo: `https://wa.me/573138615813?text=Hola%20BikerPro%20quiero%20info%20de%20los%20impermeables`
+- **Ciudad base:** Bogotá
+- **Visión:** empezar con impermeables de moto y crecer a tienda de accesorios
+  (guantes, cascos, etc.). Por eso el nombre "BikerPro" (paraguas, escalable).
+- **Colores de marca:**
+  - Azul profundo `#0B3D91`
+  - Azul oscuro `#061A3F`
+  - Negro carbón `#1A1A1A`
+  - Amarillo `#FFC300`
+  - Blanco `#FFFFFF`
+- **Logo actual:** águila dorada + "BikerPro" (el usuario lo generó con Nano Banana).
+  Versiones de respaldo (casco) en `/assets/marca/`.
+
+---
+
+## 2. El producto y el modelo de negocio
+
+- **Producto:** conjunto impermeable para moto de **4 piezas** (chaqueta, pantalón,
+  zapatones/cubrebotas y bolsa) con **costura termosellada real**.
+- **Colores:** 6 (blanco, verde, rojo, morado, fucsia, amarillo).
+- **Tallas:** S a 2XL.
+- **Precio:** **$59.900 SIN envío** (el cliente paga el envío según ciudad).
+- **Pago:** contraentrega (paga al recibir).
+- **Costo producto:** ~$34.000 · Empaque/etiqueta: ~$1.500.
+- **Margen bruto:** ~$25.900 · Ganancia por venta con CPA $9.000: ~$15.400.
+- **Meta de CPA:** $8.000–$10.000. **Punto de equilibrio: CPA $24.400** (arriba de eso, pierde).
+- **Riesgo #1:** rechazo de contraentrega (20–35% en Colombia). **Solución:** confirmar
+  SIEMPRE el pedido por WhatsApp ("SÍ CONFIRMO") antes de despachar → baja rechazo a <10%.
+- **Ventaja competitiva:** competencia vende a $56.999–$69.900 sin termosellado real y
+  cobrando zapatones aparte; BikerPro entra con 4 piezas + termosellado + 6 colores igual precio.
+
+---
+
+## 3. Estado actual (qué ya está hecho)
+
+- [x] Página de Facebook creada (BikerPro · Accesorios).
+- [x] Instagram profesional @bikerproco con logo + 5 publicaciones iniciales.
+- [x] Portadas de destacados diseñadas (5): Productos, Calidad, Comprar, Opiniones, Preguntas
+      (archivos en `/assets/marca/`).
+- [x] **Campaña Meta CORRIENDO** (lanzada 2026-07-11).
+
+### Configuración de la campaña activa
+- **Objetivo:** Interacción → Mensajes / Conversaciones de WhatsApp.
+- **Campaña:** "Impermeables · Prospección Motociclistas".
+- **Estructura:** presupuesto a nivel de **conjunto (ABO)**, NO campaña.
+- **Conjuntos:**
+  1. **Motociclistas** — intereses: Motocicletas, Yamaha, Bajaj, AKT, Suzuki, Honda motos,
+     Cascos, Accesorios. Ciudades: Bogotá, Medellín, Cali, Barranquilla, Bucaramanga,
+     Cúcuta, Pereira. Edad 20–55, todos.
+  2. **Domiciliarios** — Rappi, DiDi, iFood, mensajería, domicilios, conductor de reparto.
+- **Presupuesto:** $18.000/día por conjunto (~$36.000/día total).
+- **Puja:** Volumen más alto (sin límite de costo — correcto para aprendizaje).
+- **Plantilla de chat:** mensaje de bienvenida + preguntas frecuentes (NO formulario de correo).
+- **Ubicaciones:** Advantage+.
+- **Prueba A/B:** desactivada.
+
+---
+
+## 4. Plan de trabajo por ciclos (4 días)
+
+**Regla de oro:** los días 1–4 NO se toca nada. Meta está en fase de aprendizaje.
+
+### Ciclo actual — Días 1 a 4 (validación)
+- Dejar correr sin cambios.
+- Responder WhatsApp en < 5 min. Confirmar cada pedido antes de despachar.
+- Recoger métricas diarias (ver tabla sección 6).
+
+### Al terminar cada ciclo, revisar y decidir:
+- **CPA en meta ($8k–$10k):** subir presupuesto +20% cada 2–3 días.
+- **CPA rentable pero alto (>$15k):** optimizar creativos/audiencia.
+- **Creativo con CPA > 2x meta:** apagarlo.
+- **Renovar creativos** cada 10–14 días.
+- **Fase 2 (con ventas estables):** activar conjunto femenino, retargeting
+  (vieron +25% video o escribieron sin comprar), lookalikes 1–3% (con +100 compradores),
+  y considerar landing + píxel para escalar.
+
+---
+
+## 5. Pendientes / próximos pasos
+
+- [ ] Subir las 5 portadas de destacados a Instagram.
+- [ ] Poner bio + nombre + link de WhatsApp en Instagram (textos en sección 7).
+- [ ] Publicar 6–9 posts para que el perfil no se vea vacío.
+- [ ] **IA de ventas por WhatsApp** — decisión pendiente:
+  - **Camino A (no-code):** ManyChat / Wati / Leadsales / 360dialog. Rápido, ~$20–60/mes.
+  - **Camino B (a medida, lo construye Kiro):** WhatsApp Cloud API + LLM (Claude/GPT/Gemini)
+    con prompt entrenado en BikerPro, captura de pedido, confirmación anti-rechazo y
+    handoff a humano. Requiere Cloud API + servidor.
+  - Requisito clave: el número 313 861 5813 debe pasar a la Cloud API para IA real.
+
+---
+
+## 6. Bitácora de métricas (llenar cada ciclo)
+
+| Fecha | Día | Gasto | Conversaciones | Costo/conv | Ventas | CPA | Rechazos | Notas |
+|-------|-----|-------|----------------|-----------|--------|-----|----------|-------|
+| 2026-07-11 | 1 | | | | | | | Campaña lanzada |
+
+**KPIs de referencia:**
+| Métrica | Bueno | Alerta |
+|---------|-------|--------|
+| CTR | > 1.5% | < 0.8% |
+| Costo por conversación | $1.500–$4.000 | > $6.000 |
+| Tasa de cierre | > 30% | < 15% |
+| CPA | $8.000–$10.000 | > $24.000 |
+| Rechazo contraentrega | < 10% | > 25% |
+
+---
+
+## 7. Textos de marca listos (Instagram)
+
+**Nombre (campo buscable):** `BikerPro | Impermeables de Moto`
+
+**Bio:**
+```
+🏍️ Impermeables de moto 4 piezas + termosellado
+💧 6 colores | Calidad real
+📦 Pago contraentrega en toda Colombia 🇨🇴
+👇 Pídelo por WhatsApp
+```
+
+**Destacados:** 🏍️ Productos · 💧 Calidad · 📦 Comprar · ⭐ Opiniones · ❓ Preguntas
+
+---
+
+## 8. La app (este repo)
+
+- Es un dashboard de una sola página: `index.html` (vanilla HTML/CSS/JS, sin dependencias).
+- Publicado en GitHub Pages: https://mtavera99.github.io/impermeables/
+- Secciones: Resumen, Calculadora, Estructura, Audiencias, Copies, Creativos,
+  Revisión, Video, WhatsApp, Escalamiento, Checklist.
+- Para que un cambio salga en vivo, debe llegar a la rama que sirve GitHub Pages (main).
