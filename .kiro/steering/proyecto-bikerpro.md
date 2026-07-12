@@ -110,7 +110,7 @@
 
 | Fecha | Día | Gasto | Conversaciones | Costo/conv | Ventas | CPA | Rechazos | Notas |
 |-------|-----|-------|----------------|-----------|--------|-----|----------|-------|
-| 2026-07-11 | 1 | | | | | | | Campaña lanzada |
+| 2026-07-11 | 1 | (parcial) | 35 | muy bajo (bueno) | 0 | — | — | Buen volumen de conversaciones (anuncios funcionan). 0 ventas por pedir "anticipo no reembolsable" que espantó a los clientes. Corregido: usar cierre 100% contraentrega. 22 solo primer mensaje; 13 preguntaron detalles (reactivar). |
 
 **KPIs de referencia:**
 | Métrica | Bueno | Alerta |
@@ -139,10 +139,43 @@
 
 ---
 
-## 8. La app (este repo)
+## 8. Protocolo de cierre y logística (aprendizajes clave)
+
+### Cierre por WhatsApp
+- **NUNCA pedir "anticipo no reembolsable".** Contradice el "pago contraentrega",
+  huele a estafa y mata la venta (confirmado el día 1: 0 ventas por esto).
+- **Modelo A — 100% contraentrega (usar AHORA):** el cliente no paga nada por
+  adelantado. Máxima conversión. Ideal para conseguir primeras ventas y reseñas.
+- **Modelo B — flete anticipado (más adelante, con reseñas):** el cliente prepaga
+  SOLO el envío (transferencia a 313 861 5813); el producto lo paga al recibir.
+  Reduce rechazos. Debe avisarse desde el PRIMER mensaje, con redacción honesta
+  ("pagas el envío", nunca "anticipo no reembolsable").
+- Responder en < 5 min. Siempre cerrar con pregunta que avanza la venta.
+- Exigir "SÍ CONFIRMO" antes de despachar (baja rechazo de ~30% a <10%).
+- Los guiones completos de ambos modelos + objeciones + seguimiento + recordatorio
+  de entrega están en la sección "Cierre por WhatsApp" de la app.
+
+### Logística / transportadoras (recomendación)
+- **Principal: Interrapidísimo** — mejor cobertura en pueblos/municipios, fletes
+  baratos (clave con ticket bajo $59.900), pensado para vendedores COD.
+- **Agregador: Mi Paquete** — conecta varias transportadoras (Servientrega,
+  Coordinadora, Envía, TCC, Deprisa), genera guías manuales (ideal venta por WhatsApp),
+  maneja recaudo en un panel.
+- **Coordinadora**: confiable/premium, para ciudades grandes y cuando escale.
+- **Dropi**: plataforma completa de dropshipping COD; más de lo necesario ahora
+  (producto propio).
+- **Si rechazan:** el producto se devuelve (no se pierde), pero el vendedor paga el
+  flete de retorno. Confirmar bien y filtrar pedidos falsos para minimizarlo.
+- Al registrarse, confirmar: comisión de recaudo, frecuencia de pago del recaudo,
+  costo de flete de devolución y cobertura de la ciudad.
+
+## 9. La app (este repo)
 
 - Es un dashboard de una sola página: `index.html` (vanilla HTML/CSS/JS, sin dependencias).
 - Publicado en GitHub Pages: https://mtavera99.github.io/impermeables/
 - Secciones: Resumen, Calculadora, Estructura, Audiencias, Copies, Creativos,
-  Revisión, Video, WhatsApp, Escalamiento, Checklist.
+  Revisión, Video, WhatsApp (con guiones Modelo A y B), **Costos de envío**
+  (calculadora de flete por ciudad, editable), Escalamiento, Checklist.
+- La calculadora de envíos usa una tabla de fletes estimados por ciudad, editable
+  por el usuario y guardada en localStorage (clave `bp_fletes`).
 - Para que un cambio salga en vivo, debe llegar a la rama que sirve GitHub Pages (main).
