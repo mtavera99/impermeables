@@ -3,9 +3,9 @@ const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
 const GRAPH = "https://graph.facebook.com/v21.0";
 
-async function sendText(to, body) {
+async function sendPayload(payload) {
   if (!TOKEN || !PHONE_ID) {
-    console.log(`[SIN CREDENCIALES] Responderia a ${to}: ${body}`);
+    console.log(`[SIN CREDENCIALES] Payload:`, JSON.stringify(payload));
     return;
   }
   try {
@@ -15,13 +15,7 @@ async function sendText(to, body) {
         Authorization: `Bearer ${TOKEN}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        messaging_product: "whatsapp",
-        recipient_type: "individual",
-        to,
-        type: "text",
-        text: { preview_url: false, body }
-      })
+      body: JSON.stringify({ messaging_product: "whatsapp", recipient_type: "individual", ...payload })
     });
     if (!res.ok) {
       const err = await res.text();
@@ -32,4 +26,16 @@ async function sendText(to, body) {
   }
 }
 
-module.exports = { sendText };
+async function sendText(to, body) {
+  return sendPayload({ to, type: "text", text: { preview_url: false, body } });
+}
+
+async function sendImage(to, link, caption) {
+  return sendPayload({ to, type: "image", image: { link, caption } });
+}
+
+async function sendVideo(to, link, caption) {
+  return sendPayload({ to, type: "video", video: { link, caption } });
+}
+
+module.exports = { sendText, sendImage, sendVideo };
