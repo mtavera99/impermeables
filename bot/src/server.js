@@ -9,10 +9,37 @@ app.use(express.json());
 
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || "bikerpro_verify_123";
 const OWNER = process.env.OWNER_WHATSAPP;
+const WABA_ID = process.env.WHATSAPP_WABA_ID || "2213159576112051";
+const WA_TOKEN = process.env.WHATSAPP_TOKEN;
+
+// Suscribe la cuenta de WhatsApp (WABA) a esta app para que Meta entregue
+// los mensajes entrantes al webhook. Es idempotente: repetirlo no causa daño.
+async function subscribeWaba() {
+  if (!WA_TOKEN || !WABA_ID) {
+    console.log("subscribeWaba: falta WHATSAPP_TOKEN o WHATSAPP_WABA_ID");
+    return;
+  }
+  try {
+    const res = await fetch(`https://graph.facebook.com/v21.0/${WABA_ID}/subscribed_apps`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${WA_TOKEN}` }
+    });
+    const body = await res.text();
+    console.log(`subscribeWaba (${res.status}): ${body}`);
+  } catch (e) {
+    console.error("subscribeWaba error:", e.message);
+  }
+}
 
 // Salud
 app.get("/", (_req, res) => res.send("BikerPro bot activo 🏍️"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
+
+// Suscripción manual de la WABA (visita esta URL una vez para forzarla)
+app.get("/setup-waba", async (_req, res) => {
+  await subscribeWaba();
+  res.send("Suscripción de WABA ejecutada. Revisa los logs de Render para ver el resultado.");
+});
 
 // Verificación del webhook (Meta)
 app.get("/webhook", (req, res) => {
@@ -73,4 +100,7 @@ async function handleWebhook(body) {
 }
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`BikerPro bot escuchando en puerto ${PORT} 🏍️`));
+app.listen(PORT, () => {
+  console.log(`BikerPro bot escuchando en puerto ${PORT} 🏍️`);
+  subscribeWaba(); // auto-suscribe la WABA al arrancar
+});
