@@ -97,12 +97,8 @@
 - [ ] Subir las 5 portadas de destacados a Instagram.
 - [ ] Poner bio + nombre + link de WhatsApp en Instagram (textos en sección 7).
 - [ ] Publicar 6–9 posts para que el perfil no se vea vacío.
-- [ ] **IA de ventas por WhatsApp** — decisión pendiente:
-  - **Camino A (no-code):** ManyChat / Wati / Leadsales / 360dialog. Rápido, ~$20–60/mes.
-  - **Camino B (a medida, lo construye Kiro):** WhatsApp Cloud API + LLM (Claude/GPT/Gemini)
-    con prompt entrenado en BikerPro, captura de pedido, confirmación anti-rechazo y
-    handoff a humano. Requiere Cloud API + servidor.
-  - Requisito clave: el número 313 861 5813 debe pasar a la Cloud API para IA real.
+- [x] **IA de ventas por WhatsApp** — DECIDIDO: Camino B (bot a medida). Código construido
+  en `/bot` (ver sección 10). Falta que el usuario configure Cloud API + hosting + claves.
 
 ---
 
@@ -179,3 +175,27 @@
 - La calculadora de envíos usa una tabla de fletes estimados por ciudad, editable
   por el usuario y guardada en localStorage (clave `bp_fletes`).
 - Para que un cambio salga en vivo, debe llegar a la rama que sirve GitHub Pages (main).
+
+## 10. Bot de IA para WhatsApp (`/bot`)
+
+- **Qué es:** agente de ventas con IA que responde WhatsApp automáticamente.
+- **Stack:** Node.js + Express (webhook) + WhatsApp Cloud API + Google Gemini (`gemini-2.5-flash`).
+- **Archivos clave:**
+  - `src/prompt.js` — el "cerebro": precios, reglas, tono, objeciones (Modelo A, NUNCA pide adelantos).
+  - `src/fletes.js` — tabla de fletes por ciudad (para cotizar envío).
+  - `src/agent.js` — llama a Gemini, detecta pedido confirmado (`##ORDER##`) y handoff (`##HANDOFF##`).
+  - `src/whatsapp.js` — envía mensajes por Cloud API.
+  - `src/store.js` — guarda conversaciones y pedidos en JSON (`data/`).
+  - `src/server.js` — webhook (verificación + recepción).
+  - `src/simulate.js` — probar el bot por consola sin WhatsApp (`npm run chat`).
+  - `README.md` — guía de instalación paso a paso (no técnica).
+- **Funciones:** responde 24/7, cotiza envío, captura pedido (color/talla/ciudad/dirección/
+  nombre/celular), avisa cada pedido al dueño (`OWNER_WHATSAPP`), pasa a humano cuando hace falta.
+- **Pendiente del usuario para activarlo:**
+  1. Clave Gemini (aistudio.google.com/apikey).
+  2. App de WhatsApp en Meta + número de PRUEBA (probar sin riesgo antes del número real).
+  3. Desplegar en Render/Railway y configurar el webhook.
+- **Probado:** arranca, verifica webhook, recibe/responde mensajes y persiste datos (sin
+  credenciales usa un mensaje de respaldo). Falta prueba end-to-end con claves reales.
+- **Recordatorio:** el número 313 861 5813 debe migrarse a Cloud API para IA en el número real
+  (sale de la app WhatsApp Business; el manejo manual pasa a una bandeja/inbox).

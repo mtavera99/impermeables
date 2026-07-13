@@ -1,0 +1,18 @@
+{
+  "name": "bikerpro-bot",
+  "version": "1.0.0",
+  "description": "Agente de ventas con IA para WhatsApp - BikerPro (impermeables de moto, contraentrega)",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "chat": "node src/simulate.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
