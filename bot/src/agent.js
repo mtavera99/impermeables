@@ -43,6 +43,16 @@ function extractOrder(text) {
   return { order, clean };
 }
 
+// Extrae marcadores [[MEDIA:clave]] y los separa del mensaje visible
+function extractMedia(text) {
+  const keys = [];
+  const re = /\[\[MEDIA:(\w+)\]\]/g;
+  let m;
+  while ((m = re.exec(text)) !== null) keys.push(m[1]);
+  const clean = text.replace(/\[\[MEDIA:\w+\]\]/g, "").trim();
+  return { keys, clean };
+}
+
 // Genera la respuesta para un mensaje entrante
 async function generateReply(phone, userText) {
   store.pushMsg(phone, "user", userText);
@@ -66,15 +76,20 @@ async function generateReply(phone, userText) {
   const handoff = reply.includes("##HANDOFF##");
   reply = reply.replace(/##HANDOFF##/g, "").trim();
 
-  const { order, clean } = extractOrder(reply);
-  reply = clean;
+  const orderRes = extractOrder(reply);
+  reply = orderRes.clean;
+  const order = orderRes.order;
+
+  const mediaRes = extractMedia(reply);
+  reply = mediaRes.clean;
+  const media = mediaRes.keys;
 
   let savedOrder = null;
   if (order) savedOrder = store.saveOrder({ ...order, telefono_chat: phone });
   if (handoff) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
-  return { reply, order: savedOrder, handoff };
+  return { reply, order: savedOrder, handoff, media };
 }
 
 module.exports = { generateReply };

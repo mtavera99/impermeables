@@ -195,7 +195,22 @@
   1. Clave Gemini (aistudio.google.com/apikey).
   2. App de WhatsApp en Meta + número de PRUEBA (probar sin riesgo antes del número real).
   3. Desplegar en Render/Railway y configurar el webhook.
-- **Probado:** arranca, verifica webhook, recibe/responde mensajes y persiste datos (sin
-  credenciales usa un mensaje de respaldo). Falta prueba end-to-end con claves reales.
-- **Recordatorio:** el número 313 861 5813 debe migrarse a Cloud API para IA en el número real
-  (sale de la app WhatsApp Business; el manejo manual pasa a una bandeja/inbox).
+- **Estado:** ✅ FUNCIONANDO end-to-end con el NÚMERO DE PRUEBA de Meta (2026-07-13).
+  El bot recibe, responde con IA (gemini-3.5-flash) y notifica pedidos.
+- **Desplegado en Render:** servicio `impermeables` → `https://impermeables.onrender.com`
+  (plan gratis: se duerme tras 15 min de inactividad → conviene keep-alive o plan pago).
+- **Datos de Meta (app "BikerPro Bot"):** App ID `1338086151301765` ·
+  WABA ID `2213159576112051` · número de prueba Phone Number ID `1257126177474870`.
+- **Aprendizajes clave de la instalación:**
+  1. Modelo `gemini-2.5-flash` quedó descontinuado → usar `gemini-3.5-flash`.
+  2. Los mensajes reales no llegaban hasta suscribir la WABA a la app
+     (`POST /{WABA_ID}/subscribed_apps`) — el bot lo hace solo al arrancar (`subscribeWaba`).
+  3. El token temporal de Meta dura 24h y da errores 401/#131005 al vencerse →
+     PARA PRODUCCIÓN hay que generar un TOKEN PERMANENTE (System User).
+- **PENDIENTE — pasar al número real (313 861 5813):**
+  1. Generar TOKEN PERMANENTE (System User) con permisos whatsapp_business_messaging +
+     whatsapp_business_management.
+  2. Verificación del negocio en Meta (para volumen sin límites).
+  3. Registrar el número real en la Cloud API (SALE de la app WhatsApp Business).
+  4. Actualizar en Render: `WHATSAPP_TOKEN` (permanente), `WHATSAPP_PHONE_NUMBER_ID` (del real).
+  5. Para chatear manualmente se usa una bandeja/inbox (Meta WhatsApp Manager o herramienta).

@@ -1,7 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const { generateReply } = require("./agent");
-const { sendText } = require("./whatsapp");
+const { sendText, sendImage, sendVideo } = require("./whatsapp");
+const { MEDIA } = require("./media");
 const store = require("./store");
 
 const app = express();
@@ -77,8 +78,19 @@ async function handleWebhook(body) {
         }
 
         console.log(`Cliente ${from}: ${text}`);
-        const { reply, order, handoff } = await generateReply(from, text);
-        await sendText(from, reply);
+        const { reply, order, handoff, media } = await generateReply(from, text);
+        if (reply) await sendText(from, reply);
+
+        // Enviar fotos/videos si el bot los solicitó
+        for (const key of media || []) {
+          const item = MEDIA[key];
+          if (!item || !item.url) {
+            console.log(`Media '${key}' sin URL configurada (agrega MEDIA_${key.toUpperCase()} en Render)`);
+            continue;
+          }
+          if (item.type === "video") await sendVideo(from, item.url, item.caption);
+          else await sendImage(from, item.url, item.caption);
+        }
 
         if (order && OWNER) {
           await sendText(
