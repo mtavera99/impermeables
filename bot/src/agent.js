@@ -58,13 +58,17 @@ function extractMedia(text) {
 function detectMediaIntent(text) {
   const t = (text || "").toLowerCase();
   const has = (arr) => arr.some((w) => t.includes(w));
-  const quiereVer = has(["foto", "fotos", "imagen", "imagen", "imagenes", "imágenes",
+  const quiereVer = has(["foto", "fotos", "imagen", "imagenes", "imágenes",
     "muestr", "muéstr", "enséñ", "enseñ", "ensename", "mira", "manda", "envia", "envía", " ver "]);
+  const colorNames = ["rojo", "roja", "verde", "negro", "negra", "blanco", "blanca", "morado", "morada", "amarillo", "azul", "gris"];
+  const mencionaColor = has(colorNames);
   const keys = [];
-  if (t.includes("color")) keys.push("colores");
+  // Menciona "color" o el nombre de un color + quiere ver → muestra el cuadro de colores
+  if (t.includes("color") || (quiereVer && mencionaColor)) keys.push("colores");
   if (has(["puesto", "puesta", "modelo", "se ve", "persona"])) keys.push("modelo");
   if (t.includes("video")) keys.push("video");
-  if (quiereVer && has(["producto", "conjunto", "impermeable", "piezas", "traje", "articulo", "artículo"])) keys.push("producto");
+  // Foto del producto: solo si NO pidió un color específico (para no mandar el negro si pide otro color)
+  if (quiereVer && !mencionaColor && has(["producto", "conjunto", "impermeable", "piezas", "traje", "articulo", "artículo"])) keys.push("producto");
   if (quiereVer && keys.length === 0) keys.push("producto");
   return keys;
 }
