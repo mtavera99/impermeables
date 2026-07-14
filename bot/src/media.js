@@ -8,8 +8,8 @@ const MEDIA = {
   // bot los lista en texto. Cuando haya una foto correcta, pon MEDIA_COLORES o colores.jpg.
   colores: {
     type: "image",
-    url: process.env.MEDIA_COLORES || "",
-    caption: "🌈 La franja reflectiva la eliges en: blanco, negro, rojo, verde o morado. ¿Cuál te gusta?"
+    url: process.env.MEDIA_COLORES || `${BASE}/colores.png`,
+    caption: "🌈 El impermeable es negro y eliges el color de la franja reflectiva: blanco, negro, rojo, verde o morado. ¿Cuál te gusta?"
   },
   // Foto del conjunto completo (las 4 piezas). ✅ Activa.
   producto: {
