@@ -20,7 +20,7 @@ const MEDIA = {
   // Fotos individuales por color de franja (recortadas de la cuadrícula).
   rojo: {
     type: "image",
-    url: process.env.MEDIA_ROJO || `${BASE}/rojo.png`,
+    url: process.env.MEDIA_ROJO || `${BASE}/rojo.jpg`,
     caption: "🔴 Impermeable con franja ROJA (el conjunto es negro). ¿Te gusta este?"
   },
   verde: {
