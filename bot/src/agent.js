@@ -53,6 +53,22 @@ function extractMedia(text) {
   return { keys, clean };
 }
 
+// Respaldo: detecta por palabras clave del mensaje del cliente qué foto/video enviar,
+// por si la IA no puso el marcador. Así el envío de multimedia es confiable.
+function detectMediaIntent(text) {
+  const t = (text || "").toLowerCase();
+  const has = (arr) => arr.some((w) => t.includes(w));
+  const quiereVer = has(["foto", "fotos", "imagen", "imagen", "imagenes", "imágenes",
+    "muestr", "muéstr", "enséñ", "enseñ", "ensename", "mira", "manda", "envia", "envía", " ver "]);
+  const keys = [];
+  if (t.includes("color")) keys.push("colores");
+  if (has(["puesto", "puesta", "modelo", "se ve", "persona"])) keys.push("modelo");
+  if (t.includes("video")) keys.push("video");
+  if (quiereVer && has(["producto", "conjunto", "impermeable", "piezas", "traje", "articulo", "artículo"])) keys.push("producto");
+  if (quiereVer && keys.length === 0) keys.push("producto");
+  return keys;
+}
+
 // Genera la respuesta para un mensaje entrante
 async function generateReply(phone, userText) {
   store.pushMsg(phone, "user", userText);
@@ -82,7 +98,8 @@ async function generateReply(phone, userText) {
 
   const mediaRes = extractMedia(reply);
   reply = mediaRes.clean;
-  const media = mediaRes.keys;
+  // Combina lo que pidió la IA (marcadores) con la detección por palabras clave del cliente
+  const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
 
   let savedOrder = null;
   if (order) savedOrder = store.saveOrder({ ...order, telefono_chat: phone });
