@@ -7,7 +7,7 @@ const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 
 // Llama a la API de Gemini con el prompt de sistema + historial
-async function callGemini(systemPrompt, messages) {
+async function callGemini(systemPrompt, messages, retries = 2) {
   const contents = messages.map((m) => ({
     role: m.role === "assistant" ? "model" : "user",
     parts: [{ text: m.content }]
@@ -20,26 +20,41 @@ async function callGemini(systemPrompt, messages) {
     body: JSON.stringify({
       system_instruction: { parts: [{ text: systemPrompt }] },
       contents,
-      generationConfig: { temperature: 0.6, maxOutputTokens: 500 }
+      generationConfig: { temperature: 0.6, maxOutputTokens: 800 }
     })
   });
 
   if (!res.ok) {
     const err = await res.text();
+    // Reintenta ante límite de tasa (429) o saturación temporal (500/503)
+    if ((res.status === 429 || res.status === 500 || res.status === 503) && retries > 0) {
+      console.log(`Gemini ${res.status}, reintentando en 2.5s (quedan ${retries})...`);
+      await new Promise((r) => setTimeout(r, 2500));
+      return callGemini(systemPrompt, messages, retries - 1);
+    }
     throw new Error(`Gemini ${res.status}: ${err}`);
   }
   const data = await res.json();
   const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "";
+  // Si la respuesta viene vacía (a veces pasa), reintenta
+  if (!text.trim() && retries > 0) {
+    await new Promise((r) => setTimeout(r, 1500));
+    return callGemini(systemPrompt, messages, retries - 1);
+  }
   return text.trim();
 }
 
 // Extrae el bloque ##ORDER## {...} y lo separa del mensaje visible
 function extractOrder(text) {
   const m = text.match(/##ORDER##\s*(\{[\s\S]*?\})/);
-  if (!m) return { order: null, clean: text };
   let order = null;
-  try { order = JSON.parse(m[1]); } catch { order = null; }
-  const clean = text.replace(/##ORDER##\s*\{[\s\S]*?\}/, "").trim();
+  let clean = text;
+  if (m) {
+    try { order = JSON.parse(m[1]); } catch { order = null; }
+    clean = text.replace(/##ORDER##\s*\{[\s\S]*?\}/, "").trim();
+  }
+  // Elimina cualquier resto de ##ORDER## aunque esté truncado/malformado (para que no llegue al cliente)
+  clean = clean.replace(/##ORDER##[\s\S]*$/, "").trim();
   return { order, clean };
 }
 
@@ -99,8 +114,9 @@ async function generateReply(phone, userText) {
       reply = await callGemini(buildSystemPrompt(), conv.messages);
     } catch (e) {
       console.error("Error IA:", e.message);
+      // Respaldo que NO reinicia la conversación (evita el saludo genérico a mitad de charla)
       reply =
-        "¡Hola! 🏍️ Gracias por escribir a BikerPro. Cuéntame color y talla y con gusto te ayudo a pedir tu impermeable 😊 (pago contraentrega 📦)";
+        "Perdón, se me cruzó la señal un momento 🙏 ¿Me repites lo último, por favor? Con gusto sigo con tu pedido 🏍️";
     }
   }
 
