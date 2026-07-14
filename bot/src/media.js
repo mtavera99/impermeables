@@ -17,6 +17,22 @@ const MEDIA = {
     url: process.env.MEDIA_PRODUCTO || `${BASE}/producto.png`,
     caption: "🏍️ Tu conjunto impermeable de 4 piezas: chaqueta, pantalón, zapatones y bolsa. PVC siliconado calibre 8, termosellado. El impermeable es negro y la franja reflectiva la eliges en color."
   },
+  // Fotos individuales por color de franja (recortadas de la cuadrícula).
+  rojo: {
+    type: "image",
+    url: process.env.MEDIA_ROJO || `${BASE}/rojo.png`,
+    caption: "🔴 Impermeable con franja ROJA (el conjunto es negro). ¿Te gusta este?"
+  },
+  verde: {
+    type: "image",
+    url: process.env.MEDIA_VERDE || `${BASE}/verde.png`,
+    caption: "🟢 Impermeable con franja VERDE. ¿Te gusta este?"
+  },
+  negro: {
+    type: "image",
+    url: process.env.MEDIA_NEGRO || `${BASE}/negro.png`,
+    caption: "⚫ Impermeable todo NEGRO. ¿Te gusta este?"
+  },
   // Foto del conjunto puesto (modelo). Se envía si piden ver el producto puesto.
   modelo: {
     type: "image",
