@@ -60,14 +60,25 @@ function detectMediaIntent(text) {
   const has = (arr) => arr.some((w) => t.includes(w));
   const quiereVer = has(["foto", "fotos", "imagen", "imagenes", "imágenes",
     "muestr", "muéstr", "enséñ", "enseñ", "ensename", "mira", "manda", "envia", "envía", " ver "]);
-  const colorNames = ["rojo", "roja", "verde", "negro", "negra", "blanco", "blanca", "morado", "morada", "amarillo", "azul", "gris"];
-  const mencionaColor = has(colorNames);
   const keys = [];
-  // Menciona "color" o el nombre de un color + quiere ver → muestra el cuadro de colores
-  if (t.includes("color") || (quiereVer && mencionaColor)) keys.push("colores");
+  // Colores con foto individual disponible
+  const conFoto = [];
+  if (has(["rojo", "roja"])) conFoto.push("rojo");
+  if (has(["verde"])) conFoto.push("verde");
+  if (has(["negro", "negra"])) conFoto.push("negro");
+  // Colores sin foto individual (se muestran en el cuadro de colores)
+  const pideColorSinFoto = has(["blanco", "blanca", "morado", "morada", "amarillo", "azul", "gris"]);
+  const pideColorGenerico = t.includes("color");
+  const mencionaColor = conFoto.length > 0 || pideColorSinFoto || pideColorGenerico;
+
+  if (quiereVer && conFoto.length > 0) {
+    conFoto.forEach((k) => keys.push(k));        // foto específica del color pedido
+  } else if (pideColorGenerico || (quiereVer && pideColorSinFoto)) {
+    keys.push("colores");                         // cuadro con todos los colores
+  }
   if (has(["puesto", "puesta", "modelo", "se ve", "persona"])) keys.push("modelo");
   if (t.includes("video")) keys.push("video");
-  // Foto del producto: solo si NO pidió un color específico (para no mandar el negro si pide otro color)
+  // Foto del producto: solo si NO pidió un color específico
   if (quiereVer && !mencionaColor && has(["producto", "conjunto", "impermeable", "piezas", "traje", "articulo", "artículo"])) keys.push("producto");
   if (quiereVer && keys.length === 0) keys.push("producto");
   return keys;
