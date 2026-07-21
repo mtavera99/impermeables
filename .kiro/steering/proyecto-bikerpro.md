@@ -1,216 +1,193 @@
-# Proyecto BikerPro — Plan Maestro y Contexto
+# Proyecto BikerPro — Plan Maestro y Contexto (RESPALDO COMPLETO)
 
-> **IMPORTANTE (para cualquier sesión de Kiro):** Este archivo es la memoria del proyecto.
-> Léelo completo antes de trabajar. Si un chat se daña, aquí está todo para continuar.
-> Mantenlo actualizado: cada vez que haya avances o nuevas métricas, edítalo.
+> **IMPORTANTE (para cualquier sesión de Kiro):** Este archivo es la MEMORIA COMPLETA del proyecto.
+> Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
+> Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-07-11
+Última actualización: 2026-07-13 (noche)
+
+---
+
+## 0. ⭐ DÓNDE QUEDAMOS HOY (lo más importante)
+
+**Resumen en una línea:** El bot de ventas con IA está CONSTRUIDO y FUNCIONANDO en el número
+de PRUEBA de Meta. Estamos en proceso de (a) estabilizarlo y (b) pasarlo al número real.
+
+**Estado por frente:**
+1. 🤖 **Bot de WhatsApp:** construido, desplegado en Render, responde con IA, envía fotos
+   (producto/colores/modelo/rojo/verde/negro), maneja 2 formas de pago y captura pedidos.
+2. 🔴 **BLOQUEO #1 — Facturación de Gemini:** el bot falla de forma intermitente (manda un
+   respaldo genérico) porque las llamadas a Gemini topan el límite del plan GRATIS (20/día).
+   El usuario "metió saldo" a Gemini, PERO el bot sigue fallando → hay que CONFIRMAR que la
+   facturación quedó activa en el MISMO proyecto de la API key. Revisar logs de Render: si sale
+   error `quota`/`FreeTier`, el saldo no está en el proyecto correcto.
+3. 🟡 **Migración al número real (313 861 5813):** EN PAUSA / con trabas:
+   - Verificación del negocio: ENVIADA, estado "Pending review" (WABA "BikerProCo").
+   - Al registrar el número en Cloud API, el SMS de verificación se bloqueó
+     ("requested code too many times"). Esperó 1h+ y seguía bloqueado.
+   - DECISIÓN DEL USUARIO: reactivar el número en la **app WhatsApp Business** para atender
+     clientes MANUALMENTE mientras tanto (no perder ventas). El bot sigue en el número de prueba.
+4. 🟢 **Anuncios Meta:** corriendo (ver sección 3).
+
+**Próximo paso lógico:** arreglar la facturación de Gemini (que el bot deje de fallar) →
+probar venta completa en número de prueba → cuando el negocio esté verificado + pase el bloqueo
+del SMS, migrar el número real con calma.
 
 ---
 
 ## 1. La marca
 
-- **Nombre:** BikerPro
-- **Instagram:** @bikerproco
-- **Facebook:** Página "BikerPro" (categoría: Accesorios)
-- **WhatsApp de ventas:** 313 861 5813 (Colombia, +57 313 861 5813)
-  - Link directo: `https://wa.me/573138615813?text=Hola%20BikerPro%20quiero%20info%20de%20los%20impermeables`
+- **Nombre:** BikerPro · **Instagram:** @bikerproco · **Facebook:** Página "BikerPro" (Accesorios)
+- **WhatsApp de ventas (número real):** 313 861 5813 (+57 313 861 5813)
+  - Link: `https://wa.me/573138615813?text=Hola%20BikerPro%20quiero%20info%20de%20los%20impermeables`
 - **Ciudad base:** Bogotá
-- **Visión:** empezar con impermeables de moto y crecer a tienda de accesorios
-  (guantes, cascos, etc.). Por eso el nombre "BikerPro" (paraguas, escalable).
-- **Colores de marca:**
-  - Azul profundo `#0B3D91`
-  - Azul oscuro `#061A3F`
-  - Negro carbón `#1A1A1A`
-  - Amarillo `#FFC300`
-  - Blanco `#FFFFFF`
-- **Logo actual:** águila dorada + "BikerPro" (el usuario lo generó con Nano Banana).
-  Versiones de respaldo (casco) en `/assets/marca/`.
+- **Visión:** empezar con impermeables y crecer a tienda de accesorios de moto (por eso "BikerPro").
+- **Colores de marca:** Azul `#0B3D91` · Azul oscuro `#061A3F` · Negro `#1A1A1A` · Amarillo `#FFC300` · Blanco `#FFFFFF`
+- **Logo:** águila dorada + "BikerPro" (generado con Nano Banana). Respaldos (casco) en `/assets/marca/`.
 
 ---
 
-## 2. El producto y el modelo de negocio
+## 2. El producto (DATOS CORRECTOS Y ACTUALIZADOS)
 
-- **Producto:** conjunto impermeable para moto de **4 piezas** (chaqueta, pantalón,
-  zapatones/cubrebotas y bolsa) con **costura termosellada real**.
-- **Colores:** 6 (blanco, verde, rojo, morado, fucsia, amarillo).
-- **Tallas:** S a 2XL.
+- **Producto:** conjunto impermeable de moto de **4 PIEZAS**: chaqueta, pantalón, zapatones
+  (cubrebotas) y bolsa.
+- **Material:** **PVC siliconado calibre 8**, costura **TERMOSELLADA** (no se filtra agua).
+- **COLOR (modelo de franja):** el impermeable SIEMPRE es NEGRO; lo que va en color es la
+  **FRANJA REFLECTIVA**. Colores de franja disponibles: **blanco, negro, rojo, verde, morado**.
+  - ⚠️ El **amarillo está AGOTADO** (si lo piden, avisar y ofrecer otro).
+- **Capota:** sí. **Bolsillos:** NO (a propósito, para no filtrar agua). **Reflectivo:** sí (las
+  franjas de color). **Pantalón:** bota recta. **Tallas:** S, M, L, XL, 2XL.
 - **Precio:** **$59.900 SIN envío** (el cliente paga el envío según ciudad).
-- **Pago:** contraentrega (paga al recibir).
-- **Costo producto:** ~$34.000 · Empaque/etiqueta: ~$1.500.
-- **Margen bruto:** ~$25.900 · Ganancia por venta con CPA $9.000: ~$15.400.
-- **Meta de CPA:** $8.000–$10.000. **Punto de equilibrio: CPA $24.400** (arriba de eso, pierde).
-- **Riesgo #1:** rechazo de contraentrega (20–35% en Colombia). **Solución:** confirmar
-  SIEMPRE el pedido por WhatsApp ("SÍ CONFIRMO") antes de despachar → baja rechazo a <10%.
-- **Ventaja competitiva:** competencia vende a $56.999–$69.900 sin termosellado real y
-  cobrando zapatones aparte; BikerPro entra con 4 piezas + termosellado + 6 colores igual precio.
+- **Pago:** contraentrega O pago anticipado (ambos; ver sección 8).
+- Costo ~$34.000 · empaque ~$1.500 · margen bruto ~$25.900 · meta CPA $8.000–$10.000 · equilibrio CPA $24.400.
+
+> ⚠️ **INCONSISTENCIA PENDIENTE:** la app (`index.html`) y anuncios dicen "6 colores (fucsia,
+> amarillo)". Los reales son 5 (blanco, negro, rojo, verde, morado). Falta actualizar la app/anuncios.
 
 ---
 
-## 3. Estado actual (qué ya está hecho)
+## 3. Redes y campaña Meta
 
-- [x] Página de Facebook creada (BikerPro · Accesorios).
-- [x] Instagram profesional @bikerproco con logo + 5 publicaciones iniciales.
-- [x] Portadas de destacados diseñadas (5): Productos, Calidad, Comprar, Opiniones, Preguntas
-      (archivos en `/assets/marca/`).
-- [x] **Campaña Meta CORRIENDO** (lanzada 2026-07-11).
-
-### Configuración de la campaña activa
-- **Objetivo:** Interacción → Mensajes / Conversaciones de WhatsApp.
-- **Campaña:** "Impermeables · Prospección Motociclistas".
-- **Estructura:** presupuesto a nivel de **conjunto (ABO)**, NO campaña.
-- **Conjuntos:**
-  1. **Motociclistas** — intereses: Motocicletas, Yamaha, Bajaj, AKT, Suzuki, Honda motos,
-     Cascos, Accesorios. Ciudades: Bogotá, Medellín, Cali, Barranquilla, Bucaramanga,
-     Cúcuta, Pereira. Edad 20–55, todos.
-  2. **Domiciliarios** — Rappi, DiDi, iFood, mensajería, domicilios, conductor de reparto.
-- **Presupuesto:** $18.000/día por conjunto (~$36.000/día total).
-- **Puja:** Volumen más alto (sin límite de costo — correcto para aprendizaje).
-- **Plantilla de chat:** mensaje de bienvenida + preguntas frecuentes (NO formulario de correo).
-- **Ubicaciones:** Advantage+.
-- **Prueba A/B:** desactivada.
+- [x] Facebook creado · [x] Instagram @bikerproco con logo + posts + destacados diseñados.
+- [x] **Campaña Meta corriendo** (lanzada 2026-07-11): "Impermeables · Prospección Motociclistas".
+  - Objetivo: Mensajes/Conversaciones de WhatsApp. Presupuesto por conjunto (ABO), $18.000/día c/u.
+  - Conjuntos: **Motociclistas** (Yamaha, Bajaj, AKT, Suzuki, Honda, cascos; ciudades grandes; 20–55)
+    y **Domiciliarios** (Rappi, DiDi, iFood, mensajería). Puja: volumen más alto. Ubicaciones Advantage+.
+- **Día 1:** 35 conversaciones, 0 ventas — al inicio se pidió "anticipo no reembolsable" (error grave
+  que espantó clientes). Corregido: cierre 100% contraentrega.
 
 ---
 
-## 4. Plan de trabajo por ciclos (4 días)
+## 4. Cuentas, IDs y accesos (REFERENCIA TÉCNICA)
 
-**Regla de oro:** los días 1–4 NO se toca nada. Meta está en fase de aprendizaje.
-
-### Ciclo actual — Días 1 a 4 (validación)
-- Dejar correr sin cambios.
-- Responder WhatsApp en < 5 min. Confirmar cada pedido antes de despachar.
-- Recoger métricas diarias (ver tabla sección 6).
-
-### Al terminar cada ciclo, revisar y decidir:
-- **CPA en meta ($8k–$10k):** subir presupuesto +20% cada 2–3 días.
-- **CPA rentable pero alto (>$15k):** optimizar creativos/audiencia.
-- **Creativo con CPA > 2x meta:** apagarlo.
-- **Renovar creativos** cada 10–14 días.
-- **Fase 2 (con ventas estables):** activar conjunto femenino, retargeting
-  (vieron +25% video o escribieron sin comprar), lookalikes 1–3% (con +100 compradores),
-  y considerar landing + píxel para escalar.
-
----
-
-## 5. Pendientes / próximos pasos
-
-- [ ] Subir las 5 portadas de destacados a Instagram.
-- [ ] Poner bio + nombre + link de WhatsApp en Instagram (textos en sección 7).
-- [ ] Publicar 6–9 posts para que el perfil no se vea vacío.
-- [x] **IA de ventas por WhatsApp** — DECIDIDO: Camino B (bot a medida). Código construido
-  en `/bot` (ver sección 10). Falta que el usuario configure Cloud API + hosting + claves.
+- **Repo GitHub:** `mtavera99/impermeables` · GitHub Pages: https://mtavera99.github.io/impermeables/
+- **Meta Business ID:** `1271452296042859`
+- **App Meta "BikerPro Bot":** App ID `1338086151301765`
+- **WABA del bot (número de prueba):** ID `2213159576112051` · Phone Number ID (prueba) `1257126177474870`
+- **WABA "BikerProCo" (para número real):** ID `1523356755909234` (verificación Pending review)
+- **Render:** servicio `impermeables` (srv-d9alleurnols73d95bf0) → https://impermeables.onrender.com
+  - Env logs: https://dashboard.render.com/web/srv-d9alleurnols73d95bf0/env
+  - Plan GRATIS: se duerme tras 15 min de inactividad (retrasa 1ª respuesta ~50s). Conviene keep-alive/plan pago.
+- **Variables de entorno en Render (NO están en el repo, son privadas):**
+  `WHATSAPP_TOKEN` (permanente, System User), `WHATSAPP_PHONE_NUMBER_ID` (hoy = número de prueba),
+  `WHATSAPP_VERIFY_TOKEN` = `bikerpro_verify_123`, `WHATSAPP_WABA_ID` = `2213159576112051`,
+  `GEMINI_API_KEY`, `GEMINI_MODEL` = `gemini-3.5-flash`, `OWNER_WHATSAPP` = `573138615813`,
+  `PAGO_NEQUI` / `PAGO_BANCOLOMBIA` / `PAGO_DAVIPLATA` / `PAGO_BREB` (datos de pago).
+- **Gemini:** API key de Google AI Studio. ⚠️ Verificar que la facturación esté activa en el
+  proyecto de esa key (plan gratis = 20 req/día → el bot falla).
 
 ---
 
-## 6. Bitácora de métricas (llenar cada ciclo)
+## 5. El bot de IA (`/bot`) — DETALLE COMPLETO
 
-| Fecha | Día | Gasto | Conversaciones | Costo/conv | Ventas | CPA | Rechazos | Notas |
-|-------|-----|-------|----------------|-----------|--------|-----|----------|-------|
-| 2026-07-11 | 1 | (parcial) | 35 | muy bajo (bueno) | 0 | — | — | Buen volumen de conversaciones (anuncios funcionan). 0 ventas por pedir "anticipo no reembolsable" que espantó a los clientes. Corregido: usar cierre 100% contraentrega. 22 solo primer mensaje; 13 preguntaron detalles (reactivar). |
+- **Stack:** Node.js + Express (webhook) + WhatsApp Cloud API + Google Gemini (`gemini-3.5-flash`).
+- **Archivos:**
+  - `src/prompt.js` — cerebro: producto, material, colores (franja), 2 formas de pago, objeciones,
+    marcadores de multimedia y de pedido. NUNCA pide anticipo en contraentrega.
+  - `src/fletes.js` — fletes estimados por ciudad.
+  - `src/agent.js` — llama a Gemini (con REINTENTOS ante 429/500/503 y respuesta vacía),
+    detecta pedido `##ORDER##`, handoff `##HANDOFF##`, y multimedia por marcador `[[MEDIA:..]]`
+    + por PALABRAS CLAVE (`detectMediaIntent`: rojo/verde/negro → foto de ese color; blanco/morado
+    o "colores" → cuadro de colores; "producto" → 4 piezas; "puesto/modelo" → modelo; "video").
+  - `src/whatsapp.js` — envía texto, imagen y video por Cloud API.
+  - `src/media.js` — catálogo de fotos/videos (URLs en GitHub Pages `/assets/productos/`).
+  - `src/store.js` — guarda conversaciones y pedidos en JSON (`data/`), maneja pausa (handoff).
+  - `src/server.js` — webhook (verificación + recepción), auto-suscribe la WABA al arrancar
+    (`subscribeWaba`), endpoint `/setup-waba`, `/health`.
+  - `src/simulate.js` — probar por consola sin WhatsApp (`npm run chat`).
+- **Fotos configuradas (en `/assets/productos/`, servidas por GitHub Pages):**
+  - `producto.png` (4 piezas) · `colores.png` (cuadro generado con los 5 colores) · `modelo.png`
+  - `rojo.jpg` (FOTO REAL) · `verde.png` y `negro.png` (recortes de la cuadrícula)
+  - ❌ Faltan fotos individuales de **blanco** y **morado** (por ahora esos mandan el cuadro de colores).
+  - ❌ Falta **video** (debe pesar < 15 MB; WhatsApp no envía video > 16 MB).
+- **Robustez ya implementada:** reintentos ante fallos de Gemini, respaldo que NO reinicia la
+  conversación ("se me cruzó la señal, ¿me repites?"), limpieza de bloques `##ORDER##` malformados,
+  maxOutputTokens 800.
 
-**KPIs de referencia:**
-| Métrica | Bueno | Alerta |
-|---------|-------|--------|
-| CTR | > 1.5% | < 0.8% |
-| Costo por conversación | $1.500–$4.000 | > $6.000 |
-| Tasa de cierre | > 30% | < 15% |
-| CPA | $8.000–$10.000 | > $24.000 |
-| Rechazo contraentrega | < 10% | > 25% |
+### Errores conocidos y sus causas (para no repetir diagnóstico)
+- **"El bot repite el saludo genérico a mitad de charla" / respuestas raras ("000..."):**
+  causa = Gemini falla (cupo/límite). Arreglo real = facturación de Gemini en el proyecto correcto.
+- **Mensajes reales no llegaban al bot:** faltaba suscribir la WABA (ya resuelto con `subscribeWaba`).
+- **Error 401/#131005 al responder:** token vencido → ya se usa TOKEN PERMANENTE (System User).
+- **Modelo `gemini-2.5-flash` da 404:** descontinuado → usar `gemini-3.5-flash`.
 
 ---
 
-## 7. Textos de marca listos (Instagram)
+## 6. La app dashboard (`index.html`)
 
-**Nombre (campo buscable):** `BikerPro | Impermeables de Moto`
-
-**Bio:**
-```
-🏍️ Impermeables de moto 4 piezas + termosellado
-💧 6 colores | Calidad real
-📦 Pago contraentrega en toda Colombia 🇨🇴
-👇 Pídelo por WhatsApp
-```
-
-**Destacados:** 🏍️ Productos · 💧 Calidad · 📦 Comprar · ⭐ Opiniones · ❓ Preguntas
+- Dashboard de una página (HTML/CSS/JS puro), en GitHub Pages: https://mtavera99.github.io/impermeables/
+- Secciones: Resumen, Calculadora de ganancia, Estructura de campaña, Audiencias, Copies, Creativos,
+  Revisión, Video, **Cierre por WhatsApp** (guiones Modelo A y B), **Costos de envío** (calculadora de
+  flete por ciudad, editable, en localStorage `bp_fletes`), Escalamiento, Checklist.
+- `privacidad.html` — política de privacidad (usada para verificación/publicación en Meta).
 
 ---
 
-## 8. Protocolo de cierre y logística (aprendizajes clave)
+## 7. Cierre por WhatsApp y logística (aprendizajes)
 
-### Cierre por WhatsApp
-- **NUNCA pedir "anticipo no reembolsable".** Contradice el "pago contraentrega",
-  huele a estafa y mata la venta (confirmado el día 1: 0 ventas por esto).
-- **Modelo A — 100% contraentrega (usar AHORA):** el cliente no paga nada por
-  adelantado. Máxima conversión. Ideal para conseguir primeras ventas y reseñas.
-- **Modelo B — flete anticipado (más adelante, con reseñas):** el cliente prepaga
-  SOLO el envío (transferencia a 313 861 5813); el producto lo paga al recibir.
-  Reduce rechazos. Debe avisarse desde el PRIMER mensaje, con redacción honesta
-  ("pagas el envío", nunca "anticipo no reembolsable").
-- Responder en < 5 min. Siempre cerrar con pregunta que avanza la venta.
-- Exigir "SÍ CONFIRMO" antes de despachar (baja rechazo de ~30% a <10%).
-- Los guiones completos de ambos modelos + objeciones + seguimiento + recordatorio
-  de entrega están en la sección "Cierre por WhatsApp" de la app.
+- **NUNCA pedir "anticipo no reembolsable"** (mató ventas el día 1). En contraentrega el cliente NO
+  paga nada por adelantado.
+- **2 formas de pago que maneja el bot:** (A) contraentrega (paga al recibir) — recomendada;
+  (B) pago anticipado (Nequi/Bancolombia/Daviplata/Bre-B, envía comprobante, luego se despacha).
+- Responder < 5 min, cerrar con pregunta, exigir "SÍ CONFIRMO" antes de despachar (baja rechazos).
+- **Transportadoras:** Interrapidísimo (mejor cobertura pueblos, barato), Mi Paquete (agregador),
+  Coordinadora (premium). En rechazo, el vendedor paga flete de retorno (el producto se devuelve).
 
-### Logística / transportadoras (recomendación)
-- **Principal: Interrapidísimo** — mejor cobertura en pueblos/municipios, fletes
-  baratos (clave con ticket bajo $59.900), pensado para vendedores COD.
-- **Agregador: Mi Paquete** — conecta varias transportadoras (Servientrega,
-  Coordinadora, Envía, TCC, Deprisa), genera guías manuales (ideal venta por WhatsApp),
-  maneja recaudo en un panel.
-- **Coordinadora**: confiable/premium, para ciudades grandes y cuando escale.
-- **Dropi**: plataforma completa de dropshipping COD; más de lo necesario ahora
-  (producto propio).
-- **Si rechazan:** el producto se devuelve (no se pierde), pero el vendedor paga el
-  flete de retorno. Confirmar bien y filtrar pedidos falsos para minimizarlo.
-- Al registrarse, confirmar: comisión de recaudo, frecuencia de pago del recaudo,
-  costo de flete de devolución y cobertura de la ciudad.
+---
 
-## 9. La app (este repo)
+## 8. Textos de marca (Instagram)
 
-- Es un dashboard de una sola página: `index.html` (vanilla HTML/CSS/JS, sin dependencias).
-- Publicado en GitHub Pages: https://mtavera99.github.io/impermeables/
-- Secciones: Resumen, Calculadora, Estructura, Audiencias, Copies, Creativos,
-  Revisión, Video, WhatsApp (con guiones Modelo A y B), **Costos de envío**
-  (calculadora de flete por ciudad, editable), Escalamiento, Checklist.
-- La calculadora de envíos usa una tabla de fletes estimados por ciudad, editable
-  por el usuario y guardada en localStorage (clave `bp_fletes`).
-- Para que un cambio salga en vivo, debe llegar a la rama que sirve GitHub Pages (main).
+- **Nombre buscable:** `BikerPro | Impermeables de Moto`
+- **Bio:**
+  ```
+  🏍️ Impermeables de moto 4 piezas + termosellado
+  💧 Colores | Calidad real
+  📦 Pago contraentrega en toda Colombia 🇨🇴
+  👇 Pídelo por WhatsApp
+  ```
+- **Destacados:** 🏍️ Productos · 💧 Calidad · 📦 Comprar · ⭐ Opiniones · ❓ Preguntas
 
-## 10. Bot de IA para WhatsApp (`/bot`)
+---
 
-- **Qué es:** agente de ventas con IA que responde WhatsApp automáticamente.
-- **Stack:** Node.js + Express (webhook) + WhatsApp Cloud API + Google Gemini (`gemini-2.5-flash`).
-- **Archivos clave:**
-  - `src/prompt.js` — el "cerebro": precios, reglas, tono, objeciones (Modelo A, NUNCA pide adelantos).
-  - `src/fletes.js` — tabla de fletes por ciudad (para cotizar envío).
-  - `src/agent.js` — llama a Gemini, detecta pedido confirmado (`##ORDER##`) y handoff (`##HANDOFF##`).
-  - `src/whatsapp.js` — envía mensajes por Cloud API.
-  - `src/store.js` — guarda conversaciones y pedidos en JSON (`data/`).
-  - `src/server.js` — webhook (verificación + recepción).
-  - `src/simulate.js` — probar el bot por consola sin WhatsApp (`npm run chat`).
-  - `README.md` — guía de instalación paso a paso (no técnica).
-- **Funciones:** responde 24/7, cotiza envío, captura pedido (color/talla/ciudad/dirección/
-  nombre/celular), avisa cada pedido al dueño (`OWNER_WHATSAPP`), pasa a humano cuando hace falta.
-- **Pendiente del usuario para activarlo:**
-  1. Clave Gemini (aistudio.google.com/apikey).
-  2. App de WhatsApp en Meta + número de PRUEBA (probar sin riesgo antes del número real).
-  3. Desplegar en Render/Railway y configurar el webhook.
-- **Estado:** ✅ FUNCIONANDO end-to-end con el NÚMERO DE PRUEBA de Meta (2026-07-13).
-  El bot recibe, responde con IA (gemini-3.5-flash) y notifica pedidos.
-- **Desplegado en Render:** servicio `impermeables` → `https://impermeables.onrender.com`
-  (plan gratis: se duerme tras 15 min de inactividad → conviene keep-alive o plan pago).
-- **Datos de Meta (app "BikerPro Bot"):** App ID `1338086151301765` ·
-  WABA ID `2213159576112051` · número de prueba Phone Number ID `1257126177474870`.
-- **Aprendizajes clave de la instalación:**
-  1. Modelo `gemini-2.5-flash` quedó descontinuado → usar `gemini-3.5-flash`.
-  2. Los mensajes reales no llegaban hasta suscribir la WABA a la app
-     (`POST /{WABA_ID}/subscribed_apps`) — el bot lo hace solo al arrancar (`subscribeWaba`).
-  3. El token temporal de Meta dura 24h y da errores 401/#131005 al vencerse →
-     PARA PRODUCCIÓN hay que generar un TOKEN PERMANENTE (System User).
-- **PENDIENTE — pasar al número real (313 861 5813):**
-  1. Generar TOKEN PERMANENTE (System User) con permisos whatsapp_business_messaging +
-     whatsapp_business_management.
-  2. Verificación del negocio en Meta (para volumen sin límites).
-  3. Registrar el número real en la Cloud API (SALE de la app WhatsApp Business).
-  4. Actualizar en Render: `WHATSAPP_TOKEN` (permanente), `WHATSAPP_PHONE_NUMBER_ID` (del real).
-  5. Para chatear manualmente se usa una bandeja/inbox (Meta WhatsApp Manager o herramienta).
+## 9. Pendientes priorizados (checklist para retomar)
+
+1. [ ] 🔴 **Confirmar facturación de Gemini** en el proyecto correcto (que el bot deje de fallar). #1.
+2. [ ] 🔀 **Mergear PRs abiertos** en GitHub y hacer **Manual Deploy** en Render (revisar cuáles quedan sin merge).
+3. [ ] 🧪 Probar una **venta completa** en el número de prueba, sin fallos.
+4. [ ] 🏢 **Verificación del negocio** (enviada, esperar aprobación).
+5. [ ] 📱 **Migrar número real 313 861 5813** a Cloud API (cuando pase el bloqueo del SMS + negocio verificado
+   + Gemini estable). Ojo: sale de la app WhatsApp Business; para chatear manual se usa una bandeja/inbox.
+6. [ ] 💳 Agregar **método de pago de WhatsApp/Meta** (distinto al de Gemini).
+7. [ ] 📸 Fotos reales de **blanco** y **morado** (subir a `/assets/productos/` como `blanco.jpg`/`morado.jpg`).
+8. [ ] 🎬 Subir **video** (< 15 MB) → activar en el bot.
+9. [ ] 🎨 Actualizar la **app/anuncios** a los 5 colores reales (quitar fucsia/amarillo, aclarar franja).
+10. [ ] 🧹 Limpiar archivos con nombres raros en `/assets/productos/` (`*.heic`, `Gemini_*`, `rojo3.png.JPG`, etc.).
+
+---
+
+## 10. Cómo subir cambios (flujo)
+
+- Los archivos del bot y la app viven en el repo `mtavera99/impermeables`.
+- Cambios de código → PR → merge a `main` → Render redespliega solo (o Manual Deploy) y GitHub Pages actualiza.
+- Fotos/video del bot → subir a `/assets/productos/` (GitHub Pages les da URL pública) → el bot las usa.
+- Datos sensibles (tokens, claves, números de pago) → SIEMPRE en variables de entorno de Render, NUNCA en el repo.
