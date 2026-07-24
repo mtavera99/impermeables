@@ -4,16 +4,34 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-07-24 (noche) — sesión de análisis de campaña + estrategia de pago
+Última actualización: 2026-07-25 — resultado de entregas (5/5) + relanzamiento de campaña optimizada
 
 ---
 
 ## 0. ⭐ DÓNDE QUEDAMOS HOY (lo más importante)
 
-**Resumen en una línea:** El bot está CONSTRUIDO pero NO conectado a WhatsApp. TODAS las ventas
-hasta hoy (5) se hicieron ATENDIENDO MANUALMENTE. La campaña Meta está APAGADA por falta de saldo.
-El anuncio funciona muy bien; la fuga está en el CIERRE (2,84%). Falta el dato de entregas de
-Interrapidísimo (contraentrega) para saber si el margen aguanta.
+**Resumen en una línea:** ¡Las 5 ventas de contraentrega se ENTREGARON Y PAGARON TODAS (rechazo 0%)!
+Contraentrega queda CONFIRMADO como modelo ganador. La campaña se RELANZÓ optimizada ($30.000 total/día,
+solo el creativo ganador) y debe correr ~4 días SIN tocar. El bot sigue SIN conectar (ventas manuales).
+El foco ahora está FUERA de Meta: conseguir testimonios de los 5 clientes + subir el % de cierre (2,84%).
+
+**🎉 HITO 2026-07-25 — ENTREGAS: 5 de 5 entregadas y pagadas.**
+- **Rechazo = 0%** (muy por debajo del break-even de ~25%) → CONTRAENTREGA es el modelo ganador,
+  NO hace falta pedir prepago casi a nadie. El instinto del dueño era correcto.
+- **Cuenta real:** 5 × $24.400 margen = $122.000 ingreso; publicidad −$120.000; rechazos −$0 →
+  neto ≈ **+$2.000 (break-even)**. LO IMPORTANTE: llegó a break-even con TODO en contra (bot sin
+  conectar, cierre bajo 2,84%, sin reseñas, campaña sin optimizar). Al arreglar eso, se vuelve rentable.
+- **Activo desbloqueado:** 5 clientes felices → pedirles foto + testimonio YA (prueba social sube el cierre).
+
+**📣 CAMPAÑA RELANZADA (2026-07-25):** el dueño reactivó tras confirmar las entregas. Presupuesto
+**$30.000 TOTAL/día** (~$15.000 por conjunto, MISMO nivel de siempre — NO escaló). Pausó los creativos
+malos ("Peluca video" y "Peluca fondo negro" en Motorizados), dejó el ganador "Fondo azul sin personaje".
+**INSTRUCCIÓN: dejarla correr ~4 días SIN tocar** (no editar, no subir presupuesto, no pausar) para que
+Meta salga de la fase de aprendizaje. Evaluar con datos nuevos a los 4 días.
+
+**Contexto previo (sigue vigente):** El bot está CONSTRUIDO pero NO conectado a WhatsApp. Las 176
+conversaciones y 5 ventas se hicieron A MANO. El anuncio funciona muy bien; la fuga está en el
+CIERRE (2,84%), que es la mayor palanca de mejora.
 
 **Estado por frente:**
 1. 🤖 **Bot de WhatsApp:** CONSTRUIDO y desplegado en Render, responde bien en pruebas (Gemini con
@@ -125,12 +143,24 @@ Datos del export de Meta (campaña "Impermeables · Prospección Motociclistas",
   públicos · mantener "Peluca fondo negro" SOLO en Domiciliarios · apagar "Peluca fondo negro" en
   Motorizados y "Peluca video" · producir más creativos estilo "Fondo azul" (limpio, producto directo).
 
-### 💰 VENTAS REALES (a 2026-07-24)
+### 📣 RELANZAMIENTO DE CAMPAÑA (2026-07-25)
+- El dueño RELANZÓ la campaña tras confirmar las 5 entregas. Aplicó la optimización recomendada:
+  pausó los creativos malos, dejó activo el ganador "Fondo azul sin personaje".
+- Presupuesto: **$30.000 TOTAL/día** (~$15.000 por conjunto — MISMO nivel de siempre, NO escaló).
+- ⏳ **REGLA: dejarla correr ~4 días SIN tocar** (no editar/pausar/subir presupuesto) para que Meta
+  salga de la fase de aprendizaje (~50 conversaciones o 3-4 días). Los primeros 1-2 días se ven más
+  caros → es normal, NO apagar. Evaluar con datos nuevos a los 4 días.
+- NO escalar presupuesto hasta confirmar que baja el CAC por venta (hoy ~$24.000).
+
+### 💰 VENTAS REALES — ✅ ENTREGAS CONFIRMADAS (2026-07-25)
 - **5 pedidos** cerrados de las 176 conversaciones. **0 pago anticipado, 5 contraentrega (100%).**
-- Todos despachados ~jueves por **Interrapidísimo (contraentrega)**. Lunes 24 fue festivo en Colombia
-  → aún sin novedad. ⏳ PENDIENTE: revisar la app de Interrapidísimo (¿cuántas entregadas y pagadas,
-  en reparto, rechazadas?). Ese es el DATO #1 que decide si el modelo es rentable.
-- CAC provisional: $24.000/venta (casi break-even). Si sube el cierre, el CAC se desploma.
+- Despachados por **Interrapidísimo (contraentrega)**. **RESULTADO: las 5 se ENTREGARON Y PAGARON.**
+  **Tasa de rechazo = 0%** → muy por debajo del break-even de ~25% → CONTRAENTREGA CONFIRMADA como
+  modelo ganador. NO hace falta pedir prepago casi a nadie (dejar prepago solo para alto riesgo real).
+- Cuenta real: 5 × $24.400 = $122.000 margen; publicidad −$120.000; rechazos −$0 → neto ≈ +$2.000
+  (break-even). Llegó a equilibrio con el bot sin conectar y cierre bajo (2,84%) → margen de mejora enorme.
+- CAC: $24.000/venta. Baja fuerte si sube el cierre (2,84% → 6% ≈ el doble de ventas, mismo gasto).
+- 🌟 ACCIÓN EN CURSO: pedir foto + testimonio a los 5 clientes (prueba social para subir el cierre).
 
 ---
 
@@ -262,25 +292,25 @@ Datos del export de Meta (campaña "Impermeables · Prospección Motociclistas",
 
 ---
 
-## 9. Pendientes priorizados (checklist para retomar) — ACTUALIZADO 2026-07-24
+## 9. Pendientes priorizados (checklist para retomar) — ACTUALIZADO 2026-07-25
 
-1. [x] ✅ **PR #18 (colores) y PR #19 (flujo WhatsApp ciudad primero) FUSIONADOS.** Web ya actualizada.
-2. [ ] 📦 **Revisar entregas de Interrapidísimo** de las 5 ventas (¿cuántas entregadas y pagadas?).
-   DATO CLAVE: dice si el rechazo está bajo el break-even de ~25% (sección 7).
-3. [ ] 📈 **Subir la tasa de cierre** (hoy 2,84% manual): respuesta rápida, "SÍ CONFIRMO", seguimiento,
-   reseñas de los primeros clientes. AQUÍ está la plata (mismo gasto de anuncios, más ventas).
-4. [ ] 🔌 **Conectar el bot a WhatsApp** (mayor palanca). Bloqueo actual = número real trancado en Meta
+1. [x] ✅ **PR #18 (colores) y PR #19 (flujo WhatsApp ciudad primero) FUSIONADOS.** Web actualizada.
+2. [x] ✅ **Entregas de Interrapidísimo: 5/5 entregadas y pagadas (rechazo 0%).** Contraentrega confirmada.
+3. [x] ✅ **Campaña relanzada optimizada (2026-07-25):** $30.000 total/día, solo creativo ganador.
+   → ⏳ AHORA: **dejarla correr ~4 días SIN tocar** y evaluar con datos nuevos.
+4. [ ] 🌟 **Conseguir testimonios/fotos de los 5 clientes** (en curso). Publicarlos en IG/estados. #1 actual.
+5. [ ] 📈 **Subir la tasa de cierre** (hoy 2,84% manual): respuesta rápida, "SÍ CONFIRMO", seguimiento,
+   prueba social. AQUÍ está la plata (mismo gasto de anuncios, más ventas).
+6. [ ] 🔌 **Conectar el bot a WhatsApp** (mayor palanca). Bloqueo = número real trancado en Meta
    (verificación del negocio Pending review). Cuando se conecte, confirmar facturación de Gemini.
-5. [ ] 💰 **Recargar saldo/fondos de la campaña** (hoy apagada `not_delivering`). Recargar POCO; NO escalar
-   hasta bajar el CAC por venta de $24.000.
-6. [ ] 🎯 **Relanzar campaña optimizada:** escalar "Fondo azul sin personaje"; apagar "Peluca fondo negro"
-   en Motorizados y "Peluca video"; mantener "Peluca fondo negro" solo en Domiciliarios.
-7. [ ] 🏢 **Verificación del negocio** en Meta (enviada, Pending review varios días — revisar Centro de
+7. [ ] 🎯 **A los 4 días: evaluar campaña** con datos nuevos (conversaciones, costo, ventas). Solo entonces
+   decidir si escalar presupuesto (nunca antes de bajar el CAC de ~$24.000).
+8. [ ] 🏢 **Verificación del negocio** en Meta (enviada, Pending review varios días — revisar Centro de
    seguridad por si piden documento; nombre/dirección deben coincidir exactos).
-8. [ ] 📱 **Migrar número real 313 861 5813** a Cloud API (cuando el negocio esté verificado; verificar el
+9. [ ] 📱 **Migrar número real 313 861 5813** a Cloud API (cuando el negocio esté verificado; verificar el
    número con código por LLAMADA, no SMS). El número NO debe estar logueado en la app de WhatsApp.
-9. [ ] 💳 Agregar **método de pago de WhatsApp/Meta**.
-10. [ ] 📸 Fotos reales de **blanco** y **morado** · 🎬 subir **video** (< 15 MB) → activar en el bot.
+10. [ ] 💳 Agregar **método de pago de WhatsApp/Meta** · 📸 Fotos reales de **blanco** y **morado** ·
+   🎬 subir **video** (< 15 MB) → activar en el bot.
 11. [ ] 🧹 Limpiar/eliminar la WABA vacía "biker" · limpiar archivos raros en `/assets/productos/`.
 
 **Notas de proceso:** al trabajar varias cosas seguidas, NO fusionar PRs hasta que Kiro diga "subí todo"
