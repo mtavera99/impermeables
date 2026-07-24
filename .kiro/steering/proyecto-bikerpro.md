@@ -4,34 +4,55 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-07-13 (noche)
+Última actualización: 2026-07-24 (noche) — sesión de análisis de campaña + estrategia de pago
 
 ---
 
 ## 0. ⭐ DÓNDE QUEDAMOS HOY (lo más importante)
 
-**Resumen en una línea:** El bot de ventas con IA está CONSTRUIDO y FUNCIONANDO en el número
-de PRUEBA de Meta. Estamos en proceso de (a) estabilizarlo y (b) pasarlo al número real.
+**Resumen en una línea:** El bot está CONSTRUIDO pero NO conectado a WhatsApp. TODAS las ventas
+hasta hoy (5) se hicieron ATENDIENDO MANUALMENTE. La campaña Meta está APAGADA por falta de saldo.
+El anuncio funciona muy bien; la fuga está en el CIERRE (2,84%). Falta el dato de entregas de
+Interrapidísimo (contraentrega) para saber si el margen aguanta.
 
 **Estado por frente:**
-1. 🤖 **Bot de WhatsApp:** construido, desplegado en Render, responde con IA, envía fotos
-   (producto/colores/modelo/rojo/verde/negro), maneja 2 formas de pago y captura pedidos.
-2. 🔴 **BLOQUEO #1 — Facturación de Gemini:** el bot falla de forma intermitente (manda un
-   respaldo genérico) porque las llamadas a Gemini topan el límite del plan GRATIS (20/día).
-   El usuario "metió saldo" a Gemini, PERO el bot sigue fallando → hay que CONFIRMAR que la
-   facturación quedó activa en el MISMO proyecto de la API key. Revisar logs de Render: si sale
-   error `quota`/`FreeTier`, el saldo no está en el proyecto correcto.
+1. 🤖 **Bot de WhatsApp:** CONSTRUIDO y desplegado en Render, responde bien en pruebas (Gemini con
+   saldo responde perfecto). ⚠️ **NO ESTÁ CONECTADO a WhatsApp** → hoy NO atiende clientes reales.
+   Las 176 conversaciones y las 5 ventas se hicieron A MANO por el dueño. El bot es la mayor palanca
+   de crecimiento pendiente (atender al instante, 24/7, subir el % de cierre).
+2. 🟢 **Gemini:** ya NO es el bloqueo #1. El bot no estuvo en la jugada durante la campaña, así que
+   el bug de Gemini NO afectó estas ventas. Cuando se conecte el bot, confirmar que la facturación
+   siga activa en el proyecto correcto de la API key.
 3. 🟡 **Migración al número real (313 861 5813):** EN PAUSA / con trabas:
-   - Verificación del negocio: ENVIADA, estado "Pending review" (WABA "BikerProCo").
-   - Al registrar el número en Cloud API, el SMS de verificación se bloqueó
-     ("requested code too many times"). Esperó 1h+ y seguía bloqueado.
-   - DECISIÓN DEL USUARIO: reactivar el número en la **app WhatsApp Business** para atender
-     clientes MANUALMENTE mientras tanto (no perder ventas). El bot sigue en el número de prueba.
-4. 🟢 **Anuncios Meta:** corriendo (ver sección 3).
+   - Verificación del negocio: ENVIADA, sigue en **"Pending review"** — LLEVA VARIOS DÍAS TRABADA
+     (el usuario la intentó/reintentó y a 2026-07-24 aún NO la aprueban). Este es el bloqueo real
+     para migrar: mientras el negocio no esté verificado, Meta deja en GRIS "Registrar" y
+     "Suscribir webhooks" (mensaje: "Number registration and webhook subscription are unavailable
+     for this account now").
+   - **✅ LIMPIEZA HECHA (2026-07-24):** el número estaba DUPLICADO en dos WABAs ("biker"
+     `1345319974418244` y "BikerProCo" `1523356755909234`). Se ELIMINÓ el número de la WABA
+     "biker" (quedó vacía). El número quedó SOLO en **BikerProCo**, estado **"No verificado"**.
+     Ya no hay conflicto de número duplicado.
+   - Pendiente cuando el negocio quede verificado: verificar el número (usar código por LLAMADA,
+     no SMS, porque el SMS ya se bloqueó antes con "requested code too many times") → Registrar en
+     Cloud API → suscribir webhooks → cambiar `WHATSAPP_PHONE_NUMBER_ID` en Render.
+   - ⚠️ El número de PRUEBA de Meta NO sirve para vender al público (solo habla con hasta 5 números
+     agregados a mano; es solo para que el dueño pruebe el bot). Los clientes de los anuncios llegan
+     al número REAL.
+   - DECISIÓN DEL USUARIO (vigente a 2026-07-24): mientras Meta aprueba la verificación, **atiende
+     las ventas MANUALMENTE por WhatsApp** en el número real (no perder ventas). El bot solo se
+     prueba en el número de prueba.
+4. 🔴 **Anuncios Meta:** APAGADOS por falta de saldo/fondos de prepago (`not_delivering`, presupuesto 0).
+   Cada día apagados = ~44 conversaciones baratas que se dejan de recibir. Ver embudo en sección 3.
+5. 🎨 **Web (`index.html`) — CORREGIDA HOY:** colores actualizados a 5 franjas reales (PR #18 FUSIONADO)
+   y flujo de WhatsApp arreglado para preguntar la CIUDAD primero (PR #19 — ⚠️ FALTA FUSIONARLO).
 
-**Próximo paso lógico:** arreglar la facturación de Gemini (que el bot deje de fallar) →
-probar venta completa en número de prueba → cuando el negocio esté verificado + pase el bloqueo
-del SMS, migrar el número real con calma.
+**Próximo paso lógico (orden correcto):**
+1. Fusionar el **PR #19** (arreglo del flujo de WhatsApp).
+2. Ver **entregas de Interrapidísimo** (dato #1: de las 5 ventas, ¿cuántas se entregan y pagan?).
+   Ese número dice si el rechazo está bajo el break-even de ~25% (ver sección 7).
+3. NO escalar la campaña todavía — primero subir el % de cierre (2,84% tiene techo enorme) y
+   conectar el bot. Recargar poco para no quedar a oscuras, pero el gran gasto va después.
 
 ---
 
@@ -59,10 +80,13 @@ del SMS, migrar el número real con calma.
   franjas de color). **Pantalón:** bota recta. **Tallas:** S, M, L, XL, 2XL.
 - **Precio:** **$59.900 SIN envío** (el cliente paga el envío según ciudad).
 - **Pago:** contraentrega O pago anticipado (ambos; ver sección 8).
-- Costo ~$34.000 · empaque ~$1.500 · margen bruto ~$25.900 · meta CPA $8.000–$10.000 · equilibrio CPA $24.400.
+- Costo ~$34.000 · empaque ~$1.500 · margen bruto ~$24.400 · meta CPA $8.000–$10.000 · equilibrio CPA $24.400.
 
-> ⚠️ **INCONSISTENCIA PENDIENTE:** la app (`index.html`) y anuncios dicen "6 colores (fucsia,
-> amarillo)". Los reales son 5 (blanco, negro, rojo, verde, morado). Falta actualizar la app/anuncios.
+> ✅ **INCONSISTENCIA DE COLORES: CORREGIDA (2026-07-24).** La web (`index.html`) ya dice
+> "franja reflectiva en 5 colores" (blanco, negro, rojo, verde, morado), sin fucsia ni amarillo.
+> (PR #18, fusionado.) Los anuncios de Meta viejos aún pueden mencionar colores mal → al relanzar,
+> usar copy corregido ("El producto lo pagas al recibir; envío según ciudad"), NO prometer
+> "contraentrega en toda Colombia" (ata a un modelo antes de saber la ciudad — ver sección 7).
 
 ---
 
@@ -76,6 +100,38 @@ del SMS, migrar el número real con calma.
 - **Día 1:** 35 conversaciones, 0 ventas — al inicio se pidió "anticipo no reembolsable" (error grave
   que espantó clientes). Corregido: cierre 100% contraentrega.
 
+### 📊 RESULTADOS CAMPAÑA (1–24 jul 2026) — EMBUDO COMPLETO
+Datos del export de Meta (campaña "Impermeables · Prospección Motociclistas", `not_delivering`):
+
+| Escalón | Número | Conversión | Lectura |
+|---|---|---|---|
+| Alcance | 9.613 personas | — | — |
+| Impresiones | 16.868 | frecuencia 1,75 | ✓ sana |
+| Clics al enlace | ~332 | CTR 1,97% · CPC $361 | ✓ decente |
+| Conversaciones | **176** | **53% de los clics** | ✅ excelente |
+| Ventas (cerradas) | **5** | **2,84% de conversaciones** | 🔴 aquí se rompe |
+
+- Gasto: **$120.000** · Costo/conversación: **$682** (barato) · CPM ~$7.113 (barato).
+- **DIAGNÓSTICO CLAVE:** el embudo está sano en TODOS los escalones (anuncio, clic, clic→chat 53%)
+  **hasta la conversación**. La fuga está SOLO en el CIERRE (2,84%). El problema NO es el anuncio ni
+  el público → es el cierre, que además fue 100% MANUAL. Subir el cierre a 6% ≈ 11 ventas con el
+  MISMO gasto. Palanca de crecimiento = cerrar mejor, NO gastar más.
+- **Por creativo (ambos públicos):** 🏆 **"Fondo azul sin personaje"** = ganador (120 conv, 68% del
+  total, ~$650 c/u). "Peluca fondo negro" = mixto (51 conv): bien en Domiciliarios ($667), MAL en
+  Motorizados ($1.152). "Peluca video" = muerto (Meta casi no lo entregó, 0 conv en Motorizados).
+- **Por público:** Motorizados y Domiciliarios rinden IGUAL (~$681/conv) → la palanca es el CREATIVO,
+  no la audiencia.
+- **Al relanzar (optimización, mismo presupuesto):** escalar "Fondo azul sin personaje" en ambos
+  públicos · mantener "Peluca fondo negro" SOLO en Domiciliarios · apagar "Peluca fondo negro" en
+  Motorizados y "Peluca video" · producir más creativos estilo "Fondo azul" (limpio, producto directo).
+
+### 💰 VENTAS REALES (a 2026-07-24)
+- **5 pedidos** cerrados de las 176 conversaciones. **0 pago anticipado, 5 contraentrega (100%).**
+- Todos despachados ~jueves por **Interrapidísimo (contraentrega)**. Lunes 24 fue festivo en Colombia
+  → aún sin novedad. ⏳ PENDIENTE: revisar la app de Interrapidísimo (¿cuántas entregadas y pagadas,
+  en reparto, rechazadas?). Ese es el DATO #1 que decide si el modelo es rentable.
+- CAC provisional: $24.000/venta (casi break-even). Si sube el cierre, el CAC se desploma.
+
 ---
 
 ## 4. Cuentas, IDs y accesos (REFERENCIA TÉCNICA)
@@ -84,7 +140,11 @@ del SMS, migrar el número real con calma.
 - **Meta Business ID:** `1271452296042859`
 - **App Meta "BikerPro Bot":** App ID `1338086151301765`
 - **WABA del bot (número de prueba):** ID `2213159576112051` · Phone Number ID (prueba) `1257126177474870`
-- **WABA "BikerProCo" (para número real):** ID `1523356755909234` (verificación Pending review)
+- **WABA "BikerProCo" (para número real):** ID `1523356755909234` (verificación Pending review).
+  ✅ 2026-07-24: es la ÚNICA WABA con el número real (313 861 5813), estado "No verificado".
+- **WABA "biker" (`1345319974418244`):** ERA una WABA duplicada que tenía el MISMO número real.
+  El 2026-07-24 se le QUITÓ el número (quedó vacía) para eliminar el conflicto. Se puede borrar por
+  completo desde Configuración del negocio → Cuentas de WhatsApp. NO usar esta WABA.
 - **Render:** servicio `impermeables` (srv-d9alleurnols73d95bf0) → https://impermeables.onrender.com
   - Env logs: https://dashboard.render.com/web/srv-d9alleurnols73d95bf0/env
   - Plan GRATIS: se duerme tras 15 min de inactividad (retrasa 1ª respuesta ~50s). Conviene keep-alive/plan pago.
@@ -143,15 +203,48 @@ del SMS, migrar el número real con calma.
 
 ---
 
-## 7. Cierre por WhatsApp y logística (aprendizajes)
+## 7. Cierre por WhatsApp y logística (aprendizajes) — ACTUALIZADO 2026-07-24
 
 - **NUNCA pedir "anticipo no reembolsable"** (mató ventas el día 1). En contraentrega el cliente NO
   paga nada por adelantado.
-- **2 formas de pago que maneja el bot:** (A) contraentrega (paga al recibir) — recomendada;
-  (B) pago anticipado (Nequi/Bancolombia/Daviplata/Bre-B, envía comprobante, luego se despacha).
-- Responder < 5 min, cerrar con pregunta, exigir "SÍ CONFIRMO" antes de despachar (baja rechazos).
-- **Transportadoras:** Interrapidísimo (mejor cobertura pueblos, barato), Mi Paquete (agregador),
-  Coordinadora (premium). En rechazo, el vendedor paga flete de retorno (el producto se devuelve).
+- **APRENDIZAJE DEL DUEÑO:** cuando pidió el flete por adelantado a todos, **se le caían muchas
+  ventas** → por eso pasó a 100% contraentrega. Esa decisión fue RACIONAL.
+
+### 🎯 ESTRATEGIA DE PAGO (marco de decisión — el análisis grande de hoy)
+- **El modelo de pago NO es el problema; la TASA DE RECHAZO es la que decide qué modelo conviene.**
+- **Break-even ≈ 25% de rechazo** (con margen $24.400 y pérdida por rechazo = UN flete ~$15.000,
+  que es lo que cobra Interrapidísimo, NO ida y vuelta; y caída del ~40% al pedir prepago):
+  - Rechazo **< 25%** → gana **CONTRAENTREGA** (más ventas netas aunque haya rechazos).
+  - Rechazo **> 25%** → gana **PREPAGO del flete**.
+  - Con "SÍ CONFIRMO" el rechazo baja a ~10% → contraentrega gana CLARO. Ese es el objetivo.
+- **Descartado: "envío gratis por pago anticipado"** → NO alcanza el margen ($24.400; el flete
+  ~$12–15k se comería casi toda la ganancia).
+- **JUGADA GANADORA = Contraentrega default + obsesión por bajar el rechazo + PREPAGO SELECTIVO**
+  (solo pedir flete anticipado a pedidos de ALTO RIESGO: pueblos/veredas y clientes evasivos que no
+  confirman datos; a ciudad grande + cliente que confirma rápido, dejarlo contraentrega).
+
+### 🔒 CÓMO BAJAR EL RECHAZO (3 momentos)
+- ANTES de despachar: exigir **"SÍ CONFIRMO"**, dejar claro el **TOTAL exacto** a pagar, verificar
+  **dirección completa + celular**. Banderas rojas (→ pedir flete): dirección vaga, cliente evasivo,
+  pueblo/vereda.
+- EN TRÁNSITO: mandar la **guía/rastreo** (genera confianza y compromiso).
+- DÍA DE ENTREGA: **recordatorio** ("hoy llega, ten listos los $___ en efectivo").
+- MEDIR el motivo de cada rechazo para atacar la causa real.
+
+### 💬 FLUJO DE WhatsApp CORREGIDO (2026-07-24, PR #19)
+- **ERROR detectado:** el 1er mensaje prometía "contraentrega, pagas todo al recibir" ANTES de saber
+  la ciudad → si el cliente era de pueblo, ya te habías comprometido y no podías pedir prepago.
+- **ARREGLO:** bienvenida NEUTRAL que pregunta **CIUDAD primero** + color + talla, diciendo solo
+  "el producto lo pagas al recibir" (verdad en ambos modelos, no te ata). Ya con la ciudad se decide
+  la rama: ciudad grande → contraentrega (Modelo A); pueblo/vereda → flete anticipado (Modelo B).
+
+- **2 formas de pago:** (A) contraentrega (paga al recibir) — default; (B) pago anticipado del flete
+  (Nequi/Bancolombia/Daviplata/Bre-B) — solo para alto riesgo.
+- Responder **rápido** (aquí entra el BOT, que hoy no está conectado), cerrar con pregunta, seguimiento.
+- **Confianza (para poder empujar prepago):** reseñas/fotos de los primeros 5 clientes, garantía
+  explícita ("si llega con falla, cambio/devuelvo"), cuenta a nombre del negocio.
+- **Transportadoras:** Interrapidísimo (mejor cobertura pueblos, barato; cobra UN flete en devolución),
+  Mi Paquete (agregador), Coordinadora (premium).
 
 ---
 
@@ -169,19 +262,30 @@ del SMS, migrar el número real con calma.
 
 ---
 
-## 9. Pendientes priorizados (checklist para retomar)
+## 9. Pendientes priorizados (checklist para retomar) — ACTUALIZADO 2026-07-24
 
-1. [ ] 🔴 **Confirmar facturación de Gemini** en el proyecto correcto (que el bot deje de fallar). #1.
-2. [ ] 🔀 **Mergear PRs abiertos** en GitHub y hacer **Manual Deploy** en Render (revisar cuáles quedan sin merge).
-3. [ ] 🧪 Probar una **venta completa** en el número de prueba, sin fallos.
-4. [ ] 🏢 **Verificación del negocio** (enviada, esperar aprobación).
-5. [ ] 📱 **Migrar número real 313 861 5813** a Cloud API (cuando pase el bloqueo del SMS + negocio verificado
-   + Gemini estable). Ojo: sale de la app WhatsApp Business; para chatear manual se usa una bandeja/inbox.
-6. [ ] 💳 Agregar **método de pago de WhatsApp/Meta** (distinto al de Gemini).
-7. [ ] 📸 Fotos reales de **blanco** y **morado** (subir a `/assets/productos/` como `blanco.jpg`/`morado.jpg`).
-8. [ ] 🎬 Subir **video** (< 15 MB) → activar en el bot.
-9. [ ] 🎨 Actualizar la **app/anuncios** a los 5 colores reales (quitar fucsia/amarillo, aclarar franja).
-10. [ ] 🧹 Limpiar archivos con nombres raros en `/assets/productos/` (`*.heic`, `Gemini_*`, `rojo3.png.JPG`, etc.).
+1. [x] ✅ **PR #18 (colores) y PR #19 (flujo WhatsApp ciudad primero) FUSIONADOS.** Web ya actualizada.
+2. [ ] 📦 **Revisar entregas de Interrapidísimo** de las 5 ventas (¿cuántas entregadas y pagadas?).
+   DATO CLAVE: dice si el rechazo está bajo el break-even de ~25% (sección 7).
+3. [ ] 📈 **Subir la tasa de cierre** (hoy 2,84% manual): respuesta rápida, "SÍ CONFIRMO", seguimiento,
+   reseñas de los primeros clientes. AQUÍ está la plata (mismo gasto de anuncios, más ventas).
+4. [ ] 🔌 **Conectar el bot a WhatsApp** (mayor palanca). Bloqueo actual = número real trancado en Meta
+   (verificación del negocio Pending review). Cuando se conecte, confirmar facturación de Gemini.
+5. [ ] 💰 **Recargar saldo/fondos de la campaña** (hoy apagada `not_delivering`). Recargar POCO; NO escalar
+   hasta bajar el CAC por venta de $24.000.
+6. [ ] 🎯 **Relanzar campaña optimizada:** escalar "Fondo azul sin personaje"; apagar "Peluca fondo negro"
+   en Motorizados y "Peluca video"; mantener "Peluca fondo negro" solo en Domiciliarios.
+7. [ ] 🏢 **Verificación del negocio** en Meta (enviada, Pending review varios días — revisar Centro de
+   seguridad por si piden documento; nombre/dirección deben coincidir exactos).
+8. [ ] 📱 **Migrar número real 313 861 5813** a Cloud API (cuando el negocio esté verificado; verificar el
+   número con código por LLAMADA, no SMS). El número NO debe estar logueado en la app de WhatsApp.
+9. [ ] 💳 Agregar **método de pago de WhatsApp/Meta**.
+10. [ ] 📸 Fotos reales de **blanco** y **morado** · 🎬 subir **video** (< 15 MB) → activar en el bot.
+11. [ ] 🧹 Limpiar/eliminar la WABA vacía "biker" · limpiar archivos raros en `/assets/productos/`.
+
+**Notas de proceso:** al trabajar varias cosas seguidas, NO fusionar PRs hasta que Kiro diga "subí todo"
+(el 2026-07-24 se fusionó el PR #18 a mitad de camino y el arreglo de WhatsApp quedó fuera → hubo que
+abrir el PR #19 aparte).
 
 ---
 
