@@ -4,16 +4,51 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-07-25 — resultado de entregas (5/5) + relanzamiento de campaña optimizada
+Última actualización: 2026-07-26 — RONDA 2: 14 ventas, CAC $6.429, escalamiento a $36.000/día
 
 ---
 
 ## 0. ⭐ DÓNDE QUEDAMOS HOY (lo más importante)
 
-**Resumen en una línea:** ¡Las 5 ventas de contraentrega se ENTREGARON Y PAGARON TODAS (rechazo 0%)!
-Contraentrega queda CONFIRMADO como modelo ganador. La campaña se RELANZÓ optimizada ($30.000 total/día,
-solo el creativo ganador) y debe correr ~4 días SIN tocar. El bot sigue SIN conectar (ventas manuales).
-El foco ahora está FUERA de Meta: conseguir testimonios de los 5 clientes + subir el % de cierre (2,84%).
+**Resumen en una línea:** 🔥 EL NEGOCIO YA ES RENTABLE. La ronda 2 (3 días, $90.000) dio **14 ventas**
+con **CAC de $6.429** (meta era $8-10k) y la tasa de cierre subió de 2,84% a **7%**. Se escaló el
+presupuesto a **$36.000/día** (2026-07-26). El bot sigue SIN conectar (todo manual) y el cuello de
+botella ya es el TIEMPO del dueño + inventario + flujo de caja.
+
+**🚀 HITO 2026-07-26 — RONDA 2 DE CAMPAÑA (3 días, tras optimizar creativos):**
+
+| Métrica | Ronda 1 | Ronda 2 | Cambio |
+|---|---|---|---|
+| Gasto | $120.000 | $90.000 (3 días) | — |
+| Conversaciones | 176 | 200 | ⬆️ |
+| Costo/conversación | $682 | **$450** | −34% |
+| CTR | 1,97% | 2,27% | ⬆️ |
+| CPC | $361 | $242 | −33% |
+| Clic→chat | 53% | 53,8% | estable |
+| **Ventas** | 5 | **14** | 🔥 |
+| **Tasa de cierre** | 2,84% | **7,0%** | 2,5× |
+| **CAC (pub/venta)** | $24.000 | **$6.429** | −73% |
+
+- **Ventas ronda 2:** 14 (1 PAGO ANTICIPADO — el primero de la historia, señal de confianza; 13 contraentrega
+  en tránsito, resultado de entregas PENDIENTE).
+- **Utilidad proyectada:** ~+$251.600 si rechazo 0% · +$133.400 si rechazo 20% · **se necesitarían ~7
+  rechazos de 13 (54%) para no ganar nada** → rentable en casi cualquier escenario.
+- **Acumulado (1–26 jul):** 376 conversaciones · $210.000 gastados · **19 ventas** · CAC acumulado $11.052
+  · cierre acumulado 5,05% · alcance 18.362 · frecuencia 1,81 (sana).
+- **¿Por qué mejoró?** (a) cortar los creativos malos bajó el costo/conversación 34%; (b) el cierre subió
+  por el flujo nuevo (ciudad primero) + "SÍ CONFIRMO" + experiencia del dueño vendiendo.
+
+**📈 ESCALAMIENTO (2026-07-26):** presupuesto subido de $30.000 → **$36.000/día** (+20%, escalamiento
+moderado correcto). ⚠️ REGLA: solo se tocó el PRESUPUESTO (no creativos, ni públicos, ni copies).
+Nunca duplicar de golpe (reinicia aprendizaje y dispara costos). Esperar 3-4 días, verificar que el CAC
+siga bajo $10.000, y recién entonces subir otro 20-30%.
+
+**⚠️ LOS 3 FRENOS REALES (ya no son Meta, son la operación):**
+1. 📦 **Inventario:** 19 conjuntos vendidos. Escalar sin stock = anuncios prendidos sin producto.
+2. 💵 **Flujo de caja (el más crítico):** en contraentrega se paga primero (producto $34.000 + anuncio) y
+   se cobra después (Interrapidísimo demora días). Escalar solo hasta donde aguante la caja.
+3. ⏰ **Tiempo del dueño:** ~4,7 ventas/día atendiendo A MANO + empaque + despacho. Aquí el bot pasa de
+   "bonito de tener" a NECESARIO.
 
 **🎉 HITO 2026-07-25 — ENTREGAS: 5 de 5 entregadas y pagadas.**
 - **Rechazo = 0%** (muy por debajo del break-even de ~25%) → CONTRAENTREGA es el modelo ganador,
@@ -296,15 +331,15 @@ Datos del export de Meta (campaña "Impermeables · Prospección Motociclistas",
 
 1. [x] ✅ **PR #18 (colores) y PR #19 (flujo WhatsApp ciudad primero) FUSIONADOS.** Web actualizada.
 2. [x] ✅ **Entregas de Interrapidísimo: 5/5 entregadas y pagadas (rechazo 0%).** Contraentrega confirmada.
-3. [x] ✅ **Campaña relanzada optimizada (2026-07-25):** $30.000 total/día, solo creativo ganador.
-   → ⏳ AHORA: **dejarla correr ~4 días SIN tocar** y evaluar con datos nuevos.
-4. [ ] 🌟 **Conseguir testimonios/fotos de los 5 clientes** (en curso). Publicarlos en IG/estados. #1 actual.
-5. [ ] 📈 **Subir la tasa de cierre** (hoy 2,84% manual): respuesta rápida, "SÍ CONFIRMO", seguimiento,
-   prueba social. AQUÍ está la plata (mismo gasto de anuncios, más ventas).
-6. [ ] 🔌 **Conectar el bot a WhatsApp** (mayor palanca). Bloqueo = número real trancado en Meta
-   (verificación del negocio Pending review). Cuando se conecte, confirmar facturación de Gemini.
-7. [ ] 🎯 **A los 4 días: evaluar campaña** con datos nuevos (conversaciones, costo, ventas). Solo entonces
-   decidir si escalar presupuesto (nunca antes de bajar el CAC de ~$24.000).
+3. [x] ✅ **Campaña relanzada optimizada (2026-07-25)** → RONDA 2 exitosa: 14 ventas, CAC $6.429, cierre 7%.
+4. [x] ✅ **Escalado a $36.000/día (2026-07-26)**, +20%. Solo presupuesto, nada más.
+   → ⏳ AHORA: **dejarla correr 3-4 días SIN tocar** y evaluar (¿CAC sigue bajo $10.000?).
+5. [ ] 📦 **Resultado de entregas de los 13 contraentrega** de la ronda 2 (¿cuántos rechazos?).
+6. [ ] 📦💵 **Verificar INVENTARIO y FLUJO DE CAJA** antes del próximo escalamiento (frenos reales).
+7. [ ] 🌟 **Conseguir testimonios/fotos** — ya hay **19 clientes** (mucho más material que antes).
+8. [ ] 🔌 **Conectar el bot a WhatsApp** — ya es NECESARIO (el cuello de botella es el tiempo del dueño).
+   Bloqueo = número real trancado en Meta (verificación Pending review). Al conectar, confirmar Gemini.
+9. [ ] 🎯 **A los 3-4 días: evaluar y escalar otro 20-30%** si el CAC sigue bajo $10.000.
 8. [ ] 🏢 **Verificación del negocio** en Meta (enviada, Pending review varios días — revisar Centro de
    seguridad por si piden documento; nombre/dirección deben coincidir exactos).
 9. [ ] 📱 **Migrar número real 313 861 5813** a Cloud API (cuando el negocio esté verificado; verificar el
