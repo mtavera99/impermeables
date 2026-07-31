@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Creativos · BikerPro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#0B3D91; --azul-osc:#061A3F; --negro:#1A1A1A;
+    --amarillo:#FFC300; --blanco:#FFFFFF; --verde-wa:#25D366;
+    --borde:#1e3a6b; --panel:#0d2451; --texto:#e8eefc; --muted:#93a6cd;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:linear-gradient(160deg,#061A3F,#0a2555 60%,#061A3F);
+    color:var(--texto); font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+  }
+  header{
+    padding:22px 20px; border-bottom:1px solid var(--borde);
+    background:rgba(6,26,63,.75); position:sticky; top:0; z-index:10; backdrop-filter:blur(8px);
+  }
+  .logo{font-family:'Anton',sans-serif; font-size:26px; letter-spacing:.5px}
+  .logo span{color:var(--amarillo)}
+  header p{margin:6px 0 0; color:var(--muted); font-size:14px}
+  .wrap{max-width:1240px; margin:0 auto; padding:22px 20px 60px}
+  .grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,420px); gap:24px; align-items:start}
+  @media (max-width:980px){ .grid{grid-template-columns:1fr} }
+  .card{
+    background:var(--panel); border:1px solid var(--borde); border-radius:16px; padding:18px; margin-bottom:18px;
+  }
+  h2{margin:0 0 4px; font-size:18px}
+  h3{margin:18px 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:1px; color:var(--muted)}
+  label{display:block; font-size:13px; color:var(--muted); margin:12px 0 5px; font-weight:600}
+  input[type=text], textarea, select{
+    width:100%; padding:11px 12px; border-radius:10px; border:1px solid var(--borde);
+    background:#081c42; color:var(--texto); font-family:inherit; font-size:14px;
+  }
+  textarea{min-height:74px; resize:vertical; line-height:1.5}
+  input[type=range]{width:100%}
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  .row>*{flex:1; min-width:120px}
+  .presets{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+  .preset{
+    flex:1; min-width:96px; padding:12px 10px; border-radius:12px; cursor:pointer; text-align:center;
+    background:#081c42; border:1px solid var(--borde); color:var(--texto); font-weight:700; font-size:13px;
+    transition:.15s;
+  }
+  .preset:hover{border-color:var(--amarillo)}
+  .preset.on{background:var(--azul); border-color:var(--amarillo); box-shadow:0 0 0 2px rgba(255,195,0,.25)}
+  .preset small{display:block; font-weight:400; color:var(--muted); font-size:11px; margin-top:3px}
+  .btn{
+    display:inline-block; width:100%; padding:13px 16px; border-radius:12px; border:0; cursor:pointer;
+    background:var(--amarillo); color:#221a00; font-weight:800; font-size:14px; font-family:inherit;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn.sec{background:#12305f; color:var(--texto); border:1px solid var(--borde)}
+  .btn:disabled{opacity:.45; cursor:not-allowed}
+  .drop{
+    border:2px dashed var(--borde); border-radius:14px; padding:26px 16px; text-align:center;
+    cursor:pointer; background:#081c42; transition:.15s;
+  }
+  .drop:hover, .drop.over{border-color:var(--amarillo); background:#0a2350}
+  .drop strong{display:block; margin-bottom:4px}
+  .drop small{color:var(--muted)}
+  .preview{
+    background:#04122e; border:1px solid var(--borde); border-radius:16px; padding:16px; text-align:center;
+    position:sticky; top:96px;
+  }
+  canvas#c{max-width:100%; max-height:62vh; border-radius:10px; box-shadow:0 10px 40px rgba(0,0,0,.5)}
+  .fmt{display:flex; gap:8px; justify-content:center; margin:14px 0 4px; flex-wrap:wrap}
+  .fmt button{
+    padding:8px 14px; border-radius:999px; border:1px solid var(--borde); background:#081c42;
+    color:var(--texto); cursor:pointer; font-size:12px; font-weight:700; font-family:inherit;
+  }
+  .fmt button.on{background:var(--amarillo); color:#221a00; border-color:var(--amarillo)}
+  .copybox{
+    position:relative; background:#081c42; border:1px solid var(--borde); border-radius:10px;
+    padding:12px 44px 12px 12px; font-size:13px; white-space:pre-wrap; line-height:1.5; margin-bottom:8px;
+  }
+  .copybox button{
+    position:absolute; top:8px; right:8px; border:0; background:var(--azul); color:#fff;
+    border-radius:7px; padding:5px 8px; cursor:pointer; font-size:11px; font-weight:700; font-family:inherit;
+  }
+  .copybox button:hover{background:var(--amarillo); color:#221a00}
+  .lbl{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin:12px 0 5px; font-weight:700}
+  .note{border-radius:12px; padding:12px 14px; font-size:13px; line-height:1.55; margin-bottom:14px; border:1px solid}
+  .note.g{background:rgba(37,211,102,.08); border-color:rgba(37,211,102,.35)}
+  .note.r{background:rgba(255,90,90,.08); border-color:rgba(255,90,90,.35)}
+  .note.y{background:rgba(255,195,0,.08); border-color:rgba(255,195,0,.35)}
+  .chk{display:flex; align-items:center; gap:8px; margin:10px 0; font-size:13px; color:var(--texto)}
+  .chk input{width:16px; height:16px; accent-color:var(--amarillo)}
+  .steps{counter-reset:s}
+  .steps div{
+    display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; font-size:13px; line-height:1.5;
+  }
+  .steps div::before{
+    counter-increment:s; content:counter(s); flex:0 0 22px; height:22px; border-radius:50%;
+    background:var(--azul); color:#fff; font-size:12px; font-weight:800; display:grid; place-items:center;
+  }
+  .muted{color:var(--muted); font-size:12px; line-height:1.5}
+  a{color:var(--amarillo)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">BIKER<span>PRO</span> · Generador de Creativos</div>
+  <p>Sube tu imagen, elige el creativo y descarga listo para Meta (9:16, 1:1 y 4:5).</p>
+</header>
+
+<div class="wrap">
+  <div class="note y"><strong>Cómo funciona:</strong> genera la imagen con IA <em>sin texto</em>, súbela aquí,
+  elige el creativo (A, B o C) y descarga. Los textos, colores de marca y formatos ya están listos.</div>
+
+  <div class="grid">
+    <!-- ================= CONTROLES ================= -->
+    <div>
+      <div class="card">
+        <h2>1. Sube tu imagen</h2>
+        <div class="drop" id="drop">
+          <strong>📁 Clic aquí o arrastra la imagen</strong>
+          <small>PNG o JPG · idealmente vertical 9:16 y sin texto</small>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div>
+            <label>Zoom</label>
+            <input type="range" id="zoom" min="100" max="220" value="100">
+          </div>
+          <div>
+            <label>Posición vertical</label>
+            <input type="range" id="offy" min="-50" max="50" value="0">
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Oscurecer para que lea el texto</label>
+            <input type="range" id="scrim" min="30" max="100" value="72">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>2. Elige el creativo</h2>
+        <div class="presets" id="presets">
+          <div class="preset on" data-p="A">TEST A<small>Prueba social</small></div>
+          <div class="preset" data-p="B">TEST B<small>Reflectivo noche</small></div>
+          <div class="preset" data-p="C">TEST C<small>Agua no pasa</small></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>3. Textos de la imagen</h2>
+        <p class="muted">Vienen listos. Edítalos solo si quieres.</p>
+        <label>Etiqueta (badge)</label>
+        <input type="text" id="badge">
+        <label>Titular</label>
+        <input type="text" id="titular">
+        <label>Subtítulo</label>
+        <input type="text" id="sub">
+        <label>Precio</label>
+        <input type="text" id="precio">
+        <label>Botón / llamado</label>
+        <input type="text" id="cta">
+        <div class="chk"><input type="checkbox" id="showLogo" checked><label for="showLogo" style="margin:0">Mostrar logo BikerPro</label></div>
+      </div>
+
+      <div class="card">
+        <h2>4. Descarga</h2>
+        <div class="row">
+          <button class="btn" id="dl">⬇️ Descargar este formato</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn sec" id="dlAll">📦 Descargar los 3 formatos</button>
+        </div>
+        <p class="muted" style="margin-top:10px">Se descargan en tamaño real: 1080×1920, 1080×1080 y 1080×1350.</p>
+      </div>
+
+      <div class="card">
+        <h2>5. Textos para pegar en Meta</h2>
+        <p class="muted">Cambian según el creativo elegido.</p>
+        <div class="lbl">Nombre del anuncio</div>
+        <div class="copybox" id="mName"></div>
+        <div class="lbl">Texto principal</div>
+        <div class="copybox" id="mBody"></div>
+        <div class="lbl">Titular</div>
+        <div class="copybox" id="mHead"></div>
+        <div class="lbl">Descripción</div>
+        <div class="copybox" id="mDesc"></div>
+        <div class="lbl">Botón</div>
+        <div class="copybox" id="mCta"></div>
+        <div class="lbl">Mensaje prellenado de WhatsApp</div>
+        <div class="copybox" id="mWa"></div>
+        <div class="lbl">Prompt de IA para la imagen</div>
+        <div class="copybox" id="mPrompt"></div>
+      </div>
+
+      <div class="card">
+        <h2>6. Montarlo en Meta</h2>
+        <div class="steps">
+          <div>Duplica el conjunto <strong>Domiciliarios</strong> y renómbralo <strong>"TEST Creativos"</strong>.</div>
+          <div>Presupuesto del conjunto nuevo: <strong>$12.000/día</strong>.</div>
+          <div>Borra los anuncios que vinieron en la copia.</div>
+          <div>Crea <strong>3 anuncios</strong>, uno por creativo, y sube la imagen descargada de aquí.</div>
+          <div>Pega los campos del bloque 5 en cada anuncio.</div>
+          <div>Baja <strong>Motorizados de $18.000 a $13.000</strong> para financiar el test.</div>
+          <div>Publica y <strong>deja correr 3–4 días sin tocar nada</strong>.</div>
+        </div>
+        <div class="note r" style="margin:14px 0 0"><strong>No toques el conjunto ganador</strong>
+        ("Fondo azul sin personaje"). Este test es aparte.</div>
+      </div>
+
+      <div class="card">
+        <h2>Reglas que no se rompen</h2>
+        <p class="muted" style="line-height:1.9">
+          ❌ Nunca "envío gratis" (el margen no lo aguanta).<br>
+          ❌ Nunca "contraentrega en toda Colombia" → usa <strong>"el producto lo pagas al recibir"</strong>.<br>
+          ❌ Nunca fucsia ni amarillo (amarillo agotado). Solo blanco, negro, rojo, verde y morado.<br>
+          ❌ El traje es <strong>NEGRO</strong>; lo que va en color es la <strong>franja reflectiva</strong>.<br>
+          ✅ Tallas siempre "S a 2XL". ✅ Precio $59.900 + envío. ✅ CTA hacia WhatsApp.
+        </p>
+      </div>
+    </div>
+
+    <!-- ================= PREVIEW ================= -->
+    <div>
+      <div class="preview">
+        <canvas id="c"></canvas>
+        <div class="fmt" id="fmts">
+          <button class="on" data-f="story">9:16 · Reels/Stories</button>
+          <button data-f="square">1:1 · Feed</button>
+          <button data-f="portrait">4:5 · Feed vertical</button>
+        </div>
+        <p class="muted">Vista previa reducida. La descarga sale en tamaño real.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FORMATS = {
+  story:    {w:1080, h:1920, label:'1080x1920'},
+  square:   {w:1080, h:1080, label:'1080x1080'},
+  portrait: {w:1080, h:1350, label:'1080x1350'}
+};
+
+const PRESETS = {
+  A: {
+    badge:'+50 clientes',
+    titular:'+50 motociclistas ya llegan secos',
+    sub:'Conjunto 4 piezas · Tallas S a 2XL',
+    precio:'$59.900 + envío',
+    cta:'Pídelo por WhatsApp',
+    meta:{
+      name:'TEST A - Prueba social +50 clientes',
+      body:`Ya somos +50 motociclistas que dejamos de llegar empapados 🏍️💧
+
+Conjunto impermeable de 4 piezas: chaqueta, pantalón, zapatones y bolsa.
+PVC siliconado calibre 8 con costura TERMOSELLADA = el agua no se filtra.
+
+✅ Franja reflectiva en 5 colores
+✅ Tallas S a 2XL
+✅ Capota incluida
+✅ El producto lo pagas al recibir 📦
+
+$59.900 + envío según tu ciudad.
+Escríbenos por WhatsApp 👇`,
+      head:'+50 motociclistas ya llegan secos',
+      desc:'4 piezas · $59.900 · Tallas S a 2XL',
+      cta:'Enviar mensaje por WhatsApp',
+      wa:'Hola BikerPro 👋 Vi el anuncio y quiero pedir el conjunto impermeable 🏍️',
+      prompt:'Advertising photography of several folded black motorcycle rain suits neatly stacked in a row, each showing a reflective stripe in a different color (white, black, red, green, purple), deep royal blue background, premium commercial studio lighting, no people, ultra sharp detail, true-to-life colors. Vertical 9:16, professional quality. No text.'
+    }
+  },
+  B: {
+    badge:'Reflectivo',
+    titular:'Que te vean de noche',
+    sub:'Franja reflectiva en 5 colores',
+    precio:'$59.900 + envío',
+    cta:'Pídelo por WhatsApp',
+    meta:{
+      name:'TEST B - Franja reflectiva noche',
+      body:`De noche, que te VEAN 🌙🏍️
+
+Nuestro conjunto impermeable trae franja reflectiva que brilla con las luces de los carros. Llegas seco y más seguro.
+
+✅ 4 piezas: chaqueta, pantalón, zapatones y bolsa
+✅ Costura termosellada = 0 filtraciones
+✅ Franja reflectiva en 5 colores
+✅ Tallas S a 2XL
+✅ El producto lo pagas al recibir 📦
+
+$59.900 + envío según tu ciudad.
+Escríbenos por WhatsApp 👇`,
+      head:'Que te vean de noche 🌙',
+      desc:'Franja reflectiva en 5 colores',
+      cta:'Enviar mensaje por WhatsApp',
+      wa:'Hola BikerPro 👋 Vi el anuncio del impermeable con franja reflectiva y quiero info 🌙',
+      prompt:'Advertising product photography of a black motorcycle rain jacket with a bright highly-reflective stripe glowing intensely as headlights hit it, dramatic dark navy blue background, product floating centered, no people, premium commercial lighting, ultra sharp detail, true-to-life colors. Vertical 9:16, professional studio quality. No text.'
+    }
+  },
+  C: {
+    badge:'Termosellado',
+    titular:'El agua no pasa',
+    sub:'Costura termosellada · 0 filtraciones',
+    precio:'$59.900 + envío',
+    cta:'Pídelo por WhatsApp',
+    meta:{
+      name:'TEST C - Demostracion agua rueda',
+      body:`¿De verdad no se moja? Míralo 💧
+
+PVC siliconado calibre 8 con costura TERMOSELLADA: el agua rueda y no pasa. Sin bolsillos, justamente para que no se filtre.
+
+✅ 4 piezas: chaqueta, pantalón, zapatones y bolsa
+✅ Capota incluida · bota recta
+✅ Franja reflectiva en 5 colores
+✅ Tallas S a 2XL
+✅ El producto lo pagas al recibir 📦
+
+$59.900 + envío según tu ciudad.
+Escríbenos por WhatsApp 👇`,
+      head:'El agua no pasa 💧',
+      desc:'Costura termosellada · 4 piezas',
+      cta:'Enviar mensaje por WhatsApp',
+      wa:'Hola BikerPro 👋 Vi el anuncio y quiero saber del conjunto impermeable 💧',
+      prompt:'Extreme close-up macro advertising photography of water droplets beading and rolling off black siliconized PVC waterproof fabric, glistening water beads, deep blue background, no people, premium commercial studio lighting, ultra sharp detail, high contrast. Vertical 9:16, professional quality. No text.'
+    }
+  }
+};
+
+const DISPLAY = "'Anton', Impact, system-ui, sans-serif";
+const BODY = "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+
+const state = { img:null, fmt:'story', preset:'A', zoom:100, offy:0, scrim:72, logo:true };
+const $ = id => document.getElementById(id);
+const canvas = $('c'), ctx = canvas.getContext('2d');
+
+/* ---------- helpers ---------- */
+function roundRect(x, rx, ry, rw, rh, r){
+  x.beginPath();
+  x.moveTo(rx+r, ry);
+  x.arcTo(rx+rw, ry, rx+rw, ry+rh, r);
+  x.arcTo(rx+rw, ry+rh, rx, ry+rh, r);
+  x.arcTo(rx, ry+rh, rx, ry, r);
+  x.arcTo(rx, ry, rx+rw, ry, r);
+  x.closePath();
+}
+function wrap(x, text, maxW){
+  const words = String(text||'').split(/\s+/).filter(Boolean);
+  const lines = []; let line = '';
+  for(const wd of words){
+    const t = line ? line+' '+wd : wd;
+    if(x.measureText(t).width > maxW && line){ lines.push(line); line = wd; }
+    else line = t;
+  }
+  if(line) lines.push(line);
+  return lines;
+}
+function coverDraw(x, img, w, h, zoom, offy){
+  const s = Math.max(w/img.width, h/img.height) * (zoom/100);
+  const dw = img.width*s, dh = img.height*s;
+  const dx = (w-dw)/2, dy = (h-dh)/2 + (offy/100)*h*0.5;
+  x.drawImage(img, dx, dy, dw, dh);
+}
+
+/* ---------- render ---------- */
+function render(target, fmtKey){
+  const {w,h} = FORMATS[fmtKey];
+  const c = target; c.width = w; c.height = h;
+  const x = c.getContext('2d');
+  const S = w/1080;
+  const pad = 76*S;
+
+  // fondo
+  x.fillStyle = '#061A3F'; x.fillRect(0,0,w,h);
+  if(state.img) coverDraw(x, state.img, w, h, state.zoom, state.offy);
+  else {
+    const g0 = x.createLinearGradient(0,0,w,h);
+    g0.addColorStop(0,'#0B3D91'); g0.addColorStop(1,'#061A3F');
+    x.fillStyle = g0; x.fillRect(0,0,w,h);
+    x.fillStyle = 'rgba(255,255,255,.35)';
+    x.font = `600 ${34*S}px ${BODY}`; x.textAlign='center';
+    x.fillText('Sube tu imagen para ver la vista previa', w/2, h*0.42);
+    x.textAlign='left';
+  }
+
+  // scrim inferior
+  const a = state.scrim/100;
+  const gh = h*0.66;
+  const g = x.createLinearGradient(0, h-gh, 0, h);
+  g.addColorStop(0, 'rgba(6,26,63,0)');
+  g.addColorStop(0.42, `rgba(6,26,63,${(a*0.78).toFixed(3)})`);
+  g.addColorStop(1, `rgba(6,26,63,${Math.min(a*1.32,0.98).toFixed(3)})`);
+  x.fillStyle = g; x.fillRect(0, h-gh, w, gh);
+
+  // scrim superior (para el logo)
+  const tg = x.createLinearGradient(0,0,0,h*0.2);
+  tg.addColorStop(0,'rgba(6,26,63,.70)'); tg.addColorStop(1,'rgba(6,26,63,0)');
+  x.fillStyle = tg; x.fillRect(0,0,w,h*0.2);
+
+  // logo
+  if(state.logo){
+    const fs = 46*S;
+    x.font = `400 ${fs}px ${DISPLAY}`;
+    x.textBaseline = 'top'; x.textAlign = 'left';
+    x.fillStyle = '#fff';
+    x.fillText('BIKER', pad, pad*0.62);
+    const wB = x.measureText('BIKER').width;
+    x.fillStyle = '#FFC300';
+    x.fillText('PRO', pad + wB, pad*0.62);
+  }
+
+  // barra amarilla inferior
+  x.fillStyle = '#FFC300'; x.fillRect(0, h-10*S, w, 10*S);
+
+  // ---- bloque de textos, de abajo hacia arriba ----
+  let yb = h - pad;
+  const maxW = w - pad*2;
+
+  // CTA (pill verde WhatsApp)
+  if(state.cta.trim()){
+    const fs = 40*S, ph = 102*S;
+    yb -= ph;
+    roundRect(x, pad, yb, maxW, ph, ph/2);
+    x.fillStyle = '#25D366'; x.fill();
+    x.font = `800 ${fs}px ${BODY}`;
+    x.fillStyle = '#062b12'; x.textAlign='center'; x.textBaseline='middle';
+    x.fillText(state.cta.toUpperCase(), w/2, yb + ph/2 + 1*S);
+    x.textAlign='left';
+    yb -= 34*S;
+  }
+
+  // precio
+  if(state.precio.trim()){
+    const fs = 66*S;
+    x.font = `400 ${fs}px ${DISPLAY}`;
+    const lh = fs*1.08;
+    yb -= lh;
+    x.fillStyle = '#FFC300'; x.textBaseline='top';
+    x.fillText(state.precio, pad, yb);
+    yb -= 16*S;
+  }
+
+  // subtítulo
+  if(state.sub.trim()){
+    const fs = 40*S;
+    x.font = `600 ${fs}px ${BODY}`;
+    const lines = wrap(x, state.sub, maxW);
+    const lh = fs*1.34;
+    yb -= lines.length*lh;
+    x.fillStyle = 'rgba(255,255,255,.94)'; x.textBaseline='top';
+    lines.forEach((l,i)=> x.fillText(l, pad, yb + i*lh));
+    yb -= 20*S;
+  }
+
+  // titular
+  if(state.titular.trim()){
+    let fs = 92*S;
+    let lines, lh;
+    for(let k=0;k<8;k++){
+      x.font = `400 ${fs}px ${DISPLAY}`;
+      lines = wrap(x, state.titular.toUpperCase(), maxW);
+      lh = fs*1.03;
+      if(lines.length <= 3) break;
+      fs *= 0.92;
+    }
+    yb -= lines.length*lh;
+    x.fillStyle = '#fff'; x.textBaseline='top';
+    lines.forEach((l,i)=> x.fillText(l, pad, yb + i*lh));
+    yb -= 26*S;
+  }
+
+  // badge
+  if(state.badge.trim()){
+    const fs = 32*S;
+    x.font = `800 ${fs}px ${BODY}`;
+    const tw = x.measureText(state.badge.toUpperCase()).width;
+    const bh = fs*2.05, bw = tw + fs*1.7;
+    yb -= bh;
+    roundRect(x, pad, yb, bw, bh, bh/2);
+    x.fillStyle = '#FFC300'; x.fill();
+    x.fillStyle = '#061A3F'; x.textBaseline='middle'; x.textAlign='left';
+    x.fillText(state.badge.toUpperCase(), pad + fs*0.85, yb + bh/2 + 1*S);
+  }
+}
+
+function draw(){ render(canvas, state.fmt); }
+
+/* ---------- textos de Meta ---------- */
+function fillMeta(){
+  const m = PRESETS[state.preset].meta;
+  const set = (id, val) => {
+    const el = $(id);
+    el.textContent = val;
+    const b = document.createElement('button');
+    b.textContent = 'Copiar';
+    b.onclick = () => {
+      navigator.clipboard.writeText(val).then(()=>{
+        b.textContent = '✓ Listo';
+        setTimeout(()=> b.textContent='Copiar', 1400);
+      });
+    };
+    el.appendChild(b);
+  };
+  set('mName', m.name); set('mBody', m.body); set('mHead', m.head);
+  set('mDesc', m.desc); set('mCta', m.cta); set('mWa', m.wa); set('mPrompt', m.prompt);
+}
+
+function loadPreset(p){
+  state.preset = p;
+  const d = PRESETS[p];
+  $('badge').value = d.badge; $('titular').value = d.titular;
+  $('sub').value = d.sub; $('precio').value = d.precio; $('cta').value = d.cta;
+  syncTexts(); fillMeta(); draw();
+}
+function syncTexts(){
+  state.badge = $('badge').value; state.titular = $('titular').value;
+  state.sub = $('sub').value; state.precio = $('precio').value; state.cta = $('cta').value;
+}
+
+/* ---------- eventos ---------- */
+$('drop').onclick = () => $('file').click();
+$('drop').ondragover = e => { e.preventDefault(); $('drop').classList.add('over'); };
+$('drop').ondragleave = () => $('drop').classList.remove('over');
+$('drop').ondrop = e => {
+  e.preventDefault(); $('drop').classList.remove('over');
+  if(e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+};
+$('file').onchange = e => { if(e.target.files[0]) readFile(e.target.files[0]); };
+
+function readFile(f){
+  if(!f.type.startsWith('image/')) return alert('Ese archivo no es una imagen.');
+  const r = new FileReader();
+  r.onload = ev => {
+    const im = new Image();
+    im.onload = () => { state.img = im; draw(); };
+    im.src = ev.target.result;
+  };
+  r.readAsDataURL(f);
+}
+
+['badge','titular','sub','precio','cta'].forEach(id => {
+  $(id).oninput = () => { syncTexts(); draw(); };
+});
+$('zoom').oninput = e => { state.zoom = +e.target.value; draw(); };
+$('offy').oninput = e => { state.offy = +e.target.value; draw(); };
+$('scrim').oninput = e => { state.scrim = +e.target.value; draw(); };
+$('showLogo').onchange = e => { state.logo = e.target.checked; draw(); };
+
+$('presets').onclick = e => {
+  const el = e.target.closest('.preset'); if(!el) return;
+  document.querySelectorAll('.preset').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  loadPreset(el.dataset.p);
+};
+$('fmts').onclick = e => {
+  const b = e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#fmts button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  state.fmt = b.dataset.f; draw();
+};
+
+function download(fmtKey){
+  const tmp = document.createElement('canvas');
+  render(tmp, fmtKey);
+  const a = document.createElement('a');
+  a.download = `bikerpro-TEST-${state.preset}-${FORMATS[fmtKey].label}.png`;
+  a.href = tmp.toDataURL('image/png');
+  a.click();
+}
+$('dl').onclick = () => {
+  if(!state.img && !confirm('No has subido imagen. ¿Descargar solo con el fondo azul?')) return;
+  download(state.fmt);
+};
+$('dlAll').onclick = () => {
+  if(!state.img && !confirm('No has subido imagen. ¿Descargar solo con el fondo azul?')) return;
+  const keys = Object.keys(FORMATS);
+  keys.forEach((k,i) => setTimeout(()=> download(k), i*450));
+};
+
+/* ---------- arranque ---------- */
+function boot(){ loadPreset('A'); }
+if(document.fonts && document.fonts.ready){
+  Promise.race([document.fonts.ready, new Promise(r=>setTimeout(r,2500))]).then(boot);
+} else boot();
+</script>
+</body>
+</html>
