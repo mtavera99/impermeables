@@ -4,24 +4,51 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-07-28 — ~26 ventas acumuladas · riesgo de UN solo creativo · saldo día a día
+Última actualización: 2026-07-31 — 50 VENTAS · CAC $7.789 · generador de creativos · test publicado
 
 ---
 
 ## 0. ⭐ DÓNDE QUEDAMOS HOY (lo más importante)
 
-**Resumen en una línea:** 🔥 EL NEGOCIO ESTÁ VENDIENDO BIEN (~26 ventas acumuladas; el 27-jul fue el
-mejor día con **7 ventas**). El CAC está en ~$6.429 (meta era $8-10k). Presupuesto en **$36.000/día**.
-Los 2 riesgos/frenos actuales son: (1) **el 99,7% de las conversaciones vienen de UN SOLO creativo**
-("Fondo azul sin personaje") y (2) el dueño **recarga el saldo de Meta día a día**, lo que causa
-apagones y re-arranques caros. El bot sigue SIN conectar (todo manual).
+**Resumen en una línea:** 🔥 **NEGOCIO RENTABLE Y VALIDADO: 50 VENTAS, 1 SOLO RECHAZO (~4%),
+CAC $7.789** (dentro de la meta de $8-10k) y **utilidad proyectada ~$750.000**. Frecuencia < 1,5
+(audiencia fresca, hay espacio para escalar). Se creó el **generador de creativos** y ya está
+**publicado el conjunto "TEST Creativos"** con 3 creativos nuevos. El bot sigue SIN conectar (todo manual).
+**El freno ya NO es Meta: son inventario, caja y el tiempo del dueño.**
 
-**📅 ESTADO AL 2026-07-28:**
-- Campaña **ACTIVA**, presupuesto $36.000/día (día 3 de este nivel).
-- Ventas acumuladas ≈ **26** (5 ronda 1 + 14 ronda 2 + 7 el 27-jul). ⚠️ Conteo aproximado, confirmar.
-- ⏳ PENDIENTE: entregas de los **13 contraentrega** de la ronda 2 + los del 27-jul.
-- ⚠️ Verificar si el presupuesto de la campaña sigue **por conjunto (ABO)** o cambió a **compartido (CBO)**
-  — en el panel del 28-jul aparecía la palabra "Compartido" y eso cambia cómo se reparte la plata.
+**📅 ESTADO AL 2026-07-31 (métricas acumuladas 1–31 jul):**
+
+| Métrica | Valor |
+|---|---|
+| Conversaciones | **749** |
+| Gastado | $389.432 |
+| Costo/conversación | $520 |
+| **Ventas** | **50** |
+| **Tasa de cierre** | **6,68%** |
+| **CAC (pub/venta)** | **$7.789** ✅ dentro de meta |
+| Alcance | 52.074 personas |
+| Frecuencia | 1,60 acumulada · **< 1,5 en 7 días** ✅ sana |
+| CTR | 1,89% · CPC $248 |
+
+- **VENTANA RECIENTE (27–31 jul, la mejor):** 373 conversaciones · $179.432 · ~31 ventas ·
+  **cierre ~8,3%** · **CAC $5.788** (el mejor de la historia). El cierre sigue subiendo: 2,84% → 7% → 8,3%.
+- **RECHAZOS: 1 de ~25 resueltos = ~4%** (el pendiente es uno que no ha recogido en oficina de
+  Interrapidísimo). MUY por debajo del break-even de ~25% → **CONTRAENTREGA CONFIRMADA** definitivamente.
+- **Utilidad proyectada:** ~$750.000 con rechazo 4% · ~$634.000 con 10% · ~$437.000 con 20%.
+- **~25 pedidos en ruta** = ~$850.000 en producto ya pagado sin cobrar (capital de trabajo amarrado).
+- ✅ **RESUELTO:** el presupuesto SÍ es **por conjunto (ABO)** — el CSV dice "Con el presupuesto del
+  conjunto de anuncios". La palabra "Compartido" del panel era otra cosa. Estructura OK para el test.
+
+**🧪 TEST DE CREATIVOS — PUBLICADO (2026-07-31):**
+- Se creó el conjunto **"TEST Creativos"** con 3 anuncios nuevos (Prueba social, Reflectivo, Termosellado).
+- ⏳ **Dejar correr 3-4 días SIN tocar.** Referencia a batir: **~$480-520 por conversación**.
+- Al 4º día: si alguno rinde igual o mejor → subirlo al conjunto principal (ya hay respaldo) → **ahí sí escalar**.
+
+**🔍 HALLAZGO QUE CORRIGE UNA HIPÓTESIS ANTERIOR:** se creía que el CTR bajando (2,12% → 1,74%) era
+fatiga del creativo. **NO lo es** — con frecuencia < 1,5 la gente no lo ve repetido. La causa real es
+que **Meta salió a públicos más amplios** (alcance 18.362 → 52.074), y al ir más lejos entra gente
+menos calificada. **Es normal al escalar y no es grave** mientras el CAC siga sano (y está en $5.788).
+→ Por eso la urgencia de creativos nuevos BAJA, pero el test sigue siendo valioso (no depender de uno solo).
 
 **🚀 HITO 2026-07-26 — RONDA 2 DE CAMPAÑA (3 días, tras optimizar creativos):**
 
@@ -309,6 +336,39 @@ creativos nuevos en el mismo conjunto del ganador: no se mostrarían.**
 
 ---
 
+## 6-B. 🎨 GENERADOR DE CREATIVOS (`creativos.html`) — creado 2026-07-31
+
+**URL:** https://mtavera99.github.io/impermeables/creativos.html
+
+Herramienta front-end pura (HTML/CSS/JS, sin dependencias) que arma los creativos automáticamente.
+**Flujo:** generar imagen con IA sin texto → subirla al generador → elegir creativo (A, B o C) →
+descargar YA TERMINADO.
+
+**Qué hace:**
+- Monta la imagen con degradado azul de marca para que el texto se lea.
+- Pone logo BikerPro, badge amarillo, titular (fuente Anton), subtítulo, precio y botón verde de WhatsApp.
+- Exporta los 3 formatos de Meta: **1080×1920 (9:16) · 1080×1080 (1:1) · 1080×1350 (4:5)**.
+- Nombra archivos solo: `bikerpro-TEST-A-1080x1920.png`.
+- Controles: zoom, posición vertical, nivel de oscurecimiento, textos editables, mostrar/ocultar logo.
+- Incluye TODOS los textos de Meta con botón de copiar + el prompt de IA de cada creativo.
+
+**⚠️ PENDIENTE DE ARREGLO — ZONAS SEGURAS:** el generador pone el botón de WhatsApp y la barra amarilla
+a ~135px del borde inferior. Meta tapa con su interfaz el **14% de arriba (~270px)** y el **20% de abajo
+(~380px)** en Stories/Reels → **el botón puede quedar tapado**. Falta subir los textos en formato 9:16
+y/o mostrar guías de zona segura.
+
+**Los 3 creativos del test (cada uno con ángulo distinto para no canibalizarse):**
+- **A — Prueba social:** "+50 motociclistas ya llegan secos" (usa el activo nuevo: los clientes reales).
+- **B — Reflectivo:** "Que te vean de noche" (ángulo de SEGURIDAD, no solo lluvia; pega a domiciliarios).
+- **C — Termosellado:** "El agua no pasa" (prueba técnica; ataca la objeción "¿de verdad no se moja?").
+- **D (opcional, propuesto):** "Todo el kit para la lluvia" — las 4 piezas visibles (ángulo de VALOR).
+
+**Prompt para las 4 piezas (Gemini):** pedir explícitamente las 4 piezas separadas, en la MITAD SUPERIOR,
+dejando el TERCIO INFERIOR vacío y oscuro para el texto. Nota: **las IAs cuentan mal** — hay que generar
+varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir mejor).
+
+---
+
 ## 6. La app dashboard (`index.html`)
 
 - Dashboard de una página (HTML/CSS/JS puro), en GitHub Pages: https://mtavera99.github.io/impermeables/
@@ -386,27 +446,34 @@ creativos nuevos en el mismo conjunto del ganador: no se mostrarían.**
 3. [x] **Campaña relanzada optimizada (2026-07-25)** → RONDA 2: 14 ventas, CAC $6.429, cierre 7%.
 4. [x] **Escalado a $36.000/día (2026-07-26)**, +20%. Solo presupuesto.
 5. [x] **Creativos malos pausados en Motorizados** (Peluca video y Peluca fondo negro: $0 gastados).
+6. [x] **50 VENTAS acumuladas con solo 1 rechazo (~4%)** y CAC $7.789 dentro de meta (2026-07-31).
+7. [x] **Generador de creativos creado** (`creativos.html`) — ver sección 6-B.
+8. [x] **Conjunto "TEST Creativos" PUBLICADO** con los 3 creativos nuevos (2026-07-31).
+9. [x] **Confirmado: presupuesto es ABO (por conjunto)**, no compartido.
 
 ### 🔥 Prioridad ALTA (ahora)
-6. [ ] 💰 **Cargar saldo de Meta para 3-7 días** (o método de pago automático) → dejar de perder plata
-   en re-arranques caros por quedarse sin fondos. Ver sección 11.
-7. [ ] 🎨 **Crear 2-3 creativos nuevos** estilo "Fondo azul" (limpio, producto directo, sin personaje)
-   en un **conjunto "TEST Creativos"** duplicado de Domiciliarios, $10-12k/día. Es el SEGURO DE VIDA
-   contra el desgaste del único creativo que sostiene el 99,7% del negocio. Ver sección 11.
-8. [ ] 📦💵 **Vigilar INVENTARIO y FLUJO DE CAJA** — a 7 ventas/día son ~$238.000 de producto por día.
-   Es el límite real del crecimiento, no Meta.
-9. [ ] 📦 **Confirmar entregas** de los 13 contraentrega de la ronda 2 + los del 27-jul.
+10. [ ] ⏳ **Dejar correr el TEST 3-4 días SIN tocar.** Al 4º día evaluar contra la referencia
+    (~$480-520/conversación). Si alguno rinde igual o mejor → subirlo al conjunto principal.
+11. [ ] 💰 **Cargar saldo de Meta para 3-7 días** (o método de pago automático) → dejar de perder plata
+    en re-arranques caros por quedarse sin fondos. Ver sección 11.
+12. [ ] 📦💵 **Vigilar INVENTARIO y FLUJO DE CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
+    A 6-7 ventas/día son ~$238.000 de producto por día. **Es el freno real, ya no es Meta.**
+13. [ ] 📦 **Confirmar entregas** de los ~25 pedidos en ruta. Rescatar el que no ha recogido en oficina
+    (escribirle directo: Interrapidísimo devuelve el paquete en pocos días).
 
 ### 🟡 Prioridad media
-10. [ ] 🧹 **Limpieza de anuncios:** apagar "Peluca video" (Domiciliarios, $0) y "Nuevo anuncio de
+14. [ ] 🔧 **Arreglar zonas seguras en el generador** — el botón de WhatsApp queda tapado en Stories
+    (Meta tapa 20% abajo / 14% arriba). Ver sección 6-B.
+15. [ ] 🧹 **Limpieza de anuncios:** apagar "Peluca video" (Domiciliarios, $0) y "Nuevo anuncio de
     Clientes potenciales" ($122, 0 resultados) — no aportan y ensucian la lectura.
-11. [ ] 🎯 **Decidir sobre Motorizados** (sub-gasta pero es más barato): ampliar audiencia o mover
+16. [ ] 🎯 **Decidir sobre Motorizados** (sub-gasta pero es más barato): ampliar audiencia o mover
     presupuesto a Domiciliarios.
-12. [ ] ⚙️ **Verificar si el presupuesto es por conjunto (ABO) o compartido (CBO)** — en el panel del
-    28-jul aparecía "Compartido". Importa antes de crear el conjunto de prueba.
-13. [ ] 🌟 **Conseguir testimonios/fotos** — ya hay ~26 clientes (mucho material).
-14. [ ] 🔌 **Conectar el bot a WhatsApp** — ya es NECESARIO (cuello de botella = tiempo del dueño).
+17. [ ] 🌟 **Conseguir testimonios/fotos** — ya hay **50 clientes** (muchísimo material). Alimenta el
+    Creativo A (prueba social) y sube el cierre.
+18. [ ] 🔌 **Conectar el bot a WhatsApp** — ya es NECESARIO (cuello de botella = tiempo del dueño).
     Bloqueo = número real trancado en Meta. Al conectar, confirmar facturación de Gemini.
+19. [ ] 📈 **Escalar presupuesto otro 20-30%** cuando (a) el test dé un respaldo y (b) inventario y caja
+    lo permitan. Con frecuencia < 1,5 y CAC $5.788, Meta NO es el límite.
 
 ### 🔵 Prioridad baja / bloqueados por Meta
 15. [ ] 🏢 **Verificación del negocio** en Meta (Pending review varios días — revisar Centro de seguridad
@@ -473,6 +540,53 @@ costo por conversación**. Hoy se está pagando "precio de afán".
 - **Reglas de oro:** nunca pausar/editar el ganador para testear · máximo 2-3 creativos nuevos ·
   el objetivo NO es superar al ganador sino tener un **respaldo** · si uno rinde igual o mejor, subirlo
   al conjunto principal.
+
+### 🐛 PROBLEMA RESUELTO: "el texto del anuncio no se publica" (2026-07-31)
+El dueño reportó que al publicar anuncios, algunos salían **sin el texto principal**. Diagnóstico:
+
+**Causa raíz encontrada:** los campos estaban REALMENTE VACÍOS y el anuncio quedaba en **BORRADOR**.
+- 🪤 **LA TRAMPA:** abajo dice *"✓ Se guardaron todos los cambios"* pero eso **solo guarda el BORRADOR**.
+  Arriba sigue diciendo **"Cambios sin publicar"**. **Hay que darle "Publicar"**.
+  → **REGLA: después de editar, confirmar que el aviso "Cambios sin publicar" DESAPARECIÓ.**
+- ⚠️ **"Optimizar texto por persona" estaba ACTIVADO** → Meta mueve/cambia los textos entre campos.
+  Desactivarlo si se quiere que salga exactamente lo escrito.
+
+**Segundo síntoma: "pongo el texto y se borra solo antes de publicar".** Causas probables (en orden):
+1. **Muchas pestañas de Ads Manager abiertas** → una pestaña con estado viejo sobrescribe y borra la otra.
+   Solución: **UNA sola pestaña**, editar, publicar, cerrar.
+2. **Extensiones de traductor** (el dueño tiene "VozPuente Traductor" y "TRADUCTOR AI") → reescriben el DOM
+   y vacían los campos de React. Solución: desactivarlas o **probar en ventana de incógnito**.
+3. **"Optimizar texto por persona"** → desactivar PRIMERO, luego escribir.
+4. Otros: pegar como texto plano (Cmd+Shift+V), probar sin emojis, llenar y publicar de una sola pasada,
+   o **descartar borrador y crear el anuncio de cero**. Plan B: la app móvil de Ads Manager.
+
+### 📄 POR QUÉ EL TEXTO PRINCIPAL NO SIEMPRE SE VE
+- **Cada ubicación muestra los textos distinto:** Feed ~50-150 caracteres; Stories/Marketplace 125/40;
+  Reels de Facebook 40/55; **columna derecha solo titular (sin texto principal)**; banner de Reels ~10
+  caracteres de titular. Con Ubicaciones Advantage+ el anuncio corre en todas.
+- **Meta recomienda 125 caracteres** de texto principal; más largo se corta con "Ver más".
+- 🚨 **ERROR A EVITAR:** poner el precio y el CTA al FINAL del texto → nadie los ve (quedan tras "Ver más").
+  **Poner lo esencial (gancho + precio + pago + CTA) en las PRIMERAS líneas.**
+- ✅ **REGLA DE ORO: la imagen SIEMPRE se ve; el texto principal NO.** Por eso el mensaje clave va
+  QUEMADO EN LA IMAGEN (lo que hace el generador). El texto principal es un extra, nunca lo esencial.
+- **Verificar antes de publicar:** en la vista previa, **cambiar la ubicación en el desplegable** (Feed,
+  Stories, Reels...). La vista por defecto no muestra cómo se ve realmente en todas partes.
+
+### 📐 ZONAS SEGURAS DE META (importante para los creativos)
+- En **Stories/Reels** Meta tapa con su interfaz el **14% superior (~270px)** y el **20% inferior (~380px)**.
+- Mantener el texto importante en el **centro 60-70%** del cuadro.
+- Un análisis de +5.000 campañas encontró que **42% de los usuarios pierde interés** cuando la interfaz
+  tapa el texto importante.
+
+### 📊 FRECUENCIA (dónde verla y cómo leerla)
+- **Dónde:** Ads Manager → botón **"Columnas"** → preset **"Entrega"** (trae Alcance, Impresiones,
+  Frecuencia, CPM). O **"Personalizar columnas"** → buscar "Frecuencia" → guardar como vista.
+- **Fórmula:** Impresiones ÷ Alcance.
+- **Interpretación:** 1,0–2,0 = sana, hay espacio para escalar · 2,0–3,0 = ojo, empieza a saturar ·
+  3,0+ = saturado (CTR cae, costos suben).
+- ⚠️ **Verla con rango "Últimos 7 días"**, NO el acumulado del mes (la frecuencia se acumula y el
+  acumulado mezcla periodos). Y revisarla **por conjunto**.
+- **Estado 2026-07-31: < 1,5 en 7 días** → audiencia fresca, espacio para escalar.
 
 ### 📏 REGLAS DE LECTURA DE DATOS (para no reaccionar mal)
 - ❌ NO juzgar por: horas, ni un día parcial. ✅ SÍ juzgar por: ventanas de **3-4 días** y **~50+ conversaciones**.
