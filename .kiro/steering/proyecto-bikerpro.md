@@ -4,16 +4,24 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-07-26 — RONDA 2: 14 ventas, CAC $6.429, escalamiento a $36.000/día
+Última actualización: 2026-07-28 — ~26 ventas acumuladas · riesgo de UN solo creativo · saldo día a día
 
 ---
 
 ## 0. ⭐ DÓNDE QUEDAMOS HOY (lo más importante)
 
-**Resumen en una línea:** 🔥 EL NEGOCIO YA ES RENTABLE. La ronda 2 (3 días, $90.000) dio **14 ventas**
-con **CAC de $6.429** (meta era $8-10k) y la tasa de cierre subió de 2,84% a **7%**. Se escaló el
-presupuesto a **$36.000/día** (2026-07-26). El bot sigue SIN conectar (todo manual) y el cuello de
-botella ya es el TIEMPO del dueño + inventario + flujo de caja.
+**Resumen en una línea:** 🔥 EL NEGOCIO ESTÁ VENDIENDO BIEN (~26 ventas acumuladas; el 27-jul fue el
+mejor día con **7 ventas**). El CAC está en ~$6.429 (meta era $8-10k). Presupuesto en **$36.000/día**.
+Los 2 riesgos/frenos actuales son: (1) **el 99,7% de las conversaciones vienen de UN SOLO creativo**
+("Fondo azul sin personaje") y (2) el dueño **recarga el saldo de Meta día a día**, lo que causa
+apagones y re-arranques caros. El bot sigue SIN conectar (todo manual).
+
+**📅 ESTADO AL 2026-07-28:**
+- Campaña **ACTIVA**, presupuesto $36.000/día (día 3 de este nivel).
+- Ventas acumuladas ≈ **26** (5 ronda 1 + 14 ronda 2 + 7 el 27-jul). ⚠️ Conteo aproximado, confirmar.
+- ⏳ PENDIENTE: entregas de los **13 contraentrega** de la ronda 2 + los del 27-jul.
+- ⚠️ Verificar si el presupuesto de la campaña sigue **por conjunto (ABO)** o cambió a **compartido (CBO)**
+  — en el panel del 28-jul aparecía la palabra "Compartido" y eso cambia cómo se reparte la plata.
 
 **🚀 HITO 2026-07-26 — RONDA 2 DE CAMPAÑA (3 días, tras optimizar creativos):**
 
@@ -95,17 +103,17 @@ CIERRE (2,84%), que es la mayor palanca de mejora.
    - DECISIÓN DEL USUARIO (vigente a 2026-07-24): mientras Meta aprueba la verificación, **atiende
      las ventas MANUALMENTE por WhatsApp** en el número real (no perder ventas). El bot solo se
      prueba en el número de prueba.
-4. 🔴 **Anuncios Meta:** APAGADOS por falta de saldo/fondos de prepago (`not_delivering`, presupuesto 0).
-   Cada día apagados = ~44 conversaciones baratas que se dejan de recibir. Ver embudo en sección 3.
-5. 🎨 **Web (`index.html`) — CORREGIDA HOY:** colores actualizados a 5 franjas reales (PR #18 FUSIONADO)
-   y flujo de WhatsApp arreglado para preguntar la CIUDAD primero (PR #19 — ⚠️ FALTA FUSIONARLO).
+4. 🟢 **Anuncios Meta:** ACTIVOS, $36.000/día. ⚠️ PERO el dueño recarga el saldo prepago **día a día**,
+   lo que causa apagones y re-arranques caros (ver sección 11).
+5. ✅ **Web (`index.html`):** colores corregidos a 5 franjas reales (PR #18) y flujo de WhatsApp que
+   pregunta la CIUDAD primero (PR #19). **Ambos FUSIONADOS.**
 
 **Próximo paso lógico (orden correcto):**
-1. Fusionar el **PR #19** (arreglo del flujo de WhatsApp).
-2. Ver **entregas de Interrapidísimo** (dato #1: de las 5 ventas, ¿cuántas se entregan y pagan?).
-   Ese número dice si el rechazo está bajo el break-even de ~25% (ver sección 7).
-3. NO escalar la campaña todavía — primero subir el % de cierre (2,84% tiene techo enorme) y
-   conectar el bot. Recargar poco para no quedar a oscuras, pero el gran gasto va después.
+1. 💰 **Cargar saldo para 3-7 días** (o método de pago automático) → deja de perder plata en re-arranques.
+2. 🎨 **Crear 2-3 creativos nuevos** estilo "Fondo azul" en un CONJUNTO DE PRUEBA (ver sección 11) →
+   es el seguro de vida contra el desgaste del único creativo que funciona.
+3. 📦 Ver **entregas** de los contraentrega en tránsito + vigilar **inventario y caja**.
+4. 🔌 **Conectar el bot** (el cuello de botella ya es el tiempo del dueño).
 
 ---
 
@@ -196,6 +204,49 @@ Datos del export de Meta (campaña "Impermeables · Prospección Motociclistas",
   (break-even). Llegó a equilibrio con el bot sin conectar y cierre bajo (2,84%) → margen de mejora enorme.
 - CAC: $24.000/venta. Baja fuerte si sube el cierre (2,84% → 6% ≈ el doble de ventas, mismo gasto).
 - 🌟 ACCIÓN EN CURSO: pedir foto + testimonio a los 5 clientes (prueba social para subir el cierre).
+
+### 🔬 ANÁLISIS POR ANUNCIO (21–27 jul 2026) — EL HALLAZGO MÁS IMPORTANTE
+
+| Anuncio | Conjunto | Estado | Gastó | Conv. | Costo/conv |
+|---|---|---|---|---|---|
+| 🏆 **Fondo azul sin personaje** | Domiciliarios | activo | $91.692 | **189** | $485 |
+| 🏆 **Fondo azul sin personaje** | Motorizados | activo | $69.113 | **149** | **$464** |
+| Peluca fondo negro | Domiciliarios | activo | $680 | 1 | $680 |
+| Nuevo anuncio C. potenciales | Motorizados | activo | $122 | 0 | — |
+| Peluca video | Domiciliarios | activo | **$0** | 0 | — |
+| Peluca fondo negro | Motorizados | ⏸️ inactivo | $0 | — | — |
+| Peluca video | Motorizados | ⏸️ inactivo | $0 | — | — |
+
+**Totales ventana:** $161.607 gastados · 339 conversaciones · ~$477/conv.
+
+**🚨 RIESGO #1 — DEPENDENCIA DE UN SOLO CREATIVO:** "Fondo azul sin personaje" genera **338 de 339
+conversaciones = 99,7%** del negocio. Cuando ese creativo se desgaste, el negocio se cae de golpe.
+Aún NO hay desgaste (frecuencia 1,17–1,22, muy sana) → hay tiempo, pero es URGENTE producir respaldos.
+
+**⚠️ HALLAZGO #2 — MOTORIZADOS SUB-GASTA:** gastó $69.235 vs $92.372 de Domiciliarios (25% menos),
+**aunque es MÁS BARATO** ($464 vs $485/conv). Su audiencia es más estrecha y no logra gastar su
+presupuesto → de ahí la alerta **"Presupuesto bajo utilizado"**. Opciones: (A) ampliar su audiencia
+(más intereses/edad/ciudades) o (B) mover ese presupuesto a Domiciliarios, que sí lo absorbe.
+
+**✅ ACLARACIÓN sobre "Presupuesto bajo utilizado":** NO es un error. Significa que el anuncio/conjunto
+tiene presupuesto disponible pero no lo gasta, porque Meta **concentra toda la entrega en el ganador**.
+Comprobado en esta cuenta: los anuncios que no son el ganador reciben $0. **Por eso NO sirve meter
+creativos nuevos en el mismo conjunto del ganador: no se mostrarían.**
+
+### 💰 VENTAS 27-JUL (MEJOR DÍA) Y ACUMULADO
+- **27-jul: 7 ventas en un día** — el mejor día hasta la fecha.
+- **Acumulado ≈ 26 ventas:** 5 (ronda 1, todas entregadas) + 14 (ronda 2) + 7 (27-jul).
+  ⚠️ Conteo aproximado — confirmar con el dueño.
+- ⏳ Entregas pendientes de confirmar: los 13 contraentrega de la ronda 2 + los del 27-jul.
+- ⚠️ 7 ventas/día ≈ $238.000 de producto por día → **inventario y caja son el límite real, no Meta.**
+
+### 📉 DATO PARCIAL 28-JUL (ejemplo de cómo NO leer los números)
+- A las 3:29 pm: $8.290 gastados · 5 conversaciones · **$1.659/conv** (3,4× más caro de lo normal).
+- **Es NORMAL y no significa nada:** muestra minúscula (5 conv), solo ~2,5 h de entrega, y **recién
+  reactivado tras quedarse sin saldo** (los re-arranques son caros al inicio y se normalizan).
+- **REGLA DE LECTURA:** nunca juzgar por horas ni por un día parcial. Juzgar por ventanas de **3-4 días**
+  y con al menos **~50 conversaciones**. Reaccionar a un número de media tarde es el error más común
+  (cada cambio provoca otro re-arranque caro).
 
 ---
 
@@ -327,26 +378,43 @@ Datos del export de Meta (campaña "Impermeables · Prospección Motociclistas",
 
 ---
 
-## 9. Pendientes priorizados (checklist para retomar) — ACTUALIZADO 2026-07-25
+## 9. Pendientes priorizados (checklist para retomar) — ACTUALIZADO 2026-07-28
 
-1. [x] ✅ **PR #18 (colores) y PR #19 (flujo WhatsApp ciudad primero) FUSIONADOS.** Web actualizada.
-2. [x] ✅ **Entregas de Interrapidísimo: 5/5 entregadas y pagadas (rechazo 0%).** Contraentrega confirmada.
-3. [x] ✅ **Campaña relanzada optimizada (2026-07-25)** → RONDA 2 exitosa: 14 ventas, CAC $6.429, cierre 7%.
-4. [x] ✅ **Escalado a $36.000/día (2026-07-26)**, +20%. Solo presupuesto, nada más.
-   → ⏳ AHORA: **dejarla correr 3-4 días SIN tocar** y evaluar (¿CAC sigue bajo $10.000?).
-5. [ ] 📦 **Resultado de entregas de los 13 contraentrega** de la ronda 2 (¿cuántos rechazos?).
-6. [ ] 📦💵 **Verificar INVENTARIO y FLUJO DE CAJA** antes del próximo escalamiento (frenos reales).
-7. [ ] 🌟 **Conseguir testimonios/fotos** — ya hay **19 clientes** (mucho más material que antes).
-8. [ ] 🔌 **Conectar el bot a WhatsApp** — ya es NECESARIO (el cuello de botella es el tiempo del dueño).
-   Bloqueo = número real trancado en Meta (verificación Pending review). Al conectar, confirmar Gemini.
-9. [ ] 🎯 **A los 3-4 días: evaluar y escalar otro 20-30%** si el CAC sigue bajo $10.000.
-8. [ ] 🏢 **Verificación del negocio** en Meta (enviada, Pending review varios días — revisar Centro de
-   seguridad por si piden documento; nombre/dirección deben coincidir exactos).
-9. [ ] 📱 **Migrar número real 313 861 5813** a Cloud API (cuando el negocio esté verificado; verificar el
-   número con código por LLAMADA, no SMS). El número NO debe estar logueado en la app de WhatsApp.
-10. [ ] 💳 Agregar **método de pago de WhatsApp/Meta** · 📸 Fotos reales de **blanco** y **morado** ·
-   🎬 subir **video** (< 15 MB) → activar en el bot.
-11. [ ] 🧹 Limpiar/eliminar la WABA vacía "biker" · limpiar archivos raros en `/assets/productos/`.
+### ✅ Ya hecho
+1. [x] **PR #18 (colores) y PR #19 (flujo WhatsApp ciudad primero) FUSIONADOS.** Web actualizada.
+2. [x] **Entregas ronda 1: 5/5 entregadas y pagadas (rechazo 0%).** Contraentrega confirmada.
+3. [x] **Campaña relanzada optimizada (2026-07-25)** → RONDA 2: 14 ventas, CAC $6.429, cierre 7%.
+4. [x] **Escalado a $36.000/día (2026-07-26)**, +20%. Solo presupuesto.
+5. [x] **Creativos malos pausados en Motorizados** (Peluca video y Peluca fondo negro: $0 gastados).
+
+### 🔥 Prioridad ALTA (ahora)
+6. [ ] 💰 **Cargar saldo de Meta para 3-7 días** (o método de pago automático) → dejar de perder plata
+   en re-arranques caros por quedarse sin fondos. Ver sección 11.
+7. [ ] 🎨 **Crear 2-3 creativos nuevos** estilo "Fondo azul" (limpio, producto directo, sin personaje)
+   en un **conjunto "TEST Creativos"** duplicado de Domiciliarios, $10-12k/día. Es el SEGURO DE VIDA
+   contra el desgaste del único creativo que sostiene el 99,7% del negocio. Ver sección 11.
+8. [ ] 📦💵 **Vigilar INVENTARIO y FLUJO DE CAJA** — a 7 ventas/día son ~$238.000 de producto por día.
+   Es el límite real del crecimiento, no Meta.
+9. [ ] 📦 **Confirmar entregas** de los 13 contraentrega de la ronda 2 + los del 27-jul.
+
+### 🟡 Prioridad media
+10. [ ] 🧹 **Limpieza de anuncios:** apagar "Peluca video" (Domiciliarios, $0) y "Nuevo anuncio de
+    Clientes potenciales" ($122, 0 resultados) — no aportan y ensucian la lectura.
+11. [ ] 🎯 **Decidir sobre Motorizados** (sub-gasta pero es más barato): ampliar audiencia o mover
+    presupuesto a Domiciliarios.
+12. [ ] ⚙️ **Verificar si el presupuesto es por conjunto (ABO) o compartido (CBO)** — en el panel del
+    28-jul aparecía "Compartido". Importa antes de crear el conjunto de prueba.
+13. [ ] 🌟 **Conseguir testimonios/fotos** — ya hay ~26 clientes (mucho material).
+14. [ ] 🔌 **Conectar el bot a WhatsApp** — ya es NECESARIO (cuello de botella = tiempo del dueño).
+    Bloqueo = número real trancado en Meta. Al conectar, confirmar facturación de Gemini.
+
+### 🔵 Prioridad baja / bloqueados por Meta
+15. [ ] 🏢 **Verificación del negocio** en Meta (Pending review varios días — revisar Centro de seguridad
+    por si piden documento; nombre/dirección deben coincidir exactos).
+16. [ ] 📱 **Migrar número real 313 861 5813** a Cloud API (cuando el negocio esté verificado; código por
+    LLAMADA, no SMS). El número NO debe estar logueado en la app de WhatsApp.
+17. [ ] 💳 Método de pago de WhatsApp/Meta · 📸 Fotos de **blanco** y **morado** · 🎬 **video** (<15 MB).
+18. [ ] 🧹 Eliminar la WABA vacía "biker" · limpiar archivos raros en `/assets/productos/`.
 
 **Notas de proceso:** al trabajar varias cosas seguidas, NO fusionar PRs hasta que Kiro diga "subí todo"
 (el 2026-07-24 se fusionó el PR #18 a mitad de camino y el arreglo de WhatsApp quedó fuera → hubo que
@@ -360,3 +428,57 @@ abrir el PR #19 aparte).
 - Cambios de código → PR → merge a `main` → Render redespliega solo (o Manual Deploy) y GitHub Pages actualiza.
 - Fotos/video del bot → subir a `/assets/productos/` (GitHub Pages les da URL pública) → el bot las usa.
 - Datos sensibles (tokens, claves, números de pago) → SIEMPRE en variables de entorno de Render, NUNCA en el repo.
+
+---
+
+## 11. 📚 MANUAL OPERATIVO DE META ADS (aprendido en la práctica, 2026-07-28)
+
+### 💸 Cómo funciona el gasto (dudas resueltas del dueño)
+- **El presupuesto se gasta cuando Meta MUESTRA el anuncio**, NO cuando uno paga ni cuando la gente escribe.
+  Pagar/recargar = llenar el tanque. El gasto ocurre al entregar impresiones.
+- ⚠️ **Se paga por MOSTRAR, no por conversación.** Si Meta muestra el anuncio a 1.000 personas y ninguna
+  escribe, igual se gastó la plata. El "costo por conversación" es un cálculo posterior (gasto ÷ conv.),
+  NO es lo que Meta cobra. (Tipo de puja de esta cuenta: `ABSOLUTE_OCPM`.)
+- **El "día publicitario" va de medianoche a medianoche** (zona horaria de la cuenta). Meta reparte el
+  presupuesto a lo largo de ese día.
+- **Por qué el saldo "se explota" en 1-2 horas:** (a) recuperación — tras estar apagado por falta de
+  fondos, Meta acelera; (b) si se paga a las 2pm quedan ~10 h para gastar el presupuesto del día →
+  acelera; (c) el creativo es competitivo y barato (CPC ~$202-225) → gana muchas subastas rápido.
+  **NO es indicador de demanda del producto.** La demanda real se mide en VENTAS (ej. 7 el 27-jul).
+- **Por qué a veces no llegan mensajes tras recargar:** demora en aplicar el saldo (minutos a horas),
+  re-arranque de la entrega, o variación normal del día. Los mensajes llegan cuando la audiencia está
+  activa (hay horas pico), no de forma uniforme.
+
+### 🚨 PROBLEMA ACTUAL: recargar saldo día a día
+Recargar ~1 día de presupuesto a la vez causa: anuncios apagados/irregulares, **arranques y paradas
+(el peor enemigo del algoritmo)** y gasto concentrado en pocas horas no necesariamente óptimas.
+**✅ SOLUCIÓN: cargar saldo para 3-7 días** (ej. $150.000–$250.000) o configurar **método de pago
+automático**. Beneficio: Meta reparte parejo las 24 h, busca las oportunidades más baratas y **baja el
+costo por conversación**. Hoy se está pagando "precio de afán".
+
+### 🧪 CÓMO PROBAR CREATIVOS NUEVOS SIN DAÑAR EL GANADOR
+**Regla:** MISMA campaña, **CONJUNTO NUEVO**. Nunca en el conjunto del ganador, nunca campaña nueva.
+- ❌ **En el mismo conjunto:** (a) puede reiniciar la fase de aprendizaje del conjunto que funciona;
+  (b) comprobado en esta cuenta: los anuncios que no son el ganador reciben **$0** de entrega → el test
+  nunca ocurriría.
+- ❌ **Campaña nueva:** arranca de cero en aprendizaje (más caro) y **compite contra uno mismo** en la
+  subasta con la misma audiencia (encarece los costos propios).
+- ✅ **CORRECTO:** **duplicar el conjunto que funciona** (Domiciliarios), y en la copia poner SOLO los
+  creativos nuevos. Nombrarlo claro: **"TEST Creativos"**. Ventajas: misma audiencia (comparación
+  limpia, solo cambia el creativo), presupuesto propio (los nuevos SÍ se muestran), y el ganador queda
+  intacto (riesgo cero). Con ABO el conjunto nuevo no le quita plata a los demás.
+- **Presupuesto del test:** $10.000–$12.000/día, dejarlo **3-4 días sin tocar**.
+  💡 Truco de caja: **bajar Motorizados de $18.000 a ~$13.000** (igual solo gasta ~$13.847) y financiar
+  el test casi sin subir el gasto total.
+- **Reglas de oro:** nunca pausar/editar el ganador para testear · máximo 2-3 creativos nuevos ·
+  el objetivo NO es superar al ganador sino tener un **respaldo** · si uno rinde igual o mejor, subirlo
+  al conjunto principal.
+
+### 📏 REGLAS DE LECTURA DE DATOS (para no reaccionar mal)
+- ❌ NO juzgar por: horas, ni un día parcial. ✅ SÍ juzgar por: ventanas de **3-4 días** y **~50+ conversaciones**.
+- Los primeros 1-2 días tras cualquier cambio se ven más caros → **es normal, NO apagar**.
+- **Escalar de a 20-30% cada 3-4 días.** Nunca duplicar de golpe (reinicia aprendizaje y dispara costos).
+- Al escalar: **tocar SOLO el presupuesto** (no creativos, ni públicos, ni copies).
+- **"Recomendaciones" de Meta:** leerlas, pero NO aplicarlas automáticamente (suelen empujar a subir
+  presupuesto de golpe o activar cambios automáticos de creativo).
+- Lo ideal es **1-3 anuncios fuertes por conjunto**; más anuncios dividen el aprendizaje.
