@@ -4,19 +4,45 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-07-31 — 50 VENTAS · CAC $7.789 · generador de creativos · test publicado
+Última actualización: 2026-08-04 — 80 VENTAS · CAC $5.018 (RECORD) · cierre 10,2% · TEST DE CREATIVOS SUPERADO
 
 ---
 
 ## 0. ⭐ DÓNDE QUEDAMOS HOY (lo más importante)
 
-**Resumen en una línea:** 🔥 **NEGOCIO RENTABLE Y VALIDADO: 50 VENTAS, 1 SOLO RECHAZO (~4%),
-CAC $7.789** (dentro de la meta de $8-10k) y **utilidad proyectada ~$750.000**. Frecuencia < 1,5
-(audiencia fresca, hay espacio para escalar). Se creó el **generador de creativos** y ya está
-**publicado el conjunto "TEST Creativos"** con 3 creativos nuevos. El bot sigue SIN conectar (todo manual).
-**El freno ya NO es Meta: son inventario, caja y el tiempo del dueño.**
+**Resumen en una línea:** 🔥🔥 **MEJOR MOMENTO DE LA HISTORIA: 80 VENTAS ACUMULADAS. En los 4 primeros
+días de agosto: 30 ventas, cierre 10,2% y CAC $5.018 — ambos RECORD.** El **TEST DE CREATIVOS FUE UN
+ÉXITO**: el creativo nuevo "Demostración agua rueda" ($484/conv) le GANA al ganador histórico
+($503) → **el RIESGO #1 (dependencia de un solo creativo) queda CERRADO.** El bot sigue SIN conectar
+(todo manual). **El freno ya NO es Meta ni el creativo: son INVENTARIO y CAJA.**
 
-**📅 ESTADO AL 2026-07-31 (métricas acumuladas 1–31 jul):**
+**📅 ESTADO AL 2026-08-04 (ventana 1–4 ago, la mejor de la historia):**
+
+| Métrica | 1–4 ago | vs. julio |
+|---|---|---|
+| Conversaciones | **293** | ~73/día |
+| Gastado | **$150.546** | ~$37.600/día |
+| Costo/conversación | $514 | $520 |
+| **Ventas** | **30** (~7,5/día) | 🔥 |
+| **Tasa de cierre** | **10,2%** | 6,68% → **RECORD** |
+| **CAC (pub/venta)** | **$5.018** | $7.789 → **RECORD** |
+| **Utilidad estimada (4 días)** | **~$534.000** | — |
+
+- **EVOLUCIÓN DEL CIERRE (la palanca que más ha movido el negocio):** 2,84% → 7% → 8,3% → **10,2%**.
+  Se cuadruplicó. Causa: flujo "ciudad primero" + "SÍ CONFIRMO" + prueba social (ya hay 80 clientes)
+  + experiencia del dueño vendiendo.
+- **RENTABILIDAD POR PESO DE PUBLICIDAD:** margen $24.400 ÷ CAC $5.018 = **$4,86 de margen por cada
+  $1 de publicidad**. Meta ya NO es un costo relevante frente al margen.
+- ⚠️ **NUEVO BREAK-EVEN DE RECHAZO: ~49%** (recalculado con el CAC de $5.018; antes era ~25%).
+  Con rechazo real ~4%, el negocio es rentable con un colchón enorme:
+  - rechazo 4% → utilidad **~$534.000** · 10% → **~$463.000** · 20% → **~$345.000** (4 días).
+- **CAJA (el freno real):** 30 ventas en 4 días = **~$1.020.000 de producto** + $45.000 empaque +
+  $150.546 publicidad = **~$1.215.000 de salida en 4 días (~$304.000/día)**, que se cobra DESPUÉS
+  (Interrapidísimo demora). A este ritmo el capital de trabajo amarrado es de **$2–3 millones**.
+- ✅ **CONFIRMADO (otra vez):** presupuesto **por conjunto (ABO)**. El "Diario, compartido" del panel
+  significa que los ANUNCIOS comparten el presupuesto DE SU CONJUNTO. Tema cerrado, no revisarlo más.
+
+**📅 ESTADO AL 2026-07-31 (métricas acumuladas 1–31 jul) — histórico:**
 
 | Métrica | Valor |
 |---|---|
@@ -39,10 +65,66 @@ CAC $7.789** (dentro de la meta de $8-10k) y **utilidad proyectada ~$750.000**. 
 - ✅ **RESUELTO:** el presupuesto SÍ es **por conjunto (ABO)** — el CSV dice "Con el presupuesto del
   conjunto de anuncios". La palabra "Compartido" del panel era otra cosa. Estructura OK para el test.
 
-**🧪 TEST DE CREATIVOS — PUBLICADO (2026-07-31):**
-- Se creó el conjunto **"TEST Creativos"** con 3 anuncios nuevos (Prueba social, Reflectivo, Termosellado).
-- ⏳ **Dejar correr 3-4 días SIN tocar.** Referencia a batir: **~$480-520 por conversación**.
-- Al 4º día: si alguno rinde igual o mejor → subirlo al conjunto principal (ya hay respaldo) → **ahí sí escalar**.
+**🧪 TEST DE CREATIVOS — ✅ SUPERADO (evaluado 2026-08-04, ventana 30 jul–4 ago):**
+
+Ranking real de TODOS los anuncios de la cuenta (10 anuncios, solo 4 con entrega):
+
+| # | Anuncio | Conjunto (ppto/día) | Conv. | Costo/conv | Gasto aprox. |
+|---|---|---|---|---|---|
+| 🥇 | **Demostración agua rueda** (NUEVO) | TEST ($12.000) | 40 | **$484** | ~$19.360 |
+| 🥈 | Fondo azul sin personaje | Motorizados ($15.000) | 183 | **$485** | ~$88.755 |
+| 🥉 | Fondo azul sin personaje | Domiciliarios ($18.000) | 222 | **$503** | ~$111.666 |
+| 4 | TEST B – Franja reflectiva noche (NUEVO) | TEST ($12.000) | 24 | **$516** | ~$12.384 |
+| — | Prueba social +50 clientes (NUEVO) | TEST ($12.000) | **1** | $394 | ~$394 |
+| — | Peluca video ×2 · Peluca fondo negro · Nuevo anuncio C. potenciales | — | 0 | — | **$0** |
+
+**Totales ventana: 470 conversaciones · ~$232.600 · $495/conv** (mejor que el $520 de julio).
+
+- 🎉 **EL CREATIVO NUEVO GANÓ:** "Demostración agua rueda" ($484) es **el más barato de la cuenta** y
+  le gana al ganador histórico en Domiciliarios ($503). **TEST B ($516) también es viable** (a 2,6%
+  del ganador). El test no encontró UN respaldo, encontró DOS.
+- ✅ **RIESGO #1 CERRADO:** ya no hay dependencia del 99,7% en "Fondo azul sin personaje".
+  El ángulo **"termosellado / el agua no pasa" funciona igual o mejor** que el ángulo original.
+- ⚪ **"Prueba social +50 clientes" NO FUE PROBADO:** gastó solo $394 → Meta **nunca le dio entrega**.
+  NO perdió, fue IGNORADO. Sigue pendiente probarlo de verdad (es el mejor activo: 80 clientes reales).
+- ⚠️ **MATIZ IMPORTANTE sobre "subir el creativo al conjunto del ganador":** la regla de la sección 11
+  dice que los anuncios que no son el ganador reciben $0 — eso aplica a creativos **PEORES** (por eso
+  Peluca recibe $0). Un creativo **medible­mente más barato** sí puede ganar la subasta interna.
+  Aun así, la jugada preferida es la del solapamiento (abajo), no mover el creativo.
+
+**💰 DIAGNÓSTICO DE PRESUPUESTOS (2026-08-04) — aquí está la plata desperdiciada:**
+
+| Conjunto | Ppto/día | Gasto real/día | Utilización | Lectura |
+|---|---|---|---|---|
+| Domiciliarios | $18.000 | ~$18.600 | **103%** | 🔴 TOPADO → es el único que pide más presupuesto |
+| Motorizados | $15.000 | ~$14.800 | **99%** | ✅ perfectamente calibrado, NO tocar |
+| TEST Creativos | $12.000 | ~$5.400–6.400 | **45–54%** | 🚨 desperdicia ~$6.000/día |
+
+- ✅ **BAJAR MOTORIZADOS DE $18.000 → $15.000 FUE UN ACIERTO.** Antes solo gastaba ~$13.800 (de ahí la
+  alerta "presupuesto bajo utilizado"); ahora gasta 99% **y es el más barato de los dos ganadores**.
+  → **NO subirle presupuesto a Motorizados:** ya se comprobó que a $18.000 no lo absorbe (audiencia
+  estrecha). Para crecerlo hay que **AMPLIAR LA AUDIENCIA primero**, no darle más plata.
+- 🚨 **CAUSA DEL SUB-GASTO DEL TEST = SOLAPAMIENTO DE AUDIENCIA (hallazgo nuevo e importante).**
+  El TEST es un **duplicado de Domiciliarios** → misma audiencia → **los dos conjuntos compiten entre
+  sí en la subasta**, y Domiciliarios (ya establecido) le gana las pujas. NO es falta de saldo (los
+  otros dos gastaron el 100%). Resultado: se está dejando de gastar ~$6.000/día **en el creativo más
+  barato de la cuenta**.
+  → **ARREGLO: darle audiencia propia al conjunto TEST** (amplia/Advantage+ o intereses distintos).
+  Así gasta sus $12.000 completos y el creativo de $484 produce el doble de conversaciones,
+  **sin tocar nada de lo que ya funciona**.
+  ⚠️ **LECCIÓN GENERAL:** duplicar un conjunto sirve para TESTEAR creativos (comparación limpia), pero
+  NO sirve para producción permanente — el duplicado canibaliza al original. Al graduar un test,
+  hay que **cambiarle la audiencia**.
+
+**🔍 HALLAZGO (2026-08-04) — CLIC→CHAT SE ESTÁ DEGRADANDO (alerta temprana del techo):**
+- Ventana 25 jul–4 ago: 111.190 impresiones × CTR 1,78% ≈ **1.975 clics** para 866 conversaciones =
+  **clic→chat 43,8%**. Antes era **53%** (y 47,7% en el acumulado de julio). Tendencia: 53% → 47,7% → 43,8%.
+- **Causa:** Meta salió a públicos más amplios (alcance 9.613 → 52.074 → **69.469**) → entra gente
+  menos calificada. Coherente con el hallazgo del CTR (abajo).
+- **Por qué NO es un problema hoy:** el **CPC se derrumbó de $361 → $212 (−41%)**, más rápido de lo que
+  se degrada el clic→chat, así que el costo/conversación igual MEJORÓ.
+- ⚠️ **ES EL INDICADOR A VIGILAR:** cuando el CPC toque piso y el clic→chat siga bajando, el costo por
+  conversación empezará a subir. Ese será el techo real de escalamiento de esta audiencia.
 
 **🔍 HALLAZGO QUE CORRIGE UNA HIPÓTESIS ANTERIOR:** se creía que el CTR bajando (2,12% → 1,74%) era
 fatiga del creativo. **NO lo es** — con frecuencia < 1,5 la gente no lo ve repetido. La causa real es
@@ -130,17 +212,35 @@ CIERRE (2,84%), que es la mayor palanca de mejora.
    - DECISIÓN DEL USUARIO (vigente a 2026-07-24): mientras Meta aprueba la verificación, **atiende
      las ventas MANUALMENTE por WhatsApp** en el número real (no perder ventas). El bot solo se
      prueba en el número de prueba.
-4. 🟢 **Anuncios Meta:** ACTIVOS, $36.000/día. ⚠️ PERO el dueño recarga el saldo prepago **día a día**,
+4. 🟢 **Anuncios Meta:** ACTIVOS. Capacidad **$45.000/día** en 3 conjuntos (Domiciliarios $18.000 +
+   Motorizados $15.000 + TEST $12.000), pero solo gasta **~$37.600/día** por el sub-gasto del TEST
+   (ver diagnóstico de presupuestos en sección 0). ⚠️ El dueño recarga el saldo prepago **día a día**,
    lo que causa apagones y re-arranques caros (ver sección 11).
 5. ✅ **Web (`index.html`):** colores corregidos a 5 franjas reales (PR #18) y flujo de WhatsApp que
    pregunta la CIUDAD primero (PR #19). **Ambos FUSIONADOS.**
 
-**Próximo paso lógico (orden correcto):**
-1. 💰 **Cargar saldo para 3-7 días** (o método de pago automático) → deja de perder plata en re-arranques.
-2. 🎨 **Crear 2-3 creativos nuevos** estilo "Fondo azul" en un CONJUNTO DE PRUEBA (ver sección 11) →
-   es el seguro de vida contra el desgaste del único creativo que funciona.
-3. 📦 Ver **entregas** de los contraentrega en tránsito + vigilar **inventario y caja**.
-4. 🔌 **Conectar el bot** (el cuello de botella ya es el tiempo del dueño).
+**Próximo paso lógico (orden correcto, definido 2026-08-04):**
+
+*Ahora mismo — riesgo cero:*
+1. 🧹 **Apagar los 4 anuncios muertos:** Peluca video (×2), Peluca fondo negro, Nuevo anuncio de
+   Clientes potenciales. $0 gastado, 0 resultados; solo ensucian la lectura.
+
+*La jugada de mayor retorno — sin tocar al ganador:*
+2. 🎯 **Cambiarle la AUDIENCIA al conjunto TEST** para que deje de competir con Domiciliarios
+   (amplia/Advantage+ o intereses distintos) → recupera ~$6.000/día en el creativo más barato.
+3. 🏷️ **Renombrar "TEST Creativos"** → ya es producción (ej. "Agua · Amplia").
+
+*Después de 3-4 días sin tocar:*
+4. 📈 **Subir Domiciliarios 20-30%** ($18.000 → ~$22.000). **Es el ÚNICO conjunto topado (103%).**
+   ⚠️ CONDICIONADO a que inventario y caja aguanten.
+5. 🌟 **Rescatar "Prueba social +50 clientes"** en un conjunto nuevo pequeño (nunca recibió entrega).
+6. 💰 **Cargar saldo para 3-7 días** (o método de pago automático) → deja de perder plata en re-arranques.
+7. 📦💵 **Resolver INVENTARIO y CAJA** — es EL freno. Ver sección 0 (~$304.000/día de salida).
+8. 🔌 **Conectar el bot** (a 7,5 ventas/día, el tiempo del dueño ya no da).
+
+*Alternativa más simple si no quiere manejar 3 conjuntos:* mover "Demostración agua rueda" al conjunto
+de Domiciliarios (quedan 2 creativos fuertes, el ideal del manual), apagar el TEST y subir presupuesto.
+Más fácil de administrar, pero toca el conjunto que funciona. **Preferida: la opción 2.**
 
 ---
 
@@ -450,13 +550,28 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 7. [x] **Generador de creativos creado** (`creativos.html`) — ver sección 6-B.
 8. [x] **Conjunto "TEST Creativos" PUBLICADO** con los 3 creativos nuevos (2026-07-31).
 9. [x] **Confirmado: presupuesto es ABO (por conjunto)**, no compartido.
+10. [x] ✅ **TEST DE CREATIVOS EVALUADO Y SUPERADO (2026-08-04).** "Demostración agua rueda" $484/conv
+    (40 conv) le GANA al ganador histórico ($503). TEST B $516 también viable. **Riesgo #1 cerrado.**
+11. [x] 🔥 **80 VENTAS acumuladas.** 1–4 ago: 30 ventas · cierre **10,2%** · CAC **$5.018** (records).
+12. [x] 🔍 **Diagnóstico de presupuestos + hallazgo del solapamiento de audiencia** (ver sección 0).
+13. [x] ✅ **Bajar Motorizados a $15.000 confirmado como acierto** (99% de utilización, $485/conv).
 
 ### 🔥 Prioridad ALTA (ahora)
-10. [ ] ⏳ **Dejar correr el TEST 3-4 días SIN tocar.** Al 4º día evaluar contra la referencia
-    (~$480-520/conversación). Si alguno rinde igual o mejor → subirlo al conjunto principal.
-11. [ ] 💰 **Cargar saldo de Meta para 3-7 días** (o método de pago automático) → dejar de perder plata
+14. [ ] 🧹 **Apagar los 4 anuncios muertos** (Peluca video ×2, Peluca fondo negro, Nuevo anuncio de
+    Clientes potenciales). Riesgo cero, limpia la lectura.
+15. [ ] 🎯 **Cambiar la AUDIENCIA del conjunto TEST** para que no compita con Domiciliarios →
+    recupera ~$6.000/día en el creativo más barato de la cuenta. **Mayor retorno / riesgo bajo.**
+16. [ ] 📈 **Subir Domiciliarios de $18.000 a ~$22.000** (es el único topado al 103%) — SOLO si
+    inventario y caja aguantan. NO subirle a Motorizados (ya se probó que no absorbe $18.000).
+17. [ ] 💰 **Cargar saldo de Meta para 3-7 días** (o método de pago automático) → dejar de perder plata
     en re-arranques caros por quedarse sin fondos. Ver sección 11.
-12. [ ] 📦💵 **Vigilar INVENTARIO y FLUJO DE CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
+18. [ ] 📦💵 **RESOLVER INVENTARIO Y FLUJO DE CAJA — ES EL FRENO PRINCIPAL.** A 7,5 ventas/día son
+    ~$304.000/día de salida (producto + empaque + publicidad) que se cobra días después.
+    Capital de trabajo amarrado estimado: **$2–3 millones**. Definir cuánto ritmo aguanta la caja
+    ANTES de escalar presupuesto.
+19. [ ] 🌟 **Rescatar "Prueba social +50 clientes"** en conjunto propio — nunca recibió entrega ($394).
+    Es el mejor activo sin explotar (80 clientes reales).
+20. [ ] 📦💵 **[histórico] Vigilar INVENTARIO y CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
     A 6-7 ventas/día son ~$238.000 de producto por día. **Es el freno real, ya no es Meta.**
 13. [ ] 📦 **Confirmar entregas** de los ~25 pedidos en ruta. Rescatar el que no ha recogido en oficina
     (escribirle directo: Interrapidísimo devuelve el paquete en pocos días).
@@ -540,6 +655,21 @@ costo por conversación**. Hoy se está pagando "precio de afán".
 - **Reglas de oro:** nunca pausar/editar el ganador para testear · máximo 2-3 creativos nuevos ·
   el objetivo NO es superar al ganador sino tener un **respaldo** · si uno rinde igual o mejor, subirlo
   al conjunto principal.
+
+### 🚨 ACTUALIZACIÓN DEL PLAYBOOK (aprendido en el test, 2026-08-04)
+**El duplicado sirve para TESTEAR, pero NO para producción permanente.**
+- Comprobado: el conjunto TEST (duplicado de Domiciliarios) solo gastó **45-54% de su presupuesto**
+  porque **compite contra el original por la misma audiencia** y el establecido gana las pujas.
+  El solapamiento de audiencia hace que ABO no lo proteja: los dos conjuntos se canibalizan en la subasta.
+- ✅ **AL GRADUAR UN TEST: cambiarle la AUDIENCIA** (amplia/Advantage+ u otros intereses) y renombrarlo.
+  Así el conjunto nuevo gasta completo y produce en paralelo, sin robarle al original.
+- **Cómo detectarlo:** un conjunto que no gasta su presupuesto **mientras los otros gastan el 100%**
+  → NO es falta de saldo, es solapamiento (o audiencia demasiado estrecha, como Motorizados a $18.000).
+- **Matiz sobre "el que no es ganador recibe $0":** aplica a creativos **peores**. Uno medible­mente
+  **más barato** SÍ puede ganar la subasta interna del conjunto. No es una ley absoluta.
+- **Cuál conjunto escalar:** solo el que esté **topado (≥100% de utilización)**. Darle más presupuesto
+  a uno que ya sub-gasta no hace nada. Motorizados es el ejemplo: a $18.000 gastaba $13.800; a $15.000
+  gasta el 99% y es más barato → primero AMPLIAR AUDIENCIA, después subir presupuesto.
 
 ### 🐛 PROBLEMA RESUELTO: "el texto del anuncio no se publica" (2026-07-31)
 El dueño reportó que al publicar anuncios, algunos salían **sin el texto principal**. Diagnóstico:
