@@ -4,7 +4,8 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-04 — 80 VENTAS · CAC $5.018 (RECORD) · cierre 10,2% · TEST DE CREATIVOS SUPERADO
+Última actualización: 2026-08-07 — CONSOLIDACIÓN VALIDADA (ratio 1,006 · $30.000 se quedan) ·
+80+ VENTAS · CAC $5.018 · TEST SUPERADO · hallazgos Advantage+ y "subir ppto no reinicia aprendizaje"
 
 ---
 
@@ -219,28 +220,146 @@ CIERRE (2,84%), que es la mayor palanca de mejora.
 5. ✅ **Web (`index.html`):** colores corregidos a 5 franjas reales (PR #18) y flujo de WhatsApp que
    pregunta la CIUDAD primero (PR #19). **Ambos FUSIONADOS.**
 
-**Próximo paso lógico (orden correcto, definido 2026-08-04):**
+## 0-B. ⚡ REESTRUCTURACIÓN EJECUTADA EL 2026-08-04 (¡YA ESTÁ HECHA!)
 
-*Ahora mismo — riesgo cero:*
-1. 🧹 **Apagar los 4 anuncios muertos:** Peluca video (×2), Peluca fondo negro, Nuevo anuncio de
-   Clientes potenciales. $0 gastado, 0 resultados; solo ensucian la lectura.
+**Se CONSOLIDÓ la cuenta de 3 conjuntos a 2.** El dueño ejecutó todo el mismo día. Estado final:
 
-*La jugada de mayor retorno — sin tocar al ganador:*
-2. 🎯 **Cambiarle la AUDIENCIA al conjunto TEST** para que deje de competir con Domiciliarios
-   (amplia/Advantage+ o intereses distintos) → recupera ~$6.000/día en el creativo más barato.
-3. 🏷️ **Renombrar "TEST Creativos"** → ya es producción (ej. "Agua · Amplia").
+| Conjunto | Estado | Ppto/día | Anuncios activos |
+|---|---|---|---|
+| **Domiciliarios** | 🟢 Activa | **$30.000** | Fondo azul sin personaje · **Demostración agua rueda - Copia** · **TEST B – Franja reflectiva noche - Copia** |
+| **Motorizados** | 🟢 Activa | $15.000 | Fondo azul sin personaje (NO SE TOCÓ) |
+| ~~TEST Creativos~~ | ⚫ **APAGADO** | — | los originales quedan ahí como respaldo |
 
-*Después de 3-4 días sin tocar:*
-4. 📈 **Subir Domiciliarios 20-30%** ($18.000 → ~$22.000). **Es el ÚNICO conjunto topado (103%).**
-   ⚠️ CONDICIONADO a que inventario y caja aguanten.
-5. 🌟 **Rescatar "Prueba social +50 clientes"** en un conjunto nuevo pequeño (nunca recibió entrega).
-6. 💰 **Cargar saldo para 3-7 días** (o método de pago automático) → deja de perder plata en re-arranques.
-7. 📦💵 **Resolver INVENTARIO y CAJA** — es EL freno. Ver sección 0 (~$304.000/día de salida).
-8. 🔌 **Conectar el bot** (a 7,5 ventas/día, el tiempo del dueño ya no da).
+**Lo que se hizo, en orden:**
+1. ✅ Apagados los 4 anuncios muertos (Peluca video ×2, Peluca fondo negro, Nuevo anuncio C. potenciales).
+2. ✅ **DUPLICADOS** (no movidos — "Duplicar" deja el original como red de seguridad) los 2 creativos
+   nuevos ganadores al conjunto **Domiciliarios**.
+3. ✅ **Apagado el conjunto TEST Creativos.**
+4. ✅ **Domiciliarios subido de $18.000 → $30.000** (absorbe los $12.000 que el TEST no lograba gastar).
+5. ✅ Verificado: los 3 anuncios están dentro de Domiciliarios con interruptor activo y SIN aviso de
+   "Cambios sin publicar".
 
-*Alternativa más simple si no quiere manejar 3 conjuntos:* mover "Demostración agua rueda" al conjunto
-de Domiciliarios (quedan 2 creativos fuertes, el ideal del manual), apagar el TEST y subir presupuesto.
-Más fácil de administrar, pero toca el conjunto que funciona. **Preferida: la opción 2.**
+**Por qué CONSOLIDAR y no diferenciar (razonamiento, para no revertirlo por error):**
+- Con Advantage+ activo (ver sección 11) **no se pueden hacer dos conjuntos realmente distintos** salvo
+  por geografía → mantener un duplicado solo garantiza competencia interna.
+- Un solo conjunto con **3 creativos fuertes** es exactamente el ideal del manual ("1-3 por conjunto").
+- **Riesgo bajo:** agregar un anuncio es un cambio mucho más suave que cambiar el público (no reinicia
+  el aprendizaje de la audiencia).
+- El creativo nuevo **no se va a morir de hambre** porque está comprobado que es MÁS BARATO ($484 vs $503)
+  → gana entrega por mérito propio. (La regla de "el que no es ganador recibe $0" aplica a creativos peores.)
+
+- 💡 **EL GASTO TOTAL NO SUBIÓ:** antes $18.000+$15.000+$12.000 = $45.000/día. Ahora $30.000+$15.000 =
+  **$45.000/día**. Misma plata, pero ahora en un lugar donde SÍ se puede gastar.
+- ⚠️ **PERO Domiciliarios pasó de gastar ~$18.600/día a tener que gastar $30.000/día (+61%).**
+  Los primeros 1-2 días se verán más caros. **NO APAGAR.** A favor: ya no compite con el TEST, así que
+  tiene toda la bolsa de Advantage+ para él solo, lo que ayuda a absorber el presupuesto.
+- 📌 Los anuncios nuevos quedaron con sufijo **"- Copia"** en el nombre (cosmético, no afecta nada).
+- 📌 Al duplicar, los anuncios nuevos quedan en **"Procesando"** (revisión de Meta). Confirmar horas
+  después que digan **"Activa"** y no "Rechazado".
+
+## 0-C. ✅ VEREDICTO DE LA CONSOLIDACIÓN (evaluado 2026-08-07, ventana 31 jul–6 ago)
+
+**LA CONSOLIDACIÓN FUNCIONÓ. DECISIÓN: MANTENER DOMICILIARIOS EN $30.000.**
+
+Las 3 preguntas que quedaron abiertas el 4-ago, respondidas:
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Domiciliarios absorbió los $30.000/día? | ✅ **SÍ** — ~$28.500/día (95%) |
+| ¿Costo/conversación bajo $550? | ✅ **SÍ** — $515 en el conjunto · ~$531 aislando el post-cambio |
+| ¿Los 3 creativos reciben entrega? | 🟡 Sí, pero **reparto 91/9** a favor del veterano |
+
+**🌡️ EL TERMÓMETRO (ratio Domiciliarios ÷ Motorizados) — la métrica más útil que salió de esto:**
+Como Motorizados NO se tocó, sirve de **grupo de control** y cancela el "efecto del día".
+
+| Momento | Ratio | Lectura |
+|---|---|---|
+| Normal histórico | 1,03 | los dos cuestan casi igual |
+| Miércoles 5-ago (día 1) | **1,71** | pánico injustificado |
+| **31 jul–6 ago (7 días)** | **1,006** | ✅ **mejor que el histórico** |
+
+**Prueba definitiva de que el aumento de presupuesto NO costó eficiencia:**
+
+| Conjunto | Base | Semana 31jul–6ago | Cambio | ¿Se le subió ppto? |
+|---|---|---|---|---|
+| Motorizados (control) | $487 | $512 | **+5,1%** | ❌ No |
+| Domiciliarios | $504 | ~$531 (post-cambio) | **+5,4%** | ✅ Sí, +67% |
+
+→ **Degradación IDÉNTICA.** El +5% es el clima de la semana, no la decisión. **Hipótesis "los $30.000
+son demasiado" QUEDA DESCARTADA.**
+
+**✅ LAS COPIAS RINDEN IGUAL QUE LOS ORIGINALES** (dato 100% limpio: las copias solo existen desde el 4-ago):
+
+| Creativo | En el TEST (antes) | Copia en Domiciliarios | Diferencia |
+|---|---|---|---|
+| Demostración agua rueda | $484 | **$494** (6 conv) | +2,0% |
+| TEST B – Franja reflectiva | $516 | **$525** (7 conv) | +1,7% |
+
+- El miércoles 5-ago (día 1) se vieron $751 y $0 de entrega → **corrigió por completo en 24-48 h.**
+  Era **reinicio de aprendizaje**, exactamente como se había previsto. ⚠️ Lección: NO reaccionar al día 1.
+
+**🔑 HALLAZGO NUEVO — SUBIR PRESUPUESTO **NO** REINICIA EL APRENDIZAJE EN ESTA CUENTA:**
+El CSV trae el campo **"Último cambio significativo"**. Para Domiciliarios y sus 3 anuncios dice
+**2026-07-11** — o sea que el salto de $18.000 → $30.000 (+67%) **NO fue registrado por Meta como
+cambio significativo** y el conjunto nunca volvió a fase de aprendizaje. Los anuncios del TEST sí
+marcan 31-jul (crearlos SÍ cuenta).
+→ **Implicación práctica: escalar presupuesto es más barato de lo que temíamos.** Lo que sí reinicia
+aprendizaje es crear/duplicar anuncios y conjuntos, o cambiar audiencias.
+
+**🟡 EL REPARTO 91/9 (no pelearlo):** Fondo azul se lleva ~91% del presupuesto de Domiciliarios; las
+2 copias ~9% juntas (~$1.235 y ~$1.532/día). Aparece la alerta "Presupuesto bajo utilizado" en
+Demostración - Copia.
+- **Es el comportamiento estructural de Meta ya documentado. NO intervenir.**
+- **El objetivo se cumplió igual:** los respaldos están activos, aprobados y comprobados a $494/$525.
+  Si Fondo azul se desgasta, Meta tiene a dónde moverse de inmediato. Lo que NO se obtuvo es
+  diversificación de VOLUMEN — pero eso nunca fue el objetivo.
+
+**💡 SORPRESA — "PRUEBA SOCIAL +50 CLIENTES" PUEDE SER EL MEJOR CREATIVO DE LA CUENTA:**
+
+| Anuncio | CTR | CPC |
+|---|---|---|
+| **Prueba social +50 clientes** | **2,53%** 🏆 | **$197** 🏆 |
+| Demostración agua rueda - Copia | 2,38% | $228 |
+| Fondo azul (Domiciliarios) | 1,90% | $214 |
+| Fondo azul (Motorizados) | 1,68% | $226 |
+
+Tiene **el mejor CTR y el CPC más bajo de toda la cuenta** — con solo 79 impresiones, así que es casi
+anecdótico, pero es señal fuerte de que la prueba social pega. **SUBE DE PRIORIDAD: conjunto propio
+con $8.000-10.000/día.**
+
+**📊 SEMANA 31 jul – 6 ago (7 días):**
+
+| Métrica | Valor | Lectura |
+|---|---|---|
+| Conversaciones | **565** (80,7/día) | ⬆️ antes 73/día (**+10%**) |
+| Gastado | $289.281 ($41.326/día) | 92% de la capacidad de $45.000 |
+| Costo/conversación | **$512** | julio $520 → ligeramente mejor |
+| Frecuencia | **1,38–1,40** | ✅ sana, aún hay espacio |
+| Clic→chat | **43,4%** | ✅ **SE ESTABILIZÓ** (venía cayendo 53→47,7→43,8) |
+
+⚠️ **PENDIENTE: ventas del 5 y 6 de agosto** para calcular el CAC de la semana.
+
+**Ranking de anuncios (31 jul–6 ago):**
+
+| Anuncio | Conjunto | Conv. | Costo/conv | Gastado |
+|---|---|---|---|---|
+| Fondo azul sin personaje | Domiciliarios | 286 | $515 | $147.404 |
+| Fondo azul sin personaje | Motorizados | 199 | $512 | $101.965 |
+| Demostración agua rueda (orig.) | TEST (apagado) | 42 | $484 | $20.341 |
+| TEST B – Franja reflectiva (orig.) | TEST (apagado) | 24 | $516 | $12.391 |
+| TEST B – Franja reflectiva - Copia | Domiciliarios | 7 | $525 | $3.677 |
+| Demostración agua rueda - Copia | Domiciliarios | 6 | $494 | $2.963 |
+| Prueba social +50 clientes | TEST (apagado) | 1 | $394 | $394 |
+
+**Próximo paso lógico (después del 8-ago):**
+1. 📦💵 **RESOLVER INVENTARIO Y CAJA — ES EL FRENO PRINCIPAL** (~$304.000/día de salida; ver sección 0).
+2. 🌟 **Rescatar "Prueba social +50 clientes"** en un conjunto PROPIO y pequeño. Nunca recibió entrega
+   ($394 en 5 días) y quedó FUERA de la consolidación porque 4 anuncios excede el máximo del manual (1-3).
+   Es el mejor activo sin explotar (80 clientes reales).
+3. 💰 **Cargar saldo para 3-7 días** (o método de pago automático) → deja de perder plata en re-arranques.
+4. 🔌 **Conectar el bot** — a ~9,5 ventas/día proyectadas, el tiempo del dueño ya NO da. Bloqueado por
+   la verificación del negocio en Meta (empujar el Centro de seguridad por si piden documento).
+5. 🔧 **Arreglar zonas seguras del generador de creativos** (`creativos.html`, sección 6-B).
 
 ---
 
@@ -285,6 +404,11 @@ Más fácil de administrar, pero toca el conjunto que funciona. **Preferida: la 
   - Objetivo: Mensajes/Conversaciones de WhatsApp. Presupuesto por conjunto (ABO), $18.000/día c/u.
   - Conjuntos: **Motociclistas** (Yamaha, Bajaj, AKT, Suzuki, Honda, cascos; ciudades grandes; 20–55)
     y **Domiciliarios** (Rappi, DiDi, iFood, mensajería). Puja: volumen más alto. Ubicaciones Advantage+.
+  - ⚠️ **ESTRUCTURA ACTUAL (desde 2026-08-04): 2 conjuntos, NO los de arriba.** Domiciliarios $30.000/día
+    con 3 creativos + Motorizados $15.000/día. TEST Creativos apagado. **Ver sección 0-B.**
+  - ⚠️ **Los intereses listados arriba son NOMINALES:** con Público de Advantage+ Meta los ignora
+    cuando quiere, así que los nombres de los conjuntos ya no describen audiencias reales distintas.
+    **Ver el hallazgo de Advantage+ en la sección 11.**
 - **Día 1:** 35 conversaciones, 0 ventas — al inicio se pidió "anticipo no reembolsable" (error grave
   que espantó clientes). Corregido: cierre 100% contraentrega.
 
@@ -557,24 +681,41 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 13. [x] ✅ **Bajar Motorizados a $15.000 confirmado como acierto** (99% de utilización, $485/conv).
 
 ### 🔥 Prioridad ALTA (ahora)
-14. [ ] 🧹 **Apagar los 4 anuncios muertos** (Peluca video ×2, Peluca fondo negro, Nuevo anuncio de
-    Clientes potenciales). Riesgo cero, limpia la lectura.
-15. [ ] 🎯 **Cambiar la AUDIENCIA del conjunto TEST** para que no compita con Domiciliarios →
-    recupera ~$6.000/día en el creativo más barato de la cuenta. **Mayor retorno / riesgo bajo.**
-16. [ ] 📈 **Subir Domiciliarios de $18.000 a ~$22.000** (es el único topado al 103%) — SOLO si
-    inventario y caja aguantan. NO subirle a Motorizados (ya se probó que no absorbe $18.000).
-17. [ ] 💰 **Cargar saldo de Meta para 3-7 días** (o método de pago automático) → dejar de perder plata
-    en re-arranques caros por quedarse sin fondos. Ver sección 11.
-18. [ ] 📦💵 **RESOLVER INVENTARIO Y FLUJO DE CAJA — ES EL FRENO PRINCIPAL.** A 7,5 ventas/día son
+14. [x] 🧹 **Apagados los 4 anuncios muertos** (Peluca video ×2, Peluca fondo negro, Nuevo anuncio de
+    Clientes potenciales) — 2026-08-04.
+15. [x] 🎯 **RESUELTO EL SUB-GASTO DEL TEST — pero por CONSOLIDACIÓN, no por cambio de audiencia.**
+    Causa real = **Advantage+ vuelve clones a los conjuntos** (ver sección 11). Se apagó el TEST y sus
+    2 creativos ganadores se duplicaron a Domiciliarios. Ver sección 0-B.
+16. [x] 📈 **Domiciliarios subido de $18.000 → $30.000.** Gasto total de la cuenta SIN CAMBIO ($45.000/día).
+17. [x] 🎯 **HALLAZGO: la cuenta usa Público de Advantage+** → documentado en sección 11. Explica el
+    sub-gasto, el alcance disparado (69.469) y el clic→chat cayendo (53% → 43,8%).
+
+18. [x] ✅ **CONSOLIDACIÓN VALIDADA (2026-08-07).** Se mantuvieron los $30.000 y fue correcto:
+    termómetro 1,006, degradación idéntica al conjunto de control, copias rindiendo a $494/$525.
+    **Ver sección 0-C.** El susto del miércoles (día 1) era reinicio de aprendizaje y corrigió en 24-48 h.
+19. [x] 🔔 **Confirmado: los 2 anuncios nuevos quedaron "Activa"** (ninguno rechazado) y ambos entregan.
+
+### 🔥 Prioridad ALTA (ahora)
+19-B. [ ] 📊 **Conseguir las VENTAS del 5 y 6 de agosto** para calcular el CAC de la semana
+    (565 conversaciones en 7 días · $289.281 gastados). Sin esto no se puede decidir si escalar más.
+20. [ ] 📦💵 **RESOLVER INVENTARIO Y FLUJO DE CAJA — ES EL FRENO PRINCIPAL.** A 7,5 ventas/día son
     ~$304.000/día de salida (producto + empaque + publicidad) que se cobra días después.
-    Capital de trabajo amarrado estimado: **$2–3 millones**. Definir cuánto ritmo aguanta la caja
-    ANTES de escalar presupuesto.
-19. [ ] 🌟 **Rescatar "Prueba social +50 clientes"** en conjunto propio — nunca recibió entrega ($394).
-    Es el mejor activo sin explotar (80 clientes reales).
-20. [ ] 📦💵 **[histórico] Vigilar INVENTARIO y CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
+    Capital de trabajo amarrado: **$2–3 millones** hoy · **$2,7–3,8M** si se llega a ~9,5 ventas/día.
+    Definir cuánto ritmo aguanta la caja ANTES de escalar más presupuesto.
+    ✅ El dueño confirmó el 4-ago que **SÍ hay caja** para el ritmo actual.
+21. [ ] 🌟🔥 **RESCATAR "Prueba social +50 clientes" — SUBIÓ DE PRIORIDAD (2026-08-07).**
+    Conjunto PROPIO con $8.000-10.000/día. Motivo del ascenso: tiene **el mejor CTR (2,53%) y el CPC
+    más bajo ($197) de TODA la cuenta** (ver sección 0-C), aunque con solo 79 impresiones.
+    Nunca recibió entrega ($394 en 5 días) y quedó fuera de la consolidación porque 4 anuncios excede
+    el máximo del manual (1-3 por conjunto). Es el mejor activo sin explotar (80 clientes reales).
+22. [ ] 💰 **Cargar saldo de Meta para 3-7 días** (o método de pago automático) → dejar de perder plata
+    en re-arranques caros por quedarse sin fondos. Ver sección 11.
+23. [ ] 🔌 **Conectar el bot** — a ~9,5 ventas/día el tiempo del dueño ya NO da. Empujar la verificación
+    del negocio en Meta (revisar Centro de seguridad por si piden documento).
+24. [ ] 📦 **Confirmar entregas** de los pedidos en ruta (~25+ y creciendo). Rescatar el que no ha
+    recogido en oficina (escribirle directo: Interrapidísimo devuelve el paquete en pocos días).
+25. [ ] 📦💵 **[histórico] Vigilar INVENTARIO y CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
     A 6-7 ventas/día son ~$238.000 de producto por día. **Es el freno real, ya no es Meta.**
-13. [ ] 📦 **Confirmar entregas** de los ~25 pedidos en ruta. Rescatar el que no ha recogido en oficina
-    (escribirle directo: Interrapidísimo devuelve el paquete en pocos días).
 
 ### 🟡 Prioridad media
 14. [ ] 🔧 **Arreglar zonas seguras en el generador** — el botón de WhatsApp queda tapado en Stories
@@ -670,6 +811,71 @@ costo por conversación**. Hoy se está pagando "precio de afán".
 - **Cuál conjunto escalar:** solo el que esté **topado (≥100% de utilización)**. Darle más presupuesto
   a uno que ya sub-gasta no hace nada. Motorizados es el ejemplo: a $18.000 gastaba $13.800; a $15.000
   gasta el 99% y es más barato → primero AMPLIAR AUDIENCIA, después subir presupuesto.
+
+### 🌡️ EL TERMÓMETRO: SIEMPRE DEJAR UN CONJUNTO SIN TOCAR COMO GRUPO DE CONTROL (2026-08-07)
+**La técnica más útil aprendida hasta ahora para leer datos sin engañarse.**
+- Al cambiar algo en un conjunto, **NO tocar el otro**. El intacto se convierte en **grupo de control**.
+- **Métrica:** `costo/conv del conjunto cambiado ÷ costo/conv del conjunto de control`.
+  Esto **cancela automáticamente el "efecto del día"** (clima de subasta, competencia, estacionalidad).
+- **En esta cuenta el ratio normal es ~1,03.** Ejemplo real: el 5-ago (día 1 tras consolidar) el ratio
+  fue **1,71** y parecía un desastre; medido sobre 7 días fue **1,006** → no había pasado nada.
+- **Alternativa aún más limpia:** comparar cuánto se degradó CADA conjunto contra SU PROPIA línea base.
+  Si ambos se degradan lo mismo, el cambio no tuvo culpa (fue el clima). Ejemplo: Motorizados +5,1% vs
+  Domiciliarios +5,4% → el aumento de presupuesto del 67% costó CERO eficiencia.
+
+### ⏱️ "ÚLTIMO CAMBIO SIGNIFICATIVO": SUBIR PRESUPUESTO **NO** REINICIA EL APRENDIZAJE (2026-08-07)
+- El export de Meta trae la columna **"Último cambio significativo"**. Es la forma de saber si un
+  conjunto volvió a fase de aprendizaje o no. **Revisarla siempre después de un cambio.**
+- **Comprobado en esta cuenta:** el salto de Domiciliarios de $18.000 → $30.000 (**+67%**) dejó el campo
+  en **2026-07-11** (sin cambios) → **Meta NO lo consideró significativo y el conjunto NUNCA reinició
+  aprendizaje.** Por eso el costo alto duró un solo día.
+- **Lo que SÍ reinicia aprendizaje:** crear o duplicar anuncios (los del TEST marcan 31-jul), crear
+  conjuntos nuevos, y cambiar audiencias.
+- **Implicación:** escalar presupuesto es MÁS BARATO de lo que temíamos. La regla de "20-30% cada 3-4
+  días" sigue siendo prudente, pero el miedo a reiniciar el aprendizaje por subir presupuesto es infundado.
+  ⚠️ El costo real de subir presupuesto es otro: Meta va a buscar gente menos calificada para gastarlo.
+  Eso se mide con el TERMÓMETRO, no con el campo de aprendizaje.
+
+### 🎯 HALLAZGO CLAVE (2026-08-04): LA CUENTA USA **PÚBLICO DE ADVANTAGE+**
+**Esto explica la mitad de los misterios de la cuenta. Leer antes de tocar cualquier audiencia.**
+
+**Cómo se detecta:** al abrir el conjunto → Editar público, aparece la sección **"Tus sugerencias"** con
+el texto *"Mostraremos los anuncios a personas fuera de esta configuración si es probable que mejore el
+rendimiento"*. Esa frase es la firma de Advantage+.
+
+**Qué implica:**
+- ⚠️ **Los intereses son SOLO SUGERENCIAS.** Meta los ignora cuando quiere. Los nombres de los conjuntos
+  ("Domiciliarios", "Motorizados") ya NO describen audiencias reales distintas.
+- ❌ **NO existe la segmentación detallada** con "Acotar más" ni "Excluir personas" (por intereses).
+  El único "Excluir" disponible es **"Excluir estos públicos personalizados"**, que sirve solo para
+  listas propias / píxel — **NO sirve para excluir intereses.**
+- 🚨 **DOS CONJUNTOS EN ADVANTAGE+ CON LAS MISMAS CIUDADES Y EDADES SON PRÁCTICAMENTE CLONES**, sin
+  importar los intereses que tengan escritos. Pescan en la misma bolsa → se canibalizan al máximo.
+  **Esa fue la causa REAL del sub-gasto del TEST** (no era falta de saldo ni intereses solapados).
+- ✅ **Explica también:** el alcance disparándose (9.613 → 52.074 → 69.469) y el clic→chat cayendo
+  (53% → 43,8%). **Meta se fue a público amplio SOLO, hace rato.** No fue una decisión del dueño.
+
+**Consecuencia práctica — la única forma de diferenciar conjuntos bajo Advantage+ es la GEOGRAFÍA**
+(ubicaciones distintas, que nunca se solapan). Si no se quiere dividir por ciudades, **NO tiene sentido
+tener dos conjuntos: hay que consolidar** (lo que se hizo el 2026-08-04, ver sección 0-B).
+- ⚠️ Si algún día se quiere segmentación real por intereses, habría que **desactivar Advantage+** — pero
+  hoy NO conviene: está entregando a $484-503/conv y es el motor de los records de agosto.
+- ⚠️ Si se divide por ciudades: usar **solo ciudades grandes**. Pueblos/veredas disparan el rechazo del
+  contraentrega (ver sección 7, Modelo B).
+
+### 🧠 "ACOTAR" vs "EXCLUIR" (para no confundirlos nunca más)
+Cuando NO hay Advantage+ y sí aparece la segmentación detallada, hay 3 controles distintos:
+
+| Control | Lógica | Efecto | ¿Sirve para separar conjuntos? |
+|---|---|---|---|
+| **Incluir** (caja principal) | **O** | Le interesa A **o** B | Es el campo normal |
+| **Acotar más** | **Y** | Cumple lo de arriba **Y ADEMÁS** esto → audiencia más CHICA | ❌ **NO** — la vuelve más parecida a la otra |
+| **Excluir personas** | **NO** | Todos **MENOS** los que cumplan esto | ✅ **SÍ** |
+
+- **Regla mental:** *"Acotar" hace la audiencia más pequeña y más parecida. "Excluir" la hace DIFERENTE.*
+- ⚠️ Confundirlos hace **lo contrario** de lo buscado: acotar con "Rappi" entrega justo la audiencia de
+  Domiciliarios, o sea empeora el solapamiento.
+- 📌 "Excluir personas" **solo aparece si ya hay algo en la caja de Incluir.**
 
 ### 🐛 PROBLEMA RESUELTO: "el texto del anuncio no se publica" (2026-07-31)
 El dueño reportó que al publicar anuncios, algunos salían **sin el texto principal**. Diagnóstico:
