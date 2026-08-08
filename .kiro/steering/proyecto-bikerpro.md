@@ -4,8 +4,9 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-07 — CONSOLIDACIÓN VALIDADA (ratio 1,006 · $30.000 se quedan) ·
-80+ VENTAS · CAC $5.018 · TEST SUPERADO · hallazgos Advantage+ y "subir ppto no reinicia aprendizaje"
+Última actualización: 2026-08-07 (tarde) — CONSOLIDACIÓN VALIDADA (termómetro 0,895 · Domiciliarios
+$484 ya es MÁS BARATO que el control) · TEST DE "PRUEBA SOCIAL" PRENDIDO · capacidad $57.000/día ·
+80+ VENTAS · CAC $5.018 · hallazgos: Advantage+, "subir ppto no reinicia aprendizaje", promedio semanal
 
 ---
 
@@ -228,7 +229,11 @@ CIERRE (2,84%), que es la mayor palanca de mejora.
 |---|---|---|---|
 | **Domiciliarios** | 🟢 Activa | **$30.000** | Fondo azul sin personaje · **Demostración agua rueda - Copia** · **TEST B – Franja reflectiva noche - Copia** |
 | **Motorizados** | 🟢 Activa | $15.000 | Fondo azul sin personaje (NO SE TOCÓ) |
-| ~~TEST Creativos~~ | ⚫ **APAGADO** | — | los originales quedan ahí como respaldo |
+| ~~TEST Creativos~~ | ⚫ APAGADO el 4-ago | — | los originales quedan ahí como respaldo |
+
+> ⚠️ **ESTA TABLA CAMBIÓ EL 2026-08-07 (tarde):** el conjunto **TEST Creativos se VOLVIÓ A PRENDER**
+> con **solo "Prueba social +50 clientes" activo** (los 2 originales apagados por redundantes, ya que
+> corren como "- Copia" en Domiciliarios). **Capacidad total ahora: $57.000/día.** Ver sección 0-D.
 
 **Lo que se hizo, en orden:**
 1. ✅ Apagados los 4 anuncios muertos (Peluca video ×2, Peluca fondo negro, Nuevo anuncio C. potenciales).
@@ -265,9 +270,19 @@ Las 3 preguntas que quedaron abiertas el 4-ago, respondidas:
 
 | Pregunta | Respuesta |
 |---|---|
-| ¿Domiciliarios absorbió los $30.000/día? | ✅ **SÍ** — ~$28.500/día (95%) |
-| ¿Costo/conversación bajo $550? | ✅ **SÍ** — $515 en el conjunto · ~$531 aislando el post-cambio |
+| ¿Domiciliarios absorbió los $30.000/día? | ✅ **SÍ — 99,7% del presupuesto asignado en la semana** |
+| ¿Costo/conversación bajo $550? | ✅ **SÍ** — $515 en la semana · **$484 el 6-ago** (mejor que su base) |
 | ¿Los 3 creativos reciben entrega? | 🟡 Sí, pero **reparto 91/9** a favor del veterano |
+
+**📊 UTILIZACIÓN REAL DEL PRESUPUESTO (semana 31 jul–6 ago) — dato definitivo:**
+
+| Conjunto | Presupuesto asignado | Gastado | Utilización |
+|---|---|---|---|
+| **Domiciliarios** | ~$154.500 | $154.112 | **99,7%** ✅ |
+| **Motorizados** | $105.000 | $102.043 | **97,2%** ✅ |
+
+→ **NO FALTA PLATA EN NINGUNA PARTE. Los dos conjuntos están genuinamente TOPADOS.**
+**Consecuencia estratégica: ya NO hay eficiencia escondida por recuperar. Más volumen = más presupuesto.**
 
 **🌡️ EL TERMÓMETRO (ratio Domiciliarios ÷ Motorizados) — la métrica más útil que salió de esto:**
 Como Motorizados NO se tocó, sirve de **grupo de control** y cancela el "efecto del día".
@@ -287,6 +302,44 @@ Como Motorizados NO se tocó, sirve de **grupo de control** y cancela el "efecto
 
 → **Degradación IDÉNTICA.** El +5% es el clima de la semana, no la decisión. **Hipótesis "los $30.000
 son demasiado" QUEDA DESCARTADA.**
+
+**📅 LA RECUPERACIÓN, DÍA POR DÍA (días completos, el dato más limpio de todos):**
+
+| Día | Domiciliarios | Motorizados (control) | **Termómetro** | Util. Dom | Util. Mot |
+|---|---|---|---|---|---|
+| **5 ago** (día 1 tras el cambio) | $687 (36 conv) | $560 (22 conv) | **1,227** | 82,4% | 82,1% |
+| **6 ago** (día 2) | **$484** (52 conv) | $541 (24 conv) | **0,895** ✅ | 83,9% | 86,5% |
+| Línea base | $504 | $487 | 1,03 | — | — |
+
+- 🔥 **Domiciliarios pasó de $687 a $484 en UN DÍA** y terminó **por debajo de su línea base** ($504).
+- 🔥 **El termómetro cayó de 1,227 a 0,895** → **Domiciliarios quedó MÁS BARATO que el conjunto de
+  control**, cuando históricamente eran iguales. La consolidación no solo no hizo daño: mejoró el conjunto.
+- Mientras Domiciliarios mejoraba 4% contra su base, Motorizados (intacto) empeoraba 11%.
+
+**🚫 HIPÓTESIS DESCARTADA — "SE QUEDA SIN SALDO" (error de análisis del 2026-08-07, NO REPETIR):**
+Al ver que el 5 y 6 de ago los DOS conjuntos gastaron solo 82-87% de su presupuesto diario —y en
+proporciones casi idénticas (82,4% vs 82,1%)— se planteó que el límite real era el saldo prepago
+(~$37-38.000/día) y no el presupuesto ($45.000/día). **ERA FALSO. El dueño confirmó que la cuenta
+siempre está recargada.**
+- **La causa real: Meta PROMEDIA el presupuesto diario a lo largo de ~una semana.** Puede gastar hasta
+  **125%** un día y compensar gastando menos otro. Comprobado en esta cuenta:
+
+| Período | Domiciliarios | Motorizados |
+|---|---|---|
+| 31 jul – 4 ago | **~110%** | **~102%** |
+| 5 y 6 ago | 82-84% | 82-87% |
+| **Promedio semana** | **99,7%** | **97,2%** |
+
+- Los dos conjuntos se mueven juntos porque **están sujetos al mismo ciclo de compensación semanal**,
+  no porque compartan un límite de plata.
+- ⚠️ **LECCIÓN DE MÉTODO (el error fue de Kiro):** se miraron 2 días aislados y se sacó una conclusión
+  sistémica — exactamente la regla que este archivo repite en la sección 11. **Para juzgar utilización
+  de presupuesto hay que comparar la SEMANA completa contra el presupuesto asignado día por día**
+  (ojo: si el presupuesto cambió a mitad de semana, hay que prorratearlo, no multiplicar por 7).
+- ❌ Quedan sin efecto los cálculos derivados de esa hipótesis: los "$7.400/día sin gastar" y los
+  "~$37.000/día de margen perdido" **NO EXISTÍAN**.
+- 📌 El **pago automático** de Meta sigue siendo recomendable por COMODIDAD (quita la tarea diaria de
+  recargar y evita re-arranques), pero **NO es un arreglo urgente ni una fuga de plata.**
 
 **✅ LAS COPIAS RINDEN IGUAL QUE LOS ORIGINALES** (dato 100% limpio: las copias solo existen desde el 4-ago):
 
@@ -338,6 +391,46 @@ con $8.000-10.000/día.**
 | Clic→chat | **43,4%** | ✅ **SE ESTABILIZÓ** (venía cayendo 53→47,7→43,8) |
 
 ⚠️ **PENDIENTE: ventas del 5 y 6 de agosto** para calcular el CAC de la semana.
+
+## 0-D. 🧪 TEST DE "PRUEBA SOCIAL" — PRENDIDO EL 2026-08-07 (en curso)
+
+**Estado de la cuenta desde el 7-ago (tarde):**
+
+| Conjunto | Estado | Ppto/día | Anuncios activos |
+|---|---|---|---|
+| **Domiciliarios** | 🟢 Activa | $30.000 | Fondo azul · Demostración agua rueda - Copia · TEST B - Copia |
+| **Motorizados** | 🟢 Activa | $15.000 | Fondo azul (intacto — sigue siendo el GRUPO DE CONTROL) |
+| **TEST Creativos** | 🟢 **RE-ACTIVADO** | $12.000 | **SOLO "Prueba social +50 clientes"** |
+| **TOTAL** | | **$57.000/día** | |
+
+**Por qué se reactivó el conjunto viejo en vez de crear uno nuevo:**
+- La estructura ya existía con su presupuesto → cero configuración nueva.
+- **Con solo 1 anuncio activo, "Prueba social" recibe el 100% de la entrega del conjunto** — por primera
+  vez va a tener una prueba real. Antes gastó $394 en 5 días porque competía con 2 creativos mejores.
+- ⚠️ **PASO CRÍTICO que se hizo:** apagar los 2 originales ("Demostración agua rueda" y "TEST B") ANTES
+  de prender el conjunto. Si se prende con los 3 activos, Meta le da todo al mejor y Prueba social
+  vuelve a recibir $0. **Los originales son redundantes** (corren como "- Copia" en Domiciliarios).
+
+**Por qué vale la pena:** "Prueba social" tiene el **mejor CTR (2,53%) y el CPC más bajo ($197) de toda
+la cuenta**, y es el único creativo que usa el mejor activo del negocio: **80 clientes reales**.
+
+**⚠️ RIESGO CONOCIDO — vuelve el solapamiento de Advantage+:** el TEST es duplicado de Domiciliarios, así
+que compiten por la misma bolsa (ver sección 11). **Evidencia tranquilizadora:** cuando convivieron
+(31 jul–4 ago), Domiciliarios gastó el 103% de su presupuesto — **la competencia lastima al recién
+llegado, no al establecido.** Pero ahora Domiciliarios está a $30.000 (más difícil de llenar), así que
+es algo más vulnerable. **Para eso está el termómetro.**
+
+**⏳ EVALUACIÓN: martes/miércoles 11-12 ago (5-6 días).** Necesita ~50 conversaciones; gastando
+~$6-12.000/día eso toma **5-7 días, no 4.** Las 3 preguntas:
+1. **¿La cuenta absorbe los $57.000/día,** o ahí aparece el techo real? (medir por SEMANA, prorrateando)
+2. **¿Cuánto rinde "Prueba social"** con entrega real por primera vez?
+   - **≤ $550/conv** → 🏆 promoverlo · **$550-700** → dejarlo correr más · **> $700** → apagarlo
+3. **¿El TEST le está robando a Domiciliarios?** → **si el termómetro se va arriba de 1,3, apagar el TEST.**
+
+- ⚠️ Los primeros 1-2 días se verán caros (anuncio estrenando entrega, sin historial). **NO APAGAR.**
+- 💵 Suma ~$6-12.000/día de publicidad (+13% a +27%). El dueño confirmó que hay caja.
+
+---
 
 **Ranking de anuncios (31 jul–6 ago):**
 
@@ -696,20 +789,24 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 19. [x] 🔔 **Confirmado: los 2 anuncios nuevos quedaron "Activa"** (ninguno rechazado) y ambos entregan.
 
 ### 🔥 Prioridad ALTA (ahora)
-19-B. [ ] 📊 **Conseguir las VENTAS del 5 y 6 de agosto** para calcular el CAC de la semana
-    (565 conversaciones en 7 días · $289.281 gastados). Sin esto no se puede decidir si escalar más.
+19-B. [ ] 📊 **Conseguir las VENTAS del 5, 6 y 7 de agosto** para calcular el CAC de la semana
+    (565 conversaciones del 31jul-6ago · $289.281 gastados). **Es el único dato que falta** para saber
+    si el ritmo de ~81 conversaciones/día se está convirtiendo bien. Sin esto no se puede decidir si
+    escalar más allá de los $57.000/día.
+19-C. [ ] ⏳ **EVALUAR EL TEST DE "PRUEBA SOCIAL" el 11-12 de agosto** (5-6 días sin tocar).
+    Las 3 preguntas y los umbrales están en la **sección 0-D**.
 20. [ ] 📦💵 **RESOLVER INVENTARIO Y FLUJO DE CAJA — ES EL FRENO PRINCIPAL.** A 7,5 ventas/día son
     ~$304.000/día de salida (producto + empaque + publicidad) que se cobra días después.
     Capital de trabajo amarrado: **$2–3 millones** hoy · **$2,7–3,8M** si se llega a ~9,5 ventas/día.
     Definir cuánto ritmo aguanta la caja ANTES de escalar más presupuesto.
     ✅ El dueño confirmó el 4-ago que **SÍ hay caja** para el ritmo actual.
-21. [ ] 🌟🔥 **RESCATAR "Prueba social +50 clientes" — SUBIÓ DE PRIORIDAD (2026-08-07).**
-    Conjunto PROPIO con $8.000-10.000/día. Motivo del ascenso: tiene **el mejor CTR (2,53%) y el CPC
-    más bajo ($197) de TODA la cuenta** (ver sección 0-C), aunque con solo 79 impresiones.
-    Nunca recibió entrega ($394 en 5 días) y quedó fuera de la consolidación porque 4 anuncios excede
-    el máximo del manual (1-3 por conjunto). Es el mejor activo sin explotar (80 clientes reales).
-22. [ ] 💰 **Cargar saldo de Meta para 3-7 días** (o método de pago automático) → dejar de perder plata
-    en re-arranques caros por quedarse sin fondos. Ver sección 11.
+21. [x] ✅ **"PRUEBA SOCIAL +50 CLIENTES" YA ESTÁ EN PRUEBA (2026-08-07).** Se reactivó el conjunto
+    TEST Creativos con SOLO ese anuncio activo. **Ver sección 0-D.** Evaluar el 11-12 de agosto.
+22. [ ] 💰 **[BAJÓ DE PRIORIDAD — es comodidad, NO una fuga de plata]** Método de pago automático de Meta.
+    ⚠️ **El dueño confirmó el 7-ago que la cuenta SIEMPRE está recargada.** La utilización semanal es
+    97-100%, así que **NO se está perdiendo presupuesto por falta de fondos** (ver la hipótesis
+    descartada en la sección 0-C). El pago automático sigue siendo cómodo (quita la tarea diaria y evita
+    re-arranques), pero no es urgente ni resuelve ninguna pérdida.
 23. [ ] 🔌 **Conectar el bot** — a ~9,5 ventas/día el tiempo del dueño ya NO da. Empujar la verificación
     del negocio en Meta (revisar Centro de seguridad por si piden documento).
 24. [ ] 📦 **Confirmar entregas** de los pedidos en ruta (~25+ y creciendo). Rescatar el que no ha
@@ -822,6 +919,21 @@ costo por conversación**. Hoy se está pagando "precio de afán".
 - **Alternativa aún más limpia:** comparar cuánto se degradó CADA conjunto contra SU PROPIA línea base.
   Si ambos se degradan lo mismo, el cambio no tuvo culpa (fue el clima). Ejemplo: Motorizados +5,1% vs
   Domiciliarios +5,4% → el aumento de presupuesto del 67% costó CERO eficiencia.
+
+### 💸 META PROMEDIA EL PRESUPUESTO DIARIO A LO LARGO DE ~UNA SEMANA (2026-08-07)
+**Regla nueva para no volver a dar una falsa alarma por "no se gastó el presupuesto".**
+- **El presupuesto diario es un OBJETIVO PROMEDIO, no un tope exacto por día.** Meta puede gastar hasta
+  **125%** en un día bueno y compensar gastando **~82-85%** en otro. Lo que cuadra es el **promedio semanal**.
+- **Comprobado en esta cuenta:** Domiciliarios corrió al ~110% del 31 jul al 4 ago y al 82-84% el 5 y 6
+  de ago → promedio semanal **99,7%**. Motorizados igual: ~102% y luego 82-87% → **97,2%**.
+- ⚠️ **Todos los conjuntos se compensan AL MISMO TIEMPO** (mismo ciclo semanal), así que ver a varios
+  conjuntos quedarse cortos el mismo día en proporciones parecidas es **NORMAL** — no es señal de un
+  límite compartido de saldo ni de un problema de cuenta.
+- ✅ **CÓMO MEDIR BIEN LA UTILIZACIÓN:** sumar el gasto de la **semana completa** y compararlo con el
+  presupuesto **asignado día por día**. Si el presupuesto cambió a mitad de semana hay que
+  **prorratearlo** (NO multiplicar el presupuesto actual × 7 — ese error subestima la utilización).
+- **Interpretación:** 95-100% semanal = **TOPADO** (para crecer hay que subir presupuesto).
+  Consistentemente <80% semanal = ahí SÍ hay un problema real (audiencia estrecha o solapamiento).
 
 ### ⏱️ "ÚLTIMO CAMBIO SIGNIFICATIVO": SUBIR PRESUPUESTO **NO** REINICIA EL APRENDIZAJE (2026-08-07)
 - El export de Meta trae la columna **"Último cambio significativo"**. Es la forma de saber si un
