@@ -4,9 +4,10 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-07 (tarde) — CONSOLIDACIÓN VALIDADA (termómetro 0,895 · Domiciliarios
-$484 ya es MÁS BARATO que el control) · TEST DE "PRUEBA SOCIAL" PRENDIDO · capacidad $57.000/día ·
-80+ VENTAS · CAC $5.018 · hallazgos: Advantage+, "subir ppto no reinicia aprendizaje", promedio semanal
+Última actualización: 2026-08-12 — 🎉 **EL FRENO DEL TIEMPO SE RESOLVIÓ: IA de WhatsApp Business
+atendiendo 24/7 con handoff** · **TRANSPORTADORA NUEVA: 99 ENVÍOS** (más barata + seguro de devolución) ·
+~155-160 VENTAS · rechazo real **11,9%** (no 4%) · caída del 11-12 ago = **TEMBLOR + quincena** ·
+techo de la cuenta ~$47.800/día → crecer = ABRIR CIUDADES, no subir presupuesto
 
 ---
 
@@ -60,6 +61,9 @@ días de agosto: 30 ventas, cierre 10,2% y CAC $5.018 — ambos RECORD.** El **T
 
 - **VENTANA RECIENTE (27–31 jul, la mejor):** 373 conversaciones · $179.432 · ~31 ventas ·
   **cierre ~8,3%** · **CAC $5.788** (el mejor de la historia). El cierre sigue subiendo: 2,84% → 7% → 8,3%.
+- ⚠️⚠️ **DATO OBSOLETO — EL RECHAZO REAL ES 11,9%, NO 4%.** Ver sección 0-E. El 4% salía de
+  **1 de 25** (muestra minúscula). Con **67 guías resueltas: 8 devoluciones = 11,9%.** Todas las
+  proyecciones de utilidad de julio que usan 4% están infladas.
 - **RECHAZOS: 1 de ~25 resueltos = ~4%** (el pendiente es uno que no ha recogido en oficina de
   Interrapidísimo). MUY por debajo del break-even de ~25% → **CONTRAENTREGA CONFIRMADA** definitivamente.
 - **Utilidad proyectada:** ~$750.000 con rechazo 4% · ~$634.000 con 10% · ~$437.000 con 20%.
@@ -188,7 +192,12 @@ conversaciones y 5 ventas se hicieron A MANO. El anuncio funciona muy bien; la f
 CIERRE (2,84%), que es la mayor palanca de mejora.
 
 **Estado por frente:**
-1. 🤖 **Bot de WhatsApp:** CONSTRUIDO y desplegado en Render, responde bien en pruebas (Gemini con
+1. ✅✅ **[RESUELTO 2026-08-12] LA ATENCIÓN AUTOMÁTICA YA FUNCIONA — pero NO con el bot propio.**
+   El dueño activó la **IA de WhatsApp Business (Meta AI)**, la configuró con todo el catálogo, y
+   **cuando no puede responder algo le avisa y entra él** (handoff). **Diseño híbrido correcto: la IA
+   absorbe volumen, el humano cierra los casos difíciles.** → **EL FRENO DEL TIEMPO DEL DUEÑO YA NO
+   EXISTE.** Ver sección 5-B. Lo de abajo queda como historia del bot propio (sigue sin conectar).
+1-bis. 🤖 **Bot de WhatsApp:** CONSTRUIDO y desplegado en Render, responde bien en pruebas (Gemini con
    saldo responde perfecto). ⚠️ **NO ESTÁ CONECTADO a WhatsApp** → hoy NO atiende clientes reales.
    Las 176 conversaciones y las 5 ventas se hicieron A MANO por el dueño. El bot es la mayor palanca
    de crecimiento pendiente (atender al instante, 24/7, subir el % de cierre).
@@ -456,6 +465,122 @@ es algo más vulnerable. **Para eso está el termómetro.**
 
 ---
 
+## 0-E. 📦 LOGÍSTICA Y RECHAZO — DATOS CORREGIDOS (2026-08-12)
+
+### 🚚 TRANSPORTADORA ACTUAL: **99 ENVÍOS** (`99envios.com`)
+Cambió dos veces en agosto: **Interrapidísimo → Heka → 99 Envíos.** El dueño hizo la comparativa y
+**99 Envíos salió más económico Y con seguro de devolución incluido.**
+
+- **Es agregador:** despacha por TCC, Coordinadora, Inter Rapidísimo, Servientrega y Envía.
+- ✅ **Seguro anti-devolución activo** (cubre flete de ida y de vuelta cuando el cliente no recibe).
+- ✅ **Flete más barato que Heka.** ⚠️ **OJO CON EL ENCUADRE:** como el modelo de precio es
+  **$59.900 SIN envío (el cliente paga el flete)**, un flete más barato **NO mejora el margen del
+  dueño — mejora la oferta al cliente.** Es una **palanca de conversión**, no un ahorro. El total que
+  ve el cliente bajó → debería subir el cierre.
+- ❓ **DATO QUE FALTA:** el **% de comisión por gestionar el recaudo** contraentrega. Es lo único que
+  descuenta margen directo. Referencia: 3% sobre $59.900 = $1.798/venta ≈ $539.000/mes a 300 ventas.
+- ❓ También falta confirmar **en cuántos días paga.** Referencia a batir: **Heka pagaba en 1 DÍA HÁBIL**
+  (excelente) si se solicitaba antes de 6pm de lunes a jueves.
+- ✅ **Cabos con Heka cerrados el 12-ago:** se retiraron los **$2.788.601** de la billetera y se
+  gestionaron las **7 novedades** pendientes.
+
+### 🔴 TASA DE RECHAZO REAL: **11,9%** (8 devoluciones de 67 guías resueltas)
+**Corrige el 4% que estaba escrito en todo el archivo** (salía de 1 de 25, muestra minúscula).
+Es el rechazo **duro**: ya descontados los que el dueño rescató contactándolos.
+
+**EL COSTO REAL DE UN RECHAZO — el número más importante de esta sección:**
+
+| Concepto | Monto |
+|---|---|
+| Publicidad ya pagada (CAC) | **−$5.018** |
+| Margen que no se ganó | **−$24.400** |
+| Empaque perdido + producto inmovilizado 1-2 semanas | −$1.500 |
+| Producto recuperado | +$0 (vuelve, se salva) |
+| **Diferencia entre entregar y que rechacen** | **~$25.900** |
+
+- ⚠️ **NINGÚN seguro de transportadora devuelve el CAC ni el margen.** El seguro cubre solo los fletes
+  (~1/3 del golpe). **Los otros 2/3 son irrecuperables** → bajar el rechazo es palanca propia, no del
+  proveedor. Bajar de 12% a 6% vale **~$420.000/mes** a 270 ventas/mes.
+- ✅ **La contraentrega sigue siendo correcta:** break-even de rentabilidad ~49% de rechazo;
+  umbral donde convendría el prepago ~25%. **Estás en 11,9%.**
+- ⚠️ **El prepago selectivo TAMPOCO es gratis** (si el cliente se va, se pierde la venta Y el CAC).
+  Punto de quiebre: **solo pedir prepago si ESE pedido tiene >~38% de probabilidad de rechazo**
+  (dirección muy vaga, cliente que no confirma, vereda). Para un pedido normal, gana contraentrega.
+- ✅ **Lo barato que sí funciona (3 momentos, no cuestan ventas):** "SÍ CONFIRMO" + total exacto +
+  dirección/celular verificados ANTES · guía de rastreo EN TRÁNSITO · recordatorio con el monto exacto
+  EL DÍA DE ENTREGA.
+- 📌 **La tasa de rechazo se reinicia con el cambio de transportadora.** El 11,9% era con Heka/
+  Interrapidísimo. **Medir desde cero con 99 Envíos** (cobertura distinta = resultados distintos).
+
+---
+
+## 0-F. 📉 LA CAÍDA DE VENTAS DEL 11-12 AGO = **TEMBLOR + QUINCENA** (diagnóstico cerrado)
+
+**Los hechos:** venía vendiendo **10-12/día**; el 11-ago hizo **6** y el 12-ago **5** (−50%).
+
+**🔑 EL DIAGNÓSTICO CLAVE:** el 11-ago hubo **89 conversaciones = su promedio normal exacto.**
+**Las conversaciones NO cayeron. Cayó el CIERRE (de 12-14% a 6,7%).**
+→ **Eso descarta a Meta.** El problema estaba DESPUÉS del clic, y era externo.
+
+**Causa: hubo un TEMBLOR fuerte en zonas de Colombia el 11 de agosto.** Encaja perfecto:
+los anuncios siguen corriendo solos (conversaciones normales), pero la atención de todos se va a la
+familia y las noticias, WhatsApp se llena de mensajes personales y las compras no urgentes se posponen.
+**Probablemente sumado a la QUINCENA** (el 11-12 son los días de menos efectivo del mes, y en
+contraentrega el cliente necesita los $59.900 en efectivo el día de la entrega).
+
+- ✅ **La demanda no se perdió, se APLAZÓ.** El dueño hizo **seguimiento a los que escribieron el 11 y
+  12** (~11 ventas aplazadas ≈ ~$134.000 de margen recuperable). **Lección: ante un shock externo, el
+  seguimiento a los no-cerrados es la acción de mayor retorno, y CADUCA en días.**
+- ✅ **NO SE TOCÓ LA CAMPAÑA, y fue lo correcto.** Termómetro 0,96, frecuencia 1,31, $568/conv: sana.
+  Apagar algo por un evento externo de 2 días habría sido atacar el órgano sano.
+- 💪 **Tranquilidad de fondo: el punto de equilibrio es ~2,2 ventas/día.** A 5-6 ventas seguía ganando
+  ~$69.000/día. La caída costó ~$117.000/día de utilidad, pero **nunca hubo riesgo de pérdida.**
+- ⚠️ **REGLA: cuando el volumen de conversaciones es normal y el cierre cae, NO es la campaña.**
+  Revisar en este orden: **clima (¡vende impermeables, depende de que llueva!) · quincena ·
+  eventos externos · tiempo de respuesta · calidad de leads de un creativo nuevo.**
+
+### 📊 CAMPAÑA 7-12 AGO — CONCLUSIONES
+
+| Métrica | 4 días limpios (8-11 ago) | Ventana 7-12 ago |
+|---|---|---|
+| Conversaciones | 347 | 527 (87,8/día) |
+| Gastado | $197.236 | $286.856 |
+| **Costo/conversación** | **$568** | $544 |
+| Frecuencia | **1,29-1,31** ✅ audiencia fresca | — |
+| Termómetro | **0,92-1,05** ✅ sano | — |
+
+**Evolución del cierre (la métrica que más ha movido el negocio):**
+2,84% → 7% → 8,3% → 10,2% → **~12-14% (5-10 ago, el pico)** → 6,7% (11-ago, temblor).
+
+**🧪 VEREDICTO DE "PRUEBA SOCIAL": $617-645/conv con 61-72 conversaciones → SE QUEDA CORRIENDO.**
+Banda media ($550-700): ni promoverlo ni apagarlo. **Rentable** (CAC ~$6.300, dentro de la meta de
+$8-10k). Y su presupuesto **no tenía mejor destino**: Domiciliarios solo absorbe ~90% de lo suyo.
+
+**🚨 RIESGO ABIERTO — VOLVIÓ LA DEPENDENCIA DE UN SOLO CREATIVO:** "Fondo azul" se lleva el **99,4%**
+del presupuesto de Domiciliarios. Los dos respaldos reciben **$0-157/día**. Existen y están aprobados,
+pero **sin historial vivo**: si Fondo azul se desgasta, arrancan de cero. No es urgente
+(frecuencia 1,31 = sin desgaste), pero el "seguro" es teórico.
+
+**📊 TECHO DE LA CUENTA: ~$47.800/día.** Se subió la capacidad de $45.000 a $57.000 (+27%) y el gasto
+real solo subió 16%. **Con frecuencia en 1,31 NO es saturación de audiencia** — es que los 3 conjuntos
+se estorban entre sí bajo Advantage+.
+→ 🎯 **PARA CRECER HAY QUE ABRIR CIUDADES NUEVAS, NO SUBIR PRESUPUESTO.** Es la jugada estratégica
+pendiente, y bajo Advantage+ la geografía es la única forma real de diferenciar conjuntos.
+
+### 🎉 LOS 3 FRENOS DEL NEGOCIO — ESTADO AL 2026-08-12
+
+| Freno | Estado |
+|---|---|
+| ⏰ **Tiempo del dueño** | ✅ **RESUELTO** — IA de WhatsApp con handoff (sección 5-B) |
+| 💵 **Caja** | ✅ Prácticamente — $2,79M retirados y la transportadora paga rápido |
+| 📦 **Inventario** | ❓ **El único que sigue sin medir** |
+
+**⏸️ CONGELAMIENTO ACORDADO: no tocar NADA hasta el 2026-08-17.** Se movieron 3 variables a la vez
+(IA de WhatsApp + transportadora nueva + temblor) más la quincena. **Con 4 variables sueltas es
+imposible atribuir resultados.** El 17 se evalúa con datos asentados.
+
+---
+
 ## 1. La marca
 
 - **Nombre:** BikerPro · **Instagram:** @bikerproco · **Facebook:** Página "BikerPro" (Accesorios)
@@ -618,7 +743,34 @@ creativos nuevos en el mismo conjunto del ganador: no se mostrarían.**
 
 ---
 
-## 5. El bot de IA (`/bot`) — DETALLE COMPLETO
+## 5-B. ✅ LA IA QUE SÍ ESTÁ ATENDIENDO (desde ~2026-08-12)
+
+**El dueño resolvió la atención automática con la IA nativa de WhatsApp Business (Meta AI), NO con el
+bot propio de `/bot`.**
+
+| | |
+|---|---|
+| Qué usa | **IA de WhatsApp Business / Meta AI** |
+| Configuración | Cargada por el dueño con el catálogo y las condiciones del negocio |
+| Handoff | ✅ **Cuando no puede responder algo, le avisa y entra él** |
+| Ventaja clave | **No depende de la verificación de Meta** que lleva semanas trancada, ni de Render, ni del cupo de Gemini |
+
+- 🎉 **CONSECUENCIA MÁS IMPORTANTE: el freno del "tiempo del dueño" QUEDÓ RESUELTO.** Era el más
+  difícil de los tres frenos del negocio. Ya no se pierden ventas por responder tarde de noche.
+- ✅ **El diseño híbrido es el correcto y hay que mantenerlo:** la IA para volumen y preguntas
+  repetitivas, el dueño para el que duda, objeta o necesita confianza. Ahí es donde se gana la venta.
+- 📌 **NO BORRAR el bot propio de `/bot`.** Aunque nunca se conecte, `src/prompt.js` es **la fuente
+  de verdad del conocimiento del negocio** (producto, colores de franja, fletes por ciudad, objeciones,
+  flujo de ciudad primero, "SÍ CONFIRMO"). Si hay que reconfigurar o auditar la IA, se saca de ahí.
+- ⚠️ **Datos donde equivocarse cuesta ~$25.900 (una devolución).** Si alguna vez hay que auditar la IA,
+  probar estas 6 con un celular ajeno: (1) ¿amarillo? → **AGOTADO**; (2) "quiero uno rojo" → el
+  impermeable es **NEGRO**, la **FRANJA** es roja; (3) precio → **$59.900 SIN envío**; (4) ¿bolsillos?
+  → **NO**, a propósito; (5) ¿contraentrega? → **debe preguntar la CIUDAD PRIMERO**; (6) vereda →
+  no prometer pago al recibir de una.
+
+---
+
+## 5. El bot de IA (`/bot`) — DETALLE COMPLETO (NO CONECTADO — es respaldo/fuente de conocimiento)
 
 - **Stack:** Node.js + Express (webhook) + WhatsApp Cloud API + Google Gemini (`gemini-3.5-flash`).
 - **Archivos:**
@@ -736,6 +888,9 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 - Responder **rápido** (aquí entra el BOT, que hoy no está conectado), cerrar con pregunta, seguimiento.
 - **Confianza (para poder empujar prepago):** reseñas/fotos de los primeros 5 clientes, garantía
   explícita ("si llega con falla, cambio/devuelvo"), cuenta a nombre del negocio.
+> ⚠️ **LA TRANSPORTADORA CAMBIÓ DOS VECES EN AGOSTO: Interrapidísimo → Heka → 99 ENVÍOS (actual).**
+> **Ver sección 7-B.** Lo de abajo queda como historia.
+
 - **Transportadoras:** Interrapidísimo (mejor cobertura pueblos, barato; cobra UN flete en devolución),
   Mi Paquete (agregador), Coordinadora (premium).
 
@@ -788,29 +943,40 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     **Ver sección 0-C.** El susto del miércoles (día 1) era reinicio de aprendizaje y corrigió en 24-48 h.
 19. [x] 🔔 **Confirmado: los 2 anuncios nuevos quedaron "Activa"** (ninguno rechazado) y ambos entregan.
 
+19-C. [x] ✅ **TEST DE "PRUEBA SOCIAL" EVALUADO (12-ago): $617-645/conv → SE QUEDA CORRIENDO.**
+    Banda media, rentable. Ver sección 0-F.
+21. [x] ✅ **"PRUEBA SOCIAL +50 CLIENTES" YA ESTÁ EN PRUEBA (2026-08-07).** Ver sección 0-D.
+23. [x] ✅ **[RESUELTO DE OTRA FORMA] La atención automática YA FUNCIONA con la IA de WhatsApp Business,
+    no con el bot propio** (2026-08-12). El bot de `/bot` sigue sin conectar y ya NO es prioridad.
+    **Ver sección 5-B.** → **El freno del tiempo del dueño quedó resuelto.**
+24. [x] ✅ **Cabos con Heka cerrados (12-ago):** retirados los **$2.788.601** y gestionadas las
+    **7 novedades**. Se hizo la comparativa y **99 Envíos ganó** (más barato + seguro de devolución).
+25. [x] ✅ **Seguimiento hecho a los clientes del 11-12 ago** (los aplazados por el temblor).
+
 ### 🔥 Prioridad ALTA (ahora)
-19-B. [ ] 📊 **Conseguir las VENTAS del 5, 6 y 7 de agosto** para calcular el CAC de la semana
-    (565 conversaciones del 31jul-6ago · $289.281 gastados). **Es el único dato que falta** para saber
-    si el ritmo de ~81 conversaciones/día se está convirtiendo bien. Sin esto no se puede decidir si
-    escalar más allá de los $57.000/día.
-19-C. [ ] ⏳ **EVALUAR EL TEST DE "PRUEBA SOCIAL" el 11-12 de agosto** (5-6 días sin tocar).
-    Las 3 preguntas y los umbrales están en la **sección 0-D**.
-20. [ ] 📦💵 **RESOLVER INVENTARIO Y FLUJO DE CAJA — ES EL FRENO PRINCIPAL.** A 7,5 ventas/día son
-    ~$304.000/día de salida (producto + empaque + publicidad) que se cobra días después.
-    Capital de trabajo amarrado: **$2–3 millones** hoy · **$2,7–3,8M** si se llega a ~9,5 ventas/día.
-    Definir cuánto ritmo aguanta la caja ANTES de escalar más presupuesto.
-    ✅ El dueño confirmó el 4-ago que **SÍ hay caja** para el ritmo actual.
-21. [x] ✅ **"PRUEBA SOCIAL +50 CLIENTES" YA ESTÁ EN PRUEBA (2026-08-07).** Se reactivó el conjunto
-    TEST Creativos con SOLO ese anuncio activo. **Ver sección 0-D.** Evaluar el 11-12 de agosto.
-22. [ ] 💰 **[BAJÓ DE PRIORIDAD — es comodidad, NO una fuga de plata]** Método de pago automático de Meta.
-    ⚠️ **El dueño confirmó el 7-ago que la cuenta SIEMPRE está recargada.** La utilización semanal es
-    97-100%, así que **NO se está perdiendo presupuesto por falta de fondos** (ver la hipótesis
-    descartada en la sección 0-C). El pago automático sigue siendo cómodo (quita la tarea diaria y evita
-    re-arranques), pero no es urgente ni resuelve ninguna pérdida.
-23. [ ] 🔌 **Conectar el bot** — a ~9,5 ventas/día el tiempo del dueño ya NO da. Empujar la verificación
-    del negocio en Meta (revisar Centro de seguridad por si piden documento).
-24. [ ] 📦 **Confirmar entregas** de los pedidos en ruta (~25+ y creciendo). Rescatar el que no ha
-    recogido en oficina (escribirle directo: Interrapidísimo devuelve el paquete en pocos días).
+26. [ ] ⏸️ **CONGELAMIENTO HASTA EL 2026-08-17 — NO TOCAR NADA.** Se movieron 3 variables a la vez
+    (IA de WhatsApp + transportadora nueva + temblor) más la quincena. **Con 4 variables sueltas es
+    imposible atribuir resultados.** Ni presupuesto, ni creativos, ni conjuntos, ni configuración de la IA.
+27. [ ] 📊 **EL 17-AGO: verificar el rebote.** Si las ventas volvieron a 10-12/día → era el temblor +
+    quincena, confirmado, y se pasa a la conversación de crecimiento. **Si siguen en 5-6 con ~87
+    conversaciones/día → hay algo estructural** y toca revisar en el orden de la sección 0-F.
+28. [ ] ❓ **Preguntar a 99 Envíos el % de comisión por recaudo** y **en cuántos días paga.**
+    Es lo único que descuenta margen directo. Referencia a batir en pagos: Heka pagaba en 1 día hábil.
+29. [ ] 📦 **MEDIR INVENTARIO — es el ÚNICO de los 3 frenos que sigue sin resolver.** Los otros dos
+    (tiempo y caja) ya están. Sin este dato no se puede decidir cuánto crecer.
+30. [ ] 🌎 **LA JUGADA DE CRECIMIENTO: ABRIR CIUDADES NUEVAS, no subir presupuesto.**
+    La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia
+    de 1,31 prueba que NO es saturación de audiencia). **Bajo Advantage+ la geografía es la única forma
+    real de diferenciar conjuntos.** ⚠️ Usar **solo ciudades grandes** (los pueblos disparan el rechazo).
+31. [ ] 📉 **MEDIR LA TASA DE RECHAZO DESDE CERO con 99 Envíos.** El 11,9% era con Heka/Interrapidísimo;
+    cobertura distinta = resultados distintos. Ver sección 0-E.
+32. [ ] 🎯 **CERRAR EL HUECO DE "COSTO POR VENTA" (no por conversación).** Todo el análisis mide costo
+    por CONVERSACIÓN; no se sabe **qué creativo genera las VENTAS**. Un creativo puede traer
+    conversaciones baratas que no compran. **Solución práctica: poner un mensaje inicial DISTINTO en
+    cada anuncio** para poder identificarlos en WhatsApp y atribuir ventas por creativo.
+33. [ ] 🛡️ **Decidir si se le da conjunto propio a "Demostración agua rueda"** (~$10.000/día) para
+    tener un respaldo REAL y no teórico. Hoy recibe $0-63/día dentro de Domiciliarios. No urgente
+    (frecuencia 1,31 = Fondo azul sin desgaste), pero cuando se desgaste ya se querrá tener corriendo.
 25. [ ] 📦💵 **[histórico] Vigilar INVENTARIO y CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
     A 6-7 ventas/día son ~$238.000 de producto por día. **Es el freno real, ya no es Meta.**
 
@@ -908,6 +1074,46 @@ costo por conversación**. Hoy se está pagando "precio de afán".
 - **Cuál conjunto escalar:** solo el que esté **topado (≥100% de utilización)**. Darle más presupuesto
   a uno que ya sub-gasta no hace nada. Motorizados es el ejemplo: a $18.000 gastaba $13.800; a $15.000
   gasta el 99% y es más barato → primero AMPLIAR AUDIENCIA, después subir presupuesto.
+
+### 🔑 UN CREATIVO NECESITA SU PROPIO CONJUNTO PARA SOBREVIVIR (2026-08-12)
+**El hallazgo más accionable de estas dos semanas. Corrige en parte la lógica de la consolidación.**
+
+Evidencia del mismo día (10-ago), con los mismos creativos:
+
+| Creativo | Dónde está | Gasto diario |
+|---|---|---|
+| **Prueba social** | **Su propio conjunto** | **~$9.500** ✅ |
+| Demostración agua rueda | Dentro de Domiciliarios | **$0-63** ❌ |
+| TEST B – Franja reflectiva | Dentro de Domiciliarios | **$0-157** ❌ |
+
+- 🚨 **"Demostración agua rueda" era el creativo MÁS BARATO de la cuenta ($484) cuando tenía conjunto
+  propio. Se movió a Domiciliarios y ahora recibe CERO.** No es calidad: **es ubicación.**
+- 🔄 Y al revés: "Prueba social", que Meta ignoraba cuando compartía conjunto ($394 en 5 días), pasó a
+  producir 15-17 conversaciones diarias al aislarlo.
+- ✅ **REGLA:** un creativo que se quiera mantener VIVO necesita **su propio conjunto**. Meterlo junto a
+  un ganador establecido lo mata, aunque sea mejor. La regla del manual de "1-3 anuncios fuertes por
+  conjunto" **NO aplica en esta cuenta** (Advantage+ concentra todo en el de más historial).
+- ⚠️ **Consecuencia:** para tener respaldos REALES (no teóricos), cada uno necesita conjunto propio con
+  presupuesto (~$10.000/día). El costo es más conjuntos que administrar y más gasto total.
+- 📌 **NO promover un creativo bueno al conjunto del ganador** esperando que corra: iría a $0.
+
+### 📉 MUESTRAS PEQUEÑAS: LA CAUSA DE LOS 3 ERRORES DE KIRO (2026-08-12)
+**Los tres errores de análisis de estas dos semanas tuvieron la MISMA raíz: muestras pequeñas.**
+Registrado para que se exija más rigor en el futuro.
+
+1. **Inventé un problema de saldo** con 2 días de datos (utilización real: 97-100% semanal).
+   **El dueño lo corrigió** diciendo que la cuenta siempre está recargada.
+2. **Le puse demasiada fe a "Prueba social"** por su CTR de **2,53% sobre 79 impresiones**. Con volumen
+   real (10.247 impresiones) el CTR **cayó a 1,60%** y el costo/conv subió de $394 a $645.
+   → **REGRESIÓN A LA MEDIA: por debajo de ~1.000 impresiones o ~30 conversaciones, los indicadores de
+   un anuncio son RUIDO.** No decidir con ellos, ni para promover ni para descartar.
+3. **Leí una tendencia en 3 días** ($594 → $567 → $530) y al día siguiente saltó a **$841**.
+   → **Tres días consecutivos en la misma dirección pasan por casualidad todo el tiempo. NO son
+   tendencia.**
+
+✅ **UMBRAL EXIGIBLE antes de aceptar cualquier conclusión: ventana de 4+ días Y 50+ conversaciones.**
+⚠️ Y los umbrales de decisión se aplican a **PROMEDIOS DE VENTANA, nunca a días sueltos**: un día en
+$841 no mata un creativo, igual que tres días buenos no lo coronan.
 
 ### 🌡️ EL TERMÓMETRO: SIEMPRE DEJAR UN CONJUNTO SIN TOCAR COMO GRUPO DE CONTROL (2026-08-07)
 **La técnica más útil aprendida hasta ahora para leer datos sin engañarse.**
