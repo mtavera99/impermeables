@@ -8,10 +8,15 @@
 corre en UTC y ya marca el día siguiente)* — 🔴 **ALERTA PRINCIPAL: EL CIERRE NO SE RECUPERÓ (6,1% vs
 13% del pico) Y EL CPA SE DETERIORÓ +72% ($5.433 → ~$9.343). Conversaciones estables en 84,9/día →
 NO ES META, es DESPUÉS del clic. Vale ~$2,2 MILLONES/MES.**
-**3 hipótesis vivas y SUPERPUESTAS, ninguna probada (sección 0-I): (A) el ciclo de pago — la ventana
-10-14 ago cae ENTERA en el valle previo a la quincena del 15 · (C) EL CLIMA, que el archivo pone
-primero y nunca se ha mirado · (D) las horas de venta del dueño, consumidas por la migración de
-transportadora y el seguimiento del temblor.**
+🔴🔴 **HIPÓTESIS PRINCIPAL (E) — SECCIÓN 0-K: EL "CIERRE" ESTÁ MAL MEDIDO. El denominador son "toques
+de botón del anuncio", no conversaciones, y el dueño confirma que hay MUCHÍSIMOS chats donde nadie
+escribió nada. Si los vacíos pasaron de ~25% a ~65%, la caída de 13% a 6,1% queda explicada COMPLETA
+sin que nada esté roto. Es la única hipótesis que explica volumen estable + cierre a la mitad, y el
+mecanismo (Meta amplió público → gente menos calificada) YA ESTABA ESCRITO en este archivo.**
+**MEDIRLO ES LO PRIMERO (pendiente #42): 5 minutos contando en la lista de WhatsApp, en el pico Y en el
+valle.** Si se confirma, el arreglo es de **segmentación en Meta**, no del guion ni de la IA.
+**Hipótesis en segundo plano (sección 0-I): (A) el ciclo de pago · (C) EL CLIMA, nunca revisado ·
+(D) las horas de venta del dueño.**
 **(B) 🔻 la IA de WhatsApp queda DESCARTADA: está supervisada siempre Y se activa cuando SUBE el flujo,
 así que estuvo más activa en los días del pico de cierre — la correlación va al revés de lo que la
 hipótesis necesitaba.** ✅ **La IA es una válvula de capacidad: el freno del tiempo del dueño está
@@ -952,6 +957,11 @@ conversaciones/día → hay algo ESTRUCTURAL"*. **Los datos: 5,2 ventas/día con
 **Y NO ES META:** volumen intacto, frecuencia sana, clic→chat estable. **El problema está DESPUÉS del
 clic**, igual que el 11-ago.
 
+> 🔴🔴 **LEER PRIMERO LA SECCIÓN 0-K.** Apareció una hipótesis **(E)** que explica **todas** las
+> observaciones a la vez, incluida la que ninguna otra explica (volumen estable + cierre a la mitad):
+> **el denominador del "cierre" está contaminado con toques de botón vacíos.** Las hipótesis de abajo
+> **pasan a segundo plano** hasta que (E) se mida.
+
 ### ⚖️ DOS HIPÓTESIS SUPERPUESTAS QUE HOY SON **INDISTINGUIBLES** (no rankearlas)
 
 **(A) EL CICLO DE PAGO (quincena).** Script: `/analisis/ciclo-quincena.py`.
@@ -1075,6 +1085,79 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-K. 🔴🔴 HIPÓTESIS (E) — EL "CIERRE" ESTÁ MAL MEDIDO: EL DENOMINADOR ESTÁ CONTAMINADO
+
+**Confirmado por el dueño el 2026-08-14: hay MUCHÍSIMOS chats donde la persona nunca escribió nada.**
+Solo se dispara el mensaje prerrellenado del botón del anuncio (*"¡Hola! Quiero más información."*)
+y ahí muere. **Script: `/analisis/conversaciones-vacias.py`.**
+
+> ⚠️ **ESTA HIPÓTESIS SE HABÍA DADO POR REFUTADA EN LA SECCIÓN 0-J, Y ESE TEST NO VALÍA.** Salió "6%
+> de vacíos" sobre una muestra que **el dueño eligió por tener información, excluyendo a propósito los
+> vacíos.** **Testear una hipótesis con la muestra que garantiza el resultado es peor que no testearla:**
+> deja una conclusión falsa escrita con apariencia de dato. **Es el quinto error de método de la serie
+> (ver sección 11) y el más grave, porque el sesgo era conocido de antemano.**
+
+### 🔑 EL PROBLEMA DE FONDO
+Lo que Meta cuenta como "conversación iniciada" **es un toque en el botón del anuncio.** No requiere
+que la persona escriba una palabra. **Entonces el "cierre" = ventas ÷ toques de botón, no ventas ÷
+conversaciones.** Si cambia la proporción de toques vacíos, **el cierre se mueve solo, sin que nada del
+negocio haya cambiado.** Es un problema de **MEZCLA**, no de venta.
+
+### 📊 CIERRE REAL SEGÚN CUÁNTOS SEAN VACÍOS (ventana 10-14 ago: 424 "conv." · 26 ventas)
+
+| % vacíos | Conversaciones reales | **Cierre real** | |
+|---|---|---|---|
+| 0% | 424 | 6,1% | (lo que se reportó) |
+| 20% | 340 | 7,7% | |
+| **40%** | 255 | **10,2%** | nivel de 1-4 ago |
+| **50%** | 212 | **12,2%** | |
+| **60%** | 170 | **15,3%** | **supera el pico** |
+| 70% | 127 | 20,4% | |
+
+**¿Cuánto tendría que haber cambiado la mezcla para explicar TODO?**
+Si en el pico ~25% eran vacíos y en el valle subieron a **~65%**, **la caída de 13% a 6,1% queda
+explicada completa** — sin que se haya roto la IA, ni el guion, ni el clima, ni la quincena.
+⚠️ **Es un cambio de mezcla grande. Hay que medirlo, no asumirlo.**
+
+### ✅ POR QUÉ ES LA MEJOR HIPÓTESIS: EXPLICA LO QUE NINGUNA OTRA EXPLICA
+
+| Observación | Cómo la explica (E) |
+|---|---|
+| 🔑 **El volumen NO cayó (84,9/día)** | Meta sigue entregando los mismos "inicios" |
+| 🔑 **Pero el cierre se cayó a la mitad** | **cambió la composición**, no la cantidad |
+| Costo/conversación +11,8% ($512→$572) | se paga más por tráfico de peor calidad |
+| CTR bajó y CPC subió | público más amplio = menos calificado |
+| Clic→chat cayó 53% → 43% | **ya estaba documentado y apunta al mismo lado** |
+| Nada en la operación parece roto | **porque nada está roto** |
+
+🔑 **EL MECANISMO YA ESTABA ESCRITO EN ESTE ARCHIVO** (secciones 0 y 11): *"Meta salió a públicos más
+amplios (alcance 18.362 → 52.074 → 69.469) y al ir más lejos entra gente menos calificada."*
+**Se documentó como "normal al escalar y no grave".** → **Si eso llena el embudo de toques vacíos, SÍ
+es grave: es exactamente el mecanismo que tumba el cierre.** El dato estaba y no se conectó.
+
+### ⚡ LO QUE CAMBIA SI SE CONFIRMA
+- **(a) El CPA está mal medido.** Costo por conversación **real**: **$954** con 40% de vacíos, **$1.431**
+  con 60% — no $572.
+- **(b) El problema NO está después del clic: está EN el clic.** Vuelve a ser un problema de Meta.
+- **(c) El arreglo NO es el guion ni la IA: es la SEGMENTACIÓN** — acotar público, o cambiar el evento
+  de optimización para que Meta deje de comprar toques baratos que no conversan.
+- **(d) (A) quincena, (C) clima y (D) horas del dueño pasan a segundo plano:** ninguna explica que el
+  volumen se mantenga estable mientras el cierre se parte al medio.
+
+### 📏 CÓMO MEDIRLO — UN CHAT VACÍO TIENE FIRMA VISUAL
+En la lista de WhatsApp, **el último mensaje de un chat vacío es un seguimiento automático del negocio**
+(*"¿Te resuelvo alguna duda…"*, *"Aún tengo tu color disponible"*). **El cliente nunca es el autor del
+último mensaje.**
+1. **5 MINUTOS, SIN EXPORTAR NADA:** contar en la lista, para un rango de fechas, cuántos terminan en un
+   seguimiento automático. **Un conteo aproximado ya decide:** la diferencia entre 20% y 60% se ve a
+   simple vista.
+2. **RIGUROSO:** exportar ~40 chats **por recencia pura, sin mirar el contenido.** Al no elegirlos, la
+   tasa sale limpia. **Y lo mismo para la ventana del pico (5-10 ago)** → ahí está la comparación que
+   cierra el caso.
+3. **DEFINITIVO:** conectar la Cloud API → la métrica se calcula sola todos los días.
+
+---
+
 ## 0-J. 💬 PRIMER ANÁLISIS DE LOS CHATS DE WHATSAPP (47 chats, 24 jul – 14 ago) — 2026-08-14
 
 **Por fin hay datos del hueco del medio.** Todo el análisis previo medía antes del clic (Meta) o
@@ -1117,7 +1200,7 @@ De los 44 que escribieron: **color 77% · talla 64%** · envío 20% · fotos 16%
 ### ❌ TRES HIPÓTESIS MÍAS QUE ESTOS DATOS MATARON (quedan escritas a propósito)
 | Hipótesis | Realidad |
 |---|---|
-| "Muchas conversaciones son toques de botón vacíos" | ❌ **solo 6%** escribió nada propio *(pero la muestra la eligió el dueño → sesgo en esta dirección; necesita muestra aleatoria)* |
+| ~~"Muchas conversaciones son toques de botón vacíos"~~ | 🔄 **NO REFUTADA — EL TEST ESTABA MAL HECHO.** El "6%" salió de una muestra que el dueño **eligió por tener información, excluyendo a propósito los vacíos.** Testear una hipótesis con la muestra que garantiza el resultado **es peor que no testearla.** El dueño confirma que **hay muchísimos chats vacíos.** → **PASA A SER LA HIPÓTESIS PRINCIPAL: ver sección 0-K.** |
 | "Se perdió el CIUDAD PRIMERO del PR #19" | ❌ **5 de 47, dispersos** — variación, no regresión. Se concluyó desde **2** archivos y se refutó con 47 |
 | "39% quedan sin respuesta = $415.000 tirados" | ❌ **artefacto de la métrica**: 15 de 18 eran el cliente diciendo "Ok/Gracias". Fuga real: **1 de 44** |
 
@@ -1541,6 +1624,16 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     pico de 13% que en el valle. **La correlación va al revés de lo que haría falta.**
     Vale ~$2,2M/mes, pero **medir mal cuesta más que esperar 3 días** — a 5,2 ventas/día se gana
     ~$65.000/día, 2,4× sobre el equilibrio. ✅ Nada de esto rompe el congelamiento: se mide, no se mueve.
+42. [ ] 🔴🔴🔴 **LA MEDICIÓN #1 DEL NEGOCIO: CONTAR LAS CONVERSACIONES VACÍAS.** Es la hipótesis (E)
+    de la sección 0-K y **es la única que explica el volumen estable con el cierre a la mitad.**
+    **5 minutos, sin exportar nada:** en la lista de WhatsApp, contar para un rango de fechas cuántos
+    chats **terminan en un seguimiento automático del negocio** (= el cliente nunca escribió).
+    **Un conteo aproximado ya decide: la diferencia entre 20% y 60% se ve a simple vista.**
+    ⚠️ **Y hay que hacerlo en DOS ventanas: el pico (5-10 ago) y el valle (10-14 ago).** El número
+    suelto no sirve; **lo que importa es si la proporción SUBIÓ.**
+    → Si subió de ~25% a ~65%, **toda la caída del cierre queda explicada y no hay nada roto**: el
+    arreglo es de **segmentación en Meta**, no del guion ni de la IA.
+    ⚠️ **Antes de tocar el guion (#38) o el tarifario (#35), medir esto:** cambia qué problema hay.
 36-ter. [ ] 🌧️ **LAS 2 PREGUNTAS GRATIS QUE SE PUEDEN HACER HOY MISMO** (no esperan al 17, no tocan nada):
     **(a) ¿LLOVIÓ MENOS del 10 al 14 de agosto?** El propio archivo pone el clima **primero** en el orden
     de revisión (sección 0-F) y **nunca se ha mirado.** Vende impermeables: es el único factor que baja
