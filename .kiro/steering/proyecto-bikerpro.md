@@ -4,11 +4,16 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-12 — 🎉 **EL FRENO DEL TIEMPO SE RESOLVIÓ: IA de WhatsApp Business
-atendiendo 24/7 con handoff** · **TRANSPORTADORA NUEVA: 99 ENVÍOS** (más barata + seguro de devolución) ·
+Última actualización: 2026-08-15 — 🎉 **EL FRENO DEL TIEMPO SE RESOLVIÓ: IA de WhatsApp Business
+atendiendo 24/7 con handoff** · **TRANSPORTADORA NUEVA: 99 ENVÍOS** ·
 ~155-160 VENTAS · **AUDITORÍA FINANCIERA COMPLETA (sección 0-G): rechazo real 15,3% · CPA real
 $6.414 por cliente que paga · ganancia Heka ~$1.982.000** · caída del 11-12 ago = **TEMBLOR + quincena** ·
-techo de la cuenta ~$47.800/día → crecer = ABRIR CIUDADES, no subir presupuesto
+techo de la cuenta ~$47.800/día → crecer = ABRIR CIUDADES, no subir presupuesto ·
+🆕 **PRIMERA AUDITORÍA DE 99 ENVÍOS (sección 0-H): "más barato" NO se ve en los datos —
+cobra $20.894 vs $21.000 de Heka, y la ambigüedad del seguro vale $5.696/guía** ·
+🆕 **FUGA NUEVA: se absorben $3.900-4.900 de flete por venta en destinos caros (~$384.000/mes)** ·
+🆕 **7 guías en novedad = $181.744 de margen en riesgo (Cartagena es la llamada #1)** ·
+⚠️ **el volumen NO ha vuelto a 10-12/día: va en 5,2 guías/día**
 
 ---
 
@@ -690,6 +695,135 @@ La sección 7 dice que pueblos y veredas son de alto riesgo y que a ellos hay qu
 
 ---
 
+## 0-H. 🚚 PRIMERA VENTANA CON 99 ENVÍOS (10–14 ago) — AUDITADA EL 2026-08-15
+
+**Fuente:** export "Envíos Completos" de `99envios.com` del 15-ago. **26 guías · 27 unidades ·
+$2.128.056 de recaudo comprometido.** Datos y script en `/analisis/guias-99envios.csv` y
+`/analisis/analizar-99envios.py`.
+
+### ⚠️ LO PRIMERO: ESTA VENTANA **NO** SIRVE PARA MEDIR RECHAZO
+10 entregadas · **0 devueltas** · 7 en novedad · 9 en curso. El 0% es **falso por inmadurez**: las
+entregas se resuelven en 2-4 días y las devoluciones tardan 8-15, así que a 5 días solo alcanzan a
+aparecer las buenas noticias. **Techo teórico si las 7 novedades fallaran: 41,2%.**
+→ **El rechazo de 99 Envíos se mide a fin de agosto, no ahora.** El **15,3%** de la sección 0-G sigue
+siendo el número vigente para cualquier cálculo.
+
+### 🚨 HALLAZGO 1 — "99 ENVÍOS ES MÁS BARATO" NO SE VE EN LOS DATOS (y el motivo es una ambigüedad)
+
+| Concepto | Valor |
+|---|---|
+| Cobro promedio de 99 Envíos por guía | **$20.894** |
+| Flete promedio de Heka (referencia) | $21.000 |
+| Diferencia | **−0,5%** (es decir: **igual**) |
+
+El archivo trae un campo `valor_seguro_99` que es **exactamente 13,6% del cobro en las 26 guías**
+(constante, sin una sola excepción). Eso abre dos lecturas y **cambia la conclusión por completo**:
+
+| Lectura | Flete real por guía | vs. Heka |
+|---|---|---|
+| **(a)** el seguro está **INCLUIDO** en `valor_servicio` | **$18.046** | **−14,1%** ✅ sí es más barato |
+| **(b)** el seguro se cobra **APARTE** al liquidar | **$23.742** | **+13,1%** 🔴 es más caro |
+
+- **La diferencia entre (a) y (b) es $5.696 por guía** ≈ **$1,7 millones/mes a 300 ventas.**
+  No es un detalle contable: decide si el cambio de transportadora fue un acierto o un error.
+- ✅ **ESTO CONVIERTE EL PENDIENTE #28 EN URGENTE**, y le agrega una tercera pregunta:
+  1. ¿% de comisión por recaudo?
+  2. ¿En cuántos días paga? (Heka: 1 día hábil)
+  3. 🆕 **¿El `valor_seguro_99` está dentro del `valor_servicio` o se cobra aparte?**
+- 📌 Ojo con el encuadre de la sección 0-E: como el cliente paga el flete, un flete más barato **no
+  mejora el margen**, mejora la oferta. Pero un flete más CARO **sí golpea el margen**, porque el total
+  al cliente está topado (ver hallazgo 2). La asimetría juega en contra.
+
+### 🚨 HALLAZGO 2 — SE ESTÁ ABSORBIENDO FLETE EN LOS DESTINOS CAROS (fuga nueva, no documentada)
+
+El modelo dice "$59.900 **sin** envío, el cliente paga el flete". **Los datos dicen que no siempre.**
+El recaudo se cobra por tarifario con un **total tope de ~$80.000-82.000**, así que cuando el flete
+sube, lo que queda para el dueño baja:
+
+| Recaudo al cliente | Cobro 99 Envíos | Queda por unidad | Absorbido | Destinos |
+|---|---|---|---|---|
+| $72.698 | $12.871 | $59.827 | $73 | Bogotá, Soacha, Zipaquirá (6) |
+| $81.752 | $22.793 | $58.959 | $941 | Bucaramanga, Cereté, Ipiales… (6) |
+| $80.676 | $22.714 | $57.962 | $1.938 | Florencia (1) |
+| **$81.030** | **$25.029** | **$56.001** | **$3.899** | Algeciras, Guachené, Gómez Plata, Remedios (4) |
+| **$80.061** | **$24.957** | **$55.104** | **$4.796** | Inzá (1) |
+| **$80.000** | **$24.953** | **$55.047** | **$4.853** | Málaga (1) |
+
+- **Precio implícito real: $58.697/unidad** contra los **$59.933 auditados con Heka** → **−$1.236.**
+- **Absorbido en 5 días: $33.314 en 21 guías. Proyectado: ~$384.000/mes** a 300 ventas.
+- **Margen por unidad entregada: $23.607** vs. **$24.433** con Heka (−$826).
+- 🔑 **DÓNDE DUELE: los destinos con flete ~$25.000 son todos pueblos pequeños** (Guachené, Gómez
+  Plata, Remedios, Málaga, Inzá, Algeciras) → ahí se absorben **$3.900-4.900 por venta.**
+
+### ⚖️ CONSECUENCIA: EL VEREDICTO SOBRE LOS PUEBLOS SE VUELVE MIXTO (matiza la sección 0-G)
+
+La sección 0-G probó que **los pueblos rechazan MENOS** (7-11% vs 20-23%) y mató la regla vieja de la
+sección 7. **Eso sigue en pie.** Pero ahora aparece el otro lado de la moneda:
+
+| | Ciudades grandes | Pueblos |
+|---|---|---|
+| Rechazo (0-G, 98 guías Heka) | 20-23% 🔴 | 7-11% ✅ |
+| Flete absorbido por venta (0-H) | ~$73-941 ✅ | **~$3.900-4.900** 🔴 |
+| Ventaja esperada por menor rechazo | — | ~$2.600/venta |
+| Costo del flete absorbido | — | ~$4.000/venta |
+
+→ **NETO: la ventaja de rechazo de los pueblos NO alcanza a pagar el flete que se absorbe.**
+⚠️ **Pero ambos números son de muestras chicas** (15 devoluciones · 6 guías caras). **No es ley.**
+**Lo que sí queda firme:** el criterio para expandir **no es "grande vs. pueblo"**, es
+**rechazo esperado − flete absorbido**, y hoy eso se puede calcular guía por guía con el tarifario.
+- ✅ **ACCIÓN CONCRETA Y BARATA:** subir el total al cliente en los destinos de flete ~$25.000
+  (de $80.000-81.000 a ~$84.000-85.000). Recupera $3.900-4.900 por venta. **El cliente de pueblo ya
+  demostró que compra igual y rechaza menos** → es el que mejor tolera un total un poco más alto.
+
+### 📞 PLATA EN RIESGO AHORA MISMO — 7 GUÍAS, $181.744 DE MARGEN
+
+| Ciudad | Estado | Recaudo | Margen |
+|---|---|---|---|
+| 🔥 **CARTAGENA DE INDIAS** (2 uds) | **Intento de entrega** | **$155.841** | **$48.981** |
+| POPAYÁN | Reclame en oficina | $82.827 | $24.457 |
+| REMEDIOS | Reclame en oficina | $81.030 | $20.501 |
+| INZÁ | Reclame en oficina | $80.061 | $19.604 |
+| MÁLAGA | Reclame en oficina | $80.000 | $19.547 |
+| BOGOTÁ, D.C. | Telemercadeo | $72.698 | $24.327 |
+| SOACHA | Telemercadeo | $72.698 | $24.327 |
+| **TOTAL** | | **$625.155** | **$181.744** |
+
+- **Con la publicidad ya gastada, fallar las 7 cuesta $226.642.**
+- 🔥 **CARTAGENA ES LA LLAMADA #1 DEL NEGOCIO:** es el pedido más grande de la ventana (2 unidades,
+  $48.981 de margen), **ya tiene un intento de entrega fallido**, y **Cartagena acumuló 2 de las 15
+  devoluciones del período Heka**. Máximo valor + máximo riesgo + señal de alarma ya encendida.
+- ⚠️ **"Telemercadeo" en Interrapidísimo NO es tránsito normal** — es la transportadora llamando al
+  cliente para resolver algo (dirección/coordinación). Bogotá y Soacha son entregas urbanas de 1-2 días
+  y llevan más: **tratarlas como novedad, no esperar.**
+- 📌 Estas 7 son **además** de las 21 guías de Heka de la sección 0-G (12 en "Para Reclamar en Oficina").
+  **Son dos frentes distintos y los dos caducan.**
+
+### 📉 DATO DE VOLUMEN (adelanta el chequeo del 17-ago)
+
+| Fecha | Guías |
+|---|---|
+| 10-ago | 3 |
+| 11-ago | 5 |
+| 12-ago | 6 |
+| 13-ago | **8** |
+| 14-ago | 4 |
+
+**Promedio 5,2 guías/día.** Antes del temblor vendía **10-12/día**.
+- ⚠️ **A 5 días del temblor el volumen NO ha vuelto al nivel previo.** El 13-ago (8) fue el mejor.
+- ⚠️ **NO CONCLUIR TODAVÍA:** guía despachada ≠ venta cerrada (hay lag de 1 día y se despacha de noche),
+  y el 14-ago puede estar incompleto. **Esto adelanta la pregunta del 17-ago, no la responde.**
+- 📌 Si el 17-ago sigue en 5-6 con ~87 conversaciones/día, **el guion de la sección 0-F aplica:**
+  clima → quincena → eventos → tiempo de respuesta → calidad de leads. **Ojo con el clima: la IA de
+  WhatsApp es nueva y nunca se ha medido su cierre contra el del dueño** — es una variable candidata
+  que antes no existía.
+
+### ❌ LO QUE ESTE ARCHIVO NO PUEDE RESPONDER
+- **CPA / costo por venta:** sigue faltando el **export de Meta con desglose POR DÍA**. Sin gasto
+  alineado por fecha no hay CPA, y el CPA es lo que se quería saber.
+- **Comisión por recaudo y días de pago:** no son campos del export. Solo 99 Envíos los tiene.
+
+---
+
 ## 1. La marca
 
 - **Nombre:** BikerPro · **Instagram:** @bikerproco · **Facebook:** Página "BikerPro" (Accesorios)
@@ -1069,16 +1203,28 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 27. [ ] 📊 **EL 17-AGO: verificar el rebote.** Si las ventas volvieron a 10-12/día → era el temblor +
     quincena, confirmado, y se pasa a la conversación de crecimiento. **Si siguen en 5-6 con ~87
     conversaciones/día → hay algo estructural** y toca revisar en el orden de la sección 0-F.
-28. [ ] ❓ **Preguntar a 99 Envíos el % de comisión por recaudo** y **en cuántos días paga.**
-    Es lo único que descuenta margen directo. Referencia a batir en pagos: Heka pagaba en 1 día hábil.
+28. [ ] 🔴🔴 **URGENTE — LAS 3 PREGUNTAS A 99 ENVÍOS** (subió de prioridad con la sección 0-H):
+    (1) **% de comisión por recaudo**; (2) **en cuántos días paga** (Heka: 1 día hábil);
+    (3) 🆕 **¿el `valor_seguro_99` está INCLUIDO en el `valor_servicio` o se cobra aparte?**
+    ⚠️ La #3 vale **$5.696 por guía (~$1,7M/mes)** y decide si 99 Envíos es 14% más barato que Heka
+    o 13% más caro. **Sin esa respuesta no se sabe si el cambio de transportadora fue un acierto.**
 29. [ ] 📦 **MEDIR INVENTARIO — es el ÚNICO de los 3 frenos que sigue sin resolver.** Los otros dos
     (tiempo y caja) ya están. Sin este dato no se puede decidir cuánto crecer.
 30. [ ] 🌎 **LA JUGADA DE CRECIMIENTO: ABRIR CIUDADES NUEVAS, no subir presupuesto.**
     La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia
     de 1,31 prueba que NO es saturación de audiencia). **Bajo Advantage+ la geografía es la única forma
-    real de diferenciar conjuntos.** ⚠️ Usar **solo ciudades grandes** (los pueblos disparan el rechazo).
+    real de diferenciar conjuntos.**
+    ⚠️⚠️ **CORREGIDO EL 2026-08-15 — ESTE PUNTO DECÍA "usar solo ciudades grandes porque los pueblos
+    disparan el rechazo". ESO ERA FALSO** (venía de la sección 7, que nunca tuvo datos detrás).
+    La sección **0-G** probó que **los pueblos rechazan MENOS** (7-11% vs 20-23% de las ciudades).
+    **El criterio correcto NO es "grande vs. pueblo"**, es **rechazo esperado − flete absorbido**
+    (ver sección **0-H**): los pueblos rechazan menos pero hoy se les absorbe $3.900-4.900 de flete.
+    → **Arreglar primero el tarifario de los destinos caros (0-H) y después abrir, sin excluir pueblos.**
 31. [ ] 📉 **MEDIR LA TASA DE RECHAZO DESDE CERO con 99 Envíos.** El 15,3% era con Heka/Interrapidísimo;
     cobertura distinta = resultados distintos. Ver sección 0-E.
+    ⏳ **Primer corte hecho el 15-ago y NO es utilizable** (10 entregadas / 0 devueltas / 7 novedades a
+    5 días = 0% falso por inmadurez). **Volver a exportar a fin de agosto**, cuando las novedades se
+    hayan resuelto. **Hasta entonces usar el 15,3%.** Ver sección 0-H.
 32. [ ] 🎯 **CERRAR EL HUECO DE "COSTO POR VENTA" (no por conversación).** Todo el análisis mide costo
     por CONVERSACIÓN; no se sabe **qué creativo genera las VENTAS**. Un creativo puede traer
     conversaciones baratas que no compran. **Solución práctica: poner un mensaje inicial DISTINTO en
@@ -1086,6 +1232,17 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 33. [ ] 🛡️ **Decidir si se le da conjunto propio a "Demostración agua rueda"** (~$10.000/día) para
     tener un respaldo REAL y no teórico. Hoy recibe $0-63/día dentro de Domiciliarios. No urgente
     (frecuencia 1,31 = Fondo azul sin desgaste), pero cuando se desgaste ya se querrá tener corriendo.
+34. [ ] 🔥📞 **RESCATAR LAS 7 GUÍAS EN NOVEDAD DE 99 ENVÍOS — $181.744 de margen, y CADUCA.**
+    Orden de llamada por valor: **CARTAGENA (2 uds, $48.981, ya tiene un intento fallido y Cartagena
+    acumuló 2 de las 15 devoluciones de Heka — es la llamada #1 del negocio)** · Popayán $24.457 ·
+    Bogotá $24.327 · Soacha $24.327 · Remedios $20.501 · Inzá $19.604 · Málaga $19.547.
+    ⚠️ Bogotá y Soacha están en **"Telemercadeo"** = la transportadora no pudo y está llamando:
+    **es novedad, no tránsito.** **NO se cruza con el congelamiento** (esto es operación, no campaña).
+    Ver sección 0-H. **Esto es ADEMÁS de las 21 guías de Heka del punto de la sección 0-G.**
+35. [ ] 💰 **SUBIR EL TARIFARIO EN LOS DESTINOS DE FLETE ~$25.000** (Guachené, Gómez Plata, Remedios,
+    Algeciras, Málaga, Inzá y similares): de $80.000-81.000 a **~$84.000-85.000** de total al cliente.
+    Hoy se absorben **$3.900-4.900 por venta** ahí (~$384.000/mes proyectado). El cliente de pueblo
+    rechaza menos y compra igual → es el que mejor tolera un total un poco más alto. Ver sección 0-H.
 25. [ ] 📦💵 **[histórico] Vigilar INVENTARIO y CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
     A 6-7 ventas/día son ~$238.000 de producto por día. **Es el freno real, ya no es Meta.**
 
