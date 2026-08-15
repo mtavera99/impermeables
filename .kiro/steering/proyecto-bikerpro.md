@@ -8,11 +8,14 @@
 corre en UTC y ya marca el día siguiente)* — 🔴 **ALERTA PRINCIPAL: EL CIERRE NO SE RECUPERÓ (6,1% vs
 13% del pico) Y EL CPA SE DETERIORÓ +72% ($5.433 → ~$9.343). Conversaciones estables en 84,9/día →
 NO ES META, es DESPUÉS del clic. Vale ~$2,2 MILLONES/MES.**
-**4 hipótesis vivas y SUPERPUESTAS, ninguna probada (sección 0-I): (A) el ciclo de pago — la ventana
+**3 hipótesis vivas y SUPERPUESTAS, ninguna probada (sección 0-I): (A) el ciclo de pago — la ventana
 10-14 ago cae ENTERA en el valle previo a la quincena del 15 · (C) EL CLIMA, que el archivo pone
 primero y nunca se ha mirado · (D) las horas de venta del dueño, consumidas por la migración de
-transportadora y el seguimiento del temblor · (B) 🔻 la IA de WhatsApp CASI DESCARTADA: solo la usa
-mientras duerme, supervisa y reescribe a mano — es aditiva.**
+transportadora y el seguimiento del temblor.**
+**(B) 🔻 la IA de WhatsApp queda DESCARTADA: está supervisada siempre Y se activa cuando SUBE el flujo,
+así que estuvo más activa en los días del pico de cierre — la correlación va al revés de lo que la
+hipótesis necesitaba.** ✅ **La IA es una válvula de capacidad: el freno del tiempo del dueño está
+RESUELTO y la atención NO limita cuánto tráfico se puede recibir → abrir ciudades es viable.**
 ⏳ **El 17-ago (2 días tras la quincena) decide entre (A) y el resto; el valle del 26-29 ago es la
 prueba definitiva** ·
 ✅ **EL CAMBIO A 99 ENVÍOS FUE CORRECTO: flete 14,1% más barato ($18.046 vs $21.000) + seguro
@@ -212,10 +215,10 @@ CIERRE (2,84%), que es la mayor palanca de mejora.
 1. ✅✅ **[RESUELTO 2026-08-12] LA ATENCIÓN AUTOMÁTICA YA FUNCIONA — pero NO con el bot propio.**
    El dueño activó la **IA de WhatsApp Business (Meta AI)**, la configuró con todo el catálogo, y
    **cuando no puede responder algo le avisa y entra él** (handoff). **Diseño híbrido correcto.**
-   ⚠️ **CORREGIDO EL 14-AGO: la IA se usa SOLO DE NOCHE, mientras el dueño duerme; él monitorea las
-   conversaciones y reescribe a mano a los que se enfrían. Es ADITIVA (velocidad + turno nocturno), no
-   un reemplazo.** → **El freno del tiempo está PARCIALMENTE resuelto, no cerrado: el cierre en horas
-   de tráfico sigue siendo manual.** Ver sección 5-B. Lo de abajo es historia del bot propio (sin conectar).
+   📌 **PRECISADO EL 14-AGO: la IA es una VÁLVULA DE CAPACIDAD — se activa cuando sube el flujo (y de
+   noche), y el dueño NUNCA la deja sola: monitorea y reescribe a mano a los que se enfrían.**
+   → **EL FRENO DEL TIEMPO ESTÁ RESUELTO en lo que importa: la atención ya NO limita cuánto tráfico se
+   puede recibir.** Ver sección 5-B. Lo de abajo es historia del bot propio (sigue sin conectar).
 1-bis. 🤖 **Bot de WhatsApp:** CONSTRUIDO y desplegado en Render, responde bien en pruebas (Gemini con
    saldo responde perfecto). ⚠️ **NO ESTÁ CONECTADO a WhatsApp** → hoy NO atiende clientes reales.
    Las 176 conversaciones y las 5 ventas se hicieron A MANO por el dueño. El bot es la mayor palanca
@@ -598,7 +601,7 @@ pendiente, y bajo Advantage+ la geografía es la única forma real de diferencia
 
 | Freno | Estado |
 |---|---|
-| ⏰ **Tiempo del dueño** | 🟡 **PARCIAL** *(corregido el 14-ago)* — la IA cubre **solo la noche** y él supervisa y reescribe a mano; **el cierre en horas de tráfico sigue siendo suyo.** Ver sección 5-B |
+| ⏰ **Tiempo del dueño** | ✅ **RESUELTO** — la IA de WhatsApp funciona como **válvula de capacidad**: se activa cuando sube el flujo (y de noche), **siempre supervisada por el dueño**. → **la atención ya NO limita cuánto tráfico se puede recibir.** Ver sección 5-B |
 | 💵 **Caja** | ✅ Prácticamente — $2,79M retirados y la transportadora paga rápido |
 | 📦 **Inventario** | ❓ **El único que sigue sin medir** |
 
@@ -971,24 +974,29 @@ clic**, igual que el 11-ago.
   Está contaminado (el 27-jul tiene 19 guías por la reactivación, el 9-ago tiene 18 por lote), pero
   **hay que decirlo: no hay ni un dato que respalde la quincena.** Es una hipótesis plausible, no un hecho.
 
-**(B) ~~LA IA DE WHATSAPP CIERRA PEOR QUE EL DUEÑO~~ → 🔻 CASI DESCARTADA (2026-08-14)**
+**(B) ~~LA IA DE WHATSAPP CIERRA PEOR QUE EL DUEÑO~~ → 🔻 DESCARTADA (2026-08-14)**
 
-> ⚠️ **SEGUNDA CORRECCIÓN DEL DUEÑO EL MISMO DÍA. La primera versión de esta sección puso a la IA como
-> "hipótesis #1" basándose SOLO en que las fechas coincidían. El dueño aclaró cómo la usa de verdad:**
-> - **Solo la usa MIENTRAS DUERME.** No atiende el día.
-> - **Él monitorea las conversaciones igual.** La IA nunca está sola.
-> - **Él vuelve a escribir a mano** a los que dejaron de responder y a los que nunca volvieron.
-> - **La IA le ha AYUDADO a cerrar ventas por velocidad**, sobre todo de noche.
+> ⚠️ **ESTA HIPÓTESIS SE PUSO COMO "#1" BASÁNDOSE SOLO EN QUE LAS FECHAS COINCIDÍAN. El dueño precisó
+> cómo usa la IA y la hipótesis se cae por dos motivos distintos:**
 >
-> **→ La IA es ADITIVA, no sustitutiva. No reemplazó al vendedor: le tapó el turno de la noche.**
-> **Una IA que cubre ~8 horas de bajo tráfico, supervisada, con seguimiento manual encima, NO puede
-> explicar que el cierre se caiga de 13% a 6%.** La hipótesis queda **abajo de la lista**, no muerta
-> (nunca se ha medido el cierre por franja horaria), pero **dejar de tratarla como la principal.**
+> **1. Está supervisada, siempre.** El dueño **nunca la deja sola**: monitorea mientras responde y
+> **reescribe a mano** a los que se enfrían. No hay un tramo donde la IA decida sola el cierre.
 >
-> 🧠 **LECCIÓN DE MÉTODO — ES LA CUARTA VEZ QUE PASA (ver sección 11):** se construyó una hipótesis
-> fuerte sobre una **coincidencia de fechas**, sin verificar **cómo funciona la operación en la
-> práctica.** El archivo describía la IA como "atendiendo 24/7 y absorbiendo volumen" (sección 5-B) y
-> eso **se dio por cierto sin preguntar.** **Antes de acusar a un componente, preguntar cómo se usa.**
+> **2. 🔑 LA CORRELACIÓN VA AL REVÉS DE LO QUE LA HIPÓTESIS NECESITA.** La IA **se activa cuando el
+> flujo SUBE** (es una válvula de capacidad, no un turno fijo). Entonces **estuvo MÁS activa en los
+> días de más volumen — que son justamente los del pico de cierre del 13%** — y menos en los días
+> flojos del valle. **Si la IA dañara el cierre, el patrón tendría que ser el opuesto al observado.**
+> Este punto solo no la absuelve: **la refuta.**
+>
+> 📌 La IA **ayuda a cerrar por velocidad** (responder al instante, sin cola). Es aditiva.
+> **No volver a abrir esta hipótesis sin un dato nuevo de verdad** (cierre con IA activa vs. sin IA).
+>
+> 🧠 **LECCIÓN DE MÉTODO — ES LA CUARTA VEZ (ver sección 11):** se construyó una hipótesis fuerte sobre
+> una **coincidencia de fechas**, sin verificar **cómo funciona la operación en la práctica.** Peor: el
+> archivo describía la IA como "atendiendo 24/7 y absorbiendo volumen" y eso **se dio por cierto sin
+> preguntar** — y después se sobrecorrigió al extremo opuesto ("solo de noche"), que **también** era una
+> inferencia inventada. **Antes de acusar a un componente del negocio, preguntar cómo se usa.
+> Y no reemplazar una suposición por otra.**
 
 **(C) EL CLIMA — la que el propio archivo pone PRIMERA y nadie ha revisado.** 🌧️
 La sección 0-F dice textual: *"clima (¡vende impermeables, depende de que llueva!)"* como **primer**
@@ -1234,35 +1242,37 @@ creativos nuevos en el mismo conjunto del ganador: no se mostrarían.**
 **El dueño resolvió la atención automática con la IA nativa de WhatsApp Business (Meta AI), NO con el
 bot propio de `/bot`.**
 
-> ⚠️⚠️ **CORRECCIÓN IMPORTANTE (2026-08-14). Esta sección decía que la IA "atiende 24/7 y absorbe
-> volumen" y que el freno del tiempo "QUEDÓ RESUELTO". ESO EXAGERA LO QUE PASA DE VERDAD.**
-> **Cómo la usa el dueño, en sus palabras:**
-> - **La usa SOLO MIENTRAS DUERME.** El resto del día atiende él.
-> - **Monitorea las conversaciones igual.** La IA **nunca está sola.**
-> - **Vuelve a escribir a mano** a los que dejaron de responder y a los que nunca volvieron.
-> - **La IA le ayuda a cerrar por VELOCIDAD** (responder al instante) y a no perder los de la noche.
+> ✅ **CÓMO SE USA DE VERDAD (precisado por el dueño el 2026-08-14). LEER ESTO ANTES DE ANALIZARLA:**
+> - **Se activa CUANDO EL FLUJO SUBE** y también mientras el dueño duerme. **Es una VÁLVULA DE
+>   CAPACIDAD que se abre cuando hace falta**, no un turno fijo.
+> - **EL DUEÑO NUNCA LA DEJA SOLA.** Monitorea las conversaciones mientras la IA responde.
+> - **Reescribe a mano** a los que dejaron de responder y a los que se enfriaron.
+> - **Le ha AYUDADO a cerrar ventas por velocidad** (responder al instante, sin cola).
 >
-> **→ La IA es ADITIVA: cubre el turno de la noche y acelera la primera respuesta.**
-> **NO es un vendedor que reemplace al dueño, y no hay que analizarla como si lo fuera.**
+> **→ Las dos cosas a la vez: SÍ absorbe volumen (por eso se puede recibir más tráfico) Y está
+> supervisada.** No es "IA sola" ni es "solo de noche". **Es capacidad elástica con humano encima.**
+> ⚠️ **Una versión anterior de esta sección dijo "solo la usa mientras duerme" y degradó el freno del
+> tiempo a PARCIAL. Estaba mal: eso era una inferencia, no lo que dijo el dueño. Queda RESUELTO.**
 
 | | |
 |---|---|
 | Qué usa | **IA de WhatsApp Business / Meta AI** |
 | Configuración | Cargada por el dueño con el catálogo y las condiciones del negocio |
-| **Franja real de uso** | **de noche, mientras el dueño duerme** (no todo el día) |
-| **Supervisión** | **el dueño lee las conversaciones y reescribe a mano a los que se enfrían** |
+| **Cuándo se activa** | **cuando sube el flujo** + mientras el dueño duerme → **válvula de capacidad** |
+| **Supervisión** | 🔑 **SIEMPRE. El dueño lee las conversaciones y reescribe a mano a los que se enfrían. NUNCA se deja sola.** |
 | Handoff | ✅ Cuando no puede responder algo, le avisa y entra él |
 | Ventaja clave | **No depende de la verificación de Meta** que lleva semanas trancada, ni de Render, ni del cupo de Gemini |
 
-- ✅ **LO QUE SÍ RESOLVIÓ:** las ventas que antes se perdían por responder tarde de noche, y la
-  velocidad de primera respuesta. **Eso es real y hay que mantenerlo.**
-- ⚠️ **LO QUE **NO** RESOLVIÓ: el freno del tiempo del dueño NO está cerrado.** El cierre sigue siendo
-  **manual y suyo** en las horas de más tráfico. **Consecuencia estratégica: al abrir ciudades, las
-  conversaciones nuevas siguen cayendo sobre él.** El techo de atención sigue existiendo.
-- ✅ **El diseño híbrido es el correcto y hay que mantenerlo:** la IA para la noche y la respuesta
-  inmediata, el dueño para el que duda, objeta o necesita confianza. Ahí es donde se gana la venta.
-- 📌 **NUNCA se ha medido el cierre por franja horaria** (noche-IA vs. día-dueño). No es urgente —la IA
-  es aditiva— pero es el dato que zanjaría cualquier duda futura sobre su aporte.
+- 🎉 **EL FRENO DEL TIEMPO DEL DUEÑO ESTÁ RESUELTO, y en el sentido que importa: LA ATENCIÓN YA NO
+  LIMITA CUÁNTO TRÁFICO SE PUEDE RECIBIR.** Cuando llegan picos, se abre la válvula.
+  → **Consecuencia estratégica: abrir ciudades nuevas es viable. El techo NO es la atención**
+  (son inventario, caja y la geografía de Advantage+).
+- ✅ **El diseño híbrido es el correcto y hay que mantenerlo:** la IA absorbe volumen y da velocidad;
+  el dueño supervisa y entra donde se gana la venta (el que duda, objeta o necesita confianza).
+- ⚠️ **LA REGLA QUE NO SE NEGOCIA: no dejar la IA sola.** El valor del diseño está en la combinación.
+  Si alguna vez se propone "automatizar del todo para escalar", **eso rompe lo que hoy funciona.**
+- 📌 **Nunca se ha medido el cierre con IA activa vs. sin IA.** No es urgente ni sospechoso —la IA es
+  aditiva y supervisada— pero sería el dato que zanjaría cualquier duda futura sobre su aporte.
 - 📌 **NO BORRAR el bot propio de `/bot`.** Aunque nunca se conecte, `src/prompt.js` es **la fuente
   de verdad del conocimiento del negocio** (producto, colores de franja, fletes por ciudad, objeciones,
   flujo de ciudad primero, "SÍ CONFIRMO"). Si hay que reconfigurar o auditar la IA, se saca de ahí.
@@ -1469,9 +1479,9 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     separa las dos hipótesis de la sección 0-I, y **hay que esperarlo antes de actuar.**
     - **Si rebota a 10-13%** → era el **ciclo de pago**. **No tocar nada.**
     - **Si sigue en ~6%** con ~85 conversaciones/día → pasar a **clima** y **horas de venta del dueño**.
-    ⚠️ **NO acusar a la IA de WhatsApp:** el dueño aclaró que **solo la usa mientras duerme, monitorea
-    igual y reescribe a mano a los que no responden** → es aditiva, le ayuda a cerrar por velocidad.
-    Una IA supervisada que cubre 8 horas de bajo tráfico **no explica un cierre de 13% a 6%.**
+    ⚠️ **NO acusar a la IA de WhatsApp — está DESCARTADA:** el dueño **nunca la deja sola** (monitorea y
+    reescribe a mano) **y la activa cuando SUBE el flujo**, así que estuvo más activa en los días del
+    pico de 13% que en el valle. **La correlación va al revés de lo que haría falta.**
     Vale ~$2,2M/mes, pero **medir mal cuesta más que esperar 3 días** — a 5,2 ventas/día se gana
     ~$65.000/día, 2,4× sobre el equilibrio. ✅ Nada de esto rompe el congelamiento: se mide, no se mueve.
 36-ter. [ ] 🌧️ **LAS 2 PREGUNTAS GRATIS QUE SE PUEDEN HACER HOY MISMO** (no esperan al 17, no tocan nada):
