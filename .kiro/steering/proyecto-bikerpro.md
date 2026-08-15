@@ -1075,6 +1075,63 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-J. 💬 PRIMER ANÁLISIS DE LOS CHATS DE WHATSAPP (47 chats, 24 jul – 14 ago) — 2026-08-14
+
+**Por fin hay datos del hueco del medio.** Todo el análisis previo medía antes del clic (Meta) o
+después de la venta (guías). **Resultados completos: `/analisis/resultados-chats-whatsapp.md`.**
+Chats crudos y scripts en el repo **privado** `bikerpro-chats-privado` (traen datos de clientes).
+⚠️ **Muestra VARIADA, no aleatoria** → sirve para **defectos**, no para tasas.
+
+### 🔴 HALLAZGO PRINCIPAL: EL GUION PROMETE UN ENVÍO QUE NO EXISTE — Y ESO CAUSA LA FUGA DE 0-H
+
+**20 de 47 chats (43%)** dicen *"el envío tiene un costo de **$15.000 a $20.000**"*.
+**El flete real de las 26 guías va de $12.871 a $35.860.**
+
+🔑 **CIERRA UN CÍRCULO QUE ESTABA ABIERTO:** la sección 0-H encontró que se absorben **$3.900-4.900
+de flete** en destinos caros y no se sabía por qué. **La causa es esta: el guion ya prometió un total
+bajo, así que cuando el flete real llega a $25.000-35.000 hay que comerse la diferencia.**
+**No era un problema de tarifario — era el guion generando la deuda antes de cotizar.**
+- Y del lado del rechazo: prometer $20.000 y que el mensajero cobre $35.000 **es exactamente la
+  sorpresa que hace que el cliente no reciba** → conecta con el **15,3%**.
+- ✅ **ARREGLO:** que el guion **no dé rango**; que pregunte ciudad y **cotice el flete real**, o que
+  diga el techo verdadero. **Esto cambia el orden del pendiente #35: primero el guion, después el tarifario.**
+
+### 🔴 SE MANDA EL CUADRO DE CONFIRMACIÓN CON LOS CAMPOS EN BLANCO
+**17 de 47 chats (36%)** mandan la plantilla **sin rellenar** (`• Color: ___ · Talla: ___`,
+`• Dirección: ___`) y le piden "SÍ CONFIRMO" a un pedido vacío — **justo en el momento del cierre**,
+que es el paso que el archivo identifica como palanca. **Es el defecto más fácil de arreglar.**
+
+### 📊 LA CONVERSACIÓN SE DECIDE EN COLOR Y TALLA, NO EN PRECIO
+De los 44 que escribieron: **color 77% · talla 64%** · envío 20% · fotos 16% · contraentrega 11% ·
+2+ unidades 9% · dinero/quincena 7% · precio caro 5% · clima 2% · **desconfianza 0%**.
+- 🔑 **El precio casi no se objeta y la desconfianza es CERO.** Los dos miedos que el archivo asumía
+  **no aparecen** → la prueba social ya hizo su trabajo. **Dejar de optimizar por ahí.**
+- ⚠️ **77% pregunta por COLOR y no hay fotos de blanco ni morado** (sección 9). Revisar si se están
+  perdiendo conversaciones por colores que no se pueden mostrar.
+- 💡 **9% pide 2 unidades sin que se lo ofrezcan**, pero **solo 4 chats muestran la oferta del
+  descuento** → palanca desaprovechada (coherente con el 16% de la sección 0-G).
+- ✅ **La velocidad NO es el problema:** los 47 chats tienen primera respuesta en **< 2 minutos**.
+- ⚠️ **Atribución por creativo IMPOSIBLE hoy:** Facebook e Instagram usan **el mismo texto de
+  apertura**. **Confirma el pendiente #32 y da la solución: un texto de apertura distinto por anuncio.**
+
+### ❌ TRES HIPÓTESIS MÍAS QUE ESTOS DATOS MATARON (quedan escritas a propósito)
+| Hipótesis | Realidad |
+|---|---|
+| "Muchas conversaciones son toques de botón vacíos" | ❌ **solo 6%** escribió nada propio *(pero la muestra la eligió el dueño → sesgo en esta dirección; necesita muestra aleatoria)* |
+| "Se perdió el CIUDAD PRIMERO del PR #19" | ❌ **5 de 47, dispersos** — variación, no regresión. Se concluyó desde **2** archivos y se refutó con 47 |
+| "39% quedan sin respuesta = $415.000 tirados" | ❌ **artefacto de la métrica**: 15 de 18 eran el cliente diciendo "Ok/Gracias". Fuga real: **1 de 44** |
+
+🧠 **Y sobre las hipótesis de 0-I:** en lo que los clientes escriben, **quincena 7% · clima 2%**.
+Es **la primera evidencia directa**, es débil por tamaño, y **apunta ligeramente EN CONTRA de ambas.**
+
+### 📌 SIGUIENTE TANDA (para medir tasas, no defectos)
+1. **Muestra ALEATORIA, no elegida** → medir sin sesgo el % de toques de botón vacíos.
+2. **~30 del pico (5-10 ago) + ~30 del valle (10-14 ago)** → la comparación que puede cerrar el 0-I.
+3. **Chats que terminaron en DEVOLUCIÓN** → ver si la sorpresa del flete aparece ahí. **Es la conexión
+   más valiosa que quedó abierta.**
+
+---
+
 ## 1. La marca
 
 - **Nombre:** BikerPro · **Instagram:** @bikerproco · **Facebook:** Página "BikerPro" (Accesorios)
@@ -1538,6 +1595,27 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⚠️ Bogotá y Soacha están en **"Telemercadeo"** = la transportadora no pudo y está llamando:
     **es novedad, no tránsito.** **NO se cruza con el congelamiento** (esto es operación, no campaña).
     Ver sección 0-H. **Esto es ADEMÁS de las 21 guías de Heka del punto de la sección 0-G.**
+38. [ ] 🔴🔴 **ARREGLAR EL GUION DE LA IA — 2 DEFECTOS CONCRETOS Y BARATOS** (sección 0-J):
+    **(a) QUITAR la promesa de "envío $15.000 a $20.000"** (está en 43% de los chats). El flete real
+    va de **$12.871 a $35.860**. Que pregunte la ciudad y **cotice el real**, o que diga el techo
+    verdadero. 🔑 **ESTA ES LA CAUSA de la fuga de flete de la sección 0-H** — se absorben
+    $3.900-4.900 por venta para no romper una promesa que el guion no debió hacer. Y prometer $20.000
+    y cobrar $35.000 **alimenta el rechazo del 15,3%**.
+    **(b) RELLENAR el cuadro de confirmación** — 36% de los chats mandan la plantilla con
+    `Color: ___ · Talla: ___ · Dirección: ___` en blanco, **en el momento del cierre**.
+    ⚠️ **HACER (a) ANTES del punto 35:** si se sube el tarifario sin arreglar el guion, la promesa
+    sigue rota y el cliente se sorprende igual.
+39. [ ] 🎯 **PONER UN TEXTO DE APERTURA DISTINTO POR ANUNCIO** — resuelve el pendiente #32 de verdad.
+    Hoy Facebook e Instagram usan **el mismo** texto, así que en el chat es imposible saber qué
+    creativo trajo la venta. Con textos distintos se puede atribuir **VENTAS** por creativo, no solo
+    conversaciones baratas. Ver sección 0-J.
+40. [ ] 💡 **OFRECER SISTEMÁTICAMENTE LA SEGUNDA UNIDAD.** El 9% la pide **sin que se la ofrezcan** y
+    el 16% de los pedidos ya son de 2+ (sección 0-G), pero **solo 4 de 47 chats muestran la oferta**.
+    Cada unidad extra en un pedido existente da margen completo **sin costar publicidad**, y el gancho
+    es que **el flete se comparte**. Ver sección 0-J.
+41. [ ] 📸 **REVISAR EL PROBLEMA DE LOS COLORES: el 77% de los clientes pregunta por color** y **no hay
+    fotos de blanco ni de morado.** Medir cuántas conversaciones se caen pidiendo un color que no se
+    puede mostrar. Se cruza con el pendiente de fotos de la sección 9. Ver sección 0-J.
 35. [ ] 💰 **SUBIR EL TARIFARIO EN LOS DESTINOS DE FLETE ~$25.000** (Guachené, Gómez Plata, Remedios,
     Algeciras, Málaga, Inzá y similares): de $80.000-81.000 a **~$84.000-85.000** de total al cliente.
     Hoy se absorben **$3.900-4.900 por venta** ahí (~$384.000/mes proyectado). El cliente de pueblo
