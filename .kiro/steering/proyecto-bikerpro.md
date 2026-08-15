@@ -6,7 +6,8 @@
 
 Última actualización: 2026-08-12 — 🎉 **EL FRENO DEL TIEMPO SE RESOLVIÓ: IA de WhatsApp Business
 atendiendo 24/7 con handoff** · **TRANSPORTADORA NUEVA: 99 ENVÍOS** (más barata + seguro de devolución) ·
-~155-160 VENTAS · rechazo real **11,9%** (no 4%) · caída del 11-12 ago = **TEMBLOR + quincena** ·
+~155-160 VENTAS · **AUDITORÍA FINANCIERA COMPLETA (sección 0-G): rechazo real 15,3% · CPA real
+$6.414 por cliente que paga · ganancia Heka ~$1.982.000** · caída del 11-12 ago = **TEMBLOR + quincena** ·
 techo de la cuenta ~$47.800/día → crecer = ABRIR CIUDADES, no subir presupuesto
 
 ---
@@ -61,9 +62,10 @@ días de agosto: 30 ventas, cierre 10,2% y CAC $5.018 — ambos RECORD.** El **T
 
 - **VENTANA RECIENTE (27–31 jul, la mejor):** 373 conversaciones · $179.432 · ~31 ventas ·
   **cierre ~8,3%** · **CAC $5.788** (el mejor de la historia). El cierre sigue subiendo: 2,84% → 7% → 8,3%.
-- ⚠️⚠️ **DATO OBSOLETO — EL RECHAZO REAL ES 11,9%, NO 4%.** Ver sección 0-E. El 4% salía de
-  **1 de 25** (muestra minúscula). Con **67 guías resueltas: 8 devoluciones = 11,9%.** Todas las
-  proyecciones de utilidad de julio que usan 4% están infladas.
+- ⚠️⚠️ **DATO OBSOLETO — EL RECHAZO REAL ES 15,3%, NO 4%.** Ver **sección 0-G** (auditoría con las
+  98 guías resueltas del historial completo de Heka). El 4% salía de **1 de 25** y el 11,9% de
+  **8 de 67**; ambas eran muestras parciales. **Todas las proyecciones de utilidad de julio y agosto
+  que usen 4% (o el CAC de $5.018) están infladas** — los números buenos están en la sección 0-G.
 - **RECHAZOS: 1 de ~25 resueltos = ~4%** (el pendiente es uno que no ha recogido en oficina de
   Interrapidísimo). MUY por debajo del break-even de ~25% → **CONTRAENTREGA CONFIRMADA** definitivamente.
 - **Utilidad proyectada:** ~$750.000 con rechazo 4% · ~$634.000 con 10% · ~$437.000 con 20%.
@@ -484,9 +486,16 @@ Cambió dos veces en agosto: **Interrapidísimo → Heka → 99 Envíos.** El du
 - ✅ **Cabos con Heka cerrados el 12-ago:** se retiraron los **$2.788.601** de la billetera y se
   gestionaron las **7 novedades** pendientes.
 
-### 🔴 TASA DE RECHAZO REAL: **11,9%** (8 devoluciones de 67 guías resueltas)
-**Corrige el 4% que estaba escrito en todo el archivo** (salía de 1 de 25, muestra minúscula).
-Es el rechazo **duro**: ya descontados los que el dueño rescató contactándolos.
+### 🔴 TASA DE RECHAZO REAL: **15,3%** — AUDITADO CON EL HISTORIAL COMPLETO DE HEKA (2026-08-14)
+⚠️ **Este es el número definitivo. Reemplaza el 4% y también el 11,9% que se usó antes.**
+Base: **98 guías resueltas** (83 entregadas + 15 devueltas) del archivo completo de Heka
+(15 jul – 9 ago 2026). Datos y scripts reproducibles en **`/analisis/`** del repo.
+- Filtros aplicados: solo Interrapidísimo (se excluyó 1 guía de Servientrega), sin el pedido
+  mayorista de Yopal ($450.000 de producto, distorsionaba los promedios), sin las 2 anuladas.
+- ✅ **VALIDACIÓN DEL MÉTODO:** el precio implícito por unidad salió en **$59.933** contra el precio
+  de lista de **$59.900** (+0,1%). Si el conteo de unidades estuviera mal, ese número no cuadraría.
+- ⚠️ **15,3% estaba POR ENCIMA del umbral del 15% de Heka** → **el cambio a 99 Envíos fue oportuno**,
+  más de lo que se creía al momento de decidirlo.
 
 **EL COSTO REAL DE UN RECHAZO — el número más importante de esta sección:**
 
@@ -502,14 +511,15 @@ Es el rechazo **duro**: ya descontados los que el dueño rescató contactándolo
   (~1/3 del golpe). **Los otros 2/3 son irrecuperables** → bajar el rechazo es palanca propia, no del
   proveedor. Bajar de 12% a 6% vale **~$420.000/mes** a 270 ventas/mes.
 - ✅ **La contraentrega sigue siendo correcta:** break-even de rentabilidad ~49% de rechazo;
-  umbral donde convendría el prepago ~25%. **Estás en 11,9%.**
+  umbral donde convendría el prepago ~25%. **Estás en 15,3%** (ver sección 0-G) — sigue por debajo
+  de los dos umbrales, así que la contraentrega continúa siendo el modelo correcto.
 - ⚠️ **El prepago selectivo TAMPOCO es gratis** (si el cliente se va, se pierde la venta Y el CAC).
   Punto de quiebre: **solo pedir prepago si ESE pedido tiene >~38% de probabilidad de rechazo**
   (dirección muy vaga, cliente que no confirma, vereda). Para un pedido normal, gana contraentrega.
 - ✅ **Lo barato que sí funciona (3 momentos, no cuestan ventas):** "SÍ CONFIRMO" + total exacto +
   dirección/celular verificados ANTES · guía de rastreo EN TRÁNSITO · recordatorio con el monto exacto
   EL DÍA DE ENTREGA.
-- 📌 **La tasa de rechazo se reinicia con el cambio de transportadora.** El 11,9% era con Heka/
+- 📌 **La tasa de rechazo se reinicia con el cambio de transportadora.** El 15,3% era con Heka/
   Interrapidísimo. **Medir desde cero con 99 Envíos** (cobertura distinta = resultados distintos).
 
 ---
@@ -578,6 +588,105 @@ pendiente, y bajo Advantage+ la geografía es la única forma real de diferencia
 **⏸️ CONGELAMIENTO ACORDADO: no tocar NADA hasta el 2026-08-17.** Se movieron 3 variables a la vez
 (IA de WhatsApp + transportadora nueva + temblor) más la quincena. **Con 4 variables sueltas es
 imposible atribuir resultados.** El 17 se evalúa con datos asentados.
+
+---
+
+## 0-G. 💰 AUDITORÍA FINANCIERA DEL PERÍODO HEKA (2026-08-14) — NÚMEROS DEFINITIVOS
+
+**Fuente:** historial completo de guías de Heka (15 jul – 9 ago 2026) + exports de Meta.
+**Scripts y datos reproducibles en `/analisis/` del repo.** Si hay que recalcular, correr
+`analizar-final.py`, `cpa-ventana-heka.py` y `ganancia-heka.py`.
+
+### 🚨 CORRECCIÓN GRANDE: EL CAC REAL ES MÁS ALTO QUE EL $5.018 QUE SE USÓ TODA LA SEMANA
+
+| Concepto | Valor |
+|---|---|
+| CAC que se venía usando (era la MEJOR ventana, 1-4 ago) | $5.018 |
+| **CPA real por venta CERRADA** (27 jul – 9 ago, operación continua) | **$5.433** |
+| **CPA real por venta ENTREGADA — el que importa** | **$6.414** |
+| CPA por venta cerrada incluyendo todo julio (1 jul – 9 ago) | $6.969 |
+| CPA por venta entregada incluyendo todo julio | $8.229 |
+| **PUNTO DE EQUILIBRIO del CAC** | **$23.674** |
+
+- 🔑 **HAY DOS CPA Y HAY QUE USAR EL SEGUNDO:** el CPA por venta *cerrada* mide la campaña; el CPA por
+  venta *ENTREGADA* mide la utilidad. **Con 15,3% de rechazo el segundo es ~18% más alto**, porque una
+  venta rechazada consume la publicidad completa y no deja ni un peso de margen.
+- 💡 **La diferencia ($981 por venta) es el costo puro del rechazo.** A 300 ventas/mes son
+  **~$294.000 mensuales** que se recuperan bajando el rechazo. **Es publicidad tirada, no flete.**
+- 💪 **Colchón:** se paga $6.414 y el equilibrio está en $23.674 → **3,7 veces de margen.**
+- ⚠️ **Los primeros 26 días de julio DESTRUYERON valor:** la ventana 27 jul–9 ago tiene MÁS utilidad
+  total ($2.061.422) que la ventana completa 1 jul–9 ago ($1.974.204), con 5 ventas MENOS.
+  **Toda la utilidad del negocio se generó del 27 de julio en adelante.**
+
+### 📊 LA GANANCIA REAL DEL PERÍODO HEKA
+
+**119 ventas** · 83 entregadas (96 uds) · 15 devueltas (17 uds) · **21 en proceso (24 uds)**
+Publicidad del período: **$829.318**
+
+| Escenario | Ganancia neta |
+|---|---|
+| **PISO** — si las 21 en proceso fallaran todas | **$1.454.750** |
+| **CENTRAL** — las 21 al 84,7% de entrega (lo más probable) | **$1.981.878** |
+| **TECHO** — si las 21 se entregaran todas | **$2.077.142** |
+
+- 🎯 **$622.392 es lo que está en juego con las 21 guías en ruta.**
+  **Cada guía rescatada vale $24.433.** Y **12 de las 21 están en "Para Reclamar en Oficina"**:
+  el paquete está en la oficina esperando que el cliente vaya → **una llamada lo resuelve**.
+  **12 llamadas = hasta $293.196.** Nada más en el negocio paga tan bien por 30 minutos.
+- ⚠️ **NO ABANDONAR ESAS GUÍAS por haber cambiado de transportadora.** Están en la calle y la plata
+  sigue siendo del dueño. Interrapidísimo las devuelve en pocos días si nadie las reclama.
+
+### 📐 NÚMEROS UNITARIOS AUDITADOS (usar estos, no estimaciones)
+
+| Métrica | Valor |
+|---|---|
+| Precio real cobrado por unidad | **$59.933** |
+| Margen por unidad entregada | **$24.433** |
+| Utilidad neta por venta cerrada | **$18.083** |
+| **Margen neto sobre ventas** | **26,3%** |
+| Unidades por pedido | **1,15** |
+| Pedidos de 2+ unidades | **16%** (13 de 83) |
+| Flete promedio (lo paga el cliente) | ~$21.000 |
+
+- 💡 **EL 16% COMPRA DOS SIN QUE SE LO OFREZCAN.** Si la IA de WhatsApp ofreciera sistemáticamente un
+  segundo conjunto (el gancho es que **el flete se comparte**), ese 16% podría subir. **Cada unidad
+  extra en un pedido existente da margen completo sin costar un peso de publicidad.** Palanca sin explotar.
+
+### 🚨🚨 HALLAZGO QUE INVIERTE UNA REGLA DEL MANUAL: LAS CIUDADES GRANDES RECHAZAN MÁS
+
+La sección 7 dice que pueblos y veredas son de alto riesgo y que a ellos hay que pedirles prepago.
+**Los datos dicen lo contrario.** Probado con 3 clasificaciones distintas de "ciudad grande":
+
+| Criterio | Ciudades grandes | Pueblos |
+|---|---|---|
+| Solo capitales | **20,4%** | 10,0% |
+| + área metropolitana | **20,7%** | 7,3% |
+| Solo las 6 más grandes | **22,9%** | 10,9% |
+
+- **10 de las 15 devoluciones fueron en ciudades principales:** Bogotá (3), Cartagena (2), Cúcuta,
+  Bucaramanga, Barranquilla, Medellín, Neiva.
+- **Y el flete casi no cambia:** ciudades $20.941 vs pueblos $22.314 → **solo $1.373 de diferencia.**
+  El argumento de "a los pueblos el envío sale carísimo y no cierra" **no existe en los datos.**
+- **Por qué tiene sentido:** en ciudad la gente trabaja, vive en edificios con portería y no está
+  cuando llega el mensajero; y si cambia de opinión tiene mil alternativas. En pueblo, ir a la oficina
+  a reclamar es normal y quien pidió realmente lo quiere porque no tiene dónde más conseguirlo.
+- ⚖️ **HONESTIDAD ESTADÍSTICA:** con solo 15 devoluciones esto **NO es concluyente** (~1,5 sigma).
+  **Pero sí alcanza para matar la suposición contraria: no hay UN dato que respalde que los pueblos
+  sean más riesgosos.** Esa regla está operando sin evidencia y probablemente contra la evidencia.
+- ✅ **ACCIONES:** (1) **dejar de pedir prepago a los pueblos** — cuesta ventas sin reducir riesgo;
+  (2) **mover el esfuerzo de confirmación a las ciudades grandes** (franja horaria, segundo teléfono,
+  y si es edificio preguntar si la portería recibe — todo gratis); (3) **para la expansión geográfica
+  los pueblos YA NO son zona prohibida**, lo que cambia la recomendación previa de "solo ciudades
+  grandes"; (4) **medir rechazo por ciudad desde el día 1 con 99 Envíos** — si el patrón se repite con
+  otras 100 guías, ahí sí es ley y se rediseña el flujo alrededor.
+
+### ⚠️ PENDIENTES QUE DEJÓ LA AUDITORÍA
+- **1 guía "GENERADA" de Servientrega (PUENTE QUETAME, 16 jul, $82.031)** creada hace un mes y nunca
+  despachada. ¿Pedido olvidado? Si el cliente sigue interesado, es una venta ya pagada en publicidad.
+- **El hueco del 17 al 26 de julio** (0 guías) coincide con la campaña pausada antes del relanzamiento
+  del 25-jul. Sin confirmar por el dueño.
+- **Falta el export de Meta con desglose POR DÍA** (pestaña Anuncios → Desglose → Por día). Con eso se
+  puede alinear gasto contra guías con precisión y resolver la hipótesis de los fines de semana.
 
 ---
 
@@ -968,7 +1077,7 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia
     de 1,31 prueba que NO es saturación de audiencia). **Bajo Advantage+ la geografía es la única forma
     real de diferenciar conjuntos.** ⚠️ Usar **solo ciudades grandes** (los pueblos disparan el rechazo).
-31. [ ] 📉 **MEDIR LA TASA DE RECHAZO DESDE CERO con 99 Envíos.** El 11,9% era con Heka/Interrapidísimo;
+31. [ ] 📉 **MEDIR LA TASA DE RECHAZO DESDE CERO con 99 Envíos.** El 15,3% era con Heka/Interrapidísimo;
     cobertura distinta = resultados distintos. Ver sección 0-E.
 32. [ ] 🎯 **CERRAR EL HUECO DE "COSTO POR VENTA" (no por conversación).** Todo el análisis mide costo
     por CONVERSACIÓN; no se sabe **qué creativo genera las VENTAS**. Un creativo puede traer
