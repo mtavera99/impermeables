@@ -1087,9 +1087,63 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ## 0-K. 🔴🔴 HIPÓTESIS (E) — EL "CIERRE" ESTÁ MAL MEDIDO: EL DENOMINADOR ESTÁ CONTAMINADO
 
-**Confirmado por el dueño el 2026-08-14: hay MUCHÍSIMOS chats donde la persona nunca escribió nada.**
-Solo se dispara el mensaje prerrellenado del botón del anuncio (*"¡Hola! Quiero más información."*)
-y ahí muere. **Script: `/analisis/conversaciones-vacias.py`.**
+**MEDIDO POR EL DUEÑO SOBRE EL 14-AGO: de 90 conversaciones, 52 fueron solo el toque del botón
+(57,8%) y 38 fueron conversaciones reales (42,2%).**
+Scripts: `/analisis/conteo-vacias-14ago.py` (la medición) y `/analisis/conversaciones-vacias.py`
+(la sensibilidad).
+
+### ✅ VALIDACIÓN QUE LE DA PESO AL DATO
+El dueño contó **90 conversaciones** el 14-ago; Meta reporta **84,9/día** de promedio (+6%).
+**Los dos números coinciden → el conteo manual mide LO MISMO que Meta llama "conversación iniciada".**
+Por eso el 57,8% **se puede aplicar legítimamente al denominador de Meta**; no son dos cosas distintas.
+
+### ✅ LO QUE ESTA MEDICIÓN SÍ RESUELVE
+
+| | |
+|---|---|
+| Costo por "inicio de conversación" | $540 |
+| **Costo por conversación REAL** | **$1.279** |
+| Corrección | **×2,4** |
+
+- 🔑 **El costo por conversación que se usó todo este tiempo ($512-572) subestima 2,4× el costo real
+  de hablar con una persona.** Toda comparación histórica de "costo/conversación" mide una mezcla,
+  no un costo.
+- **Gasto que no produce nada medible:** 52 × $540 = **$28.071 el 14-ago** ≈ **$842.000/mes**.
+  No es todo recuperable (algo es inevitable en el canal), pero **bajar los vacíos de 58% a 40%
+  liberaría ~$259.000/mes de gasto efectivo.**
+- ✅ **El cierre sobre gente real es mucho mejor de lo que parecía:** el 14-ago fue **4,4% crudo**
+  (4 guías/90) pero **10,5% sobre conversaciones reales** (4/38).
+
+### 🚨 LO QUE **NO** RESUELVE — Y ES JUSTO LA PREGUNTA QUE IMPORTA
+La pregunta era **¿SUBIÓ** la proporción de vacíos entre el pico y el valle? **Eso necesita DOS
+mediciones y hay UNA.** Si la tasa fuera la misma en las dos ventanas, el cierre real sería 14,5% en
+el valle y 30,8% en el pico → **los dos suben y la caída sigue intacta.**
+→ **UNA TASA CONSTANTE NO EXPLICA UNA CAÍDA. Solo un CAMBIO la explica.**
+⚠️ **Y "tomémoslo como el peor día" no sirve de atajo:** si el 14-ago fuera el peor eso *apoyaría* la
+hipótesis, pero **suponerlo es exactamente el error que ya se cometió dos veces acá.**
+
+### 🔍 HALLAZGO NUEVO (lo aportó el dueño al explicar por qué no puede medir hacia atrás)
+**Hace seguimiento/remarketing manual al día siguiente y a los dos días**, así que en la lista de
+WhatsApp un día acumula ~300 mensajes que **mezclan conversaciones nuevas con su propio seguimiento a
+chats viejos.**
+- ⚠️ **IMPLICACIÓN METODOLÓGICA: las ventas de un día NO salen de las conversaciones de ese día.**
+  Salen de una **cola de varios días** que el dueño trabaja activamente. → **"ventas del día ÷
+  conversaciones del día" es ruidoso; el cierre solo se lee en ventanas de ≥5 días del mismo largo.**
+- 💡 **Y es una buena noticia escondida:** hay un **motor de recuperación manual** funcionando. El
+  seguimiento del temblor ya había mostrado que rescatar no-cerrados es la acción de mayor retorno;
+  esto confirma que es **parte del proceso normal**, y que el cierre real del negocio **incluye** ese
+  rescate.
+
+### 🔑 CÓMO CONSEGUIR LA SEGUNDA MEDICIÓN (sin pelear con el apelmazamiento)
+**Un chat vacío no tiene NI UN mensaje del cliente, nunca** → se ve completo en una pantalla y la
+fecha del primer mensaje dice de qué día es. **No hay nada que desapelmazar: un chat vacío no pudo
+recibir remarketing conversado.**
+- **OPCIÓN A (retro, ~20 min):** buscar los chats cuyo último mensaje sea un seguimiento automático,
+  abrir ~40 y anotar la fecha del primer mensaje → sale la tasa del pico (5-10 ago).
+- ✅ **OPCIÓN B (hacia adelante, 5 min/día — LA MEJOR):** seguir contando igual que el 14-ago, una
+  semana. **La quincena entró el 15.** Si el cierre rebota y los vacíos **no** cambian → era la
+  quincena. Si el cierre rebota **y** los vacíos bajan → era la mezcla. **Separa las dos hipótesis sin
+  ambigüedad, y ya hay línea base (57,8%).**
 
 > ⚠️ **ESTA HIPÓTESIS SE HABÍA DADO POR REFUTADA EN LA SECCIÓN 0-J, Y ESE TEST NO VALÍA.** Salió "6%
 > de vacíos" sobre una muestra que **el dueño eligió por tener información, excluyendo a propósito los
@@ -1624,16 +1678,18 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     pico de 13% que en el valle. **La correlación va al revés de lo que haría falta.**
     Vale ~$2,2M/mes, pero **medir mal cuesta más que esperar 3 días** — a 5,2 ventas/día se gana
     ~$65.000/día, 2,4× sobre el equilibrio. ✅ Nada de esto rompe el congelamiento: se mide, no se mueve.
-42. [ ] 🔴🔴🔴 **LA MEDICIÓN #1 DEL NEGOCIO: CONTAR LAS CONVERSACIONES VACÍAS.** Es la hipótesis (E)
-    de la sección 0-K y **es la única que explica el volumen estable con el cierre a la mitad.**
-    **5 minutos, sin exportar nada:** en la lista de WhatsApp, contar para un rango de fechas cuántos
-    chats **terminan en un seguimiento automático del negocio** (= el cliente nunca escribió).
-    **Un conteo aproximado ya decide: la diferencia entre 20% y 60% se ve a simple vista.**
-    ⚠️ **Y hay que hacerlo en DOS ventanas: el pico (5-10 ago) y el valle (10-14 ago).** El número
-    suelto no sirve; **lo que importa es si la proporción SUBIÓ.**
-    → Si subió de ~25% a ~65%, **toda la caída del cierre queda explicada y no hay nada roto**: el
-    arreglo es de **segmentación en Meta**, no del guion ni de la IA.
-    ⚠️ **Antes de tocar el guion (#38) o el tarifario (#35), medir esto:** cambia qué problema hay.
+42. [x] ✅ **MEDIDO EL 14-AGO: 52 de 90 conversaciones vacías = 57,8%.** El fenómeno es **mayoría**, no
+    marginal, y **el costo por conversación real es $1.279, no $540 (×2,4).** Ver sección 0-K.
+    ⚠️ **Pero NO explica la caída todavía:** hace falta la tasa del PICO para saber si **subió**.
+42-bis. [ ] 🔴🔴 **CONTAR LOS VACÍOS UNA SEMANA SEGUIDA (5 min/día).** Es la medición que **separa la
+    hipótesis (E) de la quincena**, y ya hay línea base: **57,8% el 14-ago.**
+    - Si el cierre rebota tras la quincena **y los vacíos NO cambian** → era **la quincena**.
+    - Si el cierre rebota **y los vacíos bajan** → era **la mezcla** (hipótesis E).
+    - Si el cierre no rebota → van clima y horas de venta.
+    📌 **Alternativa retro (~20 min):** un chat vacío **no tiene ni un mensaje del cliente**, así que
+    se ve completo en una pantalla y la fecha del primer mensaje dice de qué día es — **no hay que
+    desapelmazar nada.** Abrir ~40 de esos y anotar fechas da la tasa del pico (5-10 ago).
+    ⚠️ **Antes de tocar el guion (#38) o el tarifario (#35), tener esto:** cambia qué problema hay.
 36-ter. [ ] 🌧️ **LAS 2 PREGUNTAS GRATIS QUE SE PUEDEN HACER HOY MISMO** (no esperan al 17, no tocan nada):
     **(a) ¿LLOVIÓ MENOS del 10 al 14 de agosto?** El propio archivo pone el clima **primero** en el orden
     de revisión (sección 0-F) y **nunca se ha mirado.** Vende impermeables: es el único factor que baja
