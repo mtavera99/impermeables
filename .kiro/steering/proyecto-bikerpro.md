@@ -4,10 +4,17 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-15 — 🔴 **ALERTA PRINCIPAL: EL CIERRE NO SE RECUPERÓ (6,1% vs 13% del
-pico) Y EL CPA SE DETERIORÓ +72% ($5.433 → ~$9.343). Conversaciones estables en 84,9/día → NO ES META,
-es DESPUÉS del clic. Hipótesis #1: la IA de WhatsApp cierra peor que el dueño, y nunca se midió.
-Vale ~$2,2 MILLONES/MES. Ver sección 0-I** ·
+Última actualización: 2026-08-14 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
+corre en UTC y ya marca el día siguiente)* — 🔴 **ALERTA PRINCIPAL: EL CIERRE NO SE RECUPERÓ (6,1% vs
+13% del pico) Y EL CPA SE DETERIORÓ +72% ($5.433 → ~$9.343). Conversaciones estables en 84,9/día →
+NO ES META, es DESPUÉS del clic. Vale ~$2,2 MILLONES/MES.**
+**4 hipótesis vivas y SUPERPUESTAS, ninguna probada (sección 0-I): (A) el ciclo de pago — la ventana
+10-14 ago cae ENTERA en el valle previo a la quincena del 15 · (C) EL CLIMA, que el archivo pone
+primero y nunca se ha mirado · (D) las horas de venta del dueño, consumidas por la migración de
+transportadora y el seguimiento del temblor · (B) 🔻 la IA de WhatsApp CASI DESCARTADA: solo la usa
+mientras duerme, supervisa y reescribe a mano — es aditiva.**
+⏳ **El 17-ago (2 días tras la quincena) decide entre (A) y el resto; el valle del 26-29 ago es la
+prueba definitiva** ·
 ✅ **EL CAMBIO A 99 ENVÍOS FUE CORRECTO: flete 14,1% más barato ($18.046 vs $21.000) + seguro
 antidevolución incluido al mismo precio total, que en Heka no existía (sección 0-H)** ·
 ⚠️ **CORRECCIÓN: la ganancia de Heka de la sección 0-G ($1.982.000) está sobreestimada — nunca se le
@@ -204,9 +211,11 @@ CIERRE (2,84%), que es la mayor palanca de mejora.
 **Estado por frente:**
 1. ✅✅ **[RESUELTO 2026-08-12] LA ATENCIÓN AUTOMÁTICA YA FUNCIONA — pero NO con el bot propio.**
    El dueño activó la **IA de WhatsApp Business (Meta AI)**, la configuró con todo el catálogo, y
-   **cuando no puede responder algo le avisa y entra él** (handoff). **Diseño híbrido correcto: la IA
-   absorbe volumen, el humano cierra los casos difíciles.** → **EL FRENO DEL TIEMPO DEL DUEÑO YA NO
-   EXISTE.** Ver sección 5-B. Lo de abajo queda como historia del bot propio (sigue sin conectar).
+   **cuando no puede responder algo le avisa y entra él** (handoff). **Diseño híbrido correcto.**
+   ⚠️ **CORREGIDO EL 14-AGO: la IA se usa SOLO DE NOCHE, mientras el dueño duerme; él monitorea las
+   conversaciones y reescribe a mano a los que se enfrían. Es ADITIVA (velocidad + turno nocturno), no
+   un reemplazo.** → **El freno del tiempo está PARCIALMENTE resuelto, no cerrado: el cierre en horas
+   de tráfico sigue siendo manual.** Ver sección 5-B. Lo de abajo es historia del bot propio (sin conectar).
 1-bis. 🤖 **Bot de WhatsApp:** CONSTRUIDO y desplegado en Render, responde bien en pruebas (Gemini con
    saldo responde perfecto). ⚠️ **NO ESTÁ CONECTADO a WhatsApp** → hoy NO atiende clientes reales.
    Las 176 conversaciones y las 5 ventas se hicieron A MANO por el dueño. El bot es la mayor palanca
@@ -589,7 +598,7 @@ pendiente, y bajo Advantage+ la geografía es la única forma real de diferencia
 
 | Freno | Estado |
 |---|---|
-| ⏰ **Tiempo del dueño** | ✅ **RESUELTO** — IA de WhatsApp con handoff (sección 5-B) |
+| ⏰ **Tiempo del dueño** | 🟡 **PARCIAL** *(corregido el 14-ago)* — la IA cubre **solo la noche** y él supervisa y reescribe a mano; **el cierre en horas de tráfico sigue siendo suyo.** Ver sección 5-B |
 | 💵 **Caja** | ✅ Prácticamente — $2,79M retirados y la transportadora paga rápido |
 | 📦 **Inventario** | ❓ **El único que sigue sin medir** |
 
@@ -923,33 +932,106 @@ Es la misma familia de error que la sección 11 documenta en "muestras pequeñas
 
 🚨 **LA SECCIÓN 0-F ESCRIBIÓ EL CRITERIO DE ANTEMANO:** *"si siguen en 5-6 ventas con ~87
 conversaciones/día → hay algo ESTRUCTURAL"*. **Los datos: 5,2 ventas/día con 84,9 conversaciones/día.**
-→ **ES EXACTAMENTE EL ESCENARIO ESTRUCTURAL, y ya no son 2 días: son 4.**
-**La explicación "temblor + quincena" se queda sin pista: un temblor no deprime el cierre 4 días
-después, y la quincena del 15 ya pasó.**
+→ **Coincide con el escenario "estructural", y ya no son 2 días: son 4.**
+
+> ⚠️⚠️ **CORRECCIÓN DEL DUEÑO (2026-08-14): ESTE PUNTO SE ESCRIBIÓ CON UN ERROR DE FECHA.**
+> La primera versión decía *"la quincena del 15 ya pasó"* para descartarla y dejar a la IA como
+> hipótesis #1. **ERA FALSO: en Colombia era el 14 de agosto — la quincena era AL DÍA SIGUIENTE.**
+> **Causa del error: el sandbox corre en UTC y ya marcaba 15-ago; la hora local de Colombia es UTC−5.**
+> 📌 **REGLA PERMANENTE: verificar siempre la fecha en `TZ=America/Bogota` antes de razonar sobre
+> quincenas, días de la semana o "hoy". Un día de corrimiento invierte el diagnóstico.**
+>
+> **Consecuencia grave:** la ventana medida (10–14 ago) **cae COMPLETA en el valle de menos efectivo
+> del mes**, justo antes del pago del 15. Y en contraentrega **el cliente necesita ~$60.000 EN EFECTIVO
+> el día que llega el mensajero.** Hay una explicación competidora que cubre los 5 días **sin necesidad
+> de culpar a la IA.**
 
 **Y NO ES META:** volumen intacto, frecuencia sana, clic→chat estable. **El problema está DESPUÉS del
 clic**, igual que el 11-ago.
 
-### 🎯 HIPÓTESIS #1: LA IA DE WHATSAPP CIERRA PEOR QUE EL DUEÑO — Y NADIE LA HA MEDIDO
+### ⚖️ DOS HIPÓTESIS SUPERPUESTAS QUE HOY SON **INDISTINGUIBLES** (no rankearlas)
 
-**La cronología es incómoda:**
+**(A) EL CICLO DE PAGO (quincena).** Script: `/analisis/ciclo-quincena.py`.
 
-| Fecha | Quién atendía | Cierre |
+| Lo que se puede afirmar | |
+|---|---|
+| La ventana 10–14 ago | cae **completa** en el valle pre-pago (no un pedazo: los 5 días) |
+| El pico de ~13% (5–10 ago) | cae en el tramo **post-pago** del 30-31 jul + primeros días |
+| Entonces "pico y luego valle" | es **exactamente** lo que predice el ciclo de pago |
+
+⚠️ **PERO NO ESTÁ PROBADO.** Se intentó falsear con el historial de Heka (15 jul – 9 ago) y
+**el historial no alcanza:**
+- **La campaña estuvo PAUSADA del 17 al 26 de julio** → borra justo la ventana 15-20 jul, que era el
+  único tramo post-quincena limpio para comparar. Queda solo el pago del 30-31 jul.
+- **El presupuesto subió durante el período** ($30k → $36k → $45k → $57k) → las guías/día crecen por
+  razones ajenas a la quincena.
+- **El cierre venía subiendo solo** (2,84% → 7% → 8,3% → 10,2%) por el flujo nuevo y la prueba social.
+- **Se despacha por lotes** (0 guías un domingo, 14 el lunes) → el conteo diario mide despacho, no demanda.
+- 🔻 **Y el corte crudo apunta EN CONTRA:** valle pre-pago **9,3 guías/día** vs. post-pago **7,8**.
+  Está contaminado (el 27-jul tiene 19 guías por la reactivación, el 9-ago tiene 18 por lote), pero
+  **hay que decirlo: no hay ni un dato que respalde la quincena.** Es una hipótesis plausible, no un hecho.
+
+**(B) ~~LA IA DE WHATSAPP CIERRA PEOR QUE EL DUEÑO~~ → 🔻 CASI DESCARTADA (2026-08-14)**
+
+> ⚠️ **SEGUNDA CORRECCIÓN DEL DUEÑO EL MISMO DÍA. La primera versión de esta sección puso a la IA como
+> "hipótesis #1" basándose SOLO en que las fechas coincidían. El dueño aclaró cómo la usa de verdad:**
+> - **Solo la usa MIENTRAS DUERME.** No atiende el día.
+> - **Él monitorea las conversaciones igual.** La IA nunca está sola.
+> - **Él vuelve a escribir a mano** a los que dejaron de responder y a los que nunca volvieron.
+> - **La IA le ha AYUDADO a cerrar ventas por velocidad**, sobre todo de noche.
+>
+> **→ La IA es ADITIVA, no sustitutiva. No reemplazó al vendedor: le tapó el turno de la noche.**
+> **Una IA que cubre ~8 horas de bajo tráfico, supervisada, con seguimiento manual encima, NO puede
+> explicar que el cierre se caiga de 13% a 6%.** La hipótesis queda **abajo de la lista**, no muerta
+> (nunca se ha medido el cierre por franja horaria), pero **dejar de tratarla como la principal.**
+>
+> 🧠 **LECCIÓN DE MÉTODO — ES LA CUARTA VEZ QUE PASA (ver sección 11):** se construyó una hipótesis
+> fuerte sobre una **coincidencia de fechas**, sin verificar **cómo funciona la operación en la
+> práctica.** El archivo describía la IA como "atendiendo 24/7 y absorbiendo volumen" (sección 5-B) y
+> eso **se dio por cierto sin preguntar.** **Antes de acusar a un componente, preguntar cómo se usa.**
+
+**(C) EL CLIMA — la que el propio archivo pone PRIMERA y nadie ha revisado.** 🌧️
+La sección 0-F dice textual: *"clima (¡vende impermeables, depende de que llueva!)"* como **primer**
+punto del orden de revisión cuando el volumen es normal y el cierre cae. **No se ha mirado ni una vez.**
+- Es el único factor que afecta **la intención de compra sin afectar el clic** — encaja perfecto con la
+  firma del problema (conversaciones normales, cierre a la mitad).
+- **Es gratis de verificar:** ¿llovió menos en la semana del 10-14 ago en Bogotá / Medellín / Costa?
+- 📌 **Sube a hipótesis co-principal junto con la quincena.**
+
+**(D) EL TIEMPO DEL DUEÑO SE LO COMIÓ LA OPERACIÓN, no la falta de IA.** ⚠️ *(hipótesis nueva)*
+En esos mismos días el dueño estuvo: cerrando cabos con Heka (retiro de **$2.788.601** + 7 novedades),
+migrando a 99 Envíos, y haciendo **seguimiento a los aplazados del temblor**.
+- **El que cierra las ventas es él.** Si su tiempo se fue en operación y logística, **el cierre baja
+  aunque la IA funcione perfecto y aunque haya llovido.**
+- 🔑 **Encaja con todo lo demás:** explica por qué el volumen sigue igual (los anuncios corren solos) y
+  por qué el cierre cae (el cierre es manual y depende de sus horas).
+- **Pregunta directa al dueño, no requiere datos:** *¿cuántas horas pudiste dedicarle a vender del 11 al
+  14, comparado con la semana del pico?*
+
+**🔀 Y las cuatro conviven con el TEMBLOR.** Son **5 variables en 4 días** — exactamente la situación
+que el congelamiento del 17-ago existe para desenredar.
+
+### 🔬 LA PREDICCIÓN QUE SEPARA LAS HIPÓTESIS (y no cuesta nada)
+
+**El 15-ago entra la quincena.** A partir de ahí:
+
+| Qué pasa con el cierre | Qué significa | Qué hacer |
 |---|---|---|
-| 5–10 ago | **el dueño, a mano** | **~13% (el pico histórico)** |
-| 11 ago | el dueño (temblor) | 6,7% |
-| **~12 ago** | **se activa la IA de WhatsApp** | — |
-| 12–14 ago | **la IA + handoff** | **~6%** |
+| **Rebota a 10-13% en 1-3 días** | era el **CICLO DE PAGO** (A) | ✅ **no tocar nada**, y anotar la quincena como variable de planeación |
+| **Sigue en ~6%** con volumen normal | la quincena **no** era la causa | 🔍 pasar a **(C) clima** y **(D) horas de venta del dueño** — las dos se responden **preguntando o mirando el pronóstico, sin tocar la campaña** |
 
-- ⚠️ **CUIDADO CON LA CAUSALIDAD:** la caída **empezó el 11-ago, ANTES de la IA** → la IA **no puede
-  explicar el desplome inicial.** Pero **sí podría explicar por qué no se recupera.**
-- 🔑 **Son dos hipótesis que los datos actuales NO pueden separar:**
-  **(a)** resaca del temblor/quincena que aún deprime la demanda · **(b)** la IA cierra peor que el dueño.
-- 📌 **El pico del 13% se logró con el dueño vendiendo.** La sección 5-B celebró la IA por resolver el
-  freno del tiempo — **y lo resolvió** — pero **nunca se comparó su tasa de cierre contra la del dueño.**
-  Se cambió el vendedor del negocio sin medir al reemplazo.
-- ⚖️ **El tiempo del dueño ya no es el freno; ahora el freno podría ser el precio que se pagó por
-  liberarlo.** Un 13% → 6,1% de cierre cuesta más que el tiempo que ahorra.
+⚠️ **Y las dos preguntas de (C) y (D) se pueden hacer YA, hoy, sin esperar al 17:** no requieren datos
+nuevos ni mover nada. **Son las dos cosas más baratas pendientes de todo este análisis.**
+
+- ✅ **El chequeo del 17-ago cae 2 días después del pago: es el momento exacto para leerlo.**
+  **El congelamiento no solo no molesta, AYUDA.**
+- 💪 **Esperar no cuesta nada:** a 5,2 ventas/día el negocio gana ~$65.000/día, **2,4× sobre el
+  equilibrio.** No hay urgencia que justifique adivinar.
+- ⚠️ **OJO AL LEER EL REBOTE:** el rebote de quincena y el rebote post-temblor **también se superponen.**
+  Si rebota, no se sabrá cuál de los dos fue.
+  🔑 **PARA ESO SIRVE EL SIGUIENTE VALLE (26-29 ago):** si el cierre **vuelve a caer ahí**, el ciclo de
+  pago queda **demostrado** y pasa a ser una **variable permanente de planeación** (presupuesto y
+  despacho modulados por quincena), no una excusa de una sola vez.
 
 **💰 EL TAMAÑO DEL PROBLEMA:**
 
@@ -1147,22 +1229,40 @@ creativos nuevos en el mismo conjunto del ganador: no se mostrarían.**
 
 ---
 
-## 5-B. ✅ LA IA QUE SÍ ESTÁ ATENDIENDO (desde ~2026-08-12)
+## 5-B. ✅ LA IA QUE SÍ ESTÁ ATENDIENDO (desde ~2026-08-12) — ALCANCE REAL, CORREGIDO EL 2026-08-14
 
 **El dueño resolvió la atención automática con la IA nativa de WhatsApp Business (Meta AI), NO con el
 bot propio de `/bot`.**
+
+> ⚠️⚠️ **CORRECCIÓN IMPORTANTE (2026-08-14). Esta sección decía que la IA "atiende 24/7 y absorbe
+> volumen" y que el freno del tiempo "QUEDÓ RESUELTO". ESO EXAGERA LO QUE PASA DE VERDAD.**
+> **Cómo la usa el dueño, en sus palabras:**
+> - **La usa SOLO MIENTRAS DUERME.** El resto del día atiende él.
+> - **Monitorea las conversaciones igual.** La IA **nunca está sola.**
+> - **Vuelve a escribir a mano** a los que dejaron de responder y a los que nunca volvieron.
+> - **La IA le ayuda a cerrar por VELOCIDAD** (responder al instante) y a no perder los de la noche.
+>
+> **→ La IA es ADITIVA: cubre el turno de la noche y acelera la primera respuesta.**
+> **NO es un vendedor que reemplace al dueño, y no hay que analizarla como si lo fuera.**
 
 | | |
 |---|---|
 | Qué usa | **IA de WhatsApp Business / Meta AI** |
 | Configuración | Cargada por el dueño con el catálogo y las condiciones del negocio |
-| Handoff | ✅ **Cuando no puede responder algo, le avisa y entra él** |
+| **Franja real de uso** | **de noche, mientras el dueño duerme** (no todo el día) |
+| **Supervisión** | **el dueño lee las conversaciones y reescribe a mano a los que se enfrían** |
+| Handoff | ✅ Cuando no puede responder algo, le avisa y entra él |
 | Ventaja clave | **No depende de la verificación de Meta** que lleva semanas trancada, ni de Render, ni del cupo de Gemini |
 
-- 🎉 **CONSECUENCIA MÁS IMPORTANTE: el freno del "tiempo del dueño" QUEDÓ RESUELTO.** Era el más
-  difícil de los tres frenos del negocio. Ya no se pierden ventas por responder tarde de noche.
-- ✅ **El diseño híbrido es el correcto y hay que mantenerlo:** la IA para volumen y preguntas
-  repetitivas, el dueño para el que duda, objeta o necesita confianza. Ahí es donde se gana la venta.
+- ✅ **LO QUE SÍ RESOLVIÓ:** las ventas que antes se perdían por responder tarde de noche, y la
+  velocidad de primera respuesta. **Eso es real y hay que mantenerlo.**
+- ⚠️ **LO QUE **NO** RESOLVIÓ: el freno del tiempo del dueño NO está cerrado.** El cierre sigue siendo
+  **manual y suyo** en las horas de más tráfico. **Consecuencia estratégica: al abrir ciudades, las
+  conversaciones nuevas siguen cayendo sobre él.** El techo de atención sigue existiendo.
+- ✅ **El diseño híbrido es el correcto y hay que mantenerlo:** la IA para la noche y la respuesta
+  inmediata, el dueño para el que duda, objeta o necesita confianza. Ahí es donde se gana la venta.
+- 📌 **NUNCA se ha medido el cierre por franja horaria** (noche-IA vs. día-dueño). No es urgente —la IA
+  es aditiva— pero es el dato que zanjaría cualquier duda futura sobre su aporte.
 - 📌 **NO BORRAR el bot propio de `/bot`.** Aunque nunca se conecte, `src/prompt.js` es **la fuente
   de verdad del conocimiento del negocio** (producto, colores de franja, fletes por ciudad, objeciones,
   flujo de ciudad primero, "SÍ CONFIRMO"). Si hay que reconfigurar o auditar la IA, se saca de ahí.
@@ -1365,13 +1465,27 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     NO HUBO REBOTE.** 5,2 ventas/día con 84,9 conversaciones/día = cierre **6,1%** (el pico era ~13%).
     **Es literalmente el escenario "estructural" que este punto definió de antemano.** El CPA se
     deterioró **+72%** ($5.433 → ~$9.343). **Ver sección 0-I.** → pasa a ser el punto **36**.
-36. [ ] 🔴🔴🔴 **LA PRIORIDAD #1 DEL NEGOCIO: MEDIR EL CIERRE DE LA IA CONTRA EL DEL DUEÑO.**
-    Vale **~$2,2 millones/mes** (5,8 ventas/día de diferencia × $12.576). **La cronología es incómoda:**
-    el pico de 13% se hizo con el dueño vendiendo a mano (5-10 ago); la IA se activó ~12-ago y el
-    cierre lleva 4 días clavado en ~6%. ⚠️ **NO es prueba de causalidad** — la caída empezó el 11-ago,
-    ANTES de la IA → la IA no explica el desplome, **pero sí podría explicar por qué no se recupera.**
-    **EL TEST:** el dueño **atiende a mano 1-2 días** y se compara el cierre contra los días de IA.
-    ✅ **NO rompe el congelamiento** (no se toca campaña, solo se mide). Ver sección 0-I.
+36. [ ] 🔴 **EL 17-AGO (2 días después de la quincena): LEER SI EL CIERRE REBOTÓ.** Es el dato que
+    separa las dos hipótesis de la sección 0-I, y **hay que esperarlo antes de actuar.**
+    - **Si rebota a 10-13%** → era el **ciclo de pago**. **No tocar nada.**
+    - **Si sigue en ~6%** con ~85 conversaciones/día → pasar a **clima** y **horas de venta del dueño**.
+    ⚠️ **NO acusar a la IA de WhatsApp:** el dueño aclaró que **solo la usa mientras duerme, monitorea
+    igual y reescribe a mano a los que no responden** → es aditiva, le ayuda a cerrar por velocidad.
+    Una IA supervisada que cubre 8 horas de bajo tráfico **no explica un cierre de 13% a 6%.**
+    Vale ~$2,2M/mes, pero **medir mal cuesta más que esperar 3 días** — a 5,2 ventas/día se gana
+    ~$65.000/día, 2,4× sobre el equilibrio. ✅ Nada de esto rompe el congelamiento: se mide, no se mueve.
+36-ter. [ ] 🌧️ **LAS 2 PREGUNTAS GRATIS QUE SE PUEDEN HACER HOY MISMO** (no esperan al 17, no tocan nada):
+    **(a) ¿LLOVIÓ MENOS del 10 al 14 de agosto?** El propio archivo pone el clima **primero** en el orden
+    de revisión (sección 0-F) y **nunca se ha mirado.** Vende impermeables: es el único factor que baja
+    la intención de compra **sin** bajar los clics — encaja exacto con la firma del problema.
+    **(b) ¿CUÁNTAS HORAS PUDO DEDICARLE A VENDER del 11 al 14** contra la semana del pico? En esos días
+    estuvo cerrando cabos con Heka ($2,79M + 7 novedades), migrando a 99 Envíos y haciendo seguimiento
+    a los aplazados del temblor. **El cierre es manual y depende de sus horas.** Ver sección 0-I.
+36-bis. [ ] 📅 **EL 26-29 AGO (siguiente valle pre-pago): LA PRUEBA DEFINITIVA DEL CICLO DE PAGO.**
+    Si el cierre **vuelve a caer** en esos días, el ciclo de pago queda demostrado y pasa a ser
+    **variable permanente de planeación** (modular presupuesto y despacho por quincena). Si NO cae,
+    la quincena queda descartada y el problema es otro. **Es el único test limpio disponible**, porque
+    el rebote del 15-ago está contaminado por el rebote post-temblor. Ver sección 0-I.
 37. [ ] 📊 **PEDIR LOS EXPORTS DE META CON DESGLOSE** — el del 15-ago vino a nivel campaña, 1 sola fila:
     **(a) por DÍA** (para que el CPA sea medido y no estimado) · **(b) por CONJUNTO** (sin esto **NO se
     puede calcular EL TERMÓMETRO**, la herramienta principal de diagnóstico de este archivo) ·
