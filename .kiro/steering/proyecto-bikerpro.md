@@ -4,10 +4,23 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-14 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
-corre en UTC y ya marca el día siguiente)* — 🔴 **ALERTA PRINCIPAL: EL CIERRE NO SE RECUPERÓ (6,1% vs
-13% del pico) Y EL CPA SE DETERIORÓ +72% ($5.433 → ~$9.343). Conversaciones estables en 84,9/día →
-NO ES META, es DESPUÉS del clic. Vale ~$2,2 MILLONES/MES.**
+Última actualización: 2026-08-19 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
+corre en UTC y ya marca el día siguiente)*
+
+🎉🎉 **ESTADO ACTUAL — TODO SE RECUPERÓ (sección 0-L, veredicto del 19-ago):**
+**10,25 ventas/día (+97%, nivel pre-temblor) · cierre 9,4% (venía de 6,1%) · CPA por venta cerrada
+$5.702 (venía de $9.343, −39% → volvió al nivel auditado) · colchón 3,5× · utilidad ~$153.676/día
+(+136%).** **ERA EL CICLO DE PAGO**, como decía la hipótesis (A).
+✅ **SEGURO 99 CONFIRMADO CON DATOS: en una devolución solo se paga la PRIMA ($1.742-3.111), el flete
+de ida y vuelta queda cubierto completo. Ahorro ~$18.574 por devolución ≈ $852.524/mes.**
+💥 **EL TECHO DE $48.585/DÍA SE ROMPIÓ: ahora gasta $58.445/día → HAY ESPACIO PARA ESCALAR.**
+⏳ **PERO el rebote se superpone con el fin del efecto temblor → el test definitivo es el valle del
+26-29 ago.** Si el cierre vuelve a caer ahí, el ciclo de pago queda demostrado.
+⚠️ **5 guías trabadas = $113.458 en riesgo; la de GÓMEZ PLATA lleva 6 días sin que la recojan.**
+
+**Contexto histórico del bajón (ya resuelto):** 🔴 ~~ALERTA: EL CIERRE NO SE RECUPERÓ (6,1% vs
+13% del pico) Y EL CPA SE DETERIORÓ +72%. Conversaciones estables en 84,9/día →
+NO ES META, es DESPUÉS del clic. Vale ~$2,2 MILLONES/MES.~~
 🔴🔴 **HIPÓTESIS PRINCIPAL (E) — SECCIÓN 0-K: EL "CIERRE" ESTÁ MAL MEDIDO. El denominador son "toques
 de botón del anuncio", no conversaciones, y el dueño confirma que hay MUCHÍSIMOS chats donde nadie
 escribió nada. Si los vacíos pasaron de ~25% a ~65%, la caída de 13% a 6,1% queda explicada COMPLETA
@@ -1085,6 +1098,94 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-L. 🎉 VEREDICTO DEL 19-AGO: HUBO REBOTE. ERA EL CICLO DE PAGO (+ EL SEGURO CONFIRMADO)
+
+**Fuente:** export 99 Envíos del 19-ago (53 guías, 13-18 ago) + Meta 14-19 ago (528 conv, $281.820).
+Script: `/analisis/veredicto-19ago.py`. Datos: `/analisis/guias-99envios-19ago.csv`.
+
+### 🔑 PRIMERO: UNA TRAMPA METODOLÓGICA QUE CASI ARRUINA EL CÁLCULO
+**NO SE DESPACHA FIN DE SEMANA.** Guías por día (hora Colombia): jue 13 → 8 · vie 14 → 4 ·
+**sáb 15 → 0 · dom 16 → 0** · lun 17 → 9 · **mar 18 → 32**.
+El export anterior también era lunes a viernes (10-14 ago) → **patrón confirmado.**
+→ **Las 41 guías del 17-18 son las ventas acumuladas del sábado, domingo, lunes y martes.**
+⚠️ Contar "guías por fecha de despacho" habría dado **20,5 ventas/día** (falso alto) o **0 el sábado**
+(falso bajo). **Siempre repartir el lote sobre los días de venta que representa.**
+
+### ✅ EL VEREDICTO
+
+| Métrica | Valle 10-14 ago | **15-18 ago** | Cambio |
+|---|---|---|---|
+| **Ventas/día** | 5,2 | **10,25** | **+97%** ✅ nivel pre-temblor (10-12) |
+| **Tasa de cierre** | 6,1% | **9,4%** | **+53%** |
+| Conversaciones/día | 84,9 | **109,5** | +29% |
+| **CPA venta cerrada** | $9.343 | **$5.702** | **−39%** |
+| **CPA venta entregada** | $11.031 | **$6.732** | −39% |
+| Colchón sobre equilibrio | 2,1× | **3,5×** | |
+| **Utilidad/día** | ~$65.000 | **~$153.676** | **+136%** |
+
+- ✅ **EL CPA VOLVIÓ AL NIVEL AUDITADO** ($5.702 vs los $5.433 de la referencia 27jul-9ago).
+  **El deterioro del +72% se borró.**
+- 🎯 **CRITERIO CUMPLIDO EN LO QUE IMPORTA:** el umbral escrito de antemano era "cierre 10-13%".
+  Salió **9,4%** — a un pelo. **Pero las VENTAS/DÍA volvieron completas (10,25 vs 10-12 pre-temblor)**,
+  y ese es el indicador de negocio, no el ratio.
+
+### 🔍 EL MATIZ: VOLVIERON LAS VENTAS, NO EL CIERRE DEL PICO — Y ESO ES BUENO
+**Las conversaciones subieron 29% y las ventas 97%.** El cierre no llega al 13% del pico porque
+**entró MÁS gente** y parte de esa gente extra convierte peor. **Es escalamiento, no deterioro.**
+→ 📌 **LECCIÓN: el cierre es un RATIO y puede bajar mientras el negocio mejora.** Perseguir el 13%
+recortando volumen habría sido un error. **El objetivo es utilidad/día, no la tasa.**
+
+### 💥 EL TECHO DE $48.585/DÍA SE ROMPIÓ
+Gasto 15-18 ago: **$58.445/día** (vs los $48.585 que se habían declarado como techo estable con 10
+días de datos). **Con capacidad de $57.000 configurada, eso es >100%** → Meta compensó por promedio
+semanal. **La conclusión "más presupuesto no se convierte en más gasto" queda DESMENTIDA.**
+→ **Hay espacio para escalar que no existía en el diagnóstico anterior.**
+
+### 🚨🚨 HALLAZGO GRANDE: EL SEGURO 99 QUEDÓ CONFIRMADO CON DATOS REALES
+Aparecieron **las 2 primeras devoluciones** con 99 Envíos, y en ellas **el `valor_servicio` cambió:
+ya no cobran el flete, cobran SOLO la prima.**
+
+| Ciudad | Flete normal | **Cobrado** | Prima | **Ahorro** |
+|---|---|---|---|---|
+| BOGOTÁ, D.C. | $12.871 | **$1.742** | $1.742 | **$11.129** |
+| SANTA MARTA | $22.793 | **$3.111** | $3.111 | **$19.682** |
+
+- ✅ **EN UNA DEVOLUCIÓN SOLO SE PAGA LA PRIMA. El flete de ida Y vuelta queda cubierto COMPLETO.**
+  **Es MEJOR de lo que estimaba la sección 0-H.**
+- **Ahorro promedio por devolución: $18.574.** A 15,3% de rechazo = **$2.842 por guía despachada**
+  = **~$852.524/mes** a 300 ventas. (La estimación de 0-H decía $802.172/mes — **acertó.**)
+- ✅ **LA PREGUNTA 3 DEL PENDIENTE #28 QUEDA RESPONDIDA CON DATOS.** No hay que preguntarle nada más
+  a 99 Envíos sobre el seguro. **El cambio de transportadora fue una decisión claramente correcta.**
+
+### 📌 RECHAZO: 2 DE 7 RESUELTAS (29%) — **NO CONCLUIR NADA**
+Muestra minúscula. **Pero el patrón sí importa: las 2 devoluciones son BOGOTÁ y SANTA MARTA, las dos
+CIUDADES GRANDES** → van 2 datos más al lado de la sección 0-G (ciudades 20-23% vs pueblos 7-11%).
+
+### ⚠️ 5 GUÍAS QUE NECESITAN ACCIÓN HOY — $113.458 DE MARGEN
+
+| Fecha | Ciudad | Margen | Problema |
+|---|---|---|---|
+| 13-ago | GÓMEZ PLATA | $20.501 | 🔴 **"Recolección programada" — 99 ENVÍOS NUNCA LA RECOGIÓ EN 6 DÍAS** |
+| 13-ago | BOGOTÁ | $24.327 | Telemercadeo sin resolver (6 días) |
+| 13-ago | IPIALES | $23.459 | en tránsito 6 días, muy lento |
+| 14-ago | GUACHENÉ | $20.501 | Reclame en oficina (5 días) |
+| 14-ago | SOLEDAD | $24.670 | trabada en procesamiento (5 días) |
+
+🔴 **La de GÓMEZ PLATA es la más grave y es culpa de la transportadora:** el cliente está esperando y
+**el paquete nunca salió.** Reclamar hoy — y es la primera falla operativa de 99 Envíos.
+
+### ⏳ LO QUE SIGUE SIN RESOLVERSE (como estaba previsto)
+**El rebote coincide con la quincena Y con el fin del efecto temblor. Los dos se superponen, así que
+no se puede saber cuál pesó más.** → **El test definitivo sigue siendo el valle del 26-29 ago:**
+si el cierre vuelve a caer ahí, el ciclo de pago queda demostrado y pasa a ser variable permanente de
+planeación. **Faltan ~7 días.**
+- 📉 **(C) clima y (D) horas de venta quedan en pausa**, no descartadas: no hicieron falta para
+  explicar esto.
+- 📊 **(E) las conversaciones vacías siguen siendo un hallazgo válido** (57,8% el 14-ago) pero **NO
+  era la causa de la caída** — arregla cómo se MIDE el costo, no explica el bajón.
+
+---
+
 ## 0-K. 🔴🔴 HIPÓTESIS (E) — EL "CIERRE" ESTÁ MAL MEDIDO: EL DENOMINADOR ESTÁ CONTAMINADO
 
 **MEDIDO POR EL DUEÑO SOBRE EL 14-AGO: de 90 conversaciones, 52 fueron solo el toque del botón
@@ -1708,8 +1809,10 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     **(c) por ANUNCIO** (para el pendiente #32, saber qué creativo genera VENTAS).
 28. [ ] ❓ **LAS PREGUNTAS A 99 ENVÍOS** (actualizadas el 15-ago):
     (1) **% de comisión por recaudo**; (2) **en cuántos días paga** (Heka: 1 día hábil);
-    (3) **¿QUÉ REEMBOLSA EXACTAMENTE el Seguro 99?** — solo el flete de ida (sale a la par),
-    ida y vuelta (deja ~$800.000/mes), ¿y el valor del producto si se pierde o se daña?
+    (3) [x] ✅ **RESUELTO CON DATOS EL 19-AGO — NO PREGUNTAR MÁS.** Las 2 primeras devoluciones
+    mostraron que **en una devolución solo se cobra la PRIMA** ($1.742 y $3.111 en vez de $12.871 y
+    $22.793): **el flete de ida Y vuelta queda cubierto completo.** Ahorro ~$18.574 por devolución
+    ≈ **$852.524/mes** a 300 ventas. Ver sección 0-L.
     ✅ **YA RESPONDIDO por el dueño:** el seguro **está incluido** en el `valor_servicio` y **en Heka
     no se pagaba** → el cambio de transportadora **fue correcto** (flete 14,1% más barato + cobertura
     al mismo precio total). Ver sección 0-H. Lo que queda es afinar el alcance de la cobertura.
