@@ -4,11 +4,47 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-12 — 🎉 **EL FRENO DEL TIEMPO SE RESOLVIÓ: IA de WhatsApp Business
-atendiendo 24/7 con handoff** · **TRANSPORTADORA NUEVA: 99 ENVÍOS** (más barata + seguro de devolución) ·
-~155-160 VENTAS · **AUDITORÍA FINANCIERA COMPLETA (sección 0-G): rechazo real 15,3% · CPA real
-$6.414 por cliente que paga · ganancia Heka ~$1.982.000** · caída del 11-12 ago = **TEMBLOR + quincena** ·
-techo de la cuenta ~$47.800/día → crecer = ABRIR CIUDADES, no subir presupuesto
+Última actualización: 2026-08-19 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
+corre en UTC y ya marca el día siguiente)*
+
+🎉🎉 **ESTADO ACTUAL — TODO SE RECUPERÓ (sección 0-L, veredicto del 19-ago):**
+**10,25 ventas/día (+97%, nivel pre-temblor) · cierre 9,4% (venía de 6,1%) · CPA por venta cerrada
+$5.702 (venía de $9.343, −39% → volvió al nivel auditado) · colchón 3,5× · utilidad ~$153.676/día
+(+136%).** **ERA EL CICLO DE PAGO**, como decía la hipótesis (A).
+✅ **SEGURO 99 CONFIRMADO CON DATOS: en una devolución solo se paga la PRIMA ($1.742-3.111), el flete
+de ida y vuelta queda cubierto completo. Ahorro ~$18.574 por devolución ≈ $852.524/mes.**
+💥 **EL TECHO DE $48.585/DÍA SE ROMPIÓ: ahora gasta $58.445/día → HAY ESPACIO PARA ESCALAR.**
+⏳ **PERO el rebote se superpone con el fin del efecto temblor → el test definitivo es el valle del
+26-29 ago.** Si el cierre vuelve a caer ahí, el ciclo de pago queda demostrado.
+⚠️ **5 guías trabadas = $113.458 en riesgo; la de GÓMEZ PLATA lleva 6 días sin que la recojan.**
+
+**Contexto histórico del bajón (ya resuelto):** 🔴 ~~ALERTA: EL CIERRE NO SE RECUPERÓ (6,1% vs
+13% del pico) Y EL CPA SE DETERIORÓ +72%. Conversaciones estables en 84,9/día →
+NO ES META, es DESPUÉS del clic. Vale ~$2,2 MILLONES/MES.~~
+🔴🔴 **HIPÓTESIS PRINCIPAL (E) — SECCIÓN 0-K: EL "CIERRE" ESTÁ MAL MEDIDO. El denominador son "toques
+de botón del anuncio", no conversaciones, y el dueño confirma que hay MUCHÍSIMOS chats donde nadie
+escribió nada. Si los vacíos pasaron de ~25% a ~65%, la caída de 13% a 6,1% queda explicada COMPLETA
+sin que nada esté roto. Es la única hipótesis que explica volumen estable + cierre a la mitad, y el
+mecanismo (Meta amplió público → gente menos calificada) YA ESTABA ESCRITO en este archivo.**
+**MEDIRLO ES LO PRIMERO (pendiente #42): 5 minutos contando en la lista de WhatsApp, en el pico Y en el
+valle.** Si se confirma, el arreglo es de **segmentación en Meta**, no del guion ni de la IA.
+**Hipótesis en segundo plano (sección 0-I): (A) el ciclo de pago · (C) EL CLIMA, nunca revisado ·
+(D) las horas de venta del dueño.**
+**(B) 🔻 la IA de WhatsApp queda DESCARTADA: está supervisada siempre Y se activa cuando SUBE el flujo,
+así que estuvo más activa en los días del pico de cierre — la correlación va al revés de lo que la
+hipótesis necesitaba.** ✅ **La IA es una válvula de capacidad: el freno del tiempo del dueño está
+RESUELTO y la atención NO limita cuánto tráfico se puede recibir → abrir ciudades es viable.**
+⏳ **El 17-ago (2 días tras la quincena) decide entre (A) y el resto; el valle del 26-29 ago es la
+prueba definitiva** ·
+✅ **EL CAMBIO A 99 ENVÍOS FUE CORRECTO: flete 14,1% más barato ($18.046 vs $21.000) + seguro
+antidevolución incluido al mismo precio total, que en Heka no existía (sección 0-H)** ·
+⚠️ **CORRECCIÓN: la ganancia de Heka de la sección 0-G ($1.982.000) está sobreestimada — nunca se le
+descontó el flete a las 15 devoluciones (real: $1.352.000–1.667.000)** ·
+🆕 **FUGA: se absorben $3.900-4.900 de flete por venta en destinos caros (~$384.000/mes)** ·
+🆕 **7 guías en novedad = $181.744 de margen en riesgo (Cartagena es la llamada #1)** ·
+rechazo real **15,3%** (el de 99 Envíos aún no es medible) · techo de la cuenta **$48.585/día
+confirmado con 10 días** → crecer = ABRIR CIUDADES, no subir presupuesto ·
+⏸️ congelamiento hasta el 17-ago: **este hallazgo NO lo rompe, porque pide MEDIR, no mover**
 
 ---
 
@@ -196,9 +232,11 @@ CIERRE (2,84%), que es la mayor palanca de mejora.
 **Estado por frente:**
 1. ✅✅ **[RESUELTO 2026-08-12] LA ATENCIÓN AUTOMÁTICA YA FUNCIONA — pero NO con el bot propio.**
    El dueño activó la **IA de WhatsApp Business (Meta AI)**, la configuró con todo el catálogo, y
-   **cuando no puede responder algo le avisa y entra él** (handoff). **Diseño híbrido correcto: la IA
-   absorbe volumen, el humano cierra los casos difíciles.** → **EL FRENO DEL TIEMPO DEL DUEÑO YA NO
-   EXISTE.** Ver sección 5-B. Lo de abajo queda como historia del bot propio (sigue sin conectar).
+   **cuando no puede responder algo le avisa y entra él** (handoff). **Diseño híbrido correcto.**
+   📌 **PRECISADO EL 14-AGO: la IA es una VÁLVULA DE CAPACIDAD — se activa cuando sube el flujo (y de
+   noche), y el dueño NUNCA la deja sola: monitorea y reescribe a mano a los que se enfrían.**
+   → **EL FRENO DEL TIEMPO ESTÁ RESUELTO en lo que importa: la atención ya NO limita cuánto tráfico se
+   puede recibir.** Ver sección 5-B. Lo de abajo es historia del bot propio (sigue sin conectar).
 1-bis. 🤖 **Bot de WhatsApp:** CONSTRUIDO y desplegado en Render, responde bien en pruebas (Gemini con
    saldo responde perfecto). ⚠️ **NO ESTÁ CONECTADO a WhatsApp** → hoy NO atiende clientes reales.
    Las 176 conversaciones y las 5 ventas se hicieron A MANO por el dueño. El bot es la mayor palanca
@@ -581,7 +619,7 @@ pendiente, y bajo Advantage+ la geografía es la única forma real de diferencia
 
 | Freno | Estado |
 |---|---|
-| ⏰ **Tiempo del dueño** | ✅ **RESUELTO** — IA de WhatsApp con handoff (sección 5-B) |
+| ⏰ **Tiempo del dueño** | ✅ **RESUELTO** — la IA de WhatsApp funciona como **válvula de capacidad**: se activa cuando sube el flujo (y de noche), **siempre supervisada por el dueño**. → **la atención ya NO limita cuánto tráfico se puede recibir.** Ver sección 5-B |
 | 💵 **Caja** | ✅ Prácticamente — $2,79M retirados y la transportadora paga rápido |
 | 📦 **Inventario** | ❓ **El único que sigue sin medir** |
 
@@ -687,6 +725,648 @@ La sección 7 dice que pueblos y veredas son de alto riesgo y que a ellos hay qu
   del 25-jul. Sin confirmar por el dueño.
 - **Falta el export de Meta con desglose POR DÍA** (pestaña Anuncios → Desglose → Por día). Con eso se
   puede alinear gasto contra guías con precisión y resolver la hipótesis de los fines de semana.
+
+---
+
+## 0-H. 🚚 PRIMERA VENTANA CON 99 ENVÍOS (10–14 ago) — AUDITADA EL 2026-08-15
+
+**Fuente:** export "Envíos Completos" de `99envios.com` del 15-ago. **26 guías · 27 unidades ·
+$2.128.056 de recaudo comprometido.** Datos y script en `/analisis/guias-99envios.csv` y
+`/analisis/analizar-99envios.py`.
+
+### ⚠️ LO PRIMERO: ESTA VENTANA **NO** SIRVE PARA MEDIR RECHAZO
+10 entregadas · **0 devueltas** · 7 en novedad · 9 en curso. El 0% es **falso por inmadurez**: las
+entregas se resuelven en 2-4 días y las devoluciones tardan 8-15, así que a 5 días solo alcanzan a
+aparecer las buenas noticias. **Techo teórico si las 7 novedades fallaran: 41,2%.**
+→ **El rechazo de 99 Envíos se mide a fin de agosto, no ahora.** El **15,3%** de la sección 0-G sigue
+siendo el número vigente para cualquier cálculo.
+
+### ✅ HALLAZGO 1 — EL CAMBIO A 99 ENVÍOS FUE CORRECTO: MISMO PRECIO, PERO CON COBERTURA
+
+> ⚠️⚠️ **ESTE PUNTO SE ESCRIBIÓ MAL PRIMERO Y LO CORRIGIÓ EL DUEÑO EL 2026-08-15.**
+> La primera versión decía *"99 Envíos es más barato NO se ve en los datos"* porque comparó
+> **$20.894 contra $21.000 y concluyó "es igual"**. **El error: comparó precio contra precio como si
+> el servicio fuera el mismo.** No lo es — **en Heka NO se pagaba seguro antidevolución y el flete de
+> cada devolución era pérdida pura; en 99 Envíos el seguro va incluido en ese mismo precio.**
+> **No es el mismo precio por lo mismo: es el mismo precio CON EL RIESGO CUBIERTO.**
+> Esto además **resuelve** la ambigüedad que se había dejado abierta: el `valor_seguro_99` está
+> **DENTRO** del `valor_servicio`. Script: `/analisis/valor-seguro-99.py`.
+
+| Concepto | 99 Envíos | Heka |
+|---|---|---|
+| **Flete puro** | **$18.046** | $21.000 |
+| Prima del seguro (13,6%, incluida) | $2.848 | **$0 — no existía** |
+| **Precio total pagado** | **$20.894** | $21.000 |
+| Cobertura antidevolución | ✅ **todas las guías** | ❌ ninguna |
+
+- ✅ **El flete SÍ es 14,1% más barato**, tal como dijo el dueño. El ahorro se está gastando en la
+  prima, así que el total queda parejo — **pero con el riesgo cubierto. Eso no es empatar, es ganar.**
+- 💰 **LA PRIMA SE PAGA SOLA:** para empatar, el seguro solo tiene que reembolsar **1,03× el flete de
+  ida** ($18.615 por devolución). El seguro cubre **ida y vuelta** = $36.091 → **1,9× por encima del
+  punto de equilibrio.**
+
+| Si el seguro reembolsa… | Valor esperado | Neto por guía | Al mes (300 ventas) |
+|---|---|---|---|
+| solo el flete de ida | $2.761 | −$87 | −$26.120 (a la par) |
+| ida + media vuelta | $4.141 | +$1.293 | **+$388.026** |
+| **ida + vuelta completa** | $5.522 | **+$2.674** | **+$802.172** |
+
+→ **NO HAY ESCENARIO EN QUE EL SEGURO SALGA MAL.** En el peor caso empata; en el caso que describe
+la sección 0-E deja **~$800.000/mes.** Es asimétrico a favor.
+
+### 🚨 CORRECCIÓN A LA SECCIÓN 0-G: LA GANANCIA DE HEKA ESTABA SOBREESTIMADA
+
+Lo anterior destapó un error en la auditoría del período Heka. **`analizar-final.py` le descontó a
+cada devolución solo el empaque ($1.500) y la publicidad — nunca le descontó el flete.** Pero en
+contraentrega el flete se recupera del cliente **al entregar**; si el cliente no recibe, no hay
+recaudo y **el flete lo come el vendedor** (y en Heka no había seguro que lo devolviera).
+
+| Escenario | Flete no contabilizado | Ganancia Heka real |
+|---|---|---|
+| solo ida | $315.000 | $1.666.878 |
+| ida + media vuelta | $472.500 | $1.509.378 |
+| **ida + vuelta** | **$630.000** | **$1.351.878 (−32%)** |
+
+- ⚠️ **La cifra de $1.981.878 publicada en la sección 0-G es un techo, no el número real.**
+- 🔑 **Las dos correcciones apuntan al mismo lado:** el período Heka ganó **menos** de lo publicado,
+  **y** el cambio a 99 Envíos fue **mejor decisión** de lo que parecía.
+- 📌 Ojo con el encuadre de la sección 0-E: como el cliente paga el flete, un flete más barato **no
+  mejora el margen directo**, mejora la oferta. Pero **el seguro sí es margen**, porque elimina una
+  pérdida que antes caía completa sobre el dueño en el 15,3% de los envíos.
+
+### 🚨 HALLAZGO 2 — SE ESTÁ ABSORBIENDO FLETE EN LOS DESTINOS CAROS (fuga nueva, no documentada)
+
+El modelo dice "$59.900 **sin** envío, el cliente paga el flete". **Los datos dicen que no siempre.**
+El recaudo se cobra por tarifario con un **total tope de ~$80.000-82.000**, así que cuando el flete
+sube, lo que queda para el dueño baja:
+
+| Recaudo al cliente | Cobro 99 Envíos | Queda por unidad | Absorbido | Destinos |
+|---|---|---|---|---|
+| $72.698 | $12.871 | $59.827 | $73 | Bogotá, Soacha, Zipaquirá (6) |
+| $81.752 | $22.793 | $58.959 | $941 | Bucaramanga, Cereté, Ipiales… (6) |
+| $80.676 | $22.714 | $57.962 | $1.938 | Florencia (1) |
+| **$81.030** | **$25.029** | **$56.001** | **$3.899** | Algeciras, Guachené, Gómez Plata, Remedios (4) |
+| **$80.061** | **$24.957** | **$55.104** | **$4.796** | Inzá (1) |
+| **$80.000** | **$24.953** | **$55.047** | **$4.853** | Málaga (1) |
+
+- **Precio implícito real: $58.697/unidad** contra los **$59.933 auditados con Heka** → **−$1.236.**
+- **Absorbido en 5 días: $33.314 en 21 guías. Proyectado: ~$384.000/mes** a 300 ventas.
+- **Margen por unidad entregada: $23.607** vs. **$24.433** con Heka (−$826).
+- 🔑 **DÓNDE DUELE: los destinos con flete ~$25.000 son todos pueblos pequeños** (Guachené, Gómez
+  Plata, Remedios, Málaga, Inzá, Algeciras) → ahí se absorben **$3.900-4.900 por venta.**
+
+### ⚖️ CONSECUENCIA: EL VEREDICTO SOBRE LOS PUEBLOS SE VUELVE MIXTO (matiza la sección 0-G)
+
+La sección 0-G probó que **los pueblos rechazan MENOS** (7-11% vs 20-23%) y mató la regla vieja de la
+sección 7. **Eso sigue en pie.** Pero ahora aparece el otro lado de la moneda:
+
+| | Ciudades grandes | Pueblos |
+|---|---|---|
+| Rechazo (0-G, 98 guías Heka) | 20-23% 🔴 | 7-11% ✅ |
+| Flete absorbido por venta (0-H) | ~$73-941 ✅ | **~$3.900-4.900** 🔴 |
+| Ventaja esperada por menor rechazo | — | ~$2.600/venta |
+| Costo del flete absorbido | — | ~$4.000/venta |
+
+→ **NETO: la ventaja de rechazo de los pueblos NO alcanza a pagar el flete que se absorbe.**
+⚠️ **Pero ambos números son de muestras chicas** (15 devoluciones · 6 guías caras). **No es ley.**
+**Lo que sí queda firme:** el criterio para expandir **no es "grande vs. pueblo"**, es
+**rechazo esperado − flete absorbido**, y hoy eso se puede calcular guía por guía con el tarifario.
+- ✅ **ACCIÓN CONCRETA Y BARATA:** subir el total al cliente en los destinos de flete ~$25.000
+  (de $80.000-81.000 a ~$84.000-85.000). Recupera $3.900-4.900 por venta. **El cliente de pueblo ya
+  demostró que compra igual y rechaza menos** → es el que mejor tolera un total un poco más alto.
+
+### 📞 PLATA EN RIESGO AHORA MISMO — 7 GUÍAS, $181.744 DE MARGEN
+
+| Ciudad | Estado | Recaudo | Margen |
+|---|---|---|---|
+| 🔥 **CARTAGENA DE INDIAS** (2 uds) | **Intento de entrega** | **$155.841** | **$48.981** |
+| POPAYÁN | Reclame en oficina | $82.827 | $24.457 |
+| REMEDIOS | Reclame en oficina | $81.030 | $20.501 |
+| INZÁ | Reclame en oficina | $80.061 | $19.604 |
+| MÁLAGA | Reclame en oficina | $80.000 | $19.547 |
+| BOGOTÁ, D.C. | Telemercadeo | $72.698 | $24.327 |
+| SOACHA | Telemercadeo | $72.698 | $24.327 |
+| **TOTAL** | | **$625.155** | **$181.744** |
+
+- **Con la publicidad ya gastada, fallar las 7 cuesta $226.642.**
+- 🔥 **CARTAGENA ES LA LLAMADA #1 DEL NEGOCIO:** es el pedido más grande de la ventana (2 unidades,
+  $48.981 de margen), **ya tiene un intento de entrega fallido**, y **Cartagena acumuló 2 de las 15
+  devoluciones del período Heka**. Máximo valor + máximo riesgo + señal de alarma ya encendida.
+- ⚠️ **"Telemercadeo" en Interrapidísimo NO es tránsito normal** — es la transportadora llamando al
+  cliente para resolver algo (dirección/coordinación). Bogotá y Soacha son entregas urbanas de 1-2 días
+  y llevan más: **tratarlas como novedad, no esperar.**
+- 📌 Estas 7 son **además** de las 21 guías de Heka de la sección 0-G (12 en "Para Reclamar en Oficina").
+  **Son dos frentes distintos y los dos caducan.**
+
+### 📉 DATO DE VOLUMEN (adelanta el chequeo del 17-ago)
+
+| Fecha | Guías |
+|---|---|
+| 10-ago | 3 |
+| 11-ago | 5 |
+| 12-ago | 6 |
+| 13-ago | **8** |
+| 14-ago | 4 |
+
+**Promedio 5,2 guías/día.** Antes del temblor vendía **10-12/día**.
+- ⚠️ **A 5 días del temblor el volumen NO ha vuelto al nivel previo.** El 13-ago (8) fue el mejor.
+- ⚠️ **NO CONCLUIR TODAVÍA:** guía despachada ≠ venta cerrada (hay lag de 1 día y se despacha de noche),
+  y el 14-ago puede estar incompleto. **Esto adelanta la pregunta del 17-ago, no la responde.**
+- 📌 Si el 17-ago sigue en 5-6 con ~87 conversaciones/día, **el guion de la sección 0-F aplica:**
+  clima → quincena → eventos → tiempo de respuesta → calidad de leads. **Ojo con el clima: la IA de
+  WhatsApp es nueva y nunca se ha medido su cierre contra el del dueño** — es una variable candidata
+  que antes no existía.
+
+### ❌ LO QUE ESTE ARCHIVO NO PUEDE RESPONDER
+- **CPA / costo por venta:** sigue faltando el **export de Meta con desglose POR DÍA**. Sin gasto
+  alineado por fecha no hay CPA, y el CPA es lo que se quería saber.
+- **Comisión por recaudo y días de pago:** no son campos del export. Solo 99 Envíos los tiene.
+
+---
+
+## 0-I. 🔴 EL CPA SE DETERIORÓ 72% Y EL CIERRE NO SE RECUPERÓ (Meta 5–14 ago, auditado 2026-08-15)
+
+**Fuente:** export de Meta 5–14 ago (10 días, nivel campaña) cruzado con las 26 guías de 99 Envíos.
+Datos en `/analisis/meta-5-14ago.csv`, script `/analisis/cpa-99envios.py`.
+✅ **El export se verificó internamente** (gasto/conversaciones, impresiones/alcance y gasto/clics
+reproducen exactamente los campos calculados) → los datos son consistentes.
+
+### 📊 LO QUE ESTÁ SANO: EL VOLUMEN
+
+| Métrica | Valor | Lectura |
+|---|---|---|
+| Gastado | $485.850 ($48.585/día) | 85,2% de la capacidad de $57.000 |
+| Conversaciones | **849 (84,9/día)** | ✅ **estable** (venía de 80,7 y 87,8/día) |
+| Costo/conversación | **$572** | ⚠️ +11,8% contra el mejor registro ($512) |
+| Clic→chat | 42,9% | ✅ estable (venía de 43,4%) |
+| Alcance | 68.882 | igual que antes (69.469) |
+
+- ✅ **EL TECHO DE LA CUENTA QUEDA CONFIRMADO CON 10 DÍAS: $48.585/día** (antes estimado en ~$47.800
+  con 6 días). **Más presupuesto NO se convierte en más gasto.** Crecer sigue siendo abrir ciudades.
+- ✅ Reconfirma **ABO** ("Con el presupuesto del conjunto de anuncios"). Tema cerrado.
+- ⚠️ CTR bajó a **1,63%** (venía de 1,78%) y CPC subió a **$246** (venía de $212-228). Deterioro leve.
+
+### ⚠️ FRECUENCIA 1,77 — **NO ES ALARMA** (y por poco se comete el error otra vez)
+
+El dato crudo dice 1,77 cuando la regla del archivo es "sana < 1,5". **Pero esta ventana es de 10 días
+y todas las anteriores eran de 7.** La frecuencia **crece con el largo de la ventana** (mismas personas,
+más días). Escalar el 1,31 de 7 días a 10 días daría **~1,87** si el alcance no creciera; el dato real
+es **1,77, MENOR que eso** → el alcance sigue creciendo y **la audiencia NO está saturada.**
+→ **REGLA NUEVA: nunca comparar frecuencias de ventanas de distinto largo sin normalizar.**
+Es la misma familia de error que la sección 11 documenta en "muestras pequeñas".
+
+### 🔴 EL CPA: DE $5.433 A ~$9.343 POR VENTA CERRADA (+72%)
+
+⚠️ **Es una ESTIMACIÓN, no una medición:** el export vino agregado (10 días) y las guías cubren solo
+5 días, así que el gasto del tramo 10–14 hay que repartirlo. Se resolvió con sensibilidad:
+
+| Share del gasto en 10–14 ago | Gasto | CPA cerrada | CPA entregada |
+|---|---|---|---|
+| 45% | $218.632 | $8.409 | $9.928 |
+| **50% (central)** | **$242.925** | **$9.343** | **$11.031** |
+| 55% | $267.218 | $10.278 | $12.134 |
+
+| Referencia (sección 0-G) | CPA cerrada | CPA entregada |
+|---|---|---|
+| Auditado 27 jul – 9 ago | $5.433 | $6.414 |
+| **Ahora** | **$9.343** | **$11.031** |
+| **Deterioro** | **+72%** | **+72%** |
+
+- ✅ **LA CONCLUSIÓN NO DEPENDE DEL SUPUESTO:** en todo el rango 45–55% el CPA queda entre $8.409 y
+  $10.278 — **siempre muy por encima de los $5.433 auditados.**
+- 💪 **SIGUE SIENDO RENTABLE:** equilibrio $23.674 → colchón **2,1×**. **Pero antes era 3,7×.**
+  El colchón se redujo casi a la mitad.
+
+### 🔴🔴 LA CAUSA: EL CIERRE CAYÓ A LA MITAD Y **NO SE RECUPERÓ EN 4 DÍAS**
+
+**Conversaciones estables (84,9/día) + ventas en 5,2/día = cierre 6,1%.**
+
+| Momento | Cierre |
+|---|---|
+| ronda 1 | 2,84% |
+| ronda 2 | 7,0% |
+| 27–31 jul | 8,3% |
+| 1–4 ago | 10,2% |
+| **5–10 ago (PICO)** | **~13%** |
+| 11 ago (temblor) | 6,7% |
+| **10–14 ago (AHORA)** | **6,1%** |
+
+🚨 **LA SECCIÓN 0-F ESCRIBIÓ EL CRITERIO DE ANTEMANO:** *"si siguen en 5-6 ventas con ~87
+conversaciones/día → hay algo ESTRUCTURAL"*. **Los datos: 5,2 ventas/día con 84,9 conversaciones/día.**
+→ **Coincide con el escenario "estructural", y ya no son 2 días: son 4.**
+
+> ⚠️⚠️ **CORRECCIÓN DEL DUEÑO (2026-08-14): ESTE PUNTO SE ESCRIBIÓ CON UN ERROR DE FECHA.**
+> La primera versión decía *"la quincena del 15 ya pasó"* para descartarla y dejar a la IA como
+> hipótesis #1. **ERA FALSO: en Colombia era el 14 de agosto — la quincena era AL DÍA SIGUIENTE.**
+> **Causa del error: el sandbox corre en UTC y ya marcaba 15-ago; la hora local de Colombia es UTC−5.**
+> 📌 **REGLA PERMANENTE: verificar siempre la fecha en `TZ=America/Bogota` antes de razonar sobre
+> quincenas, días de la semana o "hoy". Un día de corrimiento invierte el diagnóstico.**
+>
+> **Consecuencia grave:** la ventana medida (10–14 ago) **cae COMPLETA en el valle de menos efectivo
+> del mes**, justo antes del pago del 15. Y en contraentrega **el cliente necesita ~$60.000 EN EFECTIVO
+> el día que llega el mensajero.** Hay una explicación competidora que cubre los 5 días **sin necesidad
+> de culpar a la IA.**
+
+**Y NO ES META:** volumen intacto, frecuencia sana, clic→chat estable. **El problema está DESPUÉS del
+clic**, igual que el 11-ago.
+
+> 🔴🔴 **LEER PRIMERO LA SECCIÓN 0-K.** Apareció una hipótesis **(E)** que explica **todas** las
+> observaciones a la vez, incluida la que ninguna otra explica (volumen estable + cierre a la mitad):
+> **el denominador del "cierre" está contaminado con toques de botón vacíos.** Las hipótesis de abajo
+> **pasan a segundo plano** hasta que (E) se mida.
+
+### ⚖️ DOS HIPÓTESIS SUPERPUESTAS QUE HOY SON **INDISTINGUIBLES** (no rankearlas)
+
+**(A) EL CICLO DE PAGO (quincena).** Script: `/analisis/ciclo-quincena.py`.
+
+| Lo que se puede afirmar | |
+|---|---|
+| La ventana 10–14 ago | cae **completa** en el valle pre-pago (no un pedazo: los 5 días) |
+| El pico de ~13% (5–10 ago) | cae en el tramo **post-pago** del 30-31 jul + primeros días |
+| Entonces "pico y luego valle" | es **exactamente** lo que predice el ciclo de pago |
+
+⚠️ **PERO NO ESTÁ PROBADO.** Se intentó falsear con el historial de Heka (15 jul – 9 ago) y
+**el historial no alcanza:**
+- **La campaña estuvo PAUSADA del 17 al 26 de julio** → borra justo la ventana 15-20 jul, que era el
+  único tramo post-quincena limpio para comparar. Queda solo el pago del 30-31 jul.
+- **El presupuesto subió durante el período** ($30k → $36k → $45k → $57k) → las guías/día crecen por
+  razones ajenas a la quincena.
+- **El cierre venía subiendo solo** (2,84% → 7% → 8,3% → 10,2%) por el flujo nuevo y la prueba social.
+- **Se despacha por lotes** (0 guías un domingo, 14 el lunes) → el conteo diario mide despacho, no demanda.
+- 🔻 **Y el corte crudo apunta EN CONTRA:** valle pre-pago **9,3 guías/día** vs. post-pago **7,8**.
+  Está contaminado (el 27-jul tiene 19 guías por la reactivación, el 9-ago tiene 18 por lote), pero
+  **hay que decirlo: no hay ni un dato que respalde la quincena.** Es una hipótesis plausible, no un hecho.
+
+**(B) ~~LA IA DE WHATSAPP CIERRA PEOR QUE EL DUEÑO~~ → 🔻 DESCARTADA (2026-08-14)**
+
+> ⚠️ **ESTA HIPÓTESIS SE PUSO COMO "#1" BASÁNDOSE SOLO EN QUE LAS FECHAS COINCIDÍAN. El dueño precisó
+> cómo usa la IA y la hipótesis se cae por dos motivos distintos:**
+>
+> **1. Está supervisada, siempre.** El dueño **nunca la deja sola**: monitorea mientras responde y
+> **reescribe a mano** a los que se enfrían. No hay un tramo donde la IA decida sola el cierre.
+>
+> **2. 🔑 LA CORRELACIÓN VA AL REVÉS DE LO QUE LA HIPÓTESIS NECESITA.** La IA **se activa cuando el
+> flujo SUBE** (es una válvula de capacidad, no un turno fijo). Entonces **estuvo MÁS activa en los
+> días de más volumen — que son justamente los del pico de cierre del 13%** — y menos en los días
+> flojos del valle. **Si la IA dañara el cierre, el patrón tendría que ser el opuesto al observado.**
+> Este punto solo no la absuelve: **la refuta.**
+>
+> 📌 La IA **ayuda a cerrar por velocidad** (responder al instante, sin cola). Es aditiva.
+> **No volver a abrir esta hipótesis sin un dato nuevo de verdad** (cierre con IA activa vs. sin IA).
+>
+> 🧠 **LECCIÓN DE MÉTODO — ES LA CUARTA VEZ (ver sección 11):** se construyó una hipótesis fuerte sobre
+> una **coincidencia de fechas**, sin verificar **cómo funciona la operación en la práctica.** Peor: el
+> archivo describía la IA como "atendiendo 24/7 y absorbiendo volumen" y eso **se dio por cierto sin
+> preguntar** — y después se sobrecorrigió al extremo opuesto ("solo de noche"), que **también** era una
+> inferencia inventada. **Antes de acusar a un componente del negocio, preguntar cómo se usa.
+> Y no reemplazar una suposición por otra.**
+
+**(C) EL CLIMA — la que el propio archivo pone PRIMERA y nadie ha revisado.** 🌧️
+La sección 0-F dice textual: *"clima (¡vende impermeables, depende de que llueva!)"* como **primer**
+punto del orden de revisión cuando el volumen es normal y el cierre cae. **No se ha mirado ni una vez.**
+- Es el único factor que afecta **la intención de compra sin afectar el clic** — encaja perfecto con la
+  firma del problema (conversaciones normales, cierre a la mitad).
+- **Es gratis de verificar:** ¿llovió menos en la semana del 10-14 ago en Bogotá / Medellín / Costa?
+- 📌 **Sube a hipótesis co-principal junto con la quincena.**
+
+**(D) EL TIEMPO DEL DUEÑO SE LO COMIÓ LA OPERACIÓN, no la falta de IA.** ⚠️ *(hipótesis nueva)*
+En esos mismos días el dueño estuvo: cerrando cabos con Heka (retiro de **$2.788.601** + 7 novedades),
+migrando a 99 Envíos, y haciendo **seguimiento a los aplazados del temblor**.
+- **El que cierra las ventas es él.** Si su tiempo se fue en operación y logística, **el cierre baja
+  aunque la IA funcione perfecto y aunque haya llovido.**
+- 🔑 **Encaja con todo lo demás:** explica por qué el volumen sigue igual (los anuncios corren solos) y
+  por qué el cierre cae (el cierre es manual y depende de sus horas).
+- **Pregunta directa al dueño, no requiere datos:** *¿cuántas horas pudiste dedicarle a vender del 11 al
+  14, comparado con la semana del pico?*
+
+**🔀 Y las cuatro conviven con el TEMBLOR.** Son **5 variables en 4 días** — exactamente la situación
+que el congelamiento del 17-ago existe para desenredar.
+
+### 🔬 LA PREDICCIÓN QUE SEPARA LAS HIPÓTESIS (y no cuesta nada)
+
+**El 15-ago entra la quincena.** A partir de ahí:
+
+| Qué pasa con el cierre | Qué significa | Qué hacer |
+|---|---|---|
+| **Rebota a 10-13% en 1-3 días** | era el **CICLO DE PAGO** (A) | ✅ **no tocar nada**, y anotar la quincena como variable de planeación |
+| **Sigue en ~6%** con volumen normal | la quincena **no** era la causa | 🔍 pasar a **(C) clima** y **(D) horas de venta del dueño** — las dos se responden **preguntando o mirando el pronóstico, sin tocar la campaña** |
+
+⚠️ **Y las dos preguntas de (C) y (D) se pueden hacer YA, hoy, sin esperar al 17:** no requieren datos
+nuevos ni mover nada. **Son las dos cosas más baratas pendientes de todo este análisis.**
+
+- ✅ **El chequeo del 17-ago cae 2 días después del pago: es el momento exacto para leerlo.**
+  **El congelamiento no solo no molesta, AYUDA.**
+- 💪 **Esperar no cuesta nada:** a 5,2 ventas/día el negocio gana ~$65.000/día, **2,4× sobre el
+  equilibrio.** No hay urgencia que justifique adivinar.
+- ⚠️ **OJO AL LEER EL REBOTE:** el rebote de quincena y el rebote post-temblor **también se superponen.**
+  Si rebota, no se sabrá cuál de los dos fue.
+  🔑 **PARA ESO SIRVE EL SIGUIENTE VALLE (26-29 ago):** si el cierre **vuelve a caer ahí**, el ciclo de
+  pago queda **demostrado** y pasa a ser una **variable permanente de planeación** (presupuesto y
+  despacho modulados por quincena), no una excusa de una sola vez.
+
+**💰 EL TAMAÑO DEL PROBLEMA:**
+
+| Concepto | Valor |
+|---|---|
+| Utilidad por venta entregada AHORA | $12.576 |
+| Utilidad por venta entregada ANTES | $18.019 |
+| Caída por venta | **−$5.443 (−30%)** |
+| A 13% de cierre serían | **11,0 ventas/día** (vs. 5,2) |
+| **Costo de no volver al pico** | **$73.406/día ≈ $2,2 MILLONES/MES** |
+
+- ✅ **CRUCE DE VALIDACIÓN:** este cálculo da **$65.395/día** de utilidad actual; la sección 0-F estimó
+  **~$69.000/día** por una vía completamente distinta. **Las dos coinciden** → los números son sólidos.
+- 💪 **SIN RIESGO DE PÉRDIDA:** equilibrio ~2,2 ventas/día, estás en 5,2 (**2,4×**).
+  **No es una emergencia de caja. Es $2,2 millones/mes de utilidad sobre la mesa.**
+
+### ⏸️ ¿ESTO ROMPE EL CONGELAMIENTO DEL 17-AGO? NO — Y HAY UNA RAZÓN
+
+El congelamiento existe para **no mover más variables** mientras se asientan la IA + la
+transportadora + el temblor. **Este hallazgo no pide mover ninguna palanca de campaña.**
+Pide **MEDIR**, que es justo lo contrario.
+- ✅ **Se puede hacer sin romper nada:** el dueño **atiende a mano 1-2 días** y se mide el cierre
+  contra los días de la IA. **Es el test más barato y directo del negocio**, y separa (a) de (b).
+- ⚠️ **NO tocar presupuesto, creativos ni conjuntos** hasta tener esa respuesta. **Si el problema es
+  el cierre, subir presupuesto solo compra conversaciones más caras que tampoco cierran.**
+
+### ❌ LO QUE ESTE EXPORT TODAVÍA NO PERMITE (vino a nivel campaña, 1 sola fila)
+- **Desglose POR DÍA** → sin él el CPA de arriba es estimado, no medido.
+- **Desglose POR CONJUNTO** → **no se puede calcular EL TERMÓMETRO** (Domiciliarios ÷ Motorizados),
+  que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
+  **Es la pérdida más dolorosa de este export.**
+- **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-L. 🎉 VEREDICTO DEL 19-AGO: HUBO REBOTE. ERA EL CICLO DE PAGO (+ EL SEGURO CONFIRMADO)
+
+**Fuente:** export 99 Envíos del 19-ago (53 guías, 13-18 ago) + Meta 14-19 ago (528 conv, $281.820).
+Script: `/analisis/veredicto-19ago.py`. Datos: `/analisis/guias-99envios-19ago.csv`.
+
+### 🔑 PRIMERO: UNA TRAMPA METODOLÓGICA QUE CASI ARRUINA EL CÁLCULO
+**NO SE DESPACHA FIN DE SEMANA.** Guías por día (hora Colombia): jue 13 → 8 · vie 14 → 4 ·
+**sáb 15 → 0 · dom 16 → 0** · lun 17 → 9 · **mar 18 → 32**.
+El export anterior también era lunes a viernes (10-14 ago) → **patrón confirmado.**
+→ **Las 41 guías del 17-18 son las ventas acumuladas del sábado, domingo, lunes y martes.**
+⚠️ Contar "guías por fecha de despacho" habría dado **20,5 ventas/día** (falso alto) o **0 el sábado**
+(falso bajo). **Siempre repartir el lote sobre los días de venta que representa.**
+
+### ✅ EL VEREDICTO
+
+| Métrica | Valle 10-14 ago | **15-18 ago** | Cambio |
+|---|---|---|---|
+| **Ventas/día** | 5,2 | **10,25** | **+97%** ✅ nivel pre-temblor (10-12) |
+| **Tasa de cierre** | 6,1% | **9,4%** | **+53%** |
+| Conversaciones/día | 84,9 | **109,5** | +29% |
+| **CPA venta cerrada** | $9.343 | **$5.702** | **−39%** |
+| **CPA venta entregada** | $11.031 | **$6.732** | −39% |
+| Colchón sobre equilibrio | 2,1× | **3,5×** | |
+| **Utilidad/día** | ~$65.000 | **~$153.676** | **+136%** |
+
+- ✅ **EL CPA VOLVIÓ AL NIVEL AUDITADO** ($5.702 vs los $5.433 de la referencia 27jul-9ago).
+  **El deterioro del +72% se borró.**
+- 🎯 **CRITERIO CUMPLIDO EN LO QUE IMPORTA:** el umbral escrito de antemano era "cierre 10-13%".
+  Salió **9,4%** — a un pelo. **Pero las VENTAS/DÍA volvieron completas (10,25 vs 10-12 pre-temblor)**,
+  y ese es el indicador de negocio, no el ratio.
+
+### 🔍 EL MATIZ: VOLVIERON LAS VENTAS, NO EL CIERRE DEL PICO — Y ESO ES BUENO
+**Las conversaciones subieron 29% y las ventas 97%.** El cierre no llega al 13% del pico porque
+**entró MÁS gente** y parte de esa gente extra convierte peor. **Es escalamiento, no deterioro.**
+→ 📌 **LECCIÓN: el cierre es un RATIO y puede bajar mientras el negocio mejora.** Perseguir el 13%
+recortando volumen habría sido un error. **El objetivo es utilidad/día, no la tasa.**
+
+### 💥 EL TECHO DE $48.585/DÍA SE ROMPIÓ
+Gasto 15-18 ago: **$58.445/día** (vs los $48.585 que se habían declarado como techo estable con 10
+días de datos). **Con capacidad de $57.000 configurada, eso es >100%** → Meta compensó por promedio
+semanal. **La conclusión "más presupuesto no se convierte en más gasto" queda DESMENTIDA.**
+→ **Hay espacio para escalar que no existía en el diagnóstico anterior.**
+
+### 🚨🚨 HALLAZGO GRANDE: EL SEGURO 99 QUEDÓ CONFIRMADO CON DATOS REALES
+Aparecieron **las 2 primeras devoluciones** con 99 Envíos, y en ellas **el `valor_servicio` cambió:
+ya no cobran el flete, cobran SOLO la prima.**
+
+| Ciudad | Flete normal | **Cobrado** | Prima | **Ahorro** |
+|---|---|---|---|---|
+| BOGOTÁ, D.C. | $12.871 | **$1.742** | $1.742 | **$11.129** |
+| SANTA MARTA | $22.793 | **$3.111** | $3.111 | **$19.682** |
+
+- ✅ **EN UNA DEVOLUCIÓN SOLO SE PAGA LA PRIMA. El flete de ida Y vuelta queda cubierto COMPLETO.**
+  **Es MEJOR de lo que estimaba la sección 0-H.**
+- **Ahorro promedio por devolución: $18.574.** A 15,3% de rechazo = **$2.842 por guía despachada**
+  = **~$852.524/mes** a 300 ventas. (La estimación de 0-H decía $802.172/mes — **acertó.**)
+- ✅ **LA PREGUNTA 3 DEL PENDIENTE #28 QUEDA RESPONDIDA CON DATOS.** No hay que preguntarle nada más
+  a 99 Envíos sobre el seguro. **El cambio de transportadora fue una decisión claramente correcta.**
+
+### 📌 RECHAZO: 2 DE 7 RESUELTAS (29%) — **NO CONCLUIR NADA**
+Muestra minúscula. **Pero el patrón sí importa: las 2 devoluciones son BOGOTÁ y SANTA MARTA, las dos
+CIUDADES GRANDES** → van 2 datos más al lado de la sección 0-G (ciudades 20-23% vs pueblos 7-11%).
+
+### ⚠️ 5 GUÍAS QUE NECESITAN ACCIÓN HOY — $113.458 DE MARGEN
+
+| Fecha | Ciudad | Margen | Problema |
+|---|---|---|---|
+| 13-ago | GÓMEZ PLATA | $20.501 | 🔴 **"Recolección programada" — 99 ENVÍOS NUNCA LA RECOGIÓ EN 6 DÍAS** |
+| 13-ago | BOGOTÁ | $24.327 | Telemercadeo sin resolver (6 días) |
+| 13-ago | IPIALES | $23.459 | en tránsito 6 días, muy lento |
+| 14-ago | GUACHENÉ | $20.501 | Reclame en oficina (5 días) |
+| 14-ago | SOLEDAD | $24.670 | trabada en procesamiento (5 días) |
+
+🔴 **La de GÓMEZ PLATA es la más grave y es culpa de la transportadora:** el cliente está esperando y
+**el paquete nunca salió.** Reclamar hoy — y es la primera falla operativa de 99 Envíos.
+
+### ⏳ LO QUE SIGUE SIN RESOLVERSE (como estaba previsto)
+**El rebote coincide con la quincena Y con el fin del efecto temblor. Los dos se superponen, así que
+no se puede saber cuál pesó más.** → **El test definitivo sigue siendo el valle del 26-29 ago:**
+si el cierre vuelve a caer ahí, el ciclo de pago queda demostrado y pasa a ser variable permanente de
+planeación. **Faltan ~7 días.**
+- 📉 **(C) clima y (D) horas de venta quedan en pausa**, no descartadas: no hicieron falta para
+  explicar esto.
+- 📊 **(E) las conversaciones vacías siguen siendo un hallazgo válido** (57,8% el 14-ago) pero **NO
+  era la causa de la caída** — arregla cómo se MIDE el costo, no explica el bajón.
+
+---
+
+## 0-K. 🔴🔴 HIPÓTESIS (E) — EL "CIERRE" ESTÁ MAL MEDIDO: EL DENOMINADOR ESTÁ CONTAMINADO
+
+**MEDIDO POR EL DUEÑO SOBRE EL 14-AGO: de 90 conversaciones, 52 fueron solo el toque del botón
+(57,8%) y 38 fueron conversaciones reales (42,2%).**
+Scripts: `/analisis/conteo-vacias-14ago.py` (la medición) y `/analisis/conversaciones-vacias.py`
+(la sensibilidad).
+
+### ✅ VALIDACIÓN QUE LE DA PESO AL DATO
+El dueño contó **90 conversaciones** el 14-ago; Meta reporta **84,9/día** de promedio (+6%).
+**Los dos números coinciden → el conteo manual mide LO MISMO que Meta llama "conversación iniciada".**
+Por eso el 57,8% **se puede aplicar legítimamente al denominador de Meta**; no son dos cosas distintas.
+
+### ✅ LO QUE ESTA MEDICIÓN SÍ RESUELVE
+
+| | |
+|---|---|
+| Costo por "inicio de conversación" | $540 |
+| **Costo por conversación REAL** | **$1.279** |
+| Corrección | **×2,4** |
+
+- 🔑 **El costo por conversación que se usó todo este tiempo ($512-572) subestima 2,4× el costo real
+  de hablar con una persona.** Toda comparación histórica de "costo/conversación" mide una mezcla,
+  no un costo.
+- **Gasto que no produce nada medible:** 52 × $540 = **$28.071 el 14-ago** ≈ **$842.000/mes**.
+  No es todo recuperable (algo es inevitable en el canal), pero **bajar los vacíos de 58% a 40%
+  liberaría ~$259.000/mes de gasto efectivo.**
+- ✅ **El cierre sobre gente real es mucho mejor de lo que parecía:** el 14-ago fue **4,4% crudo**
+  (4 guías/90) pero **10,5% sobre conversaciones reales** (4/38).
+
+### 🚨 LO QUE **NO** RESUELVE — Y ES JUSTO LA PREGUNTA QUE IMPORTA
+La pregunta era **¿SUBIÓ** la proporción de vacíos entre el pico y el valle? **Eso necesita DOS
+mediciones y hay UNA.** Si la tasa fuera la misma en las dos ventanas, el cierre real sería 14,5% en
+el valle y 30,8% en el pico → **los dos suben y la caída sigue intacta.**
+→ **UNA TASA CONSTANTE NO EXPLICA UNA CAÍDA. Solo un CAMBIO la explica.**
+⚠️ **Y "tomémoslo como el peor día" no sirve de atajo:** si el 14-ago fuera el peor eso *apoyaría* la
+hipótesis, pero **suponerlo es exactamente el error que ya se cometió dos veces acá.**
+
+### 🔍 HALLAZGO NUEVO (lo aportó el dueño al explicar por qué no puede medir hacia atrás)
+**Hace seguimiento/remarketing manual al día siguiente y a los dos días**, así que en la lista de
+WhatsApp un día acumula ~300 mensajes que **mezclan conversaciones nuevas con su propio seguimiento a
+chats viejos.**
+- ⚠️ **IMPLICACIÓN METODOLÓGICA: las ventas de un día NO salen de las conversaciones de ese día.**
+  Salen de una **cola de varios días** que el dueño trabaja activamente. → **"ventas del día ÷
+  conversaciones del día" es ruidoso; el cierre solo se lee en ventanas de ≥5 días del mismo largo.**
+- 💡 **Y es una buena noticia escondida:** hay un **motor de recuperación manual** funcionando. El
+  seguimiento del temblor ya había mostrado que rescatar no-cerrados es la acción de mayor retorno;
+  esto confirma que es **parte del proceso normal**, y que el cierre real del negocio **incluye** ese
+  rescate.
+
+### 🔑 CÓMO CONSEGUIR LA SEGUNDA MEDICIÓN (sin pelear con el apelmazamiento)
+**Un chat vacío no tiene NI UN mensaje del cliente, nunca** → se ve completo en una pantalla y la
+fecha del primer mensaje dice de qué día es. **No hay nada que desapelmazar: un chat vacío no pudo
+recibir remarketing conversado.**
+- **OPCIÓN A (retro, ~20 min):** buscar los chats cuyo último mensaje sea un seguimiento automático,
+  abrir ~40 y anotar la fecha del primer mensaje → sale la tasa del pico (5-10 ago).
+- ✅ **OPCIÓN B (hacia adelante, 5 min/día — LA MEJOR):** seguir contando igual que el 14-ago, una
+  semana. **La quincena entró el 15.** Si el cierre rebota y los vacíos **no** cambian → era la
+  quincena. Si el cierre rebota **y** los vacíos bajan → era la mezcla. **Separa las dos hipótesis sin
+  ambigüedad, y ya hay línea base (57,8%).**
+
+> ⚠️ **ESTA HIPÓTESIS SE HABÍA DADO POR REFUTADA EN LA SECCIÓN 0-J, Y ESE TEST NO VALÍA.** Salió "6%
+> de vacíos" sobre una muestra que **el dueño eligió por tener información, excluyendo a propósito los
+> vacíos.** **Testear una hipótesis con la muestra que garantiza el resultado es peor que no testearla:**
+> deja una conclusión falsa escrita con apariencia de dato. **Es el quinto error de método de la serie
+> (ver sección 11) y el más grave, porque el sesgo era conocido de antemano.**
+
+### 🔑 EL PROBLEMA DE FONDO
+Lo que Meta cuenta como "conversación iniciada" **es un toque en el botón del anuncio.** No requiere
+que la persona escriba una palabra. **Entonces el "cierre" = ventas ÷ toques de botón, no ventas ÷
+conversaciones.** Si cambia la proporción de toques vacíos, **el cierre se mueve solo, sin que nada del
+negocio haya cambiado.** Es un problema de **MEZCLA**, no de venta.
+
+### 📊 CIERRE REAL SEGÚN CUÁNTOS SEAN VACÍOS (ventana 10-14 ago: 424 "conv." · 26 ventas)
+
+| % vacíos | Conversaciones reales | **Cierre real** | |
+|---|---|---|---|
+| 0% | 424 | 6,1% | (lo que se reportó) |
+| 20% | 340 | 7,7% | |
+| **40%** | 255 | **10,2%** | nivel de 1-4 ago |
+| **50%** | 212 | **12,2%** | |
+| **60%** | 170 | **15,3%** | **supera el pico** |
+| 70% | 127 | 20,4% | |
+
+**¿Cuánto tendría que haber cambiado la mezcla para explicar TODO?**
+Si en el pico ~25% eran vacíos y en el valle subieron a **~65%**, **la caída de 13% a 6,1% queda
+explicada completa** — sin que se haya roto la IA, ni el guion, ni el clima, ni la quincena.
+⚠️ **Es un cambio de mezcla grande. Hay que medirlo, no asumirlo.**
+
+### ✅ POR QUÉ ES LA MEJOR HIPÓTESIS: EXPLICA LO QUE NINGUNA OTRA EXPLICA
+
+| Observación | Cómo la explica (E) |
+|---|---|
+| 🔑 **El volumen NO cayó (84,9/día)** | Meta sigue entregando los mismos "inicios" |
+| 🔑 **Pero el cierre se cayó a la mitad** | **cambió la composición**, no la cantidad |
+| Costo/conversación +11,8% ($512→$572) | se paga más por tráfico de peor calidad |
+| CTR bajó y CPC subió | público más amplio = menos calificado |
+| Clic→chat cayó 53% → 43% | **ya estaba documentado y apunta al mismo lado** |
+| Nada en la operación parece roto | **porque nada está roto** |
+
+🔑 **EL MECANISMO YA ESTABA ESCRITO EN ESTE ARCHIVO** (secciones 0 y 11): *"Meta salió a públicos más
+amplios (alcance 18.362 → 52.074 → 69.469) y al ir más lejos entra gente menos calificada."*
+**Se documentó como "normal al escalar y no grave".** → **Si eso llena el embudo de toques vacíos, SÍ
+es grave: es exactamente el mecanismo que tumba el cierre.** El dato estaba y no se conectó.
+
+### ⚡ LO QUE CAMBIA SI SE CONFIRMA
+- **(a) El CPA está mal medido.** Costo por conversación **real**: **$954** con 40% de vacíos, **$1.431**
+  con 60% — no $572.
+- **(b) El problema NO está después del clic: está EN el clic.** Vuelve a ser un problema de Meta.
+- **(c) El arreglo NO es el guion ni la IA: es la SEGMENTACIÓN** — acotar público, o cambiar el evento
+  de optimización para que Meta deje de comprar toques baratos que no conversan.
+- **(d) (A) quincena, (C) clima y (D) horas del dueño pasan a segundo plano:** ninguna explica que el
+  volumen se mantenga estable mientras el cierre se parte al medio.
+
+### 📏 CÓMO MEDIRLO — UN CHAT VACÍO TIENE FIRMA VISUAL
+En la lista de WhatsApp, **el último mensaje de un chat vacío es un seguimiento automático del negocio**
+(*"¿Te resuelvo alguna duda…"*, *"Aún tengo tu color disponible"*). **El cliente nunca es el autor del
+último mensaje.**
+1. **5 MINUTOS, SIN EXPORTAR NADA:** contar en la lista, para un rango de fechas, cuántos terminan en un
+   seguimiento automático. **Un conteo aproximado ya decide:** la diferencia entre 20% y 60% se ve a
+   simple vista.
+2. **RIGUROSO:** exportar ~40 chats **por recencia pura, sin mirar el contenido.** Al no elegirlos, la
+   tasa sale limpia. **Y lo mismo para la ventana del pico (5-10 ago)** → ahí está la comparación que
+   cierra el caso.
+3. **DEFINITIVO:** conectar la Cloud API → la métrica se calcula sola todos los días.
+
+---
+
+## 0-J. 💬 PRIMER ANÁLISIS DE LOS CHATS DE WHATSAPP (47 chats, 24 jul – 14 ago) — 2026-08-14
+
+**Por fin hay datos del hueco del medio.** Todo el análisis previo medía antes del clic (Meta) o
+después de la venta (guías). **Resultados completos: `/analisis/resultados-chats-whatsapp.md`.**
+Chats crudos y scripts en el repo **privado** `bikerpro-chats-privado` (traen datos de clientes).
+⚠️ **Muestra VARIADA, no aleatoria** → sirve para **defectos**, no para tasas.
+
+### 🔴 HALLAZGO PRINCIPAL: EL GUION PROMETE UN ENVÍO QUE NO EXISTE — Y ESO CAUSA LA FUGA DE 0-H
+
+**20 de 47 chats (43%)** dicen *"el envío tiene un costo de **$15.000 a $20.000**"*.
+**El flete real de las 26 guías va de $12.871 a $35.860.**
+
+🔑 **CIERRA UN CÍRCULO QUE ESTABA ABIERTO:** la sección 0-H encontró que se absorben **$3.900-4.900
+de flete** en destinos caros y no se sabía por qué. **La causa es esta: el guion ya prometió un total
+bajo, así que cuando el flete real llega a $25.000-35.000 hay que comerse la diferencia.**
+**No era un problema de tarifario — era el guion generando la deuda antes de cotizar.**
+- Y del lado del rechazo: prometer $20.000 y que el mensajero cobre $35.000 **es exactamente la
+  sorpresa que hace que el cliente no reciba** → conecta con el **15,3%**.
+- ✅ **ARREGLO:** que el guion **no dé rango**; que pregunte ciudad y **cotice el flete real**, o que
+  diga el techo verdadero. **Esto cambia el orden del pendiente #35: primero el guion, después el tarifario.**
+
+### 🔴 SE MANDA EL CUADRO DE CONFIRMACIÓN CON LOS CAMPOS EN BLANCO
+**17 de 47 chats (36%)** mandan la plantilla **sin rellenar** (`• Color: ___ · Talla: ___`,
+`• Dirección: ___`) y le piden "SÍ CONFIRMO" a un pedido vacío — **justo en el momento del cierre**,
+que es el paso que el archivo identifica como palanca. **Es el defecto más fácil de arreglar.**
+
+### 📊 LA CONVERSACIÓN SE DECIDE EN COLOR Y TALLA, NO EN PRECIO
+De los 44 que escribieron: **color 77% · talla 64%** · envío 20% · fotos 16% · contraentrega 11% ·
+2+ unidades 9% · dinero/quincena 7% · precio caro 5% · clima 2% · **desconfianza 0%**.
+- 🔑 **El precio casi no se objeta y la desconfianza es CERO.** Los dos miedos que el archivo asumía
+  **no aparecen** → la prueba social ya hizo su trabajo. **Dejar de optimizar por ahí.**
+- ⚠️ **77% pregunta por COLOR y no hay fotos de blanco ni morado** (sección 9). Revisar si se están
+  perdiendo conversaciones por colores que no se pueden mostrar.
+- 💡 **9% pide 2 unidades sin que se lo ofrezcan**, pero **solo 4 chats muestran la oferta del
+  descuento** → palanca desaprovechada (coherente con el 16% de la sección 0-G).
+- ✅ **La velocidad NO es el problema:** los 47 chats tienen primera respuesta en **< 2 minutos**.
+- ⚠️ **Atribución por creativo IMPOSIBLE hoy:** Facebook e Instagram usan **el mismo texto de
+  apertura**. **Confirma el pendiente #32 y da la solución: un texto de apertura distinto por anuncio.**
+
+### ❌ TRES HIPÓTESIS MÍAS QUE ESTOS DATOS MATARON (quedan escritas a propósito)
+| Hipótesis | Realidad |
+|---|---|
+| ~~"Muchas conversaciones son toques de botón vacíos"~~ | 🔄 **NO REFUTADA — EL TEST ESTABA MAL HECHO.** El "6%" salió de una muestra que el dueño **eligió por tener información, excluyendo a propósito los vacíos.** Testear una hipótesis con la muestra que garantiza el resultado **es peor que no testearla.** El dueño confirma que **hay muchísimos chats vacíos.** → **PASA A SER LA HIPÓTESIS PRINCIPAL: ver sección 0-K.** |
+| "Se perdió el CIUDAD PRIMERO del PR #19" | ❌ **5 de 47, dispersos** — variación, no regresión. Se concluyó desde **2** archivos y se refutó con 47 |
+| "39% quedan sin respuesta = $415.000 tirados" | ❌ **artefacto de la métrica**: 15 de 18 eran el cliente diciendo "Ok/Gracias". Fuga real: **1 de 44** |
+
+🧠 **Y sobre las hipótesis de 0-I:** en lo que los clientes escriben, **quincena 7% · clima 2%**.
+Es **la primera evidencia directa**, es débil por tamaño, y **apunta ligeramente EN CONTRA de ambas.**
+
+### 📌 SIGUIENTE TANDA (para medir tasas, no defectos)
+1. **Muestra ALEATORIA, no elegida** → medir sin sesgo el % de toques de botón vacíos.
+2. **~30 del pico (5-10 ago) + ~30 del valle (10-14 ago)** → la comparación que puede cerrar el 0-I.
+3. **Chats que terminaron en DEVOLUCIÓN** → ver si la sorpresa del flete aparece ahí. **Es la conexión
+   más valiosa que quedó abierta.**
 
 ---
 
@@ -852,22 +1532,42 @@ creativos nuevos en el mismo conjunto del ganador: no se mostrarían.**
 
 ---
 
-## 5-B. ✅ LA IA QUE SÍ ESTÁ ATENDIENDO (desde ~2026-08-12)
+## 5-B. ✅ LA IA QUE SÍ ESTÁ ATENDIENDO (desde ~2026-08-12) — ALCANCE REAL, CORREGIDO EL 2026-08-14
 
 **El dueño resolvió la atención automática con la IA nativa de WhatsApp Business (Meta AI), NO con el
 bot propio de `/bot`.**
+
+> ✅ **CÓMO SE USA DE VERDAD (precisado por el dueño el 2026-08-14). LEER ESTO ANTES DE ANALIZARLA:**
+> - **Se activa CUANDO EL FLUJO SUBE** y también mientras el dueño duerme. **Es una VÁLVULA DE
+>   CAPACIDAD que se abre cuando hace falta**, no un turno fijo.
+> - **EL DUEÑO NUNCA LA DEJA SOLA.** Monitorea las conversaciones mientras la IA responde.
+> - **Reescribe a mano** a los que dejaron de responder y a los que se enfriaron.
+> - **Le ha AYUDADO a cerrar ventas por velocidad** (responder al instante, sin cola).
+>
+> **→ Las dos cosas a la vez: SÍ absorbe volumen (por eso se puede recibir más tráfico) Y está
+> supervisada.** No es "IA sola" ni es "solo de noche". **Es capacidad elástica con humano encima.**
+> ⚠️ **Una versión anterior de esta sección dijo "solo la usa mientras duerme" y degradó el freno del
+> tiempo a PARCIAL. Estaba mal: eso era una inferencia, no lo que dijo el dueño. Queda RESUELTO.**
 
 | | |
 |---|---|
 | Qué usa | **IA de WhatsApp Business / Meta AI** |
 | Configuración | Cargada por el dueño con el catálogo y las condiciones del negocio |
-| Handoff | ✅ **Cuando no puede responder algo, le avisa y entra él** |
+| **Cuándo se activa** | **cuando sube el flujo** + mientras el dueño duerme → **válvula de capacidad** |
+| **Supervisión** | 🔑 **SIEMPRE. El dueño lee las conversaciones y reescribe a mano a los que se enfrían. NUNCA se deja sola.** |
+| Handoff | ✅ Cuando no puede responder algo, le avisa y entra él |
 | Ventaja clave | **No depende de la verificación de Meta** que lleva semanas trancada, ni de Render, ni del cupo de Gemini |
 
-- 🎉 **CONSECUENCIA MÁS IMPORTANTE: el freno del "tiempo del dueño" QUEDÓ RESUELTO.** Era el más
-  difícil de los tres frenos del negocio. Ya no se pierden ventas por responder tarde de noche.
-- ✅ **El diseño híbrido es el correcto y hay que mantenerlo:** la IA para volumen y preguntas
-  repetitivas, el dueño para el que duda, objeta o necesita confianza. Ahí es donde se gana la venta.
+- 🎉 **EL FRENO DEL TIEMPO DEL DUEÑO ESTÁ RESUELTO, y en el sentido que importa: LA ATENCIÓN YA NO
+  LIMITA CUÁNTO TRÁFICO SE PUEDE RECIBIR.** Cuando llegan picos, se abre la válvula.
+  → **Consecuencia estratégica: abrir ciudades nuevas es viable. El techo NO es la atención**
+  (son inventario, caja y la geografía de Advantage+).
+- ✅ **El diseño híbrido es el correcto y hay que mantenerlo:** la IA absorbe volumen y da velocidad;
+  el dueño supervisa y entra donde se gana la venta (el que duda, objeta o necesita confianza).
+- ⚠️ **LA REGLA QUE NO SE NEGOCIA: no dejar la IA sola.** El valor del diseño está en la combinación.
+  Si alguna vez se propone "automatizar del todo para escalar", **eso rompe lo que hoy funciona.**
+- 📌 **Nunca se ha medido el cierre con IA activa vs. sin IA.** No es urgente ni sospechoso —la IA es
+  aditiva y supervisada— pero sería el dato que zanjaría cualquier duda futura sobre su aporte.
 - 📌 **NO BORRAR el bot propio de `/bot`.** Aunque nunca se conecte, `src/prompt.js` es **la fuente
   de verdad del conocimiento del negocio** (producto, colores de franja, fletes por ciudad, objeciones,
   flujo de ciudad primero, "SÍ CONFIRMO"). Si hay que reconfigurar o auditar la IA, se saca de ahí.
@@ -1066,19 +1766,73 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 26. [ ] ⏸️ **CONGELAMIENTO HASTA EL 2026-08-17 — NO TOCAR NADA.** Se movieron 3 variables a la vez
     (IA de WhatsApp + transportadora nueva + temblor) más la quincena. **Con 4 variables sueltas es
     imposible atribuir resultados.** Ni presupuesto, ni creativos, ni conjuntos, ni configuración de la IA.
-27. [ ] 📊 **EL 17-AGO: verificar el rebote.** Si las ventas volvieron a 10-12/día → era el temblor +
-    quincena, confirmado, y se pasa a la conversación de crecimiento. **Si siguen en 5-6 con ~87
-    conversaciones/día → hay algo estructural** y toca revisar en el orden de la sección 0-F.
-28. [ ] ❓ **Preguntar a 99 Envíos el % de comisión por recaudo** y **en cuántos días paga.**
-    Es lo único que descuenta margen directo. Referencia a batir en pagos: Heka pagaba en 1 día hábil.
+27. [x] 📊 ~~**EL 17-AGO: verificar el rebote.**~~ 🔴 **RESPONDIDO EL 15-AGO, Y LA RESPUESTA ES MALA:
+    NO HUBO REBOTE.** 5,2 ventas/día con 84,9 conversaciones/día = cierre **6,1%** (el pico era ~13%).
+    **Es literalmente el escenario "estructural" que este punto definió de antemano.** El CPA se
+    deterioró **+72%** ($5.433 → ~$9.343). **Ver sección 0-I.** → pasa a ser el punto **36**.
+36. [ ] 🔴 **EL 17-AGO (2 días después de la quincena): LEER SI EL CIERRE REBOTÓ.** Es el dato que
+    separa las dos hipótesis de la sección 0-I, y **hay que esperarlo antes de actuar.**
+    - **Si rebota a 10-13%** → era el **ciclo de pago**. **No tocar nada.**
+    - **Si sigue en ~6%** con ~85 conversaciones/día → pasar a **clima** y **horas de venta del dueño**.
+    ⚠️ **NO acusar a la IA de WhatsApp — está DESCARTADA:** el dueño **nunca la deja sola** (monitorea y
+    reescribe a mano) **y la activa cuando SUBE el flujo**, así que estuvo más activa en los días del
+    pico de 13% que en el valle. **La correlación va al revés de lo que haría falta.**
+    Vale ~$2,2M/mes, pero **medir mal cuesta más que esperar 3 días** — a 5,2 ventas/día se gana
+    ~$65.000/día, 2,4× sobre el equilibrio. ✅ Nada de esto rompe el congelamiento: se mide, no se mueve.
+42. [x] ✅ **MEDIDO EL 14-AGO: 52 de 90 conversaciones vacías = 57,8%.** El fenómeno es **mayoría**, no
+    marginal, y **el costo por conversación real es $1.279, no $540 (×2,4).** Ver sección 0-K.
+    ⚠️ **Pero NO explica la caída todavía:** hace falta la tasa del PICO para saber si **subió**.
+42-bis. [ ] 🔴🔴 **CONTAR LOS VACÍOS UNA SEMANA SEGUIDA (5 min/día).** Es la medición que **separa la
+    hipótesis (E) de la quincena**, y ya hay línea base: **57,8% el 14-ago.**
+    - Si el cierre rebota tras la quincena **y los vacíos NO cambian** → era **la quincena**.
+    - Si el cierre rebota **y los vacíos bajan** → era **la mezcla** (hipótesis E).
+    - Si el cierre no rebota → van clima y horas de venta.
+    📌 **Alternativa retro (~20 min):** un chat vacío **no tiene ni un mensaje del cliente**, así que
+    se ve completo en una pantalla y la fecha del primer mensaje dice de qué día es — **no hay que
+    desapelmazar nada.** Abrir ~40 de esos y anotar fechas da la tasa del pico (5-10 ago).
+    ⚠️ **Antes de tocar el guion (#38) o el tarifario (#35), tener esto:** cambia qué problema hay.
+36-ter. [ ] 🌧️ **LAS 2 PREGUNTAS GRATIS QUE SE PUEDEN HACER HOY MISMO** (no esperan al 17, no tocan nada):
+    **(a) ¿LLOVIÓ MENOS del 10 al 14 de agosto?** El propio archivo pone el clima **primero** en el orden
+    de revisión (sección 0-F) y **nunca se ha mirado.** Vende impermeables: es el único factor que baja
+    la intención de compra **sin** bajar los clics — encaja exacto con la firma del problema.
+    **(b) ¿CUÁNTAS HORAS PUDO DEDICARLE A VENDER del 11 al 14** contra la semana del pico? En esos días
+    estuvo cerrando cabos con Heka ($2,79M + 7 novedades), migrando a 99 Envíos y haciendo seguimiento
+    a los aplazados del temblor. **El cierre es manual y depende de sus horas.** Ver sección 0-I.
+36-bis. [ ] 📅 **EL 26-29 AGO (siguiente valle pre-pago): LA PRUEBA DEFINITIVA DEL CICLO DE PAGO.**
+    Si el cierre **vuelve a caer** en esos días, el ciclo de pago queda demostrado y pasa a ser
+    **variable permanente de planeación** (modular presupuesto y despacho por quincena). Si NO cae,
+    la quincena queda descartada y el problema es otro. **Es el único test limpio disponible**, porque
+    el rebote del 15-ago está contaminado por el rebote post-temblor. Ver sección 0-I.
+37. [ ] 📊 **PEDIR LOS EXPORTS DE META CON DESGLOSE** — el del 15-ago vino a nivel campaña, 1 sola fila:
+    **(a) por DÍA** (para que el CPA sea medido y no estimado) · **(b) por CONJUNTO** (sin esto **NO se
+    puede calcular EL TERMÓMETRO**, la herramienta principal de diagnóstico de este archivo) ·
+    **(c) por ANUNCIO** (para el pendiente #32, saber qué creativo genera VENTAS).
+28. [ ] ❓ **LAS PREGUNTAS A 99 ENVÍOS** (actualizadas el 15-ago):
+    (1) **% de comisión por recaudo**; (2) **en cuántos días paga** (Heka: 1 día hábil);
+    (3) [x] ✅ **RESUELTO CON DATOS EL 19-AGO — NO PREGUNTAR MÁS.** Las 2 primeras devoluciones
+    mostraron que **en una devolución solo se cobra la PRIMA** ($1.742 y $3.111 en vez de $12.871 y
+    $22.793): **el flete de ida Y vuelta queda cubierto completo.** Ahorro ~$18.574 por devolución
+    ≈ **$852.524/mes** a 300 ventas. Ver sección 0-L.
+    ✅ **YA RESPONDIDO por el dueño:** el seguro **está incluido** en el `valor_servicio` y **en Heka
+    no se pagaba** → el cambio de transportadora **fue correcto** (flete 14,1% más barato + cobertura
+    al mismo precio total). Ver sección 0-H. Lo que queda es afinar el alcance de la cobertura.
 29. [ ] 📦 **MEDIR INVENTARIO — es el ÚNICO de los 3 frenos que sigue sin resolver.** Los otros dos
     (tiempo y caja) ya están. Sin este dato no se puede decidir cuánto crecer.
 30. [ ] 🌎 **LA JUGADA DE CRECIMIENTO: ABRIR CIUDADES NUEVAS, no subir presupuesto.**
     La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia
     de 1,31 prueba que NO es saturación de audiencia). **Bajo Advantage+ la geografía es la única forma
-    real de diferenciar conjuntos.** ⚠️ Usar **solo ciudades grandes** (los pueblos disparan el rechazo).
+    real de diferenciar conjuntos.**
+    ⚠️⚠️ **CORREGIDO EL 2026-08-15 — ESTE PUNTO DECÍA "usar solo ciudades grandes porque los pueblos
+    disparan el rechazo". ESO ERA FALSO** (venía de la sección 7, que nunca tuvo datos detrás).
+    La sección **0-G** probó que **los pueblos rechazan MENOS** (7-11% vs 20-23% de las ciudades).
+    **El criterio correcto NO es "grande vs. pueblo"**, es **rechazo esperado − flete absorbido**
+    (ver sección **0-H**): los pueblos rechazan menos pero hoy se les absorbe $3.900-4.900 de flete.
+    → **Arreglar primero el tarifario de los destinos caros (0-H) y después abrir, sin excluir pueblos.**
 31. [ ] 📉 **MEDIR LA TASA DE RECHAZO DESDE CERO con 99 Envíos.** El 15,3% era con Heka/Interrapidísimo;
     cobertura distinta = resultados distintos. Ver sección 0-E.
+    ⏳ **Primer corte hecho el 15-ago y NO es utilizable** (10 entregadas / 0 devueltas / 7 novedades a
+    5 días = 0% falso por inmadurez). **Volver a exportar a fin de agosto**, cuando las novedades se
+    hayan resuelto. **Hasta entonces usar el 15,3%.** Ver sección 0-H.
 32. [ ] 🎯 **CERRAR EL HUECO DE "COSTO POR VENTA" (no por conversación).** Todo el análisis mide costo
     por CONVERSACIÓN; no se sabe **qué creativo genera las VENTAS**. Un creativo puede traer
     conversaciones baratas que no compran. **Solución práctica: poner un mensaje inicial DISTINTO en
@@ -1086,6 +1840,38 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 33. [ ] 🛡️ **Decidir si se le da conjunto propio a "Demostración agua rueda"** (~$10.000/día) para
     tener un respaldo REAL y no teórico. Hoy recibe $0-63/día dentro de Domiciliarios. No urgente
     (frecuencia 1,31 = Fondo azul sin desgaste), pero cuando se desgaste ya se querrá tener corriendo.
+34. [ ] 🔥📞 **RESCATAR LAS 7 GUÍAS EN NOVEDAD DE 99 ENVÍOS — $181.744 de margen, y CADUCA.**
+    Orden de llamada por valor: **CARTAGENA (2 uds, $48.981, ya tiene un intento fallido y Cartagena
+    acumuló 2 de las 15 devoluciones de Heka — es la llamada #1 del negocio)** · Popayán $24.457 ·
+    Bogotá $24.327 · Soacha $24.327 · Remedios $20.501 · Inzá $19.604 · Málaga $19.547.
+    ⚠️ Bogotá y Soacha están en **"Telemercadeo"** = la transportadora no pudo y está llamando:
+    **es novedad, no tránsito.** **NO se cruza con el congelamiento** (esto es operación, no campaña).
+    Ver sección 0-H. **Esto es ADEMÁS de las 21 guías de Heka del punto de la sección 0-G.**
+38. [ ] 🔴🔴 **ARREGLAR EL GUION DE LA IA — 2 DEFECTOS CONCRETOS Y BARATOS** (sección 0-J):
+    **(a) QUITAR la promesa de "envío $15.000 a $20.000"** (está en 43% de los chats). El flete real
+    va de **$12.871 a $35.860**. Que pregunte la ciudad y **cotice el real**, o que diga el techo
+    verdadero. 🔑 **ESTA ES LA CAUSA de la fuga de flete de la sección 0-H** — se absorben
+    $3.900-4.900 por venta para no romper una promesa que el guion no debió hacer. Y prometer $20.000
+    y cobrar $35.000 **alimenta el rechazo del 15,3%**.
+    **(b) RELLENAR el cuadro de confirmación** — 36% de los chats mandan la plantilla con
+    `Color: ___ · Talla: ___ · Dirección: ___` en blanco, **en el momento del cierre**.
+    ⚠️ **HACER (a) ANTES del punto 35:** si se sube el tarifario sin arreglar el guion, la promesa
+    sigue rota y el cliente se sorprende igual.
+39. [ ] 🎯 **PONER UN TEXTO DE APERTURA DISTINTO POR ANUNCIO** — resuelve el pendiente #32 de verdad.
+    Hoy Facebook e Instagram usan **el mismo** texto, así que en el chat es imposible saber qué
+    creativo trajo la venta. Con textos distintos se puede atribuir **VENTAS** por creativo, no solo
+    conversaciones baratas. Ver sección 0-J.
+40. [ ] 💡 **OFRECER SISTEMÁTICAMENTE LA SEGUNDA UNIDAD.** El 9% la pide **sin que se la ofrezcan** y
+    el 16% de los pedidos ya son de 2+ (sección 0-G), pero **solo 4 de 47 chats muestran la oferta**.
+    Cada unidad extra en un pedido existente da margen completo **sin costar publicidad**, y el gancho
+    es que **el flete se comparte**. Ver sección 0-J.
+41. [ ] 📸 **REVISAR EL PROBLEMA DE LOS COLORES: el 77% de los clientes pregunta por color** y **no hay
+    fotos de blanco ni de morado.** Medir cuántas conversaciones se caen pidiendo un color que no se
+    puede mostrar. Se cruza con el pendiente de fotos de la sección 9. Ver sección 0-J.
+35. [ ] 💰 **SUBIR EL TARIFARIO EN LOS DESTINOS DE FLETE ~$25.000** (Guachené, Gómez Plata, Remedios,
+    Algeciras, Málaga, Inzá y similares): de $80.000-81.000 a **~$84.000-85.000** de total al cliente.
+    Hoy se absorben **$3.900-4.900 por venta** ahí (~$384.000/mes proyectado). El cliente de pueblo
+    rechaza menos y compra igual → es el que mejor tolera un total un poco más alto. Ver sección 0-H.
 25. [ ] 📦💵 **[histórico] Vigilar INVENTARIO y CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
     A 6-7 ventas/día son ~$238.000 de producto por día. **Es el freno real, ya no es Meta.**
 
