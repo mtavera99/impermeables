@@ -4,8 +4,25 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-19 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
+Última actualización: 2026-08-21 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
 corre en UTC y ya marca el día siguiente)*
+
+🆕🆕 **LO ÚLTIMO (2026-08-21) — DOS COSAS, UNA HECHA Y UNA QUE CORRIGE EL MANUAL:**
+1. ✅ **EL GUION Y EL TARIFARIO QUEDARON ARREGLADOS (pendientes #38 y #35 — sección 0-N).**
+   La tabla de fletes que alimentaba el conocimiento del negocio era **inventada** (Cali $13.000
+   cuando el real es $20.771; default $18.000 cuando los pueblos cuestan $25.029). Con las 79 guías
+   reales se absorbieron **$102.148** de flete en 77 guías; el tarifario nuevo lo baja a **$1.574
+   (−98,5%)**. **La fuga estaba SOLO en los destinos caros (bandas D y E), que son el 28% del
+   volumen.** ⚠️ **FALTA EL PASO MANUAL: pegar el bloque nuevo en la IA de WhatsApp Business.**
+   Cambiar el repo NO cambia lo que la IA le dice al cliente. Ver `TARIFARIO-Y-GUION.md`.
+2. 🚨 **SE CORRIGE UNA REGLA DEL MANUAL: SUBIR PRESUPUESTO *SÍ* REINICIA EL APRENDIZAJE.**
+   La sección 0-C y el plan del 19-ago decían que "escalar presupuesto es barato en esta cuenta
+   porque no reinicia el aprendizaje". **Es falso pasado cierto tamaño.** Ver sección 0-M.
+   **Regla nueva: escalones de +60% o menos.**
+🆕 **HALLAZGO QUE BLOQUEA EL PENDIENTE #40: el precio de 2 unidades NO EXISTE.** Los 5 pedidos de
+2 conjuntos se cobraron a $54.058–59.991 por unidad (dispersión 11% = **$11.864 por pedido** entre
+el mejor y el peor caso). **Cada cierre improvisó.** No se puede "ofrecer sistemáticamente la
+segunda unidad" sin definir el precio primero. **Decisión pendiente del dueño.** Ver sección 0-N.
 
 🎉🎉 **ESTADO ACTUAL — TODO SE RECUPERÓ (sección 0-L, veredicto del 19-ago):**
 **10,25 ventas/día (+97%, nivel pre-temblor) · cierre 9,4% (venía de 6,1%) · CPA por venta cerrada
@@ -400,13 +417,16 @@ siempre está recargada.**
 - El miércoles 5-ago (día 1) se vieron $751 y $0 de entrega → **corrigió por completo en 24-48 h.**
   Era **reinicio de aprendizaje**, exactamente como se había previsto. ⚠️ Lección: NO reaccionar al día 1.
 
-**🔑 HALLAZGO NUEVO — SUBIR PRESUPUESTO **NO** REINICIA EL APRENDIZAJE EN ESTA CUENTA:**
+**🔑 HALLAZGO — UN SALTO DE +67% NO REINICIÓ EL APRENDIZAJE:**
 El CSV trae el campo **"Último cambio significativo"**. Para Domiciliarios y sus 3 anuncios dice
 **2026-07-11** — o sea que el salto de $18.000 → $30.000 (+67%) **NO fue registrado por Meta como
 cambio significativo** y el conjunto nunca volvió a fase de aprendizaje. Los anuncios del TEST sí
 marcan 31-jul (crearlos SÍ cuenta).
-→ **Implicación práctica: escalar presupuesto es más barato de lo que temíamos.** Lo que sí reinicia
-aprendizaje es crear/duplicar anuncios y conjuntos, o cambiar audiencias.
+⚠️⚠️ **CORREGIDO EL 2026-08-21 — ESTE PUNTO DECÍA "SUBIR PRESUPUESTO NO REINICIA EL APRENDIZAJE EN
+ESTA CUENTA" Y ESO ERA UNA GENERALIZACIÓN DESDE UN SOLO CASO.** El salto de **$30.000 → $55.000
+(+83%)** del 19-ago **SÍ reinició** el aprendizaje de Domiciliarios (marcó 2026-08-19 01:45).
+**El umbral está entre +67% y +83% → usar escalones de +60% o menos.** Ver sección **0-M**.
+→ Lo que sí reinicia aprendizaje siempre: crear/duplicar anuncios y conjuntos, o cambiar audiencias.
 
 **🟡 EL REPARTO 91/9 (no pelearlo):** Fondo azul se lleva ~91% del presupuesto de Domiciliarios; las
 2 copias ~9% juntas (~$1.235 y ~$1.532/día). Aparece la alerta "Presupuesto bajo utilizado" en
@@ -1095,6 +1115,182 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-N. ✅ EL GUION Y EL TARIFARIO ARREGLADOS (2026-08-21) — CIERRA #38 (a)(b) Y #35
+
+**Fuente:** las 79 guías de 99 Envíos (10–19 ago), o sea los dos CSV que ya estaban en el repo.
+Scripts: `/analisis/tarifario-real.py` (construye el tarifario) y
+`node bot/src/verificar-tarifario.js` (lo audita contra las guías reales).
+Documento operativo con el bloque para pegar: **`TARIFARIO-Y-GUION.md`**.
+
+### 🔴 LA CAUSA RAÍZ ERA UNA TABLA INVENTADA EN EL PROPIO REPO
+
+La sección 0-J dijo "el guion promete un envío que no existe" y la 0-H midió la fuga, pero **nunca se
+señaló de dónde salía el número**. Salía de `bot/src/fletes.js`, la tabla que la sección 5-B declara
+**fuente de verdad del conocimiento del negocio**. Estaba escrita a ojo y decía:
+
+| Ciudad | Decía la tabla | Cobra 99 Envíos | Error |
+|---|---|---|---|
+| Cali | $13.000 | **$20.771** | −$7.771 |
+| Medellín | $13.000 | **$20.771** | −$7.771 |
+| Cartagena | $15.000 | **$20.771** | −$5.771 |
+| "otra ciudad" (default) | $18.000 | **$25.029** | −$7.029 |
+
+🔑 **El default es lo más grave: $18.000 para las ciudades que no están en la lista — que son
+exactamente los pueblos, los destinos más caros.** De ahí salía la promesa de "$15.000 a $20.000".
+
+### 📊 LOS 5 ESCALONES REALES (los fletes no son un continuo)
+
+| Zona | Flete real | 🔒 TOTAL a cobrar | Se cobraba | Recupera |
+|---|---|---|---|---|
+| **A · Bogotá y sabana** | $12.871 | **$73.000** | $72.698 | ya estaba bien |
+| **B · Boyacá / Casanare / Meta** | $16.684–16.843 | **$77.000** | $76.561 | ya estaba bien |
+| **C · Capitales grandes** | $20.771 | **$81.000** | $80.941 | ya estaba bien |
+| **D · Ciudades intermedias** | $22.714–22.870 | **$83.000** | $80.676–81.752 | **+$941 a $1.938** |
+| **E · Pueblos / zona extendida** | $24.953–25.029 | **$85.000** | $80.000–81.030 | **+$3.899 a $4.853** |
+
+**Resultado auditado: la absorción pasa de $102.148 a $1.574 en las mismas 77 guías (−98,5%).**
+
+🔑 **HALLAZGO QUE PRECISA LA SECCIÓN 0-H: la fuga NO era general, estaba SOLO en las bandas D y E.**
+Las bandas A, B y C ya se cobraban bien (con $71–426 de colchón). **El problema era exclusivamente
+los destinos caros — y la banda E es 20 de 72 guías, el 28% del volumen.** Eso convierte al
+pendiente #35 en lo que era: un ajuste quirúrgico de dos bandas, no un cambio de precios general.
+
+### 🔧 LOS DOS DEFECTOS DEL GUION, ARREGLADOS
+
+- **(a) La promesa de envío:** ahora la regla es **no dar NINGÚN número antes de saber la ciudad, y
+  nunca un rango.** Con la ciudad sabida, se da **un solo número: el TOTAL de la zona**, firme.
+  Y se habla del **total**, no del envío suelto ("en Cali te llega a $81.000" convierte mejor que
+  "$59.900 más $20.771 de envío").
+- **(b) El cuadro de confirmación en blanco:** queda el formato exacto con los 8 campos y la regla
+  de **no mandar el cuadro si falta un dato** (preguntar solo ese dato y esperar).
+- **El bloque `##ORDER##` ahora exige el total de la zona**, no "producto + flete calculado a mano":
+  si el total del bloque no coincide con el que se le dijo al cliente, la guía sale con el recaudo mal.
+
+### ⚠️ DOS DECISIONES DE CRITERIO (para no re-discutirlas)
+
+1. **Banda A se queda en $73.000 aunque una guía necesitaba $75.000.** Hubo 1 envío de Bogotá por
+   **Servientrega** a $14.674 contra 16 por Interrapidísimo a $12.871. Subir toda Bogotá $2.000 para
+   cubrir 1 de 17 casos castiga al 24% del volumen y al cliente más sensible al precio.
+   **Se acepta absorber $1.574 esporádicos.** Ese es el único caso que queda.
+2. **Los totales se redondean al millar hacia arriba** → colchón de $71 a $426 por venta, que es lo
+   que absorbe las variaciones chicas de tarifa. **Y si la ciudad no se reconoce, se cobra banda E.**
+   Errar hacia arriba cuesta una objeción; errar hacia abajo cuesta $4.900 de margen.
+
+### 🚨 HALLAZGO NUEVO: EL PRECIO DE 2 UNIDADES NO EXISTE (bloquea el #40)
+
+| Ciudad | Flete | Cobrado | Producto implícito | Por unidad |
+|---|---|---|---|---|
+| Cartagena | $35.860 | $155.841 | $119.981 | **$59.991** |
+| Caucasia | $28.037 | $142.200 | $114.163 | $57.081 |
+| Santa Rosa de Cabal | $28.014 | $141.845 | $113.831 | $56.915 |
+| Medellín | $27.891 | $139.998 | $112.107 | $56.053 |
+| Pereira | $27.608 | $135.725 | $108.117 | **$54.058** |
+
+**Dispersión 11% = $11.864 de diferencia por pedido entre el mejor y el peor caso.** Cada cierre
+improvisó. **El pendiente #40 ("ofrecer sistemáticamente la segunda unidad") está bloqueado hasta
+que el dueño fije el precio**, porque no se puede poner en un guion algo que no tiene precio.
+
+✅ **Pero el gancho es REAL y se puede usar ya: el flete de 2 unidades NO se duplica**, sube entre
+**+$6.838 y +$15.089** (Pereira $20.771→$27.608, Medellín →$27.891, Cartagena →$35.860).
+**Sugerencia para cerrar el #40: total de la zona + $57.000** (respeta el descuento que ya se venía
+dando de hecho y cubre el flete extra).
+
+### 🧰 DOS TRAMPAS TÉCNICAS DE LOS DATOS (para cualquier análisis futuro)
+
+1. 🔴 **El CSV de 99 Envíos tiene comas DENTRO de campos entrecomillados** (`"BOGOTÁ, D.C."`).
+   Partirlo por comas a lo bruto **corrompe 10 filas y da un resultado falso** — pasó en la primera
+   verificación de este mismo trabajo, dio "$0 de absorción" cuando el real era $1.574.
+   **Usar siempre un parser de CSV de verdad** (el `csv` de Python, o el que trae
+   `bot/src/verificar-tarifario.js`).
+2. 🔴 **En una devolución, `valor_servicio` es la PRIMA del seguro, no el flete** ($1.742 y $3.111).
+   Si se promedian como fletes, **bajan Bogotá y Santa Marta artificialmente**. Se excluyen con un
+   umbral de $8.000. (Es el mismo dato que en la sección 0-L fue un hallazgo bueno; acá, si no se
+   filtra, es un contaminante.)
+
+---
+
+## 0-M. 🚨 CORRECCIÓN AL MANUAL: SUBIR PRESUPUESTO **SÍ** REINICIA EL APRENDIZAJE (2026-08-21)
+
+**Fuente:** export de Meta por conjunto del 18–21 ago, campo **"Último cambio significativo"**.
+⚠️ **El CSV de ese export todavía NO está en `/analisis`** — hay que sumarlo para que este hallazgo
+quede reproducible como el resto.
+
+### LO QUE SE HIZO EL 19-AGO (no está en el plan, el plan proponía otra cosa)
+
+| Conjunto | Antes | Después | Nota |
+|---|---|---|---|
+| **Domiciliarios** | $30.000 | **$55.000** | el plan proponía $38.000; se fue más agresivo |
+| **TEST (Prueba social)** | $12.000 | **$20.000** | el plan decía dejarlo quieto |
+| **Motorizados** | $15.000 | **$15.000** | ✅ intacto = **el termómetro se preservó** |
+| **Total** | $57.000 | **$90.000** | +58% |
+
+### 🔴 EL HALLAZGO
+
+| Conjunto | Último cambio significativo |
+|---|---|
+| Motorizados | 2026-07-11 |
+| **Domiciliarios** | **2026-08-19 01:45** ← justo cuando se subió el presupuesto |
+| TEST | ninguno |
+
+**Domiciliarios entró en fase de aprendizaje por un cambio de presupuesto.** La sección 0-C y el
+plan del 19-ago afirmaban lo contrario ("escalar presupuesto es barato acá, no reinicia el
+aprendizaje") y sobre esa premisa se armó la escalera de escalones grandes.
+
+**Dónde está el umbral, con los 3 casos que hay:**
+
+| Cambio | % | ¿Registró cambio significativo? |
+|---|---|---|
+| $18.000 → $30.000 (Domiciliarios, 4-ago) | +67% | ❌ no |
+| $12.000 → $20.000 (TEST, 19-ago) | +67% | ❌ no |
+| **$30.000 → $55.000 (Domiciliarios, 19-ago)** | **+83%** | ✅ **sí** |
+
+→ **REGLA NUEVA: escalones de +60% o menos.** Entre +67% y +83% está la frontera; +60% deja margen.
+⚠️ **Y consecuencia para leer los datos: el CPA de Domiciliarios de los días 19-22 está en
+aprendizaje y puede verse peor de lo que es. No frenar por eso** (es el error que la sección 0-C ya
+documentó dos veces).
+
+### ✅ EL ESCALÓN 1 FUNCIONÓ (ventana 18–20 ago)
+
+| Conjunto | Asignado | Gastado | Utilización |
+|---|---|---|---|
+| **Domiciliarios** | $140.000 | $134.995 | **96%** 🎉 |
+| Motorizados | $45.000 | $37.790 | 84% |
+| TEST | $52.000 | $44.508 | 86% |
+
+**Gasto $80.432/día = 89% de los $90.000.** Y lo importante: **el costo por conversación quedó
+plano con 39% más volumen.**
+
+| Conjunto | Antes | Ahora | Cambio | clic→chat |
+|---|---|---|---|---|
+| Motorizados | $473 | $478 | +1,1% | **52,0%** |
+| Domiciliarios | $518 | $525 | +1,4% | 41,3% |
+| TEST | $708 | **$578** | **−18,4%** 🎉 | 41,8% |
+
+**Conversaciones 109,5 → ~152/día.** Escaló sin degradarse, que es el mejor resultado posible.
+
+- 💎 **MOTORIZADOS ES EL MEJOR TRÁFICO DE LA CUENTA, y ahora hay prueba fina:** tiene el CPC más
+  **caro** ($249 vs $217) pero el clic→chat mucho más **alto** (52,0% vs 41,3%).
+  🔑 **Clics baratos ≠ conversaciones baratas.** Sigue topado al 84% por **tamaño de audiencia**
+  → **ampliar la audiencia de Motorizados es la jugada de mayor retorno pendiente.**
+- ⚠️ **TEST mejoró fuerte ($708 → $578) → ya NO es candidato a recorte.** Cualquier propuesta previa
+  de bajarlo a $12.000 queda sin sustento.
+
+### ⏳ LO QUE FALTA PARA DECIDIR EL ESCALÓN 2
+
+**Las guías despachadas del 19, 20 y 21.** Sin eso el CPA es estimado.
+Regla fijada de antemano: **con 20 o más guías en dos días, el escalón 2 se justifica.**
+
+| Guías 19-20 | Ventas/día | CPA entregada | Veredicto |
+|---|---|---|---|
+| 20 | 10,0 | $9.496 | ✅ escalón 2 |
+| 25 | 12,5 | $7.597 | ✅ escalón 2 |
+| 30 | 15,0 | $6.331 | ✅ escalón 2 |
+| 40 | 20,0 | $4.748 | ✅ escalón 2 |
+
+⚠️ **Y el escalón 2 debe ser +60% máximo** (regla nueva de arriba), no el salto que se venía pensando.
 
 ---
 
@@ -1847,7 +2043,40 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⚠️ Bogotá y Soacha están en **"Telemercadeo"** = la transportadora no pudo y está llamando:
     **es novedad, no tránsito.** **NO se cruza con el congelamiento** (esto es operación, no campaña).
     Ver sección 0-H. **Esto es ADEMÁS de las 21 guías de Heka del punto de la sección 0-G.**
+43. [ ] 🔥🔴 **PEGAR EL GUION NUEVO EN LA IA DE WHATSAPP BUSINESS — ES LO ÚNICO QUE FALTA DEL #38 Y #35.**
+    El tarifario y el guion ya están arreglados **en el repo** (sección 0-N + `TARIFARIO-Y-GUION.md`),
+    pero **la IA que atiende a los clientes es Meta AI configurada a mano por el dueño** (sección 5-B):
+    **cambiar el repo NO cambia lo que la IA le dice al cliente.** El bloque para copiar y pegar está
+    en `TARIFARIO-Y-GUION.md` sección 2, con 4 pruebas de verificación de 3 minutos.
+    💰 **Vale ~$102.148 por cada 77 guías** (la absorción medida), concentrado en bandas D y E.
+44. [ ] 💰 **DEFINIR EL PRECIO DE LA SEGUNDA UNIDAD — desbloquea el pendiente #40.**
+    Hoy no existe: los 5 pedidos de 2 conjuntos se cobraron a **$54.058–59.991 por unidad** (dispersión
+    11% = $11.864 por pedido). Sugerencia: **total de la zona + $57.000**. Ver sección 0-N.
+45. [ ] 📊 **SUMAR A `/analisis` LOS DOS EXPORTS QUE FALTAN** para que los hallazgos del 21-ago sean
+    reproducibles como el resto: **(a)** el CSV de Meta por conjunto 18–21 ago (de donde sale el
+    hallazgo del umbral de aprendizaje de la sección 0-M) y **(b)** el xlsx/CSV de 99 Envíos del
+    21-ago. **Ninguno de los dos está en el repo.**
+46. [ ] 🎯 **CERRAR EL CHEQUEO DEL ESCALÓN 1 — FALTAN LAS GUÍAS DEL 19, 20 Y 21.** El gasto ya está
+    medido ($80.432/día, 89% de los $90.000) pero **sin las guías no hay CPA y no se puede decidir el
+    escalón 2.** Regla fijada de antemano: **20+ guías en dos días → escalón 2** (y el escalón 2 debe
+    ser **+60% máximo**, no el salto grande que se venía pensando — ver 0-M).
+    ⚠️ **Hacerlo el viernes en la noche, después de despachar:** no se despacha sábado ni domingo, así
+    que si se espera al 22-23 las ventas del fin de semana no están despachadas y el CPA sale
+    **falsamente bajo**. Es la misma trampa de las 41 guías del 17-18 (sección 0-L).
+47. [ ] 🔧 **CORRECCIÓN DE REPARTO PENDIENTE (en el chequeo, no antes): TEST $20.000 → $12.000 y
+    Domiciliarios $55.000 → $63.000.** Mismo gasto total.
+    ⚠️ **PERO REEVALUAR PRIMERO: TEST mejoró de $708 a $578/conv (−18,4%) en la ventana 18-21**, así que
+    el argumento para recortarlo se debilitó. Decidir con el CPA, no con el costo por conversación.
+48. [ ] 💎 **AMPLIAR LA AUDIENCIA DE MOTORIZADOS — la jugada de mayor retorno pendiente.**
+    Es **el mejor tráfico de la cuenta**: clic→chat **52,0%** vs 41,3% de Domiciliarios, y el
+    costo/conversación más barato ($478). 🔑 **Tiene el CPC más CARO ($249 vs $217) y aun así convierte
+    mucho mejor → clics baratos ≠ conversaciones baratas.** Sigue topado al 84% por **tamaño de
+    audiencia**, no por presupuesto (darle más plata no sirve).
+    ⚠️ **NO TOCAR HASTA DESPUÉS DEL 29-AGO:** cambiar audiencia reinicia aprendizaje **y** Motorizados
+    es el **termómetro** del test del valle del 26-29. Moverlo ahora destruye el test.
 38. [ ] 🔴🔴 **ARREGLAR EL GUION DE LA IA — 2 DEFECTOS CONCRETOS Y BARATOS** (sección 0-J):
+    ✅ **HECHO EN EL REPO EL 21-AGO** (`bot/src/prompt.js` + `bot/src/fletes.js`, sección 0-N).
+    ⚠️ **Falta el paso manual en la IA de WhatsApp Business → pendiente #43.**
     **(a) QUITAR la promesa de "envío $15.000 a $20.000"** (está en 43% de los chats). El flete real
     va de **$12.871 a $35.860**. Que pregunte la ciudad y **cotice el real**, o que diga el techo
     verdadero. 🔑 **ESTA ES LA CAUSA de la fuga de flete de la sección 0-H** — se absorben
@@ -1865,13 +2094,22 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     el 16% de los pedidos ya son de 2+ (sección 0-G), pero **solo 4 de 47 chats muestran la oferta**.
     Cada unidad extra en un pedido existente da margen completo **sin costar publicidad**, y el gancho
     es que **el flete se comparte**. Ver sección 0-J.
+    🔴 **BLOQUEADO POR EL PENDIENTE #44: el precio de 2 unidades NO EXISTE** — los 5 pedidos de 2 se
+    cobraron a $54.058-59.991 por unidad, cada cierre improvisó (sección 0-N). No se puede poner en un
+    guion algo sin precio definido.
+    ✅ **PERO EL GANCHO YA ESTÁ CONFIRMADO CON DATOS: el flete de 2 unidades NO se duplica**, sube solo
+    **+$6.838 a +$15.089** (Pereira $20.771→$27.608). "El envío casi no sube" es verdad, no un argumento
+    de venta inventado — y ya quedó escrito en el guion del repo.
 41. [ ] 📸 **REVISAR EL PROBLEMA DE LOS COLORES: el 77% de los clientes pregunta por color** y **no hay
     fotos de blanco ni de morado.** Medir cuántas conversaciones se caen pidiendo un color que no se
     puede mostrar. Se cruza con el pendiente de fotos de la sección 9. Ver sección 0-J.
-35. [ ] 💰 **SUBIR EL TARIFARIO EN LOS DESTINOS DE FLETE ~$25.000** (Guachené, Gómez Plata, Remedios,
-    Algeciras, Málaga, Inzá y similares): de $80.000-81.000 a **~$84.000-85.000** de total al cliente.
-    Hoy se absorben **$3.900-4.900 por venta** ahí (~$384.000/mes proyectado). El cliente de pueblo
-    rechaza menos y compra igual → es el que mejor tolera un total un poco más alto. Ver sección 0-H.
+35. [x] ✅ **CALCULADO EL 21-AGO — EL TARIFARIO YA ESTÁ DEFINIDO (sección 0-N).** Se confirmó el número
+    que este punto estimaba: los destinos de flete ~$25.000 pasan a **$85.000** de total al cliente
+    (era $80.000-81.000, se absorbían $3.899-4.853). Y salió el tarifario completo de 5 bandas
+    ($73.000 / $77.000 / $81.000 / $83.000 / $85.000) medido con las 79 guías reales.
+    **Absorción: $102.148 → $1.574 en 77 guías (−98,5%).**
+    ⚠️ **Falta APLICARLO en la IA de WhatsApp Business → pendiente #43.** Mientras no se pegue ahí,
+    la fuga sigue corriendo.
 25. [ ] 📦💵 **[histórico] Vigilar INVENTARIO y CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
     A 6-7 ventas/día son ~$238.000 de producto por día. **Es el freno real, ya no es Meta.**
 
@@ -2036,18 +2274,28 @@ $841 no mata un creativo, igual que tres días buenos no lo coronan.
 - **Interpretación:** 95-100% semanal = **TOPADO** (para crecer hay que subir presupuesto).
   Consistentemente <80% semanal = ahí SÍ hay un problema real (audiencia estrecha o solapamiento).
 
-### ⏱️ "ÚLTIMO CAMBIO SIGNIFICATIVO": SUBIR PRESUPUESTO **NO** REINICIA EL APRENDIZAJE (2026-08-07)
+### ⏱️ "ÚLTIMO CAMBIO SIGNIFICATIVO": SUBIR PRESUPUESTO REINICIA EL APRENDIZAJE **SI EL SALTO ES GRANDE**
+*(escrito el 2026-08-07 como "NO reinicia nunca" · **CORREGIDO el 2026-08-21** — ver sección 0-M)*
 - El export de Meta trae la columna **"Último cambio significativo"**. Es la forma de saber si un
   conjunto volvió a fase de aprendizaje o no. **Revisarla siempre después de un cambio.**
-- **Comprobado en esta cuenta:** el salto de Domiciliarios de $18.000 → $30.000 (**+67%**) dejó el campo
-  en **2026-07-11** (sin cambios) → **Meta NO lo consideró significativo y el conjunto NUNCA reinició
-  aprendizaje.** Por eso el costo alto duró un solo día.
-- **Lo que SÍ reinicia aprendizaje:** crear o duplicar anuncios (los del TEST marcan 31-jul), crear
-  conjuntos nuevos, y cambiar audiencias.
-- **Implicación:** escalar presupuesto es MÁS BARATO de lo que temíamos. La regla de "20-30% cada 3-4
-  días" sigue siendo prudente, pero el miedo a reiniciar el aprendizaje por subir presupuesto es infundado.
-  ⚠️ El costo real de subir presupuesto es otro: Meta va a buscar gente menos calificada para gastarlo.
-  Eso se mide con el TERMÓMETRO, no con el campo de aprendizaje.
+- 🔑 **HAY UN UMBRAL, y con 3 casos ya se ubica:**
+
+| Cambio de presupuesto | % | ¿Reinició aprendizaje? |
+|---|---|---|
+| Domiciliarios $18.000 → $30.000 (4-ago) | +67% | ❌ no |
+| TEST $12.000 → $20.000 (19-ago) | +67% | ❌ no |
+| **Domiciliarios $30.000 → $55.000 (19-ago)** | **+83%** | ✅ **sí** |
+
+- ⚠️ **La versión original de esta regla decía que subir presupuesto NUNCA reinicia el aprendizaje, y
+  sobre eso se armó una escalera de escalones grandes. Estaba mal:** se había generalizado desde UN
+  solo caso (+67%). El tamaño del salto **sí** importa.
+- ✅ **REGLA OPERATIVA: escalones de +60% o menos** para no reiniciar. Entre +67% y +83% está la
+  frontera; +60% deja margen.
+- **Lo que SÍ reinicia aprendizaje siempre:** crear o duplicar anuncios (los del TEST marcan 31-jul),
+  crear conjuntos nuevos, y cambiar audiencias.
+- ⚠️ **Y el costo de subir presupuesto es doble:** (1) puede reiniciar aprendizaje si el salto es
+  grande, y (2) Meta va a buscar gente menos calificada para gastarlo. Lo segundo se mide con el
+  **TERMÓMETRO** y con el **conteo de conversaciones vacías** (sección 0-K), no con este campo.
 
 ### 🎯 HALLAZGO CLAVE (2026-08-04): LA CUENTA USA **PÚBLICO DE ADVANTAGE+**
 **Esto explica la mitad de los misterios de la cuenta. Leer antes de tocar cualquier audiencia.**
