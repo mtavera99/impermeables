@@ -53,13 +53,23 @@ costar ese envío:
 | Bogotá | **$11.880** | $12.871 | $14.674 |
 | Chía | **$11.951** | $12.871 | — |
 
-→ **Por eso cada banda cobra el flete de la transportadora MÁS CARA que se haya visto ahí.**
-Cobrar de menos es pérdida segura; cobrar de más solo cuesta en los envíos que caen en la
-transportadora barata. Con 88 guías, esa regla deja la absorción en **$3.997** (era $154.107).
+**Y como vos ELEGÍS la transportadora, el precio de cada banda es alcanzable — pero hay que elegir
+bien.** Las dos reglas que hacen que el tarifario cierre:
 
-📌 **Y abre una pregunta que vale plata: ¿se puede PEDIR coordinadora?** Es ~$1.000 más barata que
-interrapidísimo y ~$2.800 más barata que servientrega en Bogotá y sabana. Si el reparto se puede
-influir, es ahorro directo sin costo. **Vale meterlo en la misma llamada de los días de pago.**
+| Destino | Elegí | Por qué |
+|---|---|---|
+| **Bogotá y sabana** | **coordinadora** (o interrapidísimo) | con servientrega ($14.674) el total de $73.000 se queda corto $1.574 |
+| **Cartagena** | **servientrega** ($20.771) | con interrapidísimo ($22.793) faltan $1.693 |
+
+⚠️ **La excepción de Cartagena:** es la ciudad que más rechaza de todas. Si interrapidísimo entrega
+mejor allá, **pagá los $2.022 y listo** — una devolución cuesta muchísimo más. Eso es decisión de
+negocio, no de tarifa.
+
+📌 **Y la pregunta que vale plata: ¿qué cobertura tiene coordinadora?** Es la más barata de las tres
+($15.440 promedio contra ~$20.800 de las otras dos) pero solo se ha usado en **5 destinos**. Si cubre
+el país, es el ahorro más grande que tenés disponible hoy. **Metelo en la misma llamada de los días
+de pago.** Solo en Bogotá, elegirla en vez de interrapidísimo son **$991 por envío** — y hubo
+8 envíos a Bogotá que se fueron por la más cara teniendo la barata disponible.
 
 ### Tres decisiones que conviene conocer
 
@@ -158,7 +168,53 @@ lo pregunto y no mando el cuadro todavía.
 
 ---
 
-## 3. 🚨 Hallazgo nuevo: el precio de 2 unidades no existe
+## 2-bis. 💰 La promo 2×$110.000 — el orden de oferta importa
+
+**La promo existe pero no se está cobrando bien: los 6 pedidos de 2 unidades cobraron 6 precios
+distintos** ($107.013 a $119.981 de producto), y en 2 de ellos **se absorbió flete ($4.870)**.
+
+**Deja plata, y bastante** (margen por pedido, con el flete pasado al cliente):
+
+| Escenario | Margen | Neto tras CPA $6.046 |
+|---|---|---|
+| 1 unidad a $59.900 | $24.400 | **$18.354** |
+| **2 unidades en promo $110.000** | $40.500 | **$34.454** |
+| 2 unidades a precio lleno $119.800 | $50.300 | **$44.254** |
+
+✅ La promo deja **1,88×** una venta de 1 unidad. ⚠️ Pero **el descuento de $9.800 sale entero del
+margen**: la segunda unidad pasa de $25.900 a $16.100.
+
+### 🔑 El orden que conviene (y quedó en el guion)
+
+**1º — El envío compartido, SIN descuento.** Los dos van en el mismo paquete, así que el cliente paga
+**un solo envío**. A Medellín eso son **$41.542 de flete si van separados contra $27.891 juntos: le
+ahorrás $13.651** y no regalás un peso de producto.
+
+> *"Si llevas dos, van en el mismo paquete y pagas un solo envío — te ahorras como $13.000 💡"*
+
+**2º — La promo de $110.000 solo cuando DUDA.** No la ofrezcas de entrada: **hay clientes que pagan
+las dos completas** (el pedido de Cartagena pagó $119.981), y el 9% pide la segunda unidad sin que se
+la ofrezcan.
+
+**3º — El envío de 2 unidades se cobra SIEMPRE completo, y no se adivina.** Sube entre **+$3.008 y
++$15.089** sobre el de 1 unidad, porque dos conjuntos cruzan escalones de peso distintos según la
+transportadora. **Los que ya están medidos:**
+
+| Ciudad | Flete 2 uds | Total con promo |
+|---|---|---|
+| Pereira | $27.608 | **$138.000** |
+| Medellín | $27.891 | **$138.000** |
+| Caucasia | $28.037 | **$139.000** |
+| Santa Rosa de Cabal | $28.014 | **$139.000** |
+| Hispania | $34.112 | **$145.000** |
+| Cartagena | $35.860 | **$146.000** |
+
+**Para cualquier otra ciudad: mirá el flete de 2 unidades en el panel antes de dar el total.** Son
+30 segundos y evita regalar $3.000.
+
+---
+
+## 3. 🚨 El precio de 2 unidades no estaba definido (ya se resolvió)
 
 Salió al mirar los pedidos multi-unidad. **Cada pedido de 2 conjuntos se cobró distinto:**
 

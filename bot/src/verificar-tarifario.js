@@ -6,7 +6,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { cotizar, PRECIO_PRODUCTO, fmt } = require("./fletes");
+const { cotizar, PRECIO_PRODUCTO, PROMO_2_UNIDADES, fmt } = require("./fletes");
 
 const ARCHIVOS = [
   "guias-99envios.csv",
@@ -92,9 +92,8 @@ function main() {
   );
   console.log(`Guías evaluadas: ${validas.length}\n`);
 
-  // La auditoría solo aplica a pedidos de 1 unidad: es donde hay tarifa firme.
-  // Para 2+ unidades no hay política de precio todavía (pendiente #44), así que
-  // medir "absorción" ahí sería medir contra una regla que no existe.
+  // La auditoría de bandas aplica a pedidos de 1 unidad. Los de 2 se auditan
+  // aparte, contra la promo de $110.000 + flete.
   const unaUnidad = validas.filter((g) => g.uds === 1);
   const multi = validas.filter((g) => g.uds > 1);
   console.log(`De esas, ${unaUnidad.length} son de 1 unidad (las que tienen tarifa firme) `
@@ -159,30 +158,43 @@ function main() {
 }
 
 
-// Bloque aparte para los pedidos de 2+ unidades: no se auditan contra una tarifa
-// (no existe), solo se muestran para que se vea el tamaño del problema abierto.
+// Audita los pedidos de 2 unidades contra la promo vigente (2 x $110.000 + flete).
+// El precio SÍ existe; lo que falla es la aplicación.
 function reportarMultiUnidad(multi) {
   if (!multi.length) return;
   console.log("\n" + "-".repeat(70));
-  console.log(`PEDIDOS DE 2+ UNIDADES (${multi.length}) — SIN POLÍTICA DE PRECIO (pendiente #44)`);
-  const unitarios = [];
-  for (const g of multi) {
-    const producto = g.cobrado - g.flete;
-    const unit = producto / g.uds;
-    unitarios.push(unit);
+  console.log(`PEDIDOS DE 2 UNIDADES (${multi.length}) — CONTRA LA PROMO DE ${fmt(PROMO_2_UNIDADES)}`);
+  console.log("  (la regla correcta es: promo + flete real, el flete NUNCA se absorbe)");
+  console.log("-".repeat(70));
+
+  let absorbido = 0;
+  let cobradoDeMas = 0;
+  for (const g of [...multi].sort((a, b) => a.cobrado - a.flete - (b.cobrado - b.flete))) {
+    const debia = PROMO_2_UNIDADES + g.flete;
+    const dif = g.cobrado - debia;
+    let nota = "";
+    if (dif < -500) {
+      absorbido += -dif;
+      nota = " 🔴 absorbió flete";
+    } else if (dif > 500) {
+      cobradoDeMas += dif;
+      nota = " (cobró por encima de la promo)";
+    } else {
+      nota = " ✅";
+    }
     console.log(
-      `  ${g.ciudad} (${g.uds} ud): flete ${fmt(Math.round(g.flete))} · ` +
-        `producto ${fmt(Math.round(producto))} → ${fmt(Math.round(unit))} por unidad`
+      `  ${g.ciudad.padEnd(24)} debía ${fmt(Math.round(debia))} · ` +
+        `cobró ${fmt(Math.round(g.cobrado))} · ${dif >= 0 ? "+" : ""}${fmt(Math.round(dif))}${nota}`
     );
   }
-  const lo = Math.min(...unitarios);
-  const hi = Math.max(...unitarios);
+  console.log(`\n  Flete absorbido en pedidos de 2 unidades: ${fmt(Math.round(absorbido))}`);
+  console.log(`  Cobrado por encima de la promo:           ${fmt(Math.round(cobradoDeMas))}`);
   console.log(
-    `\n  Precio por unidad entre ${fmt(Math.round(lo))} y ${fmt(Math.round(hi))} ` +
-      `(${((hi / lo - 1) * 100).toFixed(1)}% de dispersión).`
+    "\n  ⚠️ Que se desvíe en AMBOS sentidos confirma que la promo no se está\n" +
+      "  aplicando con una regla, sino a criterio de cada cierre. Cobrar por\n" +
+      "  encima no es un error grave (hay clientes que pagan las 2 completas),\n" +
+      "  pero absorber flete sí: es margen regalado."
   );
-  console.log("  Cada cierre improvisó. Hasta que se defina el precio, el guion");
-  console.log("  tiene instrucción de NO cotizar 2 unidades y pasar a humano.");
 }
 
 

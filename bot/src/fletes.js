@@ -58,6 +58,44 @@ const BANDAS = {
 // una objeción de precio; errar hacia abajo cuesta $4.900 de margen por venta.
 const BANDA_POR_DEFECTO = "E";
 
+// ============================================================================
+// 🔑 EL FLETE NO ES UN SORTEO: EL DUEÑO ELIGE LA TRANSPORTADORA
+//
+// 99 Envíos reparte entre interrapidísimo, servientrega y coordinadora, y cada
+// una cobra distinto por el MISMO destino. El dueño SÍ puede elegir, y elige por
+// eficiencia y por costo según la ubicación.
+//
+//   Bogotá:    coordinadora $11.880 · interrapidísimo $12.871 · servientrega $14.674
+//   Cartagena: servientrega $20.771 · interrapidísimo $22.793
+//   Bello:     coordinadora $20.710 · interrapidísimo $22.714
+//
+// CONSECUENCIA PARA ESTE ARCHIVO: los totales de abajo son alcanzables SI se
+// elige bien la transportadora. Las dos reglas que hacen que el precio cierre:
+//   · Bogotá y sabana → coordinadora o interrapidísimo. NO servientrega
+//     (a $14.674 el total de $73.000 se queda corto $1.574).
+//   · Cartagena → servientrega ($20.771). Con interrapidísimo faltan $1.693.
+//     ⚠️ Excepto que se prefiera pagar por confiabilidad: Cartagena es la ciudad
+//     que más rechaza, y una devolución cuesta mucho más que $2.022.
+// ============================================================================
+
+// Promo vigente: 2 conjuntos por $110.000 (el envío se cobra ADEMÁS).
+// ⚠️ El flete de 2 unidades NO se predice desde el de 1: los aumentos observados
+// van de +$3.008 a +$15.089 porque 2 unidades cruzan escalones de peso distintos
+// según la transportadora. Por eso `cotizar()` nunca da un total firme de 2
+// unidades: marca `requiereConfirmacion` para que se mire el panel.
+const PROMO_2_UNIDADES = 110000;
+
+// Fletes de 2 unidades REALMENTE observados, para cotizar rápido lo conocido.
+const FLETE_2_OBSERVADO = {
+  PEREIRA: 27608,
+  MEDELLIN: 27891,
+  "CARTAGENA DE INDIAS": 35860,
+  CARTAGENA: 35860,
+  CAUCASIA: 28037,
+  "SANTA ROSA DE CABAL": 28014,
+  HISPANIA: 34112,
+};
+
 // Recargo de flete por unidad adicional en el mismo pedido.
 // Observado en 6 pedidos de 2 unidades: el flete NO se duplica, sube entre
 // $6.838 y $15.089 (mediana ~$7.100).
@@ -108,13 +146,27 @@ function cotizar(ciudad, unidades = 1) {
   const reconocida = clave !== null;
   const banda = BANDAS[clave || BANDA_POR_DEFECTO];
 
-  const flete = banda.flete + (uds - 1) * RECARGO_UNIDAD_EXTRA;
-  // Para 1 unidad se usa el total ya redondeado de la banda. Para más unidades
-  // se recalcula y se redondea al millar hacia arriba.
-  const total =
-    uds === 1
-      ? banda.total
-      : Math.ceil((PRECIO_PRODUCTO * uds + flete) / 1000) * 1000;
+  if (uds === 1) {
+    return {
+      banda: clave || BANDA_POR_DEFECTO,
+      nombreBanda: banda.nombre,
+      flete: banda.flete,
+      total: banda.total,
+      unidades: 1,
+      reconocida,
+      requiereConfirmacion: false,
+    };
+  }
+
+  // ---- 2 o más unidades: precio de promo, flete a confirmar ----
+  const c = normalizar(ciudad);
+  const fleteObservado = uds === 2 ? FLETE_2_OBSERVADO[c] : undefined;
+  // Sin dato real se estima con el peor aumento visto, para no absorber.
+  const flete = fleteObservado ?? banda.flete + (uds - 1) * RECARGO_UNIDAD_EXTRA;
+  // El producto: la promo aplica al par; una 3ª unidad va a precio lleno.
+  const producto =
+    uds === 2 ? PROMO_2_UNIDADES : PROMO_2_UNIDADES + (uds - 2) * PRECIO_PRODUCTO;
+  const total = Math.ceil((producto + flete) / 1000) * 1000;
 
   return {
     banda: clave || BANDA_POR_DEFECTO,
@@ -123,9 +175,10 @@ function cotizar(ciudad, unidades = 1) {
     total,
     unidades: uds,
     reconocida,
-    // Para 1 unidad el total es una tarifa firme. Para 2+ es una estimación:
-    // falta definir el precio de la segunda unidad (pendiente #44).
-    requiereConfirmacion: uds > 1,
+    promo: uds === 2,
+    // true = el flete de este total es estimado, no medido. Hay que verificarlo
+    // en el panel de 99 Envíos antes de prometerlo.
+    requiereConfirmacion: fleteObservado === undefined,
   };
 }
 
@@ -143,7 +196,9 @@ function tablaFletesTexto() {
 module.exports = {
   BANDAS,
   BANDA_POR_DEFECTO,
+  FLETE_2_OBSERVADO,
   PRECIO_PRODUCTO,
+  PROMO_2_UNIDADES,
   RECARGO_UNIDAD_EXTRA,
   bandaDe,
   cotizar,
