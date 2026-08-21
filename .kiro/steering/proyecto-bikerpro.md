@@ -14,17 +14,16 @@ despachada $6.046 (techo: $10.000) → 4,04× de colchón.**
 (sección 0-R):** ⏱️ tiempo ✅ (IA como válvula) · 💵 caja ✅ (99 Envíos paga a demanda: ciclo de
 **3,1 días**, hacen falta $1.557.978 y hay **$5.200.000** = **3,3× de holgura**) · 📦 inventario ✅
 (**5.000 unidades** + reposición avisando el día anterior).
-🔄 **Y EL PROBLEMA SE INVIERTE: 5.000 unidades son ~14 MESES de stock al ritmo actual.** La pregunta
-ya no es "¿alcanza el producto?" sino "¿en cuánto se vende esto?". **La urgencia de escalar subió.**
+✅ **Y LAS 5.000 UNIDADES SON EN CONSIGNACIÓN → el proveedor las financia.** No hay capital dormido,
+no hay urgencia de rotación, no hay riesgo de temporada en el balance propio. **Son una OPCIÓN
+GRATIS: se puede crecer 10× sin poner un peso de producto por adelantado.**
+💵 **Y la caja se derrumba como restricción:** si al proveedor se le paga después de cobrar, hacen
+falta solo **$280.714** (holgura **18,5×**) y el techo sube a **222 ventas/día.**
 🔴 **EL FRENO QUE QUEDA NO ES INTERNO: es la GEOGRAFÍA en Meta — y un paso manual de 10 minutos
 (pegar el guion nuevo en la IA, pendiente #43). Eso es literalmente lo que bloquea el crecimiento.**
-🌧️ **Y ENTRA UN RIESGO NUEVO: LA ESTACIONALIDAD.** Son impermeables; la temporada fuerte de lluvia
-va ~sep-nov. **Escalar ahora agarra la mejor ventana del año, pero 14 meses de stock obliga a cruzar
-una temporada seca con inventario encima.** El clima llevaba desde el 12-ago como hipótesis nunca
-revisada; ya no es opcional (#54).
-❓ **PREGUNTA ABIERTA (#53): ¿las 5.000 unidades están PAGADAS o son en consignación?** A costo
-auditado son **$170.000.000 = 33× la caja líquida.** Si están pagadas hay capital dormido; si son en
-consignación no hay problema. **NO asumir la respuesta — es un supuesto de Kiro, no un dato.**
+🌧️ **LA ESTACIONALIDAD ES OPORTUNIDAD, NO RIESGO (#54):** la temporada fuerte de lluvia va ~sep-nov,
+así que **escalar ahora agarra la mejor ventana de demanda del año.** En consignación no hay riesgo de
+quedarse con inventario propio. El clima sigue siendo la hipótesis (C) nunca revisada desde el 12-ago.
 📌 **Y aparece un riesgo: $2.200.000 quietos en la plataforma.** Es el mismo patrón de los
 $2.788.601 que se acumularon con Heka. **Retirar por rutina, no cuando se acumula.**
 ✅ **Las 7 novedades trabadas se resolvieron el 21-ago.** Quedan en observación: **cuántas terminen
@@ -1229,7 +1228,41 @@ anterior.** Script: `/analisis/inventario-y-escalera.py`.
 
 **Es la primera vez desde julio que no hay ningún freno interno.**
 
-### 🔄 PERO EL PROBLEMA SE INVIERTE: 5.000 UNIDADES SON ~14 MESES DE STOCK
+### ✅ RESPUESTA DEL DUEÑO: **ESTÁN EN CONSIGNACIÓN** — SE RETIRA LA ALARMA
+
+**El proveedor financia las 5.000 unidades. No están pagadas.** Eso desmonta entero el análisis de
+"capital dormido" que esta sección planteó primero:
+
+| Lo que se había planteado | Estado real |
+|---|---|
+| $170.000.000 de capital inmovilizado | ❌ **no existe** — es mercancía del proveedor |
+| Urgencia financiera por rotar el inventario | ❌ **no existe** |
+| Riesgo de obsolescencia / temporada en el balance | ❌ **no aplica** — el riesgo es del proveedor |
+| "Contradicción" entre comprar 5.000 y reponer en 1 día | ❌ **no hay contradicción** — no se compraron |
+| ¿Los $34.000 son precio de volumen? | ❌ **pregunta sin sentido**, no hubo compra |
+
+🔑 **LO QUE SÍ SIGNIFICA, Y ES MEJOR QUE LO QUE SE PENSABA: las 5.000 unidades son una OPCIÓN
+GRATIS.** Se puede crecer 10× sin poner un peso de producto por adelantado. **Es la mejor posición
+posible para escalar.**
+
+⚠️ **LECCIÓN DE MÉTODO:** se construyó un análisis completo (capital dormido, urgencia de rotación,
+riesgo de temporada, crítica implícita a la decisión de compra) **sobre un supuesto no confirmado**.
+El supuesto era plausible pero falso. **Se marcó como pregunta abierta y por eso se pudo retirar
+limpio en vez de quedar como “hallazgo” equivocado en el archivo.** Es el patrón a repetir: cuando un
+número sale raro (33× la caja líquida), es señal de supuesto malo, no de negocio mal manejado.
+
+### 💵 Y LA CAJA SE DERRUMBA COMO RESTRICCIÓN
+
+| Escenario | Salida/día | Capital necesario | Holgura | Techo de publicidad |
+|---|---|---|---|---|
+| **A** — se paga al proveedor **al despachar** | $498.553 | $1.545.514 | **3,4×** | $244.110/día (40 ventas) |
+| **B** — se paga **después de cobrar** | **$90.553** | **$280.714** | **18,5×** | **$1.343.984/día (222 ventas)** |
+
+❓ **ÚNICA COSA QUE FALTA PRECISAR (pendiente #56): ¿el pago al proveedor es al despachar o después de
+cobrar?** En los dos casos la caja deja de ser una restricción práctica, pero la diferencia entre un
+techo de **40** y de **222** ventas/día decide si algún día hay que volver a pensar en caja.
+
+### 📊 CUÁNTO DURA EL STOCK (ya no es un riesgo, sirve para saber cuándo pedir reposición)
 
 | Ventas/día | Publicidad/día | Se agota en |
 |---|---|---|
@@ -1238,37 +1271,21 @@ anterior.** Script: `/analisis/inventario-y-escalera.py`.
 | 30 | $181.382 | 167 días — 5,6 meses |
 | 40 | $241.843 | 125 días — 4,2 meses |
 
-🔑 **La pregunta deja de ser "¿alcanza el producto?" y pasa a ser "¿en cuánto se vende esto?".**
-**La urgencia de escalar sube muchísimo, y por una razón distinta a la de antes.**
+📌 **En consignación, 14 meses de stock no es un problema: es margen de maniobra.** Y con reposición
+a 1 día de aviso, tampoco hay que vigilarlo de cerca.
 
-### ❓ PREGUNTA ABIERTA QUE CAMBIA TODO EL ANÁLISIS — **NO ASUMIR LA RESPUESTA**
-
-A costo auditado de $34.000, 5.000 unidades son **$170.000.000**, o sea **33× la caja líquida
-($5.200.000)**. Ese desbalance es tan grande que **hay que confirmar el supuesto antes de sacar
-conclusiones:**
-
-1. **¿Están PAGADAS?** Si sí → hay $170M de capital dormido y el análisis de arriba aplica entero.
-2. **¿O son en consignación / las guarda el proveedor y se pagan a medida que se venden?**
-   → entonces **no hay capital dormido, no hay urgencia financiera**, y las 5.000 unidades son
-   solamente una buena noticia.
-3. **¿El costo de $34.000 es POR comprar en volumen?** Si comprar 200 sale más caro por unidad, la
-   compra fue racional (se pagó por descuento). Si sale igual, la lección hacia adelante es no
-   repetirlo: **ese capital rinde más en publicidad que en una bodega.**
-
-⚠️ **HASTA QUE ESO SE ACLARE, NO tratar los $170M como un error.** Es un supuesto de Kiro, no un dato.
-
-### 🔴 EL RIESGO QUE NADIE HA MIRADO: LA ESTACIONALIDAD
+### 🌧️ LA ESTACIONALIDAD BAJA DE CATEGORÍA: DEJA DE SER RIESGO Y QUEDA COMO TIMING
 
 **Son impermeables: la demanda depende de que llueva.** Colombia tiene régimen bimodal y la
 temporada fuerte en la zona andina va aproximadamente de **septiembre a noviembre.**
 
-- ✅ **A favor:** se está entrando a la mejor temporada del año. **Escalar ahora agarra la ventana de
-  mayor demanda natural.**
-- 🔴 **En contra:** 14 meses de stock implica **cruzar una temporada seca completa con inventario
-  encima.** Si el ritmo no sube, parte de las 5.000 unidades espera la lluvia del año siguiente.
+- ✅ **Ya NO es un riesgo de balance.** En consignación, si la temporada se acaba con stock encima, el
+  producto no es plata propia parada — es del proveedor.
+- ✅ **Sigue siendo una oportunidad de timing, y fuerte:** se está entrando a la **mejor ventana de
+  demanda del año.** Escalar ahora la aprovecha; escalar en enero pelea contra el clima.
 
-📌 **El clima es la hipótesis (C) de las secciones 0-F y 0-I, marcada "nunca revisada" desde el
-12-ago. Con 5.000 unidades en bodega dejó de ser una curiosidad: es la variable que define el plan.**
+📌 **El clima sigue siendo la hipótesis (C) de las secciones 0-F y 0-I, nunca revisada. Vale mirarla,
+pero como palanca de crecimiento ("¿cuándo pisar el acelerador?"), no como riesgo de inventario.**
 
 ### 📈 LA ESCALERA, Y POR QUÉ SE AUTOFINANCIA
 
@@ -2521,15 +2538,19 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     al mismo precio total). Ver sección 0-H. Lo que queda es afinar el alcance de la cobertura.
 29. [x] ✅✅ **RESUELTO EL 21-AGO: 5.000 UNIDADES EN BODEGA + REPOSICIÓN A 1 DÍA DE AVISO.**
     **Con esto los 3 frenos del negocio quedan los 3 abiertos por primera vez desde julio.**
-    Ver sección **0-R**. 🔄 **Y el problema se invierte: 5.000 unidades son ~14 meses de stock al
-    ritmo actual** → la urgencia de escalar ya no es por oportunidad, es por rotación.
-53. [ ] ❓ **CONFIRMAR SI LAS 5.000 UNIDADES ESTÁN PAGADAS O SON EN CONSIGNACIÓN.**
-    A costo auditado son **$170.000.000 = 33× la caja líquida**. **El dato cambia todo el análisis:**
-    si están pagadas hay capital dormido y la rotación es urgente; si son en consignación **no hay
-    problema financiero alguno** y las 5.000 son solo buena noticia.
-    ⚠️ **NO asumir la respuesta. Es un supuesto de Kiro, no un dato.** Ver sección 0-R.
-    Y de paso: **¿el costo de $34.000 es por comprar en volumen?** Si comprar 200 sale más caro, la
-    compra fue racional. Si sale igual, la lección hacia adelante es no repetirlo.
+    Ver sección **0-R**. ✅ **Y están EN CONSIGNACIÓN**, así que no hay capital propio comprometido:
+    son una opción gratis para crecer.
+53. [x] ✅ **RESUELTO: LAS 5.000 UNIDADES SON EN CONSIGNACIÓN.** El proveedor las financia.
+    **Se retira la alarma de los $170.000.000 de capital dormido: no existe.** Tampoco hay urgencia
+    de rotación, ni riesgo de temporada en el balance propio, ni "contradicción" con reponer en 1 día.
+    🔑 **Y es mejor de lo que se pensaba: son una OPCIÓN GRATIS** → se puede crecer 10× sin poner un
+    peso de producto por adelantado. Ver sección 0-R.
+56. [ ] ❓ **PRECISAR CUÁNDO SE LE PAGA AL PROVEEDOR: ¿al despachar o después de cobrar?**
+    Es lo único que falta del modelo de caja, y mueve el techo bastante:
+    · **al despachar** → capital necesario $1.545.514 · holgura 3,4× · techo **40 ventas/día**
+    · **después de cobrar** → capital necesario **$280.714** · holgura **18,5×** · techo **222 ventas/día**
+    📌 **En los dos casos la caja deja de ser una restricción práctica**, así que NO bloquea el
+    escalón. Pero define si algún día hay que volver a pensar en caja. Ver sección 0-R.
 55. [ ] 🔴 **EXPORTAR HEKA DE NUEVO — HAY 22 GUÍAS ABIERTAS Y NO SE SABE SI SIGUEN ABIERTAS.**
     El export que hay es una foto del **9-ago** y la limpieza de cabos fue el **12-ago** (#24), así que
     no se puede saber si se resolvieron. **$622.560 de margen real en juego.** Ver sección 0-S.
@@ -2538,11 +2559,11 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     enviado). **Esas dos son fallas de proceso propio y valen $51.394 juntas.**
     📌 **Y si se perdieron, son devoluciones que NO están en la tasa de rechazo del 15,3%** — la tasa
     con la que se hacen todas las proyecciones. **El rechazo real podría ser más alto.**
-54. [ ] 🌧️🔴 **REVISAR LA ESTACIONALIDAD — YA NO ES OPCIONAL.** El clima es la hipótesis (C) de las
-    secciones 0-F y 0-I, marcada **"nunca revisada" desde el 12-ago**. Con 5.000 unidades en bodega
-    pasó de curiosidad a **la variable que define el plan**: la temporada fuerte de lluvia en la zona
-    andina va ~septiembre a noviembre, así que **escalar ahora agarra la mejor ventana del año**,
-    pero 14 meses de stock implica **cruzar una temporada seca con inventario encima.**
+54. [ ] 🌧️ **REVISAR LA ESTACIONALIDAD — COMO PALANCA DE TIMING, NO COMO RIESGO.**
+    ⚠️ **Bajó de categoría al confirmarse la consignación:** ya no hay riesgo de quedarse con
+    inventario propio. Pero sigue siendo **oportunidad fuerte**: la temporada de lluvia en la zona
+    andina va ~sep-nov, así que **escalar ahora agarra la mejor ventana de demanda del año.**
+    El clima es la hipótesis (C) de las secciones 0-F y 0-I, **nunca revisada desde el 12-ago**.
     📌 Lo mínimo: comparar ventas/día contra días de lluvia de las últimas 6 semanas.
 30. [ ] 🌎 **LA JUGADA DE CRECIMIENTO: ABRIR CIUDADES NUEVAS, no subir presupuesto.**
     La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia

@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-EL INVENTARIO NO ES UN FRENO — ES UNA OBLIGACIÓN (2026-08-21)
+EL INVENTARIO NO ES NI FRENO NI OBLIGACIÓN: ESTÁ EN CONSIGNACIÓN (2026-08-21)
 
 Datos del dueño, que cierran el GATE 0 completo:
-  · 5.000 unidades en bodega
+  · 5.000 unidades en bodega, EN CONSIGNACIÓN
   · el proveedor manda más cantidad avisando el día anterior
+
+⚠️ ESTE SCRIPT SE ESCRIBIÓ PRIMERO ASUMIENDO QUE EL INVENTARIO ESTABA COMPRADO,
+y sobre ese supuesto calculó $170.000.000 de capital dormido y una urgencia de
+rotación. El dueño aclaró que es CONSIGNACIÓN. Se retira esa conclusión:
+no hay capital inmovilizado, no hay urgencia financiera, y el riesgo de
+estacionalidad deja de ser un riesgo de balance.
+Queda escrito para no volver a razonar sobre un supuesto sin confirmarlo.
 
 Los 3 frenos históricos del negocio quedan los 3 abiertos:
   ⏱️ tiempo     ✅ resuelto (IA de WhatsApp como válvula, sección 5-B)
@@ -37,13 +44,28 @@ def sep(t):
 
 
 def main():
-    sep("1. LO PRIMERO: 5.000 UNIDADES ES MUCHÍSIMO STOCK")
+    sep("1. EN CONSIGNACIÓN: EL STOCK NO CUESTA NADA TENERLO")
     valor = UNIDADES_BODEGA * COSTO_PRODUCTO
-    print(f"  5.000 unidades × ${COSTO_PRODUCTO:,} de costo = ${valor:,} en inventario")
-    print(f"  Caja líquida del negocio:                     "
-          f"${CAJA_DISPONIBLE + EN_DISTRIBUCION:,}")
-    print(f"  → El inventario vale {valor/(CAJA_DISPONIBLE+EN_DISTRIBUCION):.0f}× la caja líquida.")
-    print(f"\n  CUÁNTO TARDA EN VENDERSE, según el ritmo:")
+    print(f"""  5.000 unidades × ${COSTO_PRODUCTO:,} = ${valor:,} de mercancía en bodega
+  que NO está pagada. El proveedor la financia.
+
+  ✅ ENTONCES SE CAE LA PREOCUPACIÓN QUE HABÍA PLANTEADO:
+     · NO hay ${valor:,} de capital dormido
+     · NO hay urgencia financiera por rotar el inventario
+     · NO hay riesgo de obsolescencia ni de temporada en el balance propio
+     · Y la "contradicción" de comprar 5.000 teniendo reposición a 1 día
+       desaparece: no se compraron, se recibieron.
+
+  🔑 LO QUE SÍ SIGNIFICA: las 5.000 unidades son una OPCIÓN GRATIS. Se puede
+     crecer 10× sin poner un peso de producto por adelantado. Es la mejor
+     posición posible para escalar.
+
+  📌 Queda una sola cosa por confirmar, y define cuánta caja hace falta:
+     ¿el pago al proveedor es al DESPACHAR o después de COBRAR?
+     Abajo se calculan los dos escenarios.
+
+  Cuánto tarda en venderse el stock, según el ritmo (ya no es un riesgo,
+  pero sirve para saber cuándo hay que pedir reposición):""")
     print(f"  {'VENTAS/DÍA':>11} {'PUBLICIDAD/DÍA':>15} {'DÍAS':>7} {'MESES':>7}")
     print("-" * 82)
     for v in [12, 19, 24, 30, 40, 60, 80]:
@@ -53,50 +75,61 @@ def main():
         print(f"  {v:>11} ${pub:>14,.0f} {dias:>7.0f} {dias/30:>7.1f}{marca}")
     print("-" * 82)
     print(f"""
-  🔑 A 12 VENTAS/DÍA ESE STOCK DURA 14 MESES. Eso no es un colchón, es capital
-     dormido: ${valor:,} quietos mientras se venden 360 unidades al mes.
-     A 40 ventas/día baja a 4 meses. **La urgencia de escalar acaba de subir
-     muchísimo, y por una razón distinta a la de ayer.**""")
+  📌 A 12 ventas/día el stock alcanza para ~14 meses. En consignación eso no es
+     un problema: es margen de maniobra. Y con reposición a 1 día de aviso,
+     tampoco hay que vigilarlo de cerca.""")
 
-    sep("2. ⚠️ EL RIESGO QUE NADIE HA MIRADO: LA ESTACIONALIDAD")
-    print("""  Son IMPERMEABLES. La demanda depende de que llueva.
-  Colombia tiene régimen bimodal: dos temporadas de lluvia al año, y la fuerte
-  en la zona andina va aproximadamente de SEPTIEMBRE a NOVIEMBRE.
+    sep("2. LA CAJA EN CONSIGNACIÓN: EL REQUERIMIENTO SE DERRUMBA")
+    print(f"""  Si el producto no se paga por adelantado, la salida diaria de caja cambia
+  por completo. Los dos escenarios posibles:
 
-  ✅ LA BUENA: estamos entrando a la mejor temporada del año. Escalar AHORA
-     agarra la ventana de mayor demanda natural.
-  🔴 LA MALA: 14 meses de stock significa cruzar una temporada SECA completa con
-     inventario encima. Si el ritmo no sube, buena parte de esas 5.000 unidades
-     se va a quedar esperando la lluvia del año siguiente.
+  ESCENARIO A — se le paga al proveedor AL DESPACHAR
+    salida/día = producto + empaque + publicidad""")
+    salida_a = VENTAS_DIA * (COSTO_PRODUCTO + COSTO_EMPAQUE) + GASTO_DIA
+    cap_a = DIAS_CICLO * salida_a
+    print(f"    = ${salida_a:,.0f}/día  →  capital necesario ${cap_a:,.0f}")
 
-  📌 El archivo lleva desde el 12-ago con el clima como hipótesis (C) de la
-     sección 0-F y 0-I, marcada "nunca revisada". **Con 5.000 unidades en bodega
-     dejó de ser una curiosidad analítica: es la variable que define el plan.**""")
+    print(f"""
+  ESCENARIO B — se le paga DESPUÉS DE COBRAR (consignación pura)
+    salida/día = empaque + publicidad (el producto se paga con lo cobrado)""")
+    salida_b = VENTAS_DIA * COSTO_EMPAQUE + GASTO_DIA
+    cap_b = DIAS_CICLO * salida_b
+    print(f"    = ${salida_b:,.0f}/día  →  capital necesario ${cap_b:,.0f}")
 
-    sep("3. 🚨 EL DATO QUE CONTRADICE LA COMPRA: EL PROVEEDOR REPONE EN 1 DÍA")
-    stock_optimo_semana = VENTAS_DIA * 7
-    print(f"""  Si el proveedor manda más avisando el día anterior, el stock necesario es de
-  días, no de meses. Con 1 día de reposición, tener 1-2 semanas de inventario ya
-  es holgado:
+    liquido = CAJA_DISPONIBLE + EN_DISTRIBUCION
+    print(f"""
+  Capital disponible: ${liquido:,}
+    holgura escenario A: {liquido/cap_a:>5.1f}×
+    holgura escenario B: {liquido/cap_b:>5.1f}×
 
-    a 12 ventas/día  → 1 semana = {stock_optimo_semana:.0f} unidades (${stock_optimo_semana*COSTO_PRODUCTO:,.0f})
-    a 19 ventas/día  → 1 semana = {19*7} unidades (${19*7*COSTO_PRODUCTO:,})
-    a 40 ventas/día  → 1 semana = {40*7} unidades (${40*7*COSTO_PRODUCTO:,})
+  🔑 EN LOS DOS CASOS LA CAJA DEJA DE SER UNA RESTRICCIÓN PRÁCTICA. En el
+     escenario B es {liquido/cap_b:.0f}× lo necesario: el negocio podría multiplicar el volumen
+     varias veces sin que la plata sea el problema.""")
 
-  Contra las 5.000 que hay (${valor:,}).
+    # Techo de caja en cada escenario
+    print(f"\n  {'ESCENARIO':>12} {'TECHO DE PUBLICIDAD/DÍA':>26} {'VENTAS/DÍA':>12}")
+    print("-" * 82)
+    for nombre, costo_var in [("A (al despachar)", COSTO_PRODUCTO + COSTO_EMPAQUE),
+                              ("B (al cobrar)", COSTO_EMPAQUE)]:
+        factor = DIAS_CICLO * (costo_var / CPA + 1)
+        pub_max = liquido / factor
+        print(f"  {nombre:>12} ${pub_max:>25,.0f} {pub_max/CPA:>12.0f}")
+    print("-" * 82)
 
-  ⚠️ Las dos cosas juntas no encajan: si se puede reponer en 1 día, comprar
-     5.000 unidades inmovilizó capital que no hacía falta inmovilizar.
+    sep("3. LA ESTACIONALIDAD BAJA DE CATEGORÍA (pero no desaparece)")
+    print("""  Son impermeables y la temporada fuerte de lluvia en la zona andina va
+  aproximadamente de SEPTIEMBRE a NOVIEMBRE.
 
-  → PREGUNTA QUE IMPORTA, y es hacia adelante: **¿el precio de $34.000 es POR
-    COMPRAR EN VOLUMEN?** Si comprar 200 cuesta más por unidad, la compra fue
-    racional (se pagó por descuento). Si cuesta lo mismo, la lección para la
-    próxima es no volver a hacerlo: **ese capital rinde mucho más en publicidad
-    que en una bodega.**""")
+  ✅ YA NO ES UN RIESGO DE BALANCE. En consignación, si la temporada se acaba con
+     stock encima, el producto no es plata propia parada: es del proveedor.
 
-    print(f"\n  Para dimensionarlo: ${valor:,} en publicidad, al CPA actual de")
-    print(f"  ${CPA:,.0f}, compran {valor/CPA:,.0f} ventas — que a ${MARGEN_UNIDAD:,} de margen")
-    print(f"  son ${valor/CPA*MARGEN_UNIDAD:,.0f} de utilidad bruta.")
+  ✅ SIGUE SIENDO UNA OPORTUNIDAD DE TIMING, Y ES FUERTE: se está entrando a la
+     mejor ventana de demanda del año. Escalar ahora la aprovecha; escalar en
+     enero pelea contra el clima.
+
+  📌 El clima sigue siendo la hipótesis (C) de las secciones 0-F y 0-I, nunca
+     revisada. Vale mirarla, pero como palanca de crecimiento (¿cuándo pisar el
+     acelerador?), no como riesgo de inventario.""")
 
     sep("4. LA ESCALERA: YA NO HAY NADA QUE LA BLOQUEE")
     print("""  Los 3 frenos están abiertos. El único límite que queda es si Meta puede
