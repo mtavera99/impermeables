@@ -1155,6 +1155,65 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-S. ❓ "¿LAS 10 GUÍAS TRABADAS SON DE HEKA?" — NO. Y HEKA TIENE SU PROPIA COLA (2026-08-21)
+
+**Pregunta del dueño.** Script: `/analisis/cola-heka-pendiente.py`.
+
+### ❌ NO SON DE HEKA: LAS FECHAS NO SE SOLAPAN
+
+| | Rango | Guías |
+|---|---|---|
+| **Heka** | 2026-07-15 → **2026-08-09** | 123 |
+| **99 Envíos** | **2026-08-10** → 2026-08-20 | 91 |
+
+**Las 10 guías trabadas se despacharon el 18 y 19 de agosto — 8-9 días después de que Heka dejara de
+usarse. Son todas de 99 Envíos.**
+
+⚠️ **NOTA DE MÉTODO (error propio, corregido en el momento):** el primer chequeo fue **inválido**. Se
+buscaron los números de guía de 99 Envíos dentro de `guias-heka.csv` y "no aparecieron" — pero **ese
+archivo no tiene columna de número de guía** (sus columnas son estado, detalle, ciudad, fecha,
+recaudo, flete), así que nunca iban a aparecer. **Un cruce que no puede fallar no prueba nada.**
+La prueba válida es la **fecha**.
+
+### 🔴 PERO HEKA DEJÓ 22 GUÍAS ABIERTAS, Y MUCHO MÁS VIEJAS
+
+| Estado | Guías |
+|---|---|
+| TRANSITO (12 de ellas "Para Reclamar en Oficina") | 12 |
+| NOVEDAD | 6 |
+| GENERADA | 2 |
+| EMPACADA | 2 |
+
+**Margen real en riesgo: $622.560.** Las más viejas: **Maceo 37 días** (EMPACADA, nunca salió),
+**Puente Quetame 36 días** (GENERADA, nunca se despachó), **Medellín 20 días** ($56.670, la de mayor
+valor), **Cartagena 18 días**.
+
+🔴 **Las 12 "Para Reclamar en Oficina" llevan 12 a 20 días ahí.** Las transportadoras devuelven al
+remitente después de ~5-10 días en oficina, así que **a esta altura lo más probable es que ya sean
+devoluciones consumadas, no rescates posibles.**
+
+📌 **Y hay dos que no son devoluciones sino errores de proceso:** Maceo quedó **EMPACADA** (empacada
+pero nunca despachada) hace 37 días y Puente Quetame quedó **GENERADA** (guía creada, producto nunca
+enviado) hace 36. **Esas dos no las perdió la transportadora.**
+
+### ⚠️ LO QUE ESTE ARCHIVO NO PUEDE RESPONDER — Y ES LO QUE IMPORTA
+
+**El export de Heka es una foto del 9-ago. El pendiente #24 dice que los cabos de Heka se cerraron el
+12-ago** (se retiraron $2.788.601 y se gestionaron las novedades). **La limpieza pasó DESPUÉS de la
+foto**, así que estas 22 guías pueden estar en dos mundos:
+
+- **(a)** ya se resolvieron en la limpieza del 12-ago → no hay nada que hacer;
+- **(b)** quedaron por fuera → hay **$622.560 de margen perdido sin registrar.**
+
+🔑 **No se puede resolver con análisis: hace falta un export nuevo de Heka** (o entrar al panel y ver
+si esas ciudades siguen abiertas). **Es lo único que distingue "ya está" de "se perdió".**
+
+📌 **Y hay una razón para mirarlo aunque duela: si se perdieron, son devoluciones que NO están
+contadas en la tasa de rechazo del 15,3%** — y esa tasa es la que alimenta todas las proyecciones de
+utilidad del negocio. **Sería un rechazo real más alto que el que se está usando para decidir.**
+
+---
+
 ## 0-R. 🎉📦 GATE 0 CERRADO: LOS 3 FRENOS ESTÁN ABIERTOS — Y EL PROBLEMA SE INVIERTE (2026-08-21)
 
 **Dato del dueño:** **5.000 unidades en bodega** + el proveedor **manda más avisando el día
@@ -2471,6 +2530,14 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⚠️ **NO asumir la respuesta. Es un supuesto de Kiro, no un dato.** Ver sección 0-R.
     Y de paso: **¿el costo de $34.000 es por comprar en volumen?** Si comprar 200 sale más caro, la
     compra fue racional. Si sale igual, la lección hacia adelante es no repetirlo.
+55. [ ] 🔴 **EXPORTAR HEKA DE NUEVO — HAY 22 GUÍAS ABIERTAS Y NO SE SABE SI SIGUEN ABIERTAS.**
+    El export que hay es una foto del **9-ago** y la limpieza de cabos fue el **12-ago** (#24), así que
+    no se puede saber si se resolvieron. **$622.560 de margen real en juego.** Ver sección 0-S.
+    🚨 **Dos de ellas NO son culpa de la transportadora: MACEO quedó "EMPACADA" hace 37 días** (empacada
+    y nunca despachada) **y PUENTE QUETAME quedó "GENERADA" hace 36** (guía creada, producto nunca
+    enviado). **Esas dos son fallas de proceso propio y valen $51.394 juntas.**
+    📌 **Y si se perdieron, son devoluciones que NO están en la tasa de rechazo del 15,3%** — la tasa
+    con la que se hacen todas las proyecciones. **El rechazo real podría ser más alto.**
 54. [ ] 🌧️🔴 **REVISAR LA ESTACIONALIDAD — YA NO ES OPCIONAL.** El clima es la hipótesis (C) de las
     secciones 0-F y 0-I, marcada **"nunca revisada" desde el 12-ago**. Con 5.000 unidades en bodega
     pasó de curiosidad a **la variable que define el plan**: la temporada fuerte de lluvia en la zona
