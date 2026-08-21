@@ -10,6 +10,16 @@ corre en UTC y ya marca el día siguiente)*
 ✅✅ **CHEQUEO DEL ESCALÓN 1 CERRADO (2026-08-21, sección 0-O): EL ESCALÓN 2 SE JUSTIFICA.**
 **24 guías el 19-20 ago (umbral: 20) · 12,0 ventas/día · gasto $72.553/día · CPA por venta
 despachada $6.046 (techo: $10.000) → 4,04× de colchón.**
+🎉🎉 **EL FRENO SE REDUJO A UNO SOLO: EL INVENTARIO (sección 0-Q).** 99 Envíos **paga cualquier día
+y se retira cuando se quiera** → el ciclo de caja es solo el tránsito (**3,1 días**), hacen falta
+$1.557.978 y hay **$5.200.000** ($2.200.000 retirables + $3.000.000 en distribución) = **3,3× de
+holgura.** **El techo que impone la caja está en $242.157/día de publicidad (40 ventas/día).**
+🔴 **Entonces CONTAR EL INVENTARIO es LO ÚNICO que falta para el escalón 2** (#29): a 19 ventas/día
+se consumen **133 conjuntos por semana.**
+📌 **Y aparece un riesgo: $2.200.000 quietos en la plataforma.** Es el mismo patrón de los
+$2.788.601 que se acumularon con Heka. **Retirar por rutina, no cuando se acumula.**
+✅ **Las 7 novedades trabadas se resolvieron el 21-ago.** Quedan en observación: **cuántas terminen
+entregadas mide por primera vez si rescatar novedades sirve.**
 🚚💰 **DOS COSAS QUE APORTÓ EL DUEÑO Y NO ESTABAN DOCUMENTADAS (sección 0-P): (1) ÉL ELIGE LA
 TRANSPORTADORA** — el flete es una decisión, no un sorteo; elegir mal costó **$16.593** medidos, y
 8 envíos a Bogotá fueron por interrapidísimo teniendo coordinadora ($991 más caro cada uno).
@@ -1133,6 +1143,79 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-Q. 💵 EL GATE 0 SE ABRIÓ A MEDIAS: LA CAJA NO ES EL FRENO, EL INVENTARIO SÍ (2026-08-21)
+
+**Dato del dueño:** 99 Envíos **paga cualquier día, se retira cuando se quiera** (no hay ciclo de
+pago). **$2.200.000 disponibles para retirar** + **~$3.000.000 en distribución.**
+Script: `/analisis/caja-y-techo-real.py`.
+
+### ✅ SE RESUELVE EL PENDIENTE #28-2, QUE ERA MEDIO GATE 0
+
+El plan del 19-ago decía: *"sin saber en cuántos días paga 99 Envíos no se puede saber cuánta caja
+hace falta; si paga en 7 días, escalar 27% amarra $3,75 millones."* **Ese escenario no existe:**
+al pagar a demanda, **el capital amarrado es solo lo que está viajando**, no lo que espera el pago.
+
+**El ciclo de caja real, deducido de los $3.000.000 en tránsito:**
+
+| | |
+|---|---|
+| Recaudo despachado por día | $960.000 (12 ventas × ~$80.000) |
+| En distribución | $3.000.000 |
+| **→ Días de ciclo** | **3,1 días** (coherente con la entrega de 1-3 días hábiles) |
+| Salida de caja por día | **$498.553** (producto+empaque $426.000 + publicidad $72.553) |
+| Capital de trabajo necesario hoy | **$1.557.978** |
+| Capital disponible | **$5.200.000** |
+| **→ Holgura** | **3,3×** |
+
+### 🔑 EL TECHO QUE IMPONE LA CAJA: $242.157/DÍA DE PUBLICIDAD (40 ventas/día)
+
+| Publicidad/día | Ventas/día | Capital necesario | ¿Alcanza? |
+|---|---|---|---|
+| $72.553 *(hoy)* | 12,0 | $1.557.978 | ✅ |
+| **$114.634 *(escalón 2, +58%)*** | **19,0** | **$2.461.605** | ✅ |
+| $145.106 | 24,0 | $3.115.956 | ✅ |
+| $181.382 | 30,0 | $3.894.945 | ✅ |
+| $290.212 | 48,0 | $6.231.912 | 🔴 no |
+
+**El escalón 2 cabe con holgura de sobra. La caja deja de ser una restricción práctica.**
+
+### 🔴 ENTONCES EL ÚNICO CANDADO QUE QUEDA ES EL INVENTARIO (pendiente #29)
+
+| Escenario | Ventas/día | Conjuntos/semana | Al mes |
+|---|---|---|---|
+| Hoy | 12,0 | **84** | 360 |
+| **Escalón 2 (+58%)** | 19,0 | **133** | **569** |
+| El doble | 24,0 | 168 | 720 |
+| El techo de caja | 40,1 | 280 | 1.202 |
+
+⚠️ **Escalar sin saber el stock es peor que no escalar: quema publicidad Y quema clientes** (se
+prenden anuncios sin producto que despachar). **Contar el inventario es ahora LO ÚNICO que separa
+al negocio del escalón 2.**
+
+### 📊 CUÁNTO PUEDE EMPEORAR EL CPA ANTES DE DOLER
+
+| CPA | vs hoy | Colchón | Utilidad/día a 19 ventas |
+|---|---|---|---|
+| **$6.046** *(hoy)* | 1,0× | **4,04×** | **$347.990** |
+| $10.000 | 1,7× | 2,44× | $273.024 |
+| $15.000 | 2,5× | 1,63× | $178.224 |
+| $20.000 | 3,3× | 1,22× | $83.424 |
+| $24.400 | 4,0× | 1,00× | $0 🔴 equilibrio |
+
+**El CPA puede empeorar 4× antes de dejar de ganar plata.** Eso es lo que hace del escalón 2 una
+apuesta barata incluso si Meta degrada la calidad del tráfico.
+
+### 📌 RIESGO NUEVO QUE APARECE CON ESTE DATO: PLATA QUIETA EN LA PLATAFORMA
+
+Si se puede retirar cuando se quiera, **dejar $2.200.000 quietos en 99 Envíos es exposición
+innecesaria**: no rinde nada y depende de que la plataforma siga operando bien.
+⚠️ **Ya pasó con Heka:** se acumularon **$2.788.601** y hubo que ir a retirarlos (pendiente #24).
+**Es el mismo patrón repitiéndose.**
+→ **Retirar por rutina** (semanal, o cuando pase de ~$1.000.000) en vez de cuando se acumula.
+No cambia la rentabilidad; baja el riesgo de contraparte.
 
 ---
 
@@ -2263,8 +2346,14 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     **(a) por DÍA** (para que el CPA sea medido y no estimado) · **(b) por CONJUNTO** (sin esto **NO se
     puede calcular EL TERMÓMETRO**, la herramienta principal de diagnóstico de este archivo) ·
     **(c) por ANUNCIO** (para el pendiente #32, saber qué creativo genera VENTAS).
-28. [ ] ❓ **LAS PREGUNTAS A 99 ENVÍOS** (actualizadas el 15-ago):
-    (1) **% de comisión por recaudo**; (2) **en cuántos días paga** (Heka: 1 día hábil);
+28. [ ] ❓ **LAS PREGUNTAS A 99 ENVÍOS** — ya solo queda UNA (la comisión) + la de coordinadora (#50):
+    (2) [x] ✅ **RESUELTO EL 21-AGO: PAGA CUALQUIER DÍA, SE RETIRA CUANDO SE QUIERA.** No hay ciclo
+    de pago → el ciclo de caja es solo el tránsito (**3,1 días**) y **la caja deja de ser el freno**
+    (3,3× de holgura, techo en $242.157/día de publicidad). **Ver sección 0-Q.**
+    ⚠️ **Y aparece un riesgo nuevo: hay $2.200.000 quietos en la plataforma.** Si se puede retirar
+    cuando se quiera, dejarlos ahí es exposición sin razón — **es el mismo patrón de los $2.788.601
+    que se acumularon con Heka (pendiente #24). Retirar por rutina, no cuando se acumula.**
+    (1) **% de comisión por recaudo** ← lo único que sigue pendiente de esta lista;
     (3) [x] ✅ **RESUELTO CON DATOS EL 19-AGO — NO PREGUNTAR MÁS.** Las 2 primeras devoluciones
     mostraron que **en una devolución solo se cobra la PRIMA** ($1.742 y $3.111 en vez de $12.871 y
     $22.793): **el flete de ida Y vuelta queda cubierto completo.** Ahorro ~$18.574 por devolución
@@ -2272,8 +2361,14 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ✅ **YA RESPONDIDO por el dueño:** el seguro **está incluido** en el `valor_servicio` y **en Heka
     no se pagaba** → el cambio de transportadora **fue correcto** (flete 14,1% más barato + cobertura
     al mismo precio total). Ver sección 0-H. Lo que queda es afinar el alcance de la cobertura.
-29. [ ] 📦 **MEDIR INVENTARIO — es el ÚNICO de los 3 frenos que sigue sin resolver.** Los otros dos
-    (tiempo y caja) ya están. Sin este dato no se puede decidir cuánto crecer.
+29. [ ] 🔴🔴📦 **CONTAR EL INVENTARIO — ES LO ÚNICO QUE FALTA PARA EL ESCALÓN 2.**
+    **Confirmado el 21-ago (sección 0-Q): tiempo ✅ resuelto, caja ✅ resuelta, inventario 🔴 no.**
+    Es literalmente el último candado del Gate 0. **A 19 ventas/día (escalón 2) se consumen
+    133 conjuntos por semana / 569 al mes.** Hoy, a 12/día, son 84 por semana.
+    ⚠️ **Escalar sin este dato es peor que no escalar:** se prenden anuncios sin producto que
+    despachar, y eso quema publicidad Y quema clientes.
+    📌 **No hace falta un conteo perfecto:** con saber cuántos conjuntos hay y cuánto tarda el
+    proveedor en reponer, ya se puede decidir el tamaño del escalón.
 30. [ ] 🌎 **LA JUGADA DE CRECIMIENTO: ABRIR CIUDADES NUEVAS, no subir presupuesto.**
     La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia
     de 1,31 prueba que NO es saturación de audiencia). **Bajo Advantage+ la geografía es la única forma
@@ -2296,12 +2391,16 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 33. [ ] 🛡️ **Decidir si se le da conjunto propio a "Demostración agua rueda"** (~$10.000/día) para
     tener un respaldo REAL y no teórico. Hoy recibe $0-63/día dentro de Domiciliarios. No urgente
     (frecuencia 1,31 = Fondo azul sin desgaste), pero cuando se desgaste ya se querrá tener corriendo.
-34. [ ] 🚨🚨🔥📞 **SIN EJECUTAR DESDE EL 15-AGO. LAS 7 SIGUEN TRABADAS Y AHORA SON 17.**
-    **Verificado el 21-ago con el export nuevo (sección 0-O): Inzá, Cartagena y Popayán llevan
-    10 DÍAS; Málaga 9; Remedios 8; Bogotá 7; Guachené 6.** Total: **17 guías, $406.346 de margen
-    REAL en riesgo.** Cartagena sigue siendo la llamada #1 ($48.981, guía 240058798601).
+34. [x] ✅ **LAS 7 NOVEDADES SE RESOLVIERON EL 21-AGO** (el dueño las gestionó). Eran Inzá, Cartagena,
+    Popayán, Málaga, Remedios, Bogotá y Guachené — llevaban entre 6 y 10 días. **Quedan en
+    observación: hay que ver cuántas terminan ENTREGADAS y cuántas en devolución.**
+    🔑 **Y eso las vuelve un dato valioso, no solo una tarea cerrada:** es la primera medición de
+    **cuánto sirve rescatar una novedad**. Si la mayoría se entrega, la gestión de novedades pasa a
+    ser rutina obligatoria; si se devuelven igual, el esfuerzo hay que ponerlo antes (en el guion y
+    en la confirmación de dirección). **Verificarlo en el próximo export.**
     ⚠️ **El monto de $181.744 que decía este punto estaba inflado: se calculó como recaudo − flete,
     sin descontar producto ni empaque.** Los montos corregidos están en la sección 0-O.
+    📌 **Quedan ~10 guías más en estados de traba** (1-3 días al 21-ago), esas todavía con tiempo.
     ↓ *(texto original del 15-ago, se conserva)*
     Orden de llamada por valor: **CARTAGENA (2 uds, $48.981, ya tiene un intento fallido y Cartagena
     acumuló 2 de las 15 devoluciones de Heka — es la llamada #1 del negocio)** · Popayán $24.457 ·
@@ -2325,13 +2424,15 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     Columna imprescindible: **"Último cambio significativo"**.
 46. [x] ✅ **CHEQUEO DEL ESCALÓN 1 CERRADO EL 21-AGO (sección 0-O): 24 guías el 19-20, 12,0
     ventas/día, CPA $6.703. ESCALÓN 2 JUSTIFICADO.**
-49. [ ] 📈 **EJECUTAR EL ESCALÓN 2.** CPA $6.046 con 4,04× de colchón → hay espacio de sobra.
-    ⚠️ **La regla del "+60% máximo" YA NO APLICA** (se cayó, sección 0-M). **El tamaño se decide por
-    CAJA e INVENTARIO**, no por el aprendizaje. Un escalón parecido al anterior (+~58%) es el único
-    tamaño cuyo resultado ya se vio funcionar.
-    ⚠️ **Motorizados sigue congelado hasta el 29-ago** (es el termómetro del test del valle).
-    🔴 **Y el freno real: a 12 ventas/día la salida es ~$500.000/día** y sigue sin saberse en cuántos
-    días paga 99 Envíos (pendiente #28-2). **Ese dato bloquea el escalón 2 más que Meta.**
+49. [ ] 📈 **EJECUTAR EL ESCALÓN 2 — SOLO FALTA CONTAR EL INVENTARIO (#29).**
+    Propuesta: **$90.000 → $114.634/día (+58%)**, el mismo tamaño de escalón que ya se vio funcionar.
+    Eso lleva a ~19 ventas/día y ~$348.000/día de utilidad si el CPA se mantiene.
+    ✅ **Caja: alcanza con 3,3× de holgura** (sección 0-Q). ✅ **CPA: 4,04× de colchón.**
+    🔴 **Inventario: sin medir → 133 conjuntos/semana. ES EL ÚNICO BLOQUEO.**
+    ⚠️ **La regla del "+60% máximo" YA NO APLICA** (se cayó, sección 0-M): el tamaño se decide por
+    caja e inventario, no por el aprendizaje.
+    ⚠️ **Motorizados sigue congelado hasta el 29-ago** (es el termómetro del test del valle) → el
+    escalón va en **Domiciliarios**, y eventualmente en TEST.
     📌 **Después del escalón, NO juzgar el CPA hasta 3-4 días** (puede haber reinicio de aprendizaje).
 50. [ ] 🚚 **PREGUNTARLE A 99 ENVÍOS POR *COORDINADORA*: ¿QUÉ COBERTURA TIENE?** Es la más barata
     ($15.440 promedio vs ~$20.800 de las otras dos) pero solo se ha usado en **5 destinos**.

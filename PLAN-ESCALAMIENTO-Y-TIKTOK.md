@@ -8,7 +8,25 @@ techo de gasto que se creía fijo ($48.585/día) se rompió: ahora absorbe **$58
 
 # PARTE 1 — ESCALAR META
 
+> ## 🔄 ACTUALIZACIÓN 2026-08-21 — LEER ESTO ANTES QUE EL RESTO DEL DOCUMENTO
+>
+> **El escalón 1 se ejecutó (a $90.000/día, no a los $65.000 que proponía este plan) y funcionó:**
+> 12,0 ventas/día · **CPA por venta despachada $6.046** · **4,04× de colchón**. Ver sección 0-O.
+>
+> **DEL GATE 0 DE ABAJO, UN CANDADO SE ABRIÓ Y EL OTRO SIGUE CERRADO:**
+> - 💵 **Días de pago de 99 Envíos → ✅ RESUELTO: paga cualquier día, se retira cuando se quiere.**
+>   El escenario de "si paga en 7 días amarra $3,75M" **no existe**. Ciclo real: **3,1 días**.
+>   Capital necesario hoy $1.557.978 contra $5.200.000 disponibles = **3,3× de holgura.**
+>   **El techo que impone la caja está en $242.157/día de publicidad (40 ventas/día).** Ver sección 0-Q.
+> - 📦 **Inventario → 🔴 SIGUE SIN MEDIRSE, y ahora es EL ÚNICO freno.** A 19 ventas/día (escalón 2)
+>   se consumen **133 conjuntos por semana**.
+>
+> ⚠️ **Y OJO: la regla de "+60% máximo" que se escribió el 21-ago SE CAYÓ** (sección 0-M). El umbral
+> del reinicio de aprendizaje **no se puede predecir**. El tamaño del escalón se decide por caja e
+> inventario, y después del cambio **no se juzga el CPA hasta 3-4 días.**
+
 ## 🚦 GATE 0: DOS DATOS QUE HAY QUE TENER **ANTES** DE SUBIR UN PESO
+*(⚠️ el candado de la caja ya se abrió — ver la actualización de arriba)*
 
 Meta ya **no** es el cuello de botella. Los frenos reales son los que el archivo viene señalando
 desde julio, y siguen sin medirse:
