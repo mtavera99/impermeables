@@ -4,8 +4,61 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-19 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
+Última actualización: 2026-08-21 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
 corre en UTC y ya marca el día siguiente)*
+
+✅✅ **CHEQUEO DEL ESCALÓN 1 CERRADO (2026-08-21, sección 0-O): EL ESCALÓN 2 SE JUSTIFICA.**
+**24 guías el 19-20 ago (umbral: 20) · 12,0 ventas/día · gasto $72.553/día · CPA por venta
+despachada $6.046 (techo: $10.000) → 4,04× de colchón.**
+🎉🎉🎉 **GATE 0 CERRADO — LOS 3 FRENOS DEL NEGOCIO ESTÁN ABIERTOS POR PRIMERA VEZ DESDE JULIO
+(sección 0-R):** ⏱️ tiempo ✅ (IA como válvula) · 💵 caja ✅ (99 Envíos paga a demanda: ciclo de
+**3,1 días**, hacen falta $1.557.978 y hay **$5.200.000** = **3,3× de holgura**) · 📦 inventario ✅
+(**5.000 unidades** + reposición avisando el día anterior).
+✅ **Y LAS 5.000 UNIDADES SON EN CONSIGNACIÓN → el proveedor las financia.** No hay capital dormido,
+no hay urgencia de rotación, no hay riesgo de temporada en el balance propio. **Son una OPCIÓN
+GRATIS: se puede crecer 10× sin poner un peso de producto por adelantado.**
+💵 **Y la caja se derrumba como restricción:** si al proveedor se le paga después de cobrar, hacen
+falta solo **$280.714** (holgura **18,5×**) y el techo sube a **222 ventas/día.**
+🔴 **EL FRENO QUE QUEDA NO ES INTERNO: es la GEOGRAFÍA en Meta — y un paso manual de 10 minutos
+(pegar el guion nuevo en la IA, pendiente #43). Eso es literalmente lo que bloquea el crecimiento.**
+🌧️ **LA ESTACIONALIDAD ES OPORTUNIDAD, NO RIESGO (#54):** la temporada fuerte de lluvia va ~sep-nov,
+así que **escalar ahora agarra la mejor ventana de demanda del año.** En consignación no hay riesgo de
+quedarse con inventario propio. El clima sigue siendo la hipótesis (C) nunca revisada desde el 12-ago.
+📌 **Y aparece un riesgo: $2.200.000 quietos en la plataforma.** Es el mismo patrón de los
+$2.788.601 que se acumularon con Heka. **Retirar por rutina, no cuando se acumula.**
+✅ **Las 7 novedades trabadas se resolvieron el 21-ago.** Quedan en observación: **cuántas terminen
+entregadas mide por primera vez si rescatar novedades sirve.**
+🚚💰 **DOS COSAS QUE APORTÓ EL DUEÑO Y NO ESTABAN DOCUMENTADAS (sección 0-P): (1) ÉL ELIGE LA
+TRANSPORTADORA** — el flete es una decisión, no un sorteo; elegir mal costó **$16.593** medidos, y
+8 envíos a Bogotá fueron por interrapidísimo teniendo coordinadora ($991 más caro cada uno).
+**(2) HAY PROMO DE 2 POR $110.000** y **ninguno de los 6 pedidos de 2 unidades la cobró bien** —
+se desvía en ambos sentidos y en 2 se absorbió flete. La promo deja **1,88×** una venta de 1 unidad.
+⚠️ **SE CAYÓ LA REGLA DEL "+60% MÁXIMO" (sección 0-M): el umbral de aprendizaje NO se puede
+predecir.** Dos cambios del mismo +67% dieron resultados opuestos. **Regla nueva: asumir que
+cualquier cambio puede reiniciar el aprendizaje y no juzgar el CPA hasta 3-4 días después.**
+🚨🚨 **ALARMA OPERATIVA, NO ANALÍTICA: LAS 7 GUÍAS DEL PENDIENTE #34 SIGUEN TRABADAS 6 DÍAS
+DESPUÉS.** Inzá, Cartagena y Popayán llevan **10 días**. En total hay **17 guías trabadas y
+$406.346 de margen real en riesgo.** Cartagena es la llamada #1 ($48.981).
+🆕 **HALLAZGO: 99 ENVÍOS REPARTE ENTRE TRES TRANSPORTADORAS Y CADA UNA COBRA DISTINTO POR EL MISMO
+DESTINO** (Bogotá: coordinadora $11.880 · interrapidísimo $12.871 · servientrega $14.674).
+**No existe "el flete de Bogotá"** → por eso el tarifario cobra el peor caso de cada banda.
+
+🆕🆕 **LO ÚLTIMO (2026-08-21) — DOS COSAS, UNA HECHA Y UNA QUE CORRIGE EL MANUAL:**
+1. ✅ **EL GUION Y EL TARIFARIO QUEDARON ARREGLADOS (pendientes #38 y #35 — sección 0-N).**
+   La tabla de fletes que alimentaba el conocimiento del negocio era **inventada** (Cali $13.000
+   cuando el real es $20.771; default $18.000 cuando los pueblos cuestan $25.029). Con las 79 guías
+   reales se absorbieron **$102.148** de flete en 77 guías; el tarifario nuevo lo baja a **$1.574
+   (−98,5%)**. **La fuga estaba SOLO en los destinos caros (bandas D y E), que son el 28% del
+   volumen.** ⚠️ **FALTA EL PASO MANUAL: pegar el bloque nuevo en la IA de WhatsApp Business.**
+   Cambiar el repo NO cambia lo que la IA le dice al cliente. Ver `TARIFARIO-Y-GUION.md`.
+2. 🚨 **SE CORRIGE UNA REGLA DEL MANUAL: SUBIR PRESUPUESTO *SÍ* REINICIA EL APRENDIZAJE.**
+   La sección 0-C y el plan del 19-ago decían que "escalar presupuesto es barato en esta cuenta
+   porque no reinicia el aprendizaje". **Es falso pasado cierto tamaño.** Ver sección 0-M.
+   **Regla nueva: escalones de +60% o menos.**
+🆕 **HALLAZGO QUE BLOQUEA EL PENDIENTE #40: el precio de 2 unidades NO EXISTE.** Los 5 pedidos de
+2 conjuntos se cobraron a $54.058–59.991 por unidad (dispersión 11% = **$11.864 por pedido** entre
+el mejor y el peor caso). **Cada cierre improvisó.** No se puede "ofrecer sistemáticamente la
+segunda unidad" sin definir el precio primero. **Decisión pendiente del dueño.** Ver sección 0-N.
 
 🎉🎉 **ESTADO ACTUAL — TODO SE RECUPERÓ (sección 0-L, veredicto del 19-ago):**
 **10,25 ventas/día (+97%, nivel pre-temblor) · cierre 9,4% (venía de 6,1%) · CPA por venta cerrada
@@ -400,13 +453,16 @@ siempre está recargada.**
 - El miércoles 5-ago (día 1) se vieron $751 y $0 de entrega → **corrigió por completo en 24-48 h.**
   Era **reinicio de aprendizaje**, exactamente como se había previsto. ⚠️ Lección: NO reaccionar al día 1.
 
-**🔑 HALLAZGO NUEVO — SUBIR PRESUPUESTO **NO** REINICIA EL APRENDIZAJE EN ESTA CUENTA:**
+**🔑 HALLAZGO — UN SALTO DE +67% NO REINICIÓ EL APRENDIZAJE:**
 El CSV trae el campo **"Último cambio significativo"**. Para Domiciliarios y sus 3 anuncios dice
 **2026-07-11** — o sea que el salto de $18.000 → $30.000 (+67%) **NO fue registrado por Meta como
 cambio significativo** y el conjunto nunca volvió a fase de aprendizaje. Los anuncios del TEST sí
 marcan 31-jul (crearlos SÍ cuenta).
-→ **Implicación práctica: escalar presupuesto es más barato de lo que temíamos.** Lo que sí reinicia
-aprendizaje es crear/duplicar anuncios y conjuntos, o cambiar audiencias.
+⚠️⚠️ **CORREGIDO EL 2026-08-21 — ESTE PUNTO DECÍA "SUBIR PRESUPUESTO NO REINICIA EL APRENDIZAJE EN
+ESTA CUENTA" Y ESO ERA UNA GENERALIZACIÓN DESDE UN SOLO CASO.** El salto de **$30.000 → $55.000
+(+83%)** del 19-ago **SÍ reinició** el aprendizaje de Domiciliarios (marcó 2026-08-19 01:45).
+**El umbral está entre +67% y +83% → usar escalones de +60% o menos.** Ver sección **0-M**.
+→ Lo que sí reinicia aprendizaje siempre: crear/duplicar anuncios y conjuntos, o cambiar audiencias.
 
 **🟡 EL REPARTO 91/9 (no pelearlo):** Fondo azul se lleva ~91% del presupuesto de Domiciliarios; las
 2 copias ~9% juntas (~$1.235 y ~$1.532/día). Aparece la alerta "Presupuesto bajo utilizado" en
@@ -1095,6 +1151,848 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-U. 💰 EL DESCUENTO DE CIERRE + EL DESPACHO DE FIN DE SEMANA (2026-08-21)
+
+Dos aportes del dueño. Script: `/analisis/descuento-de-cierre.py`.
+
+### 🗓️ PRIMERO, UN DATO OPERATIVO QUE CORRIGE UNA INFERENCIA DE KIRO
+
+**El despacho de fin de semana NO es una restricción: es una decisión por volumen.**
+Los datos muestran **0 guías despachadas sábado y domingo**, y de ahí se infirió que "no se despacha
+el fin de semana". **Falso.** El dueño aclara: *"el viernes pasado como hubo pocos lo despaché hasta
+el lunes, pero si empiezan a haber varios puedo despachar, eso no es problema"*.
+
+⚠️ **Ese lote de 29 guías del lunes 17 (el más grande de la historia) fue una elección, no un techo.**
+🔑 **Lección: "cero registros" no prueba "no puede". Prueba "no pasó".** Es la segunda vez en el día
+que un dato ausente se leyó como una restricción que no existía (la otra fue el cruce de guías Heka).
+
+### ✅ Y ESO CAMBIA EL TIMING ÓPTIMO DEL ESCALÓN — A FAVOR DE SUBIRLO ANTES
+
+| Si se sube… | Fase de aprendizaje | Valle 26-29 | ¿Se puede leer el valle? |
+|---|---|---|---|
+| **viernes 21** | 22, 23, 24, 25 | **ya estabilizado** | ✅ **sí** — 26-29 vs 31-ago+, mismo presupuesto |
+| lunes 24 | 24, 25, 26, 27 | **dentro del aprendizaje** | 🔴 no — se pisan |
+
+**Subiendo el viernes, la fase de aprendizaje se consume en el fin de semana y el valle llega con la
+cuenta estabilizada.** Ya no hay que elegir entre el escalón y el test del valle: **se tienen los dos.**
+
+### 💰 EL DESCUENTO DE CIERRE: SÍ, PERO CON TOPE DE $3.000 Y REGLAS
+
+**Idea del dueño:** si el cliente dice que el envío está caro, bajarle $3.000-5.000 de la ganancia
+como último recurso para no perder la venta.
+
+⚠️ **Mecánicamente es LO MISMO que la fuga de la sección 0-H. La diferencia es decisiva:**
+
+| | La fuga (0-H) | El descuento de cierre |
+|---|---|---|
+| Cuándo | **incondicional** — en todas las ventas de bandas caras | **solo si el cliente objeta** |
+| Visibilidad | **invisible**, nadie lo decidió | consciente y auditable |
+| Causa | el guion prometía un envío que no existía | herramienta de cierre |
+
+**Un descuento que solo reciben los que se iban a ir no es una fuga: es precio discriminado.**
+
+**El umbral, calculado:**
+
+| Descuento | Margen queda | El cierre entre los que objetan debe subir |
+|---|---|---|
+| $2.000 | $22.400 | +8,9% |
+| **$3.000** | **$21.400** | **+14,0%** ← tope recomendado |
+| $4.000 | $20.400 | +19,6% |
+| $5.000 | $19.400 | **+25,8%** |
+
+🔑 **El tope debe ser $3.000, no $5.000. La diferencia no es de $2.000: es de exigirle 14% de
+efectividad al descuento en vez de 26%.** Y es robusto: incluso si **la mitad** de los que objetan
+iba a comprar igual, con $3.000 sigue conviniendo si convierte 28% más.
+
+### 🪜 LA ESCALERA COMPLETA (el descuento es el 5º escalón, no el 1º)
+
+| # | Jugada | Costo | Por qué |
+|---|---|---|---|
+| 1º | Reforzar valor | $0 | la 0-J probó que la venta se decide en color y talla, no en precio |
+| 2º | Mostrar la cuenta | $0 | el envío no es un invento nuestro |
+| 3º | **Ofrecer 2 unidades** | **+margen** | 🥇 *"pagas un solo envío"* → le ahorra $13.651 y **sube** el margen |
+| 4º | **Cambiar transportadora** | **$0-1.000** | 🥇 sale del **costo**, no del margen. Hasta **$2.794** en Bogotá |
+| 5º | Descuento de cierre | $3.000 | último recurso, condicionado a cerrar ya |
+
+🔑 **Los escalones 3 y 4 son los hallazgos útiles: hay dos formas de "bajarle el precio" al cliente
+que no cuestan margen.** El 4º solo existe porque el dueño elige transportadora (sección 0-P).
+
+### 🔒 LAS REGLAS QUE EVITAN QUE VUELVA A SER FUGA
+
+- **Tope $3.000.** · **Solo reactivo** (nunca ofrecerlo). · **Una sola vez** por conversación.
+- **Condicionado a cerrar ya:** *"te ayudo con $3.000 si lo cerramos hoy"* — protege el precio.
+- **Decir "descuento", NO "te bajo el envío"** — si el envío parece negociable, todos negocian.
+- 🚫 **Nunca en pedidos de 2 unidades** (ahí el gancho es el envío compartido).
+
+📊 **ES AUDITABLE, y ese es el control clave:** el descuento se ve en el export como diferencia entre
+el `valor_comercial` cobrado y el total de la banda.
+**Regla de alarma: si más del 15% de las ventas de una semana llevan descuento, dejó de ser último
+recurso y se volvió el precio real → hay que revisar el tarifario, no seguir descontando.**
+
+**Dimensión del riesgo:** al 15% de las ventas cuesta $8.100/día = **1,84% del margen**. Barato
+comparado con la fuga anterior, que corría en el 28% del volumen sin que nadie lo hubiera decidido.
+
+---
+
+## 0-T. 💬 ¿PRECIO SEPARADO O TOTAL? — LA RESPUESTA ES "LOS DOS", Y HAY UN DATO NUEVO (2026-08-21)
+
+**Pregunta del dueño.** Script: `/analisis/precio-total-vs-separado.py`.
+
+### 🚨 PRIMERO, UN DATO QUE CAMBIA VARIAS CUENTAS DEL ARCHIVO: UNA DEVOLUCIÓN YA CASI NO CUESTA
+
+| Concepto | Antes | Hoy |
+|---|---|---|
+| Prima del seguro | — | $2.500 |
+| Empaque perdido | $1.500 | $1.500 |
+| **Producto** | **$34.000 perdido** | **$0** — vuelve al stock, es **consignación** |
+| **Flete ida y vuelta** | **~$21.000 perdido** | **$0** — lo cubre el **Seguro 99** |
+| **TOTAL** | **~$25.900** | **~$4.000** |
+
+🔑 **UNA DEVOLUCIÓN ES 10 VECES MÁS BARATA QUE ANTES**, por dos hallazgos que se documentaron por
+separado y **nunca se habían juntado**: el seguro (sección 0-L) y la consignación (sección 0-R).
+**El rechazo dejó de ser el enemigo del negocio.**
+
+⚠️ **Esto merece revisarse en todas las proyecciones que usan el rechazo del 15,3% como costo.**
+
+### 📊 LO QUE VALE UNA VENTA CERRADA, Y EL PUNTO DE EQUILIBRIO
+
+| Rechazo | Valor esperado por venta cerrada | vs hoy |
+|---|---|---|
+| 10,0% | $15.514 | +10,7% |
+| **15,3%** *(hoy)* | **$14.009** | — |
+| 20,0% | $12.674 | −9,5% |
+| 25,0% | $11.254 | −19,7% |
+| 40,0% | $6.994 | −50,1% |
+
+**Cuánto cierre habría que ganar para pagar más rechazo:**
+
+| Si el rechazo sube a | El cierre debe subir | O sea, de 9,4% a |
+|---|---|---|
+| 18% | +5,8% | 9,9% |
+| **20%** | **+10,5%** | **10,4%** |
+| 25% | +24,5% | 11,7% |
+
+**Son umbrales bajos: el precio separado tiene la matemática a favor** — si mostrar $59.900 en vez de
+$81.000 sube el cierre de 9,4% a apenas 10,4%, ya paga un rechazo del 20%.
+
+### ⚠️ PERO HAY TRES COSTOS QUE NO ESTÁN EN ESA CUENTA, Y SON LOS DECISIVOS
+
+1. 🔴 **EL TIEMPO DEL DUEÑO.** Cada devolución son llamadas y gestión. **El cuello de botella
+   histórico de este negocio ha sido su tiempo, no la plata** — y hay 17 guías trabadas ahora mismo,
+   7 de las cuales estuvieron 10 días sin resolver. **Más devoluciones consumen el recurso escaso.**
+2. 🔴 **EL FLETE ABSORBIDO — y esto está MEDIDO.** La sección 0-H probó que se absorbían
+   $3.900-4.900 por venta en destinos caros, **porque el guion había prometido un envío barato y
+   nadie quiere romper la promesa al momento de cerrar.** 🔑 **El precio separado CREA esa promesa.
+   El total no la crea.** Es el mecanismo exacto de la fuga.
+3. 🔴 **LA OBJECIÓN "¿por qué pago envío?"** está documentada en la sección 7 como recurrente.
+   **Esa objeción solo existe si se separa el precio.**
+
+📌 **Y un dato que apunta al mismo lado: la sección 0-J encontró que la conversación se decide en
+COLOR (77%) y TALLA (64%), no en precio.** Simplificar el precio libera la conversación para lo que
+sí gana la venta.
+
+### ✅ LA RESPUESTA: LOS DOS NÚMEROS EN UNA FRASE, CERRANDO EN EL TOTAL
+
+> ✅ *"El conjunto es $59.900 y el envío a Cali son $21.100, así que **te llega a $81.000 al recibir,
+> todo incluido** 📦"*
+
+**Por qué gana a las dos versiones puras:**
+- **Respeta el ancla del anuncio** (que dice $59.900) → no se siente engaño;
+- **Muestra la cuenta** → no hay sorpresa en la puerta, que es lo que alimenta el rechazo;
+- **Termina en el número que va a pagar de verdad** → cero ambigüedad;
+- Y **justifica por qué varía**: "el envío depende de tu ciudad".
+
+⚠️ **CORRECCIÓN AL GUION DEL MISMO DÍA:** la primera versión decía *"habla del TOTAL, nunca del envío
+suelto"*. **Era demasiado absoluto** — esconder la cuenta hace que el total parezca inflado frente al
+$59.900 del anuncio. **Ya está corregido en `bot/src/prompt.js` y en `TARIFARIO-Y-GUION.md`.**
+
+🔴 **LO QUE SÍ ESTÁ PROHIBIDO SIEMPRE: dar un RANGO antes de saber la ciudad.** Eso no es una forma
+de presentar el precio, es una promesa incumplible, y es la causa medida de la fuga.
+
+📌 **CÓMO SALIR DE LA DUDA DE VERDAD (1 semana, gratis):** el pendiente **#39** ya propone textos de
+apertura distintos por anuncio. Con eso se corre el test real —una semana con total, una con
+separado— y se compara **cierre Y rechazo**. Es la única forma de saberlo con este negocio en vez de
+con teoría.
+
+---
+
+## 0-S. ❓ "¿LAS 10 GUÍAS TRABADAS SON DE HEKA?" — NO. Y HEKA TIENE SU PROPIA COLA (2026-08-21)
+
+**Pregunta del dueño.** Script: `/analisis/cola-heka-pendiente.py`.
+
+### ❌ NO SON DE HEKA: LAS FECHAS NO SE SOLAPAN
+
+| | Rango | Guías |
+|---|---|---|
+| **Heka** | 2026-07-15 → **2026-08-09** | 123 |
+| **99 Envíos** | **2026-08-10** → 2026-08-20 | 91 |
+
+**Las 10 guías trabadas se despacharon el 18 y 19 de agosto — 8-9 días después de que Heka dejara de
+usarse. Son todas de 99 Envíos.**
+
+⚠️ **NOTA DE MÉTODO (error propio, corregido en el momento):** el primer chequeo fue **inválido**. Se
+buscaron los números de guía de 99 Envíos dentro de `guias-heka.csv` y "no aparecieron" — pero **ese
+archivo no tiene columna de número de guía** (sus columnas son estado, detalle, ciudad, fecha,
+recaudo, flete), así que nunca iban a aparecer. **Un cruce que no puede fallar no prueba nada.**
+La prueba válida es la **fecha**.
+
+### 🔴 PERO HEKA DEJÓ 22 GUÍAS ABIERTAS, Y MUCHO MÁS VIEJAS
+
+| Estado | Guías |
+|---|---|
+| TRANSITO (12 de ellas "Para Reclamar en Oficina") | 12 |
+| NOVEDAD | 6 |
+| GENERADA | 2 |
+| EMPACADA | 2 |
+
+**Margen real en riesgo: $622.560.** Las más viejas: **Maceo 37 días** (EMPACADA, nunca salió),
+**Puente Quetame 36 días** (GENERADA, nunca se despachó), **Medellín 20 días** ($56.670, la de mayor
+valor), **Cartagena 18 días**.
+
+🔴 **Las 12 "Para Reclamar en Oficina" llevan 12 a 20 días ahí.** Las transportadoras devuelven al
+remitente después de ~5-10 días en oficina, así que **a esta altura lo más probable es que ya sean
+devoluciones consumadas, no rescates posibles.**
+
+📌 **Y hay dos que no son devoluciones sino errores de proceso:** Maceo quedó **EMPACADA** (empacada
+pero nunca despachada) hace 37 días y Puente Quetame quedó **GENERADA** (guía creada, producto nunca
+enviado) hace 36. **Esas dos no las perdió la transportadora.**
+
+### ⚠️ LO QUE ESTE ARCHIVO NO PUEDE RESPONDER — Y ES LO QUE IMPORTA
+
+**El export de Heka es una foto del 9-ago. El pendiente #24 dice que los cabos de Heka se cerraron el
+12-ago** (se retiraron $2.788.601 y se gestionaron las novedades). **La limpieza pasó DESPUÉS de la
+foto**, así que estas 22 guías pueden estar en dos mundos:
+
+- **(a)** ya se resolvieron en la limpieza del 12-ago → no hay nada que hacer;
+- **(b)** quedaron por fuera → hay **$622.560 de margen perdido sin registrar.**
+
+🔑 **No se puede resolver con análisis: hace falta un export nuevo de Heka** (o entrar al panel y ver
+si esas ciudades siguen abiertas). **Es lo único que distingue "ya está" de "se perdió".**
+
+📌 **Y hay una razón para mirarlo aunque duela: si se perdieron, son devoluciones que NO están
+contadas en la tasa de rechazo del 15,3%** — y esa tasa es la que alimenta todas las proyecciones de
+utilidad del negocio. **Sería un rechazo real más alto que el que se está usando para decidir.**
+
+---
+
+## 0-R. 🎉📦 GATE 0 CERRADO: LOS 3 FRENOS ESTÁN ABIERTOS — Y EL PROBLEMA SE INVIERTE (2026-08-21)
+
+**Dato del dueño:** **5.000 unidades en bodega** + el proveedor **manda más avisando el día
+anterior.** Script: `/analisis/inventario-y-escalera.py`.
+
+### ✅ LOS TRES FRENOS HISTÓRICOS DEL NEGOCIO, LOS TRES ABIERTOS
+
+| Freno | Estado | Cómo se resolvió |
+|---|---|---|
+| ⏱️ **Tiempo del dueño** | ✅ | la IA de WhatsApp como válvula de capacidad (sección 5-B) |
+| 💵 **Caja** | ✅ | 99 Envíos paga a demanda → 3,3× de holgura (sección 0-Q) |
+| 📦 **Inventario** | ✅ | 5.000 unidades + reposición a 1 día |
+
+**Es la primera vez desde julio que no hay ningún freno interno.**
+
+### ✅ RESPUESTA DEL DUEÑO: **ESTÁN EN CONSIGNACIÓN** — SE RETIRA LA ALARMA
+
+**El proveedor financia las 5.000 unidades. No están pagadas.** Eso desmonta entero el análisis de
+"capital dormido" que esta sección planteó primero:
+
+| Lo que se había planteado | Estado real |
+|---|---|
+| $170.000.000 de capital inmovilizado | ❌ **no existe** — es mercancía del proveedor |
+| Urgencia financiera por rotar el inventario | ❌ **no existe** |
+| Riesgo de obsolescencia / temporada en el balance | ❌ **no aplica** — el riesgo es del proveedor |
+| "Contradicción" entre comprar 5.000 y reponer en 1 día | ❌ **no hay contradicción** — no se compraron |
+| ¿Los $34.000 son precio de volumen? | ❌ **pregunta sin sentido**, no hubo compra |
+
+🔑 **LO QUE SÍ SIGNIFICA, Y ES MEJOR QUE LO QUE SE PENSABA: las 5.000 unidades son una OPCIÓN
+GRATIS.** Se puede crecer 10× sin poner un peso de producto por adelantado. **Es la mejor posición
+posible para escalar.**
+
+⚠️ **LECCIÓN DE MÉTODO:** se construyó un análisis completo (capital dormido, urgencia de rotación,
+riesgo de temporada, crítica implícita a la decisión de compra) **sobre un supuesto no confirmado**.
+El supuesto era plausible pero falso. **Se marcó como pregunta abierta y por eso se pudo retirar
+limpio en vez de quedar como “hallazgo” equivocado en el archivo.** Es el patrón a repetir: cuando un
+número sale raro (33× la caja líquida), es señal de supuesto malo, no de negocio mal manejado.
+
+### 💵 Y LA CAJA SE DERRUMBA COMO RESTRICCIÓN
+
+| Escenario | Salida/día | Capital necesario | Holgura | Techo de publicidad |
+|---|---|---|---|---|
+| **A** — se paga al proveedor **al despachar** | $498.553 | $1.545.514 | **3,4×** | $244.110/día (40 ventas) |
+| **B** — se paga **después de cobrar** | **$90.553** | **$280.714** | **18,5×** | **$1.343.984/día (222 ventas)** |
+
+✅ **CONFIRMADO POR EL DUEÑO: ES EL ESCENARIO B — "le pago cuando cobro, sin afán".**
+
+🔑 **ESO ES UN CICLO DE CAJA NEGATIVO EN EL PRODUCTO, Y ES LO MÁS IMPORTANTE DE TODA ESTA SECCIÓN:**
+
+| Quién financia qué | |
+|---|---|
+| El **cliente** paga contraentrega | → financia el producto |
+| **99 Envíos** paga a demanda | → no retiene la plata |
+| Al **proveedor** se le paga después de cobrar | → no hay que adelantarle nada |
+
+**→ Lo único que el negocio pone de su bolsillo es PUBLICIDAD y EMPAQUE: $90.553/día.**
+Y se recupera en 3,1 días → **el capital de trabajo total es $280.714** contra $5.200.000
+disponibles = **18,5× de holgura.**
+
+**TECHO QUE IMPONE LA CAJA: $1.343.984/día de publicidad ≈ 222 ventas/día.** Es 18× el volumen
+actual. **La caja queda descartada como restricción, definitivamente y para cualquier escala
+realista.** No hay que volver a analizarla salvo que cambie una de las 3 condiciones de arriba.
+
+⚠️ **Y ESO CONVIERTE A LAS 3 CONDICIONES EN EL ACTIVO MÁS FRÁGIL DEL NEGOCIO.** Si el proveedor
+pidiera pago anticipado, o 99 Envíos pasara a pagar a 7 días, o hubiera que vender con pago
+anticipado, el requerimiento de caja se multiplica. **Vale cuidar esas tres relaciones más que
+cualquier optimización de CPA.**
+
+### 📊 CUÁNTO DURA EL STOCK (ya no es un riesgo, sirve para saber cuándo pedir reposición)
+
+| Ventas/día | Publicidad/día | Se agota en |
+|---|---|---|
+| **12 (hoy)** | $72.553 | **417 días — 13,9 meses** |
+| 19 (escalón 2) | $114.876 | 263 días — 8,8 meses |
+| 30 | $181.382 | 167 días — 5,6 meses |
+| 40 | $241.843 | 125 días — 4,2 meses |
+
+📌 **En consignación, 14 meses de stock no es un problema: es margen de maniobra.** Y con reposición
+a 1 día de aviso, tampoco hay que vigilarlo de cerca.
+
+### 🌧️ LA ESTACIONALIDAD BAJA DE CATEGORÍA: DEJA DE SER RIESGO Y QUEDA COMO TIMING
+
+**Son impermeables: la demanda depende de que llueva.** Colombia tiene régimen bimodal y la
+temporada fuerte en la zona andina va aproximadamente de **septiembre a noviembre.**
+
+- ✅ **Ya NO es un riesgo de balance.** En consignación, si la temporada se acaba con stock encima, el
+  producto no es plata propia parada — es del proveedor.
+- ✅ **Sigue siendo una oportunidad de timing, y fuerte:** se está entrando a la **mejor ventana de
+  demanda del año.** Escalar ahora la aprovecha; escalar en enero pelea contra el clima.
+
+📌 **El clima sigue siendo la hipótesis (C) de las secciones 0-F y 0-I, nunca revisada. Vale mirarla,
+pero como palanca de crecimiento ("¿cuándo pisar el acelerador?"), no como riesgo de inventario.**
+
+### 📈 LA ESCALERA, Y POR QUÉ SE AUTOFINANCIA
+
+| Escalón | Publicidad/día | Ventas/día | Capital necesario | Utilidad/día |
+|---|---|---|---|---|
+| hoy | $72.553 | 12,0 | $1.545.514 | $220.247 |
+| **#1** | **$108.830** | **18,0** | $2.318.271 | **$330.370** |
+| #2 | $163.244 | 27,0 | $3.477.407 | $495.556 |
+| #3 | $244.866 | 40,5 | $5.216.111 | $743.334 |
+
+🔑 **La caja se autofinancia:** en el primer escalón la utilidad es ~$330.000/día, así que **en 3 días
+genera el ~$1.000.000 extra de capital de trabajo que pide el escalón siguiente.** No hay que
+esperar a tener la plata: el negocio la produce. **Por eso el techo de $242.157/día de la sección
+0-Q es conservador — asume caja congelada, y la caja está creciendo.**
+
+**Reglas de cada escalón (fijadas de antemano):** subir SOLO presupuesto · esperar **3-4 días** antes
+de juzgar · seguir si el CPA por venta despachada queda bajo **$12.000** · **Motorizados no se toca
+hasta el 29-ago** (es el termómetro del valle).
+
+### 🔴 ENTONCES EL FRENO QUE QUEDA ES LA GEOGRAFÍA EN META — Y UN PASO MANUAL
+
+La cuenta se topa porque los 3 conjuntos se estorban bajo Advantage+, y **bajo Advantage+ la
+geografía es lo único que diferencia conjuntos de verdad** (sección 11, pendiente #30). Motorizados
+usa el 84% de su presupuesto con frecuencia 1,23: **audiencia chica, no quemada.**
+
+✅ Y el bloqueo para abrir geografía era el guion (prometía un envío que no existía → abrir ciudades
+replicaba la fuga a escala). **Ya está arreglado en el repo (sección 0-N).**
+⚠️ **Falta pegarlo en la IA de WhatsApp Business (pendiente #43). ESE PASO MANUAL DE 10 MINUTOS ES
+AHORA LO QUE BLOQUEA EL CRECIMIENTO — no el inventario, no la caja, no Meta.**
+
+**→ ORDEN CORRECTO:** (1) pegar el guion · (2) escalón en Domiciliarios · (3) leer el valle del
+26-29 · (4) abrir geografía · (5) ampliar la audiencia de Motorizados.
+
+---
+
+## 0-Q. 💵 LA CAJA NO ES EL FRENO (2026-08-21)
+
+**Dato del dueño:** 99 Envíos **paga cualquier día, se retira cuando se quiera** (no hay ciclo de
+pago). **$2.200.000 disponibles para retirar** + **~$3.000.000 en distribución.**
+Script: `/analisis/caja-y-techo-real.py`.
+
+### ✅ SE RESUELVE EL PENDIENTE #28-2, QUE ERA MEDIO GATE 0
+
+El plan del 19-ago decía: *"sin saber en cuántos días paga 99 Envíos no se puede saber cuánta caja
+hace falta; si paga en 7 días, escalar 27% amarra $3,75 millones."* **Ese escenario no existe:**
+al pagar a demanda, **el capital amarrado es solo lo que está viajando**, no lo que espera el pago.
+
+**El ciclo de caja real, deducido de los $3.000.000 en tránsito:**
+
+| | |
+|---|---|
+| Recaudo despachado por día | $960.000 (12 ventas × ~$80.000) |
+| En distribución | $3.000.000 |
+| **→ Días de ciclo** | **3,1 días** (coherente con la entrega de 1-3 días hábiles) |
+| Salida de caja por día | **$498.553** (producto+empaque $426.000 + publicidad $72.553) |
+| Capital de trabajo necesario hoy | **$1.557.978** |
+| Capital disponible | **$5.200.000** |
+| **→ Holgura** | **3,3×** |
+
+### 🔑 EL TECHO QUE IMPONE LA CAJA: $242.157/DÍA DE PUBLICIDAD (40 ventas/día)
+
+| Publicidad/día | Ventas/día | Capital necesario | ¿Alcanza? |
+|---|---|---|---|
+| $72.553 *(hoy)* | 12,0 | $1.557.978 | ✅ |
+| **$114.634 *(escalón 2, +58%)*** | **19,0** | **$2.461.605** | ✅ |
+| $145.106 | 24,0 | $3.115.956 | ✅ |
+| $181.382 | 30,0 | $3.894.945 | ✅ |
+| $290.212 | 48,0 | $6.231.912 | 🔴 no |
+
+**El escalón 2 cabe con holgura de sobra. La caja deja de ser una restricción práctica.**
+
+### 🔴 ENTONCES EL ÚNICO CANDADO QUE QUEDA ES EL INVENTARIO (pendiente #29)
+
+| Escenario | Ventas/día | Conjuntos/semana | Al mes |
+|---|---|---|---|
+| Hoy | 12,0 | **84** | 360 |
+| **Escalón 2 (+58%)** | 19,0 | **133** | **569** |
+| El doble | 24,0 | 168 | 720 |
+| El techo de caja | 40,1 | 280 | 1.202 |
+
+⚠️ **Escalar sin saber el stock es peor que no escalar: quema publicidad Y quema clientes** (se
+prenden anuncios sin producto que despachar). **Contar el inventario es ahora LO ÚNICO que separa
+al negocio del escalón 2.**
+
+### 📊 CUÁNTO PUEDE EMPEORAR EL CPA ANTES DE DOLER
+
+| CPA | vs hoy | Colchón | Utilidad/día a 19 ventas |
+|---|---|---|---|
+| **$6.046** *(hoy)* | 1,0× | **4,04×** | **$347.990** |
+| $10.000 | 1,7× | 2,44× | $273.024 |
+| $15.000 | 2,5× | 1,63× | $178.224 |
+| $20.000 | 3,3× | 1,22× | $83.424 |
+| $24.400 | 4,0× | 1,00× | $0 🔴 equilibrio |
+
+**El CPA puede empeorar 4× antes de dejar de ganar plata.** Eso es lo que hace del escalón 2 una
+apuesta barata incluso si Meta degrada la calidad del tráfico.
+
+### 📌 RIESGO NUEVO QUE APARECE CON ESTE DATO: PLATA QUIETA EN LA PLATAFORMA
+
+Si se puede retirar cuando se quiera, **dejar $2.200.000 quietos en 99 Envíos es exposición
+innecesaria**: no rinde nada y depende de que la plataforma siga operando bien.
+⚠️ **Ya pasó con Heka:** se acumularon **$2.788.601** y hubo que ir a retirarlos (pendiente #24).
+**Es el mismo patrón repitiéndose.**
+→ **Retirar por rutina** (semanal, o cuando pase de ~$1.000.000) en vez de cuando se acumula.
+No cambia la rentabilidad; baja el riesgo de contraparte.
+
+---
+
+## 0-P. 🚚💰 ELEGIR TRANSPORTADORA + LA PROMO 2×$110.000 (2026-08-21)
+
+**Las dos cosas las aportó el dueño y ninguna estaba documentada.** Script:
+`/analisis/transportadoras-y-promo.py`.
+
+### 🚚 PARTE 1 — EL FLETE ES UNA DECISIÓN, NO UN SORTEO
+
+**El dueño elige la transportadora, por eficiencia y por costo según la ubicación.** Eso cambia la
+consecuencia de la sección 0-O: el tarifario no tiene que "cubrirse del azar", tiene que **cerrar
+con la transportadora que se va a elegir.**
+
+**Precio de cada elección, en los destinos donde se usó más de una:**
+
+| Destino | coordinadora | interrapidísimo | servientrega | Diferencia |
+|---|---|---|---|---|
+| **Bogotá** | **$11.880** | $12.871 | $14.674 | **$2.794** |
+| Chía | **$11.951** | $12.871 | — | $921 |
+| Soacha | **$11.951** | $12.871 | — | $921 |
+| Bello | **$20.710** | $22.714 | — | $2.004 |
+| **Cartagena** | — | $22.793 | **$20.771** | $2.022 |
+
+**Sobrecosto medido en las guías comparables: $16.593.** ⚠️ **No es plata perdida** — parte es elegir
+a propósito una transportadora más confiable. **Pero ahora está medido y la decisión se puede tomar
+sabiendo el precio.** El caso más repetido: **8 envíos a Bogotá por interrapidísimo teniendo
+coordinadora disponible (+$991 cada uno = $7.928).**
+
+**Cobertura de cada una (dato que decide todo):**
+
+| Transportadora | Guías | Destinos distintos | Flete promedio |
+|---|---|---|---|
+| interrapidisimo | 55 | **44** | $20.849 |
+| servientrega | 22 | 12 | $20.542 |
+| **coordinadora** | 5 | **solo 5** | **$15.440** |
+
+🔴 **LA PREGUNTA CLAVE ES LA COBERTURA DE COORDINADORA.** Es claramente la más barata pero solo se ha
+usado en 5 destinos (Bogotá, Chía, Soacha, Bello, Guacarí). **Si cubre el país, es el ahorro más
+grande disponible hoy. Si solo cubre las ciudades grandes, igual sirve: ahí está el volumen.**
+
+**✅ LAS DOS REGLAS QUE HACEN QUE EL TARIFARIO CIERRE** (ya están escritas en `bot/src/fletes.js`):
+1. **Bogotá y sabana → coordinadora o interrapidísimo. NO servientrega.** A $14.674 el total de
+   $73.000 se queda corto $1.574. **Con coordinadora ($11.880) sobra $1.220.**
+2. **Cartagena → servientrega ($20.771).** Con interrapidísimo faltan $1.693.
+   ⚠️ **Salvo que se prefiera pagar por confiabilidad: Cartagena es la ciudad que más rechaza, y una
+   devolución cuesta muchísimo más que $2.022.** Esa es una decisión de negocio, no de tarifa.
+
+📌 **Con esto, los 3 casos de absorción que quedaban dejan de ser "residuo inevitable" y pasan a ser
+elecciones:** Bogotá $1.574 (por usar servientrega), Cartagena $1.693 (por usar interrapidísimo),
+Medellín $730 (por "Seguro 99 Plus", que es otra cosa).
+
+### 💰 PARTE 2 — LA PROMO 2×$110.000 EXISTE Y NO SE ESTÁ COBRANDO BIEN
+
+**Ninguno de los 6 pedidos de 2 unidades cobró la promo. Ni la promo, ni el precio lleno.**
+
+| Ciudad | Flete | Recaudado | Producto implícito | vs promo $110.000 |
+|---|---|---|---|---|
+| Cartagena | $35.860 | $155.841 | **$119.981** | +$9.981 *(precio lleno)* |
+| Caucasia | $28.037 | $142.200 | $114.163 | +$4.163 |
+| Santa Rosa de Cabal | $28.014 | $141.845 | $113.831 | +$3.831 |
+| Medellín | $27.891 | $139.998 | $112.107 | +$2.107 |
+| Pereira | $27.608 | $135.725 | $108.117 | −$1.883 |
+| Hispania | $34.112 | $141.125 | $107.013 | −$2.987 |
+
+**Se desvía en AMBOS sentidos**, y en 2 pedidos **se absorbió flete ($4.870)**.
+
+**¿La promo deja plata? Sí, y bastante** (margen por pedido, con el flete pasado al cliente):
+
+| Escenario | Margen | Menos CPA $6.046 | Neto |
+|---|---|---|---|
+| 1 unidad a $59.900 | $24.400 | | **$18.354** |
+| **2 unidades en promo $110.000** | $40.500 | | **$34.454** |
+| 2 unidades a precio lleno | $50.300 | | **$44.254** |
+
+✅ **La promo deja 1,88× lo que deja una venta de 1 unidad.** Es claramente buen negocio.
+⚠️ **Pero deja $9.800 menos que vender las dos a precio lleno, y ese descuento sale ENTERO del
+margen** (la 2ª unidad pasa de $25.900 a $16.100 de margen).
+
+🔑 **EL GANCHO QUE NO CUESTA MARGEN: EL FLETE COMPARTIDO.** Dos pedidos separados a Medellín pagan
+2 × $20.771 = **$41.542** de flete; uno de 2 unidades paga **$27.891**. **El cliente se ahorra
+$13.651 sin que el negocio regale un peso de producto.**
+📌 **Y hay evidencia de que el descuento no siempre hace falta: el pedido de Cartagena pagó $119.981,
+o sea 2 unidades a PRECIO LLENO.** Más el dato de la sección 0-J: **el 9% pide la segunda unidad sin
+que se la ofrezcan.**
+
+**→ ORDEN DE OFERTA QUE QUEDÓ EN EL GUION:** primero el envío compartido a precio lleno; la promo de
+$110.000 es la carta para cuando el cliente **duda**, no la primera oferta.
+
+⚠️ **Y EL FLETE DE 2 UNIDADES NO SE PUEDE ADIVINAR:** los aumentos van de **+$3.008 a +$15.089**
+sobre el de 1 unidad, porque 2 conjuntos cruzan escalones de peso distintos según la transportadora.
+**Por eso `cotizar()` nunca da un total firme de 2 unidades y el guion pasa a humano.** Los 6 fletes
+reales ya están cargados en `FLETE_2_OBSERVADO` para cotizar rápido lo conocido.
+
+---
+
+## 0-O. ✅ CHEQUEO DEL ESCALÓN 1 (2026-08-21): EL ESCALÓN 2 SE JUSTIFICA — Y 3 HALLAZGOS
+
+**Fuente:** export 99 Envíos del 21-ago (65 guías, 17–20 ago) → `/analisis/guias-99envios-21ago.csv`.
+Script: `/analisis/chequeo-escalon1.py`. Con los 3 exports acumulados hay **91 guías únicas**.
+
+### ✅ EL VEREDICTO: ESCALÓN 2 JUSTIFICADO
+
+| | |
+|---|---|
+| Guías despachadas el **19 y 20 de agosto** | **24** (umbral fijado de antemano: 20) |
+| Ventas/día | **12,0** |
+| Gasto/día | $80.432 |
+| **CPA por venta despachada** | **$6.703** (techo fijado: $10.000) |
+
+**Se cumplen las dos condiciones que se habían fijado ANTES de mirar los datos.**
+⚠️ **Pero el escalón 2 debe ser de +60% máximo** (regla nueva de la sección 0-M), no el salto
+grande que se venía pensando. De $90.000 → **máximo $144.000/día**.
+
+**Ritmo de despacho por lote** (el despacho es en tandas de tarde/noche):
+
+| Lote | Guías |
+|---|---|
+| 17-ago 23:22 → 18-ago 01:36 | 29 |
+| 18-ago 14:10 → 15:43 | 12 |
+| 19-ago 13:52 → 15:19 | 8 |
+| 20-ago 14:26 → 16:32 | 16 |
+
+### 🚨 HALLAZGO 1 — HAY UNA TERCERA TRANSPORTADORA, Y EL FLETE DEPENDE DE ELLA
+
+**99 Envíos no usa una sola transportadora: reparte entre tres, y cada una cobra distinto POR EL
+MISMO DESTINO.**
+
+| Transportadora | Guías | Flete promedio |
+|---|---|---|
+| interrapidisimo | 35 | $21.447 |
+| servientrega | 24 | $21.747 |
+| 🆕 **coordinadora** | 5 | **$15.440** |
+
+**El mismo destino, tres precios distintos:**
+
+| Destino | coordinadora | interrapidísimo | servientrega |
+|---|---|---|---|
+| Bogotá | **$11.880** | $12.871 | $14.674 |
+| Chía | **$11.951** | $12.871 | — |
+| Soacha | **$11.951** | — | — |
+
+🔑 **CONSECUENCIA CONCEPTUAL IMPORTANTE: no existe "el flete de Bogotá".** Existe un flete por
+*destino × transportadora*.
+
+⚠️⚠️ **CORREGIDO POR EL DUEÑO EL MISMO DÍA: ÉL SÍ ELIGE LA TRANSPORTADORA**, y la escoge por
+**eficiencia** y por **costo según la ubicación.** La primera versión de esta sección decía "quién
+despacha lo decide 99 Envíos, no el dueño" y sobre esa premisa falsa justificó cobrar el peor caso.
+**El flete no es un sorteo: es una decisión.** Ver sección **0-P**, que reescribe la consecuencia.
+
+### 🔴 HALLAZGO 2 — LAS 7 GUÍAS DEL PENDIENTE #34 NUNCA SE RESCATARON, Y HAY 10 MÁS
+
+El archivo hablaba de "5 guías trabadas, $113.458". **El número real, cruzando los 3 exports, es
+17 guías trabadas y $406.346 de margen REAL en riesgo** (recaudo − flete − producto − empaque).
+
+🚨 **Las 7 que llevan 5 o más días son EXACTAMENTE las del pendiente #34, 6 días después:**
+
+| Ciudad | Estado | Días | Margen real | Guía |
+|---|---|---|---|---|
+| **INZÁ** | Reclame en oficina | **10** | $19.604 | 240058794250 |
+| **CARTAGENA** | Intento de entrega | **10** | **$48.981** | 240058798601 |
+| **POPAYÁN** | Reclame en oficina | **10** | $24.457 | 240058805943 |
+| **MÁLAGA** | Reclame en oficina | **9** | $19.547 | 240058859184 |
+| **REMEDIOS** | Reclame en oficina | **8** | $20.501 | 240058929714 |
+| **BOGOTÁ** | Telemercadeo | **7** | $24.327 | 240059015879 |
+| **GUACHENÉ** | Reclame en oficina | **6** | $20.501 | 240059090182 |
+
+⚠️ **Esto no es un hallazgo analítico, es una alarma operativa: el pendiente #34 se escribió el
+15-ago con estas mismas guías y no se ejecutó.** Cartagena sigue siendo la llamada #1 ($48.981).
+Las otras 10 llevan 1-3 días y todavía hay tiempo.
+
+📌 **Y corrige un error de cálculo del propio archivo:** las cifras de "margen en riesgo" de la
+sección 0-H se calcularon como *recaudo − flete*, **sin descontar producto ($34.000) ni empaque
+($1.500)**. Eso infla el riesgo ~2,7×. Los números de esta tabla ya están corregidos.
+
+### 🟡 HALLAZGO 3 — EL TARIFARIO TENÍA 3 CIUDADES MAL CLASIFICADAS
+
+El chequeo encontró que 3 ciudades reales caían al default (banda E, $85.000) cuando eran más
+baratas — **el peor error posible, porque espanta la venta antes de que exista**:
+
+| Ciudad | Caía en | Debía ser | Sobrecobro |
+|---|---|---|---|
+| **CUCUNUBÁ** | E ($85.000) | **B ($77.000)** | **$8.416** |
+| **DOSQUEBRADAS** | E ($85.000) | **C ($81.000)** | $4.329 |
+| GUACARÍ | E ($85.000) | *se deja en E* | $4.390 |
+
+✅ **Corregidas Cucunubá y Dosquebradas.** **Guacarí se DEJA en E a propósito:** es un municipio
+pequeño y el único dato ($20.709) vino de **coordinadora**, la transportadora barata; con
+interrapidísimo un pueblo de ese tamaño cuesta $25.029. Con n=1 se cubre el peor caso.
+
+**Estado final del tarifario, con las 88 guías válidas acumuladas: absorción $3.997 vs $154.107
+que habría absorbido la tabla vieja (−97,4%).** Quedan 3 casos, todos por transportadora caversa:
+Bogotá $1.574 (servientrega), Cartagena $1.693 (interrapidísimo), Medellín $730 (Seguro 99 Plus).
+
+### 🧰 DOS TRAMPAS NUEVAS DE ESTE EXPORT
+
+1. 🔴 **`fecha_envio` viene en UTC y el despacho se hace de noche** → un lote arranca 23:22 y
+   termina 01:36 del día siguiente. **Agrupar por día UTC parte los lotes por la mitad.** Hay que
+   convertir a hora Colombia (UTC−5) antes de contar guías por día.
+2. 🔴 **Este export NO trae la columna `unidades`** (los anteriores sí). Se infiere del recaudo
+   (> $100.000 = 2 unidades). **Verificarlo en cada export nuevo antes de calcular nada.**
+
+---
+
+## 0-N. ✅ EL GUION Y EL TARIFARIO ARREGLADOS (2026-08-21) — CIERRA #38 (a)(b) Y #35
+
+**Fuente:** las 79 guías de 99 Envíos (10–19 ago), o sea los dos CSV que ya estaban en el repo.
+Scripts: `/analisis/tarifario-real.py` (construye el tarifario) y
+`node bot/src/verificar-tarifario.js` (lo audita contra las guías reales).
+Documento operativo con el bloque para pegar: **`TARIFARIO-Y-GUION.md`**.
+
+### 🔴 LA CAUSA RAÍZ ERA UNA TABLA INVENTADA EN EL PROPIO REPO
+
+La sección 0-J dijo "el guion promete un envío que no existe" y la 0-H midió la fuga, pero **nunca se
+señaló de dónde salía el número**. Salía de `bot/src/fletes.js`, la tabla que la sección 5-B declara
+**fuente de verdad del conocimiento del negocio**. Estaba escrita a ojo y decía:
+
+| Ciudad | Decía la tabla | Cobra 99 Envíos | Error |
+|---|---|---|---|
+| Cali | $13.000 | **$20.771** | −$7.771 |
+| Medellín | $13.000 | **$20.771** | −$7.771 |
+| Cartagena | $15.000 | **$20.771** | −$5.771 |
+| "otra ciudad" (default) | $18.000 | **$25.029** | −$7.029 |
+
+🔑 **El default es lo más grave: $18.000 para las ciudades que no están en la lista — que son
+exactamente los pueblos, los destinos más caros.** De ahí salía la promesa de "$15.000 a $20.000".
+
+### 📊 LOS 5 ESCALONES REALES (los fletes no son un continuo)
+
+| Zona | Flete real | 🔒 TOTAL a cobrar | Se cobraba | Recupera |
+|---|---|---|---|---|
+| **A · Bogotá y sabana** | $12.871 | **$73.000** | $72.698 | ya estaba bien |
+| **B · Boyacá / Casanare / Meta** | $16.684–16.843 | **$77.000** | $76.561 | ya estaba bien |
+| **C · Capitales grandes** | $20.771 | **$81.000** | $80.941 | ya estaba bien |
+| **D · Ciudades intermedias** | $22.714–22.870 | **$83.000** | $80.676–81.752 | **+$941 a $1.938** |
+| **E · Pueblos / zona extendida** | $24.953–25.029 | **$85.000** | $80.000–81.030 | **+$3.899 a $4.853** |
+
+**Resultado auditado: la absorción pasa de $102.148 a $1.574 en las mismas 77 guías (−98,5%).**
+🔄 **ACTUALIZADO EL 21-AGO con el export nuevo (88 guías válidas acumuladas): $154.107 → $3.997
+(−97,4%),** después de corregir 3 ciudades mal clasificadas. Ver sección **0-O**, hallazgo 3.
+
+🔑 **HALLAZGO QUE PRECISA LA SECCIÓN 0-H: la fuga NO era general, estaba SOLO en las bandas D y E.**
+Las bandas A, B y C ya se cobraban bien (con $71–426 de colchón). **El problema era exclusivamente
+los destinos caros — y la banda E es 20 de 72 guías, el 28% del volumen.** Eso convierte al
+pendiente #35 en lo que era: un ajuste quirúrgico de dos bandas, no un cambio de precios general.
+
+### 🔧 LOS DOS DEFECTOS DEL GUION, ARREGLADOS
+
+- **(a) La promesa de envío:** ahora la regla es **no dar NINGÚN número antes de saber la ciudad, y
+  nunca un rango.** Con la ciudad sabida, se da **un solo número: el TOTAL de la zona**, firme.
+  Y se habla del **total**, no del envío suelto ("en Cali te llega a $81.000" convierte mejor que
+  "$59.900 más $20.771 de envío").
+- **(b) El cuadro de confirmación en blanco:** queda el formato exacto con los 8 campos y la regla
+  de **no mandar el cuadro si falta un dato** (preguntar solo ese dato y esperar).
+- **El bloque `##ORDER##` ahora exige el total de la zona**, no "producto + flete calculado a mano":
+  si el total del bloque no coincide con el que se le dijo al cliente, la guía sale con el recaudo mal.
+
+### ⚠️ DOS DECISIONES DE CRITERIO (para no re-discutirlas)
+
+1. **Banda A se queda en $73.000 aunque una guía necesitaba $75.000.** Hubo 1 envío de Bogotá por
+   **Servientrega** a $14.674 contra 16 por Interrapidísimo a $12.871. Subir toda Bogotá $2.000 para
+   cubrir 1 de 17 casos castiga al 24% del volumen y al cliente más sensible al precio.
+   **Se acepta absorber $1.574 esporádicos.** Ese es el único caso que queda.
+2. **Los totales se redondean al millar hacia arriba** → colchón de $71 a $426 por venta, que es lo
+   que absorbe las variaciones chicas de tarifa. **Y si la ciudad no se reconoce, se cobra banda E.**
+   Errar hacia arriba cuesta una objeción; errar hacia abajo cuesta $4.900 de margen.
+
+### 🚨 HALLAZGO NUEVO: EL PRECIO DE 2 UNIDADES NO EXISTE (bloquea el #40)
+
+| Ciudad | Flete | Cobrado | Producto implícito | Por unidad |
+|---|---|---|---|---|
+| Cartagena | $35.860 | $155.841 | $119.981 | **$59.991** |
+| Caucasia | $28.037 | $142.200 | $114.163 | $57.081 |
+| Santa Rosa de Cabal | $28.014 | $141.845 | $113.831 | $56.915 |
+| Medellín | $27.891 | $139.998 | $112.107 | $56.053 |
+| Pereira | $27.608 | $135.725 | $108.117 | **$54.058** |
+
+**Dispersión 11% = $11.864 de diferencia por pedido entre el mejor y el peor caso.** Cada cierre
+improvisó. **El pendiente #40 ("ofrecer sistemáticamente la segunda unidad") está bloqueado hasta
+que el dueño fije el precio**, porque no se puede poner en un guion algo que no tiene precio.
+
+✅ **Pero el gancho es REAL y se puede usar ya: el flete de 2 unidades NO se duplica**, sube entre
+**+$6.838 y +$15.089** (Pereira $20.771→$27.608, Medellín →$27.891, Cartagena →$35.860).
+**Sugerencia para cerrar el #40: total de la zona + $57.000** (respeta el descuento que ya se venía
+dando de hecho y cubre el flete extra).
+
+### 🧰 DOS TRAMPAS TÉCNICAS DE LOS DATOS (para cualquier análisis futuro)
+
+1. 🔴 **El CSV de 99 Envíos tiene comas DENTRO de campos entrecomillados** (`"BOGOTÁ, D.C."`).
+   Partirlo por comas a lo bruto **corrompe 10 filas y da un resultado falso** — pasó en la primera
+   verificación de este mismo trabajo, dio "$0 de absorción" cuando el real era $1.574.
+   **Usar siempre un parser de CSV de verdad** (el `csv` de Python, o el que trae
+   `bot/src/verificar-tarifario.js`).
+2. 🔴 **En una devolución, `valor_servicio` es la PRIMA del seguro, no el flete** ($1.742 y $3.111).
+   Si se promedian como fletes, **bajan Bogotá y Santa Marta artificialmente**. Se excluyen con un
+   umbral de $8.000. (Es el mismo dato que en la sección 0-L fue un hallazgo bueno; acá, si no se
+   filtra, es un contaminante.)
+
+---
+
+## 0-M. 🚨 EL REINICIO DE APRENDIZAJE NO SE PUEDE PREDECIR (2026-08-21)
+
+**Fuente:** `/analisis/conjuntos-18-21ago.csv` · script `/analisis/termometro-18-21ago.py`.
+
+⚠️⚠️ **ESTA SECCIÓN SE ESCRIBIÓ PRIMERO CON UNA CONCLUSIÓN EQUIVOCADA Y SE CORRIGIÓ EL MISMO DÍA.**
+La primera versión decía que el umbral estaba **entre +67% (no reinicia) y +83% (sí reinicia)** y de
+ahí sacaba la regla "escalones de +60% o menos". **El CSV completo la desmiente:**
+
+| Cambio | % | Monto | ¿Reinició? |
+|---|---|---|---|
+| Domiciliarios $18.000 → $30.000 (4-ago) | +67% | +$12.000 | ❌ **no** |
+| **TEST Creativos $12.000 → $20.000 (19-ago)** | **+67%** | **+$8.000** | ✅ **sí** |
+| Domiciliarios $30.000 → $55.000 (19-ago) | +83% | +$25.000 | ✅ sí |
+
+🔴 **DOS CAMBIOS DEL MISMO +67% DIERON RESULTADOS OPUESTOS.** El porcentaje no lo explica. Y el monto
+absoluto tampoco: **el que sí reinició (+$8.000) fue MÁS CHICO que el que no reinició (+$12.000).**
+
+✅ **LA REGLA QUE SÍ SE SOSTIENE, Y ES LA QUE HAY QUE USAR:**
+> **No se puede predecir si un cambio de presupuesto va a reiniciar el aprendizaje.
+> Entonces se asume que SIEMPRE puede pasar: después de cada escalón, no juzgar el CPA hasta
+> 3-4 días después.** Eso vuelve innecesaria la regla del "+60% máximo" — el tamaño del escalón se
+> elige por caja y por inventario, no por miedo al aprendizaje.
+
+📌 **Cómo se cometió el error, para no repetirlo:** se generalizó un umbral a partir de **2 puntos**
+(+67% no, +83% sí) sin tener el tercer caso. Es exactamente el error #2 de la sección 11 ("muestras
+pequeñas"), aplicado esta vez a reglas de plataforma en vez de a creativos.
+**Con 2 puntos se puede trazar cualquier línea.**
+
+✅ **Y VALIDA EL TERMÓMETRO:** Motorizados sigue marcando **11-jul (41 días sin tocarse)**. El grupo
+de control está genuinamente intacto, así que el test del valle del 26-29 ago sigue siendo válido.
+
+### LO QUE SE HIZO EL 19-AGO (no está en el plan, el plan proponía otra cosa)
+
+| Conjunto | Antes | Después | Nota |
+|---|---|---|---|
+| **Domiciliarios** | $30.000 | **$55.000** | el plan proponía $38.000; se fue más agresivo |
+| **TEST (Prueba social)** | $12.000 | **$20.000** | el plan decía dejarlo quieto |
+| **Motorizados** | $15.000 | **$15.000** | ✅ intacto = **el termómetro se preservó** |
+| **Total** | $57.000 | **$90.000** | +58% |
+
+### 🔴 EL HALLAZGO
+
+| Conjunto | Último cambio significativo |
+|---|---|
+| Motorizados | 2026-07-11 |
+| **Domiciliarios** | **2026-08-19 01:45** ← justo cuando se subió el presupuesto |
+| TEST | ninguno |
+
+**Domiciliarios entró en fase de aprendizaje por un cambio de presupuesto.** La sección 0-C y el
+plan del 19-ago afirmaban lo contrario ("escalar presupuesto es barato acá, no reinicia el
+aprendizaje") y sobre esa premisa se armó la escalera de escalones grandes.
+
+**Dónde está el umbral, con los 3 casos que hay:**
+
+| Cambio | % | ¿Registró cambio significativo? |
+|---|---|---|
+| $18.000 → $30.000 (Domiciliarios, 4-ago) | +67% | ❌ no |
+| $12.000 → $20.000 (TEST, 19-ago) | +67% | ❌ no |
+| **$30.000 → $55.000 (Domiciliarios, 19-ago)** | **+83%** | ✅ **sí** |
+
+→ **REGLA NUEVA: escalones de +60% o menos.** Entre +67% y +83% está la frontera; +60% deja margen.
+⚠️ **Y consecuencia para leer los datos: el CPA de Domiciliarios de los días 19-22 está en
+aprendizaje y puede verse peor de lo que es. No frenar por eso** (es el error que la sección 0-C ya
+documentó dos veces).
+
+### ✅ EL ESCALÓN 1 FUNCIONÓ (ventana 18, 19 y 20 ago — el 21 aún no había gastado)
+
+| Conjunto | Asignado | Gastado | Utilización |
+|---|---|---|---|
+| **Domiciliarios** | $140.000 | $135.186 | **96,6%** 🎉 |
+| Motorizados | $45.000 | $37.835 | 84,1% ⚠️ topado |
+| TEST Creativos | $52.000 | $44.638 | 85,8% ⚠️ topado |
+| **TOTAL** | **$237.000** | **$217.659** | **91,8%** |
+
+⚠️ **GASTO DIARIO CORREGIDO: $72.553/día, no $80.432.** El número anterior estaba mal y de él salía
+un CPA inflado. **Con el gasto correcto el CPA por venta despachada es $6.046, no $6.703** →
+**4,04× de colchón sobre el equilibrio.**
+
+**El embudo completo por conjunto** (los clics se derivan de gasto÷CPC y se cruzan con CTR×impresiones):
+
+| Conjunto | CTR | CPC | Clics | Conv. | **clic→chat** | $/conv | Frecuencia |
+|---|---|---|---|---|---|---|---|
+| **Motorizados** | 1,84% | **$249** | 152 | 79 | **52,0%** | **$479** 🥇 | 1,23 |
+| Domiciliarios | 1,89% | $216 | 626 | 258 | 41,2% | $524 | 1,38 |
+| **TEST Creativos** | **2,39%** 🥇 | $241 | 185 | 77 | 41,6% | $580 | 1,32 |
+| **CUENTA** | | | **963** | **414** | | **$526** | |
+
+🔑 **CLICS CAROS ≠ CONVERSACIONES CARAS.** Motorizados tiene el **CPC más alto** ($249 vs $216) y aun
+así la **conversación más barata** ($479 vs $524), porque su clic→chat es 52,0% contra 41,2%.
+**Optimizar por CPC habría llevado a la decisión contraria a la correcta.**
+
+🆕 **TEST CREATIVOS TIENE EL MEJOR CTR DE LA CUENTA (2,39%, +27% sobre Domiciliarios)** — y esta vez
+con **7.734 impresiones**, no con las 79 que engañaron al análisis en su momento (error #2 de la
+sección 11). **El ángulo de prueba social SÍ engancha, y ahora está probado con volumen.**
+⚠️ **Pero su clic→chat es 41,6%, igual que Domiciliarios** → la conversación le sale más cara ($580).
+**Atrae más clics, no mejor gente.** Es un hallazgo útil: el creativo trabaja, el problema está
+después del clic (y eso es la hipótesis (E) de la sección 0-K otra vez).
+
+- 💎 **MOTORIZADOS ES EL MEJOR TRÁFICO DE LA CUENTA, y ahora hay prueba fina:** tiene el CPC más
+  **caro** ($249 vs $217) pero el clic→chat mucho más **alto** (52,0% vs 41,3%).
+  🔑 **Clics baratos ≠ conversaciones baratas.** Sigue topado al 84% por **tamaño de audiencia**
+  → **ampliar la audiencia de Motorizados es la jugada de mayor retorno pendiente.**
+- ⚠️ **TEST mejoró fuerte ($708 → $578) → ya NO es candidato a recorte.** Cualquier propuesta previa
+  de bajarlo a $12.000 queda sin sustento.
+
+### ⏳ LO QUE FALTA PARA DECIDIR EL ESCALÓN 2
+
+**Las guías despachadas del 19, 20 y 21.** Sin eso el CPA es estimado.
+Regla fijada de antemano: **con 20 o más guías en dos días, el escalón 2 se justifica.**
+
+| Guías 19-20 | Ventas/día | CPA entregada | Veredicto |
+|---|---|---|---|
+| 20 | 10,0 | $9.496 | ✅ escalón 2 |
+| 25 | 12,5 | $7.597 | ✅ escalón 2 |
+| 30 | 15,0 | $6.331 | ✅ escalón 2 |
+| 40 | 20,0 | $4.748 | ✅ escalón 2 |
+
+⚠️ **Y el escalón 2 debe ser +60% máximo** (regla nueva de arriba), no el salto que se venía pensando.
 
 ---
 
@@ -1807,8 +2705,14 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     **(a) por DÍA** (para que el CPA sea medido y no estimado) · **(b) por CONJUNTO** (sin esto **NO se
     puede calcular EL TERMÓMETRO**, la herramienta principal de diagnóstico de este archivo) ·
     **(c) por ANUNCIO** (para el pendiente #32, saber qué creativo genera VENTAS).
-28. [ ] ❓ **LAS PREGUNTAS A 99 ENVÍOS** (actualizadas el 15-ago):
-    (1) **% de comisión por recaudo**; (2) **en cuántos días paga** (Heka: 1 día hábil);
+28. [ ] ❓ **LAS PREGUNTAS A 99 ENVÍOS** — ya solo queda UNA (la comisión) + la de coordinadora (#50):
+    (2) [x] ✅ **RESUELTO EL 21-AGO: PAGA CUALQUIER DÍA, SE RETIRA CUANDO SE QUIERA.** No hay ciclo
+    de pago → el ciclo de caja es solo el tránsito (**3,1 días**) y **la caja deja de ser el freno**
+    (3,3× de holgura, techo en $242.157/día de publicidad). **Ver sección 0-Q.**
+    ⚠️ **Y aparece un riesgo nuevo: hay $2.200.000 quietos en la plataforma.** Si se puede retirar
+    cuando se quiera, dejarlos ahí es exposición sin razón — **es el mismo patrón de los $2.788.601
+    que se acumularon con Heka (pendiente #24). Retirar por rutina, no cuando se acumula.**
+    (1) **% de comisión por recaudo** ← lo único que sigue pendiente de esta lista;
     (3) [x] ✅ **RESUELTO CON DATOS EL 19-AGO — NO PREGUNTAR MÁS.** Las 2 primeras devoluciones
     mostraron que **en una devolución solo se cobra la PRIMA** ($1.742 y $3.111 en vez de $12.871 y
     $22.793): **el flete de ida Y vuelta queda cubierto completo.** Ahorro ~$18.574 por devolución
@@ -1816,8 +2720,39 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ✅ **YA RESPONDIDO por el dueño:** el seguro **está incluido** en el `valor_servicio` y **en Heka
     no se pagaba** → el cambio de transportadora **fue correcto** (flete 14,1% más barato + cobertura
     al mismo precio total). Ver sección 0-H. Lo que queda es afinar el alcance de la cobertura.
-29. [ ] 📦 **MEDIR INVENTARIO — es el ÚNICO de los 3 frenos que sigue sin resolver.** Los otros dos
-    (tiempo y caja) ya están. Sin este dato no se puede decidir cuánto crecer.
+29. [x] ✅✅ **RESUELTO EL 21-AGO: 5.000 UNIDADES EN BODEGA + REPOSICIÓN A 1 DÍA DE AVISO.**
+    **Con esto los 3 frenos del negocio quedan los 3 abiertos por primera vez desde julio.**
+    Ver sección **0-R**. ✅ **Y están EN CONSIGNACIÓN**, así que no hay capital propio comprometido:
+    son una opción gratis para crecer.
+53. [x] ✅ **RESUELTO: LAS 5.000 UNIDADES SON EN CONSIGNACIÓN.** El proveedor las financia.
+    **Se retira la alarma de los $170.000.000 de capital dormido: no existe.** Tampoco hay urgencia
+    de rotación, ni riesgo de temporada en el balance propio, ni "contradicción" con reponer en 1 día.
+    🔑 **Y es mejor de lo que se pensaba: son una OPCIÓN GRATIS** → se puede crecer 10× sin poner un
+    peso de producto por adelantado. Ver sección 0-R.
+56. [x] ✅ **RESUELTO: AL PROVEEDOR SE LE PAGA DESPUÉS DE COBRAR, "sin afán".**
+    🔑 **El ciclo de caja del producto es NEGATIVO: lo financia el cliente.** El negocio solo pone
+    publicidad y empaque ($90.553/día), que se recuperan en 3,1 días → **capital de trabajo total
+    $280.714 contra $5.200.000 = 18,5× de holgura. Techo: 222 ventas/día (18× el volumen actual).**
+    **La caja queda descartada como restricción para cualquier escala realista.**
+57. [ ] 🛡️ **CUIDAR LAS 3 RELACIONES QUE SOSTIENEN EL CICLO DE CAJA NEGATIVO** — son el activo más
+    frágil del negocio, más valioso que cualquier optimización de CPA:
+    **(1)** el cliente paga contraentrega · **(2)** 99 Envíos paga a demanda · **(3)** al proveedor se
+    le paga después de cobrar. **Si alguna se rompe, el requerimiento de caja se multiplica**
+    (con pago al proveedor por adelantado el techo cae de 222 a 40 ventas/día). Ver sección 0-R.
+55. [ ] 🔴 **EXPORTAR HEKA DE NUEVO — HAY 22 GUÍAS ABIERTAS Y NO SE SABE SI SIGUEN ABIERTAS.**
+    El export que hay es una foto del **9-ago** y la limpieza de cabos fue el **12-ago** (#24), así que
+    no se puede saber si se resolvieron. **$622.560 de margen real en juego.** Ver sección 0-S.
+    🚨 **Dos de ellas NO son culpa de la transportadora: MACEO quedó "EMPACADA" hace 37 días** (empacada
+    y nunca despachada) **y PUENTE QUETAME quedó "GENERADA" hace 36** (guía creada, producto nunca
+    enviado). **Esas dos son fallas de proceso propio y valen $51.394 juntas.**
+    📌 **Y si se perdieron, son devoluciones que NO están en la tasa de rechazo del 15,3%** — la tasa
+    con la que se hacen todas las proyecciones. **El rechazo real podría ser más alto.**
+54. [ ] 🌧️ **REVISAR LA ESTACIONALIDAD — COMO PALANCA DE TIMING, NO COMO RIESGO.**
+    ⚠️ **Bajó de categoría al confirmarse la consignación:** ya no hay riesgo de quedarse con
+    inventario propio. Pero sigue siendo **oportunidad fuerte**: la temporada de lluvia en la zona
+    andina va ~sep-nov, así que **escalar ahora agarra la mejor ventana de demanda del año.**
+    El clima es la hipótesis (C) de las secciones 0-F y 0-I, **nunca revisada desde el 12-ago**.
+    📌 Lo mínimo: comparar ventas/día contra días de lluvia de las últimas 6 semanas.
 30. [ ] 🌎 **LA JUGADA DE CRECIMIENTO: ABRIR CIUDADES NUEVAS, no subir presupuesto.**
     La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia
     de 1,31 prueba que NO es saturación de audiencia). **Bajo Advantage+ la geografía es la única forma
@@ -1840,14 +2775,78 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 33. [ ] 🛡️ **Decidir si se le da conjunto propio a "Demostración agua rueda"** (~$10.000/día) para
     tener un respaldo REAL y no teórico. Hoy recibe $0-63/día dentro de Domiciliarios. No urgente
     (frecuencia 1,31 = Fondo azul sin desgaste), pero cuando se desgaste ya se querrá tener corriendo.
-34. [ ] 🔥📞 **RESCATAR LAS 7 GUÍAS EN NOVEDAD DE 99 ENVÍOS — $181.744 de margen, y CADUCA.**
+34. [x] ✅ **LAS 7 NOVEDADES SE RESOLVIERON EL 21-AGO** (el dueño las gestionó). Eran Inzá, Cartagena,
+    Popayán, Málaga, Remedios, Bogotá y Guachené — llevaban entre 6 y 10 días. **Quedan en
+    observación: hay que ver cuántas terminan ENTREGADAS y cuántas en devolución.**
+    🔑 **Y eso las vuelve un dato valioso, no solo una tarea cerrada:** es la primera medición de
+    **cuánto sirve rescatar una novedad**. Si la mayoría se entrega, la gestión de novedades pasa a
+    ser rutina obligatoria; si se devuelven igual, el esfuerzo hay que ponerlo antes (en el guion y
+    en la confirmación de dirección). **Verificarlo en el próximo export.**
+    ⚠️ **El monto de $181.744 que decía este punto estaba inflado: se calculó como recaudo − flete,
+    sin descontar producto ni empaque.** Los montos corregidos están en la sección 0-O.
+    📌 **Quedan ~10 guías más en estados de traba** (1-3 días al 21-ago), esas todavía con tiempo.
+    ↓ *(texto original del 15-ago, se conserva)*
     Orden de llamada por valor: **CARTAGENA (2 uds, $48.981, ya tiene un intento fallido y Cartagena
     acumuló 2 de las 15 devoluciones de Heka — es la llamada #1 del negocio)** · Popayán $24.457 ·
     Bogotá $24.327 · Soacha $24.327 · Remedios $20.501 · Inzá $19.604 · Málaga $19.547.
     ⚠️ Bogotá y Soacha están en **"Telemercadeo"** = la transportadora no pudo y está llamando:
     **es novedad, no tránsito.** **NO se cruza con el congelamiento** (esto es operación, no campaña).
     Ver sección 0-H. **Esto es ADEMÁS de las 21 guías de Heka del punto de la sección 0-G.**
+43. [ ] 🔥🔴 **PEGAR EL GUION NUEVO EN LA IA DE WHATSAPP BUSINESS — ES LO ÚNICO QUE FALTA DEL #38 Y #35.**
+    El tarifario y el guion ya están arreglados **en el repo** (sección 0-N + `TARIFARIO-Y-GUION.md`),
+    pero **la IA que atiende a los clientes es Meta AI configurada a mano por el dueño** (sección 5-B):
+    **cambiar el repo NO cambia lo que la IA le dice al cliente.** El bloque para copiar y pegar está
+    en `TARIFARIO-Y-GUION.md` sección 2, con 4 pruebas de verificación de 3 minutos.
+    💰 **Vale ~$102.148 por cada 77 guías** (la absorción medida), concentrado en bandas D y E.
+44. [x] ✅ **RESUELTO POR EL DUEÑO EL 21-AGO: LA PROMO ES 2 POR $110.000** (+ envío aparte). Ya está
+    cargada en `bot/src/fletes.js` y en el guion. **Lo que queda es aplicarla bien → pendiente #51.**
+45. [x] ✅ **LOS DOS EXPORTS YA ESTÁN EN `/analisis`:** `conjuntos-18-21ago.csv` (Meta por conjunto) y
+    `guias-99envios-21ago.csv` (65 guías). **Y el de Meta sirvió para desmentir el umbral de
+    aprendizaje que esta misma sesión había dado por bueno** (sección 0-M).
+    📌 **Para el próximo export por conjunto, exportar desde la pestaña "Conjuntos de anuncios"**
+    (no "Campañas") y verificar que el archivo traiga **3 filas de datos**. Si trae 1, es campaña.
+    Columna imprescindible: **"Último cambio significativo"**.
+46. [x] ✅ **CHEQUEO DEL ESCALÓN 1 CERRADO EL 21-AGO (sección 0-O): 24 guías el 19-20, 12,0
+    ventas/día, CPA $6.703. ESCALÓN 2 JUSTIFICADO.**
+49. [ ] 📈 **EJECUTAR EL ESCALÓN 2 — SOLO FALTA CONTAR EL INVENTARIO (#29).**
+    Propuesta: **$90.000 → $114.634/día (+58%)**, el mismo tamaño de escalón que ya se vio funcionar.
+    Eso lleva a ~19 ventas/día y ~$348.000/día de utilidad si el CPA se mantiene.
+    ✅ **Caja: alcanza con 3,3× de holgura** (sección 0-Q). ✅ **CPA: 4,04× de colchón.**
+    🔴 **Inventario: sin medir → 133 conjuntos/semana. ES EL ÚNICO BLOQUEO.**
+    ⚠️ **La regla del "+60% máximo" YA NO APLICA** (se cayó, sección 0-M): el tamaño se decide por
+    caja e inventario, no por el aprendizaje.
+    ⚠️ **Motorizados sigue congelado hasta el 29-ago** (es el termómetro del test del valle) → el
+    escalón va en **Domiciliarios**, y eventualmente en TEST.
+    📌 **Después del escalón, NO juzgar el CPA hasta 3-4 días** (puede haber reinicio de aprendizaje).
+50. [ ] 🚚 **PREGUNTARLE A 99 ENVÍOS POR *COORDINADORA*: ¿QUÉ COBERTURA TIENE?** Es la más barata
+    ($15.440 promedio vs ~$20.800 de las otras dos) pero solo se ha usado en **5 destinos**.
+    🔑 **La cobertura es el dato que decide:** si cubre el país es el ahorro más grande disponible hoy.
+    Solo en Bogotá, elegirla en vez de interrapidísimo son **$991 por envío**. Ver sección 0-P.
+51. [ ] 💰 **APLICAR BIEN LA PROMO 2×$110.000 — hoy no se está cobrando bien (sección 0-P).**
+    Los 6 pedidos de 2 unidades cobraron 6 precios distintos ($107.013 a $119.981) y en 2 se absorbió
+    flete ($4.870). **Reglas: (a)** ofrecer PRIMERO el envío compartido a precio lleno — le ahorra al
+    cliente ~$13.651 y no cuesta margen; **(b)** la promo es la carta para cuando DUDA, no la primera
+    oferta (hay clientes que pagan las 2 completas); **(c)** el envío de 2 unidades se cobra SIEMPRE
+    completo y **no se adivina** (varía +$3.008 a +$15.089 sobre el de 1).
+52. [ ] 💎 **REVISAR EL CREATIVO DE "PRUEBA SOCIAL" — TIENE EL MEJOR CTR DE LA CUENTA (2,39%).**
+    Y esta vez con 7.734 impresiones, no con las 79 que engañaron al análisis en agosto.
+    ⚠️ **Pero su clic→chat es 41,6%, igual que Domiciliarios** → atrae más clics, no mejor gente, y
+    la conversación le sale a $580. **El creativo funciona; el problema está después del clic.**
+    → Se cruza con la hipótesis (E) de la sección 0-K (conversaciones vacías).
+47. [ ] 🔧 **CORRECCIÓN DE REPARTO PENDIENTE (en el chequeo, no antes): TEST $20.000 → $12.000 y
+    Domiciliarios $55.000 → $63.000.** Mismo gasto total.
+    ⚠️ **PERO REEVALUAR PRIMERO: TEST mejoró de $708 a $578/conv (−18,4%) en la ventana 18-21**, así que
+    el argumento para recortarlo se debilitó. Decidir con el CPA, no con el costo por conversación.
+48. [ ] 💎 **AMPLIAR LA AUDIENCIA DE MOTORIZADOS — la jugada de mayor retorno pendiente.**
+    Es **el mejor tráfico de la cuenta**: clic→chat **52,0%** vs 41,3% de Domiciliarios, y el
+    costo/conversación más barato ($478). 🔑 **Tiene el CPC más CARO ($249 vs $217) y aun así convierte
+    mucho mejor → clics baratos ≠ conversaciones baratas.** Sigue topado al 84% por **tamaño de
+    audiencia**, no por presupuesto (darle más plata no sirve).
+    ⚠️ **NO TOCAR HASTA DESPUÉS DEL 29-AGO:** cambiar audiencia reinicia aprendizaje **y** Motorizados
+    es el **termómetro** del test del valle del 26-29. Moverlo ahora destruye el test.
 38. [ ] 🔴🔴 **ARREGLAR EL GUION DE LA IA — 2 DEFECTOS CONCRETOS Y BARATOS** (sección 0-J):
+    ✅ **HECHO EN EL REPO EL 21-AGO** (`bot/src/prompt.js` + `bot/src/fletes.js`, sección 0-N).
+    ⚠️ **Falta el paso manual en la IA de WhatsApp Business → pendiente #43.**
     **(a) QUITAR la promesa de "envío $15.000 a $20.000"** (está en 43% de los chats). El flete real
     va de **$12.871 a $35.860**. Que pregunte la ciudad y **cotice el real**, o que diga el techo
     verdadero. 🔑 **ESTA ES LA CAUSA de la fuga de flete de la sección 0-H** — se absorben
@@ -1865,13 +2864,22 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     el 16% de los pedidos ya son de 2+ (sección 0-G), pero **solo 4 de 47 chats muestran la oferta**.
     Cada unidad extra en un pedido existente da margen completo **sin costar publicidad**, y el gancho
     es que **el flete se comparte**. Ver sección 0-J.
+    🔴 **BLOQUEADO POR EL PENDIENTE #44: el precio de 2 unidades NO EXISTE** — los 5 pedidos de 2 se
+    cobraron a $54.058-59.991 por unidad, cada cierre improvisó (sección 0-N). No se puede poner en un
+    guion algo sin precio definido.
+    ✅ **PERO EL GANCHO YA ESTÁ CONFIRMADO CON DATOS: el flete de 2 unidades NO se duplica**, sube solo
+    **+$6.838 a +$15.089** (Pereira $20.771→$27.608). "El envío casi no sube" es verdad, no un argumento
+    de venta inventado — y ya quedó escrito en el guion del repo.
 41. [ ] 📸 **REVISAR EL PROBLEMA DE LOS COLORES: el 77% de los clientes pregunta por color** y **no hay
     fotos de blanco ni de morado.** Medir cuántas conversaciones se caen pidiendo un color que no se
     puede mostrar. Se cruza con el pendiente de fotos de la sección 9. Ver sección 0-J.
-35. [ ] 💰 **SUBIR EL TARIFARIO EN LOS DESTINOS DE FLETE ~$25.000** (Guachené, Gómez Plata, Remedios,
-    Algeciras, Málaga, Inzá y similares): de $80.000-81.000 a **~$84.000-85.000** de total al cliente.
-    Hoy se absorben **$3.900-4.900 por venta** ahí (~$384.000/mes proyectado). El cliente de pueblo
-    rechaza menos y compra igual → es el que mejor tolera un total un poco más alto. Ver sección 0-H.
+35. [x] ✅ **CALCULADO EL 21-AGO — EL TARIFARIO YA ESTÁ DEFINIDO (sección 0-N).** Se confirmó el número
+    que este punto estimaba: los destinos de flete ~$25.000 pasan a **$85.000** de total al cliente
+    (era $80.000-81.000, se absorbían $3.899-4.853). Y salió el tarifario completo de 5 bandas
+    ($73.000 / $77.000 / $81.000 / $83.000 / $85.000) medido con las 79 guías reales.
+    **Absorción: $102.148 → $1.574 en 77 guías (−98,5%).**
+    ⚠️ **Falta APLICARLO en la IA de WhatsApp Business → pendiente #43.** Mientras no se pegue ahí,
+    la fuga sigue corriendo.
 25. [ ] 📦💵 **[histórico] Vigilar INVENTARIO y CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
     A 6-7 ventas/día son ~$238.000 de producto por día. **Es el freno real, ya no es Meta.**
 
@@ -2036,18 +3044,32 @@ $841 no mata un creativo, igual que tres días buenos no lo coronan.
 - **Interpretación:** 95-100% semanal = **TOPADO** (para crecer hay que subir presupuesto).
   Consistentemente <80% semanal = ahí SÍ hay un problema real (audiencia estrecha o solapamiento).
 
-### ⏱️ "ÚLTIMO CAMBIO SIGNIFICATIVO": SUBIR PRESUPUESTO **NO** REINICIA EL APRENDIZAJE (2026-08-07)
-- El export de Meta trae la columna **"Último cambio significativo"**. Es la forma de saber si un
-  conjunto volvió a fase de aprendizaje o no. **Revisarla siempre después de un cambio.**
-- **Comprobado en esta cuenta:** el salto de Domiciliarios de $18.000 → $30.000 (**+67%**) dejó el campo
-  en **2026-07-11** (sin cambios) → **Meta NO lo consideró significativo y el conjunto NUNCA reinició
-  aprendizaje.** Por eso el costo alto duró un solo día.
-- **Lo que SÍ reinicia aprendizaje:** crear o duplicar anuncios (los del TEST marcan 31-jul), crear
-  conjuntos nuevos, y cambiar audiencias.
-- **Implicación:** escalar presupuesto es MÁS BARATO de lo que temíamos. La regla de "20-30% cada 3-4
-  días" sigue siendo prudente, pero el miedo a reiniciar el aprendizaje por subir presupuesto es infundado.
-  ⚠️ El costo real de subir presupuesto es otro: Meta va a buscar gente menos calificada para gastarlo.
-  Eso se mide con el TERMÓMETRO, no con el campo de aprendizaje.
+### ⏱️ "ÚLTIMO CAMBIO SIGNIFICATIVO": EL REINICIO DE APRENDIZAJE **NO SE PUEDE PREDECIR**
+*(esta regla se escribió mal DOS veces. Historia completa en la sección 0-M.)*
+- El export de Meta trae la columna **"Último cambio significativo"**. Es la forma de saber **después
+  del hecho** si un conjunto volvió a fase de aprendizaje. **Revisarla siempre tras un cambio.**
+- 🔴 **NO HAY FÓRMULA. Los tres casos medidos se contradicen:**
+
+| Cambio de presupuesto | % | Monto | ¿Reinició? |
+|---|---|---|---|
+| Domiciliarios $18.000 → $30.000 (4-ago) | +67% | +$12.000 | ❌ no |
+| **TEST $12.000 → $20.000 (19-ago)** | **+67%** | **+$8.000** | ✅ **sí** |
+| Domiciliarios $30.000 → $55.000 (19-ago) | +83% | +$25.000 | ✅ sí |
+
+  **Dos cambios del mismo +67% dieron resultados opuestos, y el que reinició fue el de monto MÁS
+  CHICO.** Ni el porcentaje ni el monto absoluto lo explican.
+- ⚠️⚠️ **HISTORIAL DE ERRORES DE ESTA REGLA (por eso hay que desconfiar de ella):**
+  **v1 (7-ago):** "subir presupuesto NUNCA reinicia el aprendizaje" → generalizado desde 1 caso.
+  **v2 (21-ago):** "el umbral está entre +67% y +83%, usar escalones de +60%" → generalizado desde
+  2 casos. **Con 2 puntos se puede trazar cualquier línea.**
+- ✅ **REGLA OPERATIVA CORRECTA:** **asumir que cualquier cambio de presupuesto PUEDE reiniciar el
+  aprendizaje, y no juzgar el CPA hasta 3-4 días después del escalón.** El tamaño del escalón se
+  decide por **caja e inventario**, no por miedo al aprendizaje.
+- **Lo que SÍ reinicia aprendizaje siempre:** crear o duplicar anuncios (los del TEST marcan 31-jul),
+  crear conjuntos nuevos, y cambiar audiencias.
+- ⚠️ **Y el costo de subir presupuesto es doble:** (1) puede reiniciar aprendizaje, y (2) Meta va a
+  buscar gente menos calificada para gastarlo. Lo segundo se mide con el **TERMÓMETRO** y con el
+  **conteo de conversaciones vacías** (sección 0-K), no con este campo.
 
 ### 🎯 HALLAZGO CLAVE (2026-08-04): LA CUENTA USA **PÚBLICO DE ADVANTAGE+**
 **Esto explica la mitad de los misterios de la cuenta. Leer antes de tocar cualquier audiencia.**
