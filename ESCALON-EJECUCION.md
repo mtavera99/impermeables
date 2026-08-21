@@ -14,7 +14,7 @@ Base medida: **$72.553/día de gasto real · 12,0 ventas/día · CPA $6.046 · u
 |---|---|---|---|
 | **1** | **Pegar el guion nuevo en la IA de WhatsApp Business** | **primero** | 10 min |
 | **2** | Probar el guion con un celular ajeno (5 preguntas) | enseguida | 3 min |
-| **3** | Subir **Domiciliarios de $55.000 a $84.000** | después del punto 2 | 1 min |
+| **3** | Subir **Domiciliarios de $55.000 a $70.000** | después del punto 2 | 1 min |
 | **4** | Leer el resultado | **lunes 31-ago** | 15 min |
 
 🔑 **El guion va primero** porque la IA sigue cotizando con la tabla vieja, que se queda corta
@@ -59,20 +59,49 @@ contraindicación: es plata que se deja de perder desde el minuto que se pegue.*
 
 ---
 
+## ⚠️ ¿IMPORTA QUE EL PRESUPUESTO YA SUBIÓ EL 19-AGO?
+
+**Dos respuestas distintas, y conviene no confundirlas.**
+
+### ✅ El aprendizaje NO es el problema
+
+Domiciliarios hace **~86 conversaciones/día** (258 en la ventana). Meta sale de la fase de
+aprendizaje con ~50 eventos de optimización → **50 ÷ 86 = 0,6 días.**
+**El cambio del 19-ago ya está asentado hace días.** No se apilan dos fases de aprendizaje.
+
+Y el resultado del 19-ago **está medido y es bueno**: utilización 96,6%, costo por conversación casi
+plano ($518 → $525, +1,4%) con 39% más volumen, y CPA $6.046.
+Son **258 conversaciones** de evidencia, muy por encima del umbral de 50 del archivo.
+
+### 🔴 Pero el SALTO ACUMULADO sí importa
+
+| | a $84.000 | **a $70.000** |
+|---|---|---|
+| Paso de hoy | +53% | **+27%** |
+| **Acumulado desde el 19-ago (5 días)** | **+180%** 🔴 | **+133%** |
+| Acumulado desde el 4-ago | +367% | +289% |
+
+⚠️ **La regla del propio archivo es "20-30% cada 3-4 días"** (sección 11), y el plan del 19-ago decía
+textualmente *"esperar 3-4 días, verificar, y recién entonces evaluar otro +25%"*.
+**Ir a $84.000 sería +180% en 5 días, muy por encima de esa disciplina.**
+
+Y hay un costo de atribución: **con dos cambios apilados, si el CPA se degrada no se sabrá si fue el
+del 19 o el de hoy.** Un paso más chico deja menos plata expuesta a esa ambigüedad.
+
 ## 📈 EL CAMBIO EXACTO EN EL PANEL
 
 **Un solo cambio. Nada más.**
 
 | Conjunto | Hoy | Nuevo | Qué hacer |
 |---|---|---|---|
-| **Domiciliarios** | $55.000 | **$84.000** | ✏️ **subir (+53%)** |
+| **Domiciliarios** | $55.000 | **$70.000** | ✏️ **subir (+27%)** |
 | Motorizados | $15.000 | $15.000 | 🚫 **NO TOCAR** — es el termómetro |
 | TEST Creativos | $20.000 | $20.000 | 🚫 **NO TOCAR** — segundo control |
-| **Total asignado** | $90.000 | **$119.000** | |
+| **Total asignado** | $90.000 | **$105.000** | |
 
-**Por qué $84.000 y no otra cifra:** la cuenta gasta el **91,8%** de lo asignado, así que $119.000
-asignados producen **~$109.000/día de gasto real**, que es el escalón de +50% sobre los $72.553 de
-hoy. Y **+53% en Domiciliarios es más chico que el +58% que ya se vio funcionar** el 19-ago.
+**Por qué $70.000 y no $84.000:** respeta la regla de 20-30% del archivo, deja el salto acumulado en
++133% en vez de +180%, **y deja espacio para otro paso la semana entrante** una vez leído el
+resultado. La diferencia en utilidad es ~$39.000/día — barata contra la disciplina que compra.
 
 **Por qué solo Domiciliarios:**
 - Es el absorbedor probado: usó el **96,6%** de su presupuesto.
@@ -90,20 +119,20 @@ audiencias. Si se mueven dos cosas, el resultado no se puede atribuir.
 
 | | Hoy | Después del escalón |
 |---|---|---|
-| Gasto real/día | $72.553 | **~$109.000** |
-| Ventas/día | 12,0 | **~18** |
-| Conjuntos/semana | 84 | **~126** *(de 5.000 en bodega)* |
-| **Utilidad/día** | $220.247 | **~$330.000** |
-| **Ganancia extra** | | **+$110.000/día** |
+| Gasto real/día | $72.553 | **~$96.400** |
+| Ventas/día | 12,0 | **~16** |
+| Conjuntos/semana | 84 | **~112** *(de 5.000 en bodega)* |
+| **Utilidad/día** | $220.247 | **~$292.600** |
+| **Ganancia extra** | | **+$72.400/día** |
 
 ⚠️ **LOS PRIMEROS 2-3 DÍAS PUEDEN VERSE PEOR.** Subir presupuesto **puede** reiniciar el aprendizaje
 (no se puede predecir, sección 0-M). **No juzgar antes del día 4.** Es el error que el archivo ya
 documentó tres veces.
 
-📌 **Y ojo con el empaque:** a 18 ventas/día son ~18 paquetes diarios. **El fin de semana se puede
+📌 **Y ojo con el empaque:** a 16 ventas/día son ~16 paquetes diarios. **El fin de semana se puede
 despachar** (se hace cuando hay volumen), y con el ritmo nuevo conviene hacerlo en vez de dejar
-acumular: si se juntan sábado + domingo + lunes serían **~54 paquetes en un solo lote**, casi el
-doble del máximo histórico (29 el lunes 17). **Tener empaque listo antes del sábado.**
+acumular: si se juntan sábado + domingo + lunes serían **~48 paquetes en un solo lote**, bastante más
+que el máximo histórico (29 el lunes 17). **Tener empaque listo antes del sábado.**
 
 ---
 
@@ -135,7 +164,7 @@ el error de leer el día 1.
 | Señal | Cómo se calcula | Verde | Rojo |
 |---|---|---|---|
 | **CPA por venta despachada** | gasto/día ÷ guías/día | **< $12.000** | > $12.000 |
-| **Utilización de Domiciliarios** | gastado ÷ (84.000 × días) | **≥ 90%** | < 85% |
+| **Utilización de Domiciliarios** | gastado ÷ (70.000 × días) | **≥ 90%** | < 85% |
 | **Termómetro** | $/conv Domiciliarios ÷ $/conv Motorizados | **≤ 1,25** | > 1,25 |
 | Costo/conversación Domiciliarios | del export | ≤ $600 | > $700 |
 
@@ -148,7 +177,9 @@ de corte es el **CPA absoluto ($12.000)**, que tiene margen de sobra para absorb
 
 ### Cómo se decide, sin improvisar
 
-- **Todo verde** → **siguiente escalón** (~$130.000 en Domiciliarios) y repetir el ciclo.
+- **Todo verde** → **siguiente escalón: Domiciliarios a ~$88.000 (+25%)** y repetir el ciclo.
+  Manteniendo pasos de 25-30% cada 4-5 días se llega a los $242.000/día del techo de caja en unas
+  6 semanas, sin sustos y midiendo cada paso.
 - **Utilización < 85%** → el techo **no es presupuesto, es audiencia.** Dejar de subir y pasar a
   **abrir geografía** (pendiente #30), que es la palanca real bajo Advantage+.
 - **Termómetro > 1,25 pero CPA bajo $12.000** → el tráfico incremental es peor pero todavía
