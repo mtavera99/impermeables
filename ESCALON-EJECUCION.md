@@ -8,42 +8,49 @@ Base medida: **$72.553/día de gasto real · 12,0 ventas/día · CPA $6.046 · u
 
 ---
 
-## ⏱️ CUÁNDO: EL GUION HOY, EL PRESUPUESTO EL **LUNES 24**
-
-⚠️ **CORRECCIÓN A LA PRIMERA VERSIÓN DE ESTE DOCUMENTO.** Decía "subir el presupuesto hoy mismo
-(viernes 21)". **Estaba mal, y el error era operativo, no de Meta.** Ver el porqué abajo.
+## ⏱️ CUÁNDO: TODO HOY, VIERNES 21 — EN ESTE ORDEN
 
 | # | Acción | Cuándo | Toma |
 |---|---|---|---|
-| **1** | **Pegar el guion nuevo en la IA de WhatsApp Business** | **hoy, viernes 21** | 10 min |
-| **2** | Probar el guion con un celular ajeno (5 preguntas) | hoy, enseguida | 3 min |
-| **3** | Subir **Domiciliarios de $55.000 a $84.000** | **lunes 24, en la mañana** | 1 min |
+| **1** | **Pegar el guion nuevo en la IA de WhatsApp Business** | **primero** | 10 min |
+| **2** | Probar el guion con un celular ajeno (5 preguntas) | enseguida | 3 min |
+| **3** | Subir **Domiciliarios de $55.000 a $84.000** | después del punto 2 | 1 min |
 | **4** | Leer el resultado | **lunes 31-ago** | 15 min |
 
-### 🔴 POR QUÉ **NO** UN VIERNES: EL FIN DE SEMANA NO SE DESPACHA
+🔑 **El guion va primero** porque la IA sigue cotizando con la tabla vieja, que se queda corta
+~$1.327 por venta. Son **~$16.000/día** fugándose ahora mismo, y a 18 ventas/día pasan a ~$24.000.
+**Escalar antes de pegarlo multiplica la fuga.**
 
-**Medido con las 91 guías (hora Colombia):**
+### ✅ POR QUÉ HOY VIERNES ES **MEJOR** QUE EL LUNES (y no solo por la plata)
 
-| Día | Guías |
-|---|---|
-| **lunes 17** | **29** ← un solo lote, 23:22 → 01:36 |
-| martes 18 | 12 |
-| miércoles 19 | 8 |
-| jueves 20 | 16 |
-| **sábados y domingos** | **0 — nunca, en 10 días de datos** |
+⚠️ **Este documento cambió de recomendación dos veces. Vale entender por qué, porque cada cambio
+vino de un dato nuevo, no de cambiar de opinión:**
 
-**Ese lote de 29 del lunes es la acumulación de sábado + domingo + lunes.** Es ~3× un día normal.
+| Versión | Decía | Qué la corrigió |
+|---|---|---|
+| 1ª | subir hoy viernes | — |
+| 2ª | **esperar al lunes 24** | los datos mostraban **0 guías** despachadas sábado y domingo → parecía que el fin de semana no se despachaba y el lote del lunes se duplicaría |
+| **3ª (esta)** | **subir hoy viernes** | **el dueño aclaró que sí despacha fin de semana cuando hay volumen.** El lunes 17 tuvo 29 guías porque el viernes 14 hubo pocos pedidos y los pasó al lunes — **fue una decisión, no una restricción** |
 
-🔑 **Si el presupuesto sube un viernes, el fin de semana produce ventas al ritmo NUEVO y todas caen
-en el lote del lunes:** a 18 ventas/día serían **~54 guías en una sola noche**, casi el doble del
-máximo histórico (29). Eso es riesgo de empaque, de errores de digitación y de clientes que compran
-el sábado y reciben el jueves.
+🔑 **Y al caerse esa objeción aparece una razón MÁS FUERTE que la plata para subirlo hoy: el test del
+valle sale MEJOR.**
 
-**Subiendo el lunes**, el volumen nuevo entra de a poco (lunes, martes, miércoles con despacho
-diario) y el primer fin de semana grande llega una semana después, ya con el ritmo aprendido.
+| Si se sube… | Fase de aprendizaje | Valle 26-29 | ¿Se puede leer el valle? |
+|---|---|---|---|
+| **hoy, viernes 21** | 22, 23, 24, 25 | **ya estabilizado** | ✅ **sí** — se compara 26-29 contra 31-ago en adelante, mismo presupuesto |
+| lunes 24 | 24, 25, 26, 27 | **dentro del aprendizaje** | 🔴 no — aprendizaje y valle se pisan |
 
-📌 **Y el "22" tampoco sirve: el 22 de agosto de 2026 es sábado.** El primer día útil para subir es
-el **lunes 24**.
+**Subiendo hoy, la fase de aprendizaje se consume en el fin de semana** (que además es tráfico que
+igual iba a entrar) **y el valle del 26-29 llega con la cuenta ya estabilizada.** Eso permite
+comparar el valle contra los días posteriores a la quincena **al mismo presupuesto**, que es
+exactamente el test que la segunda versión de este documento daba por perdido.
+
+📌 **Entonces ya no hay que elegir entre el escalón y el test del valle: subiendo hoy se tienen los
+dos.** Y de paso son 3 días más de utilidad (~$334.000).
+
+⚠️ **LO ÚNICO QUE HAY QUE TENER LISTO: empaque para despachar sábado si entran varios pedidos.**
+El fin de semana es opcional cuando hay pocos, pero con el ritmo nuevo conviene no dejarlo acumular
+hasta el lunes.
 
 🔑 **POR QUÉ EL GUION SÍ VA HOY:** la IA sigue cotizando con la tabla vieja, que se queda corta
 ~$1.327 por venta (concentrado en pueblos y ciudades intermedias). Son **~$16.000/día** que se están
@@ -93,9 +100,10 @@ audiencias. Si se mueven dos cosas, el resultado no se puede atribuir.
 (no se puede predecir, sección 0-M). **No juzgar antes del día 4.** Es el error que el archivo ya
 documentó tres veces.
 
-📌 **Y ojo con el empaque:** a 18 ventas/día son ~18 paquetes diarios de lunes a viernes, y el lote
-del lunes trae el acumulado del fin de semana (**~54**). Vale la pena tener empaque y espacio listos
-antes del lunes 24, porque ese es el cuello de botella físico, no la publicidad.
+📌 **Y ojo con el empaque:** a 18 ventas/día son ~18 paquetes diarios. **El fin de semana se puede
+despachar** (se hace cuando hay volumen), y con el ritmo nuevo conviene hacerlo en vez de dejar
+acumular: si se juntan sábado + domingo + lunes serían **~54 paquetes en un solo lote**, casi el
+doble del máximo histórico (29 el lunes 17). **Tener empaque listo antes del sábado.**
 
 ---
 
@@ -133,9 +141,10 @@ el error de leer el día 1.
 
 *(hoy: CPA $6.046 · utilización 96,6% · termómetro 524÷479 = **1,09** · $/conv $524)*
 
-⚠️ **Y al leerlo, tener presente que la ventana 24-30 incluye el valle del 26-29.** Si los números
-salen peores, parte puede ser el valle y no el escalón — por eso el criterio de corte es el CPA
-absoluto ($12.000), que ya tiene margen de sobra para absorber un valle.
+⚠️ **Al leerlo, separar las dos ventanas:** del **22 al 25** es el escalón estabilizándose, y del
+**26 al 29** es el valle. Si los números del 26-29 salen peores, es esperable — por eso el criterio
+de corte es el **CPA absoluto ($12.000)**, que tiene margen de sobra para absorber un valle.
+**El escalón se juzga con la ventana 22-25; el valle con la comparación 26-29 vs 31-3sep.**
 
 ### Cómo se decide, sin improvisar
 
@@ -148,40 +157,30 @@ absoluto ($12.000), que ya tiene margen de sobra para absorber un valle.
 
 ---
 
-## ⚖️ EL COSTO REAL DE SUBIR EL 24: SE PIERDE EL TEST DEL VALLE
+## ⚖️ EL TEST DEL VALLE: CÓMO LEERLO IGUAL
 
-**Hay que decirlo sin adornos: subir el lunes 24 sacrifica el test del valle del 26-29.**
+Una aclaración que hay que dejar escrita, porque una versión anterior de este documento se equivocó:
+**el termómetro NO sirve para el test del valle.** El valle se mide con el **CIERRE** (ventas ÷
+conversaciones) y **las ventas no se pueden atribuir por conjunto** — ese es el pendiente #32/#39,
+todavía abierto. El termómetro compara **costo por conversación**, que es otra cosa.
 
-Y **no** se salva con el termómetro, como decía la primera versión de este documento. La razón es
-concreta: **el valle se mide con el CIERRE (ventas ÷ conversaciones), y las ventas NO se pueden
-atribuir por conjunto** — ese es justo el pendiente #32/#39, que sigue abierto. El termómetro sirve
-para comparar **costo por conversación**, no cierre. Entonces si el cierre baja del 26 al 29, no hay
-forma de separar "es el valle" de "es el tráfico nuevo del escalón".
+**El test del valle se hace a nivel de CUENTA, comparando dos ventanas al mismo presupuesto:**
 
-### Las dos opciones reales, con precio
-
-| | **Subir el lunes 24** | **Subir el lunes 31** |
+| Ventana | Días | Qué es |
 |---|---|---|
-| Utilidad extra hasta el 31-ago | **+$779.674** (7 días) | $0 |
-| Test del valle 26-29 | 🔴 se pierde | ✅ limpio |
-| Lectura del escalón | mezclada con el valle | ✅ limpia, días hábiles |
-| Temporada de lluvia | la agarra completa | la agarra 1 semana tarde |
+| **Valle** | 26 al 29 de agosto | los días previos a la quincena |
+| **Post-quincena** | 31-ago al 3 de septiembre | después del pago |
 
-### Por qué la recomendación es el **24**, aunque se pierda el test
+**Si el cierre de la primera ventana es notoriamente menor que el de la segunda, el ciclo de pago
+queda confirmado** y pasa a ser variable permanente de planeación (modular presupuesto por quincena).
 
-1. **El valle ya está prácticamente respondido.** La sección 0-L concluyó *"ERA EL CICLO DE PAGO"*
-   con el rebote del 19-ago. El test del 26-29 sería **confirmación, no descubrimiento.**
-2. **Y no hace falta para decidir.** La decisión operativa que saldría del test es "gastar menos en
-   el valle". **Eso se puede lograr con una regla simple sin entender la causa: si el CPA por venta
-   despachada pasa de $12.000, se baja el presupuesto.** La regla funciona igual sin el diagnóstico.
-3. **Es reversible.** Bajar el presupuesto no rompe nada; la sección 0-C documenta que la cuenta
-   se recuperó en 24-48 h después del cambio del 4-ago.
-4. **El colchón es 4,04×.** El CPA puede empeorar 4 veces antes de dejar de ganar plata. Es mucho
-   margen de error para una apuesta de $780.000 a favor.
+🔑 **Y esto SOLO funciona si el presupuesto ya está estabilizado antes del 26** — o sea, subiéndolo
+hoy. Si se sube el lunes 24, la fase de aprendizaje se mete dentro del valle y las dos cosas se
+vuelven indistinguibles.
 
-📌 **Si igual se prefiere el test limpio, subir el 31 es una decisión perfectamente defendible.**
-Cuesta ~$780.000 y compra certeza sobre una variable que se repite dos veces al mes, todos los meses.
-**No es una mala elección — es una elección más conservadora.**
+⚠️ **Lo que NO se puede hacer: mover Motorizados antes del 29.** Es el único conjunto intacto de la
+cuenta y sirve para ver si la CALIDAD del tráfico se degrada al escalar (eso sí es el termómetro).
 
-⚠️ **Lo que NO se puede hacer en ninguno de los dos casos: mover Motorizados antes del 29.**
-Es el único conjunto intacto de la cuenta y sirve para ver si la CALIDAD del tráfico se degrada.
+📌 **Y una nota de honestidad sobre este test:** comparar 26-29 contra 31-3sep tiene un sesgo suave a
+favor de la segunda ventana, porque Meta optimiza mejor con más días de historia. Si la diferencia
+sale chica (menos de ~15%), no concluir nada.

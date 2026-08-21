@@ -1154,6 +1154,89 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-U. 💰 EL DESCUENTO DE CIERRE + EL DESPACHO DE FIN DE SEMANA (2026-08-21)
+
+Dos aportes del dueño. Script: `/analisis/descuento-de-cierre.py`.
+
+### 🗓️ PRIMERO, UN DATO OPERATIVO QUE CORRIGE UNA INFERENCIA DE KIRO
+
+**El despacho de fin de semana NO es una restricción: es una decisión por volumen.**
+Los datos muestran **0 guías despachadas sábado y domingo**, y de ahí se infirió que "no se despacha
+el fin de semana". **Falso.** El dueño aclara: *"el viernes pasado como hubo pocos lo despaché hasta
+el lunes, pero si empiezan a haber varios puedo despachar, eso no es problema"*.
+
+⚠️ **Ese lote de 29 guías del lunes 17 (el más grande de la historia) fue una elección, no un techo.**
+🔑 **Lección: "cero registros" no prueba "no puede". Prueba "no pasó".** Es la segunda vez en el día
+que un dato ausente se leyó como una restricción que no existía (la otra fue el cruce de guías Heka).
+
+### ✅ Y ESO CAMBIA EL TIMING ÓPTIMO DEL ESCALÓN — A FAVOR DE SUBIRLO ANTES
+
+| Si se sube… | Fase de aprendizaje | Valle 26-29 | ¿Se puede leer el valle? |
+|---|---|---|---|
+| **viernes 21** | 22, 23, 24, 25 | **ya estabilizado** | ✅ **sí** — 26-29 vs 31-ago+, mismo presupuesto |
+| lunes 24 | 24, 25, 26, 27 | **dentro del aprendizaje** | 🔴 no — se pisan |
+
+**Subiendo el viernes, la fase de aprendizaje se consume en el fin de semana y el valle llega con la
+cuenta estabilizada.** Ya no hay que elegir entre el escalón y el test del valle: **se tienen los dos.**
+
+### 💰 EL DESCUENTO DE CIERRE: SÍ, PERO CON TOPE DE $3.000 Y REGLAS
+
+**Idea del dueño:** si el cliente dice que el envío está caro, bajarle $3.000-5.000 de la ganancia
+como último recurso para no perder la venta.
+
+⚠️ **Mecánicamente es LO MISMO que la fuga de la sección 0-H. La diferencia es decisiva:**
+
+| | La fuga (0-H) | El descuento de cierre |
+|---|---|---|
+| Cuándo | **incondicional** — en todas las ventas de bandas caras | **solo si el cliente objeta** |
+| Visibilidad | **invisible**, nadie lo decidió | consciente y auditable |
+| Causa | el guion prometía un envío que no existía | herramienta de cierre |
+
+**Un descuento que solo reciben los que se iban a ir no es una fuga: es precio discriminado.**
+
+**El umbral, calculado:**
+
+| Descuento | Margen queda | El cierre entre los que objetan debe subir |
+|---|---|---|
+| $2.000 | $22.400 | +8,9% |
+| **$3.000** | **$21.400** | **+14,0%** ← tope recomendado |
+| $4.000 | $20.400 | +19,6% |
+| $5.000 | $19.400 | **+25,8%** |
+
+🔑 **El tope debe ser $3.000, no $5.000. La diferencia no es de $2.000: es de exigirle 14% de
+efectividad al descuento en vez de 26%.** Y es robusto: incluso si **la mitad** de los que objetan
+iba a comprar igual, con $3.000 sigue conviniendo si convierte 28% más.
+
+### 🪜 LA ESCALERA COMPLETA (el descuento es el 5º escalón, no el 1º)
+
+| # | Jugada | Costo | Por qué |
+|---|---|---|---|
+| 1º | Reforzar valor | $0 | la 0-J probó que la venta se decide en color y talla, no en precio |
+| 2º | Mostrar la cuenta | $0 | el envío no es un invento nuestro |
+| 3º | **Ofrecer 2 unidades** | **+margen** | 🥇 *"pagas un solo envío"* → le ahorra $13.651 y **sube** el margen |
+| 4º | **Cambiar transportadora** | **$0-1.000** | 🥇 sale del **costo**, no del margen. Hasta **$2.794** en Bogotá |
+| 5º | Descuento de cierre | $3.000 | último recurso, condicionado a cerrar ya |
+
+🔑 **Los escalones 3 y 4 son los hallazgos útiles: hay dos formas de "bajarle el precio" al cliente
+que no cuestan margen.** El 4º solo existe porque el dueño elige transportadora (sección 0-P).
+
+### 🔒 LAS REGLAS QUE EVITAN QUE VUELVA A SER FUGA
+
+- **Tope $3.000.** · **Solo reactivo** (nunca ofrecerlo). · **Una sola vez** por conversación.
+- **Condicionado a cerrar ya:** *"te ayudo con $3.000 si lo cerramos hoy"* — protege el precio.
+- **Decir "descuento", NO "te bajo el envío"** — si el envío parece negociable, todos negocian.
+- 🚫 **Nunca en pedidos de 2 unidades** (ahí el gancho es el envío compartido).
+
+📊 **ES AUDITABLE, y ese es el control clave:** el descuento se ve en el export como diferencia entre
+el `valor_comercial` cobrado y el total de la banda.
+**Regla de alarma: si más del 15% de las ventas de una semana llevan descuento, dejó de ser último
+recurso y se volvió el precio real → hay que revisar el tarifario, no seguir descontando.**
+
+**Dimensión del riesgo:** al 15% de las ventas cuesta $8.100/día = **1,84% del margen**. Barato
+comparado con la fuga anterior, que corría en el 28% del volumen sin que nadie lo hubiera decidido.
+
+---
+
 ## 0-T. 💬 ¿PRECIO SEPARADO O TOTAL? — LA RESPUESTA ES "LOS DOS", Y HAY UN DATO NUEVO (2026-08-21)
 
 **Pregunta del dueño.** Script: `/analisis/precio-total-vs-separado.py`.

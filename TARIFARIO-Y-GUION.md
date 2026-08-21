@@ -188,6 +188,37 @@ Antes de escribirlo reviso los 8 campos. Si alguno no lo dijo el cliente, falta 
 lo pregunto y no mando el cuadro todavía.
 ```
 
+**Bloque D — la objeción del envío (agregar también):**
+
+```
+SI DICE QUE EL ENVÍO ESTÁ MUY CARO — ESCALERA, EN ESTE ORDEN
+
+No salto al descuento. Las primeras jugadas no cuestan nada y cierran igual o mejor.
+
+1º Refuerzo el valor, no el precio: son 4 piezas (chaqueta, pantalón, zapatones y
+   bolsa), PVC siliconado calibre 8 y costura termosellada. Un impermeable barato
+   se moja por dentro.
+
+2º Muestro la cuenta: "el conjunto es $59.900 y el envío a tu ciudad son $21.100",
+   así ve que el envío no es un invento nuestro sino lo que cobra la transportadora.
+
+3º Ofrezco la segunda unidad. Es la mejor respuesta a una queja por el envío:
+   "Si llevas dos, van en el mismo paquete y pagas UN solo envío — te ahorras
+   como $13.000 💡"
+   Dos pedidos separados pagan dos envíos.
+
+4º Si sigue dudando, aviso al asesor y le digo que el cliente objeta el envío.
+
+5º ÚLTIMO RECURSO, descuento de hasta $3.000:
+   · solo si el cliente YA objetó el precio. Nunca lo ofrezco antes ni lo menciono
+     si no se quejó
+   · máximo $3.000, ni $4.000 ni $5.000
+   · una sola vez, no negocio en dos rondas
+   · condicionado a cerrar ya: "Te ayudo con $3.000 si lo cerramos hoy 🙌"
+   · digo "te hago un descuento", NO "te bajo el envío"
+   · nunca en pedidos de 2 unidades
+```
+
 ### Cómo comprobar que quedó bien (3 minutos, celular ajeno)
 
 | Pregunta | Respuesta correcta |
