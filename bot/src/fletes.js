@@ -30,13 +30,13 @@ const BANDAS = {
     nombre: "Boyacá, Casanare y Meta cercano",
     flete: 16843,
     total: 77000,
-    ciudades: ["TUNJA", "PAIPA", "AGUAZUL", "TOCANCIPA", "VILLAVICENCIO", "DUITAMA", "SOGAMOSO", "YOPAL", "ACACIAS"],
+    ciudades: ["TUNJA", "PAIPA", "AGUAZUL", "TOCANCIPA", "VILLAVICENCIO", "DUITAMA", "SOGAMOSO", "YOPAL", "ACACIAS", "CUCUNUBA", "UBATE", "CHOCONTA", "VILLA DE LEYVA"],
   },
   C: {
     nombre: "Capitales grandes",
     flete: 20771,
     total: 81000,
-    ciudades: ["MEDELLIN", "CALI", "BARRANQUILLA", "SOLEDAD", "CARTAGENA", "CARTAGENA DE INDIAS", "PEREIRA", "MANIZALES", "BARRANCABERMEJA", "YARUMAL", "ARMENIA", "IBAGUE", "NEIVA"],
+    ciudades: ["MEDELLIN", "CALI", "BARRANQUILLA", "SOLEDAD", "CARTAGENA", "CARTAGENA DE INDIAS", "PEREIRA", "DOSQUEBRADAS", "MANIZALES", "BARRANCABERMEJA", "YARUMAL", "ARMENIA", "IBAGUE", "NEIVA", "ITAGUI", "ENVIGADO", "SABANETA", "PALMIRA", "JAMUNDI", "YUMBO"],
   },
   D: {
     nombre: "Ciudades intermedias",
@@ -48,7 +48,7 @@ const BANDAS = {
     nombre: "Pueblos y zona extendida",
     flete: 25029,
     total: 85000,
-    ciudades: ["GUACHENE", "GOMEZ PLATA", "ALGECIRAS", "REMEDIOS", "TUQUERRES", "TURBO", "PUERTO GAITAN", "ANSERMA", "LA UNION", "EL SANTUARIO", "LLORENTE", "SAN CARLOS DE GUAROA", "BUENAVISTA", "SAN GIL", "INZA", "MALAGA", "CAUCASIA", "SANTA ROSA DE CABAL"],
+    ciudades: ["GUACHENE", "GOMEZ PLATA", "ALGECIRAS", "REMEDIOS", "TUQUERRES", "TURBO", "PUERTO GAITAN", "ANSERMA", "LA UNION", "EL SANTUARIO", "LLORENTE", "SAN CARLOS DE GUAROA", "BUENAVISTA", "SAN GIL", "INZA", "MALAGA", "CAUCASIA", "SANTA ROSA DE CABAL", "RIOSUCIO", "MACEO", "PARATEBUENO", "SANTIAGO DE TOLU", "SAN ANDRES DE SOTAVENTO", "HISPANIA", "GUACARI"],
   },
 };
 
@@ -59,10 +59,15 @@ const BANDAS = {
 const BANDA_POR_DEFECTO = "E";
 
 // Recargo de flete por unidad adicional en el mismo pedido.
-// Observado en 5 pedidos de 2 unidades: el flete NO se duplica, sube entre
-// $6.838 y $15.089. Se usa el techo observado para no volver a absorber.
-// ⚠️ Estimado con 5 guías: revisar cuando haya más pedidos multi-unidad.
-const RECARGO_UNIDAD_EXTRA = 15100;
+// Observado en 6 pedidos de 2 unidades: el flete NO se duplica, sube entre
+// $6.838 y $15.089 (mediana ~$7.100).
+//
+// ⚠️ ES UNA ESTIMACIÓN, NO UNA TARIFA. Y además el PRECIO del producto para 2
+// unidades no está definido: los pedidos reales se cobraron entre $54.058 y
+// $59.991 por unidad, o sea que cada cierre improvisó (pendiente #44).
+// Por eso `cotizar()` marca `requiereConfirmacion` en cualquier pedido de 2+ y
+// el guion tiene instrucción explícita de NO inventar el total: pasa a humano.
+const RECARGO_UNIDAD_EXTRA = 7100;
 
 function fmt(n) {
   return "$" + Number(n || 0).toLocaleString("es-CO");
@@ -118,6 +123,9 @@ function cotizar(ciudad, unidades = 1) {
     total,
     unidades: uds,
     reconocida,
+    // Para 1 unidad el total es una tarifa firme. Para 2+ es una estimación:
+    // falta definir el precio de la segunda unidad (pendiente #44).
+    requiereConfirmacion: uds > 1,
   };
 }
 

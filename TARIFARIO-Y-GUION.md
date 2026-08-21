@@ -34,21 +34,43 @@ sección 0-H. Y **la banda E es 20 de 72 guías (28% del volumen)**, no un caso 
 ### Ciudades por banda (las vistas en 79 guías + las obvias que faltaban)
 
 - **A ($73.000):** Bogotá, Soacha, Zipaquirá, Chía, Cajicá, Mosquera, Madrid, Funza, Facatativá, Sibaté, La Calera
-- **B ($77.000):** Tunja, Paipa, Aguazul, Tocancipá, Villavicencio, Duitama, Sogamoso, Yopal, Acacías
-- **C ($81.000):** Medellín, Cali, Barranquilla, Soledad, Cartagena, Pereira, Manizales, Barrancabermeja, Yarumal, Armenia, Ibagué, Neiva
+- **B ($77.000):** Tunja, Paipa, Duitama, Sogamoso, Aguazul, Yopal, Tocancipá, Villavicencio, Acacías, **Cucunubá**, Ubaté, Chocontá, Villa de Leyva
+- **C ($81.000):** Medellín, Itagüí, Envigado, Sabaneta, Cali, Palmira, Jamundí, Yumbo, Barranquilla, Soledad, Cartagena, Pereira, **Dosquebradas**, Manizales, Barrancabermeja, Yarumal, Armenia, Ibagué, Neiva
 - **D ($83.000):** Bucaramanga, Montería, Popayán, Santa Marta, Ipiales, Florencia, Mocoa, Bello, Rionegro, Cereté, Coveñas, Samacá, Cúcuta, Pasto, Valledupar, Sincelejo, Quibdó, Riohacha
-- **E ($85.000):** Guachené, Gómez Plata, Algeciras, Remedios, Túquerres, Turbo, Puerto Gaitán, Anserma, La Unión, El Santuario, Llorente, San Carlos de Guaroa, Buenavista, San Gil, Inzá, Málaga, Caucasia, Santa Rosa de Cabal
+- **E ($85.000):** Guachené, Gómez Plata, Algeciras, Remedios, Túquerres, Turbo, Puerto Gaitán, Anserma, La Unión, El Santuario, Llorente, San Carlos de Guaroa, Buenavista, San Gil, Inzá, Málaga, Caucasia, Santa Rosa de Cabal, Riosucio, Maceo, Paratebueno, Santiago de Tolú, San Andrés de Sotavento, Hispania, Guacarí
 - **Cualquier otra → banda E ($85.000).** Antes el default era $18.000 de flete, y se quedaba corto
   justo en los destinos que no están en ninguna lista, que son los pueblos. **Errar hacia arriba
   cuesta una objeción; errar hacia abajo cuesta $4.900 de margen.**
 
-### Dos decisiones que conviene conocer
+### 🔑 Por qué el precio cubre el peor caso: **no existe "el flete de Bogotá"**
 
-1. **Banda A se queda en $73.000 aunque una guía necesitaba $75.000.** Hubo una guía de Bogotá por
-   **Servientrega** a $14.674 (las otras 16 fueron Interrapidísimo a $12.871). Subir toda Bogotá
-   $2.000 para cubrir 1 de 17 casos castiga al 24% del volumen y al cliente más sensible al precio.
-   **Se acepta absorber $1.574 esporádicos.**
-2. **Los totales están redondeados al millar hacia arriba**, así que hay un colchón de $71 a $426
+**99 Envíos reparte entre tres transportadoras y cada una cobra distinto por el mismo destino.**
+Quién despacha lo decide 99 Envíos, no vos — así que no se puede saber de antemano cuánto va a
+costar ese envío:
+
+| Destino | coordinadora | interrapidísimo | servientrega |
+|---|---|---|---|
+| Bogotá | **$11.880** | $12.871 | $14.674 |
+| Chía | **$11.951** | $12.871 | — |
+
+→ **Por eso cada banda cobra el flete de la transportadora MÁS CARA que se haya visto ahí.**
+Cobrar de menos es pérdida segura; cobrar de más solo cuesta en los envíos que caen en la
+transportadora barata. Con 88 guías, esa regla deja la absorción en **$3.997** (era $154.107).
+
+📌 **Y abre una pregunta que vale plata: ¿se puede PEDIR coordinadora?** Es ~$1.000 más barata que
+interrapidísimo y ~$2.800 más barata que servientrega en Bogotá y sabana. Si el reparto se puede
+influir, es ahorro directo sin costo. **Vale meterlo en la misma llamada de los días de pago.**
+
+### Tres decisiones que conviene conocer
+
+1. **Banda A se queda en $73.000 aunque una guía necesitaba $75.000.** Fue la de Servientrega
+   ($14.674) contra 16 de Interrapidísimo ($12.871). Subir toda Bogotá $2.000 para cubrir 1 de 17
+   casos castiga al 24% del volumen y al cliente más sensible al precio.
+   **Se acepta absorber $1.574 esporádicos.** Igual con Cartagena ($1.693) y Medellín ($730).
+2. **Guacarí se deja en la banda E ($85.000) aunque su único dato dice $81.000.** Ese dato vino de
+   **coordinadora**, la transportadora barata; con interrapidísimo un municipio de ese tamaño
+   cuesta $25.029. **Con un solo dato, se cubre el peor caso.**
+3. **Los totales están redondeados al millar hacia arriba**, así que hay un colchón de $71 a $426
    por venta. Ese colchón es lo que absorbe las variaciones chicas de tarifa.
 
 ---
@@ -80,8 +102,9 @@ TOTALES POR ZONA (1 conjunto, incluye producto + envío):
 $73.000 — Bogotá, Soacha, Zipaquirá, Chía, Cajicá, Mosquera, Madrid, Funza,
           Facatativá, Sibaté, La Calera
 $77.000 — Tunja, Paipa, Duitama, Sogamoso, Aguazul, Yopal, Tocancipá,
-          Villavicencio, Acacías
-$81.000 — Medellín, Cali, Barranquilla, Soledad, Cartagena, Pereira, Manizales,
+          Villavicencio, Acacías, Cucunubá, Ubaté, Chocontá, Villa de Leyva
+$81.000 — Medellín, Itagüí, Envigado, Sabaneta, Cali, Palmira, Jamundí, Yumbo,
+          Barranquilla, Soledad, Cartagena, Pereira, Dosquebradas, Manizales,
           Barrancabermeja, Yarumal, Armenia, Ibagué, Neiva
 $83.000 — Bucaramanga, Cúcuta, Montería, Popayán, Pasto, Ipiales, Santa Marta,
           Valledupar, Sincelejo, Florencia, Mocoa, Quibdó, Riohacha, Bello,
@@ -89,7 +112,9 @@ $83.000 — Bucaramanga, Cúcuta, Montería, Popayán, Pasto, Ipiales, Santa Mar
 $85.000 — Cualquier pueblo o municipio que no esté en las listas de arriba
           (Guachené, Gómez Plata, Algeciras, Remedios, Túquerres, Turbo,
           Puerto Gaitán, Anserma, La Unión, El Santuario, San Gil, Inzá,
-          Málaga, Caucasia, Santa Rosa de Cabal y similares)
+          Málaga, Caucasia, Santa Rosa de Cabal, Riosucio, Maceo,
+          Paratebueno, Santiago de Tolú, San Andrés de Sotavento,
+          Hispania, Guacarí y similares)
 
 Si la ciudad no aparece, uso $85.000. Nunca invento un valor más bajo para no incomodar.
 

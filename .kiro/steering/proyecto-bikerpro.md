@@ -7,6 +7,16 @@
 Última actualización: 2026-08-21 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
 corre en UTC y ya marca el día siguiente)*
 
+✅✅ **CHEQUEO DEL ESCALÓN 1 CERRADO (2026-08-21, sección 0-O): EL ESCALÓN 2 SE JUSTIFICA.**
+**24 guías el 19-20 ago (umbral: 20) · 12,0 ventas/día · CPA por venta despachada $6.703 (techo:
+$10.000).** ⚠️ **Pero el escalón 2 va con +60% máximo → de $90.000 a máximo $144.000/día.**
+🚨🚨 **ALARMA OPERATIVA, NO ANALÍTICA: LAS 7 GUÍAS DEL PENDIENTE #34 SIGUEN TRABADAS 6 DÍAS
+DESPUÉS.** Inzá, Cartagena y Popayán llevan **10 días**. En total hay **17 guías trabadas y
+$406.346 de margen real en riesgo.** Cartagena es la llamada #1 ($48.981).
+🆕 **HALLAZGO: 99 ENVÍOS REPARTE ENTRE TRES TRANSPORTADORAS Y CADA UNA COBRA DISTINTO POR EL MISMO
+DESTINO** (Bogotá: coordinadora $11.880 · interrapidísimo $12.871 · servientrega $14.674).
+**No existe "el flete de Bogotá"** → por eso el tarifario cobra el peor caso de cada banda.
+
 🆕🆕 **LO ÚLTIMO (2026-08-21) — DOS COSAS, UNA HECHA Y UNA QUE CORRIGE EL MANUAL:**
 1. ✅ **EL GUION Y EL TARIFARIO QUEDARON ARREGLADOS (pendientes #38 y #35 — sección 0-N).**
    La tabla de fletes que alimentaba el conocimiento del negocio era **inventada** (Cali $13.000
@@ -1118,6 +1128,113 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-O. ✅ CHEQUEO DEL ESCALÓN 1 (2026-08-21): EL ESCALÓN 2 SE JUSTIFICA — Y 3 HALLAZGOS
+
+**Fuente:** export 99 Envíos del 21-ago (65 guías, 17–20 ago) → `/analisis/guias-99envios-21ago.csv`.
+Script: `/analisis/chequeo-escalon1.py`. Con los 3 exports acumulados hay **91 guías únicas**.
+
+### ✅ EL VEREDICTO: ESCALÓN 2 JUSTIFICADO
+
+| | |
+|---|---|
+| Guías despachadas el **19 y 20 de agosto** | **24** (umbral fijado de antemano: 20) |
+| Ventas/día | **12,0** |
+| Gasto/día | $80.432 |
+| **CPA por venta despachada** | **$6.703** (techo fijado: $10.000) |
+
+**Se cumplen las dos condiciones que se habían fijado ANTES de mirar los datos.**
+⚠️ **Pero el escalón 2 debe ser de +60% máximo** (regla nueva de la sección 0-M), no el salto
+grande que se venía pensando. De $90.000 → **máximo $144.000/día**.
+
+**Ritmo de despacho por lote** (el despacho es en tandas de tarde/noche):
+
+| Lote | Guías |
+|---|---|
+| 17-ago 23:22 → 18-ago 01:36 | 29 |
+| 18-ago 14:10 → 15:43 | 12 |
+| 19-ago 13:52 → 15:19 | 8 |
+| 20-ago 14:26 → 16:32 | 16 |
+
+### 🚨 HALLAZGO 1 — HAY UNA TERCERA TRANSPORTADORA, Y EL FLETE DEPENDE DE ELLA
+
+**99 Envíos no usa una sola transportadora: reparte entre tres, y cada una cobra distinto POR EL
+MISMO DESTINO.**
+
+| Transportadora | Guías | Flete promedio |
+|---|---|---|
+| interrapidisimo | 35 | $21.447 |
+| servientrega | 24 | $21.747 |
+| 🆕 **coordinadora** | 5 | **$15.440** |
+
+**El mismo destino, tres precios distintos:**
+
+| Destino | coordinadora | interrapidísimo | servientrega |
+|---|---|---|---|
+| Bogotá | **$11.880** | $12.871 | $14.674 |
+| Chía | **$11.951** | $12.871 | — |
+| Soacha | **$11.951** | — | — |
+
+🔑 **CONSECUENCIA CONCEPTUAL IMPORTANTE: no existe "el flete de Bogotá".** Existe un flete por
+*destino × transportadora*, y **quién despacha lo decide 99 Envíos, no el dueño.** Por eso el
+tarifario de la sección 0-N cobra **el peor caso de cada banda**: cobrar de menos es pérdida
+segura, cobrar de más solo cuesta cuando toca la transportadora barata.
+📌 **Y abre una palanca nueva sin explorar: si se pudiera PEDIR coordinadora en Bogotá y sabana,
+son ~$1.000 por envío.** Vale preguntarle a 99 Envíos si el reparto se puede influir.
+
+### 🔴 HALLAZGO 2 — LAS 7 GUÍAS DEL PENDIENTE #34 NUNCA SE RESCATARON, Y HAY 10 MÁS
+
+El archivo hablaba de "5 guías trabadas, $113.458". **El número real, cruzando los 3 exports, es
+17 guías trabadas y $406.346 de margen REAL en riesgo** (recaudo − flete − producto − empaque).
+
+🚨 **Las 7 que llevan 5 o más días son EXACTAMENTE las del pendiente #34, 6 días después:**
+
+| Ciudad | Estado | Días | Margen real | Guía |
+|---|---|---|---|---|
+| **INZÁ** | Reclame en oficina | **10** | $19.604 | 240058794250 |
+| **CARTAGENA** | Intento de entrega | **10** | **$48.981** | 240058798601 |
+| **POPAYÁN** | Reclame en oficina | **10** | $24.457 | 240058805943 |
+| **MÁLAGA** | Reclame en oficina | **9** | $19.547 | 240058859184 |
+| **REMEDIOS** | Reclame en oficina | **8** | $20.501 | 240058929714 |
+| **BOGOTÁ** | Telemercadeo | **7** | $24.327 | 240059015879 |
+| **GUACHENÉ** | Reclame en oficina | **6** | $20.501 | 240059090182 |
+
+⚠️ **Esto no es un hallazgo analítico, es una alarma operativa: el pendiente #34 se escribió el
+15-ago con estas mismas guías y no se ejecutó.** Cartagena sigue siendo la llamada #1 ($48.981).
+Las otras 10 llevan 1-3 días y todavía hay tiempo.
+
+📌 **Y corrige un error de cálculo del propio archivo:** las cifras de "margen en riesgo" de la
+sección 0-H se calcularon como *recaudo − flete*, **sin descontar producto ($34.000) ni empaque
+($1.500)**. Eso infla el riesgo ~2,7×. Los números de esta tabla ya están corregidos.
+
+### 🟡 HALLAZGO 3 — EL TARIFARIO TENÍA 3 CIUDADES MAL CLASIFICADAS
+
+El chequeo encontró que 3 ciudades reales caían al default (banda E, $85.000) cuando eran más
+baratas — **el peor error posible, porque espanta la venta antes de que exista**:
+
+| Ciudad | Caía en | Debía ser | Sobrecobro |
+|---|---|---|---|
+| **CUCUNUBÁ** | E ($85.000) | **B ($77.000)** | **$8.416** |
+| **DOSQUEBRADAS** | E ($85.000) | **C ($81.000)** | $4.329 |
+| GUACARÍ | E ($85.000) | *se deja en E* | $4.390 |
+
+✅ **Corregidas Cucunubá y Dosquebradas.** **Guacarí se DEJA en E a propósito:** es un municipio
+pequeño y el único dato ($20.709) vino de **coordinadora**, la transportadora barata; con
+interrapidísimo un pueblo de ese tamaño cuesta $25.029. Con n=1 se cubre el peor caso.
+
+**Estado final del tarifario, con las 88 guías válidas acumuladas: absorción $3.997 vs $154.107
+que habría absorbido la tabla vieja (−97,4%).** Quedan 3 casos, todos por transportadora caversa:
+Bogotá $1.574 (servientrega), Cartagena $1.693 (interrapidísimo), Medellín $730 (Seguro 99 Plus).
+
+### 🧰 DOS TRAMPAS NUEVAS DE ESTE EXPORT
+
+1. 🔴 **`fecha_envio` viene en UTC y el despacho se hace de noche** → un lote arranca 23:22 y
+   termina 01:36 del día siguiente. **Agrupar por día UTC parte los lotes por la mitad.** Hay que
+   convertir a hora Colombia (UTC−5) antes de contar guías por día.
+2. 🔴 **Este export NO trae la columna `unidades`** (los anteriores sí). Se infiere del recaudo
+   (> $100.000 = 2 unidades). **Verificarlo en cada export nuevo antes de calcular nada.**
+
+---
+
 ## 0-N. ✅ EL GUION Y EL TARIFARIO ARREGLADOS (2026-08-21) — CIERRA #38 (a)(b) Y #35
 
 **Fuente:** las 79 guías de 99 Envíos (10–19 ago), o sea los dos CSV que ya estaban en el repo.
@@ -1152,6 +1269,8 @@ exactamente los pueblos, los destinos más caros.** De ahí salía la promesa de
 | **E · Pueblos / zona extendida** | $24.953–25.029 | **$85.000** | $80.000–81.030 | **+$3.899 a $4.853** |
 
 **Resultado auditado: la absorción pasa de $102.148 a $1.574 en las mismas 77 guías (−98,5%).**
+🔄 **ACTUALIZADO EL 21-AGO con el export nuevo (88 guías válidas acumuladas): $154.107 → $3.997
+(−97,4%),** después de corregir 3 ciudades mal clasificadas. Ver sección **0-O**, hallazgo 3.
 
 🔑 **HALLAZGO QUE PRECISA LA SECCIÓN 0-H: la fuga NO era general, estaba SOLO en las bandas D y E.**
 Las bandas A, B y C ya se cobraban bien (con $71–426 de colchón). **El problema era exclusivamente
@@ -2036,7 +2155,13 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 33. [ ] 🛡️ **Decidir si se le da conjunto propio a "Demostración agua rueda"** (~$10.000/día) para
     tener un respaldo REAL y no teórico. Hoy recibe $0-63/día dentro de Domiciliarios. No urgente
     (frecuencia 1,31 = Fondo azul sin desgaste), pero cuando se desgaste ya se querrá tener corriendo.
-34. [ ] 🔥📞 **RESCATAR LAS 7 GUÍAS EN NOVEDAD DE 99 ENVÍOS — $181.744 de margen, y CADUCA.**
+34. [ ] 🚨🚨🔥📞 **SIN EJECUTAR DESDE EL 15-AGO. LAS 7 SIGUEN TRABADAS Y AHORA SON 17.**
+    **Verificado el 21-ago con el export nuevo (sección 0-O): Inzá, Cartagena y Popayán llevan
+    10 DÍAS; Málaga 9; Remedios 8; Bogotá 7; Guachené 6.** Total: **17 guías, $406.346 de margen
+    REAL en riesgo.** Cartagena sigue siendo la llamada #1 ($48.981, guía 240058798601).
+    ⚠️ **El monto de $181.744 que decía este punto estaba inflado: se calculó como recaudo − flete,
+    sin descontar producto ni empaque.** Los montos corregidos están en la sección 0-O.
+    ↓ *(texto original del 15-ago, se conserva)*
     Orden de llamada por valor: **CARTAGENA (2 uds, $48.981, ya tiene un intento fallido y Cartagena
     acumuló 2 de las 15 devoluciones de Heka — es la llamada #1 del negocio)** · Popayán $24.457 ·
     Bogotá $24.327 · Soacha $24.327 · Remedios $20.501 · Inzá $19.604 · Málaga $19.547.
@@ -2052,17 +2177,18 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 44. [ ] 💰 **DEFINIR EL PRECIO DE LA SEGUNDA UNIDAD — desbloquea el pendiente #40.**
     Hoy no existe: los 5 pedidos de 2 conjuntos se cobraron a **$54.058–59.991 por unidad** (dispersión
     11% = $11.864 por pedido). Sugerencia: **total de la zona + $57.000**. Ver sección 0-N.
-45. [ ] 📊 **SUMAR A `/analisis` LOS DOS EXPORTS QUE FALTAN** para que los hallazgos del 21-ago sean
-    reproducibles como el resto: **(a)** el CSV de Meta por conjunto 18–21 ago (de donde sale el
-    hallazgo del umbral de aprendizaje de la sección 0-M) y **(b)** el xlsx/CSV de 99 Envíos del
-    21-ago. **Ninguno de los dos está en el repo.**
-46. [ ] 🎯 **CERRAR EL CHEQUEO DEL ESCALÓN 1 — FALTAN LAS GUÍAS DEL 19, 20 Y 21.** El gasto ya está
-    medido ($80.432/día, 89% de los $90.000) pero **sin las guías no hay CPA y no se puede decidir el
-    escalón 2.** Regla fijada de antemano: **20+ guías en dos días → escalón 2** (y el escalón 2 debe
-    ser **+60% máximo**, no el salto grande que se venía pensando — ver 0-M).
-    ⚠️ **Hacerlo el viernes en la noche, después de despachar:** no se despacha sábado ni domingo, así
-    que si se espera al 22-23 las ventas del fin de semana no están despachadas y el CPA sale
-    **falsamente bajo**. Es la misma trampa de las 41 guías del 17-18 (sección 0-L).
+45. [ ] 📊 **SUMAR A `/analisis` EL EXPORT DE META QUE FALTA:** el CSV por conjunto 18–21 ago, de
+    donde sale el hallazgo del umbral de aprendizaje de la sección 0-M. Sin él ese hallazgo no es
+    reproducible. ✅ **El de 99 Envíos ya está** (`guias-99envios-21ago.csv`, 65 guías).
+46. [x] ✅ **CHEQUEO DEL ESCALÓN 1 CERRADO EL 21-AGO (sección 0-O): 24 guías el 19-20, 12,0
+    ventas/día, CPA $6.703. ESCALÓN 2 JUSTIFICADO.**
+49. [ ] 📈 **EJECUTAR EL ESCALÓN 2 — CON +60% MÁXIMO.** De $90.000/día a **máximo $144.000/día**.
+    ⚠️ **Motorizados sigue congelado hasta el 29-ago** (es el termómetro del test del valle).
+    ⚠️ **Y ojo con la caja: a 12 ventas/día la salida es ~$500.000/día** y sigue sin saberse en
+    cuántos días paga 99 Envíos (pendiente #28-2). **Ese dato bloquea el escalón 2 más que Meta.**
+50. [ ] 🚚 **PREGUNTARLE A 99 ENVÍOS SI SE PUEDE PEDIR *COORDINADORA*.** Es la transportadora más
+    barata y en Bogotá/sabana cobra ~$1.000 menos que interrapidísimo y ~$2.800 menos que
+    servientrega (sección 0-O). Si el reparto se puede influir, es ahorro directo sin costo.
 47. [ ] 🔧 **CORRECCIÓN DE REPARTO PENDIENTE (en el chequeo, no antes): TEST $20.000 → $12.000 y
     Domiciliarios $55.000 → $63.000.** Mismo gasto total.
     ⚠️ **PERO REEVALUAR PRIMERO: TEST mejoró de $708 a $578/conv (−18,4%) en la ventana 18-21**, así que
