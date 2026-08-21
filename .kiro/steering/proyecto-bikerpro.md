@@ -10,12 +10,21 @@ corre en UTC y ya marca el día siguiente)*
 ✅✅ **CHEQUEO DEL ESCALÓN 1 CERRADO (2026-08-21, sección 0-O): EL ESCALÓN 2 SE JUSTIFICA.**
 **24 guías el 19-20 ago (umbral: 20) · 12,0 ventas/día · gasto $72.553/día · CPA por venta
 despachada $6.046 (techo: $10.000) → 4,04× de colchón.**
-🎉🎉 **EL FRENO SE REDUJO A UNO SOLO: EL INVENTARIO (sección 0-Q).** 99 Envíos **paga cualquier día
-y se retira cuando se quiera** → el ciclo de caja es solo el tránsito (**3,1 días**), hacen falta
-$1.557.978 y hay **$5.200.000** ($2.200.000 retirables + $3.000.000 en distribución) = **3,3× de
-holgura.** **El techo que impone la caja está en $242.157/día de publicidad (40 ventas/día).**
-🔴 **Entonces CONTAR EL INVENTARIO es LO ÚNICO que falta para el escalón 2** (#29): a 19 ventas/día
-se consumen **133 conjuntos por semana.**
+🎉🎉🎉 **GATE 0 CERRADO — LOS 3 FRENOS DEL NEGOCIO ESTÁN ABIERTOS POR PRIMERA VEZ DESDE JULIO
+(sección 0-R):** ⏱️ tiempo ✅ (IA como válvula) · 💵 caja ✅ (99 Envíos paga a demanda: ciclo de
+**3,1 días**, hacen falta $1.557.978 y hay **$5.200.000** = **3,3× de holgura**) · 📦 inventario ✅
+(**5.000 unidades** + reposición avisando el día anterior).
+🔄 **Y EL PROBLEMA SE INVIERTE: 5.000 unidades son ~14 MESES de stock al ritmo actual.** La pregunta
+ya no es "¿alcanza el producto?" sino "¿en cuánto se vende esto?". **La urgencia de escalar subió.**
+🔴 **EL FRENO QUE QUEDA NO ES INTERNO: es la GEOGRAFÍA en Meta — y un paso manual de 10 minutos
+(pegar el guion nuevo en la IA, pendiente #43). Eso es literalmente lo que bloquea el crecimiento.**
+🌧️ **Y ENTRA UN RIESGO NUEVO: LA ESTACIONALIDAD.** Son impermeables; la temporada fuerte de lluvia
+va ~sep-nov. **Escalar ahora agarra la mejor ventana del año, pero 14 meses de stock obliga a cruzar
+una temporada seca con inventario encima.** El clima llevaba desde el 12-ago como hipótesis nunca
+revisada; ya no es opcional (#54).
+❓ **PREGUNTA ABIERTA (#53): ¿las 5.000 unidades están PAGADAS o son en consignación?** A costo
+auditado son **$170.000.000 = 33× la caja líquida.** Si están pagadas hay capital dormido; si son en
+consignación no hay problema. **NO asumir la respuesta — es un supuesto de Kiro, no un dato.**
 📌 **Y aparece un riesgo: $2.200.000 quietos en la plataforma.** Es el mismo patrón de los
 $2.788.601 que se acumularon con Heka. **Retirar por rutina, no cuando se acumula.**
 ✅ **Las 7 novedades trabadas se resolvieron el 21-ago.** Quedan en observación: **cuántas terminen
@@ -1146,7 +1155,97 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
-## 0-Q. 💵 EL GATE 0 SE ABRIÓ A MEDIAS: LA CAJA NO ES EL FRENO, EL INVENTARIO SÍ (2026-08-21)
+## 0-R. 🎉📦 GATE 0 CERRADO: LOS 3 FRENOS ESTÁN ABIERTOS — Y EL PROBLEMA SE INVIERTE (2026-08-21)
+
+**Dato del dueño:** **5.000 unidades en bodega** + el proveedor **manda más avisando el día
+anterior.** Script: `/analisis/inventario-y-escalera.py`.
+
+### ✅ LOS TRES FRENOS HISTÓRICOS DEL NEGOCIO, LOS TRES ABIERTOS
+
+| Freno | Estado | Cómo se resolvió |
+|---|---|---|
+| ⏱️ **Tiempo del dueño** | ✅ | la IA de WhatsApp como válvula de capacidad (sección 5-B) |
+| 💵 **Caja** | ✅ | 99 Envíos paga a demanda → 3,3× de holgura (sección 0-Q) |
+| 📦 **Inventario** | ✅ | 5.000 unidades + reposición a 1 día |
+
+**Es la primera vez desde julio que no hay ningún freno interno.**
+
+### 🔄 PERO EL PROBLEMA SE INVIERTE: 5.000 UNIDADES SON ~14 MESES DE STOCK
+
+| Ventas/día | Publicidad/día | Se agota en |
+|---|---|---|
+| **12 (hoy)** | $72.553 | **417 días — 13,9 meses** |
+| 19 (escalón 2) | $114.876 | 263 días — 8,8 meses |
+| 30 | $181.382 | 167 días — 5,6 meses |
+| 40 | $241.843 | 125 días — 4,2 meses |
+
+🔑 **La pregunta deja de ser "¿alcanza el producto?" y pasa a ser "¿en cuánto se vende esto?".**
+**La urgencia de escalar sube muchísimo, y por una razón distinta a la de antes.**
+
+### ❓ PREGUNTA ABIERTA QUE CAMBIA TODO EL ANÁLISIS — **NO ASUMIR LA RESPUESTA**
+
+A costo auditado de $34.000, 5.000 unidades son **$170.000.000**, o sea **33× la caja líquida
+($5.200.000)**. Ese desbalance es tan grande que **hay que confirmar el supuesto antes de sacar
+conclusiones:**
+
+1. **¿Están PAGADAS?** Si sí → hay $170M de capital dormido y el análisis de arriba aplica entero.
+2. **¿O son en consignación / las guarda el proveedor y se pagan a medida que se venden?**
+   → entonces **no hay capital dormido, no hay urgencia financiera**, y las 5.000 unidades son
+   solamente una buena noticia.
+3. **¿El costo de $34.000 es POR comprar en volumen?** Si comprar 200 sale más caro por unidad, la
+   compra fue racional (se pagó por descuento). Si sale igual, la lección hacia adelante es no
+   repetirlo: **ese capital rinde más en publicidad que en una bodega.**
+
+⚠️ **HASTA QUE ESO SE ACLARE, NO tratar los $170M como un error.** Es un supuesto de Kiro, no un dato.
+
+### 🔴 EL RIESGO QUE NADIE HA MIRADO: LA ESTACIONALIDAD
+
+**Son impermeables: la demanda depende de que llueva.** Colombia tiene régimen bimodal y la
+temporada fuerte en la zona andina va aproximadamente de **septiembre a noviembre.**
+
+- ✅ **A favor:** se está entrando a la mejor temporada del año. **Escalar ahora agarra la ventana de
+  mayor demanda natural.**
+- 🔴 **En contra:** 14 meses de stock implica **cruzar una temporada seca completa con inventario
+  encima.** Si el ritmo no sube, parte de las 5.000 unidades espera la lluvia del año siguiente.
+
+📌 **El clima es la hipótesis (C) de las secciones 0-F y 0-I, marcada "nunca revisada" desde el
+12-ago. Con 5.000 unidades en bodega dejó de ser una curiosidad: es la variable que define el plan.**
+
+### 📈 LA ESCALERA, Y POR QUÉ SE AUTOFINANCIA
+
+| Escalón | Publicidad/día | Ventas/día | Capital necesario | Utilidad/día |
+|---|---|---|---|---|
+| hoy | $72.553 | 12,0 | $1.545.514 | $220.247 |
+| **#1** | **$108.830** | **18,0** | $2.318.271 | **$330.370** |
+| #2 | $163.244 | 27,0 | $3.477.407 | $495.556 |
+| #3 | $244.866 | 40,5 | $5.216.111 | $743.334 |
+
+🔑 **La caja se autofinancia:** en el primer escalón la utilidad es ~$330.000/día, así que **en 3 días
+genera el ~$1.000.000 extra de capital de trabajo que pide el escalón siguiente.** No hay que
+esperar a tener la plata: el negocio la produce. **Por eso el techo de $242.157/día de la sección
+0-Q es conservador — asume caja congelada, y la caja está creciendo.**
+
+**Reglas de cada escalón (fijadas de antemano):** subir SOLO presupuesto · esperar **3-4 días** antes
+de juzgar · seguir si el CPA por venta despachada queda bajo **$12.000** · **Motorizados no se toca
+hasta el 29-ago** (es el termómetro del valle).
+
+### 🔴 ENTONCES EL FRENO QUE QUEDA ES LA GEOGRAFÍA EN META — Y UN PASO MANUAL
+
+La cuenta se topa porque los 3 conjuntos se estorban bajo Advantage+, y **bajo Advantage+ la
+geografía es lo único que diferencia conjuntos de verdad** (sección 11, pendiente #30). Motorizados
+usa el 84% de su presupuesto con frecuencia 1,23: **audiencia chica, no quemada.**
+
+✅ Y el bloqueo para abrir geografía era el guion (prometía un envío que no existía → abrir ciudades
+replicaba la fuga a escala). **Ya está arreglado en el repo (sección 0-N).**
+⚠️ **Falta pegarlo en la IA de WhatsApp Business (pendiente #43). ESE PASO MANUAL DE 10 MINUTOS ES
+AHORA LO QUE BLOQUEA EL CRECIMIENTO — no el inventario, no la caja, no Meta.**
+
+**→ ORDEN CORRECTO:** (1) pegar el guion · (2) escalón en Domiciliarios · (3) leer el valle del
+26-29 · (4) abrir geografía · (5) ampliar la audiencia de Motorizados.
+
+---
+
+## 0-Q. 💵 LA CAJA NO ES EL FRENO (2026-08-21)
 
 **Dato del dueño:** 99 Envíos **paga cualquier día, se retira cuando se quiera** (no hay ciclo de
 pago). **$2.200.000 disponibles para retirar** + **~$3.000.000 en distribución.**
@@ -2361,14 +2460,23 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ✅ **YA RESPONDIDO por el dueño:** el seguro **está incluido** en el `valor_servicio` y **en Heka
     no se pagaba** → el cambio de transportadora **fue correcto** (flete 14,1% más barato + cobertura
     al mismo precio total). Ver sección 0-H. Lo que queda es afinar el alcance de la cobertura.
-29. [ ] 🔴🔴📦 **CONTAR EL INVENTARIO — ES LO ÚNICO QUE FALTA PARA EL ESCALÓN 2.**
-    **Confirmado el 21-ago (sección 0-Q): tiempo ✅ resuelto, caja ✅ resuelta, inventario 🔴 no.**
-    Es literalmente el último candado del Gate 0. **A 19 ventas/día (escalón 2) se consumen
-    133 conjuntos por semana / 569 al mes.** Hoy, a 12/día, son 84 por semana.
-    ⚠️ **Escalar sin este dato es peor que no escalar:** se prenden anuncios sin producto que
-    despachar, y eso quema publicidad Y quema clientes.
-    📌 **No hace falta un conteo perfecto:** con saber cuántos conjuntos hay y cuánto tarda el
-    proveedor en reponer, ya se puede decidir el tamaño del escalón.
+29. [x] ✅✅ **RESUELTO EL 21-AGO: 5.000 UNIDADES EN BODEGA + REPOSICIÓN A 1 DÍA DE AVISO.**
+    **Con esto los 3 frenos del negocio quedan los 3 abiertos por primera vez desde julio.**
+    Ver sección **0-R**. 🔄 **Y el problema se invierte: 5.000 unidades son ~14 meses de stock al
+    ritmo actual** → la urgencia de escalar ya no es por oportunidad, es por rotación.
+53. [ ] ❓ **CONFIRMAR SI LAS 5.000 UNIDADES ESTÁN PAGADAS O SON EN CONSIGNACIÓN.**
+    A costo auditado son **$170.000.000 = 33× la caja líquida**. **El dato cambia todo el análisis:**
+    si están pagadas hay capital dormido y la rotación es urgente; si son en consignación **no hay
+    problema financiero alguno** y las 5.000 son solo buena noticia.
+    ⚠️ **NO asumir la respuesta. Es un supuesto de Kiro, no un dato.** Ver sección 0-R.
+    Y de paso: **¿el costo de $34.000 es por comprar en volumen?** Si comprar 200 sale más caro, la
+    compra fue racional. Si sale igual, la lección hacia adelante es no repetirlo.
+54. [ ] 🌧️🔴 **REVISAR LA ESTACIONALIDAD — YA NO ES OPCIONAL.** El clima es la hipótesis (C) de las
+    secciones 0-F y 0-I, marcada **"nunca revisada" desde el 12-ago**. Con 5.000 unidades en bodega
+    pasó de curiosidad a **la variable que define el plan**: la temporada fuerte de lluvia en la zona
+    andina va ~septiembre a noviembre, así que **escalar ahora agarra la mejor ventana del año**,
+    pero 14 meses de stock implica **cruzar una temporada seca con inventario encima.**
+    📌 Lo mínimo: comparar ventas/día contra días de lluvia de las últimas 6 semanas.
 30. [ ] 🌎 **LA JUGADA DE CRECIMIENTO: ABRIR CIUDADES NUEVAS, no subir presupuesto.**
     La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia
     de 1,31 prueba que NO es saturación de audiencia). **Bajo Advantage+ la geografía es la única forma
