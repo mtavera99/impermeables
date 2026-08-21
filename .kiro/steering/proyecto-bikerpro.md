@@ -1258,9 +1258,28 @@ número sale raro (33× la caja líquida), es señal de supuesto malo, no de neg
 | **A** — se paga al proveedor **al despachar** | $498.553 | $1.545.514 | **3,4×** | $244.110/día (40 ventas) |
 | **B** — se paga **después de cobrar** | **$90.553** | **$280.714** | **18,5×** | **$1.343.984/día (222 ventas)** |
 
-❓ **ÚNICA COSA QUE FALTA PRECISAR (pendiente #56): ¿el pago al proveedor es al despachar o después de
-cobrar?** En los dos casos la caja deja de ser una restricción práctica, pero la diferencia entre un
-techo de **40** y de **222** ventas/día decide si algún día hay que volver a pensar en caja.
+✅ **CONFIRMADO POR EL DUEÑO: ES EL ESCENARIO B — "le pago cuando cobro, sin afán".**
+
+🔑 **ESO ES UN CICLO DE CAJA NEGATIVO EN EL PRODUCTO, Y ES LO MÁS IMPORTANTE DE TODA ESTA SECCIÓN:**
+
+| Quién financia qué | |
+|---|---|
+| El **cliente** paga contraentrega | → financia el producto |
+| **99 Envíos** paga a demanda | → no retiene la plata |
+| Al **proveedor** se le paga después de cobrar | → no hay que adelantarle nada |
+
+**→ Lo único que el negocio pone de su bolsillo es PUBLICIDAD y EMPAQUE: $90.553/día.**
+Y se recupera en 3,1 días → **el capital de trabajo total es $280.714** contra $5.200.000
+disponibles = **18,5× de holgura.**
+
+**TECHO QUE IMPONE LA CAJA: $1.343.984/día de publicidad ≈ 222 ventas/día.** Es 18× el volumen
+actual. **La caja queda descartada como restricción, definitivamente y para cualquier escala
+realista.** No hay que volver a analizarla salvo que cambie una de las 3 condiciones de arriba.
+
+⚠️ **Y ESO CONVIERTE A LAS 3 CONDICIONES EN EL ACTIVO MÁS FRÁGIL DEL NEGOCIO.** Si el proveedor
+pidiera pago anticipado, o 99 Envíos pasara a pagar a 7 días, o hubiera que vender con pago
+anticipado, el requerimiento de caja se multiplica. **Vale cuidar esas tres relaciones más que
+cualquier optimización de CPA.**
 
 ### 📊 CUÁNTO DURA EL STOCK (ya no es un riesgo, sirve para saber cuándo pedir reposición)
 
@@ -2545,12 +2564,16 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     de rotación, ni riesgo de temporada en el balance propio, ni "contradicción" con reponer en 1 día.
     🔑 **Y es mejor de lo que se pensaba: son una OPCIÓN GRATIS** → se puede crecer 10× sin poner un
     peso de producto por adelantado. Ver sección 0-R.
-56. [ ] ❓ **PRECISAR CUÁNDO SE LE PAGA AL PROVEEDOR: ¿al despachar o después de cobrar?**
-    Es lo único que falta del modelo de caja, y mueve el techo bastante:
-    · **al despachar** → capital necesario $1.545.514 · holgura 3,4× · techo **40 ventas/día**
-    · **después de cobrar** → capital necesario **$280.714** · holgura **18,5×** · techo **222 ventas/día**
-    📌 **En los dos casos la caja deja de ser una restricción práctica**, así que NO bloquea el
-    escalón. Pero define si algún día hay que volver a pensar en caja. Ver sección 0-R.
+56. [x] ✅ **RESUELTO: AL PROVEEDOR SE LE PAGA DESPUÉS DE COBRAR, "sin afán".**
+    🔑 **El ciclo de caja del producto es NEGATIVO: lo financia el cliente.** El negocio solo pone
+    publicidad y empaque ($90.553/día), que se recuperan en 3,1 días → **capital de trabajo total
+    $280.714 contra $5.200.000 = 18,5× de holgura. Techo: 222 ventas/día (18× el volumen actual).**
+    **La caja queda descartada como restricción para cualquier escala realista.**
+57. [ ] 🛡️ **CUIDAR LAS 3 RELACIONES QUE SOSTIENEN EL CICLO DE CAJA NEGATIVO** — son el activo más
+    frágil del negocio, más valioso que cualquier optimización de CPA:
+    **(1)** el cliente paga contraentrega · **(2)** 99 Envíos paga a demanda · **(3)** al proveedor se
+    le paga después de cobrar. **Si alguna se rompe, el requerimiento de caja se multiplica**
+    (con pago al proveedor por adelantado el techo cae de 222 a 40 ventas/día). Ver sección 0-R.
 55. [ ] 🔴 **EXPORTAR HEKA DE NUEVO — HAY 22 GUÍAS ABIERTAS Y NO SE SABE SI SIGUEN ABIERTAS.**
     El export que hay es una foto del **9-ago** y la limpieza de cabos fue el **12-ago** (#24), así que
     no se puede saber si se resolvieron. **$622.560 de margen real en juego.** Ver sección 0-S.
