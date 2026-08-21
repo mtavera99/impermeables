@@ -1154,6 +1154,88 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-T. 💬 ¿PRECIO SEPARADO O TOTAL? — LA RESPUESTA ES "LOS DOS", Y HAY UN DATO NUEVO (2026-08-21)
+
+**Pregunta del dueño.** Script: `/analisis/precio-total-vs-separado.py`.
+
+### 🚨 PRIMERO, UN DATO QUE CAMBIA VARIAS CUENTAS DEL ARCHIVO: UNA DEVOLUCIÓN YA CASI NO CUESTA
+
+| Concepto | Antes | Hoy |
+|---|---|---|
+| Prima del seguro | — | $2.500 |
+| Empaque perdido | $1.500 | $1.500 |
+| **Producto** | **$34.000 perdido** | **$0** — vuelve al stock, es **consignación** |
+| **Flete ida y vuelta** | **~$21.000 perdido** | **$0** — lo cubre el **Seguro 99** |
+| **TOTAL** | **~$25.900** | **~$4.000** |
+
+🔑 **UNA DEVOLUCIÓN ES 10 VECES MÁS BARATA QUE ANTES**, por dos hallazgos que se documentaron por
+separado y **nunca se habían juntado**: el seguro (sección 0-L) y la consignación (sección 0-R).
+**El rechazo dejó de ser el enemigo del negocio.**
+
+⚠️ **Esto merece revisarse en todas las proyecciones que usan el rechazo del 15,3% como costo.**
+
+### 📊 LO QUE VALE UNA VENTA CERRADA, Y EL PUNTO DE EQUILIBRIO
+
+| Rechazo | Valor esperado por venta cerrada | vs hoy |
+|---|---|---|
+| 10,0% | $15.514 | +10,7% |
+| **15,3%** *(hoy)* | **$14.009** | — |
+| 20,0% | $12.674 | −9,5% |
+| 25,0% | $11.254 | −19,7% |
+| 40,0% | $6.994 | −50,1% |
+
+**Cuánto cierre habría que ganar para pagar más rechazo:**
+
+| Si el rechazo sube a | El cierre debe subir | O sea, de 9,4% a |
+|---|---|---|
+| 18% | +5,8% | 9,9% |
+| **20%** | **+10,5%** | **10,4%** |
+| 25% | +24,5% | 11,7% |
+
+**Son umbrales bajos: el precio separado tiene la matemática a favor** — si mostrar $59.900 en vez de
+$81.000 sube el cierre de 9,4% a apenas 10,4%, ya paga un rechazo del 20%.
+
+### ⚠️ PERO HAY TRES COSTOS QUE NO ESTÁN EN ESA CUENTA, Y SON LOS DECISIVOS
+
+1. 🔴 **EL TIEMPO DEL DUEÑO.** Cada devolución son llamadas y gestión. **El cuello de botella
+   histórico de este negocio ha sido su tiempo, no la plata** — y hay 17 guías trabadas ahora mismo,
+   7 de las cuales estuvieron 10 días sin resolver. **Más devoluciones consumen el recurso escaso.**
+2. 🔴 **EL FLETE ABSORBIDO — y esto está MEDIDO.** La sección 0-H probó que se absorbían
+   $3.900-4.900 por venta en destinos caros, **porque el guion había prometido un envío barato y
+   nadie quiere romper la promesa al momento de cerrar.** 🔑 **El precio separado CREA esa promesa.
+   El total no la crea.** Es el mecanismo exacto de la fuga.
+3. 🔴 **LA OBJECIÓN "¿por qué pago envío?"** está documentada en la sección 7 como recurrente.
+   **Esa objeción solo existe si se separa el precio.**
+
+📌 **Y un dato que apunta al mismo lado: la sección 0-J encontró que la conversación se decide en
+COLOR (77%) y TALLA (64%), no en precio.** Simplificar el precio libera la conversación para lo que
+sí gana la venta.
+
+### ✅ LA RESPUESTA: LOS DOS NÚMEROS EN UNA FRASE, CERRANDO EN EL TOTAL
+
+> ✅ *"El conjunto es $59.900 y el envío a Cali son $21.100, así que **te llega a $81.000 al recibir,
+> todo incluido** 📦"*
+
+**Por qué gana a las dos versiones puras:**
+- **Respeta el ancla del anuncio** (que dice $59.900) → no se siente engaño;
+- **Muestra la cuenta** → no hay sorpresa en la puerta, que es lo que alimenta el rechazo;
+- **Termina en el número que va a pagar de verdad** → cero ambigüedad;
+- Y **justifica por qué varía**: "el envío depende de tu ciudad".
+
+⚠️ **CORRECCIÓN AL GUION DEL MISMO DÍA:** la primera versión decía *"habla del TOTAL, nunca del envío
+suelto"*. **Era demasiado absoluto** — esconder la cuenta hace que el total parezca inflado frente al
+$59.900 del anuncio. **Ya está corregido en `bot/src/prompt.js` y en `TARIFARIO-Y-GUION.md`.**
+
+🔴 **LO QUE SÍ ESTÁ PROHIBIDO SIEMPRE: dar un RANGO antes de saber la ciudad.** Eso no es una forma
+de presentar el precio, es una promesa incumplible, y es la causa medida de la fuga.
+
+📌 **CÓMO SALIR DE LA DUDA DE VERDAD (1 semana, gratis):** el pendiente **#39** ya propone textos de
+apertura distintos por anuncio. Con eso se corre el test real —una semana con total, una con
+separado— y se compara **cierre Y rechazo**. Es la única forma de saberlo con este negocio en vez de
+con teoría.
+
+---
+
 ## 0-S. ❓ "¿LAS 10 GUÍAS TRABADAS SON DE HEKA?" — NO. Y HEKA TIENE SU PROPIA COLA (2026-08-21)
 
 **Pregunta del dueño.** Script: `/analisis/cola-heka-pendiente.py`.
