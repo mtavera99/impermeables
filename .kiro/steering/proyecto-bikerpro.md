@@ -44,7 +44,10 @@ DESTINO** (Bogotá: coordinadora $11.880 · interrapidísimo $12.871 · servient
 **No existe "el flete de Bogotá"** → por eso el tarifario cobra el peor caso de cada banda.
 
 🆕🆕 **LO ÚLTIMO (2026-08-21) — DOS COSAS, UNA HECHA Y UNA QUE CORRIGE EL MANUAL:**
-1. ✅ **EL GUION Y EL TARIFARIO QUEDARON ARREGLADOS (pendientes #38 y #35 — sección 0-N).**
+1. ✅✅ **EL GUION Y EL TARIFARIO QUEDARON ARREGLADOS *Y PEGADOS EN LA IA* EL 21-AGO
+   (pendientes #38, #35 y #43 cerrados — secciones 0-N, 0-T y 0-U).** ⚠️ **Falta verificar en el
+   próximo export que la IA lo esté obedeciendo (#58): las guías posteriores al 21-ago deben cobrar
+   $85.000 en banda E y $83.000 en banda D. Si sigue habiendo absorción, el bloque no tomó efecto.**
    La tabla de fletes que alimentaba el conocimiento del negocio era **inventada** (Cali $13.000
    cuando el real es $20.771; default $18.000 cuando los pueblos cuestan $25.029). Con las 79 guías
    reales se absorbieron **$102.148** de flete en 77 guías; el tarifario nuevo lo baja a **$1.574
@@ -2792,12 +2795,22 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⚠️ Bogotá y Soacha están en **"Telemercadeo"** = la transportadora no pudo y está llamando:
     **es novedad, no tránsito.** **NO se cruza con el congelamiento** (esto es operación, no campaña).
     Ver sección 0-H. **Esto es ADEMÁS de las 21 guías de Heka del punto de la sección 0-G.**
-43. [ ] 🔥🔴 **PEGAR EL GUION NUEVO EN LA IA DE WHATSAPP BUSINESS — ES LO ÚNICO QUE FALTA DEL #38 Y #35.**
-    El tarifario y el guion ya están arreglados **en el repo** (sección 0-N + `TARIFARIO-Y-GUION.md`),
-    pero **la IA que atiende a los clientes es Meta AI configurada a mano por el dueño** (sección 5-B):
-    **cambiar el repo NO cambia lo que la IA le dice al cliente.** El bloque para copiar y pegar está
-    en `TARIFARIO-Y-GUION.md` sección 2, con 4 pruebas de verificación de 3 minutos.
-    💰 **Vale ~$102.148 por cada 77 guías** (la absorción medida), concentrado en bandas D y E.
+43. [x] ✅✅ **GUION PEGADO EN LA IA DE WHATSAPP BUSINESS EL 2026-08-21.** Con eso quedan cerrados
+    **#38 (a) y (b)** y **#35** de punta a punta: el tarifario real, la regla de no dar rangos, el
+    cuadro de confirmación sin campos vacíos, la promo 2×$110.000 con su orden de oferta, y la
+    escalera de la objeción del envío con tope de descuento de $3.000.
+    Bloque consolidado: **`GUION-PARA-PEGAR.md`**.
+    💰 **Cortó una fuga medida de ~$1.327 por venta (~$16.000/día al ritmo de ese momento).**
+58. [ ] 🔍 **VERIFICAR EN EL PRÓXIMO EXPORT QUE EL GUION SÍ TOMÓ EFECTO — pegarlo no garantiza que la
+    IA lo obedezca.** Es una prueba objetiva y no depende de recordar conversaciones:
+    **comparar el `valor_comercial` de las guías POSTERIORES al 21-ago contra el total de su banda.**
+    · Banda E debería cobrar **$85.000** (antes cobraba $80.000-81.030)
+    · Banda D debería cobrar **$83.000** (antes $80.676-81.752)
+    · `node bot/src/verificar-tarifario.js` lo mide directo
+    ✅ **Si la absorción de las guías nuevas es ~$0, el guion está vivo.** 🔴 Si sigue apareciendo
+    absorción en bandas D y E, la IA está ignorando el bloque nuevo o quedó texto viejo compitiendo.
+    📌 **Y de paso mide el descuento de cierre (#51):** las ventas con descuento se ven como
+    diferencia de hasta $3.000 contra el total de la banda. **Alarma si superan el 15%.**
 44. [x] ✅ **RESUELTO POR EL DUEÑO EL 21-AGO: LA PROMO ES 2 POR $110.000** (+ envío aparte). Ya está
     cargada en `bot/src/fletes.js` y en el guion. **Lo que queda es aplicarla bien → pendiente #51.**
 45. [x] ✅ **LOS DOS EXPORTS YA ESTÁN EN `/analisis`:** `conjuntos-18-21ago.csv` (Meta por conjunto) y
