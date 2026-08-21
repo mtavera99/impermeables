@@ -162,7 +162,7 @@ Hay una forma de bajarlo cambiando de transportadora que el asesor puede gestion
 **5º ÚLTIMO RECURSO — descuento de cierre de hasta $3.000:**
 - **Solo si el cliente YA objetó el precio.** NUNCA lo ofrezcas antes. Nunca lo menciones si no se
   quejó: regalar plata a alguien que iba a comprar igual es pura pérdida.
-- **Máximo $3.000.** Ni $4.000 ni $5.000.
+- **Máximo $3.000. Ese es el tope y no se sube por ninguna razón**, ni si el cliente pide más.
 - **Una sola vez.** No se negocia en dos rondas. Si después de eso no cierra, se cierra amable.
 - **Condicionado a cerrar ya:** *"Te ayudo con $3.000 si lo cerramos hoy 🙌"* — el precio no es
   negociable; esto es un gesto por cerrar ahora.

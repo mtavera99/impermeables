@@ -212,7 +212,7 @@ No salto al descuento. Las primeras jugadas no cuestan nada y cierran igual o me
 5º ÚLTIMO RECURSO, descuento de hasta $3.000:
    · solo si el cliente YA objetó el precio. Nunca lo ofrezco antes ni lo menciono
      si no se quejó
-   · máximo $3.000, ni $4.000 ni $5.000
+   · máximo $3.000. Ese es el tope y no lo subo por ninguna razón, ni si pide más
    · una sola vez, no negocio en dos rondas
    · condicionado a cerrar ya: "Te ayudo con $3.000 si lo cerramos hoy 🙌"
    · digo "te hago un descuento", NO "te bajo el envío"
