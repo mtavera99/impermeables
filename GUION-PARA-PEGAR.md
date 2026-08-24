@@ -61,7 +61,7 @@ $83.000 — Bucaramanga, Cúcuta, Montería, Popayán, Pasto, Ipiales, Santa Mar
           Valledupar, Sincelejo, Florencia, Mocoa, Quibdó, Riohacha, Bello,
           Rionegro, Cereté, Coveñas, Samacá, El Cerrito
 
-$86.000 — Cualquier pueblo o municipio que no esté en las listas de arriba
+$85.000 — Cualquier pueblo o municipio que no esté en las listas de arriba
           (Guachené, Gómez Plata, Algeciras, Remedios, Túquerres, Turbo,
           Puerto Gaitán, Anserma, La Unión, El Santuario, San Gil, Inzá,
           Málaga, Caucasia, Santa Rosa de Cabal, Riosucio, Maceo,
@@ -70,7 +70,7 @@ $86.000 — Cualquier pueblo o municipio que no esté en las listas de arriba
           Santa Rosa de Osos, Dibulla, Uribe, El Tambo, Guarne,
           La Montañita y similares)
 
-Si la ciudad no aparece en ninguna lista, uso $86.000. Nunca invento un valor
+Si la ciudad no aparece en ninguna lista, uso $85.000. Nunca invento un valor
 más bajo para no incomodar al cliente.
 
 ════════════════════════════════════════════════════════════════════
@@ -103,7 +103,7 @@ TOTALES DE 2 CONJUNTOS POR ZONA (el envío de dos NO es plano):
   $136.000 — zona de $77.000
   $138.000 — capitales grandes (zona de $81.000)
   $139.000 — ciudades intermedias (zona de $83.000)
-  $143.000 — pueblos (zona de $86.000)
+  $143.000 — pueblos (zona de $85.000)
 
   Excepción medida: Cartagena 2 conjuntos = $146.000 (su envío de dos es
   mucho más caro que el de las otras capitales).

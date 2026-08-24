@@ -50,13 +50,21 @@ const BANDAS = {
     ciudades: ["BUCARAMANGA", "MONTERIA", "POPAYAN", "SANTA MARTA", "IPIALES", "FLORENCIA", "MOCOA", "BELLO", "RIONEGRO", "CERETE", "COVENAS", "SAMACA", "CUCUTA", "SAN JOSE DE CUCUTA", "PASTO", "VALLEDUPAR", "SINCELEJO", "QUIBDO", "RIOHACHA", "EL CERRITO"],
   },
   E: {
-    // ⚠️ SUBIÓ DE $85.000 A $86.000 EL 24-AGO. 99 Envíos movió la tarifa: el
-    // flete de esta banda pasó de $25.029 a $25.481, y con $85.000 el colchón
-    // quedó en −$381, o sea que CADA venta de banda E absorbía. Y es la banda
-    // de mayor volumen: 13 de 30 guías (43%) del export del 24-ago.
+    // ⚠️ SE QUEDA EN $85.000 POR DECISIÓN DEL DUEÑO (24-ago), aunque el flete
+    // subió de $25.029 a $25.481 y el colchón quedó en −$381 por venta.
+    // Banda E es el 43% del volumen, así que absorber esos $381 cuesta
+    // ~$2.262/día. La cartera lo tapa: con el tarifario completo la cuenta
+    // queda en +$5.956 sobre 30 guías, porque el colchón de la banda D
+    // (+$1.182 por guía) subsidia el hueco de la E.
+    // Es una decisión de negocio válida: el dueño prefiere no arriesgar
+    // conversión por $1.000. Ver /analisis/banda-e-85-vs-86.py.
+    //
+    // 🔔 GATILLO: si el flete de banda E pasa de $26.000, hay que subir el
+    // precio o cambiar de transportadora. A $900 de absorción por venta son
+    // ~$5.343/día y ahí la cartera ya NO lo tapa.
     nombre: "Pueblos y zona extendida",
     flete: 25481,
-    total: 86000,
+    total: 85000,
     ciudades: ["GUACHENE", "GOMEZ PLATA", "ALGECIRAS", "REMEDIOS", "TUQUERRES", "TURBO", "PUERTO GAITAN", "ANSERMA", "LA UNION", "EL SANTUARIO", "LLORENTE", "SAN CARLOS DE GUAROA", "BUENAVISTA", "SAN GIL", "INZA", "MALAGA", "CAUCASIA", "SANTA ROSA DE CABAL", "RIOSUCIO", "MACEO", "PARATEBUENO", "SANTIAGO DE TOLU", "SAN ANDRES DE SOTAVENTO", "HISPANIA", "GUACARI", "SAN ESTANISLAO", "ACEVEDO", "PUERTO ASIS", "FUNES", "MAGANGUE", "SANTA ROSA DE OSOS", "DIBULLA", "URIBE", "EL TAMBO", "GUARNE", "LA MONTANITA"],
   },
 };

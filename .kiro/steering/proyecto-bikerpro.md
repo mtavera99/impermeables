@@ -1370,6 +1370,9 @@ presupuesto** — y sería la palanca de mayor retorno encontrada hasta ahora.
 ### 🔴 TRES CORRECCIONES QUE EL EXPORT DEJÓ AL DESCUBIERTO
 
 **1. 99 ENVÍOS SUBIÓ TARIFAS Y LA BANDA E DEJÓ DE CUBRIR.**
+⛔ **DECISIÓN DEL DUEÑO (24-ago): banda E SE QUEDA EN $85.000, no sube a $86.000.** Cuesta
+~$2.262/día y **la cartera lo absorbe** (+$5.956 sobre 30 guías, la banda D subsidia). Queda el
+gatillo del pendiente #62: **si el flete pasa de $26.000, hay que actuar.**
 
 | Banda | Flete antes | Flete ahora | Cobra | Colchón |
 |---|---|---|---|---|
@@ -1380,7 +1383,7 @@ presupuesto** — y sería la palanca de mayor retorno encontrada hasta ahora.
 | **E** | $25.029 | **$25.481** | $85.000 | **−$381** 🔴 |
 
 🔴 **Banda E absorbía $381 en CADA venta, y es el 43% del volumen** (13 de 30 guías).
-→ **Banda E sube a $86.000.**
+→ **Banda E se queda en $85.000** (decisión del dueño, pendiente #62).
 🔔 **Y banda A queda en vigilancia con solo $144 de colchón. Gatillo: si su flete pasa de $13.100,
 subirla a $74.000.** No se sube ahora porque son el 27% del volumen y el cliente más sensible.
 
@@ -3076,15 +3079,27 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     de una banda**, contra los números sucios de antes ($72.698, $80.941, $81.030). Ver sección 0-V.
     ✅ **Y el descuento de cierre se usa como último recurso, no por default: 6,7% de las ventas**
     (2 de 30), muy por debajo de la alarma del 15%.
-59. [ ] 🔴🔥 **RE-PEGAR EL GUION CON LAS 3 CORRECCIONES DEL 24-AGO (sección 0-V).** El guion funciona,
-    pero el export dejó al descubierto tres cosas que hay que arreglar ya:
-    **(a) BANDA E SUBE A $86.000.** 99 Envíos subió la tarifa ($25.029 → $25.481) y con $85.000 se
-    absorbían **$381 en CADA venta de banda E, que es el 43% del volumen.**
-    **(b) 14 CIUDADES NUEVAS A SUS BANDAS.** 6 estaban mal: Buenaventura, Puerto Berrío y Copacabana
-    sobrecobraban $4.000 (espanta la venta); Uribe cobraba $4.000 de menos.
-    **(c) LA PROMO DEJA DE SER PLANA:** A $128.000 · B $136.000 · C $138.000 · D $139.000 · E $143.000.
-    El $138.000 plano sobrecobraba **$10.342 en Bogotá** y absorbía $3.774 en destinos caros.
+59. [ ] 🔴🔥 **RE-PEGAR EL GUION CON LAS 2 CORRECCIONES DEL 24-AGO (sección 0-V).**
+    **(a) 14 CIUDADES NUEVAS A SUS BANDAS.** 6 estaban mal: Buenaventura, Puerto Berrío y Copacabana
+    sobrecobraban $4.000 (el error que espanta la venta); Uribe cobraba $4.000 de menos.
+    **(b) LA PROMO DEJA DE SER PLANA:** A $128.000 · B $136.000 · C $138.000 · D $139.000 · E $143.000,
+    con Cartagena como excepción medida a $146.000. El $138.000 plano sobrecobraba **$10.342 en
+    Bogotá** y absorbía $3.774 en destinos caros.
+    ⛔ **BANDA E SE QUEDA EN $85.000 — decisión del dueño, NO volver a proponer subirla.**
+    Ver el pendiente #62 con el análisis y el gatillo.
     📌 Bloque actualizado listo en **`GUION-PARA-PEGAR.md`**.
+62. [ ] 🔔 **GATILLO DE BANDA E — NO ES UN PENDIENTE DE PRECIO, ES DE VIGILANCIA.**
+    **El dueño decidió el 24-ago dejar banda E en $85.000** aunque el flete subió a $25.481 y se
+    absorben **$381 por venta (~$2.262/día).** ✅ **Es sostenible: la cartera queda en +$5.956 sobre
+    30 guías** porque el colchón de la banda D subsidia el hueco de la E.
+    📌 **Y hay evidencia que respalda su instinto sobre la conversión, aunque no sobre la
+    sensibilidad:** el 21-ago banda E ya subió de ~$81.030 a $85.000 (**+4,9%**) y su participación
+    **creció de 28% a 43%** de las guías. **El precio no le bajó el volumen.**
+    🔔 **GATILLO: si el flete de banda E pasa de $26.000, hay que actuar.** A $900 de absorción por
+    venta son ~$5.343/día y **ahí la cartera ya NO lo tapa.**
+    🔑 **La salida preferida no es subir el precio: es el pendiente #50** — preguntar si
+    **coordinadora** cubre pueblos. Si cubre, el flete baja y el problema desaparece sin tocar al
+    cliente. Ver `/analisis/banda-e-85-vs-86.py`.
 60. [ ] 🚀 **CONFIRMAR EL SALTO DEL SHARE DE 2 UNIDADES CON EL EXPORT DEL 31-AGO.**
     Pasó de **6,8% a 26,8%** (3,9×) tras poner el gancho del envío compartido en el guion. A 16
     ventas/día eso vale **+$51.549/día ≈ $1.546.000/mes.**
