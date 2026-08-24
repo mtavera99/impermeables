@@ -1226,14 +1226,69 @@ control puro dentro de la misma cuenta.** Para aislar de verdad haría falta otr
 🔴 **Y este export NO trae el desglose por día** (vino con 3 filas), que es justo lo que permitiría
 separarlo. **Es el pendiente #37, abierto desde el 15-ago y todavía sin resolver.**
 
-### 📌 DECISIÓN: NO SUBIR MÁS TODAVÍA
+### 🔑🔑 POR QUÉ NO CONVIENE SEGUIR SUBIENDO PRESUPUESTO — LA RAZÓN REAL
 
-Los cuatro criterios pasan, pero **hay tres razones para esperar al 31:**
-1. La comparación está contaminada por día de semana y no hay desglose diario.
-2. **El clic→chat se cayó en el conjunto congelado** y conviene entender qué pasa antes de meter más.
-3. **El valle empieza el miércoles 26** → subir ahora mezclaría un tercer efecto.
+⚠️ **Primero, dos razones que se dieron el 24-ago y NO aguantan.** Quedan escritas porque el error
+importa: se presentaron como prudencia y eran flojas.
 
-✅ **Lo que sí se puede hacer hoy sin riesgo: re-pegar el guion corregido (#59).**
+| Razón dada | Por qué no aguanta |
+|---|---|
+| *"la ventana está contaminada por el fin de semana"* | El criterio es un **umbral absoluto** ($12.000), no una comparación. Y si el fin de semana rinde peor, **la medición SUBESTIMA el desempeño** → sesga a favor del escalón, no en contra |
+| *"hay un efecto externo sin identificar"* | **Sí se identificó**: el arrastre de Advantage+. Y ya está **dentro** del CPA de $8.443 — es un costo pagado y medido, no un riesgo pendiente |
+
+### 📉 LA RAZÓN VERDADERA: LA ELASTICIDAD ES 0,61 Y LA CURVA YA ESTÁ PLANA
+
+**Medido con el único escalón que hay:** el gasto subió **+36,7%** ($72.553 → $99.188) y el costo por
+conversación subió **+22,2%** ($526 → $642).
+
+> 🔑 **ELASTICIDAD = 0,61.** Por cada 1% más de gasto, el costo por conversación sube 0,61%.
+> **Las ventas crecen como gasto^0,39: duplicar el presupuesto sube las ventas solo 31%.**
+
+| Gasto/día | Ventas/día | CPA | Utilidad/día | Margen del último peso |
+|---|---|---|---|---|
+| $72.553 | 12,1 | $5.992 | $275.158 | |
+| **$99.188** *(hoy)* | **13,7** | **$7.240** | **$294.208** | +0,72 por peso |
+| $125.969 | 15,1 | $8.367 | $306.353 | +0,45 por peso |
+| $159.980 | 16,5 | $9.669 | $315.120 | **+0,26 por peso** |
+| $203.175 | 18,2 | $11.174 | $318.937 | **+0,09 por peso** |
+| $258.032 | 20,0 | $12.913 | $315.743 | **−0,06** 🔴 destruye valor |
+
+**📈 Máximo de utilidad: ~$208.000/día de publicidad** (18 ventas/día, utilidad $318.972).
+
+🔴 **Y LO DECISIVO: la utilidad es CASI PLANA entre $126.000 y $203.000. Subir el gasto 61% en ese
+rango cambia la utilidad menos del 2%.**
+
+**→ La respuesta a "¿por qué no escalar?" NO es que sea riesgoso. Es que ya casi no paga.**
+Escalar +27% hoy vale **$14.365 en la semana** (con el valle contado en ambas opciones). Es ruido.
+
+⚠️ **CAVEAT HONESTO: la elasticidad sale de UN solo escalón.** Extrapolarla 4× es el error de
+"muestras pequeñas" de la sección 11. **El número exacto del óptimo no es confiable; lo robusto es la
+FORMA de la curva: rendimientos decrecientes fuertes.** Cada escalón nuevo la vuelve a medir.
+
+### ✅ LO QUE SÍ MUEVE LA AGUJA (y no es presupuesto)
+
+1. 🌎 **ABRIR GEOGRAFÍA (#30).** Es lo **único que baja la elasticidad**, porque mete audiencia NUEVA
+   en vez de ampliar la misma. El archivo lo señala desde julio y ahora hay una razón numérica.
+2. 🚀 **EL SHARE DE 2 UNIDADES (#60).** Ya subió el margen por pedido **13% sin gastar un peso más**.
+   Si se sostiene, **vale más que tres escalones de presupuesto.**
+3. 💬 **LAS CONVERSACIONES VACÍAS (57,8%, sección 0-K).** El cierre es el divisor de todo:
+   mejorarlo **levanta la curva entera** en vez de moverse sobre ella.
+
+### 🔴 UNA TRAMPA QUE EL CÁLCULO DESTAPÓ: EL UMBRAL DE $12.000 VA A FALLAR EN EL VALLE
+
+Si el valle pega −35% al cierre (como el 11-14 ago), el CPA de esos días sube a **$12.959** — **pasa
+el umbral aunque todo esté bien**, porque ese día se siguen ganando **$153.165**.
+
+✅ **REGLA CORREGIDA PARA LEER DEL 26 AL 29:**
+- el umbral de **$12.000 aplica a los días NORMALES**, no a los de valle;
+- **en los días de valle el número que manda es la UTILIDAD/DÍA**, que debe seguir positiva.
+  **El equilibrio real del CPA es $28.715, no $12.000.**
+
+### 📌 DECISIÓN
+
+**No subir presupuesto.** No por riesgo — porque el retorno marginal ya es de $0,45 por peso y bajando.
+✅ **Lo que sí conviene hoy: re-pegar el guion corregido (#59)**, que son ~$2.300/día ciertos.
+✅ **Y la siguiente palanca es abrir geografía, no subir el presupuesto.**
 
 ---
 
@@ -2927,7 +2982,15 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     andina va ~sep-nov, así que **escalar ahora agarra la mejor ventana de demanda del año.**
     El clima es la hipótesis (C) de las secciones 0-F y 0-I, **nunca revisada desde el 12-ago**.
     📌 Lo mínimo: comparar ventas/día contra días de lluvia de las últimas 6 semanas.
-30. [ ] 🌎 **LA JUGADA DE CRECIMIENTO: ABRIR CIUDADES NUEVAS, no subir presupuesto.**
+30. [ ] 🌎🔥 **ABRIR CIUDADES NUEVAS — Y AHORA HAY UNA RAZÓN NUMÉRICA, NO SOLO UNA INTUICIÓN.**
+    **La elasticidad medida es 0,61** (sección 0-W): por cada 1% más de gasto, el costo por
+    conversación sube 0,61%, así que las ventas crecen como gasto^0,39 y **la utilidad ya está casi
+    plana entre $126.000 y $203.000/día.** Subir presupuesto devuelve **$0,45 por peso y bajando.**
+    🔑 **Abrir geografía es lo ÚNICO que baja la elasticidad**, porque mete audiencia NUEVA en vez de
+    ampliar la misma. **Pasó de ser "la jugada de crecimiento" a ser LA ÚNICA jugada de crecimiento.**
+    ✅ **Y el bloqueo que tenía ya no existe:** el guion prometía un envío que no existía y abrir
+    ciudades replicaba la fuga a escala. **El guion está arreglado y verificado desde el 21-ago**
+    (secciones 0-N y 0-V), así que este pendiente quedó desbloqueado.
     La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia
     de 1,31 prueba que NO es saturación de audiencia). **Bajo Advantage+ la geografía es la única forma
     real de diferenciar conjuntos.**
