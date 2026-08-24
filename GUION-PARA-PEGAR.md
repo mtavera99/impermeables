@@ -51,23 +51,26 @@ $73.000 — Bogotá, Soacha, Zipaquirá, Chía, Cajicá, Mosquera, Madrid, Funza
 $77.000 — Tunja, Paipa, Duitama, Sogamoso, Aguazul, Yopal, Tocancipá,
           Villavicencio, Acacías, Cucunubá, Ubaté, Chocontá, Villa de Leyva
 
-$81.000 — Medellín, Itagüí, Envigado, Sabaneta, Bello es aparte (ver abajo),
-          Cali, Palmira, Jamundí, Yumbo, Barranquilla, Soledad, Cartagena,
+$81.000 — Medellín, Itagüí, Envigado, Sabaneta, Copacabana, Cali, Palmira,
+          Jamundí, Yumbo, Buenaventura, Barranquilla, Soledad, Cartagena,
           Pereira, Dosquebradas, Manizales, Barrancabermeja, Yarumal,
-          Armenia, Ibagué, Neiva
+          Puerto Berrío, Ocaña, Armenia, Ibagué, Neiva
+          (ojo: BELLO no va acá, va en la lista de $83.000)
 
 $83.000 — Bucaramanga, Cúcuta, Montería, Popayán, Pasto, Ipiales, Santa Marta,
           Valledupar, Sincelejo, Florencia, Mocoa, Quibdó, Riohacha, Bello,
-          Rionegro, Cereté, Coveñas, Samacá
+          Rionegro, Cereté, Coveñas, Samacá, El Cerrito
 
-$85.000 — Cualquier pueblo o municipio que no esté en las listas de arriba
+$86.000 — Cualquier pueblo o municipio que no esté en las listas de arriba
           (Guachené, Gómez Plata, Algeciras, Remedios, Túquerres, Turbo,
           Puerto Gaitán, Anserma, La Unión, El Santuario, San Gil, Inzá,
           Málaga, Caucasia, Santa Rosa de Cabal, Riosucio, Maceo,
           Paratebueno, Santiago de Tolú, San Andrés de Sotavento, Hispania,
-          Guacarí y similares)
+          Guacarí, San Estanislao, Acevedo, Puerto Asís, Funes, Magangué,
+          Santa Rosa de Osos, Dibulla, Uribe, El Tambo, Guarne,
+          La Montañita y similares)
 
-Si la ciudad no aparece en ninguna lista, uso $85.000. Nunca invento un valor
+Si la ciudad no aparece en ninguna lista, uso $86.000. Nunca invento un valor
 más bajo para no incomodar al cliente.
 
 ════════════════════════════════════════════════════════════════════
@@ -94,9 +97,16 @@ total en un momento, y aviso al asesor:
 "En promo son $110.000 los dos 🙌 Déjame confirmarte el envío exacto a tu
 ciudad y te doy el total en un minuto."
 
-Totales de 2 conjuntos ya confirmados (estos sí los puedo dar directo):
-  Pereira $138.000 · Medellín $138.000 · Caucasia $139.000
-  Santa Rosa de Cabal $139.000 · Hispania $145.000 · Cartagena $146.000
+TOTALES DE 2 CONJUNTOS POR ZONA (el envío de dos NO es plano):
+
+  $128.000 — Bogotá y sabana (zona de $73.000)
+  $136.000 — zona de $77.000
+  $138.000 — capitales grandes (zona de $81.000)
+  $139.000 — ciudades intermedias (zona de $83.000)
+  $143.000 — pueblos (zona de $86.000)
+
+  Excepción medida: Cartagena 2 conjuntos = $146.000 (su envío de dos es
+  mucho más caro que el de las otras capitales).
 
 ════════════════════════════════════════════════════════════════════
 SI DICE QUE EL ENVÍO ESTÁ MUY CARO — ESCALERA, EN ESTE ORDEN

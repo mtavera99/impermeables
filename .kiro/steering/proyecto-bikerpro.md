@@ -1157,6 +1157,97 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-V. 🎉 EL GUION FUNCIONÓ — Y APARECIÓ ALGO MÁS GRANDE (2026-08-24)
+
+**Fuente:** `/analisis/guias-99envios-24ago.csv` (41 guías, 21 y 24 ago).
+Script: `/analisis/verificar-guion-24ago.py`. **Cierra el pendiente #58.**
+
+### ✅ PRUEBA SUPERADA: LA IA ESTÁ COTIZANDO EL TARIFARIO
+
+**28 de 30 guías de 1 unidad (93%) cobraron el total EXACTO de una banda.**
+
+| Antes del 21-ago | Después |
+|---|---|
+| $72.698 · $80.941 · $81.030 · $80.676 | **$73.000 · $77.000 · $81.000 · $83.000 · $85.000** |
+
+Los recaudos pasaron de números "sucios" (producto + flete exacto) a los totales redondos del
+tarifario. **No hay ambigüedad: el guion está vivo.**
+
+✅ **Y el descuento de cierre se está usando como se diseñó, no como default:** solo 2 de 30 guías
+(**6,7%**) salieron por debajo de su banda — Ocaña a $78.000 (−$3.000, justo el tope) y Pereira a
+$80.000 (−$1.000). **Muy por debajo de la alarma del 15%** (sección 0-U).
+
+### 🚀 EL HALLAZGO GRANDE: EL SHARE DE PEDIDOS DE 2 UNIDADES SE CUADRUPLICÓ
+
+| Ventana | Guías | De 2 unidades | Share | Unidades/guía |
+|---|---|---|---|---|
+| 10–20 ago | 88 | 6 | **6,8%** | 1,07 |
+| **21–24 ago** | 41 | 11 | **26,8%** | **1,27** |
+
+**3,9× más pedidos de 2 unidades.** Es exactamente lo que el guion nuevo buscaba con el gancho del
+envío compartido (*"si llevas dos pagas un solo envío"*, sección 0-P).
+
+**Lo que vale, a 16 ventas/día:** un pedido de 2 en promo deja **$40.500** de margen contra $24.400
+de uno de 1 → **+$51.549/día · ~$1.546.000/mes.**
+
+⚠️⚠️ **PERO ES SEÑAL, NO CONCLUSIÓN: son 41 guías y 2 lotes.** El archivo tiene documentado tres
+veces el error de leer muestras chicas (sección 11). **Confirmarlo con el export del 31-ago**, que
+tendrá ~10 días. Si el share se sostiene por encima del 20%, **esto vale más que el escalón de
+presupuesto** — y sería la palanca de mayor retorno encontrada hasta ahora.
+
+### 🔴 TRES CORRECCIONES QUE EL EXPORT DEJÓ AL DESCUBIERTO
+
+**1. 99 ENVÍOS SUBIÓ TARIFAS Y LA BANDA E DEJÓ DE CUBRIR.**
+
+| Banda | Flete antes | Flete ahora | Cobra | Colchón |
+|---|---|---|---|---|
+| A | $12.871 | $12.956 | $73.000 | **+$144** ⚠️ justo |
+| B | $16.843 | $16.811 | $77.000 | +$289 ✅ |
+| C | $20.771 | $20.923 | $81.000 | +$329 ✅ |
+| D | $22.870 | $23.030 | $83.000 | +$2.293 ✅ |
+| **E** | $25.029 | **$25.481** | $85.000 | **−$381** 🔴 |
+
+🔴 **Banda E absorbía $381 en CADA venta, y es el 43% del volumen** (13 de 30 guías).
+→ **Banda E sube a $86.000.**
+🔔 **Y banda A queda en vigilancia con solo $144 de colchón. Gatillo: si su flete pasa de $13.100,
+subirla a $74.000.** No se sube ahora porque son el 27% del volumen y el cliente más sensible.
+
+**2. EL 47% DE LAS CIUDADES NO ESTABA EN LAS LISTAS.** 14 de 30 cayeron al default. La mayoría cayó
+bien, pero 6 no:
+
+| Ciudad | Caía en | Debía ser | Error |
+|---|---|---|---|
+| Buenaventura, Puerto Berrío, Copacabana | E ($85.000) | **C ($81.000)** | +$4.000 *(espanta la venta)* |
+| Ocaña | E | **C ($81.000)** | la IA cobró $78.000 |
+| El Cerrito | E | **D ($83.000)** | +$2.000 |
+| Uribe | E pero la IA cobró $81.000 | **E ($86.000)** | −$4.000 |
+
+→ **Las 14 ciudades quedaron agregadas a su banda correcta en `bot/src/fletes.js`.**
+
+**3. LA PROMO SE COBRÓ COMO TARIFA PLANA DE $138.000 (9 de 11).**
+Estandarizarla fue una mejora enorme contra los 6 precios distintos de antes. **Pero el flete de
+2 unidades va de $17.658 a $32.458**, así que la tarifa plana:
+- **sobrecobra $10.342 en Bogotá** (donde el flete de 2 es solo $17.658) → riesgo de perder la venta
+- **absorbe $3.774 en El Tambo y Guarne** (flete $31.774)
+
+→ **La promo ahora sigue las bandas:** A $128.000 · B $136.000 · C $138.000 · D $139.000 · E $143.000.
+
+**Resultado del tarifario corregido sobre las mismas 41 guías: absorción $0 y sobrecobro $0**
+(era $13.256 y $27.049).
+
+### 📦 DATO DE VOLUMEN (direccional, NO para juzgar el escalón)
+
+| Lote | Guías | Unidades |
+|---|---|---|
+| viernes 21, 17:05 | 10 | 14 |
+| **lunes 24, 01:26** *(el fin de semana acumulado)* | **31** | **38** |
+
+31 guías en 2 días = **15,5/día**, que coincide con las ~16/día proyectadas para el escalón.
+⚠️ **Pero son 2 días y ambos de fin de semana. NO es la lectura del escalón** — esa es el 31-ago.
+📌 **Y el fin de semana se acumuló otra vez** (todo salió el domingo por la noche, 01:26 del lunes).
+
+---
+
 ## 0-U. 💰 EL DESCUENTO DE CIERRE + EL DESPACHO DE FIN DE SEMANA (2026-08-21)
 
 Dos aportes del dueño. Script: `/analisis/descuento-de-cierre.py`.
@@ -2801,16 +2892,28 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     escalera de la objeción del envío con tope de descuento de $3.000.
     Bloque consolidado: **`GUION-PARA-PEGAR.md`**.
     💰 **Cortó una fuga medida de ~$1.327 por venta (~$16.000/día al ritmo de ese momento).**
-58. [ ] 🔍 **VERIFICAR EN EL PRÓXIMO EXPORT QUE EL GUION SÍ TOMÓ EFECTO — pegarlo no garantiza que la
-    IA lo obedezca.** Es una prueba objetiva y no depende de recordar conversaciones:
-    **comparar el `valor_comercial` de las guías POSTERIORES al 21-ago contra el total de su banda.**
-    · Banda E debería cobrar **$85.000** (antes cobraba $80.000-81.030)
-    · Banda D debería cobrar **$83.000** (antes $80.676-81.752)
-    · `node bot/src/verificar-tarifario.js` lo mide directo
-    ✅ **Si la absorción de las guías nuevas es ~$0, el guion está vivo.** 🔴 Si sigue apareciendo
-    absorción en bandas D y E, la IA está ignorando el bloque nuevo o quedó texto viejo compitiendo.
-    📌 **Y de paso mide el descuento de cierre (#51):** las ventas con descuento se ven como
-    diferencia de hasta $3.000 contra el total de la banda. **Alarma si superan el 15%.**
+58. [x] ✅✅ **VERIFICADO EL 24-AGO: EL GUION ESTÁ VIVO. 28 de 30 guías (93%) cobraron el total EXACTO
+    de una banda**, contra los números sucios de antes ($72.698, $80.941, $81.030). Ver sección 0-V.
+    ✅ **Y el descuento de cierre se usa como último recurso, no por default: 6,7% de las ventas**
+    (2 de 30), muy por debajo de la alarma del 15%.
+59. [ ] 🔴🔥 **RE-PEGAR EL GUION CON LAS 3 CORRECCIONES DEL 24-AGO (sección 0-V).** El guion funciona,
+    pero el export dejó al descubierto tres cosas que hay que arreglar ya:
+    **(a) BANDA E SUBE A $86.000.** 99 Envíos subió la tarifa ($25.029 → $25.481) y con $85.000 se
+    absorbían **$381 en CADA venta de banda E, que es el 43% del volumen.**
+    **(b) 14 CIUDADES NUEVAS A SUS BANDAS.** 6 estaban mal: Buenaventura, Puerto Berrío y Copacabana
+    sobrecobraban $4.000 (espanta la venta); Uribe cobraba $4.000 de menos.
+    **(c) LA PROMO DEJA DE SER PLANA:** A $128.000 · B $136.000 · C $138.000 · D $139.000 · E $143.000.
+    El $138.000 plano sobrecobraba **$10.342 en Bogotá** y absorbía $3.774 en destinos caros.
+    📌 Bloque actualizado listo en **`GUION-PARA-PEGAR.md`**.
+60. [ ] 🚀 **CONFIRMAR EL SALTO DEL SHARE DE 2 UNIDADES CON EL EXPORT DEL 31-AGO.**
+    Pasó de **6,8% a 26,8%** (3,9×) tras poner el gancho del envío compartido en el guion. A 16
+    ventas/día eso vale **+$51.549/día ≈ $1.546.000/mes.**
+    ⚠️ **Son 41 guías y 2 lotes: es señal, no conclusión** (error documentado tres veces en la
+    sección 11). **Si con ~10 días de datos el share sigue arriba del 20%, esto vale MÁS que el
+    escalón de presupuesto** y pasa a ser la palanca principal del negocio.
+61. [ ] 🔔 **VIGILAR LA BANDA A: solo $144 de colchón.** El flete de Bogotá subió de $12.871 a $12.956.
+    **Gatillo: si pasa de $13.100, subir la banda a $74.000.** No se sube ahora porque es el 27% del
+    volumen y el cliente más sensible al precio. Ver sección 0-V.
 44. [x] ✅ **RESUELTO POR EL DUEÑO EL 21-AGO: LA PROMO ES 2 POR $110.000** (+ envío aparte). Ya está
     cargada en `bot/src/fletes.js` y en el guion. **Lo que queda es aplicarla bien → pendiente #51.**
 45. [x] ✅ **LOS DOS EXPORTS YA ESTÁN EN `/analisis`:** `conjuntos-18-21ago.csv` (Meta por conjunto) y
