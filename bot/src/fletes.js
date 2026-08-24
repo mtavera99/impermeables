@@ -21,8 +21,13 @@ const PRECIO_PRODUCTO = 59900;
 //           al millar hacia arriba). Cobrar esto deja la absorción en ~$0.
 const BANDAS = {
   A: {
+    // ⚠️ VIGILAR: el flete subió de $12.871 a $12.956 el 24-ago, así que el
+    // colchón quedó en solo +$144. Sigue positivo, y subir $1.000 al 27% del
+    // volumen (que además es el cliente más sensible al precio) para proteger
+    // $144 no vale la pena todavía.
+    // 🔔 GATILLO: si el flete pasa de $13.100, subir esta banda a $74.000.
     nombre: "Bogotá y sabana",
-    flete: 12871,
+    flete: 12956,
     total: 73000,
     ciudades: ["BOGOTA", "SOACHA", "ZIPAQUIRA", "CHIA", "CAJICA", "MOSQUERA", "MADRID", "FUNZA", "FACATATIVA", "SIBATE", "LA CALERA"],
   },
@@ -36,19 +41,31 @@ const BANDAS = {
     nombre: "Capitales grandes",
     flete: 20771,
     total: 81000,
-    ciudades: ["MEDELLIN", "CALI", "BARRANQUILLA", "SOLEDAD", "CARTAGENA", "CARTAGENA DE INDIAS", "PEREIRA", "DOSQUEBRADAS", "MANIZALES", "BARRANCABERMEJA", "YARUMAL", "ARMENIA", "IBAGUE", "NEIVA", "ITAGUI", "ENVIGADO", "SABANETA", "PALMIRA", "JAMUNDI", "YUMBO"],
+    ciudades: ["MEDELLIN", "CALI", "BARRANQUILLA", "SOLEDAD", "CARTAGENA", "CARTAGENA DE INDIAS", "PEREIRA", "DOSQUEBRADAS", "MANIZALES", "BARRANCABERMEJA", "YARUMAL", "ARMENIA", "IBAGUE", "NEIVA", "ITAGUI", "ENVIGADO", "SABANETA", "PALMIRA", "JAMUNDI", "YUMBO", "COPACABANA", "BUENAVENTURA", "PUERTO BERRIO", "OCANA"],
   },
   D: {
     nombre: "Ciudades intermedias",
     flete: 22870,
     total: 83000,
-    ciudades: ["BUCARAMANGA", "MONTERIA", "POPAYAN", "SANTA MARTA", "IPIALES", "FLORENCIA", "MOCOA", "BELLO", "RIONEGRO", "CERETE", "COVENAS", "SAMACA", "CUCUTA", "PASTO", "VALLEDUPAR", "SINCELEJO", "QUIBDO", "RIOHACHA"],
+    ciudades: ["BUCARAMANGA", "MONTERIA", "POPAYAN", "SANTA MARTA", "IPIALES", "FLORENCIA", "MOCOA", "BELLO", "RIONEGRO", "CERETE", "COVENAS", "SAMACA", "CUCUTA", "SAN JOSE DE CUCUTA", "PASTO", "VALLEDUPAR", "SINCELEJO", "QUIBDO", "RIOHACHA", "EL CERRITO"],
   },
   E: {
+    // ⚠️ SE QUEDA EN $85.000 POR DECISIÓN DEL DUEÑO (24-ago), aunque el flete
+    // subió de $25.029 a $25.481 y el colchón quedó en −$381 por venta.
+    // Banda E es el 43% del volumen, así que absorber esos $381 cuesta
+    // ~$2.262/día. La cartera lo tapa: con el tarifario completo la cuenta
+    // queda en +$5.956 sobre 30 guías, porque el colchón de la banda D
+    // (+$1.182 por guía) subsidia el hueco de la E.
+    // Es una decisión de negocio válida: el dueño prefiere no arriesgar
+    // conversión por $1.000. Ver /analisis/banda-e-85-vs-86.py.
+    //
+    // 🔔 GATILLO: si el flete de banda E pasa de $26.000, hay que subir el
+    // precio o cambiar de transportadora. A $900 de absorción por venta son
+    // ~$5.343/día y ahí la cartera ya NO lo tapa.
     nombre: "Pueblos y zona extendida",
-    flete: 25029,
+    flete: 25481,
     total: 85000,
-    ciudades: ["GUACHENE", "GOMEZ PLATA", "ALGECIRAS", "REMEDIOS", "TUQUERRES", "TURBO", "PUERTO GAITAN", "ANSERMA", "LA UNION", "EL SANTUARIO", "LLORENTE", "SAN CARLOS DE GUAROA", "BUENAVISTA", "SAN GIL", "INZA", "MALAGA", "CAUCASIA", "SANTA ROSA DE CABAL", "RIOSUCIO", "MACEO", "PARATEBUENO", "SANTIAGO DE TOLU", "SAN ANDRES DE SOTAVENTO", "HISPANIA", "GUACARI"],
+    ciudades: ["GUACHENE", "GOMEZ PLATA", "ALGECIRAS", "REMEDIOS", "TUQUERRES", "TURBO", "PUERTO GAITAN", "ANSERMA", "LA UNION", "EL SANTUARIO", "LLORENTE", "SAN CARLOS DE GUAROA", "BUENAVISTA", "SAN GIL", "INZA", "MALAGA", "CAUCASIA", "SANTA ROSA DE CABAL", "RIOSUCIO", "MACEO", "PARATEBUENO", "SANTIAGO DE TOLU", "SAN ANDRES DE SOTAVENTO", "HISPANIA", "GUACARI", "SAN ESTANISLAO", "ACEVEDO", "PUERTO ASIS", "FUNES", "MAGANGUE", "SANTA ROSA DE OSOS", "DIBULLA", "URIBE", "EL TAMBO", "GUARNE", "LA MONTANITA"],
   },
 };
 
@@ -87,14 +104,30 @@ const PROMO_2_UNIDADES = 110000;
 
 // Fletes de 2 unidades REALMENTE observados, para cotizar rápido lo conocido.
 const FLETE_2_OBSERVADO = {
+  "BOGOTA": 17658,
   PEREIRA: 27608,
   MEDELLIN: 27891,
+  SOLEDAD: 27758,
+  COPACABANA: 27758,
+  MANIZALES: 26915,
+  PALMIRA: 26915,
+  VILLAVICENCIO: 25445,
   "CARTAGENA DE INDIAS": 35860,
   CARTAGENA: 35860,
   CAUCASIA: 28037,
   "SANTA ROSA DE CABAL": 28014,
   HISPANIA: 34112,
+  "EL TAMBO": 31774,
+  GUARNE: 31774,
+  "LA MONTANITA": 32458,
 };
+
+// Total de la promo de 2 unidades POR BANDA.
+// ⚠️ CORRECCIÓN DEL 24-AGO: se estaba cobrando un $138.000 PLANO para todo el
+// país, y el flete de 2 unidades va de $17.658 a $32.458. Eso sobrecobraba
+// $10.342 en Bogotá (riesgo de perder la venta) y absorbía $3.774 en los
+// destinos caros. La promo tiene que seguir las bandas, igual que 1 unidad.
+const PROMO_2_TOTAL = { A: 128000, B: 136000, C: 138000, D: 139000, E: 143000 };
 
 // Recargo de flete por unidad adicional en el mismo pedido.
 // Observado en 6 pedidos de 2 unidades: el flete NO se duplica, sube entre
@@ -158,15 +191,27 @@ function cotizar(ciudad, unidades = 1) {
     };
   }
 
-  // ---- 2 o más unidades: precio de promo, flete a confirmar ----
+  // ---- 2 o más unidades: precio de promo por banda ----
   const c = normalizar(ciudad);
+  const claveBanda = clave || BANDA_POR_DEFECTO;
   const fleteObservado = uds === 2 ? FLETE_2_OBSERVADO[c] : undefined;
   // Sin dato real se estima con el peor aumento visto, para no absorber.
   const flete = fleteObservado ?? banda.flete + (uds - 1) * RECARGO_UNIDAD_EXTRA;
-  // El producto: la promo aplica al par; una 3ª unidad va a precio lleno.
-  const producto =
-    uds === 2 ? PROMO_2_UNIDADES : PROMO_2_UNIDADES + (uds - 2) * PRECIO_PRODUCTO;
-  const total = Math.ceil((producto + flete) / 1000) * 1000;
+
+  let total;
+  if (uds === 2) {
+    // El total de la promo lo fija la BANDA, no una tarifa plana nacional.
+    // Si además hay flete medido para esa ciudad, se usa el mayor de los dos:
+    // así nunca se cobra por debajo del costo real.
+    total = Math.max(
+      PROMO_2_TOTAL[claveBanda],
+      Math.ceil((PROMO_2_UNIDADES + flete) / 1000) * 1000
+    );
+  } else {
+    // 3+ unidades: la promo aplica al par y el resto va a precio lleno.
+    const producto = PROMO_2_UNIDADES + (uds - 2) * PRECIO_PRODUCTO;
+    total = Math.ceil((producto + flete) / 1000) * 1000;
+  }
 
   return {
     banda: clave || BANDA_POR_DEFECTO,
@@ -198,6 +243,7 @@ module.exports = {
   BANDA_POR_DEFECTO,
   FLETE_2_OBSERVADO,
   PRECIO_PRODUCTO,
+  PROMO_2_TOTAL,
   PROMO_2_UNIDADES,
   RECARGO_UNIDAD_EXTRA,
   bandaDe,

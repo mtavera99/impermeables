@@ -44,7 +44,10 @@ DESTINO** (Bogotá: coordinadora $11.880 · interrapidísimo $12.871 · servient
 **No existe "el flete de Bogotá"** → por eso el tarifario cobra el peor caso de cada banda.
 
 🆕🆕 **LO ÚLTIMO (2026-08-21) — DOS COSAS, UNA HECHA Y UNA QUE CORRIGE EL MANUAL:**
-1. ✅ **EL GUION Y EL TARIFARIO QUEDARON ARREGLADOS (pendientes #38 y #35 — sección 0-N).**
+1. ✅✅ **EL GUION Y EL TARIFARIO QUEDARON ARREGLADOS *Y PEGADOS EN LA IA* EL 21-AGO
+   (pendientes #38, #35 y #43 cerrados — secciones 0-N, 0-T y 0-U).** ⚠️ **Falta verificar en el
+   próximo export que la IA lo esté obedeciendo (#58): las guías posteriores al 21-ago deben cobrar
+   $85.000 en banda E y $83.000 en banda D. Si sigue habiendo absorción, el bloque no tomó efecto.**
    La tabla de fletes que alimentaba el conocimiento del negocio era **inventada** (Cali $13.000
    cuando el real es $20.771; default $18.000 cuando los pueblos cuestan $25.029). Con las 79 guías
    reales se absorbieron **$102.148** de flete en 77 guías; el tarifario nuevo lo baja a **$1.574
@@ -1151,6 +1154,272 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-W. 📈 LECTURA PRELIMINAR DEL ESCALÓN (21-24 ago) — PASA, PERO CON UNA SORPRESA
+
+**Fuente:** `/analisis/conjuntos-21-24ago.csv` · script `/analisis/lectura-escalon-24ago.py`.
+⚠️ **NO es la lectura definitiva — esa es el 31-ago.** Acá hay 3,5 días.
+
+### ✅ LOS CUATRO CRITERIOS FIJADOS DE ANTEMANO PASAN
+
+**Cifras CONFIRMADAS por el dueño el 24-ago: gasto de los 3 días completos (21, 22 y 23)
+= $293.831 · 41 guías.** Script: `/analisis/cpa-confirmado-24ago.py`.
+
+| Criterio | Valor | Umbral | |
+|---|---|---|---|
+| **CPA por pedido** | **$7.167** | < $12.000 | ✅ **40% bajo el techo** |
+| Utilización de Domiciliarios | **100%** | ≥ 90% | ✅ |
+| Termómetro | **1,190** | ≤ 1,25 | ✅ |
+| Utilidad/día | **$294.492** | > $233.385 | ✅ |
+
+**Utilidad +$61.107/día (+26%).** El escalón **no** hay que revertirlo.
+
+⚠️ **ERROR DE REPORTE, CORREGIDO:** la primera versión de esta sección lideró con **$8.443**, que
+divide **gasto de 3,5 días entre ventas de 3 días** (el export de 99 Envíos se generó a la 01:29 del
+lunes, así que no traía el despacho del lunes, pero el gasto del lunes sí estaba contado).
+**El CPA real es $7.167 — el número que reporté estaba 18% inflado.**
+📌 **La estimación del gasto sí estaba bien** ($294.717 vs $293.831 real, 0,3% de error). **El
+problema fue de reporte, no de cálculo: el número correcto estaba en la tabla como "alternativa
+ajustada" en vez de como el principal.** Lo detectó el dueño al cuadrar sus propias cuentas.
+
+### 🚀🔑 EL DATO MÁS IMPORTANTE: EL 72% DE LA MEJORA LA PUSO EL GUION, NO EL PRESUPUESTO
+
+| | Antes | Ahora | |
+|---|---|---|---|
+| Gasto/día | $72.553 | $97.944 | +35,0% |
+| Ventas/día (pedidos) | 12,0 | 13,7 | +13,9% |
+| **Unidades/día** | 12,8 | **17,3** | **+35,0%** |
+| **CPA por pedido** | $6.046 | $7.167 | **+18,5%** 🔴 |
+| **Margen por pedido** | $25.495 | $28.715 | **+12,6%** ✅ |
+| **Utilidad/día** | $233.385 | **$294.492** | **+26,2%** |
+
+**Descomposición de los +$61.107/día:**
+
+| Fuente | Aporte | |
+|---|---|---|
+| El escalón de presupuesto | **+$17.101/día** | 28% |
+| **El guion (share de 2 unidades)** | **+$44.007/día** | **72%** |
+
+🔑 **El CPA por pedido EMPEORÓ 18,5%, pero el margen por pedido MEJORÓ 12,6% y eso compensó de sobra.
+Sin el cambio del guion, este escalón habría dado solo +$17.101/día en vez de +$61.107.**
+
+**→ Es la evidencia más fuerte de toda la sesión de que la palanca NO es el presupuesto.** El guion
+costó 10 minutos y aportó 2,6× lo que aportó subir el gasto 35%.
+🎉 **Y Domiciliarios absorbe el 100% de $70.000** (a $55.000 absorbía 96,6%) → **el presupuesto no
+es el límite.** Gasto de la cuenta $99.188/día (+37%).
+
+🔑 **Buena parte del mérito NO es del escalón sino del share de 2 unidades:** el margen por pedido
+subió de $25.495 a **$28.715 (+13%) sin gastar un peso más** (sección 0-V).
+
+### 🔴 LA SORPRESA: LA EFICIENCIA CAYÓ TAMBIÉN EN EL CONJUNTO CONGELADO
+
+| Conjunto | $/conv antes | $/conv ahora | | clic→chat antes | ahora | |
+|---|---|---|---|---|---|---|
+| **Motorizados** 🔒 *(congelado 44 días)* | $479 | **$551** | **+15,0%** | 52,0% | **40,3%** | **−22,4%** |
+| Domiciliarios | $524 | $655 | +25,0% | 41,2% | 34,9% | −15,3% |
+| TEST Creativos | $580 | $691 | +19,3% | 41,6% | 41,4% | −0,6% |
+
+**Motorizados no se tocó y aun así su costo por conversación subió 15% y su clic→chat se derrumbó
+22%.** Entonces la degradación **no es toda del escalón.**
+
+**Descomposición del +25% de Domiciliarios:** ~**+15% externo** (lo que se ve en el congelado) y
+~**+9% del escalón** (el corrimiento del termómetro, 1,094 → 1,190).
+
+### 🚨🚨 HALLAZGO METODOLÓGICO QUE INVALIDA UNA HERRAMIENTA DEL ARCHIVO
+
+**¿Por qué se degradó Motorizados si nadie lo tocó? Porque su audiencia se amplió sola:**
+
+| Motorizados, por día | Antes | Ahora | |
+|---|---|---|---|
+| Gasto | $12.612 | $15.460 | +23% |
+| **Alcance (personas)** | **2.244** | **3.150** | **+40%** |
+| CPC | $249 | $222 | **−11%** |
+| clic→chat | 52,0% | 40,3% | **−23%** |
+
+🔑 **El alcance creció 40% con solo 23% más de gasto, el CPC BAJÓ y el clic→chat se cayó. Esa es la
+firma exacta de una audiencia más amplia y más barata — en un conjunto que nadie tocó.**
+
+**Bajo Advantage+ los conjuntos comparten el pool de audiencia** (documentado en la sección 11: *"los
+3 conjuntos se estorban"*). **Subir Domiciliarios arrastró a Motorizados a un público más amplio.**
+
+⚠️⚠️ **CONSECUENCIA: MOTORIZADOS NO ES UN GRUPO DE CONTROL LIMPIO.** El termómetro sigue sirviendo
+como **medida relativa** (y por eso el +9% atribuible al escalón es un número útil), pero **NO aísla
+el efecto de una decisión, porque el "control" también se mueve.**
+📌 **Corrige el alcance de la técnica descrita en la sección 0-C.** Bajo Advantage+ **no existe un
+control puro dentro de la misma cuenta.** Para aislar de verdad haría falta otra cuenta publicitaria.
+
+### ⚠️ Y LA VENTANA ESTÁ CONTAMINADA POR DÍA DE SEMANA
+
+| Ventana | Días | Composición |
+|---|---|---|
+| Anterior (18-21) | mar, mié, jue, vie | **toda de semana** |
+| **Nueva (21-24)** | vie, sáb, dom, lun | **3 de 4 de fin de semana** |
+
+**Cualquier diferencia puede ser el escalón O puede ser el fin de semana.**
+🔴 **Y este export NO trae el desglose por día** (vino con 3 filas), que es justo lo que permitiría
+separarlo. **Es el pendiente #37, abierto desde el 15-ago y todavía sin resolver.**
+
+### 🔑🔑 POR QUÉ NO CONVIENE SEGUIR SUBIENDO PRESUPUESTO — LA RAZÓN REAL
+
+⚠️ **Primero, dos razones que se dieron el 24-ago y NO aguantan.** Quedan escritas porque el error
+importa: se presentaron como prudencia y eran flojas.
+
+| Razón dada | Por qué no aguanta |
+|---|---|
+| *"la ventana está contaminada por el fin de semana"* | El criterio es un **umbral absoluto** ($12.000), no una comparación. Y si el fin de semana rinde peor, **la medición SUBESTIMA el desempeño** → sesga a favor del escalón, no en contra |
+| *"hay un efecto externo sin identificar"* | **Sí se identificó**: el arrastre de Advantage+. Y ya está **dentro** del CPA de $8.443 — es un costo pagado y medido, no un riesgo pendiente |
+
+### 📉 LA RAZÓN VERDADERA: LA ELASTICIDAD ES 0,61 Y LA CURVA YA ESTÁ PLANA
+
+**Medido con el único escalón que hay:** el gasto subió **+35,0%** ($72.553 → $97.944, confirmado) y
+el costo por conversación subió **+22,2%** ($526 → $642).
+
+> 🔑 **ELASTICIDAD = 0,63.** Por cada 1% más de gasto, el costo por conversación sube 0,61%.
+> **Las ventas crecen como gasto^0,39: duplicar el presupuesto sube las ventas solo 31%.**
+
+| Gasto/día | Ventas/día | CPA | Utilidad/día | Margen del último peso |
+|---|---|---|---|---|
+| $72.553 | 12,2 | $5.923 | $279.159 | |
+| **$97.944** *(hoy)* | **13,7** | **$7.167** | **$294.492** | +0,60 por peso |
+| $125.000 | 14,9 | $8.367 | $303.988 | +0,35 por peso |
+| $160.000 | 16,3 | $9.787 | $309.449 | **+0,16 por peso** |
+| $200.000 | 17,7 | $11.276 | $309.296 | **−0,00** 🔴 |
+| $250.000 | 19,2 | $12.993 | $302.526 | **−0,14** 🔴 destruye valor |
+
+**📈 Máximo de utilidad: ~$178.000/día de publicidad.**
+*(Recalculado con el gasto confirmado de $293.831/3 días. La primera versión usaba $99.188/día
+estimado y daba un óptimo de $208.000 — la conclusión no cambia.)*
+
+🔴 **Y LO DECISIVO: la utilidad es CASI PLANA entre $126.000 y $203.000. Subir el gasto 61% en ese
+rango cambia la utilidad menos del 2%.**
+
+**→ La respuesta a "¿por qué no escalar?" NO es que sea riesgoso. Es que ya casi no paga.**
+Escalar +27% hoy vale **$14.365 en la semana** (con el valle contado en ambas opciones). Es ruido.
+
+⚠️ **CAVEAT HONESTO: la elasticidad sale de UN solo escalón.** Extrapolarla 4× es el error de
+"muestras pequeñas" de la sección 11. **El número exacto del óptimo no es confiable; lo robusto es la
+FORMA de la curva: rendimientos decrecientes fuertes.** Cada escalón nuevo la vuelve a medir.
+
+### ✅ LO QUE SÍ MUEVE LA AGUJA (y no es presupuesto)
+
+1. 🌎 **ABRIR GEOGRAFÍA (#30).** Es lo **único que baja la elasticidad**, porque mete audiencia NUEVA
+   en vez de ampliar la misma. El archivo lo señala desde julio y ahora hay una razón numérica.
+2. 🚀 **EL SHARE DE 2 UNIDADES (#60).** Ya subió el margen por pedido **13% sin gastar un peso más**.
+   Si se sostiene, **vale más que tres escalones de presupuesto.**
+3. 💬 **LAS CONVERSACIONES VACÍAS (57,8%, sección 0-K).** El cierre es el divisor de todo:
+   mejorarlo **levanta la curva entera** en vez de moverse sobre ella.
+
+### 🔴 UNA TRAMPA QUE EL CÁLCULO DESTAPÓ: EL UMBRAL DE $12.000 VA A FALLAR EN EL VALLE
+
+Si el valle pega −35% al cierre (como el 11-14 ago), el CPA de esos días sube a **$12.959** — **pasa
+el umbral aunque todo esté bien**, porque ese día se siguen ganando **$153.165**.
+
+✅ **REGLA CORREGIDA PARA LEER DEL 26 AL 29:**
+- el umbral de **$12.000 aplica a los días NORMALES**, no a los de valle;
+- **en los días de valle el número que manda es la UTILIDAD/DÍA**, que debe seguir positiva.
+  **El equilibrio real del CPA es $28.715, no $12.000.**
+
+### 📌 DECISIÓN
+
+**No subir presupuesto.** No por riesgo — porque el retorno marginal ya es de $0,45 por peso y bajando.
+✅ **Lo que sí conviene hoy: re-pegar el guion corregido (#59)**, que son ~$2.300/día ciertos.
+✅ **Y la siguiente palanca es abrir geografía, no subir el presupuesto.**
+
+---
+
+## 0-V. 🎉 EL GUION FUNCIONÓ — Y APARECIÓ ALGO MÁS GRANDE (2026-08-24)
+
+**Fuente:** `/analisis/guias-99envios-24ago.csv` (41 guías, 21 y 24 ago).
+Script: `/analisis/verificar-guion-24ago.py`. **Cierra el pendiente #58.**
+
+### ✅ PRUEBA SUPERADA: LA IA ESTÁ COTIZANDO EL TARIFARIO
+
+**28 de 30 guías de 1 unidad (93%) cobraron el total EXACTO de una banda.**
+
+| Antes del 21-ago | Después |
+|---|---|
+| $72.698 · $80.941 · $81.030 · $80.676 | **$73.000 · $77.000 · $81.000 · $83.000 · $85.000** |
+
+Los recaudos pasaron de números "sucios" (producto + flete exacto) a los totales redondos del
+tarifario. **No hay ambigüedad: el guion está vivo.**
+
+✅ **Y el descuento de cierre se está usando como se diseñó, no como default:** solo 2 de 30 guías
+(**6,7%**) salieron por debajo de su banda — Ocaña a $78.000 (−$3.000, justo el tope) y Pereira a
+$80.000 (−$1.000). **Muy por debajo de la alarma del 15%** (sección 0-U).
+
+### 🚀 EL HALLAZGO GRANDE: EL SHARE DE PEDIDOS DE 2 UNIDADES SE CUADRUPLICÓ
+
+| Ventana | Guías | De 2 unidades | Share | Unidades/guía |
+|---|---|---|---|---|
+| 10–20 ago | 88 | 6 | **6,8%** | 1,07 |
+| **21–24 ago** | 41 | 11 | **26,8%** | **1,27** |
+
+**3,9× más pedidos de 2 unidades.** Es exactamente lo que el guion nuevo buscaba con el gancho del
+envío compartido (*"si llevas dos pagas un solo envío"*, sección 0-P).
+
+**Lo que vale, a 16 ventas/día:** un pedido de 2 en promo deja **$40.500** de margen contra $24.400
+de uno de 1 → **+$51.549/día · ~$1.546.000/mes.**
+
+⚠️⚠️ **PERO ES SEÑAL, NO CONCLUSIÓN: son 41 guías y 2 lotes.** El archivo tiene documentado tres
+veces el error de leer muestras chicas (sección 11). **Confirmarlo con el export del 31-ago**, que
+tendrá ~10 días. Si el share se sostiene por encima del 20%, **esto vale más que el escalón de
+presupuesto** — y sería la palanca de mayor retorno encontrada hasta ahora.
+
+### 🔴 TRES CORRECCIONES QUE EL EXPORT DEJÓ AL DESCUBIERTO
+
+**1. 99 ENVÍOS SUBIÓ TARIFAS Y LA BANDA E DEJÓ DE CUBRIR.**
+⛔ **DECISIÓN DEL DUEÑO (24-ago): banda E SE QUEDA EN $85.000, no sube a $86.000.** Cuesta
+~$2.262/día y **la cartera lo absorbe** (+$5.956 sobre 30 guías, la banda D subsidia). Queda el
+gatillo del pendiente #62: **si el flete pasa de $26.000, hay que actuar.**
+
+| Banda | Flete antes | Flete ahora | Cobra | Colchón |
+|---|---|---|---|---|
+| A | $12.871 | $12.956 | $73.000 | **+$144** ⚠️ justo |
+| B | $16.843 | $16.811 | $77.000 | +$289 ✅ |
+| C | $20.771 | $20.923 | $81.000 | +$329 ✅ |
+| D | $22.870 | $23.030 | $83.000 | +$2.293 ✅ |
+| **E** | $25.029 | **$25.481** | $85.000 | **−$381** 🔴 |
+
+🔴 **Banda E absorbía $381 en CADA venta, y es el 43% del volumen** (13 de 30 guías).
+→ **Banda E se queda en $85.000** (decisión del dueño, pendiente #62).
+🔔 **Y banda A queda en vigilancia con solo $144 de colchón. Gatillo: si su flete pasa de $13.100,
+subirla a $74.000.** No se sube ahora porque son el 27% del volumen y el cliente más sensible.
+
+**2. EL 47% DE LAS CIUDADES NO ESTABA EN LAS LISTAS.** 14 de 30 cayeron al default. La mayoría cayó
+bien, pero 6 no:
+
+| Ciudad | Caía en | Debía ser | Error |
+|---|---|---|---|
+| Buenaventura, Puerto Berrío, Copacabana | E ($85.000) | **C ($81.000)** | +$4.000 *(espanta la venta)* |
+| Ocaña | E | **C ($81.000)** | la IA cobró $78.000 |
+| El Cerrito | E | **D ($83.000)** | +$2.000 |
+| Uribe | E pero la IA cobró $81.000 | **E ($86.000)** | −$4.000 |
+
+→ **Las 14 ciudades quedaron agregadas a su banda correcta en `bot/src/fletes.js`.**
+
+**3. LA PROMO SE COBRÓ COMO TARIFA PLANA DE $138.000 (9 de 11).**
+Estandarizarla fue una mejora enorme contra los 6 precios distintos de antes. **Pero el flete de
+2 unidades va de $17.658 a $32.458**, así que la tarifa plana:
+- **sobrecobra $10.342 en Bogotá** (donde el flete de 2 es solo $17.658) → riesgo de perder la venta
+- **absorbe $3.774 en El Tambo y Guarne** (flete $31.774)
+
+→ **La promo ahora sigue las bandas:** A $128.000 · B $136.000 · C $138.000 · D $139.000 · E $143.000.
+
+**Resultado del tarifario corregido sobre las mismas 41 guías: absorción $0 y sobrecobro $0**
+(era $13.256 y $27.049).
+
+### 📦 DATO DE VOLUMEN (direccional, NO para juzgar el escalón)
+
+| Lote | Guías | Unidades |
+|---|---|---|
+| viernes 21, 17:05 | 10 | 14 |
+| **lunes 24, 01:26** *(el fin de semana acumulado)* | **31** | **38** |
+
+31 guías en 2 días = **15,5/día**, que coincide con las ~16/día proyectadas para el escalón.
+⚠️ **Pero son 2 días y ambos de fin de semana. NO es la lectura del escalón** — esa es el 31-ago.
+📌 **Y el fin de semana se acumuló otra vez** (todo salió el domingo por la noche, 01:26 del lunes).
 
 ---
 
@@ -2753,7 +3022,15 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     andina va ~sep-nov, así que **escalar ahora agarra la mejor ventana de demanda del año.**
     El clima es la hipótesis (C) de las secciones 0-F y 0-I, **nunca revisada desde el 12-ago**.
     📌 Lo mínimo: comparar ventas/día contra días de lluvia de las últimas 6 semanas.
-30. [ ] 🌎 **LA JUGADA DE CRECIMIENTO: ABRIR CIUDADES NUEVAS, no subir presupuesto.**
+30. [ ] 🌎🔥 **ABRIR CIUDADES NUEVAS — Y AHORA HAY UNA RAZÓN NUMÉRICA, NO SOLO UNA INTUICIÓN.**
+    **La elasticidad medida es 0,63** (sección 0-W): por cada 1% más de gasto, el costo por
+    conversación sube 0,61%, así que las ventas crecen como gasto^0,37 y **la utilidad ya está casi
+    plana entre $125.000 y $200.000/día.** Subir presupuesto devuelve **$0,35 por peso y bajando.**
+    🔑 **Abrir geografía es lo ÚNICO que baja la elasticidad**, porque mete audiencia NUEVA en vez de
+    ampliar la misma. **Pasó de ser "la jugada de crecimiento" a ser LA ÚNICA jugada de crecimiento.**
+    ✅ **Y el bloqueo que tenía ya no existe:** el guion prometía un envío que no existía y abrir
+    ciudades replicaba la fuga a escala. **El guion está arreglado y verificado desde el 21-ago**
+    (secciones 0-N y 0-V), así que este pendiente quedó desbloqueado.
     La cuenta se topa en ~$47.800/día porque los 3 conjuntos se estorban bajo Advantage+ (la frecuencia
     de 1,31 prueba que NO es saturación de audiencia). **Bajo Advantage+ la geografía es la única forma
     real de diferenciar conjuntos.**
@@ -2792,12 +3069,46 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⚠️ Bogotá y Soacha están en **"Telemercadeo"** = la transportadora no pudo y está llamando:
     **es novedad, no tránsito.** **NO se cruza con el congelamiento** (esto es operación, no campaña).
     Ver sección 0-H. **Esto es ADEMÁS de las 21 guías de Heka del punto de la sección 0-G.**
-43. [ ] 🔥🔴 **PEGAR EL GUION NUEVO EN LA IA DE WHATSAPP BUSINESS — ES LO ÚNICO QUE FALTA DEL #38 Y #35.**
-    El tarifario y el guion ya están arreglados **en el repo** (sección 0-N + `TARIFARIO-Y-GUION.md`),
-    pero **la IA que atiende a los clientes es Meta AI configurada a mano por el dueño** (sección 5-B):
-    **cambiar el repo NO cambia lo que la IA le dice al cliente.** El bloque para copiar y pegar está
-    en `TARIFARIO-Y-GUION.md` sección 2, con 4 pruebas de verificación de 3 minutos.
-    💰 **Vale ~$102.148 por cada 77 guías** (la absorción medida), concentrado en bandas D y E.
+43. [x] ✅✅ **GUION PEGADO EN LA IA DE WHATSAPP BUSINESS EL 2026-08-21.** Con eso quedan cerrados
+    **#38 (a) y (b)** y **#35** de punta a punta: el tarifario real, la regla de no dar rangos, el
+    cuadro de confirmación sin campos vacíos, la promo 2×$110.000 con su orden de oferta, y la
+    escalera de la objeción del envío con tope de descuento de $3.000.
+    Bloque consolidado: **`GUION-PARA-PEGAR.md`**.
+    💰 **Cortó una fuga medida de ~$1.327 por venta (~$16.000/día al ritmo de ese momento).**
+58. [x] ✅✅ **VERIFICADO EL 24-AGO: EL GUION ESTÁ VIVO. 28 de 30 guías (93%) cobraron el total EXACTO
+    de una banda**, contra los números sucios de antes ($72.698, $80.941, $81.030). Ver sección 0-V.
+    ✅ **Y el descuento de cierre se usa como último recurso, no por default: 6,7% de las ventas**
+    (2 de 30), muy por debajo de la alarma del 15%.
+59. [ ] 🔴🔥 **RE-PEGAR EL GUION CON LAS 2 CORRECCIONES DEL 24-AGO (sección 0-V).**
+    **(a) 14 CIUDADES NUEVAS A SUS BANDAS.** 6 estaban mal: Buenaventura, Puerto Berrío y Copacabana
+    sobrecobraban $4.000 (el error que espanta la venta); Uribe cobraba $4.000 de menos.
+    **(b) LA PROMO DEJA DE SER PLANA:** A $128.000 · B $136.000 · C $138.000 · D $139.000 · E $143.000,
+    con Cartagena como excepción medida a $146.000. El $138.000 plano sobrecobraba **$10.342 en
+    Bogotá** y absorbía $3.774 en destinos caros.
+    ⛔ **BANDA E SE QUEDA EN $85.000 — decisión del dueño, NO volver a proponer subirla.**
+    Ver el pendiente #62 con el análisis y el gatillo.
+    📌 Bloque actualizado listo en **`GUION-PARA-PEGAR.md`**.
+62. [ ] 🔔 **GATILLO DE BANDA E — NO ES UN PENDIENTE DE PRECIO, ES DE VIGILANCIA.**
+    **El dueño decidió el 24-ago dejar banda E en $85.000** aunque el flete subió a $25.481 y se
+    absorben **$381 por venta (~$2.262/día).** ✅ **Es sostenible: la cartera queda en +$5.956 sobre
+    30 guías** porque el colchón de la banda D subsidia el hueco de la E.
+    📌 **Y hay evidencia que respalda su instinto sobre la conversión, aunque no sobre la
+    sensibilidad:** el 21-ago banda E ya subió de ~$81.030 a $85.000 (**+4,9%**) y su participación
+    **creció de 28% a 43%** de las guías. **El precio no le bajó el volumen.**
+    🔔 **GATILLO: si el flete de banda E pasa de $26.000, hay que actuar.** A $900 de absorción por
+    venta son ~$5.343/día y **ahí la cartera ya NO lo tapa.**
+    🔑 **La salida preferida no es subir el precio: es el pendiente #50** — preguntar si
+    **coordinadora** cubre pueblos. Si cubre, el flete baja y el problema desaparece sin tocar al
+    cliente. Ver `/analisis/banda-e-85-vs-86.py`.
+60. [ ] 🚀 **CONFIRMAR EL SALTO DEL SHARE DE 2 UNIDADES CON EL EXPORT DEL 31-AGO.**
+    Pasó de **6,8% a 26,8%** (3,9×) tras poner el gancho del envío compartido en el guion. A 16
+    ventas/día eso vale **+$51.549/día ≈ $1.546.000/mes.**
+    ⚠️ **Son 41 guías y 2 lotes: es señal, no conclusión** (error documentado tres veces en la
+    sección 11). **Si con ~10 días de datos el share sigue arriba del 20%, esto vale MÁS que el
+    escalón de presupuesto** y pasa a ser la palanca principal del negocio.
+61. [ ] 🔔 **VIGILAR LA BANDA A: solo $144 de colchón.** El flete de Bogotá subió de $12.871 a $12.956.
+    **Gatillo: si pasa de $13.100, subir la banda a $74.000.** No se sube ahora porque es el 27% del
+    volumen y el cliente más sensible al precio. Ver sección 0-V.
 44. [x] ✅ **RESUELTO POR EL DUEÑO EL 21-AGO: LA PROMO ES 2 POR $110.000** (+ envío aparte). Ya está
     cargada en `bot/src/fletes.js` y en el guion. **Lo que queda es aplicarla bien → pendiente #51.**
 45. [x] ✅ **LOS DOS EXPORTS YA ESTÁN EN `/analisis`:** `conjuntos-18-21ago.csv` (Meta por conjunto) y
@@ -3019,6 +3330,13 @@ Registrado para que se exija más rigor en el futuro.
 $841 no mata un creativo, igual que tres días buenos no lo coronan.
 
 ### 🌡️ EL TERMÓMETRO: SIEMPRE DEJAR UN CONJUNTO SIN TOCAR COMO GRUPO DE CONTROL (2026-08-07)
+⚠️⚠️ **LIMITACIÓN DESCUBIERTA EL 2026-08-24 (sección 0-W): BAJO ADVANTAGE+ EL "CONTROL" TAMBIÉN SE
+MUEVE.** Al subir Domiciliarios el 21-ago, Motorizados —congelado 44 días, mismo presupuesto—
+**amplió su alcance 40% por día, su CPC bajó 11% y su clic→chat se cayó 23%.** Los conjuntos comparten
+el pool de audiencia, así que tocar uno arrastra a los otros.
+→ **El termómetro sigue sirviendo como MEDIDA RELATIVA** (el corrimiento 1,094 → 1,190 sí dice cuánto
+aportó la decisión), **pero NO aísla el efecto: no existe un control puro dentro de la misma cuenta.**
+Para aislar de verdad haría falta otra cuenta publicitaria.
 **La técnica más útil aprendida hasta ahora para leer datos sin engañarse.**
 - Al cambiar algo en un conjunto, **NO tocar el otro**. El intacto se convierte en **grupo de control**.
 - **Métrica:** `costo/conv del conjunto cambiado ÷ costo/conv del conjunto de control`.
