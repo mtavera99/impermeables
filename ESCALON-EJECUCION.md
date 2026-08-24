@@ -152,14 +152,46 @@ Domiciliarios contra el de Motorizados (el termómetro). **Si el termómetro pas
 📌 **Lo que NO hay que hacer es mirarlo el día 1 y asustarse.** El archivo tiene documentado tres
 veces el mismo error: el 4-ago el CPA se vio horrible el primer día y corrigió en 24-48 horas.
 
-## 📊 QUÉ MIRAR EL LUNES 31-AGO
+## 📊 QUÉ EXPORTAR Y CUÁNDO — ESPECIFICACIÓN EXACTA
 
-Exportar por **conjunto**, ventana **24 al 30 de agosto** (pestaña "Conjuntos de anuncios", verificar
-que traiga 3 filas), más las guías despachadas del 24 al 28.
+### 🟢 HOY MISMO (24-ago): solo 99 Envíos
 
-📌 **Una semana completa, no 3 días:** la regla del archivo es **4+ días y 50+ conversaciones**, y
-además hay que dejar pasar el posible reinicio de aprendizaje. Mirarlo el miércoles 26 sería repetir
-el error de leer el día 1.
+**Export de 99 Envíos con todo desde el 21 de agosto hasta hoy.**
+No es para juzgar el escalón — es para dos cosas que **no** dependen de esperar:
+
+1. **Verificar que el guion tomó efecto (#58).** Es binario: si las guías a pueblos cobran
+   **$85.000** y las de ciudades intermedias **$83.000**, la IA está obedeciendo. Si siguen en
+   $81.030 / $80.676, no tomó efecto y **cada día cuesta ~$16.000.**
+2. **Ver cómo terminaron las 7 novedades** que se resolvieron el 20-ago (#34): cuántas quedaron
+   *Entregada* y cuántas en devolución. **Es la primera medición de si rescatar novedades sirve.**
+
+⚠️ **Meta NO hace falta hoy.** Hoy es el día 3 del escalón, el día está incompleto, y los dos días
+completos que hay (22 y 23) son sábado y domingo — no representan una semana. Leerlo hoy sería
+exactamente el error que este archivo tiene documentado tres veces.
+
+### 🔵 LUNES 31-AGO: los dos exports, y uno con un desglose que nunca se ha pedido
+
+**(a) META — ventana 22 al 30 de agosto, con DOS desgloses: por conjunto Y POR DÍA.**
+
+🔑 **El desglose por día es lo que cambia todo, y es el pendiente #37 que lleva abierto desde el
+15-ago.** Sin él, la ventana 22-30 mezcla el escalón con el valle y no se pueden separar. Con él:
+
+| Sub-ventana | Días | Qué mide |
+|---|---|---|
+| **Escalón limpio** | 22, 23, 24, 25 | el efecto del presupuesto nuevo |
+| **Valle** | 26, 27, 28, 29 | el ciclo de pago pre-quincena |
+| **Post-quincena** | 30 (y lo que siga) | la recuperación |
+
+**Cómo se saca:** en el Administrador de anuncios, pestaña **"Conjuntos de anuncios"** → botón de
+**"Desglose"** → **por tiempo → Día**. Después exportar.
+✅ **Control antes de mandarlo: el archivo debe traer ~27 filas** (3 conjuntos × 9 días), no 3 y no 1.
+Si trae 3, faltó el desglose por día. Si trae 1, se exportó a nivel campaña otra vez.
+
+**(b) 99 ENVÍOS — todo desde el 21 al 30 de agosto.** Para el CPA por venta despachada y para cerrar
+la verificación del guion con más volumen.
+
+📌 **Por qué el 31 y no antes:** la regla del archivo es **4+ días y 50+ conversaciones**, y hay que
+dejar pasar el posible reinicio de aprendizaje. Y el 31 permite además leer el valle, que termina el 29.
 
 | Señal | Cómo se calcula | Verde | Rojo |
 |---|---|---|---|
