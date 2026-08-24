@@ -1164,14 +1164,49 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ### ✅ LOS CUATRO CRITERIOS FIJADOS DE ANTEMANO PASAN
 
+**Cifras CONFIRMADAS por el dueño el 24-ago: gasto de los 3 días completos (21, 22 y 23)
+= $293.831 · 41 guías.** Script: `/analisis/cpa-confirmado-24ago.py`.
+
 | Criterio | Valor | Umbral | |
 |---|---|---|---|
-| CPA por venta despachada | **$8.443** *(pesimista)* · $7.188 *(ajustado)* | < $12.000 | ✅ |
+| **CPA por pedido** | **$7.167** | < $12.000 | ✅ **40% bajo el techo** |
 | Utilización de Domiciliarios | **100%** | ≥ 90% | ✅ |
 | Termómetro | **1,190** | ≤ 1,25 | ✅ |
-| Utilidad/día | **$294.197** | > $233.385 | ✅ |
+| Utilidad/día | **$294.492** | > $233.385 | ✅ |
 
-**Utilidad +$60.812/día (+26%).** El escalón **no** hay que revertirlo.
+**Utilidad +$61.107/día (+26%).** El escalón **no** hay que revertirlo.
+
+⚠️ **ERROR DE REPORTE, CORREGIDO:** la primera versión de esta sección lideró con **$8.443**, que
+divide **gasto de 3,5 días entre ventas de 3 días** (el export de 99 Envíos se generó a la 01:29 del
+lunes, así que no traía el despacho del lunes, pero el gasto del lunes sí estaba contado).
+**El CPA real es $7.167 — el número que reporté estaba 18% inflado.**
+📌 **La estimación del gasto sí estaba bien** ($294.717 vs $293.831 real, 0,3% de error). **El
+problema fue de reporte, no de cálculo: el número correcto estaba en la tabla como "alternativa
+ajustada" en vez de como el principal.** Lo detectó el dueño al cuadrar sus propias cuentas.
+
+### 🚀🔑 EL DATO MÁS IMPORTANTE: EL 72% DE LA MEJORA LA PUSO EL GUION, NO EL PRESUPUESTO
+
+| | Antes | Ahora | |
+|---|---|---|---|
+| Gasto/día | $72.553 | $97.944 | +35,0% |
+| Ventas/día (pedidos) | 12,0 | 13,7 | +13,9% |
+| **Unidades/día** | 12,8 | **17,3** | **+35,0%** |
+| **CPA por pedido** | $6.046 | $7.167 | **+18,5%** 🔴 |
+| **Margen por pedido** | $25.495 | $28.715 | **+12,6%** ✅ |
+| **Utilidad/día** | $233.385 | **$294.492** | **+26,2%** |
+
+**Descomposición de los +$61.107/día:**
+
+| Fuente | Aporte | |
+|---|---|---|
+| El escalón de presupuesto | **+$17.101/día** | 28% |
+| **El guion (share de 2 unidades)** | **+$44.007/día** | **72%** |
+
+🔑 **El CPA por pedido EMPEORÓ 18,5%, pero el margen por pedido MEJORÓ 12,6% y eso compensó de sobra.
+Sin el cambio del guion, este escalón habría dado solo +$17.101/día en vez de +$61.107.**
+
+**→ Es la evidencia más fuerte de toda la sesión de que la palanca NO es el presupuesto.** El guion
+costó 10 minutos y aportó 2,6× lo que aportó subir el gasto 35%.
 🎉 **Y Domiciliarios absorbe el 100% de $70.000** (a $55.000 absorbía 96,6%) → **el presupuesto no
 es el límite.** Gasto de la cuenta $99.188/día (+37%).
 
@@ -1238,22 +1273,24 @@ importa: se presentaron como prudencia y eran flojas.
 
 ### 📉 LA RAZÓN VERDADERA: LA ELASTICIDAD ES 0,61 Y LA CURVA YA ESTÁ PLANA
 
-**Medido con el único escalón que hay:** el gasto subió **+36,7%** ($72.553 → $99.188) y el costo por
-conversación subió **+22,2%** ($526 → $642).
+**Medido con el único escalón que hay:** el gasto subió **+35,0%** ($72.553 → $97.944, confirmado) y
+el costo por conversación subió **+22,2%** ($526 → $642).
 
-> 🔑 **ELASTICIDAD = 0,61.** Por cada 1% más de gasto, el costo por conversación sube 0,61%.
+> 🔑 **ELASTICIDAD = 0,63.** Por cada 1% más de gasto, el costo por conversación sube 0,61%.
 > **Las ventas crecen como gasto^0,39: duplicar el presupuesto sube las ventas solo 31%.**
 
 | Gasto/día | Ventas/día | CPA | Utilidad/día | Margen del último peso |
 |---|---|---|---|---|
-| $72.553 | 12,1 | $5.992 | $275.158 | |
-| **$99.188** *(hoy)* | **13,7** | **$7.240** | **$294.208** | +0,72 por peso |
-| $125.969 | 15,1 | $8.367 | $306.353 | +0,45 por peso |
-| $159.980 | 16,5 | $9.669 | $315.120 | **+0,26 por peso** |
-| $203.175 | 18,2 | $11.174 | $318.937 | **+0,09 por peso** |
-| $258.032 | 20,0 | $12.913 | $315.743 | **−0,06** 🔴 destruye valor |
+| $72.553 | 12,2 | $5.923 | $279.159 | |
+| **$97.944** *(hoy)* | **13,7** | **$7.167** | **$294.492** | +0,60 por peso |
+| $125.000 | 14,9 | $8.367 | $303.988 | +0,35 por peso |
+| $160.000 | 16,3 | $9.787 | $309.449 | **+0,16 por peso** |
+| $200.000 | 17,7 | $11.276 | $309.296 | **−0,00** 🔴 |
+| $250.000 | 19,2 | $12.993 | $302.526 | **−0,14** 🔴 destruye valor |
 
-**📈 Máximo de utilidad: ~$208.000/día de publicidad** (18 ventas/día, utilidad $318.972).
+**📈 Máximo de utilidad: ~$178.000/día de publicidad.**
+*(Recalculado con el gasto confirmado de $293.831/3 días. La primera versión usaba $99.188/día
+estimado y daba un óptimo de $208.000 — la conclusión no cambia.)*
 
 🔴 **Y LO DECISIVO: la utilidad es CASI PLANA entre $126.000 y $203.000. Subir el gasto 61% en ese
 rango cambia la utilidad menos del 2%.**
@@ -2983,9 +3020,9 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     El clima es la hipótesis (C) de las secciones 0-F y 0-I, **nunca revisada desde el 12-ago**.
     📌 Lo mínimo: comparar ventas/día contra días de lluvia de las últimas 6 semanas.
 30. [ ] 🌎🔥 **ABRIR CIUDADES NUEVAS — Y AHORA HAY UNA RAZÓN NUMÉRICA, NO SOLO UNA INTUICIÓN.**
-    **La elasticidad medida es 0,61** (sección 0-W): por cada 1% más de gasto, el costo por
-    conversación sube 0,61%, así que las ventas crecen como gasto^0,39 y **la utilidad ya está casi
-    plana entre $126.000 y $203.000/día.** Subir presupuesto devuelve **$0,45 por peso y bajando.**
+    **La elasticidad medida es 0,63** (sección 0-W): por cada 1% más de gasto, el costo por
+    conversación sube 0,61%, así que las ventas crecen como gasto^0,37 y **la utilidad ya está casi
+    plana entre $125.000 y $200.000/día.** Subir presupuesto devuelve **$0,35 por peso y bajando.**
     🔑 **Abrir geografía es lo ÚNICO que baja la elasticidad**, porque mete audiencia NUEVA en vez de
     ampliar la misma. **Pasó de ser "la jugada de crecimiento" a ser LA ÚNICA jugada de crecimiento.**
     ✅ **Y el bloqueo que tenía ya no existe:** el guion prometía un envío que no existía y abrir
