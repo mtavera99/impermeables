@@ -1157,6 +1157,86 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-W. 📈 LECTURA PRELIMINAR DEL ESCALÓN (21-24 ago) — PASA, PERO CON UNA SORPRESA
+
+**Fuente:** `/analisis/conjuntos-21-24ago.csv` · script `/analisis/lectura-escalon-24ago.py`.
+⚠️ **NO es la lectura definitiva — esa es el 31-ago.** Acá hay 3,5 días.
+
+### ✅ LOS CUATRO CRITERIOS FIJADOS DE ANTEMANO PASAN
+
+| Criterio | Valor | Umbral | |
+|---|---|---|---|
+| CPA por venta despachada | **$8.443** *(pesimista)* · $7.188 *(ajustado)* | < $12.000 | ✅ |
+| Utilización de Domiciliarios | **100%** | ≥ 90% | ✅ |
+| Termómetro | **1,190** | ≤ 1,25 | ✅ |
+| Utilidad/día | **$294.197** | > $233.385 | ✅ |
+
+**Utilidad +$60.812/día (+26%).** El escalón **no** hay que revertirlo.
+🎉 **Y Domiciliarios absorbe el 100% de $70.000** (a $55.000 absorbía 96,6%) → **el presupuesto no
+es el límite.** Gasto de la cuenta $99.188/día (+37%).
+
+🔑 **Buena parte del mérito NO es del escalón sino del share de 2 unidades:** el margen por pedido
+subió de $25.495 a **$28.715 (+13%) sin gastar un peso más** (sección 0-V).
+
+### 🔴 LA SORPRESA: LA EFICIENCIA CAYÓ TAMBIÉN EN EL CONJUNTO CONGELADO
+
+| Conjunto | $/conv antes | $/conv ahora | | clic→chat antes | ahora | |
+|---|---|---|---|---|---|---|
+| **Motorizados** 🔒 *(congelado 44 días)* | $479 | **$551** | **+15,0%** | 52,0% | **40,3%** | **−22,4%** |
+| Domiciliarios | $524 | $655 | +25,0% | 41,2% | 34,9% | −15,3% |
+| TEST Creativos | $580 | $691 | +19,3% | 41,6% | 41,4% | −0,6% |
+
+**Motorizados no se tocó y aun así su costo por conversación subió 15% y su clic→chat se derrumbó
+22%.** Entonces la degradación **no es toda del escalón.**
+
+**Descomposición del +25% de Domiciliarios:** ~**+15% externo** (lo que se ve en el congelado) y
+~**+9% del escalón** (el corrimiento del termómetro, 1,094 → 1,190).
+
+### 🚨🚨 HALLAZGO METODOLÓGICO QUE INVALIDA UNA HERRAMIENTA DEL ARCHIVO
+
+**¿Por qué se degradó Motorizados si nadie lo tocó? Porque su audiencia se amplió sola:**
+
+| Motorizados, por día | Antes | Ahora | |
+|---|---|---|---|
+| Gasto | $12.612 | $15.460 | +23% |
+| **Alcance (personas)** | **2.244** | **3.150** | **+40%** |
+| CPC | $249 | $222 | **−11%** |
+| clic→chat | 52,0% | 40,3% | **−23%** |
+
+🔑 **El alcance creció 40% con solo 23% más de gasto, el CPC BAJÓ y el clic→chat se cayó. Esa es la
+firma exacta de una audiencia más amplia y más barata — en un conjunto que nadie tocó.**
+
+**Bajo Advantage+ los conjuntos comparten el pool de audiencia** (documentado en la sección 11: *"los
+3 conjuntos se estorban"*). **Subir Domiciliarios arrastró a Motorizados a un público más amplio.**
+
+⚠️⚠️ **CONSECUENCIA: MOTORIZADOS NO ES UN GRUPO DE CONTROL LIMPIO.** El termómetro sigue sirviendo
+como **medida relativa** (y por eso el +9% atribuible al escalón es un número útil), pero **NO aísla
+el efecto de una decisión, porque el "control" también se mueve.**
+📌 **Corrige el alcance de la técnica descrita en la sección 0-C.** Bajo Advantage+ **no existe un
+control puro dentro de la misma cuenta.** Para aislar de verdad haría falta otra cuenta publicitaria.
+
+### ⚠️ Y LA VENTANA ESTÁ CONTAMINADA POR DÍA DE SEMANA
+
+| Ventana | Días | Composición |
+|---|---|---|
+| Anterior (18-21) | mar, mié, jue, vie | **toda de semana** |
+| **Nueva (21-24)** | vie, sáb, dom, lun | **3 de 4 de fin de semana** |
+
+**Cualquier diferencia puede ser el escalón O puede ser el fin de semana.**
+🔴 **Y este export NO trae el desglose por día** (vino con 3 filas), que es justo lo que permitiría
+separarlo. **Es el pendiente #37, abierto desde el 15-ago y todavía sin resolver.**
+
+### 📌 DECISIÓN: NO SUBIR MÁS TODAVÍA
+
+Los cuatro criterios pasan, pero **hay tres razones para esperar al 31:**
+1. La comparación está contaminada por día de semana y no hay desglose diario.
+2. **El clic→chat se cayó en el conjunto congelado** y conviene entender qué pasa antes de meter más.
+3. **El valle empieza el miércoles 26** → subir ahora mezclaría un tercer efecto.
+
+✅ **Lo que sí se puede hacer hoy sin riesgo: re-pegar el guion corregido (#59).**
+
+---
+
 ## 0-V. 🎉 EL GUION FUNCIONÓ — Y APARECIÓ ALGO MÁS GRANDE (2026-08-24)
 
 **Fuente:** `/analisis/guias-99envios-24ago.csv` (41 guías, 21 y 24 ago).
@@ -3135,6 +3215,13 @@ Registrado para que se exija más rigor en el futuro.
 $841 no mata un creativo, igual que tres días buenos no lo coronan.
 
 ### 🌡️ EL TERMÓMETRO: SIEMPRE DEJAR UN CONJUNTO SIN TOCAR COMO GRUPO DE CONTROL (2026-08-07)
+⚠️⚠️ **LIMITACIÓN DESCUBIERTA EL 2026-08-24 (sección 0-W): BAJO ADVANTAGE+ EL "CONTROL" TAMBIÉN SE
+MUEVE.** Al subir Domiciliarios el 21-ago, Motorizados —congelado 44 días, mismo presupuesto—
+**amplió su alcance 40% por día, su CPC bajó 11% y su clic→chat se cayó 23%.** Los conjuntos comparten
+el pool de audiencia, así que tocar uno arrastra a los otros.
+→ **El termómetro sigue sirviendo como MEDIDA RELATIVA** (el corrimiento 1,094 → 1,190 sí dice cuánto
+aportó la decisión), **pero NO aísla el efecto: no existe un control puro dentro de la misma cuenta.**
+Para aislar de verdad haría falta otra cuenta publicitaria.
 **La técnica más útil aprendida hasta ahora para leer datos sin engañarse.**
 - Al cambiar algo en un conjunto, **NO tocar el otro**. El intacto se convierte en **grupo de control**.
 - **Métrica:** `costo/conv del conjunto cambiado ÷ costo/conv del conjunto de control`.
