@@ -4,107 +4,152 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: 2026-08-21 *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el sandbox
-corre en UTC y ya marca el día siguiente)*
-
-✅✅ **CHEQUEO DEL ESCALÓN 1 CERRADO (2026-08-21, sección 0-O): EL ESCALÓN 2 SE JUSTIFICA.**
-**24 guías el 19-20 ago (umbral: 20) · 12,0 ventas/día · gasto $72.553/día · CPA por venta
-despachada $6.046 (techo: $10.000) → 4,04× de colchón.**
-🎉🎉🎉 **GATE 0 CERRADO — LOS 3 FRENOS DEL NEGOCIO ESTÁN ABIERTOS POR PRIMERA VEZ DESDE JULIO
-(sección 0-R):** ⏱️ tiempo ✅ (IA como válvula) · 💵 caja ✅ (99 Envíos paga a demanda: ciclo de
-**3,1 días**, hacen falta $1.557.978 y hay **$5.200.000** = **3,3× de holgura**) · 📦 inventario ✅
-(**5.000 unidades** + reposición avisando el día anterior).
-✅ **Y LAS 5.000 UNIDADES SON EN CONSIGNACIÓN → el proveedor las financia.** No hay capital dormido,
-no hay urgencia de rotación, no hay riesgo de temporada en el balance propio. **Son una OPCIÓN
-GRATIS: se puede crecer 10× sin poner un peso de producto por adelantado.**
-💵 **Y la caja se derrumba como restricción:** si al proveedor se le paga después de cobrar, hacen
-falta solo **$280.714** (holgura **18,5×**) y el techo sube a **222 ventas/día.**
-🔴 **EL FRENO QUE QUEDA NO ES INTERNO: es la GEOGRAFÍA en Meta — y un paso manual de 10 minutos
-(pegar el guion nuevo en la IA, pendiente #43). Eso es literalmente lo que bloquea el crecimiento.**
-🌧️ **LA ESTACIONALIDAD ES OPORTUNIDAD, NO RIESGO (#54):** la temporada fuerte de lluvia va ~sep-nov,
-así que **escalar ahora agarra la mejor ventana de demanda del año.** En consignación no hay riesgo de
-quedarse con inventario propio. El clima sigue siendo la hipótesis (C) nunca revisada desde el 12-ago.
-📌 **Y aparece un riesgo: $2.200.000 quietos en la plataforma.** Es el mismo patrón de los
-$2.788.601 que se acumularon con Heka. **Retirar por rutina, no cuando se acumula.**
-✅ **Las 7 novedades trabadas se resolvieron el 21-ago.** Quedan en observación: **cuántas terminen
-entregadas mide por primera vez si rescatar novedades sirve.**
-🚚💰 **DOS COSAS QUE APORTÓ EL DUEÑO Y NO ESTABAN DOCUMENTADAS (sección 0-P): (1) ÉL ELIGE LA
-TRANSPORTADORA** — el flete es una decisión, no un sorteo; elegir mal costó **$16.593** medidos, y
-8 envíos a Bogotá fueron por interrapidísimo teniendo coordinadora ($991 más caro cada uno).
-**(2) HAY PROMO DE 2 POR $110.000** y **ninguno de los 6 pedidos de 2 unidades la cobró bien** —
-se desvía en ambos sentidos y en 2 se absorbió flete. La promo deja **1,88×** una venta de 1 unidad.
-⚠️ **SE CAYÓ LA REGLA DEL "+60% MÁXIMO" (sección 0-M): el umbral de aprendizaje NO se puede
-predecir.** Dos cambios del mismo +67% dieron resultados opuestos. **Regla nueva: asumir que
-cualquier cambio puede reiniciar el aprendizaje y no juzgar el CPA hasta 3-4 días después.**
-🚨🚨 **ALARMA OPERATIVA, NO ANALÍTICA: LAS 7 GUÍAS DEL PENDIENTE #34 SIGUEN TRABADAS 6 DÍAS
-DESPUÉS.** Inzá, Cartagena y Popayán llevan **10 días**. En total hay **17 guías trabadas y
-$406.346 de margen real en riesgo.** Cartagena es la llamada #1 ($48.981).
-🆕 **HALLAZGO: 99 ENVÍOS REPARTE ENTRE TRES TRANSPORTADORAS Y CADA UNA COBRA DISTINTO POR EL MISMO
-DESTINO** (Bogotá: coordinadora $11.880 · interrapidísimo $12.871 · servientrega $14.674).
-**No existe "el flete de Bogotá"** → por eso el tarifario cobra el peor caso de cada banda.
-
-🆕🆕 **LO ÚLTIMO (2026-08-21) — DOS COSAS, UNA HECHA Y UNA QUE CORRIGE EL MANUAL:**
-1. ✅✅ **EL GUION Y EL TARIFARIO QUEDARON ARREGLADOS *Y PEGADOS EN LA IA* EL 21-AGO
-   (pendientes #38, #35 y #43 cerrados — secciones 0-N, 0-T y 0-U).** ⚠️ **Falta verificar en el
-   próximo export que la IA lo esté obedeciendo (#58): las guías posteriores al 21-ago deben cobrar
-   $85.000 en banda E y $83.000 en banda D. Si sigue habiendo absorción, el bloque no tomó efecto.**
-   La tabla de fletes que alimentaba el conocimiento del negocio era **inventada** (Cali $13.000
-   cuando el real es $20.771; default $18.000 cuando los pueblos cuestan $25.029). Con las 79 guías
-   reales se absorbieron **$102.148** de flete en 77 guías; el tarifario nuevo lo baja a **$1.574
-   (−98,5%)**. **La fuga estaba SOLO en los destinos caros (bandas D y E), que son el 28% del
-   volumen.** ⚠️ **FALTA EL PASO MANUAL: pegar el bloque nuevo en la IA de WhatsApp Business.**
-   Cambiar el repo NO cambia lo que la IA le dice al cliente. Ver `TARIFARIO-Y-GUION.md`.
-2. 🚨 **SE CORRIGE UNA REGLA DEL MANUAL: SUBIR PRESUPUESTO *SÍ* REINICIA EL APRENDIZAJE.**
-   La sección 0-C y el plan del 19-ago decían que "escalar presupuesto es barato en esta cuenta
-   porque no reinicia el aprendizaje". **Es falso pasado cierto tamaño.** Ver sección 0-M.
-   **Regla nueva: escalones de +60% o menos.**
-🆕 **HALLAZGO QUE BLOQUEA EL PENDIENTE #40: el precio de 2 unidades NO EXISTE.** Los 5 pedidos de
-2 conjuntos se cobraron a $54.058–59.991 por unidad (dispersión 11% = **$11.864 por pedido** entre
-el mejor y el peor caso). **Cada cierre improvisó.** No se puede "ofrecer sistemáticamente la
-segunda unidad" sin definir el precio primero. **Decisión pendiente del dueño.** Ver sección 0-N.
-
-🎉🎉 **ESTADO ACTUAL — TODO SE RECUPERÓ (sección 0-L, veredicto del 19-ago):**
-**10,25 ventas/día (+97%, nivel pre-temblor) · cierre 9,4% (venía de 6,1%) · CPA por venta cerrada
-$5.702 (venía de $9.343, −39% → volvió al nivel auditado) · colchón 3,5× · utilidad ~$153.676/día
-(+136%).** **ERA EL CICLO DE PAGO**, como decía la hipótesis (A).
-✅ **SEGURO 99 CONFIRMADO CON DATOS: en una devolución solo se paga la PRIMA ($1.742-3.111), el flete
-de ida y vuelta queda cubierto completo. Ahorro ~$18.574 por devolución ≈ $852.524/mes.**
-💥 **EL TECHO DE $48.585/DÍA SE ROMPIÓ: ahora gasta $58.445/día → HAY ESPACIO PARA ESCALAR.**
-⏳ **PERO el rebote se superpone con el fin del efecto temblor → el test definitivo es el valle del
-26-29 ago.** Si el cierre vuelve a caer ahí, el ciclo de pago queda demostrado.
-⚠️ **5 guías trabadas = $113.458 en riesgo; la de GÓMEZ PLATA lleva 6 días sin que la recojan.**
-
-**Contexto histórico del bajón (ya resuelto):** 🔴 ~~ALERTA: EL CIERRE NO SE RECUPERÓ (6,1% vs
-13% del pico) Y EL CPA SE DETERIORÓ +72%. Conversaciones estables en 84,9/día →
-NO ES META, es DESPUÉS del clic. Vale ~$2,2 MILLONES/MES.~~
-🔴🔴 **HIPÓTESIS PRINCIPAL (E) — SECCIÓN 0-K: EL "CIERRE" ESTÁ MAL MEDIDO. El denominador son "toques
-de botón del anuncio", no conversaciones, y el dueño confirma que hay MUCHÍSIMOS chats donde nadie
-escribió nada. Si los vacíos pasaron de ~25% a ~65%, la caída de 13% a 6,1% queda explicada COMPLETA
-sin que nada esté roto. Es la única hipótesis que explica volumen estable + cierre a la mitad, y el
-mecanismo (Meta amplió público → gente menos calificada) YA ESTABA ESCRITO en este archivo.**
-**MEDIRLO ES LO PRIMERO (pendiente #42): 5 minutos contando en la lista de WhatsApp, en el pico Y en el
-valle.** Si se confirma, el arreglo es de **segmentación en Meta**, no del guion ni de la IA.
-**Hipótesis en segundo plano (sección 0-I): (A) el ciclo de pago · (C) EL CLIMA, nunca revisado ·
-(D) las horas de venta del dueño.**
-**(B) 🔻 la IA de WhatsApp queda DESCARTADA: está supervisada siempre Y se activa cuando SUBE el flujo,
-así que estuvo más activa en los días del pico de cierre — la correlación va al revés de lo que la
-hipótesis necesitaba.** ✅ **La IA es una válvula de capacidad: el freno del tiempo del dueño está
-RESUELTO y la atención NO limita cuánto tráfico se puede recibir → abrir ciudades es viable.**
-⏳ **El 17-ago (2 días tras la quincena) decide entre (A) y el resto; el valle del 26-29 ago es la
-prueba definitiva** ·
-✅ **EL CAMBIO A 99 ENVÍOS FUE CORRECTO: flete 14,1% más barato ($18.046 vs $21.000) + seguro
-antidevolución incluido al mismo precio total, que en Heka no existía (sección 0-H)** ·
-⚠️ **CORRECCIÓN: la ganancia de Heka de la sección 0-G ($1.982.000) está sobreestimada — nunca se le
-descontó el flete a las 15 devoluciones (real: $1.352.000–1.667.000)** ·
-🆕 **FUGA: se absorben $3.900-4.900 de flete por venta en destinos caros (~$384.000/mes)** ·
-🆕 **7 guías en novedad = $181.744 de margen en riesgo (Cartagena es la llamada #1)** ·
-rechazo real **15,3%** (el de 99 Envíos aún no es medible) · techo de la cuenta **$48.585/día
-confirmado con 10 días** → crecer = ABRIR CIUDADES, no subir presupuesto ·
-⏸️ congelamiento hasta el 17-ago: **este hallazgo NO lo rompe, porque pide MEDIR, no mover**
+Última actualización: **2026-08-24** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
+sandbox corre en UTC y ya marca el día siguiente)*
 
 ---
 
-## 0. ⭐ DÓNDE QUEDAMOS HOY (lo más importante)
+# 🧭 ÍNDICE — POR DÓNDE EMPEZAR
+
+**Si tenés 2 minutos:** leé el bloque "ESTADO AL 24-AGO" de abajo y la lista de pendientes vivos.
+**Si tenés 15:** agregá las secciones 0-V, 0-W, 0-X y 0-M, que son las que tienen las reglas activas.
+
+| Sección | Qué hay ahí | Fecha |
+|---|---|---|
+| **0-X** | 🌎 Ya es NACIONAL (78 ciudades): los lagos son Valle y Atlántico | 24-ago |
+| **0-W** | 📈 Lectura del escalón · **elasticidad 0,63** · la curva ya está plana | 24-ago |
+| **0-V** | 🎉 El guion funcionó (93%) · **share de 2 uds 6,8% → 26,8%** | 24-ago |
+| 0-U | 💰 Descuento de cierre (tope $3.000) + el fin de semana SÍ se despacha | 21-ago |
+| 0-T | 💬 Precio separado vs total → **los dos, cerrando en el total** | 21-ago |
+| 0-S | ❓ Heka dejó 22 guías abiertas sin verificar | 21-ago |
+| 0-R | 📦 Gate 0 cerrado: los 3 frenos abiertos · consignación | 21-ago |
+| 0-Q | 💵 La caja no es el freno (ciclo negativo) | 21-ago |
+| 0-P | 🚚 El dueño elige transportadora + promo 2×$110.000 | 21-ago |
+| 0-O | ✅ Chequeo del escalón 1 | 21-ago |
+| 0-N | ✅ El tarifario real (la tabla vieja era inventada) | 21-ago |
+| 0-M | 🚨 El reinicio de aprendizaje NO se puede predecir | 21-ago |
+| 0-L | 🎉 Veredicto del 19-ago: era el ciclo de pago + seguro confirmado | 19-ago |
+| 0-K | 🔴 Las conversaciones vacías (57,8%) | 14-ago |
+| 0-J | 💬 Análisis de 47 chats de WhatsApp | 14-ago |
+| 0-G a 0-I | 💰 Auditorías financieras Heka y 99 Envíos | 14-15 ago |
+| 5-B | 🤖 La IA de WhatsApp que sí atiende (Meta AI, no el bot) | 14-ago |
+| **9** | 📋 **PENDIENTES PRIORIZADOS — la lista de trabajo** | vivo |
+| **11** | 📚 **MANUAL OPERATIVO DE META ADS** — reglas aprendidas | vivo |
+
+**Documentos aparte (fuera de este archivo):**
+`GUION-PARA-PEGAR.md` (el guion listo para la IA) · `TARIFARIO-Y-GUION.md` (el tarifario explicado) ·
+`ESCALON-EJECUCION.md` (cómo escalar y qué medir) · `META-50-UNIDADES-DIARIAS.md` y
+`TECHO-REALISTA.md` (hasta dónde se puede crecer) · `PLAN-ESCALAMIENTO-Y-TIKTOK.md` ·
+`TIKTOK-GUIONES-Y-SETUP.md`
+
+---
+
+# 📊 ESTADO AL 2026-08-24
+
+## Los números de hoy (ventana 21-23 ago, confirmados por el dueño)
+
+| | |
+|---|---|
+| Ventas/día (pedidos) | **13,7** |
+| **Unidades/día** | **17,3** |
+| Gasto publicitario/día | $97.944 |
+| **CPA por pedido** | **$7.167** *(techo fijado: $12.000)* |
+| Margen por pedido | **$28.715** |
+| **Utilidad/día** | **$294.492** ≈ $8,8 M/mes |
+| Conversaciones/día | 154 |
+| Presupuesto Meta | Domiciliarios $70.000 · Motorizados $15.000 · TEST $20.000 |
+
+**Crecimiento:** de **1,6 ventas/día en julio a 13,7 hoy** = 8,6× en 7 semanas.
+
+## ✅ LO QUE SE RESOLVIÓ (no volver a discutir)
+
+- 🎉 **GATE 0 CERRADO: los 3 frenos históricos están abiertos.** ⏱️ tiempo (IA como válvula) ·
+  💵 caja (99 Envíos paga a demanda + proveedor en **consignación** = ciclo de caja **negativo**,
+  holgura **18,5×**, techo 222 ventas/día) · 📦 inventario (**5.000 unidades** en consignación +
+  reposición a 1 día de aviso).
+- ✅ **EL TARIFARIO REAL, PEGADO Y VERIFICADO.** La tabla vieja de `fletes.js` era **inventada**
+  (Cali $13.000 cuando el real es $20.771). Se corrigió, se pegó en la IA el 21-ago y **el 24-ago se
+  verificó con datos: 93% de las guías cobran el total exacto de su banda.**
+- ✅ **EL DESCUENTO DE CIERRE se usa como último recurso**, no por default: 6,7% de las ventas
+  (alarma en 15%).
+- ✅ **Las 7 novedades trabadas se gestionaron** el 20-ago.
+
+## 🚀 EL HALLAZGO MÁS IMPORTANTE DE TODO EL PROYECTO
+
+**El share de pedidos de 2 unidades pasó de 6,8% a 26,8% (3,9×)** al poner el gancho del envío
+compartido en el guion (sección 0-V).
+
+| Fuente de la mejora de +$61.107/día | Aporte | |
+|---|---|---|
+| **El guion** | **+$44.007/día** | **72%** |
+| El escalón de presupuesto (+35% de gasto) | +$17.101/día | 28% |
+
+🔑 **El guion costó 10 minutos y aportó 2,6× lo que aportó subir el gasto 35%.**
+⚠️ **Pero es señal, no conclusión: son 41 guías. Confirmarlo con el export del 31-ago (#60).**
+
+## 🔴 LA REGLA QUE CAMBIA LA ESTRATEGIA: SUBIR PRESUPUESTO YA NO PAGA
+
+**Elasticidad medida: 0,63.** Por cada 1% más de gasto, el costo por conversación sube 0,63% → las
+ventas crecen como gasto^0,37, o sea que **duplicar el presupuesto sube las ventas solo 31%.**
+
+| Gasto/día | Ventas/día | Utilidad/día | Lo que devuelve el último peso |
+|---|---|---|---|
+| **$97.944** *(hoy)* | **13,7** | **$294.492** | +$0,60 |
+| $125.000 | 14,9 | $303.988 | **+$0,35** |
+| $160.000 | 16,3 | $309.449 | **+$0,16** |
+| $200.000 | 17,7 | $309.296 | **−$0,00** 🔴 |
+
+**La utilidad está casi plana entre $125.000 y $200.000.** El óptimo es ~$178.000/día.
+⚠️ **CAVEAT: sale de UN solo escalón.** Lo robusto es la forma de la curva, no el número exacto.
+
+**→ Las tres palancas reales, en orden:** (1) el guion / share de 2 unidades · (2) forzar geografía
+(sección 0-X) · (3) las conversaciones vacías del 57,8%. **Subir presupuesto es la más floja.**
+
+## 🌎 Y "ABRIR CIUDADES" ERA UN DIAGNÓSTICO VIEJO
+
+**Ya se vende en 78 ciudades de 12 regiones.** No hay geografía nueva que abrir. Lo que hay que hacer
+es **forzar a Meta a gastar donde hoy no gasta** (bajo Advantage+ concentra en los bolsillos baratos).
+
+| Región | % ventas | % población | Índice |
+|---|---|---|---|
+| **Valle** | 4,7% | **8,7%** | **0,54** 🔴 sub-explotada |
+| **Atlántico** | 2,3% | **5,2%** | **0,45** 🔴 sub-explotada |
+| Antioquia | 22,5% | 13,1% | 1,72 🟢 ya explotada |
+
+## 🎯 LA META: 50 UNIDADES/DÍA
+
+**Es alcanzable.** Techo estructural **75-100 uds/día**; 50 son solo **0,6% del mercado nacional**
+(13,5 M motos, 1,1 M nuevas/año, 92% en estratos 1-2-3). A 50/día la utilidad sería **~$25,5 M/mes.**
+
+⚠️ **Pero NO se llega subiendo presupuesto** (haría falta 17,6× el gasto y el CPA llegaría a $43.559
+contra un margen de $28.715). **La condición es bajar la elasticidad de 0,63 a ~0,41**, y eso solo
+pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
+
+## ⚠️ ALARMAS VIVAS
+
+- 🔴 **17 guías trabadas, $406.346 de margen real en riesgo** (sección 0-O). Las 7 más viejas se
+  gestionaron el 20-ago; **falta verificar cuántas terminaron entregadas (#34).**
+- 🔴 **Heka dejó 22 guías abiertas y no se sabe si siguen abiertas** ($622.560, sección 0-S, #55).
+- 🔔 **Banda E absorbe $381 por venta** ($2.262/día). **Decisión del dueño: se queda en $85.000.**
+  Gatillo: si el flete pasa de $26.000, hay que actuar (#62).
+- 📌 **$2.200.000 quietos en 99 Envíos.** Mismo patrón que los $2.788.601 de Heka. Retirar por rutina.
+
+## 🚦 LO SIGUIENTE, EN ORDEN
+
+1. **Re-pegar el guion con las 2 correcciones del 24-ago** (14 ciudades + promo por zona) → **#59**
+2. **NO subir presupuesto** (retorno marginal $0,35 por peso)
+3. **Lunes 31: los dos exports** — Meta 22-30 **con desglose por día** (~27 filas) + 99 Envíos 21-30
+4. **Prender el conjunto de Valle el 30 o 31**, cuando pase el valle → **#63**
+5. **Leer el valle 26-29 con la regla corregida:** el umbral de $12.000 **no aplica** en esos días;
+   ahí manda la **utilidad/día** (el equilibrio real del CPA es $28.715)
+
+---
+
+## 0. 📜 ESTADO HISTÓRICO (agosto temprano) — conservado como referencia
+
+> ⚠️ **Esto es historia, no el estado actual.** El estado vigente está en el bloque
+> "ESTADO AL 2026-08-24" de arriba. Se conserva porque tiene el detalle de cómo se llegó acá.
+
 
 **Resumen en una línea:** 🔥🔥 **MEJOR MOMENTO DE LA HISTORIA: 80 VENTAS ACUMULADAS. En los 4 primeros
 días de agosto: 30 ventas, cierre 10,2% y CAC $5.018 — ambos RECORD.** El **TEST DE CREATIVOS FUE UN
@@ -1154,6 +1199,74 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-X. 🌎 EL NEGOCIO YA ES NACIONAL — "ABRIR CIUDADES" ERA UN DIAGNÓSTICO VIEJO (2026-08-24)
+
+Script: `/analisis/donde-estan-los-lagos.py`. **Corrige el pendiente #30, abierto desde julio.**
+
+### 🔴 NO HAY GEOGRAFÍA NUEVA QUE ABRIR
+
+Cruzando los 4 exports de 99 Envíos: **129 guías únicas en 78 CIUDADES distintas de 12 regiones**,
+de Dibulla a Túquerres y de Puerto Asís a Magangué. **Ya se vende en todo el país.**
+
+El pendiente #30 decía "abrir ciudades nuevas" y **eso no describe el problema.**
+
+### ✅ LO QUE SÍ SIGNIFICA "ABRIR UN LAGO"
+
+**Bajo Advantage+ con segmentación nacional, Meta gasta donde le sale más barata la conversación.**
+Eso concentra la pauta en unos pocos bolsillos y deja el resto del país sin tocar **aunque esté
+técnicamente abierto.**
+
+🔑 **Por eso la sección 11 dice que bajo Advantage+ la geografía es lo único que diferencia conjuntos
+de verdad: no porque haya que abrir mercados, sino porque un conjunto por región OBLIGA a Meta a
+gastar en cada una.**
+
+> **"Abrir un lago" = crear un conjunto con geografía RESTRINGIDA a una región sub-explotada, con su
+> propio presupuesto.** Meta ya no puede huir al bolsillo barato. **Y cada conjunto regional trae su
+> propia curva de elasticidad con audiencia fresca**, que es exactamente lo que hace falta para bajar
+> la elasticidad agregada de 0,63 (sección 0-W).
+
+### 📊 DÓNDE ESTÁN LAS VENTAS CONTRA DÓNDE ESTÁ LA GENTE
+
+| Región | Guías | % ventas | % población | Índice | |
+|---|---|---|---|---|---|
+| Llanos | 9 | 7,0% | 3,5% | **2,02** | 🟢 sobre-explotada |
+| Eje Cafetero | 12 | 9,3% | 4,8% | **1,93** | 🟢 sobre-explotada |
+| Antioquia | 29 | 22,5% | 13,1% | **1,72** | 🟢 sobre-explotada |
+| Bolívar | 8 | 6,2% | 4,2% | 1,47 | |
+| Caribe resto | 10 | 7,8% | 5,8% | 1,34 | |
+| Sur (Huila/Caquetá/Putumayo) | 7 | 5,4% | 4,6% | 1,18 | |
+| Cauca/Nariño | 8 | 6,2% | 6,0% | 1,04 | |
+| Bogotá/Cundinamarca | 28 | 21,7% | 21,2% | 1,03 | en su peso |
+| Boyacá | 3 | 2,3% | 2,3% | 1,01 | |
+| Santanderes | 6 | 4,7% | 6,3% | 0,73 | |
+| **Valle** | 6 | 4,7% | **8,7%** | **0,54** | 🔴 **SUB-EXPLOTADA** |
+| **Atlántico** | 3 | 2,3% | **5,2%** | **0,45** | 🔴 **SUB-EXPLOTADA** |
+
+🎯 **Valle y Atlántico tienen el 14% de la población del país y solo el 7% de las ventas.**
+A su peso natural serían ~18 guías en vez de 9 → **2× en esas zonas.** Y las dos tienen margen sano:
+**Valle $23.313 · Atlántico $22.400** por pedido.
+
+📌 **Antioquia (1,72×) y Llanos (2,02×) ya están sobre-explotadas: ahí queda poco por sacar.**
+
+⚠️ **CAVEAT:** el flete promedio por región sale de pocas guías en varios casos, así que el margen es
+orientativo. **Lo robusto es el índice de sub-explotación**, que sale de comparar contra población.
+
+### 🗓️ POR QUÉ NO PRENDERLO ANTES DEL 30-31 (y por qué el valle NO es la razón)
+
+⚠️ **Se dio primero una razón floja:** *"el valle mezcla un tercer efecto"*. **Es débil:** el valle
+golpea el **cierre**, pero **Meta optimiza por CONVERSACIONES INICIADAS, no por ventas**, así que
+**la fase de aprendizaje del conjunto nuevo no se daña con el valle.**
+
+🔑 **LA RAZÓN QUE SÍ AGUANTA: un conjunto nuevo NO TIENE LÍNEA BASE.** Cuando se sube presupuesto, el
+conjunto tiene historia propia para comparar. Un conjunto regional nuevo arranca de cero: **si sus
+primeros 4 días son de valle, no hay forma de saber si la región es mala o si el timing fue malo** —
+y esa es justo la decisión que hay que tomar (seguir o cerrar la región).
+
+**→ Prenderlo el 30 o 31, apenas pasa la quincena**, para que sus primeros 4-5 días signifiquen algo.
+**Si se prende antes, hay que escribir de antemano que no se juzga hasta el 4-sep.**
 
 ---
 
@@ -3022,7 +3135,19 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     andina va ~sep-nov, así que **escalar ahora agarra la mejor ventana de demanda del año.**
     El clima es la hipótesis (C) de las secciones 0-F y 0-I, **nunca revisada desde el 12-ago**.
     📌 Lo mínimo: comparar ventas/día contra días de lluvia de las últimas 6 semanas.
-30. [ ] 🌎🔥 **ABRIR CIUDADES NUEVAS — Y AHORA HAY UNA RAZÓN NUMÉRICA, NO SOLO UNA INTUICIÓN.**
+30. [ ] 🌎🔥 **"ABRIR CIUDADES" ESTÁ MAL PLANTEADO — EL NEGOCIO YA ES NACIONAL (corregido 24-ago).**
+    🔴 **Cruzando los 4 exports hay 129 guías en 78 CIUDADES de 12 regiones**, de Dibulla a Túquerres
+    y de Puerto Asís a Magangué. **No hay geografía nueva que abrir.**
+    ✅ **LO QUE SÍ HAY QUE HACER: forzar a Meta a gastar donde hoy no gasta.** Bajo Advantage+ con
+    segmentación nacional, Meta concentra la pauta en los bolsillos más baratos y deja el resto del
+    país sin tocar **aunque esté técnicamente abierto.** Un conjunto con geografía **restringida** a
+    una región la obliga a gastar ahí — y le da **su propia curva de elasticidad con audiencia fresca.**
+    🎯 **LAS DOS REGIONES SUB-EXPLOTADAS, medidas contra población:**
+    · **Valle** — 8,7% de la población, 4,7% de las ventas (índice **0,54**), margen $23.313
+    · **Atlántico** — 5,2% de la población, 2,3% de las ventas (índice **0,45**), margen $22.400
+    Juntas: **14% de la población y 7% de las ventas → a su peso natural serían 2× lo que venden hoy.**
+    📌 Antioquia (1,72×) y Llanos (2,02×) ya están sobre-explotadas: ahí queda poco por sacar.
+    Ver `/analisis/donde-estan-los-lagos.py`.
     **La elasticidad medida es 0,63** (sección 0-W): por cada 1% más de gasto, el costo por
     conversación sube 0,61%, así que las ventas crecen como gasto^0,37 y **la utilidad ya está casi
     plana entre $125.000 y $200.000/día.** Subir presupuesto devuelve **$0,35 por peso y bajando.**
@@ -3088,6 +3213,19 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⛔ **BANDA E SE QUEDA EN $85.000 — decisión del dueño, NO volver a proponer subirla.**
     Ver el pendiente #62 con el análisis y el gatillo.
     📌 Bloque actualizado listo en **`GUION-PARA-PEGAR.md`**.
+63. [ ] 🌎🎯 **PRENDER EL CONJUNTO REGIONAL DE VALLE — la palanca que sigue (sección 0-X).**
+    **NO es "abrir una ciudad nueva"** (Cali, Palmira y Buenaventura ya venden). Es **crear un
+    conjunto con geografía RESTRINGIDA al Valle** para forzar a Meta a gastar ahí, porque bajo
+    Advantage+ concentra la pauta en los bolsillos más baratos y deja la región al **0,54 de su peso
+    poblacional.**
+    **Por qué Valle primero:** 8,7% de la población, más margen que Atlántico ($23.313 vs $22.400) y
+    **ya hay presencia** en 3 ciudades, así que no arranca de cero.
+    🗓️ **Prenderlo el 30 o 31-ago**, apenas pase el valle: un conjunto nuevo **no tiene línea base**,
+    así que si sus primeros días son de valle no se puede saber si la región es mala o el timing.
+    📌 **Presupuesto sugerido: $25.000-30.000/día**, sacados de subir el total (NO de quitarle a
+    Domiciliarios, que absorbe el 100%). **Y Motorizados sigue congelado.**
+    🔑 **Lo que hay que medir es la ELASTICIDAD de ese conjunto**, no solo su CPA: es el dato que
+    define si la meta de 50 uds/día es alcanzable (sección 0-W y `TECHO-REALISTA.md`).
 62. [ ] 🔔 **GATILLO DE BANDA E — NO ES UN PENDIENTE DE PRECIO, ES DE VIGILANCIA.**
     **El dueño decidió el 24-ago dejar banda E en $85.000** aunque el flete subió a $25.481 y se
     absorben **$381 por venta (~$2.262/día).** ✅ **Es sostenible: la cartera queda en +$5.956 sobre
