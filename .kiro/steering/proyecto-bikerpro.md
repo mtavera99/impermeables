@@ -16,6 +16,7 @@ sandbox corre en UTC y ya marca el día siguiente)*
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-Y** | 🗓️ El "valle 26-29" era inventado · **guías/día ≠ ventas/día** | 25-ago |
 | **0-X** | 🌎 Ya es NACIONAL (78 ciudades): los lagos son Valle y Atlántico | 24-ago |
 | **0-W** | 📈 Lectura del escalón · **elasticidad 0,63** · la curva ya está plana | 24-ago |
 | **0-V** | 🎉 El guion funcionó (93%) · **share de 2 uds 6,8% → 26,8%** | 24-ago |
@@ -136,12 +137,14 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 
 ## 🚦 LO SIGUIENTE, EN ORDEN
 
-1. **Re-pegar el guion con las 2 correcciones del 24-ago** (14 ciudades + promo por zona) → **#59**
+1. ✅ **Guion re-pegado** el 24-25 ago (14 ciudades + promo por zona) — **#59 cerrado**
 2. **NO subir presupuesto** (retorno marginal $0,35 por peso)
 3. **Lunes 31: los dos exports** — Meta 22-30 **con desglose por día** (~27 filas) + 99 Envíos 21-30
 4. **Prender el conjunto de Valle el 30 o 31**, cuando pase el valle → **#63**
-5. **Leer el valle 26-29 con la regla corregida:** el umbral de $12.000 **no aplica** en esos días;
-   ahí manda la **utilidad/día** (el equilibrio real del CPA es $28.715)
+5. ⚠️ **NO leer los días sueltos por guías/día.** Las guías son despachos: el fin de semana se
+   acumula y se descarga el lunes o el martes (31-32 guías = **3,9x** un día normal de 8). Un día
+   normal tras la descarga se ve como **−75%** y no es valle → **0-Y**. El umbral de $12.000 tampoco
+   aplica en valle; ahí manda la **utilidad/día** (equilibrio real del CPA: $28.715)
 
 ---
 
@@ -1199,6 +1202,79 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-Y. 🗓️ EL "VALLE 26-29" ME LO INVENTÉ — Y LAS GUÍAS/DÍA NO MIDEN VENTAS/DÍA (2026-08-25)
+
+**Origen:** el martes 25 el dueño pregunta *"¿cuándo arranca en sí el valle? hoy es martes 25 y las
+ventas bajaron"*. Script: `/analisis/cuando-arranca-el-valle.py`.
+
+### 🔴 PRIMERO, UNA CORRECCIÓN MÍA
+
+Le dije al dueño **"el valle es 26-29 ago"** como si fuera un hecho medido. **No lo era.** Ese rango
+está **escrito a mano** en `ciclo-quincena.py` como una *definición*:
+
+```python
+elif d.day in (11, 12, 13, 14, 26, 27, 28, 29):
+    marca = '  (valle: antes del pago)'
+```
+
+Y la sección 0-I ya había concluido lo contrario: *"no hay ni un dato que respalde la quincena"*, con
+el corte crudo apuntando **en contra** (pre-pago 9,3 guías/día vs. post-pago 7,8). **Se convirtió una
+etiqueta de un script en un pronóstico. No repetir ese rango como si estuviera medido.**
+
+### 🔴 SEGUNDO, LA TRAMPA DE FONDO: `fecha_envio` ES EL DESPACHO, NO LA VENTA
+
+Juntando los 4 exports de 99 Envíos (185 filas → **132 guías únicas**, 53 eran repetidas), **sábado y
+domingo dan 0 guías SIEMPRE, en las 4 ventanas.** Con pauta prendida es imposible vender 0 dos días
+seguidos todas las semanas. La 0-U ya lo había visto de refilón (*"el fin de semana se acumuló otra
+vez, todo salió a las 01:26 del lunes"*), pero no se sacó la consecuencia:
+
+| | Guías | vs. día normal |
+|---|---|---|
+| Días de **descarga** post-finde | 32 (18-ago), 31 (24-ago) | **3,9x** |
+| Días **normales** | 3·4·5·6·8·8·9·10·16 → mediana **8** | 1,0x |
+
+**Y el día de la descarga se mueve:**
+
+| Semana | Lunes | Martes | Dónde cayó la descarga |
+|---|---|---|---|
+| 17-21 ago | 9 | **32** | el **martes** |
+| 24-28 ago | **31** | ? | el **lunes** |
+
+### ✅ POR QUÉ LA CAÍDA DEL MARTES 25 NO ES EL VALLE
+
+La descarga del fin de semana ya se hizo el **lunes 24** (31 guías = sáb + dom + lun). Entonces el
+martes 25 arranca limpio, con **solo su propia demanda**:
+
+- un martes normal da **~8 guías**;
+- contra las 31 del lunes eso se ve como **−75%**;
+- **y es un día perfectamente normal.**
+
+🎯 **Solo sería señal real si baja de ~5 guías.** El ruido normal entre dos días seguidos es del
+**62% (mediana), con un salto máximo observado del 256%** — con **un** día flojo no se distingue
+valle de ruido.
+
+📌 **La comparación correcta es martes 25 vs. martes 18, no martes 25 vs. lunes 24.** Nunca comparar
+contra un día de descarga.
+
+### ⚠️ LO QUE ESTO INVALIDA
+
+El corte pre/post pago que este mismo script calculó (**−40%**) **no es confiable**: el índice
+post-pago de 1,15 se sostiene sobre la descarga de 32 guías del 18-ago, que es demanda del fin de
+semana anterior, no del 18. **Con datos de despacho no se puede medir el ciclo de quincena.**
+
+**→ Para medir demanda por día hace falta el desglose diario de Meta** (conversaciones iniciadas),
+que es justo el export pendiente del lunes 31. Es otra razón para pedirlo **por día** y no agregado.
+
+### 🕵️ UN CONFUSOR QUE LLEGÓ EL MISMO DÍA
+
+El guion nuevo se pegó entre el 24 y el 25, y **subió el precio de la promo de 2**: antes era
+$110.000 y ahora el envío se cobra aparte ($128.000-$146.000 según zona), además de pasar la promo a
+**carta de último recurso** en vez de primera oferta. Si aparece una caída sostenida en el share de
+2 unidades, **la causa más probable es el guion, no la quincena.** Medir: share de 2 uds venía en
+**26,8%** (0-V).
 
 ---
 
