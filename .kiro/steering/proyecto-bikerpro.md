@@ -16,7 +16,7 @@ sandbox corre en UTC y ya marca el día siguiente)*
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
-| **0-Y** | 🗓️ El "valle 26-29" era inventado · **guías/día ≠ ventas/día** | 25-ago |
+| **0-Y** | 🗓️ **guías/día ≠ ventas/día** · el finde rinde +44% · CPA provisional | 25-ago |
 | **0-X** | 🌎 Ya es NACIONAL (78 ciudades): los lagos son Valle y Atlántico | 24-ago |
 | **0-W** | 📈 Lectura del escalón · **elasticidad 0,63** · la curva ya está plana | 24-ago |
 | **0-V** | 🎉 El guion funcionó (93%) · **share de 2 uds 6,8% → 26,8%** | 24-ago |
@@ -45,22 +45,26 @@ sandbox corre en UTC y ya marca el día siguiente)*
 
 ---
 
-# 📊 ESTADO AL 2026-08-24
+# 📊 ESTADO AL 2026-08-25
 
-## Los números de hoy (ventana 21-23 ago, confirmados por el dueño)
+## Los números de hoy
 
 | | |
 |---|---|
-| Ventas/día (pedidos) | **13,7** |
-| **Unidades/día** | **17,3** |
-| Gasto publicitario/día | $97.944 |
-| **CPA por pedido** | **$7.167** *(techo fijado: $12.000)* |
+| Ventas/día — **fin de semana** | **15,5** *(sáb 22 + dom 23)* |
+| Ventas/día — **día hábil** | **10,8** *(mar 18 · mié 19 · jue 20 · vie 21 · lun 24)* |
+| **Unidades por pedido** | **1,38** *(share de 2 uds: 37,5% con n=8)* |
+| Gasto publicitario/día | ~$105.000 *(= presupuesto diario de los 3 conjuntos)* |
+| **CPA por pedido** | ⚠️ **$7.167 PROVISIONAL** — ver el descuadre en **0-Y** |
 | Margen por pedido | **$28.715** |
-| **Utilidad/día** | **$294.492** ≈ $8,8 M/mes |
-| Conversaciones/día | 154 |
 | Presupuesto Meta | Domiciliarios $70.000 · Motorizados $15.000 · TEST $20.000 |
 
-**Crecimiento:** de **1,6 ventas/día en julio a 13,7 hoy** = 8,6× en 7 semanas.
+**Crecimiento:** de **1,6 ventas/día en julio** a **10,8-15,5 hoy** = **7-10×** en 7 semanas.
+
+🔴 **REGLA DE LECTURA (0-Y): las guías/día NO son ventas/día.** El fin de semana y los festivos se
+acumulan y se despachan en un lote (lunes o martes). **Nunca comparar un día hábil contra un día de
+descarga**, ni promediar guías por día de calendario. Comparar **hábil vs. hábil** y **finde vs.
+finde, dividiendo por los días de venta que cubre el lote.**
 
 ## ✅ LO QUE SE RESOLVIÓ (no volver a discutir)
 
@@ -141,10 +145,12 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 2. **NO subir presupuesto** (retorno marginal $0,35 por peso)
 3. **Lunes 31: los dos exports** — Meta 22-30 **con desglose por día** (~27 filas) + 99 Envíos 21-30
 4. **Prender el conjunto de Valle el 30 o 31**, cuando pase el valle → **#63**
-5. ⚠️ **NO leer los días sueltos por guías/día.** Las guías son despachos: el fin de semana se
-   acumula y se descarga el lunes o el martes (31-32 guías = **3,9x** un día normal de 8). Un día
-   normal tras la descarga se ve como **−75%** y no es valle → **0-Y**. El umbral de $12.000 tampoco
-   aplica en valle; ahí manda la **utilidad/día** (equilibrio real del CPA: $28.715)
+5. ⚠️ **NO leer los días sueltos por guías/día.** Las guías son despachos: finde y festivos se
+   acumulan en un lote (31 guías = **2,9x** un día hábil de 10,8). Un día hábil normal tras la
+   descarga se ve como **−75%** y no es valle → **0-Y**. El umbral de $12.000 tampoco aplica en
+   valle; ahí manda la **utilidad/día** (equilibrio real del CPA: $28.715)
+6. 🆕 **Evaluar mover presupuesto del hábil al finde** (el finde rinde **+44%** más por día). No es
+   subir presupuesto, es reasignarlo → **necesita el desglose diario del lunes 31** para decidir → **#64**
 
 ---
 
@@ -1231,50 +1237,87 @@ domingo dan 0 guías SIEMPRE, en las 4 ventanas.** Con pauta prendida es imposib
 seguidos todas las semanas. La 0-U ya lo había visto de refilón (*"el fin de semana se acumuló otra
 vez, todo salió a las 01:26 del lunes"*), pero no se sacó la consecuencia:
 
-| | Guías | vs. día normal |
+### ✅ EL DUEÑO CORRIGIÓ EL DETALLE, Y LAS HORAS DE CREACIÓN LE DAN LA RAZÓN
+
+Mi primera lectura decía *"lote de 32 el 18-ago"* y *"el lunes 24 = sáb+dom+lun"*. **Las dos estaban
+mal.** El dueño aclaró: el **lunes 17 fue FESTIVO** (Asunción, corrido al lunes por Ley Emiliani) y
+por eso no se pudo despachar; y las 31 del lunes 24 son **solo sábado + domingo**, porque las del
+lunes las guardó para el martes 25. Las horas locales de creación lo confirman:
+
+| Día | Guías y hora | Qué es |
 |---|---|---|
-| Días de **descarga** post-finde | 32 (18-ago), 31 (24-ago) | **3,9x** |
-| Días **normales** | 3·4·5·6·8·8·9·10·16 → mediana **8** | 1,0x |
+| lun 17 (festivo) | 9, **todas a las 23h** | arranca el lote |
+| mar 18 | 20 a las **0h-1h** | **el mismo lote**, cruzando la medianoche |
+| mar 18 | 12 a las **14h-15h** | la demanda propia del martes |
+| lun 24 | 31, **todas a la 1h** | un solo lote |
 
-**Y el día de la descarga se mueve:**
+🎯 **Entonces el lote del finde festivo fueron 29 guías (9+20), no 32.** Las 12 de la tarde del
+martes 18 son demanda del martes. **Mi conteo mezclaba las dos cosas.**
 
-| Semana | Lunes | Martes | Dónde cayó la descarga |
+### ✅ Y SÍ, "FUNCIONÓ" — MEJOR DE LO QUE EL DUEÑO DIJO
+
+| Fin de semana | Guías | Días de venta | Por día |
 |---|---|---|---|
-| 17-21 ago | 9 | **32** | el **martes** |
-| 24-28 ago | **31** | ? | el **lunes** |
+| 15-17 ago (sáb+dom+**lun festivo**) | 29 | 3 | **9,7** |
+| 22-23 ago (sáb+dom) | 31 | 2 | **15,5** |
 
-### ✅ POR QUÉ LA CAÍDA DEL MARTES 25 NO ES EL VALLE
+**→ +60% por día de venta.** El dueño dijo *"las mismas guías en 2 días en vez de 3"* (sería +50%);
+separando el lote por horas la mejora es **+60%**.
 
-La descarga del fin de semana ya se hizo el **lunes 24** (31 guías = sáb + dom + lun). Entonces el
-martes 25 arranca limpio, con **solo su propia demanda**:
+⚠️ **Salvedad honesta:** las ventas del viernes después de las 17h caen en el lote del lunes (el
+viernes 21 despachó a las 17h). Eso puede inflar algo el lado del finde. **La dirección es sólida,
+el tamaño no.**
 
-- un martes normal da **~8 guías**;
-- contra las 31 del lunes eso se ve como **−75%**;
-- **y es un día perfectamente normal.**
+### ✅ POR QUÉ LAS 8 GUÍAS DEL MARTES 25 NO SON EL VALLE
 
-🎯 **Solo sería señal real si baja de ~5 guías.** El ruido normal entre dos días seguidos es del
-**62% (mediana), con un salto máximo observado del 256%** — con **un** día flojo no se distingue
-valle de ruido.
+Días hábiles ya limpios de lote de finde: **mar 18 → 12 · mié 19 → 8 · jue 20 → 16 · vie 21 → 10 ·
+lun 24 → 8** (estas últimas son las que despachó el martes 25).
 
-📌 **La comparación correcta es martes 25 vs. martes 18, no martes 25 vs. lunes 24.** Nunca comparar
-contra un día de descarga.
+- Promedio hábil **10,8 guías/día**, desviación **3,3**
+- Las 8 de hoy están a **−0,84 desviaciones**. El miércoles 19 dio exactamente lo mismo.
+- ✅ **Es un día hábil normal.** 🎯 **Solo sería alarma si baja de 4 guías.**
+
+📌 **La comparación correcta es día hábil vs. día hábil.** Nunca contra un día de descarga: contra
+las 31 del lunes, un día normal se ve como **−75%** sin que pase nada.
+
+### 🆕 HALLAZGO: EL FIN DE SEMANA RINDE +44% MÁS QUE EL DÍA HÁBIL
+
+**Finde 15,5 guías/día vs. hábil 10,8.** El presupuesto es plano toda la semana pero la demanda no.
+
+**Subir el finde y bajar el hábil NO es "subir presupuesto"** (eso ya se descartó por elasticidad
+0,63): es **mover el mismo dinero a donde rinde más**, y eso es gratis. ⚠️ **Pero con 2 findes
+medidos no alcanza para mover plata** → confirmar con el desglose diario del lunes 31.
+
+### ✅ EL CONFUSOR DEL GUION NO APARECIÓ
+
+El guion nuevo **subió la promo de 2** de $110.000 a $128.000-$146.000 (envío aparte) y la pasó a
+carta de último recurso. Riesgo levantado el 24: que se cayera el share de 2 unidades.
+
+De los **8 pedidos del martes 25, 3 fueron dobles** → 11 unidades, **1,38 uds/pedido**, share de 2
+uds **37,5%** contra **26,8%** de base (0-V).
+
+⚠️ **Con n=8 el intervalo de confianza es 14%-69%**, y el 26,8% cae dentro → **no se puede concluir
+que mejoró.** Pero sí: ✅ **no hay ninguna señal de que el guion haya dañado la promo de 2.**
+Para decidir de verdad hacen falta **~75 pedidos** (±10 puntos) → lectura del lunes 31.
 
 ### ⚠️ LO QUE ESTO INVALIDA
 
-El corte pre/post pago que este mismo script calculó (**−40%**) **no es confiable**: el índice
-post-pago de 1,15 se sostiene sobre la descarga de 32 guías del 18-ago, que es demanda del fin de
-semana anterior, no del 18. **Con datos de despacho no se puede medir el ciclo de quincena.**
+El corte pre/post pago que el script calculó (**−40%**) **no es confiable**: el lado post-pago se
+sostiene sobre el lote del 18-ago, que es demanda del finde anterior. **Con datos de despacho no se
+puede medir el ciclo de quincena** → hace falta el desglose **diario** de Meta del lunes 31.
 
-**→ Para medir demanda por día hace falta el desglose diario de Meta** (conversaciones iniciadas),
-que es justo el export pendiente del lunes 31. Es otra razón para pedirlo **por día** y no agregado.
+### 🔴 Y UN DESCUADRE EN EL CPA DE $7.167 — QUEDA PROVISIONAL
 
-### 🕵️ UN CONFUSOR QUE LLEGÓ EL MISMO DÍA
+Salió de $293.831 / 41 guías, pero **los dos lados no cubren el mismo período**:
 
-El guion nuevo se pegó entre el 24 y el 25, y **subió el precio de la promo de 2**: antes era
-$110.000 y ahora el envío se cobra aparte ($128.000-$146.000 según zona), además de pasar la promo a
-**carta de último recurso** en vez de primera oferta. Si aparece una caída sostenida en el share de
-2 unidades, **la causa más probable es el guion, no la quincena.** Medir: share de 2 uds venía en
-**26,8%** (0-V).
+- el export de Meta 21-24 ago trae **$346.176** gastados, no $293.831
+  ($346.176 ÷ $105.000 de presupuesto diario = **3,3 días**);
+- las 41 guías eran 10 del viernes 21 + 31 del lote sáb+dom → **la demanda del viernes está contada
+  pero su gasto no necesariamente, y la del lunes 24 (las 8 del martes) no está contada.**
+
+📌 **No se recalcula a ciegas.** Se arregla el lunes 31 casando cada día de gasto con su día de
+venta, y metiendo el lote de finde en los días que le corresponden. **El CPA de $7.167 pasa de
+"confirmado" a PROVISIONAL.**
 
 ---
 
@@ -3280,7 +3323,12 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     de una banda**, contra los números sucios de antes ($72.698, $80.941, $81.030). Ver sección 0-V.
     ✅ **Y el descuento de cierre se usa como último recurso, no por default: 6,7% de las ventas**
     (2 de 30), muy por debajo de la alarma del 15%.
-59. [ ] 🔴🔥 **RE-PEGAR EL GUION CON LAS 2 CORRECCIONES DEL 24-AGO (sección 0-V).**
+59. [x] ✅ **RE-PEGADO el 24-25 ago — confirmado por el dueño ("el guion ya está pegado").**
+    ✅ **Primera lectura, martes 25:** 8 pedidos, **3 dobles (37,5% de share de 2 uds)** contra 26,8%
+    de base. Con n=8 el intervalo es 14%-69%, así que **no** se puede afirmar que mejoró — pero
+    **no hay ninguna señal de que la promo más cara haya dañado el share**, que era el riesgo. Ver 0-Y.
+    ↓ *(texto original de la tarea, se conserva)*
+    🔴🔥 **RE-PEGAR EL GUION CON LAS 2 CORRECCIONES DEL 24-AGO (sección 0-V).**
     **(a) 14 CIUDADES NUEVAS A SUS BANDAS.** 6 estaban mal: Buenaventura, Puerto Berrío y Copacabana
     sobrecobraban $4.000 (el error que espanta la venta); Uribe cobraba $4.000 de menos.
     **(b) LA PROMO DEJA DE SER PLANA:** A $128.000 · B $136.000 · C $138.000 · D $139.000 · E $143.000,
@@ -3300,6 +3348,22 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     así que si sus primeros días son de valle no se puede saber si la región es mala o el timing.
     📌 **Presupuesto sugerido: $25.000-30.000/día**, sacados de subir el total (NO de quitarle a
     Domiciliarios, que absorbe el 100%). **Y Motorizados sigue congelado.**
+64. [ ] 🆕📅 **EVALUAR SUBIR EL PRESUPUESTO DEL FIN DE SEMANA Y BAJARLO EN SEMANA (sección 0-Y).**
+    Medido: **finde 15,5 pedidos/día vs. hábil 10,8 → el finde rinde +44% más.** El presupuesto es
+    plano toda la semana y la demanda no lo es.
+    🔑 **Esto NO contradice el "no subir presupuesto"** (que se sostiene en la elasticidad de 0,63):
+    aquí no se agrega plata, se **mueve** la misma a los días que rinden más. Por eso es gratis.
+    ⚠️ **NO ejecutar todavía:** son solo 2 findes medidos, y uno de ellos (15-17) estaba deformado
+    por el festivo. Además las ventas del viernes de noche caen en el lote del lunes, lo que puede
+    inflar el lado del finde.
+    🗓️ **Decidir el lunes 31 con el desglose diario de Meta**, que es justo lo que permite separar
+    gasto por día de la semana.
+65. [ ] 🔴🧮 **RECALCULAR EL CPA CASANDO GASTO Y VENTA DEL MISMO DÍA (sección 0-Y).**
+    El **$7.167 pasa a PROVISIONAL.** Dos descuadres: el export de Meta 21-24 trae **$346.176** y no
+    los $293.831 que se usaron; y las 41 guías eran 10 del viernes 21 + 31 del lote sáb+dom, o sea
+    que **el viernes aporta ventas pero quizá no su gasto, y el lunes 24 no aparece.**
+    📌 **No recalcular a ciegas.** Con el desglose diario del lunes 31: asignar el lote de finde a
+    los días de venta que cubre, y dividir por el gasto de esos mismos días.
     🔑 **Lo que hay que medir es la ELASTICIDAD de ese conjunto**, no solo su CPA: es el dato que
     define si la meta de 50 uds/día es alcanzable (sección 0-W y `TECHO-REALISTA.md`).
 62. [ ] 🔔 **GATILLO DE BANDA E — NO ES UN PENDIENTE DE PRECIO, ES DE VIGILANCIA.**
