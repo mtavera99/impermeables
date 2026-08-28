@@ -4,18 +4,20 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-08-24** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
-sandbox corre en UTC y ya marca el día siguiente)*
+Última actualización: **2026-08-28** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
+sandbox corre en UTC y puede marcar el día siguiente)*
 
 ---
 
 # 🧭 ÍNDICE — POR DÓNDE EMPEZAR
 
-**Si tenés 2 minutos:** leé el bloque "ESTADO AL 24-AGO" de abajo y la lista de pendientes vivos.
-**Si tenés 15:** agregá las secciones 0-V, 0-W, 0-X y 0-M, que son las que tienen las reglas activas.
+**Si tenés 2 minutos:** leé el bloque "ESTADO VIGENTE AL 2026-08-28" y la lista de pendientes vivos.
+**Si tenés 15:** leé además las secciones 0-Z, 0-Y, 0-X, 0-W y 0-V, que contienen las decisiones más recientes.
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-Z** | 🆕 **catálogo de 3 productos** · precios · márgenes · guiones · anuncios · logo | 28-ago |
+| **0-Y** | 🗓️ **guías/día ≠ ventas/día** · el finde rinde +44% · CPA provisional | 25-ago |
 | **0-X** | 🌎 Ya es NACIONAL (78 ciudades): los lagos son Valle y Atlántico | 24-ago |
 | **0-W** | 📈 Lectura del escalón · **elasticidad 0,63** · la curva ya está plana | 24-ago |
 | **0-V** | 🎉 El guion funcionó (93%) · **share de 2 uds 6,8% → 26,8%** | 24-ago |
@@ -44,22 +46,39 @@ sandbox corre en UTC y ya marca el día siguiente)*
 
 ---
 
-# 📊 ESTADO AL 2026-08-24
+# 📊 ESTADO VIGENTE AL 2026-08-28
 
-## Los números de hoy (ventana 21-23 ago, confirmados por el dueño)
+> **Corte de producto y contenido:** 28-ago. **Último corte de métricas operativas:** 25-ago; no se
+> maquillaron como nuevas. El CPA de $7.167 sigue provisional hasta casar gasto y ventas del mismo día.
+
+## Cambio de negocio del 28-ago (resumen ejecutivo)
+
+- **Tradicional activo:** $59.900 + envío según ciudad; promoción **2 por $110.000 + envío**. No subir
+  a $64.900 por ahora. Empaque $0 en el cálculo vigente.
+- **Colmena premium en validación:** costo $85.000; precio final **$149.900 con envío gratis** y pago al
+  recibir. Es un SKU separado, no reemplaza al tradicional.
+- **Chaqueta reflectiva doble faz:** producto candidato; precio pausado hasta tener costo, peso y flete.
+- **Publicidad nueva:** voz real como principal; mostrar precio en ~80% de creativos y reservar ~20%
+  sin precio para prueba controlada. Ver sección **0-Z**.
+
+## Últimos números medidos (corte 2026-08-25)
 
 | | |
 |---|---|
-| Ventas/día (pedidos) | **13,7** |
-| **Unidades/día** | **17,3** |
-| Gasto publicitario/día | $97.944 |
-| **CPA por pedido** | **$7.167** *(techo fijado: $12.000)* |
+| Ventas/día — **fin de semana** | **15,5** *(sáb 22 + dom 23)* |
+| Ventas/día — **día hábil** | **10,8** *(mar 18 · mié 19 · jue 20 · vie 21 · lun 24)* |
+| **Unidades por pedido** | **1,38** *(share de 2 uds: 37,5% con n=8)* |
+| Gasto publicitario/día | ~$105.000 *(= presupuesto diario de los 3 conjuntos)* |
+| **CPA por pedido** | ⚠️ **$7.167 PROVISIONAL** — ver el descuadre en **0-Y** |
 | Margen por pedido | **$28.715** |
-| **Utilidad/día** | **$294.492** ≈ $8,8 M/mes |
-| Conversaciones/día | 154 |
 | Presupuesto Meta | Domiciliarios $70.000 · Motorizados $15.000 · TEST $20.000 |
 
-**Crecimiento:** de **1,6 ventas/día en julio a 13,7 hoy** = 8,6× en 7 semanas.
+**Crecimiento:** de **1,6 ventas/día en julio** a **10,8-15,5 en el corte del 25-ago** = **7-10×** en 7 semanas.
+
+🔴 **REGLA DE LECTURA (0-Y): las guías/día NO son ventas/día.** El fin de semana y los festivos se
+acumulan y se despachan en un lote (lunes o martes). **Nunca comparar un día hábil contra un día de
+descarga**, ni promediar guías por día de calendario. Comparar **hábil vs. hábil** y **finde vs.
+finde, dividiendo por los días de venta que cubre el lote.**
 
 ## ✅ LO QUE SE RESOLVIÓ (no volver a discutir)
 
@@ -136,19 +155,24 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 
 ## 🚦 LO SIGUIENTE, EN ORDEN
 
-1. **Re-pegar el guion con las 2 correcciones del 24-ago** (14 ciudades + promo por zona) → **#59**
+1. ✅ **Guion re-pegado** el 24-25 ago (14 ciudades + promo por zona) — **#59 cerrado**
 2. **NO subir presupuesto** (retorno marginal $0,35 por peso)
 3. **Lunes 31: los dos exports** — Meta 22-30 **con desglose por día** (~27 filas) + 99 Envíos 21-30
-4. **Prender el conjunto de Valle el 30 o 31**, cuando pase el valle → **#63**
-5. **Leer el valle 26-29 con la regla corregida:** el umbral de $12.000 **no aplica** en esos días;
-   ahí manda la **utilidad/día** (el equilibrio real del CPA es $28.715)
+4. **Evaluar el conjunto regional de Valle solo después del export y sin atribuir el timing a un
+   “valle 26-29”**: esa estacionalidad no está demostrada. Si se prueba, aislar la variable → **#63**
+5. ⚠️ **NO leer los días sueltos por guías/día.** Las guías son despachos: finde y festivos se
+   acumulan en un lote (31 guías = **2,9x** un día hábil de 10,8). Un día hábil normal tras la
+   descarga se ve como **−75%** sin que exista una caída real → **0-Y**. El umbral de $12.000 no
+   reemplaza la lectura de utilidad/día (equilibrio provisional del CPA: $28.715).
+6. 🆕 **Evaluar mover presupuesto del hábil al finde** (el finde rinde **+44%** más por día). No es
+   subir presupuesto, es reasignarlo → **necesita el desglose diario del lunes 31** para decidir → **#64**
 
 ---
 
 ## 0. 📜 ESTADO HISTÓRICO (agosto temprano) — conservado como referencia
 
 > ⚠️ **Esto es historia, no el estado actual.** El estado vigente está en el bloque
-> "ESTADO AL 2026-08-24" de arriba. Se conserva porque tiene el detalle de cómo se llegó acá.
+> "ESTADO VIGENTE AL 2026-08-28" de arriba. Sus métricas operativas siguen identificadas con corte 25-ago.
 
 
 **Resumen en una línea:** 🔥🔥 **MEJOR MOMENTO DE LA HISTORIA: 80 VENTAS ACUMULADAS. En los 4 primeros
@@ -1202,6 +1226,286 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-Z. 🆕 TRES PRODUCTOS, PRECIOS, MÁRGENES Y CONTENIDO PUBLICITARIO (2026-08-28)
+
+**Origen:** decisiones del dueño durante la preparación de contenido del 28-ago. Esta sección es la
+fuente vigente para los productos nuevos. **No activa automáticamente los SKU en la IA de WhatsApp**
+ni reemplaza el tarifario del tradicional: eso requiere ejecutar el pendiente **#69**.
+
+### ✅ DECISIONES CERRADAS EN UNA PÁGINA
+
+| Producto | Estado | Costo proveedor | Precio al cliente | Envío |
+|---|---|---:|---:|---|
+| **Tradicional, 4 piezas** | Activo | $34.000 | **$59.900** | Se cobra según ciudad |
+| **Tradicional, promo 2** | Activa | $68.000 | **2 por $110.000** | Se cobra según ciudad; nunca gratis |
+| **Tipo colmena premium** | Nuevo / validación | $85.000 | **$149.900** | **Gratis**, incluido en el precio |
+| **Chaqueta reflectiva doble faz** | En pausa | Pendiente | Pendiente | Pendiente de peso y modalidad |
+
+**Decisiones que no se vuelven a abrir sin datos nuevos:**
+- El tradicional **se queda en $59.900 + envío**. Se evaluó $64.900: podría aportar cerca de $1,13 M
+  mensuales solo si el volumen casi no cae, pero el beneficio no compensa todavía el riesgo de
+  conversión. El dueño decidió conservar $59.900.
+- El colmena es un **SKU premium separado**; no reemplaza al tradicional. Se descartaron $169.900 por
+  barrera de precio, $159.900 aunque era viable, y $149.900 + envío. La decisión final exacta es
+  **$149.900 con envío gratis**.
+- La chaqueta se vende conceptualmente como **impermeable de alta calidad, reflectiva y doble faz**,
+  no como un rompevientos económico. Su precio queda pausado hasta conocer costo de proveedor.
+
+### 💰 AUDITORÍA VIGENTE DEL TRADICIONAL
+
+- Precio del producto: **$59.900**; costo: **$34.000**; margen bruto antes de variables: **$25.900**.
+- **Empaque: $0** en el cálculo vigente, por instrucción del dueño. Los análisis históricos que restan
+  $1.500 por empaque no representan la economía actual.
+- CPA de referencia: **$7.167 PROVISIONAL**, no confirmado. Sigue abierto el pendiente #65 para casar
+  gasto publicitario y venta del mismo día.
+- En 99 Envíos, una devolución **no cobra ida y vuelta**: solo la prima puntual. Tres primas observadas:
+  **$1.742 + $3.111 + $1.742 = $6.595; promedio $2.198 por devolución.** No volver a restar los
+  $630.000-$765.000 de fletes Heka/retornos usados en cálculos descartados.
+- Proyección sobre la cohorte reciente, usando la incidencia observada de primas y CPA provisional:
+  **~28,93% antes de comisión de recaudo**; si la comisión fuese 3%, **~25,93%**. No llamar esto
+  “margen exacto” hasta conocer la comisión real de 99 Envíos y cerrar #65.
+
+**Promo creativa vigente del tradicional:**
+- `1 CONJUNTO $59.900`
+- `2 CONJUNTOS $110.000`
+- `AHORRAS $9.800`
+- Pie obligatorio: **“Envío según ciudad”**. Nunca anunciar envío gratis para esta promoción.
+
+### 💎 COLMENA PREMIUM: ECONOMÍA Y REGLA DE VALIDACIÓN
+
+El proveedor lo deja en **$85.000**. Precio elegido: **$149.900 con envío gratis**. El cálculo de abajo
+incluye publicidad, la incidencia estimada de devoluciones y una **comisión hipotética de recaudo del
+3%**; por eso es escenario, no cierre contable. El flete se aproxima con las bandas actuales hasta
+pesar/cotizar el paquete real (**#66**).
+
+| Banda estimada de destino | Utilidad por pedido | Margen sobre $149.900 |
+|---|---:|---:|
+| A | **$38.588** | **25,74%** |
+| B | $34.733 | 23,17% |
+| C | $30.621 | 20,43% |
+| D | $28.514 | 19,02% |
+| E | $26.063 | 17,39% |
+| **Promedio según mezcla actual** | **~$31.000** | **~20,7%** |
+
+Sin comisión de recaudo, el promedio sería aproximadamente **$35.500 / 23,7%**. La comisión real, el
+peso y el flete pueden mover el resultado. **Gate de lanzamiento:** leer las primeras **15-20 entregas**
+por CPA, flete real, comisión y devoluciones antes de escalar (**#67**).
+
+### 🧥 CHAQUETA REFLECTIVA DOBLE FAZ: MERCADO Y PRECIO EN PAUSA
+
+Referencias comerciales observadas el 28-ago (sirven para ubicar mercado, **no prueban ventas**):
+- La Casa del Motero: desde **$109.900**.
+- Very Nice, anuncio de Meta ID **1941698309986978**: **$139.000 con envío gratis**; seis anuncios
+  reutilizaban creativo/texto desde el 6-jun. La persistencia es señal de validación, no evidencia de
+  rentabilidad.
+- Mac Helmets: **$179.900-$184.000**.
+- Los cortavientos de ~$69.900 **no son comparables** con una chaqueta impermeable doble faz premium.
+
+Costo máximo de proveedor para aspirar a un margen cercano al 30%, con los supuestos publicitarios y
+logísticos usados en la evaluación:
+
+| Precio de venta | Costo máximo si el envío es gratis |
+|---:|---:|
+| $139.900 | $64.374 |
+| $149.900 | $71.074 |
+| $159.900 | $77.774 |
+| $169.900 | $84.474 |
+| $179.900 | $91.174 |
+
+Si el envío se cobra aparte: a **$139.900**, costo máximo aproximado **$84.874**; a **$149.900**,
+**$91.574**. **No fijar precio ni grabar el guion final** hasta obtener costo, peso, ficha de calidad y
+modalidad de envío del proveedor (**#68**).
+
+### 🎙️ GUION FINAL — COLMENA PREMIUM, VOZ EN OFF DE 35 SEGUNDOS
+
+> **“¿Quieres protección de verdad sin verte con el típico impermeable de siempre? Conoce el nuevo
+> impermeable BikerPro tipo colmena: un conjunto premium con apariencia de sudadera, pensado para
+> moverte cómodo y protegido en la moto. Mira sus costuras, cremalleras reforzadas, capota y cada uno
+> de sus acabados. Es resistente, cómodo y tiene ese estilo que puedes usar incluso cuando deja de
+> llover. Llévalo por $149.900 con envío gratis a toda Colombia y paga cuando lo recibas. Escríbenos
+> ahora por WhatsApp y pide tu talla antes de que se agoten.”**
+
+**Edición:** abrir con el modelo ya vestido y lluvia/agua; acompañar “costuras, cremalleras, capota”
+con sus macros; mostrar placa **`$149.900 · ENVÍO GRATIS · PAGAS AL RECIBIR`** en el cierre.
+
+### 🎙️ GUION FINAL — TRADICIONAL, VOZ EN OFF DE 35 SEGUNDOS
+
+> **“Que la lluvia no te obligue a parar ni a llegar empapado. Con el impermeable BikerPro tienes
+> protección completa para seguir rodando: chaqueta con capota, pantalón y cubrebotas, fabricados en
+> PVC siliconado calibre 8 con costuras termoselladas para evitar filtraciones. Además, sus franjas
+> reflectivas ayudan a que te vean mejor en la vía. Elige tu talla y el color de franja que más te
+> guste. Un conjunto cuesta $59.900, o aprovecha dos por $110.000. El envío se calcula según tu
+> ciudad. Escríbenos por WhatsApp y paga al recibir.”**
+
+**Edición:** mostrar agua resbalando y las cuatro piezas mientras se nombran; cerrar con la promoción,
+“envío según ciudad” y WhatsApp. No decir “envío gratis”.
+
+### 🖼️ PROMPT DE GEMINI — PLACA VERTICAL PARA LA PROMO 1 O 2
+
+Adjuntar **dos referencias**: (1) foto real del impermeable y (2) imagen real de colores/franjas. Usar:
+
+> **Crea una imagen publicitaria vertical 9:16 (1080 × 1920) para un video de la marca BikerPro,
+> usando obligatoriamente las dos imágenes adjuntas como referencia. Conserva exactamente el diseño,
+> material, proporciones y detalles del impermeable de la primera foto; no inventes bolsillos, logos,
+> piezas ni accesorios. Usa la segunda foto para representar fielmente los colores disponibles de las
+> franjas reflectivas; el cuerpo del impermeable siempre debe verse negro. Diseña una composición
+> premium, limpia, de alto contraste y fácil de leer en celular, con ambiente de lluvia y motociclista,
+> sin tapar el producto. Deja todo el texto importante dentro del 70% central para que no lo cubra la
+> interfaz de Reels. Texto principal exacto, sin cambiar cifras ni ortografía: “1 CONJUNTO $59.900” y
+> “2 CONJUNTOS $110.000”. Agrega un sello visible: “AHORRAS $9.800”. En la parte inferior escribe:
+> “Envío según ciudad · Paga al recibir”. Incluye el logo tipográfico BikerPro de forma discreta. No
+> escribas envío gratis. No agregues precios distintos, texto pequeño ilegible ni colores de producto
+> que no estén en las referencias. Entrega una sola pieza final lista para insertar en video.**
+
+Antes de publicar, revisar manualmente que Gemini no altere el producto y que haya escrito exactamente
+**$59.900, $110.000 y $9.800**.
+
+### 📣 REGLAS PARA LOS NUEVOS ANUNCIOS
+
+1. **Voz real del dueño como principal:** transmite autenticidad y confianza. Voz digital solo para
+   sacar variantes rápidas o pruebas A/B; no reemplazar por defecto la voz real.
+2. **Precio visible en aproximadamente 80% de anuncios:** filtra curiosos y prepara la conversación.
+   Reservar ~20% sin precio para medir si un hook de curiosidad aporta ventas, no solo chats.
+3. Placa exacta del tradicional: **`$59.900 + envío según ciudad`**. Placa exacta del colmena:
+   **`$149.900 · envío gratis · pagas al recibir`**.
+4. Un anuncio activo o longevo en Meta Ads Library es **referente creativo, no prueba de éxito**. No
+   afirmar que vende solo por estar activo; validar con ventas propias, CPA y margen.
+5. Cada variante debe tener texto inicial de WhatsApp identificable para atribuir **pedidos y ventas**,
+   no coronar ganadores por CTR o costo por conversación (**#70**).
+6. En esta cuenta, un creativo que se quiera mantener vivo necesita **su propio conjunto**; no meterlo
+   con el ganador esperando que Meta reparta presupuesto.
+
+### 🎨 ACTIVO DE MARCA CONFIRMADO
+
+Logo tipográfico exacto usado por el generador de creativos:
+- Archivo: `assets/marca/bikerpro-logo-letras.png`
+- Commit: `146f6aa2125ef040923b6f722a297c91c8991468`
+- Rama de origen: `asset/logo-tipografico`
+- Descarga directa: `https://raw.githubusercontent.com/mtavera99/impermeables/asset/logo-tipografico/assets/marca/bikerpro-logo-letras.png`
+
+### ⏸️ BLOQUEOS Y SIGUIENTES PASOS
+
+- **#66:** pesar y cotizar flete real del colmena.
+- **#67:** validar las primeras 15-20 entregas del colmena.
+- **#68:** conseguir costo, peso y ficha de la chaqueta doble faz.
+- **#69:** definir tarifario y guion de WhatsApp de SKU nuevos antes de pautarlos.
+- **#70:** ejecutar prueba con/sin precio y atribución por texto inicial.
+
+`GUION-PARA-PEGAR.md` **no se modifica todavía**: el tradicional sigue activo con su flujo actual y
+los SKU nuevos no deben aparecer en la IA hasta tener reglas de cotización completas.
+
+---
+
+## 0-Y. 🗓️ EL "VALLE 26-29" ME LO INVENTÉ — Y LAS GUÍAS/DÍA NO MIDEN VENTAS/DÍA (2026-08-25)
+
+**Origen:** el martes 25 el dueño pregunta *"¿cuándo arranca en sí el valle? hoy es martes 25 y las
+ventas bajaron"*. Script: `/analisis/cuando-arranca-el-valle.py`.
+
+### 🔴 PRIMERO, UNA CORRECCIÓN MÍA
+
+Le dije al dueño **"el valle es 26-29 ago"** como si fuera un hecho medido. **No lo era.** Ese rango
+está **escrito a mano** en `ciclo-quincena.py` como una *definición*:
+
+```python
+elif d.day in (11, 12, 13, 14, 26, 27, 28, 29):
+    marca = '  (valle: antes del pago)'
+```
+
+Y la sección 0-I ya había concluido lo contrario: *"no hay ni un dato que respalde la quincena"*, con
+el corte crudo apuntando **en contra** (pre-pago 9,3 guías/día vs. post-pago 7,8). **Se convirtió una
+etiqueta de un script en un pronóstico. No repetir ese rango como si estuviera medido.**
+
+### 🔴 SEGUNDO, LA TRAMPA DE FONDO: `fecha_envio` ES EL DESPACHO, NO LA VENTA
+
+Juntando los 4 exports de 99 Envíos (185 filas → **132 guías únicas**, 53 eran repetidas), **sábado y
+domingo dan 0 guías SIEMPRE, en las 4 ventanas.** Con pauta prendida es imposible vender 0 dos días
+seguidos todas las semanas. La 0-U ya lo había visto de refilón (*"el fin de semana se acumuló otra
+vez, todo salió a las 01:26 del lunes"*), pero no se sacó la consecuencia:
+
+### ✅ EL DUEÑO CORRIGIÓ EL DETALLE, Y LAS HORAS DE CREACIÓN LE DAN LA RAZÓN
+
+Mi primera lectura decía *"lote de 32 el 18-ago"* y *"el lunes 24 = sáb+dom+lun"*. **Las dos estaban
+mal.** El dueño aclaró: el **lunes 17 fue FESTIVO** (Asunción, corrido al lunes por Ley Emiliani) y
+por eso no se pudo despachar; y las 31 del lunes 24 son **solo sábado + domingo**, porque las del
+lunes las guardó para el martes 25. Las horas locales de creación lo confirman:
+
+| Día | Guías y hora | Qué es |
+|---|---|---|
+| lun 17 (festivo) | 9, **todas a las 23h** | arranca el lote |
+| mar 18 | 20 a las **0h-1h** | **el mismo lote**, cruzando la medianoche |
+| mar 18 | 12 a las **14h-15h** | la demanda propia del martes |
+| lun 24 | 31, **todas a la 1h** | un solo lote |
+
+🎯 **Entonces el lote del finde festivo fueron 29 guías (9+20), no 32.** Las 12 de la tarde del
+martes 18 son demanda del martes. **Mi conteo mezclaba las dos cosas.**
+
+### ✅ Y SÍ, "FUNCIONÓ" — MEJOR DE LO QUE EL DUEÑO DIJO
+
+| Fin de semana | Guías | Días de venta | Por día |
+|---|---|---|---|
+| 15-17 ago (sáb+dom+**lun festivo**) | 29 | 3 | **9,7** |
+| 22-23 ago (sáb+dom) | 31 | 2 | **15,5** |
+
+**→ +60% por día de venta.** El dueño dijo *"las mismas guías en 2 días en vez de 3"* (sería +50%);
+separando el lote por horas la mejora es **+60%**.
+
+⚠️ **Salvedad honesta:** las ventas del viernes después de las 17h caen en el lote del lunes (el
+viernes 21 despachó a las 17h). Eso puede inflar algo el lado del finde. **La dirección es sólida,
+el tamaño no.**
+
+### ✅ POR QUÉ LAS 8 GUÍAS DEL MARTES 25 NO SON EL VALLE
+
+Días hábiles ya limpios de lote de finde: **mar 18 → 12 · mié 19 → 8 · jue 20 → 16 · vie 21 → 10 ·
+lun 24 → 8** (estas últimas son las que despachó el martes 25).
+
+- Promedio hábil **10,8 guías/día**, desviación **3,3**
+- Las 8 de hoy están a **−0,84 desviaciones**. El miércoles 19 dio exactamente lo mismo.
+- ✅ **Es un día hábil normal.** 🎯 **Solo sería alarma si baja de 4 guías.**
+
+📌 **La comparación correcta es día hábil vs. día hábil.** Nunca contra un día de descarga: contra
+las 31 del lunes, un día normal se ve como **−75%** sin que pase nada.
+
+### 🆕 HALLAZGO: EL FIN DE SEMANA RINDE +44% MÁS QUE EL DÍA HÁBIL
+
+**Finde 15,5 guías/día vs. hábil 10,8.** El presupuesto es plano toda la semana pero la demanda no.
+
+**Subir el finde y bajar el hábil NO es "subir presupuesto"** (eso ya se descartó por elasticidad
+0,63): es **mover el mismo dinero a donde rinde más**, y eso es gratis. ⚠️ **Pero con 2 findes
+medidos no alcanza para mover plata** → confirmar con el desglose diario del lunes 31.
+
+### ✅ EL CONFUSOR DEL GUION NO APARECIÓ
+
+El guion nuevo **subió la promo de 2** de $110.000 a $128.000-$146.000 (envío aparte) y la pasó a
+carta de último recurso. Riesgo levantado el 24: que se cayera el share de 2 unidades.
+
+De los **8 pedidos del martes 25, 3 fueron dobles** → 11 unidades, **1,38 uds/pedido**, share de 2
+uds **37,5%** contra **26,8%** de base (0-V).
+
+⚠️ **Con n=8 el intervalo de confianza es 14%-69%**, y el 26,8% cae dentro → **no se puede concluir
+que mejoró.** Pero sí: ✅ **no hay ninguna señal de que el guion haya dañado la promo de 2.**
+Para decidir de verdad hacen falta **~75 pedidos** (±10 puntos) → lectura del lunes 31.
+
+### ⚠️ LO QUE ESTO INVALIDA
+
+El corte pre/post pago que el script calculó (**−40%**) **no es confiable**: el lado post-pago se
+sostiene sobre el lote del 18-ago, que es demanda del finde anterior. **Con datos de despacho no se
+puede medir el ciclo de quincena** → hace falta el desglose **diario** de Meta del lunes 31.
+
+### 🔴 Y UN DESCUADRE EN EL CPA DE $7.167 — QUEDA PROVISIONAL
+
+Salió de $293.831 / 41 guías, pero **los dos lados no cubren el mismo período**:
+
+- el export de Meta 21-24 ago trae **$346.176** gastados, no $293.831
+  ($346.176 ÷ $105.000 de presupuesto diario = **3,3 días**);
+- las 41 guías eran 10 del viernes 21 + 31 del lote sáb+dom → **la demanda del viernes está contada
+  pero su gasto no necesariamente, y la del lunes 24 (las 8 del martes) no está contada.**
+
+📌 **No se recalcula a ciegas.** Se arregla el lunes 31 casando cada día de gasto con su día de
+venta, y metiendo el lote de finde en los días que le corresponden. **El CPA de $7.167 pasa de
+"confirmado" a PROVISIONAL.**
+
+---
+
 ## 0-X. 🌎 EL NEGOCIO YA ES NACIONAL — "ABRIR CIUDADES" ERA UN DIAGNÓSTICO VIEJO (2026-08-24)
 
 Script: `/analisis/donde-estan-los-lagos.py`. **Corrige el pendiente #30, abierto desde julio.**
@@ -1551,7 +1855,10 @@ el lunes, pero si empiezan a haber varios puedo despachar, eso no es problema"*.
 🔑 **Lección: "cero registros" no prueba "no puede". Prueba "no pasó".** Es la segunda vez en el día
 que un dato ausente se leyó como una restricción que no existía (la otra fue el cruce de guías Heka).
 
-### ✅ Y ESO CAMBIA EL TIMING ÓPTIMO DEL ESCALÓN — A FAVOR DE SUBIRLO ANTES
+### ✅ Y ESO CAMBIA EL TIMING ÓPTIMO DEL ESCALÓN — LECTURA HISTÓRICA INVALIDADA
+
+> ⚠️ **Corrección del 25-ago (0-Y):** este bloque asumía un “valle 26-29” no medido. Se conserva para
+> auditar cómo se tomó la decisión, pero **no debe usarse para programar presupuesto ni campañas**.
 
 | Si se sube… | Fase de aprendizaje | Valle 26-29 | ¿Se puede leer el valle? |
 |---|---|---|---|
@@ -2662,7 +2969,11 @@ Es **la primera evidencia directa**, es débil por tamaño, y **apunta ligeramen
 
 ---
 
-## 2. El producto (DATOS CORRECTOS Y ACTUALIZADOS)
+## 2. El producto — CATÁLOGO VIGENTE (actualizado 2026-08-28)
+
+> La economía, los guiones y las decisiones completas de lanzamiento están en **0-Z**.
+
+### 2-A. Tradicional de 4 piezas — ACTIVO
 
 - **Producto:** conjunto impermeable de moto de **4 PIEZAS**: chaqueta, pantalón, zapatones
   (cubrebotas) y bolsa.
@@ -2672,15 +2983,27 @@ Es **la primera evidencia directa**, es débil por tamaño, y **apunta ligeramen
   - ⚠️ El **amarillo está AGOTADO** (si lo piden, avisar y ofrecer otro).
 - **Capota:** sí. **Bolsillos:** NO (a propósito, para no filtrar agua). **Reflectivo:** sí (las
   franjas de color). **Pantalón:** bota recta. **Tallas:** S, M, L, XL, 2XL.
-- **Precio:** **$59.900 SIN envío** (el cliente paga el envío según ciudad).
+- **Precio:** **$59.900 + envío según ciudad**. Promo: **2 por $110.000 + un solo envío cotizado**.
 - **Pago:** contraentrega O pago anticipado (ambos; ver sección 8).
-- Costo ~$34.000 · empaque ~$1.500 · margen bruto ~$24.400 · meta CPA $8.000–$10.000 · equilibrio CPA $24.400.
+- **Economía vigente:** costo $34.000 · empaque $0 · margen bruto $25.900 · CPA $7.167 todavía
+  provisional · margen proyectado de cohorte ~28,93% antes de recaudo. Ver caveats en 0-Z.
 
 > ✅ **INCONSISTENCIA DE COLORES: CORREGIDA (2026-07-24).** La web (`index.html`) ya dice
 > "franja reflectiva en 5 colores" (blanco, negro, rojo, verde, morado), sin fucsia ni amarillo.
-> (PR #18, fusionado.) Los anuncios de Meta viejos aún pueden mencionar colores mal → al relanzar,
-> usar copy corregido ("El producto lo pagas al recibir; envío según ciudad"), NO prometer
-> "contraentrega en toda Colombia" (ata a un modelo antes de saber la ciudad — ver sección 7).
+> Los anuncios viejos aún pueden mencionar colores mal. Copy vigente: **“$59.900 + envío según
+> ciudad”**; no prometer envío gratis ni “contraentrega en toda Colombia” antes de conocer la ciudad.
+
+### 2-B. Tipo colmena — PREMIUM EN VALIDACIÓN
+
+- Apariencia tipo sudadera; mostrar costuras, cremalleras, capota y acabados en el contenido.
+- **Costo proveedor:** $85.000. **Precio final:** **$149.900 con envío gratis**.
+- SKU separado: **no reemplaza** al tradicional. Validar 15-20 entregas antes de escalar.
+- Falta pesar/cotizar flete real y configurar su tarifario/guion de WhatsApp (**#66, #67 y #69**).
+
+### 2-C. Chaqueta reflectiva doble faz — EN PAUSA
+
+- Posicionamiento: **impermeable de alta calidad, reflectiva y doble faz**; no simple rompevientos.
+- **Costo, precio, peso, envío y guion final: pendientes.** No publicarla hasta cerrar **#68 y #69**.
 
 ---
 
@@ -2691,8 +3014,9 @@ Es **la primera evidencia directa**, es débil por tamaño, y **apunta ligeramen
   - Objetivo: Mensajes/Conversaciones de WhatsApp. Presupuesto por conjunto (ABO), $18.000/día c/u.
   - Conjuntos: **Motociclistas** (Yamaha, Bajaj, AKT, Suzuki, Honda, cascos; ciudades grandes; 20–55)
     y **Domiciliarios** (Rappi, DiDi, iFood, mensajería). Puja: volumen más alto. Ubicaciones Advantage+.
-  - ⚠️ **ESTRUCTURA ACTUAL (desde 2026-08-04): 2 conjuntos, NO los de arriba.** Domiciliarios $30.000/día
-    con 3 creativos + Motorizados $15.000/día. TEST Creativos apagado. **Ver sección 0-B.**
+  - ⚠️ **ESTRUCTURA HISTÓRICA (desde 2026-08-04; ya no es la vigente):** Domiciliarios $30.000/día
+    con 3 creativos + Motorizados $15.000/día; TEST apagado. **Último corte verificado, 25-ago:**
+    Domiciliarios $70.000 · Motorizados $15.000 · TEST $20.000 = ~$105.000/día. Ver estado superior.
   - ⚠️ **Los intereses listados arriba son NOMINALES:** con Público de Advantage+ Meta los ignora
     cuando quiere, así que los nombres de los conjuntos ya no describen audiencias reales distintas.
     **Ver el hallazgo de Advantage+ en la sección 11.**
@@ -2999,7 +3323,7 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 
 ---
 
-## 9. Pendientes priorizados (checklist para retomar) — ACTUALIZADO 2026-07-28
+## 9. Pendientes priorizados (checklist para retomar) — ACTUALIZADO 2026-08-28
 
 ### ✅ Ya hecho
 1. [x] **PR #18 (colores) y PR #19 (flujo WhatsApp ciudad primero) FUSIONADOS.** Web actualizada.
@@ -3078,11 +3402,11 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     **(b) ¿CUÁNTAS HORAS PUDO DEDICARLE A VENDER del 11 al 14** contra la semana del pico? En esos días
     estuvo cerrando cabos con Heka ($2,79M + 7 novedades), migrando a 99 Envíos y haciendo seguimiento
     a los aplazados del temblor. **El cierre es manual y depende de sus horas.** Ver sección 0-I.
-36-bis. [ ] 📅 **EL 26-29 AGO (siguiente valle pre-pago): LA PRUEBA DEFINITIVA DEL CICLO DE PAGO.**
-    Si el cierre **vuelve a caer** en esos días, el ciclo de pago queda demostrado y pasa a ser
-    **variable permanente de planeación** (modular presupuesto y despacho por quincena). Si NO cae,
-    la quincena queda descartada y el problema es otro. **Es el único test limpio disponible**, porque
-    el rebote del 15-ago está contaminado por el rebote post-temblor. Ver sección 0-I.
+36-bis. [x] 🛑 **INVALIDADO POR 0-Y: NO EXISTE UNA “PRUEBA DEFINITIVA DEL VALLE 26-29”.** Ese rango
+    venía escrito a mano como etiqueta en un script, no de una medición. Además, `fecha_envio` es
+    despacho y mezcla lotes de varios días. **No planear presupuesto ni declarar ciclo de pago con
+    esa ventana.** Para estudiar estacionalidad se necesitan ventas atribuidas al día real y gasto
+    diario comparable.
 37. [ ] 📊 **PEDIR LOS EXPORTS DE META CON DESGLOSE** — el del 15-ago vino a nivel campaña, 1 sola fila:
     **(a) por DÍA** (para que el CPA sea medido y no estimado) · **(b) por CONJUNTO** (sin esto **NO se
     puede calcular EL TERMÓMETRO**, la herramienta principal de diagnóstico de este archivo) ·
@@ -3204,7 +3528,12 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     de una banda**, contra los números sucios de antes ($72.698, $80.941, $81.030). Ver sección 0-V.
     ✅ **Y el descuento de cierre se usa como último recurso, no por default: 6,7% de las ventas**
     (2 de 30), muy por debajo de la alarma del 15%.
-59. [ ] 🔴🔥 **RE-PEGAR EL GUION CON LAS 2 CORRECCIONES DEL 24-AGO (sección 0-V).**
+59. [x] ✅ **RE-PEGADO el 24-25 ago — confirmado por el dueño ("el guion ya está pegado").**
+    ✅ **Primera lectura, martes 25:** 8 pedidos, **3 dobles (37,5% de share de 2 uds)** contra 26,8%
+    de base. Con n=8 el intervalo es 14%-69%, así que **no** se puede afirmar que mejoró — pero
+    **no hay ninguna señal de que la promo más cara haya dañado el share**, que era el riesgo. Ver 0-Y.
+    ↓ *(texto original de la tarea, se conserva)*
+    🔴🔥 **RE-PEGAR EL GUION CON LAS 2 CORRECCIONES DEL 24-AGO (sección 0-V).**
     **(a) 14 CIUDADES NUEVAS A SUS BANDAS.** 6 estaban mal: Buenaventura, Puerto Berrío y Copacabana
     sobrecobraban $4.000 (el error que espanta la venta); Uribe cobraba $4.000 de menos.
     **(b) LA PROMO DEJA DE SER PLANA:** A $128.000 · B $136.000 · C $138.000 · D $139.000 · E $143.000,
@@ -3220,12 +3549,45 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     poblacional.**
     **Por qué Valle primero:** 8,7% de la población, más margen que Atlántico ($23.313 vs $22.400) y
     **ya hay presencia** en 3 ciudades, así que no arranca de cero.
-    🗓️ **Prenderlo el 30 o 31-ago**, apenas pase el valle: un conjunto nuevo **no tiene línea base**,
-    así que si sus primeros días son de valle no se puede saber si la región es mala o el timing.
-    📌 **Presupuesto sugerido: $25.000-30.000/día**, sacados de subir el total (NO de quitarle a
-    Domiciliarios, que absorbe el 100%). **Y Motorizados sigue congelado.**
+    🗓️ **No condicionarlo al supuesto “valle 26-29”: 0-Y demostró que no estaba medido.** Si se prueba,
+    hacerlo después de obtener el export diario y en una ventana sin otros cambios, para poder leer
+    la región con una línea base limpia.
+    📌 **Presupuesto sugerido histórico: $25.000-30.000/día.** Revalidarlo contra la regla de no subir
+    gasto total y contra los lanzamientos de SKU nuevos; no quitarle a Domiciliarios sin evidencia.
+    **Motorizados no se congela por el valle inventado.**
+64. [ ] 🆕📅 **EVALUAR SUBIR EL PRESUPUESTO DEL FIN DE SEMANA Y BAJARLO EN SEMANA (sección 0-Y).**
+    Medido: **finde 15,5 pedidos/día vs. hábil 10,8 → el finde rinde +44% más.** El presupuesto es
+    plano toda la semana y la demanda no lo es.
+    🔑 **Esto NO contradice el "no subir presupuesto"** (que se sostiene en la elasticidad de 0,63):
+    aquí no se agrega plata, se **mueve** la misma a los días que rinden más. Por eso es gratis.
+    ⚠️ **NO ejecutar todavía:** son solo 2 findes medidos, y uno de ellos (15-17) estaba deformado
+    por el festivo. Además las ventas del viernes de noche caen en el lote del lunes, lo que puede
+    inflar el lado del finde.
+    🗓️ **Decidir el lunes 31 con el desglose diario de Meta**, que es justo lo que permite separar
+    gasto por día de la semana.
+65. [ ] 🔴🧮 **RECALCULAR EL CPA CASANDO GASTO Y VENTA DEL MISMO DÍA (sección 0-Y).**
+    El **$7.167 pasa a PROVISIONAL.** Dos descuadres: el export de Meta 21-24 trae **$346.176** y no
+    los $293.831 que se usaron; y las 41 guías eran 10 del viernes 21 + 31 del lote sáb+dom, o sea
+    que **el viernes aporta ventas pero quizá no su gasto, y el lunes 24 no aparece.**
+    📌 **No recalcular a ciegas.** Con el desglose diario del lunes 31: asignar el lote de finde a
+    los días de venta que cubre, y dividir por el gasto de esos mismos días.
     🔑 **Lo que hay que medir es la ELASTICIDAD de ese conjunto**, no solo su CPA: es el dato que
     define si la meta de 50 uds/día es alcanzable (sección 0-W y `TECHO-REALISTA.md`).
+66. [ ] 📦 **PESAR Y COTIZAR EL FLETE REAL DEL COLMENA.** Conseguir peso y dimensiones empacadas;
+    cotizar al menos un destino de cada banda en 99 Envíos. El precio ya está fijado en **$149.900
+    con envío gratis**, pero el margen por banda de 0-Z sigue siendo estimado hasta hacer esta prueba.
+67. [ ] 💎 **VALIDAR LAS PRIMERAS 15-20 ENTREGAS DEL COLMENA ANTES DE ESCALAR.** Registrar por pedido:
+    destino, flete, CPA atribuible, comisión de recaudo, prima/devolución y utilidad neta. Gate: no
+    aumentar pauta si el promedio se aleja materialmente del escenario de **~$31.000 / 20,7%**.
+68. [ ] 🧥 **OBTENER DATOS DEL PROVEEDOR PARA LA CHAQUETA REFLECTIVA DOBLE FAZ.** Pedir costo, peso y
+    dimensiones empacadas, tallas, materiales, nivel de impermeabilidad, acabados y fotos reales.
+    Después decidir precio y si el envío será gratis. **El guion final queda pausado hasta entonces.**
+69. [ ] 💬 **DEFINIR TARIFARIO Y GUION DE WHATSAPP PARA LOS SKU NUEVOS ANTES DE PAUTARLOS.** Separar
+    claramente tradicional, colmena y chaqueta; impedir que la IA mezcle precios o prometa un envío
+    no cotizado. No modificar `GUION-PARA-PEGAR.md` hasta tener estas reglas cerradas.
+70. [ ] 📣 **PROBAR ANUNCIOS CON PRECIO VS. SIN PRECIO Y ATRIBUIR VENTAS.** Arrancar aproximadamente
+    80% de variantes con precio y 20% sin precio. Dar a cada anuncio un texto inicial de WhatsApp
+    distinto y comparar pedidos, CPA y margen; CTR o conversaciones baratas por sí solos no deciden.
 62. [ ] 🔔 **GATILLO DE BANDA E — NO ES UN PENDIENTE DE PRECIO, ES DE VIGILANCIA.**
     **El dueño decidió el 24-ago dejar banda E en $85.000** aunque el flete subió a $25.481 y se
     absorben **$381 por venta (~$2.262/día).** ✅ **Es sostenible: la cartera queda en +$5.956 sobre
@@ -3248,7 +3610,8 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     **Gatillo: si pasa de $13.100, subir la banda a $74.000.** No se sube ahora porque es el 27% del
     volumen y el cliente más sensible al precio. Ver sección 0-V.
 44. [x] ✅ **RESUELTO POR EL DUEÑO EL 21-AGO: LA PROMO ES 2 POR $110.000** (+ envío aparte). Ya está
-    cargada en `bot/src/fletes.js` y en el guion. **Lo que queda es aplicarla bien → pendiente #51.**
+    cargada en `bot/src/fletes.js` y en el guion; la aplicación por bandas quedó verificada/corregida
+    en **#51 y #59**.
 45. [x] ✅ **LOS DOS EXPORTS YA ESTÁN EN `/analisis`:** `conjuntos-18-21ago.csv` (Meta por conjunto) y
     `guias-99envios-21ago.csv` (65 guías). **Y el de Meta sirvió para desmentir el umbral de
     aprendizaje que esta misma sesión había dado por bueno** (sección 0-M).
@@ -3257,26 +3620,25 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     Columna imprescindible: **"Último cambio significativo"**.
 46. [x] ✅ **CHEQUEO DEL ESCALÓN 1 CERRADO EL 21-AGO (sección 0-O): 24 guías el 19-20, 12,0
     ventas/día, CPA $6.703. ESCALÓN 2 JUSTIFICADO.**
-49. [ ] 📈 **EJECUTAR EL ESCALÓN 2 — SOLO FALTA CONTAR EL INVENTARIO (#29).**
-    Propuesta: **$90.000 → $114.634/día (+58%)**, el mismo tamaño de escalón que ya se vio funcionar.
-    Eso lleva a ~19 ventas/día y ~$348.000/día de utilidad si el CPA se mantiene.
-    ✅ **Caja: alcanza con 3,3× de holgura** (sección 0-Q). ✅ **CPA: 4,04× de colchón.**
-    🔴 **Inventario: sin medir → 133 conjuntos/semana. ES EL ÚNICO BLOQUEO.**
-    ⚠️ **La regla del "+60% máximo" YA NO APLICA** (se cayó, sección 0-M): el tamaño se decide por
-    caja e inventario, no por el aprendizaje.
-    ⚠️ **Motorizados sigue congelado hasta el 29-ago** (es el termómetro del test del valle) → el
-    escalón va en **Domiciliarios**, y eventualmente en TEST.
-    📌 **Después del escalón, NO juzgar el CPA hasta 3-4 días** (puede haber reinicio de aprendizaje).
+49. [x] 🛑 **PLAN HISTÓRICO DEL ESCALÓN 2 — NO EJECUTAR AUTOMÁTICAMENTE.**
+    La propuesta original era **$90.000 → $114.634/día (+58%)** y proyectaba ~19 ventas/día.
+    Quedó superada por la medición posterior de elasticidad 0,63 (0-W), la regla vigente de no subir
+    presupuesto y la necesidad de recalcular el CPA casado (#65).
+    ⚠️ La vieja regla del “+60% máximo” también quedó descartada. Si algún día se reabre un escalón,
+    su tamaño se decide por **CPA casado, margen, elasticidad y audiencia**, no por un umbral de
+    aprendizaje ni solo por caja/inventario.
+    ⚠️ **El supuesto “valle 26-29” y el congelamiento de Motorizados por esa causa quedaron
+    INVALIDADOS por 0-Y.** Cualquier escalón futuro debe revalidarse con el CPA casado (#65), la
+    elasticidad y las nuevas prioridades de producto, no ejecutarse por este plan histórico.
+    📌 **Después de un escalón aprobado, NO juzgar el CPA hasta 3-4 días** (puede haber reinicio de aprendizaje).
 50. [ ] 🚚 **PREGUNTARLE A 99 ENVÍOS POR *COORDINADORA*: ¿QUÉ COBERTURA TIENE?** Es la más barata
     ($15.440 promedio vs ~$20.800 de las otras dos) pero solo se ha usado en **5 destinos**.
     🔑 **La cobertura es el dato que decide:** si cubre el país es el ahorro más grande disponible hoy.
     Solo en Bogotá, elegirla en vez de interrapidísimo son **$991 por envío**. Ver sección 0-P.
-51. [ ] 💰 **APLICAR BIEN LA PROMO 2×$110.000 — hoy no se está cobrando bien (sección 0-P).**
-    Los 6 pedidos de 2 unidades cobraron 6 precios distintos ($107.013 a $119.981) y en 2 se absorbió
-    flete ($4.870). **Reglas: (a)** ofrecer PRIMERO el envío compartido a precio lleno — le ahorra al
-    cliente ~$13.651 y no cuesta margen; **(b)** la promo es la carta para cuando DUDA, no la primera
-    oferta (hay clientes que pagan las 2 completas); **(c)** el envío de 2 unidades se cobra SIEMPRE
-    completo y **no se adivina** (varía +$3.008 a +$15.089 sobre el de 1).
+51. [x] ✅ **PROMO 2×$110.000 APLICADA Y CORREGIDA POR BANDAS — RESUELTO EN #59.** La regla vigente es:
+    producto 2 por $110.000 + un solo envío completo; totales A $128.000 · B $136.000 · C $138.000 ·
+    D $139.000 · E $143.000, con Cartagena medida en $146.000. No volver a la tarifa plana ni regalar
+    el envío. El hallazgo histórico fue que los primeros 6 pedidos cobraron valores improvisados.
 52. [ ] 💎 **REVISAR EL CREATIVO DE "PRUEBA SOCIAL" — TIENE EL MEJOR CTR DE LA CUENTA (2,39%).**
     Y esta vez con 7.734 impresiones, no con las 79 que engañaron al análisis en agosto.
     ⚠️ **Pero su clic→chat es 41,6%, igual que Domiciliarios** → atrae más clics, no mejor gente, y
@@ -3291,8 +3653,9 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     costo/conversación más barato ($478). 🔑 **Tiene el CPC más CARO ($249 vs $217) y aun así convierte
     mucho mejor → clics baratos ≠ conversaciones baratas.** Sigue topado al 84% por **tamaño de
     audiencia**, no por presupuesto (darle más plata no sirve).
-    ⚠️ **NO TOCAR HASTA DESPUÉS DEL 29-AGO:** cambiar audiencia reinicia aprendizaje **y** Motorizados
-    es el **termómetro** del test del valle del 26-29. Moverlo ahora destruye el test.
+    ⚠️ **La espera hasta el 29-ago por el supuesto valle quedó INVALIDADA por 0-Y.** No cambiarla a
+    ciegas: reevaluar con export por conjunto y aislar cualquier cambio de audiencia, pero no usar
+    “26-29” como termómetro ni justificación.
 38. [ ] 🔴🔴 **ARREGLAR EL GUION DE LA IA — 2 DEFECTOS CONCRETOS Y BARATOS** (sección 0-J):
     ✅ **HECHO EN EL REPO EL 21-AGO** (`bot/src/prompt.js` + `bot/src/fletes.js`, sección 0-N).
     ⚠️ **Falta el paso manual en la IA de WhatsApp Business → pendiente #43.**
@@ -3313,12 +3676,11 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     el 16% de los pedidos ya son de 2+ (sección 0-G), pero **solo 4 de 47 chats muestran la oferta**.
     Cada unidad extra en un pedido existente da margen completo **sin costar publicidad**, y el gancho
     es que **el flete se comparte**. Ver sección 0-J.
-    🔴 **BLOQUEADO POR EL PENDIENTE #44: el precio de 2 unidades NO EXISTE** — los 5 pedidos de 2 se
-    cobraron a $54.058-59.991 por unidad, cada cierre improvisó (sección 0-N). No se puede poner en un
-    guion algo sin precio definido.
-    ✅ **PERO EL GANCHO YA ESTÁ CONFIRMADO CON DATOS: el flete de 2 unidades NO se duplica**, sube solo
-    **+$6.838 a +$15.089** (Pereira $20.771→$27.608). "El envío casi no sube" es verdad, no un argumento
-    de venta inventado — y ya quedó escrito en el guion del repo.
+    ✅ **EL BLOQUEO DE PRECIO YA SE CERRÓ (#44 y #59):** la promo es 2 por $110.000 + un solo envío,
+    con total por banda. Lo pendiente aquí es verificar que se ofrezca sistemáticamente y medir su
+    efecto sin convertir el descuento en oferta automática.
+    ✅ **El gancho está confirmado con datos: el flete de 2 unidades NO se duplica**, sube solo
+    **+$6.838 a +$15.089** (Pereira $20.771→$27.608). “El envío casi no sube” es verdad.
 41. [ ] 📸 **REVISAR EL PROBLEMA DE LOS COLORES: el 77% de los clientes pregunta por color** y **no hay
     fotos de blanco ni de morado.** Medir cuántas conversaciones se caen pidiendo un color que no se
     puede mostrar. Se cruza con el pendiente de fotos de la sección 9. Ver sección 0-J.
@@ -3616,10 +3978,13 @@ El dueño reportó que al publicar anuncios, algunos salían **sin el texto prin
 - **Estado 2026-07-31: < 1,5 en 7 días** → audiencia fresca, espacio para escalar.
 
 ### 📏 REGLAS DE LECTURA DE DATOS (para no reaccionar mal)
-- ❌ NO juzgar por: horas, ni un día parcial. ✅ SÍ juzgar por: ventanas de **3-4 días** y **~50+ conversaciones**.
-- Los primeros 1-2 días tras cualquier cambio se ven más caros → **es normal, NO apagar**.
-- **Escalar de a 20-30% cada 3-4 días.** Nunca duplicar de golpe (reinicia aprendizaje y dispara costos).
-- Al escalar: **tocar SOLO el presupuesto** (no creativos, ni públicos, ni copies).
-- **"Recomendaciones" de Meta:** leerlas, pero NO aplicarlas automáticamente (suelen empujar a subir
-  presupuesto de golpe o activar cambios automáticos de creativo).
-- Lo ideal es **1-3 anuncios fuertes por conjunto**; más anuncios dividen el aprendizaje.
+- ❌ NO juzgar por horas ni un día parcial. ✅ SÍ juzgar por ventanas de **4+ días y ~50+ conversaciones**.
+- Los primeros 1-2 días tras cualquier cambio pueden verse más caros → **no apagar por reacción**.
+- **No existe una regla universal de escalar 20-30%.** En el estado del 25-ago, subir presupuesto ya
+  no paga por elasticidad 0,63. Solo probar un escalón si CPA casado, margen y audiencia lo justifican.
+- Si se aprueba un escalón: tocar **una sola variable** y conservar un comparador; no mezclar al mismo
+  tiempo presupuesto, público, copy y creativo.
+- **"Recomendaciones" de Meta:** leerlas, pero NO aplicarlas automáticamente.
+- **Regla específica de esta cuenta:** un creativo que deba mantenerse vivo necesita su propio
+  conjunto; al compartir con un ganador establecido puede recibir $0. La vieja pauta de “1-3 anuncios
+  fuertes por conjunto” queda reemplazada por la evidencia de esta cuenta.
