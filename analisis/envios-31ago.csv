@@ -1,0 +1,95 @@
+fila,fecha,valor_servicio,valor_comercial,estado,transportadora,ciudad
+2,2026-08-31,25481.04,85000,Creado,interrapidisimo,VALLE DEL GUAMUEZ
+3,2026-08-31,20806.78,83000,Creado,servientrega,GIRON
+4,2026-08-31,20770.89,81000,Creado,servientrega,MEDELLIN
+5,2026-08-31,20752.94,80000,Creado,servientrega,PASTO
+6,2026-08-31,26238,85000,Creado,servientrega,ARJONA
+7,2026-08-31,20770.89,81000,Creado,servientrega,NEIVA
+8,2026-08-31,33028.59,139000,Creado,servientrega,LA CRUZ
+9,2026-08-31,20806.78,83000,Creado,servientrega,IPIALES
+10,2026-08-31,20770.89,81000,Creado,servientrega,MEDELLIN
+11,2026-08-31,20770.89,81000,Creado,servientrega,MEDELLIN
+12,2026-08-31,20770.89,81000,Creado,servientrega,MEDELLIN
+13,2026-08-31,23171.31,85000,Creado,interrapidisimo,SAN PEDRO DE LOS MILAGROS
+14,2026-08-31,23171.31,85000,Creado,interrapidisimo,ARCABUCO
+15,2026-08-31,12956.14,73000,Creado,interrapidisimo,BOGOTA
+16,2026-08-31,12956.14,73000,Creado,interrapidisimo,CHIA
+17,2026-08-31,12956.14,73000,Creado,interrapidisimo,CHIA
+18,2026-08-31,25481.04,85000,Creado,interrapidisimo,BARRANCA DE UPIA
+19,2026-08-31,25481.04,85000,Creado,interrapidisimo,SALADOBLANCO
+20,2026-08-31,12956.14,73000,Creado,interrapidisimo,BOGOTA
+21,2026-08-31,25481.04,85000,Creado,interrapidisimo,EL CARMEN DE VIBORAL
+22,2026-08-31,25481.04,85000,Creado,interrapidisimo,MAJAGUAL
+23,2026-08-31,17397.5,85000,Creado,interrapidisimo,GUTIERREZ
+24,2026-08-31,25114.43,80000,Creado,interrapidisimo,QUIBDO
+25,2026-08-31,23171.31,85000,Creado,interrapidisimo,GIRON
+26,2026-08-31,25481.04,85000,Creado,interrapidisimo,RIOSUCIO
+27,2026-08-31,23024.87,83000,Creado,interrapidisimo,SAMACA
+28,2026-08-31,25481.04,85000,Creado,interrapidisimo,EL BAGRE
+29,2026-08-31,31920.06,140000,Creado,interrapidisimo,PITALITO
+30,2026-08-31,25481.04,85000,Creado,interrapidisimo,PUERTO TRIUNFO
+31,2026-08-31,25481.04,85000,Creado,interrapidisimo,CALAMAR
+32,2026-08-31,44078.36,210000,Creado,interrapidisimo,SUTAMARCHAN
+33,2026-08-31,25481.04,85000,Creado,interrapidisimo,CUMBAL
+34,2026-08-28,20923.34,85000,EN PROCESAMIENTO,servientrega,CARTAGO
+35,2026-08-28,27890.24,140000,EN PROCESAMIENTO,servientrega,SOLEDAD
+36,2026-08-28,16810.73,77000,Reparto,interrapidisimo,VILLAVICENCIO
+37,2026-08-28,16737.01,76000,Transito regional,interrapidisimo,CHOACHI
+38,2026-08-28,13939.2,73000,Intento de entrega,interrapidisimo,BOGOTA
+39,2026-08-27,20770.89,81000,EN PROCESAMIENTO,servientrega,BUENAVENTURA
+40,2026-08-27,25481.04,85000,Transito Urbano,interrapidisimo,CORDOBA
+41,2026-08-27,25481.04,85000,Reclame en oficina,interrapidisimo,CAUCASIA
+42,2026-08-27,12956.14,73000,Entregada,interrapidisimo,CAJICA
+43,2026-08-27,25481.04,85000,Entregada,interrapidisimo,SAN JUAN DE BETULIA
+44,2026-08-27,25188.15,81000,Reclame en oficina,interrapidisimo,YARUMAL
+45,2026-08-27,22878.42,81000,Entregada,interrapidisimo,MANIZALES
+46,2026-08-27,23171.31,85000,Entregada,interrapidisimo,MONTENEGRO
+47,2026-08-27,25481.04,85000,Reclame en oficina,interrapidisimo,RIOSUCIO
+48,2026-08-27,17397.5,85000,Reclame en oficina,interrapidisimo,NEMOCON
+49,2026-08-27,25481.04,85000,Reclame en oficina,interrapidisimo,VALLE DEL GUAMUEZ
+50,2026-08-26,20770.89,81000,EN PROCESAMIENTO,servientrega,CARTAGENA DE INDIAS
+51,2026-08-26,20770.89,81000,EN PROCESAMIENTO,servientrega,PEREIRA
+52,2026-08-26,25481.04,85000,Reclame en oficina,interrapidisimo,TRINIDAD
+53,2026-08-26,34830.36,139000,Reclame en oficina,interrapidisimo,CERETE
+54,2026-08-26,34449.95,143000,Reclame en oficina,interrapidisimo,TAME
+55,2026-08-26,35238.7,138000,Reclame en oficina,interrapidisimo,SAN CARLOS DE GUAROA
+56,2026-08-26,16810.73,77000,Entregada,interrapidisimo,YOPAL
+57,2026-08-25,33310.52,143000,EN PROCESAMIENTO,servientrega,VALLE DEL GUAMUEZ
+58,2026-08-25,20806.78,83000,EN PROCESAMIENTO,servientrega,MONTERIA
+59,2026-08-25,27359.31,136000,Entregada,servientrega,ACACIAS
+60,2026-08-25,20770.89,81000,EN PROCESAMIENTO,servientrega,MEDELLIN
+61,2026-08-25,20770.89,81000,Entregada,servientrega,NEIVA
+62,2026-08-25,20770.89,81000,Entregada,servientrega,ITAGUI
+63,2026-08-25,25372.29,136000,Entregada,interrapidisimo,YOPAL
+64,2026-08-25,25481.04,85000,Entregada,interrapidisimo,CHITA
+65,2026-08-24,20923.34,85000,EN PROCESAMIENTO,servientrega,BUENAVENTURA
+66,2026-08-24,27757.74,138000,EN PROCESAMIENTO,servientrega,SOLEDAD
+67,2026-08-24,20752.94,80000,Entregada,servientrega,PEREIRA
+68,2026-08-24,20717.06,78000,EN PROCESAMIENTO,servientrega,OCANA
+69,2026-08-24,20923.34,85000,EN PROCESAMIENTO,servientrega,PUERTO BERRIO
+70,2026-08-24,20770.89,81000,Entregada,servientrega,DOSQUEBRADAS
+71,2026-08-24,27757.74,138000,Entregada,servientrega,COPACABANA
+72,2026-08-24,20770.89,81000,Entregada,servientrega,CARTAGENA DE INDIAS
+73,2026-08-24,27757.74,138000,Entregada,servientrega,MEDELLIN
+74,2026-08-24,20806.78,83000,Entregada,servientrega,CUCUTA
+75,2026-08-24,14720.12,77000,EN PROCESAMIENTO,servientrega,TOCANCIPA
+76,2026-08-24,20923.34,85000,EN PROCESAMIENTO,servientrega,PUERTO BERRIO
+77,2026-08-24,27757.74,138000,Entregada,servientrega,MEDELLIN
+78,2026-08-24,25481.04,85000,Reclame en oficina,interrapidisimo,SAN ESTANISLAO
+79,2026-08-24,12956.14,73000,Entregada,interrapidisimo,BOGOTA
+80,2026-08-24,12956.14,73000,Entregada,interrapidisimo,FACATATIVA
+81,2026-08-24,12956.14,73000,Entregada,interrapidisimo,BOGOTA
+82,2026-08-24,12956.14,73000,Entregada,interrapidisimo,BOGOTA
+83,2026-08-24,1754.00,73000,Devolucion ratificada,interrapidisimo,CHIA
+84,2026-08-24,12956.14,73000,Entregada,interrapidisimo,BOGOTA
+85,2026-08-24,25445.02,137000,Entregada,interrapidisimo,VILLAVICENCIO
+86,2026-08-24,12956.14,73000,Reclame en oficina,interrapidisimo,CAJICA
+87,2026-08-24,16810.73,77000,Entregada,interrapidisimo,VILLAVICENCIO
+88,2026-08-24,12956.14,73000,Creado,interrapidisimo,CHIA
+89,2026-08-24,25481.04,85000,Entregada,interrapidisimo,ACEVEDO
+90,2026-08-24,25481.04,85000,Reclame en oficina,interrapidisimo,PUERTO ASIS
+91,2026-08-24,25481.04,85000,Entregada,interrapidisimo,FUNES
+92,2026-08-24,31773.62,138000,Reclame en oficina,interrapidisimo,EL TAMBO
+93,2026-08-24,25481.04,85000,Reclame en oficina,interrapidisimo,MAGANGUE
+94,2026-08-24,25481.04,85000,Entregada,interrapidisimo,SANTA ROSA DE OSOS
+95,2026-08-24,31773.62,138000,Reclame en oficina,interrapidisimo,GUARNE
