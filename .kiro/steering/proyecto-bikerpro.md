@@ -4,7 +4,7 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-08-28** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
+Última actualización: **2026-09-01** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
 sandbox corre en UTC y puede marcar el día siguiente)*
 
 ---
@@ -12,10 +12,11 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 # 🧭 ÍNDICE — POR DÓNDE EMPEZAR
 
 **Si tenés 2 minutos:** leé el bloque "ESTADO VIGENTE AL 2026-08-28" y la lista de pendientes vivos.
-**Si tenés 15:** leé además las secciones 0-Z, 0-Y, 0-X, 0-W y 0-V, que contienen las decisiones más recientes.
+**Si tenés 15:** leé además las secciones 0-AA, 0-Z, 0-Y, 0-X y 0-W, que contienen las decisiones más recientes.
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-AA** | 🌎 **La pauta solo cubría 2 ciudades** · el video nuevo gana 30,8% · Servientrega atascada · Valle abierto | 31-ago / 1-sep |
 | **0-Z** | 🆕 **catálogo de 3 productos** · precios · márgenes · guiones · anuncios · logo | 28-ago |
 | **0-Y** | 🗓️ **guías/día ≠ ventas/día** · el finde rinde +44% · CPA provisional | 25-ago |
 | **0-X** | 🌎 Ya es NACIONAL (78 ciudades): los lagos son Valle y Atlántico | 24-ago |
@@ -50,6 +51,10 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 
 > **Corte de producto y contenido:** 28-ago. **Último corte de métricas operativas:** 25-ago; no se
 > maquillaron como nuevas. El CPA de $7.167 sigue provisional hasta casar gasto y ventas del mismo día.
+>
+> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE, ESTÁ EN 0-AA (31-ago / 1-sep):** la pauta solo cubría
+> Medellín y Bogotá, el video nuevo gana por 30,8%, Servientrega quedó fuera, y el CPA real subió a
+> ~$12.855. **Las métricas de abajo son del corte del 25-ago y NO reflejan el estado de la cuenta hoy.**
 
 ## Cambio de negocio del 28-ago (resumen ejecutivo)
 
@@ -152,20 +157,35 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 - 🔔 **Banda E absorbe $381 por venta** ($2.262/día). **Decisión del dueño: se queda en $85.000.**
   Gatillo: si el flete pasa de $26.000, hay que actuar (#62).
 - 📌 **$2.200.000 quietos en 99 Envíos.** Mismo patrón que los $2.788.601 de Heka. Retirar por rutina.
+- 🔴🆕 **$1.396.000 congelados en 14 guías de Servientrega** hasta 7 días en "EN PROCESAMIENTO"
+  (58,3% de sus guías maduras contra 2,6% de Interrapidísimo, **al mismo flete**). Ya se enruta todo
+  por Interrapidísimo, pero **falta reclamar** → **#74**. Ver **0-AA**.
+- 🔴🆕 **$1.841.000 en 15 guías en "Reclame en oficina".** Si no reclaman se vuelven devoluciones.
+  Un recordatorio por WhatsApp es la plata más fácil disponible → **#75**.
+- 🔔🆕 **El CPA se está deteriorando: ~$6.600 → $10.637 → ~$12.855** (proyección 1-sep). Sigue rentable
+  (~$15.860 por pedido) pero el colchón se adelgaza. **La causa está identificada: el 72% del gasto
+  está en los dos conjuntos más caros** → se corrige con **#71**, no con más presupuesto.
 
 ## 🚦 LO SIGUIENTE, EN ORDEN
 
-1. ✅ **Guion re-pegado** el 24-25 ago (14 ciudades + promo por zona) — **#59 cerrado**
-2. **NO subir presupuesto** (retorno marginal $0,35 por peso)
-3. **Lunes 31: los dos exports** — Meta 22-30 **con desglose por día** (~27 filas) + 99 Envíos 21-30
-4. **Evaluar el conjunto regional de Valle solo después del export y sin atribuir el timing a un
-   “valle 26-29”**: esa estacionalidad no está demostrada. Si se prueba, aislar la variable → **#63**
-5. ⚠️ **NO leer los días sueltos por guías/día.** Las guías son despachos: finde y festivos se
+1. 🔥 **EL 4-SEP: reasignar presupuesto al video nuevo.** Gana por **30,8%** con 57 conversaciones y
+   su costo marginal es **4× más barato** que el control. Domiciliarios $60.000 → $25.000 · VIDEO
+   $20.000 → $55.000. **El total en Medellín+Bogotá no sube** → **#71**, sección **0-AA**
+2. **NO subir presupuesto total.** La elasticidad 0,63 se volvió a confirmar: se pasó de $105.000 a
+   $140.000/día y el costo por conversación subió de $788 a $1.127. **Reasignar sí, sumar no**
+3. 🌎 **Arreglar la entrega de Lago Valle** — solo gasta 24% de su presupuesto y sin eso el lago no se
+   puede evaluar. La señal es buena: 22% más barato que el control en tres cortes → **#72**
+4. 💰 **Cobrar lo que está parado:** las 14 guías de Servientrega (#74) y los 15 "Reclame en oficina"
+   (#75). Son **$3.237.000** y no requieren publicidad ni producto
+5. 💎 **Colmena lanza el 2-sep** — conjunto propio, $20.000, un solo anuncio, mensaje prellenado propio.
+   #66 y #69 ya están cerrados. El gate de 15-20 entregas (#67) es para **escalar**, no para lanzar
+6. 📌 **Motorizados no se toca hasta el 4-sep.** Bajado a $15.000 el 1-sep → está en aprendizaje.
+   Y quedó demostrado que **no escala por tamaño de audiencia** (1.902 de alcance), como decía julio
+7. ⚠️ **NO leer los días sueltos por guías/día.** Las guías son despachos: finde y festivos se
    acumulan en un lote (31 guías = **2,9x** un día hábil de 10,8). Un día hábil normal tras la
-   descarga se ve como **−75%** sin que exista una caída real → **0-Y**. El umbral de $12.000 no
-   reemplaza la lectura de utilidad/día (equilibrio provisional del CPA: $28.715).
-6. 🆕 **Evaluar mover presupuesto del hábil al finde** (el finde rinde **+44%** más por día). No es
-   subir presupuesto, es reasignarlo → **necesita el desglose diario del lunes 31** para decidir → **#64**
+   descarga se ve como **−75%** sin que exista una caída real → **0-Y**
+8. 📌 **Un conjunto, un anuncio, cuando quieras medir.** De 8 anuncios de la cuenta, uno se lleva el
+   93% y tres nunca recibieron entrega. **Meta no reparte: elige** → **0-AA**
 
 ---
 
@@ -1223,6 +1243,220 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-AA. 🌎 LA PAUTA SOLO CUBRÍA DOS CIUDADES — Y EL VIDEO NUEVO GANA POR 30,8% (2026-08-31 / 2026-09-01)
+
+**Origen:** exports de Meta (regional 24-30 ago y por conjunto del 31-ago y 1-sep), export de 99 Envíos
+del 31-ago (94 guías), captura de la configuración de Domiciliarios, y la serie consolidada de 317 guías.
+Scripts: `analisis/mejor-lago-consolidado.py`, `lago-sensibilidad.py`, `desglose-regional-24-30ago.py`,
+`geografia-antes-despues.py`, `diagnostico-envios-31ago.py`, `urbano-vs-rural-31ago.py`.
+
+### 🚨 EL HALLAZGO ESTRUCTURAL: SE PAUTABA SOLO EN MEDELLÍN Y BOGOTÁ
+
+La configuración de Domiciliarios decía **Inclusión: Medellín (+40 km) y Bogotá (+40 km)**. No era
+nacional. Por eso el export regional del 24-30 ago muestra el **99,99% del gasto** ($738.338) en
+Antioquia + Bogotá + Cundinamarca, y **$0 en Valle del Cauca**.
+
+| | |
+|---|---|
+| Población cubierta por la pauta | ~11,9 M · **23%** del país |
+| Población **nunca pautada** | ~40 M · **77%** |
+
+🔑 **Y ese 77% ya compra sin que se le paute.** Proporción de pedidos de fuera de Medellín+Bogotá,
+en tres periodos independientes: **60%, 57%, 61%**. Estable, no es ruido. En los últimos 8 días,
+57 pedidos vinieron de regiones con **cero pesos** de pauta.
+
+⚠️ **CORRECCIÓN A 0-X:** el análisis de lagos medía el hueco correcto pero atribuía la causa mal.
+Se dijo que "Meta huye al bolsillo más barato y deja regiones sin tocar". **Falso.** Las regiones
+estaban sub-explotadas porque **un filtro propio las excluía**. Mismo hueco, mecanismo distinto.
+
+📌 **La casilla "Llegar a más personas con probabilidades de responder" está marcada en Domiciliarios**,
+y su letra chica dice "o cerca de ellas". Eso explica que Meta entregue fuera de la configuración y
+que lleguen pedidos de Túquerres o Puerto Asís. **En un conjunto-lago hay que DESMARCARLA**, o la
+restricción geográfica no existe y el experimento no mide nada.
+
+### 🏆 EL LAGO ELEGIDO ES VALLE DEL CAUCA
+
+Serie consolidada de **317 guías** (15-jul a 31-ago) uniendo tres fuentes: `guias-heka.csv`
+(con desenlaces resueltos), los cuatro `guias-99envios*.csv` deduplicados por número de guía, y
+`envios-31ago.csv`. 160 ciudades mapeadas a 14 regiones.
+
+**La dimensión que decidió fue la tasa de entrega real** — en contraentrega, si no entregan no se cobra:
+
+| Región | Índice | % pobl. | Entrega | Margen | Margen esperado | Upside |
+|---|---|---|---|---|---|---|
+| **Valle** | **0,49** | 9,7% | **100%** (n=5) | $31.506 | **$24.700** | **$494.976** |
+| Santanderes | 0,55 | 6,9% | 71% | $15.259 | $10.834 | $103.153 |
+| Atlántico | 0,33 | 5,2% | **50%** 🔴 | $7.232 | $3.616 | $44.929 |
+
+**Atlántico queda eliminado** aunque era el más sub-explotado: con 50% de entrega su equilibrio cae a
+$318 por conversación, imposible de lograr. Valle vale **4,8×** el segundo.
+
+**El número que sostiene la apuesta:** Cali tiene **1,4 guías por millón** de habitantes y Medellín
+**9,6**. Son ciudades comparables en tamaño y uso de moto: brecha de **7,1×**.
+
+| Valle — umbrales | |
+|---|---|
+| Equilibrio real | **$2.176** por conversación |
+| Umbral de muerte | $1.400 |
+| Expectativa | $700–$1.000 |
+
+⚠️ **Caveats honestos:** el 100% de entrega sale de **5 casos resueltos** y el margen de $31.506 de
+**15 guías**. Lo robusto es la brecha de población y el cero de Cali, no los decimales. Bajo supuestos
+uniformes Valle gana en los tres escenarios; falla solo una prueba asimétrica (su peor caso contra el
+mejor caso de los demás), que casi ninguna opción sobrevive.
+
+### 🚚 SERVIENTREGA ESTÁ ATASCADA — SE ENRUTA TODO POR INTERRAPIDÍSIMO
+
+Guías maduras despachadas 24-28 ago (n=62):
+
+| | Servientrega | Interrapidísimo |
+|---|---|---|
+| Congeladas en EN PROCESAMIENTO | **14 de 24 = 58,3%** 🔴 | 2,6% |
+| Flete promedio (1 unidad) | $20.927 | $20.774 |
+
+**Cuestan prácticamente lo mismo ($153 de diferencia) y una se atasca 22 veces más.** No hay ninguna
+razón para seguir usándola. **Decisión del dueño (31-ago): todo por Interrapidísimo.**
+
+- 💰 **$1.396.000** de valor comercial detenido, más $324.936 de flete ya pagado por envíos que no se movieron.
+- 🔴 **Guía huérfana:** Chía, $73.000, **Interrapidísimo**, 7 días en "Creado" — nunca la recogieron.
+  Interrapidísimo tampoco es perfecta; **conviene tener una tercera transportadora abierta.**
+- 💵 **15 guías en "Reclame en oficina" = $1.841.000** esperando que el cliente recoja. Si no reclaman
+  se vuelven devoluciones → **#75**.
+- ✅ **Devoluciones: 1 de 62 = 1,6%** y costó **$1.754** (solo la prima). Confirma que 99 Envíos no
+  cobra flete de ida ni vuelta en devolución.
+- ✅ **Los combos tienen mejor economía:** el flete se come **21,7%** del valor contra **25,7%** en
+  pedidos de 1 unidad.
+
+### 🎬 EL VIDEO NUEVO GANA POR 30,8% — EL EXPERIMENTO MÁS LIMPIO DEL PROYECTO
+
+Diseño de tres conjuntos, cada uno con **una sola variable** distinta:
+
+| Conjunto | Geografía | Creativo | Mide |
+|---|---|---|---|
+| Domiciliarios | Med + Bog | Fondo azul | **control** |
+| Domiciliarios VIDEO | Med + Bog | video nuevo | el **video** |
+| Lago Valle | Valle | Fondo azul | la **región** |
+
+**Acumulado 31-ago + 1-sep:**
+
+| | Conv. | Gasto | Costo/conv |
+|---|---|---|---|
+| **Video nuevo** | **57** | $44.197 | **$775** |
+| Control | 147 | $164.605 | $1.120 |
+
+**30,8% más barato**, contra un umbral exigido de 15%. Y la ventaja creció en los tres cortes:
+**24,2% → 36,4% → 45,0%**.
+
+🔑 **La evidencia definitiva es el costo marginal de la tarde del 1-sep** (comparando el corte de
+2:29 pm contra el de 6:41 pm, o sea solo las conversaciones nuevas):
+
+| Conjunto | Conv. nuevas | Gasto nuevo | Costo marginal |
+|---|---|---|---|
+| **Domiciliarios VIDEO** | 3 | $2.017 | **$672** |
+| Domiciliarios | 8 | $21.221 | **$2.653** 🔴 |
+
+**4× de diferencia, en la misma audiencia, a la misma hora, con el mismo texto.**
+
+⚠️ **Por qué no se reasignó de inmediato:** Domiciliarios VIDEO tiene 2 días de vida y los conjuntos
+nuevos suelen recibir entrega favorable al arrancar. Parte del $843 puede ser luna de miel.
+**Decisión de reasignación: 4-sep → #71.**
+
+📌 **Y el VIDEO gastó 156% de su presupuesto** ($31.207 de $20.000). Eso *fortalece* el resultado:
+compitió en inventario más caro del que le correspondía y aun así ganó por 45%.
+
+### 🔴 MOTORIZADOS NO ESCALA — CONFIRMADO, Y ESTABA ESCRITO DESDE JULIO
+
+| Presupuesto | Costo/conv | Utilización |
+|---|---|---|
+| $15.000 | **$565** | completa |
+| $25.000 (31-ago) | $851 | — |
+| **$25.000 (1-sep, día completo)** | **$1.043** | **71%** ($17.735 de $25.000) |
+
+🔑 **A $25.000 no logró gastar más de $17.735.** No es un problema de eficiencia: es un **techo de
+audiencia** — su alcance son **1.902 personas**.
+
+⚠️ **Esto ya estaba documentado en julio** ("sigue topado por tamaño de audiencia, no por presupuesto;
+para crecerlo hay que ampliar la audiencia primero"). Se recomendó subirlo ignorando una conclusión
+que el propio archivo ya tenía. **El error no fue el timing: fue no consultar la memoria.**
+
+Bajado a $15.000 el 1-sep a las 6:39 pm → entra en aprendizaje 2-3 días. **No juzgarlo antes del 4-sep.**
+
+### 💎 COLMENA: #66 Y #69 CERRADOS, LANZA EL 2-SEP
+
+**#66 cerrado:** peso y dimensiones **iguales al tradicional** → mismo rango de cobro por peso real o
+volumétrico → el flete medido del tradicional aplica tal cual. **La tabla de margen deja de ser estimada:**
+
+| Banda | Flete | Margen neto |
+|---|---|---|
+| A · Bogotá | $12.871 | **$38.588** |
+| B | $16.811 | $34.733 |
+| C · capitales | $20.923 | $30.621 |
+| D · intermedias | $23.030 | $28.514 |
+| E · pueblos | $25.029 | $26.063 |
+
+🔑 **El colmena tolera un CPA de ~$39.632 antes de perder plata, contra ~$23.800 del tradicional: 67%
+más colchón.** Por eso vale lanzarlo aunque convierta peor.
+
+**#69 cerrado:** guion de dos SKU en **`GUION-DOS-SKU.md`**, pegado en la IA de WhatsApp Business y
+**probado el 1-sep** (identificación por primer mensaje, envío incluido sin dar cifra, y el tradicional
+intacto). Se agrega a `GUION-PARA-PEGAR.md`, no lo reemplaza.
+
+⚠️ **ACLARACIÓN sobre #67:** el gate de 15-20 entregas es para **ESCALAR**, no para lanzar. La
+secuencia es *lanzar pequeño → juntar 15-20 pedidos → validar → escalar*. Se explicó mal antes.
+
+**Lanzamiento:** 2-sep, conjunto propio, **$20.000**, **un solo anuncio**, geografía igual a
+Domiciliarios, y mensaje prellenado propio: `Hola, quiero información del impermeable tipo colmena`
+— sin eso la IA no puede distinguir el producto. Esto también cierra la parte de atribución de **#70**.
+
+### ⚠️ EL $414 DE TEST CREATIVOS NO ESTÁ PROBADO A ESCALA
+
+El 1-sep TEST Creativos marcó **$414** por conversación, el más barato de la cuenta — pero gastando
+**33%** de su presupuesto ($6.626 de $20.000). Su alerta de 7 días dice **$963,63 (+51,2%)**.
+
+🔑 **Es el mismo patrón de Motorizados:** un conjunto hambriento se queda con la nata de la audiencia
+y muestra un costo que no sobrevive al escalamiento ($565 → $1.043). **No reasignar plata ahí
+esperando que aguante $414.**
+
+Matiz: su costo marginal de la tarde fue **$378**, así que el número *por ahora se sostiene*. No es
+falso — es **no probado**. Falta el desglose por anuncio → **#73**.
+
+### 📌 ASFIXIA DE ANUNCIOS, AHORA MEDIDA
+
+De **8 anuncios** cargados en la cuenta, **uno se lleva el 93%** del gasto y **tres nunca recibieron
+entrega**. "Demostración agua rueda" acumuló 137 impresiones y $545. **Meta no reparte: elige, y elige
+con los primeros datos.**
+
+Y "TEST B – Franja reflectiva" dentro de Domiciliarios llegó a **$2.640 por conversación** el 1-sep,
+el peor número de la cuenta, tras haber empatado por debajo de Fondo azul en la ventana 24-30 ago.
+
+📌 **REGLA: un conjunto, un anuncio, cuando quieras medir algo.** Meter creativos a competir dentro
+de un mismo conjunto no es un test — es dejar que Meta decida por ti con muestra insuficiente.
+
+### 📉 LOS COSTOS SUBIERON AL SUBIR EL PRESUPUESTO (otra vez la elasticidad)
+
+| Periodo | Costo/conv mezclado | Presupuesto/día |
+|---|---|---|
+| Ventana buena histórica | $696 | ~$97.000 |
+| 22–31 ago | $788 | ~$105.000 |
+| 31-ago | $845 | $140.000 |
+| **1-sep** | **$1.127** | $140.000 (real $146.550) |
+
+CPA proyectado del 1-sep: 130 conversaciones × 8,8% de cierre ≈ **11,4 pedidos** → **~$12.855**.
+Contra $10.637 del 28-30 ago y ~$6.600 de la línea base. Sigue rentable (margen $28.715 − CPA =
+**~$15.860 por pedido**) pero el colchón se está adelgazando.
+
+🔑 **Coherente con la elasticidad 0,63 de 0-W.** Y la causa concreta ya no es un misterio: **el 72%
+del gasto está en los dos conjuntos más caros** (Domiciliarios $1.533 y Motorizados $1.043), mientras
+los dos más baratos (VIDEO $843, TEST $414) tienen 28%. **La solución no es más presupuesto: es
+reasignar hacia el video.** Y como el total en Medellín+Bogotá no cambia, eso **no contradice** la
+regla de no subir presupuesto: se compra el mismo tráfico con un creativo 31% más eficiente.
+
+✅ **ABO reconfirmado:** el presupuesto **no viaja** entre conjuntos. Meta sobregasta un conjunto
+(VIDEO 156%, Domiciliarios 146%) y lo compensa durante la semana → **esperar días más flojos adelante**.
+No es plata que salió de los conjuntos que sub-gastan.
 
 ---
 
@@ -3542,7 +3776,13 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⛔ **BANDA E SE QUEDA EN $85.000 — decisión del dueño, NO volver a proponer subirla.**
     Ver el pendiente #62 con el análisis y el gatillo.
     📌 Bloque actualizado listo en **`GUION-PARA-PEGAR.md`**.
-63. [ ] 🌎🎯 **PRENDER EL CONJUNTO REGIONAL DE VALLE — la palanca que sigue (sección 0-X).**
+63. [x] ✅ **EJECUTADO EL 31-AGO: conjunto "Domiciliarios | Valle del cauca" creado y publicado**,
+    $15.000/día, geografía restringida al departamento completo, casilla de expansión DESMARCADA y
+    creativo de control (Fondo azul) para aislar la región. ⚠️ **Pero no está entregando: 24% de
+    utilización.** El costo se mantiene 22% por debajo del control ($1.197 vs $1.533) con n=3.
+    → arreglar la entrega en **#72**. Ver **0-AA**.
+    ↓ *(texto original de la tarea, se conserva)*
+    🌎🎯 **PRENDER EL CONJUNTO REGIONAL DE VALLE — la palanca que sigue (sección 0-X).**
     **NO es "abrir una ciudad nueva"** (Cali, Palmira y Buenaventura ya venden). Es **crear un
     conjunto con geografía RESTRINGIDA al Valle** para forzar a Meta a gastar ahí, porque bajo
     Advantage+ concentra la pauta en los bolsillos más baratos y deja la región al **0,54 de su peso
@@ -3573,7 +3813,12 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     los días de venta que cubre, y dividir por el gasto de esos mismos días.
     🔑 **Lo que hay que medir es la ELASTICIDAD de ese conjunto**, no solo su CPA: es el dato que
     define si la meta de 50 uds/día es alcanzable (sección 0-W y `TECHO-REALISTA.md`).
-66. [ ] 📦 **PESAR Y COTIZAR EL FLETE REAL DEL COLMENA.** Conseguir peso y dimensiones empacadas;
+66. [x] ✅ **CERRADO EL 1-SEP: PESO Y DIMENSIONES IGUALES AL TRADICIONAL.** Mismo rango de cobro por
+    peso real o volumétrico → el flete medido del tradicional aplica tal cual y **no hubo que cotizar
+    nada**. La tabla de margen deja de ser estimada: **A $38.588 · B $34.733 · C $30.621 · D $28.514 ·
+    E $26.063.** Tolerancia de CPA ~$39.632, **67% más colchón que el tradicional.** Ver **0-AA**.
+    ↓ *(texto original de la tarea, se conserva)*
+    📦 **PESAR Y COTIZAR EL FLETE REAL DEL COLMENA.** Conseguir peso y dimensiones empacadas;
     cotizar al menos un destino de cada banda en 99 Envíos. El precio ya está fijado en **$149.900
     con envío gratis**, pero el margen por banda de 0-Z sigue siendo estimado hasta hacer esta prueba.
 67. [ ] 💎 **VALIDAR LAS PRIMERAS 15-20 ENTREGAS DEL COLMENA ANTES DE ESCALAR.** Registrar por pedido:
@@ -3582,12 +3827,52 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 68. [ ] 🧥 **OBTENER DATOS DEL PROVEEDOR PARA LA CHAQUETA REFLECTIVA DOBLE FAZ.** Pedir costo, peso y
     dimensiones empacadas, tallas, materiales, nivel de impermeabilidad, acabados y fotos reales.
     Después decidir precio y si el envío será gratis. **El guion final queda pausado hasta entonces.**
-69. [ ] 💬 **DEFINIR TARIFARIO Y GUION DE WHATSAPP PARA LOS SKU NUEVOS ANTES DE PAUTARLOS.** Separar
+69. [x] ✅ **CERRADO EL 1-SEP: GUION DE DOS SKU ESCRITO, PEGADO Y PROBADO.** Vive en
+    **`GUION-DOS-SKU.md`** y se agrega a `GUION-PARA-PEGAR.md`, no lo reemplaza. La IA identifica el
+    producto por el primer mensaje, nunca da cifra de envío del colmena, y el tradicional quedó intacto
+    (verificado con las 4 preguntas críticas). Ver **0-AA**.
+    ↓ *(texto original de la tarea, se conserva)*
+    💬 **DEFINIR TARIFARIO Y GUION DE WHATSAPP PARA LOS SKU NUEVOS ANTES DE PAUTARLOS.** Separar
     claramente tradicional, colmena y chaqueta; impedir que la IA mezcle precios o prometa un envío
     no cotizado. No modificar `GUION-PARA-PEGAR.md` hasta tener estas reglas cerradas.
 70. [ ] 📣 **PROBAR ANUNCIOS CON PRECIO VS. SIN PRECIO Y ATRIBUIR VENTAS.** Arrancar aproximadamente
     80% de variantes con precio y 20% sin precio. Dar a cada anuncio un texto inicial de WhatsApp
     distinto y comparar pedidos, CPA y margen; CTR o conversaciones baratas por sí solos no deciden.
+    ✅ **La parte de atribución arranca con el colmena el 2-sep**, que lleva mensaje prellenado propio.
+71. [ ] 🎬🔥 **EL 4-SEP: REASIGNAR PRESUPUESTO HACIA EL VIDEO NUEVO — la palanca más grande abierta.**
+    El video gana por **30,8% acumulado con 57 conversaciones** y su costo marginal es **4× más barato**
+    que el control ($672 vs $2.653). Ver **0-AA**.
+    **Movimiento propuesto:** Domiciliarios $60.000 → **$25.000** · Domiciliarios VIDEO $20.000 → **$55.000**.
+    🔑 **El gasto total en Medellín+Bogotá NO sube** ($80.000 → $80.000): se compra el mismo tráfico con
+    un creativo 31% más eficiente. **Por eso no contradice la regla de no subir presupuesto de 0-W.**
+    📌 **Domiciliarios NO se deja en cero:** se queda con $25.000 como control vivo para detectar si el
+    video se desgasta más adelante.
+    ⚠️ **Esperar al 4-sep y no reasignar antes:** el conjunto del video tenía 2 días de vida y parte de
+    su ventaja puede ser entrega favorable de conjunto nuevo. Dos días más lo despejan.
+72. [ ] 🌎🔧 **ARREGLAR LA ENTREGA DE LAGO VALLE — solo gasta 24% de su presupuesto.**
+    $3.591 de $15.000 en un día completo. Revisar en orden: **(a)** que haya **un solo anuncio activo**
+    en el conjunto (el duplicado trajo 5); **(b)** si con uno solo sigue sin entregar, el público quedó
+    muy chico (Valle + público guardado + sin expansión) → ampliar edades o quitar intereses.
+    🔑 **Sin resolver esto el lago no se puede evaluar**, y la señal es buena: 22% más barato que el
+    control en tres cortes seguidos. Umbral de muerte $1.400; equilibrio real $2.176.
+73. [ ] 📊 **PEDIR EL DESGLOSE POR ANUNCIO DE TEST CREATIVOS.** Marcó **$414** el 1-sep, el más barato
+    de la cuenta, pero gastando 33% del presupuesto y con alerta de 7 días en $963,63 (+51,2%).
+    ⚠️ **NO reasignar plata ahí esperando que aguante $414** — es el patrón de Motorizados. Lo que sí
+    vale es saber **cuál** de sus 3 anuncios lo produce. Ver **0-AA**.
+74. [ ] 🚚💰 **RECLAMAR LAS 14 GUÍAS CONGELADAS DE SERVIENTREGA — $1.396.000 detenidos.**
+    Hasta 7 días en "EN PROCESAMIENTO". Con una semana ya hay derecho a exigir. Y la **guía huérfana
+    de Chía** ($73.000, Interrapidísimo, 7 días en "Creado") nunca la recogieron.
+    📌 **Abrir una tercera transportadora** (Envía, Coordinadora o TCC) aunque sea sin volumen: enrutar
+    el 100% por Interrapidísimo deja el negocio sin plan B, y tampoco es perfecta.
+75. [ ] 💵 **EMPUJAR LOS 15 "RECLAME EN OFICINA" — $1.841.000 esperando que el cliente recoja.**
+    Un recordatorio por WhatsApp a esos 15. **Si no reclaman se vuelven devoluciones.** Es la plata más
+    fácil disponible: no requiere publicidad, ni producto, ni precio.
+76. [ ] 🌎🌎 **EL SEGUNDO LAGO, SI VALLE FUNCIONA — hay 40 millones de colombianos sin pautar.**
+    La pauta cubre ~23% de la población y el 77% restante **ya genera el 61% de los pedidos** (60%/57%/61%
+    en tres periodos). Valle es el molde; si responde, se replica región por región. Ver **0-AA**.
+    **Orden sugerido por la serie consolidada:** Santanderes (entrega 71%, upside $103.153) antes que
+    Atlántico, que está más sub-explotado pero su **entrega del 50%** hunde el margen esperado a $3.616.
+    ⚠️ **Antes de abrir el segundo lago hay que resolver #72**, o se repite el problema de no-entrega.
 62. [ ] 🔔 **GATILLO DE BANDA E — NO ES UN PENDIENTE DE PRECIO, ES DE VIGILANCIA.**
     **El dueño decidió el 24-ago dejar banda E en $85.000** aunque el flete subió a $25.481 y se
     absorben **$381 por venta (~$2.262/día).** ✅ **Es sostenible: la cartera queda en +$5.956 sobre
