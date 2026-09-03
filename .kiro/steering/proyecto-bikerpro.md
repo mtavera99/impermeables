@@ -4,7 +4,7 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-01** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
+Última actualización: **2026-09-03** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
 sandbox corre en UTC y puede marcar el día siguiente)*
 
 ---
@@ -12,10 +12,11 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 # 🧭 ÍNDICE — POR DÓNDE EMPEZAR
 
 **Si tenés 2 minutos:** leé el bloque "ESTADO VIGENTE AL 2026-08-28" y la lista de pendientes vivos.
-**Si tenés 15:** leé además las secciones 0-AA, 0-Z, 0-Y, 0-X y 0-W, que contienen las decisiones más recientes.
+**Si tenés 15:** leé además las secciones 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-AB** | 💰 **CPA casado $8.257 (−35%)** · utilidad 3 días $1.127.189 · el video ganó · Valle destrabado · el colmena no se mostraba | 1 al 3-sep |
 | **0-AA** | 🌎 **La pauta solo cubría 2 ciudades** · el video nuevo gana 30,8% · Servientrega atascada · Valle abierto | 31-ago / 1-sep |
 | **0-Z** | 🆕 **catálogo de 3 productos** · precios · márgenes · guiones · anuncios · logo | 28-ago |
 | **0-Y** | 🗓️ **guías/día ≠ ventas/día** · el finde rinde +44% · CPA provisional | 25-ago |
@@ -52,9 +53,43 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 > **Corte de producto y contenido:** 28-ago. **Último corte de métricas operativas:** 25-ago; no se
 > maquillaron como nuevas. El CPA de $7.167 sigue provisional hasta casar gasto y ventas del mismo día.
 >
-> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE, ESTÁ EN 0-AA (31-ago / 1-sep):** la pauta solo cubría
-> Medellín y Bogotá, el video nuevo gana por 30,8%, Servientrega quedó fuera, y el CPA real subió a
-> ~$12.855. **Las métricas de abajo son del corte del 25-ago y NO reflejan el estado de la cuenta hoy.**
+> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE. ESTÁ EN 0-AB (1 al 3-sep) Y 0-AA (31-ago / 1-sep).**
+> **Las métricas de abajo son del corte del 25-ago y NO reflejan el estado de la cuenta hoy.**
+>
+> **Estado real al 3-sep:** CPA casado **$8.257** (−35%) · utilidad de 3 días **$1.127.189** ·
+> el video nuevo ganó y se llevó el 62% del gasto de Medellín+Bogotá · Valle destrabado al 75% ·
+> el colmena no vendió porque **no se estaba mostrando** (1.068 impresiones en 2 días).
+
+## 🖥️ CONFIGURACIÓN DE LA CUENTA AL CIERRE DEL 2026-09-03
+
+**Esta es la foto exacta de cómo quedó la cuenta.** Si se pierde el hilo, esto es el punto de partida.
+
+| Conjunto | Presup. | Creativo | Geografía | Estado |
+|---|---|---|---|---|
+| **Domiciliarios VIDEO** | **$35.000** | VIDEO | Med+Bog | 🏆 ganador, 62% del gasto de Med+Bog |
+| Domiciliarios | $45.000 | Fondo azul + TEST B | Med+Bog | control, bajando ($60.000 → $45.000 el 2-sep) |
+| **Domiciliarios \| Colmena** | $20.000 | Video Jairo Colmena | **Colombia** | 🆕 republicado el 3-sep con **Advantage+ amplio** |
+| TEST Creativos | $20.000 | Prueba social | Med+Bog | ahogado: CPM +63%, 33-38% de utilización |
+| Domiciliarios \| Valle del cauca | $15.000 | Fondo azul | Valle del Cauca | ✅ destrabado al 75% al dejar 1 anuncio |
+| Motorizados | $15.000 | Fondo azul | Med+Bog | bajado de $25.000 el 1-sep, sale de aprendizaje el 4-sep |
+| **Total** | **$150.000** | | | gasto real esperado $160.000-$180.000 |
+
+📌 **Advantage+ de campaña: DESACTIVADO.** El presupuesto vive en cada conjunto (ABO). No activarlo:
+rompería la reasignación al video.
+
+📌 **La casilla "Llegar a más personas" está MARCADA en Domiciliarios y DESMARCADA en Valle.** Eso hace
+que la comparación Valle-vs-control no sea perfecta, y le juega en contra a Valle.
+
+⚠️ **NO aplicar las recomendaciones de Meta** ("puntuación de oportunidad", "mejoras de contenido
+Advantage+", "N mejoras"). Modifican los creativos automáticamente y contaminan cualquier lectura.
+
+### Lo primero que hay que mirar el 4-sep
+
+| Señal | Umbral |
+|---|---|
+| **Impresiones del colmena** | **>3.000** = era la subasta · <500 = es el producto |
+| Costo/conv del video | se sostiene bajo $1.000 → completar reasignación a $55.000 |
+| Motorizados | vuelve a $565-$700 → se queda en $15.000 · sigue >$1.000 → se pausa |
 
 ## Cambio de negocio del 28-ago (resumen ejecutivo)
 
@@ -157,35 +192,48 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 - 🔔 **Banda E absorbe $381 por venta** ($2.262/día). **Decisión del dueño: se queda en $85.000.**
   Gatillo: si el flete pasa de $26.000, hay que actuar (#62).
 - 📌 **$2.200.000 quietos en 99 Envíos.** Mismo patrón que los $2.788.601 de Heka. Retirar por rutina.
-- 🔴🆕 **$1.396.000 congelados en 14 guías de Servientrega** hasta 7 días en "EN PROCESAMIENTO"
-  (58,3% de sus guías maduras contra 2,6% de Interrapidísimo, **al mismo flete**). Ya se enruta todo
-  por Interrapidísimo, pero **falta reclamar** → **#74**. Ver **0-AA**.
-- 🔴🆕 **$1.841.000 en 15 guías en "Reclame en oficina".** Si no reclaman se vuelven devoluciones.
-  Un recordatorio por WhatsApp es la plata más fácil disponible → **#75**.
-- 🔔🆕 **El CPA se está deteriorando: ~$6.600 → $10.637 → ~$12.855** (proyección 1-sep). Sigue rentable
-  (~$15.860 por pedido) pero el colchón se adelgaza. **La causa está identificada: el 72% del gasto
-  está en los dos conjuntos más caros** → se corrige con **#71**, no con más presupuesto.
+- 🔴 **MÍNIMO $2.190.000 CONGELADOS EN SERVIENTREGA.** Las 14 guías del 24-28 ago (~$1.396.000) más
+  **9 de las 10 del 31-ago ($794.000), sin actualizarse desde el 1-sep.** Su tasa de atasco era 58,3%
+  contra 2,6% de Interrapidísimo **al mismo flete**. Ya se enruta todo por Interrapidísimo, pero
+  **falta reclamar** → **#74**. Ver **0-AA** y **0-AB**.
+- 🔴 **$945.000 en 9 guías en "Reclame en oficina"** solo del lote del 31-ago. Si el cliente no va,
+  **se vuelven devolución**. Un WhatsApp a cada uno es la plata más fácil disponible → **#75**.
+- 🔔 **2ª guía huérfana consecutiva en Chía:** Mariela García, $73.000, creada el 31-ago y nunca
+  recogida (última actualización = hora de creación). La anterior, Mario Yair, sí se re-despachó el
+  2-sep. **Preguntarle a Interrapidísimo por esa ruta.**
+- ✅ **El CPA se corrigió: $12.639 (1-sep) → $8.257 en la ventana 1-3 sep (−35%).** La causa del
+  deterioro estaba identificada —el gasto concentrado en el creativo perdedor— y la reasignación al
+  video lo revirtió. Ver **0-AB**.
+- 🔔 **El colmena lleva cero pedidos**, pero por falta de entrega, no por falta de demanda: 1.068
+  impresiones en dos días. Republicado el 3-sep. **Su gate real sigue siendo cerrar ≥5,1%** (o 7,5%
+  si la mezcla de bandas se va a los pueblos con envío gratis nacional) → **#79**.
 
 ## 🚦 LO SIGUIENTE, EN ORDEN
 
-1. 🔥 **EL 4-SEP: reasignar presupuesto al video nuevo.** Gana por **30,8%** con 57 conversaciones y
-   su costo marginal es **4× más barato** que el control. Domiciliarios $60.000 → $25.000 · VIDEO
-   $20.000 → $55.000. **El total en Medellín+Bogotá no sube** → **#71**, sección **0-AA**
-2. **NO subir presupuesto total.** La elasticidad 0,63 se volvió a confirmar: se pasó de $105.000 a
-   $140.000/día y el costo por conversación subió de $788 a $1.127. **Reasignar sí, sumar no**
-3. 🌎 **Arreglar la entrega de Lago Valle** — solo gasta 24% de su presupuesto y sin eso el lago no se
-   puede evaluar. La señal es buena: 22% más barato que el control en tres cortes → **#72**
-4. 💰 **Cobrar lo que está parado:** las 14 guías de Servientrega (#74) y los 15 "Reclame en oficina"
-   (#75). Son **$3.237.000** y no requieren publicidad ni producto
-5. 💎 **Colmena lanza el 2-sep** — conjunto propio, $20.000, un solo anuncio, mensaje prellenado propio.
-   #66 y #69 ya están cerrados. El gate de 15-20 entregas (#67) es para **escalar**, no para lanzar
-6. 📌 **Motorizados no se toca hasta el 4-sep.** Bajado a $15.000 el 1-sep → está en aprendizaje.
-   Y quedó demostrado que **no escala por tamaño de audiencia** (1.902 de alcance), como decía julio
-7. ⚠️ **NO leer los días sueltos por guías/día.** Las guías son despachos: finde y festivos se
-   acumulan en un lote (31 guías = **2,9x** un día hábil de 10,8). Un día hábil normal tras la
-   descarga se ve como **−75%** sin que exista una caída real → **0-Y**
-8. 📌 **Un conjunto, un anuncio, cuando quieras medir.** De 8 anuncios de la cuenta, uno se lleva el
-   93% y tres nunca recibieron entrega. **Meta no reparte: elige** → **0-AA**
+1. 🔴 **EL 4-SEP: ver si el colmena ya se muestra.** Republicado el 3-sep con Advantage+ amplio y
+   Colombia. **La métrica es impresiones, no ventas:** tuvo 1.068 en dos días y cero pedidos porque
+   nunca se mostró. **>3.000 = era la subasta · <500 = es el producto** → **0-AB**
+2. 💰 **Cobrar lo que está parado — es la plata más fácil y ya lleva días:**
+   **$2.190.000** en guías congeladas de Servientrega (#74) + **$945.000** en "Reclame en oficina"
+   (#75) + la huérfana de Chía. **No requiere publicidad, ni producto, ni precio**
+3. 🎬 **Completar la reasignación al video si se sostiene:** Domiciliarios $45.000 → $25.000 ·
+   VIDEO $35.000 → $55.000. Ya pasó de 24% a 62% del gasto de Med+Bog y el CPA bajó 35% → **#71**
+4. **NO subir el presupuesto total.** La elasticidad 0,63 se volvió a confirmar. **Reasignar sí,
+   sumar no.** El total está en $150.000 con gasto real de $160.000-$180.000
+5. 🧪 **Darle audiencia propia a Prueba social (#77) y conjunto propio a TEST B Franja (#78).**
+   Los dos le ganan a Fondo azul y los dos están ahogados por él en la misma subasta
+6. 📦 **Vigilar la mezcla de bandas del colmena (#79).** Con envío gratis nacional, el 42% de los
+   pedidos cae en banda E y el margen baja de ~$35.000 a ~$29.500. **Si D+E pasa de 50%, cobrar
+   envío en esas dos bandas** — no cerrar el país
+7. 📌 **Motorizados: si el 4-sep sigue arriba de $1.000, se pausa.** Quedó demostrado que no escala
+8. ⚠️ **NO leer los días sueltos por guías/día.** Las guías son despachos. **No hubo despacho el
+   1-sep**, así que el lote del 2 cubre dos días de ventas → **0-Y**, aplicado en **0-AB**
+9. 📌 **Un conjunto, un anuncio.** Confirmado tres veces: Valle pasó de 27% a 75% de utilización al
+   dejar uno; TEST B quedó en **1 impresión**; el colmena murió por canibalización. **Meta no
+   reparte entre anuncios: elige** → **0-AB**
+10. 📌 **Nunca juzgar un creativo por CTR, CPC o CPM, ni con menos de ~30 conversaciones, ni en
+    ventanas de menos de 3 días.** El video gana con el peor CTR y el CPC más caro de la cuenta →
+    **0-AB**
 
 ---
 
@@ -1243,6 +1291,219 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-AB. 💰 EL CPA CASADO: $8.257 (−35%) Y LA REASIGNACIÓN AL VIDEO FUNCIONÓ (2026-09-01 al 2026-09-03)
+
+**Origen:** exports de Meta por anuncio × región × día (1, 2 y 3-sep) y export de 99 Envíos del 3-sep
+(87 guías del 31-ago al 3-sep). **Es la primera ventana con gasto y ventas alineados**, lo que cierra
+el pendiente **#65** abierto desde el 25-ago.
+
+### ✅ #65 CERRADO — EL CPA YA NO ES PROVISIONAL
+
+| Día | Gasto Meta |
+|---|---|
+| 1-sep | $173.163 |
+| 2-sep | $190.163 |
+| 3-sep *(parcial, export de la tarde)* | $90.802 |
+| **Total** | **$454.128** |
+
+| | |
+|---|---|
+| Pedidos despachados (lotes del 2 y 3-sep) | **55** |
+| Unidades | 67 |
+| **CPA** | **$8.257** |
+| CPA del 1-sep aislado | $12.639 |
+| **Mejora** | **−34,7%** |
+
+⚠️ **Con el día 3 completo el CPA subiría a ~$9.300** (igual −26%). Y **no hubo despacho el 1-sep**, así
+que el lote del 2 (32 guías) cubre ventas del 1 y del 2 → **la ventana correcta es 1-3 sep, no 2-3.**
+Regla de 0-Y aplicada.
+
+### 💵 LA UTILIDAD DE LOS TRES DÍAS
+
+| | |
+|---|---|
+| Recaudo | $5.130.900 |
+| − Flete | −$1.271.583 |
+| − Producto (67 uds × $34.000) | −$2.278.000 |
+| − Publicidad | −$454.128 |
+| **Utilidad bruta** | **$1.127.189** |
+| Por pedido | **$20.494** |
+| Margen sobre recaudo | **22,0%** |
+
+Ajustada por rechazo: **~$1.103.000** con el 1,6% observado con Interrapidísimo · **~$1.042.000** con
+5% · **~$867.000** con el 15,3% histórico de Heka.
+
+🔑 **El margen por pedido antes de pauta salió en $28.751 contra los $28.715 documentados: 0,1% de
+diferencia.** El tarifario está cobrando exactamente lo que debe. Flete = **24,8%** del recaudo.
+Y solo **4 de 55 pedidos** (7,3%) usaron descuento de cierre, bien por debajo de la alarma del 15%.
+
+### 🏆 LA REASIGNACIÓN AL VIDEO: EJECUTADA Y FUNCIONANDO
+
+Participación del video en el gasto de Medellín+Bogotá:
+
+| | Domiciliarios | VIDEO | VIDEO % |
+|---|---|---|---|
+| 1-sep | $102.642 | $31.868 | 23,7% |
+| 2-sep | $83.229 | $53.061 | 38,9% |
+| 3-sep | $27.744 | $44.466 | **61,6%** |
+
+En tres días pasó de un cuarto a dos tercios del gasto, **y el CPA bajó 35% en paralelo.** No es prueba
+de causalidad limpia, pero las dos curvas van en la dirección que predecía el experimento.
+
+⚠️ **El control quedó contaminado el 2-sep** y hay que decirlo: al bajar Domiciliarios de $60.000 a
+$45.000 su costo por conversación mejoró de $1.368 a $583, que es exactamente lo que se había
+advertido que pasaría (menos inventario marginal caro). **VIDEO y Domiciliarios quedaron empatados
+($582 vs $583) y ya no se puede separar** cuánto fue el creativo y cuánto el recorte de presupuesto.
+Se sacrificó el control por adelantar la reasignación un día.
+
+### 🔑 EL MECANISMO DEL VIDEO, MEDIDO: NO ES EL CLIC, ES QUIÉN ESCRIBE
+
+| 1-sep | Domiciliarios | VIDEO |
+|---|---|---|
+| CTR de enlace | 1,26% | **0,90%** 🔴 |
+| CPC | $254 | **$481** 🔴 |
+| **Clic → conversación** | **17,6%** | **56,9%** 🟢 |
+| **Costo/conversación** | $1.441 | **$845** |
+
+**El video pierde en las dos métricas que uno mira primero y gana en la única que importa.** Atrae
+menos gente al enlace y cada clic cuesta el doble, pero **57 de cada 100 escriben contra 18.**
+
+📌 **REGLA: nunca decidir un creativo por CTR, CPC ni CPM.** Solo por costo por conversación. Si el
+video se hubiera juzgado por CTR se habría apagado el primer día.
+
+Y el deterioro histórico de Domiciliarios se explica en el mismo lugar: CPM **mejoró** ($4.391 →
+$3.211), CPC **mejoró** ($270 → $254), pero el clic→conversación **se derrumbó de ~41% a 17,6%.**
+No era subasta ni fatiga (frecuencias entre 1,04 y 1,31, nadie ve el anuncio repetido): era el creativo.
+
+### ✅ #72 CERRADO — VALLE SE DESTRABÓ BORRANDO DOS ANUNCIOS
+
+| Valle | 1-sep | 2-sep |
+|---|---|---|
+| Anuncios | 3 (2 archivados después) | **1** |
+| Gastado | $3.990 | **$11.251** |
+| **Utilización** | 27% | **75%** 🟢 |
+
+**Borrar los dos anuncios de más triplicó la entrega en un día.** El conjunto llevaba tres días
+gastando 24-29% de su presupuesto y el diagnóstico era correcto.
+
+⚠️ **Pero Valle dejó de ser más barato que el control:** el 2-sep quedó en $1.081 contra $583 de
+Domiciliarios (85% MÁS caro). Su ventaja del 22% de los días previos era en buena parte un artefacto
+de que Domiciliarios estaba inflado a $60.000. **Sigue siendo rentable** (equilibrio $2.176) pero pasa
+de "mejor que el control" a "una región más". Eso **debilita la tesis del lago** y hay que decirlo.
+
+### 📌 LA REGLA QUE SE CONFIRMÓ TRES VECES: UN CONJUNTO, UN ANUNCIO
+
+| Caso | Evidencia |
+|---|---|
+| Lago Valle | 3 anuncios → 27% de utilización. Con 1 → **75%** |
+| TEST B Franja en Domiciliarios | Reactivado y **asfixiado a 1 impresión y $3** el 3-sep |
+| Colmena | 1 anuncio, correcto — su problema fue otro |
+
+**Meta no reparte entre anuncios: elige, y elige con los primeros datos.** No existe configuración
+para forzar reparto — el presupuesto vive en el conjunto o en la campaña, **nunca en el anuncio.**
+Un anuncio por conjunto es la única palanca real de control.
+
+### 🔴 EL COLMENA NO VENDIÓ PORQUE NO SE MOSTRÓ
+
+| Colmena | 2-sep | 3-sep |
+|---|---|---|
+| Gastado | $7.279 | **$250** |
+| **Impresiones** | 1.038 | **30** 🔴 |
+| CPM | $7.013 | $8.333 |
+| Pedidos | 0 | 0 |
+
+**Cero pedidos del colmena en las 87 guías**: ninguna con valor $149.900. Pero la causa no es el
+producto ni el creativo:
+
+- ✅ El anuncio ("Video Jairo Colmena") está **Activa y aprobado** — no fue rechazo
+- ✅ Su **clic→conversación es 36%**, el doble que Fondo azul (17,6%)
+- ✅ Su costo de $1.882 cae en la banda esperada ($1.800-$2.500)
+- 🔴 **1.068 impresiones en dos días.** Domiciliarios hizo 25.389 solo el 2-sep
+
+🔑 **Causa: canibalización.** Era un duplicado de Domiciliarios compartiendo el público guardado
+"BikerPro" contra **$80.000 de presupuesto combinado** teniendo solo $20.000. El más nuevo y el más
+chico pierde todas las pujas y se queda con el inventario sobrante, el más caro → **CPM +117%.**
+
+Es el mismo mecanismo que ahoga a Prueba social (CPM +65%). **Van dos conjuntos muertos por esto.**
+
+**Corrección aplicada el 3-sep:** público guardado quitado → **Advantage+ amplio**, y geografía de
+Medellín+Bogotá → **Colombia**. Presupuesto y creativo sin tocar.
+
+⚠️ **Dos cambios a la vez, aceptado a propósito:** con 4 conversaciones y 1.068 impresiones **no hay
+línea base que contaminar.** El objetivo no era medir, era conseguir entrega.
+
+**Métrica del 4-sep: impresiones, no ventas.** >3.000 = era la subasta · <500 = es el producto.
+**El colmena no ha tenido su oportunidad todavía.**
+
+### ⚠️ EL RIESGO DEL ENVÍO GRATIS NACIONAL
+
+El colmena absorbe el flete. El tradicional se lo pasa al cliente. Y la mezcla real de destinos de los
+43 pedidos sencillos del 2-3 sep es la peor posible para eso:
+
+| Banda | % de pedidos | Margen del colmena |
+|---|---|---|
+| A · Bogotá | 16% | $38.588 |
+| B | 2% | $34.733 |
+| C · capitales | 14% | $30.621 |
+| D · intermedias | 25% | $28.514 |
+| **E · pueblos** | **42%** 🔴 | **$26.063** |
+
+| | Med+Bog | Colombia |
+|---|---|---|
+| Margen esperado | ~$35.000 | **~$29.500** |
+| **Cierre necesario para no perder** | 6,3% | **7,5%** |
+
+Abrir el país le cuesta **~$6.000 por pedido (−17%)** y sube el cierre exigido de 6,3% a 7,5%, o sea
+casi el mismo del tradicional (8,8%).
+
+📌 **Se aceptó porque el problema que bloqueaba era la entrega, no el margen: $6.000 sobre cero pedidos
+son cero pesos.** Pero hay que vigilar la mezcla → **#79**.
+🔑 **Si la banda D+E pasa de 50%, la solución NO es cerrar el país: es cobrar envío en D y E** y dejar
+el envío gratis solo hasta la C. Ya estaba previsto como plan B en 0-Z.
+
+### ✅ #73 CERRADO — EL $431 DE TEST CREATIVOS ES 100% "PRUEBA SOCIAL"
+
+Es el único anuncio que entrega en ese conjunto; los otros dos reciben $0. Sus ratios son los mejores
+de la cuenta —**CTR 5,2-6,7%** y **clic→conversación 50%**— pero su **CPM de $5.034 (+63%)** y su
+alcance de 1.448 personas lo tienen topado en **33-38% de utilización.**
+
+⚠️ **Y el 2-sep empeoró de $431 a $600 gastando más.** Eso apoya que su número barato es en parte
+"nata de conjunto hambriento", el mismo patrón de Motorizados ($565 → $1.043). **La eficiencia parece
+real; el volumen a escala no está probado.** Solución: audiencia propia → **#77**.
+
+### 🚚 SERVIENTREGA: 9 DE 10 GUÍAS DEL 31-AGO SIGUEN CONGELADAS
+
+| Del lote del 31-ago | Servientrega | Interrapidísimo |
+|---|---|---|
+| Guías | 10 | 22 |
+| **EN PROCESAMIENTO** | **9** 🔴 | 0 |
+| Entregadas | 1 | 5 |
+| En ruta / oficina / acopio | 0 | 16 |
+
+**Última actualización de las 9: el 1 de septiembre.** No se movieron en dos días. **$794.000 detenidos**,
+que se suman a las 14 guías del 24-28 ago (~$1.396.000) → **mínimo $2.190.000 congelados.**
+
+Y del lote de Interrapidísimo: **9 guías en "Reclame en oficina" = $945.000** esperando que el cliente
+recoja. Si no van, se vuelven devolución.
+
+📌 **Nueva guía huérfana: Mariela García, CHÍA, $73.000** — creada el 31-ago y su última actualización
+es la misma hora de creación. Nunca la recogieron. **Es la segunda huérfana consecutiva en Chía** (la
+anterior, Mario Yair, sí se re-despachó el 2-sep). Vale preguntarle a Interrapidísimo por esa ruta.
+
+### 🔄 CORRECCIONES DE CRITERIO DE ESTA VENTANA
+
+| Qué se corrigió | Por qué |
+|---|---|
+| **TEST B Franja se pausó por error** | Es el **2º mejor creativo**: $695 con **53 conversaciones** en 7 días, 17% más barato que Fondo azul. Se pausó por un día con **n=2** ($2.640), y antes se había usado CTR/CPC como sustituto de costo por conversación. Reactivado el 2-sep |
+| **Motorizados sí puede gastar** | A $25.000 gastó 86%, no 71%. No es techo duro de audiencia: **absorbe la plata pero al doble de costo** ($565 → $1.043). Se le subió el presupuesto ignorando que julio ya había documentado que no escala |
+| **El "4× de costo marginal" era ruido** | La ventana de la tarde del 1-sep dio $2.653 para Domiciliarios, pero la de la noche dio $787. Era una ventana de 4 horas, no una constante. **La evidencia sólida es el clic→conversación**, que es estructural |
+| **El sobregasto no viene de otros conjuntos** | ABO reconfirmado: el presupuesto **no viaja** entre conjuntos. Meta sobregasta uno y compensa en la semana |
+
+📌 **REGLA NUEVA: un creativo no se juzga con menos de ~30 conversaciones, ni en ventanas de menos de
+3 días, ni por CTR/CPC/CPM.** Con esa regla TEST B nunca se habría pausado.
 
 ---
 
@@ -3805,7 +4066,14 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     inflar el lado del finde.
     🗓️ **Decidir el lunes 31 con el desglose diario de Meta**, que es justo lo que permite separar
     gasto por día de la semana.
-65. [ ] 🔴🧮 **RECALCULAR EL CPA CASANDO GASTO Y VENTA DEL MISMO DÍA (sección 0-Y).**
+65. [x] ✅ **CERRADO EL 3-SEP: EL CPA CASADO ES $8.257.** Primera ventana con gasto y ventas alineados:
+    Meta 1-3 sep = **$454.128** contra **55 pedidos** de los lotes del 2 y 3-sep. **−34,7%** frente al
+    $12.639 del 1-sep aislado. Se respetó la regla de 0-Y: **no hubo despacho el 1-sep**, así que el
+    lote del 2 cubre dos días de ventas y la ventana correcta es 1-3, no 2-3.
+    🔑 **Margen por pedido antes de pauta: $28.751**, contra los $28.715 documentados = 0,1% de
+    diferencia. **Utilidad de los 3 días: $1.127.189** (22,0% sobre recaudo). Ver **0-AB**.
+    ↓ *(texto original de la tarea, se conserva)*
+    🔴🧮 **RECALCULAR EL CPA CASANDO GASTO Y VENTA DEL MISMO DÍA (sección 0-Y).**
     El **$7.167 pasa a PROVISIONAL.** Dos descuadres: el export de Meta 21-24 trae **$346.176** y no
     los $293.831 que se usaron; y las 41 guías eran 10 del viernes 21 + 31 del lote sáb+dom, o sea
     que **el viernes aporta ventas pero quizá no su gasto, y el lunes 24 no aparece.**
@@ -3849,13 +4117,27 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     video se desgasta más adelante.
     ⚠️ **Esperar al 4-sep y no reasignar antes:** el conjunto del video tenía 2 días de vida y parte de
     su ventaja puede ser entrega favorable de conjunto nuevo. Dos días más lo despejan.
-72. [ ] 🌎🔧 **ARREGLAR LA ENTREGA DE LAGO VALLE — solo gasta 24% de su presupuesto.**
+72. [x] ✅ **CERRADO EL 2-SEP: ERAN LOS 3 ANUNCIOS.** Al dejar **un solo anuncio activo** (Fondo azul) y
+    archivar los otros dos, la utilización pasó de **27% a 75%** en un día ($3.990 → $11.251).
+    ⚠️ **Pero Valle dejó de ser más barato que el control:** $1.081 contra $583 de Domiciliarios el
+    2-sep (85% MÁS caro). Su ventaja previa del 22% era en parte artefacto de que Domiciliarios estaba
+    inflado a $60.000. **Sigue rentable** (equilibrio $2.176) pero **debilita la tesis del lago**.
+    Ver **0-AB**.
+    ↓ *(texto original de la tarea, se conserva)*
+    🌎🔧 **ARREGLAR LA ENTREGA DE LAGO VALLE — solo gasta 24% de su presupuesto.**
     $3.591 de $15.000 en un día completo. Revisar en orden: **(a)** que haya **un solo anuncio activo**
     en el conjunto (el duplicado trajo 5); **(b)** si con uno solo sigue sin entregar, el público quedó
     muy chico (Valle + público guardado + sin expansión) → ampliar edades o quitar intereses.
     🔑 **Sin resolver esto el lago no se puede evaluar**, y la señal es buena: 22% más barato que el
     control en tres cortes seguidos. Umbral de muerte $1.400; equilibrio real $2.176.
-73. [ ] 📊 **PEDIR EL DESGLOSE POR ANUNCIO DE TEST CREATIVOS.** Marcó **$414** el 1-sep, el más barato
+73. [x] ✅ **CERRADO EL 3-SEP: ES 100% "PRUEBA SOCIAL +50 CLIENTES".** Es el único anuncio que entrega
+    en ese conjunto; los otros dos reciben $0. Sus ratios son los mejores de la cuenta (**CTR 5,2-6,7%**,
+    **clic→conversación 50%**) pero su **CPM de $5.034 (+63%)** y su alcance de 1.448 personas lo topan
+    en 33-38% de utilización. ⚠️ **Y el 2-sep empeoró de $431 a $600 gastando más**, lo que apoya que
+    parte de su número barato es "nata de conjunto hambriento". **Eficiencia real, volumen no probado.**
+    → la solución es audiencia propia, no presupuesto: **#77**. Ver **0-AB**.
+    ↓ *(texto original de la tarea, se conserva)*
+    📊 **PEDIR EL DESGLOSE POR ANUNCIO DE TEST CREATIVOS.** Marcó **$414** el 1-sep, el más barato
     de la cuenta, pero gastando 33% del presupuesto y con alerta de 7 días en $963,63 (+51,2%).
     ⚠️ **NO reasignar plata ahí esperando que aguante $414** — es el patrón de Motorizados. Lo que sí
     vale es saber **cuál** de sus 3 anuncios lo produce. Ver **0-AA**.
@@ -3872,7 +4154,33 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     en tres periodos). Valle es el molde; si responde, se replica región por región. Ver **0-AA**.
     **Orden sugerido por la serie consolidada:** Santanderes (entrega 71%, upside $103.153) antes que
     Atlántico, que está más sub-explotado pero su **entrega del 50%** hunde el margen esperado a $3.616.
-    ⚠️ **Antes de abrir el segundo lago hay que resolver #72**, o se repite el problema de no-entrega.
+    ⚠️ **Antes de abrir el segundo lago hay que resolver #72** ✅ *(resuelto el 2-sep)*, o se repite el
+    problema de no-entrega. ⚠️ **Y ojo: con #72 resuelto, Valle quedó 85% MÁS CARO que el control**
+    (0-AB). La tesis del lago se debilitó; revalidar antes de abrir el segundo.
+77. [ ] 🧪💎 **DARLE AUDIENCIA PROPIA A "PRUEBA SOCIAL" — está ahogado, no es malo.**
+    Tiene los mejores ratios de la cuenta (**CTR 5,2-6,7%**, **clic→conversación 50%**, CPC $224) y aun
+    así solo gasta **33-38%** de sus $20.000, pagando el **CPM más alto (+63%)**.
+    🔑 **La causa es canibalización:** TEST Creativos es un duplicado que comparte la audiencia guardada
+    "BikerPro" con Domiciliarios, que tiene 6× su presupuesto y la señal histórica. **Meta le da el
+    inventario al conjunto grande.**
+    ⚠️ **NO es problema de presupuesto: bajarlo no ahorra nada** (no gasta lo que tiene) y **subirlo
+    tampoco sirve** si no puede ganar pujas. La salida es **audiencia distinta**, igual que se hizo con
+    el colmena el 3-sep. Ver **0-AB**.
+78. [ ] 🧪🔴 **CONJUNTO PROPIO PARA TEST B FRANJA REFLECTIVA — es el 2º mejor creativo y está muerto.**
+    **$695 con 53 conversaciones** en 7 días = **17% más barato que Fondo azul ($841)**. Reactivado el
+    2-sep dentro de Domiciliarios y Meta lo dejó en **1 impresión y $3** el 3-sep.
+    ⚠️ **Se pausó por error** el 1-sep basándose en un día con **n=2** ($2.640) y en CTR/CPC como
+    sustituto del costo por conversación. **No repetir ese error.**
+    📌 Presupuesto sugerido: **$25.000, no $20.000** — el conjunto chico paga la prima de CPM.
+    ⚠️ **Esperar que su costo suba:** el $695 lo consiguió con 6,9% del presupuesto, o sea la nata.
+    Umbral: bajo $1.100 sigue ganándole a Fondo azul; sobre $1.368 era artefacto de estar hambriento.
+79. [ ] 📦🔔 **VIGILAR LA MEZCLA DE BANDAS DEL COLMENA — el envío gratis nacional le cuesta margen.**
+    El colmena absorbe el flete y el **42%** de los pedidos cae en **banda E**. Al pasar de Med+Bog a
+    Colombia (3-sep), el margen esperado baja de **~$35.000 a ~$29.500** (−17%) y el cierre necesario
+    sube de **6,3% a 7,5%** — casi el del tradicional (8,8%).
+    🔑 **Si la banda D+E pasa de 50% de los pedidos del colmena, la solución NO es cerrar el país: es
+    cobrar envío en D y E** y dejar el envío gratis solo hasta la C. Ya previsto como plan B en 0-Z.
+    📌 Revisar con los primeros 10-15 pedidos, junto con **#67**.
 62. [ ] 🔔 **GATILLO DE BANDA E — NO ES UN PENDIENTE DE PRECIO, ES DE VIGILANCIA.**
     **El dueño decidió el 24-ago dejar banda E en $85.000** aunque el flete subió a $25.481 y se
     absorben **$381 por venta (~$2.262/día).** ✅ **Es sostenible: la cartera queda en +$5.956 sobre
