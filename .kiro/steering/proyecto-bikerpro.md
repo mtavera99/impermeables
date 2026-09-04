@@ -12,11 +12,12 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 # 🧭 ÍNDICE — POR DÓNDE EMPEZAR
 
 **Si tenés 2 minutos:** leé el bloque "ESTADO VIGENTE AL 2026-08-28" y la lista de pendientes vivos.
-**Si tenés 15:** leé además las secciones 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
+**Si tenés 15:** leé además las secciones 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
-| **0-AB** | 💰 **CPA casado $8.257 (−35%)** · utilidad 3 días $1.127.189 · el video ganó · Valle destrabado · el colmena no se mostraba | 1 al 3-sep |
+| **0-AC** | 🎯 **CPA real $7.806 (−38%)** · modelo de margen · fuga de flete $2.800/despacho · costo marginal y protocolo de escalamiento · plan del colmena | **4-sep** |
+| 0-AB | 💰 CPA casado $8.257 ⚠️ **corregido a $7.806 en 0-AC** · utilidad 3 días $1.127.189 → **$1.374.789** · el video ganó · Valle destrabado · el colmena no se mostraba | 1 al 3-sep |
 | **0-AA** | 🌎 **La pauta solo cubría 2 ciudades** · el video nuevo gana 30,8% · Servientrega atascada · Valle abierto | 31-ago / 1-sep |
 | **0-Z** | 🆕 **catálogo de 3 productos** · precios · márgenes · guiones · anuncios · logo | 28-ago |
 | **0-Y** | 🗓️ **guías/día ≠ ventas/día** · el finde rinde +44% · CPA provisional | 25-ago |
@@ -53,10 +54,11 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 > **Corte de producto y contenido:** 28-ago. **Último corte de métricas operativas:** 25-ago; no se
 > maquillaron como nuevas. El CPA de $7.167 sigue provisional hasta casar gasto y ventas del mismo día.
 >
-> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE. ESTÁ EN 0-AB (1 al 3-sep) Y 0-AA (31-ago / 1-sep).**
+> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE. ESTÁ EN 0-AC (4-sep), 0-AB (1 al 3-sep) Y 0-AA (31-ago / 1-sep).**
 > **Las métricas de abajo son del corte del 25-ago y NO reflejan el estado de la cuenta hoy.**
 >
-> **Estado real al 3-sep:** CPA casado **$8.257** (−35%) · utilidad de 3 días **$1.127.189** ·
+> **Estado real al 4-sep (ver 0-AC):** CPA real **$7.806** (−38%, corrige el $8.257) · utilidad de
+> 3 días **$1.374.789** · margen = **$25.900/unidad − $2.800/despacho** · VIDEO subido a **$55.000** ·
 > el video nuevo ganó y se llevó el 62% del gasto de Medellín+Bogotá · Valle destrabado al 75% ·
 > el colmena no vendió porque **no se estaba mostrando** (1.068 impresiones en 2 días).
 
@@ -1294,6 +1296,221 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-AC. 🎯 EL CPA REAL ES $7.806 (−38%), EL MODELO DE MARGEN, Y CÓMO ESCALAR SIN QUEMAR EL COSTO (2026-09-04)
+
+### ❌ EL CPA SE CALCULÓ MAL DOS VECES — LA TERCERA ES LA BUENA
+
+| Versión | CPA | vs $12.639 | Qué tenía mal |
+|---|---|---|---|
+| 1ª (0-AB) | $8.257 | −35% | Gasto del 3-sep **parcial** ($90.802) **y** faltaban 10 pedidos. Dos errores que se cancelaban |
+| 2ª | $9.200 | −27% | Se arregló el gasto, pero se dejaron los 10 pedidos afuera |
+| **REAL** | **$7.806** | **−38%** | Gasto completo **y** pedidos completos |
+
+**Ventana 1-3 sep, cifras definitivas:**
+
+| | |
+|---|---|
+| Gasto Meta | **$515.211** (1-sep $173.163 · 2-sep $190.163 · **3-sep $151.885**) |
+| Pedidos | **66** · **80 unidades** (1,212 uds/pedido) |
+| **CPA por pedido** | **$7.806** |
+| CPA por unidad | $6.440 |
+| Margen bruto x pedido | $28.636 |
+| **Utilidad x pedido** | **$20.830** (te quedas con el 73%) |
+| Bruto 3 días | $1.890.000 |
+| **NETO 3 días** | **$1.374.789** ($458.263/día · 22,5% sobre recaudo) |
+| Cierre conversación → pedido | **8,4%** |
+
+⚠️ **LECCIÓN DE PROCESO: el CPA se casa con la FECHA DE LA CONVERSACIÓN, no con la fecha de despacho.**
+99 Envíos da fecha de despacho, que es la que NO sirve. Los pedidos de la tarde se despachan al otro
+día, así que **todo día recién cerrado está incompleto** y el CPA sale inflado si se divide de una.
+
+📌 **FALTA UNA COLUMNA:** hay tres fechas por pedido y solo se guardan dos.
+
+| Fecha | Dónde está | Para qué |
+|---|---|---|
+| **Conversación** | WhatsApp | **medir la pauta** ← la que falta anotar |
+| Pedido cerrado | en ningún lado | medir el cierre de la IA |
+| Despacho | 99 Envíos | logística y flete |
+
+### 💵 EL MODELO DE MARGEN (reemplaza el promedio de "$28.751 por pedido")
+
+```
+Margen = $25.900 × unidades  −  $2.800 × despachos
+```
+
+Validado contra 1-3 sep: reproduce los $1.581.317 documentados **exacto**. Derivación:
+
+| | |
+|---|---|
+| Cada unidad deja | $59.900 − $34.000 = **$25.900** |
+| Envío cobrado al cliente | **$20.320** promedio |
+| Flete que se paga | **$23.120** promedio (incluye seguro) |
+| **Cada despacho CUESTA** | **−$2.800** |
+
+🔴 **FUGA CONFIRMADA: se subsidia el flete en $2.800 por despacho = ~$1.848.000/mes** a 22 pedidos/día.
+Y es un promedio: en banda E la pérdida por despacho es mayor. **Se subsidia más al cliente más lejano.**
+
+🔑 **POR ESO EL PEDIDO DE 2 UNIDADES VALE 2,1x, NO 2x** — el flete se paga una sola vez:
+
+| Pedido | Margen |
+|---|---|
+| 1 ud | $23.100 |
+| **2 uds** | **$49.000** |
+| 3 uds | $74.900 |
+
+Un pedido de 2 uds con **$5.000 de descuento en la segunda** todavía deja **$44.000**, casi el doble de
+un sencillo. La IA de WhatsApp puede ofrecerlo sola. Tres formas de tapar la fuga, de menor a mayor riesgo:
+**(1)** subir el envío cobrado $3.000 · **(2)** empujar los dobles · **(3)** ofrecer recogida en bodega.
+
+### 📦 LA VENTA INVISIBLE DE BODEGA — EL CANAL MÁS RENTABLE Y NO SE MIDE
+
+El 3-sep se despachó una venta de **2 unidades recogidas en bodega**. No quedó en WhatsApp ni en 99 Envíos.
+
+| | Margen | Por unidad |
+|---|---|---|
+| 2 uds **en bodega** | **$51.800** | **$25.900** |
+| 2 uds despachadas | $49.000 | $24.500 |
+
+Los $2.800 de diferencia son el flete que no se pagó. Y además: **cero devolución, cero seguro, cero guía
+congelada, plata el mismo día.**
+
+⚠️ **TRES COSAS QUE ROMPE NO REGISTRARLA:**
+1. **El inventario miente.** Salieron **69 unidades** en 1-3 sep, no 67. Sin registro parecen perdidas.
+2. **El CPA se ve peor.** Los pedidos eran 56, no 55.
+3. **No se puede hacer crecer lo que no se mide.** El canal más rentable es invisible.
+
+📌 **Hoja manual:** fecha en que escribió · fecha despacho · unidades · ciudad · valor · **bodega/despacho**.
+
+### 🎯 EL COSTO MARGINAL: EL NÚMERO PARA ESCALAR SIN QUEMAR EL COSTO POR MENSAJE
+
+**El promedio engaña. Lo que importa es qué compró la plata NUEVA.**
+
+| | Conversaciones | $/conv | Costo marginal |
+|---|---|---|---|
+| **Motorizados** $15.000 | 24,8 | $605 | — |
+| **Motorizados** $25.000 | 24,0 | $1.043 | **INFINITO** — los $10.000 extra compraron **CERO** |
+| **VIDEO** 2-sep $35.000 | 60 | $582 | — |
+| **VIDEO** 3-sep $64.520 | 103 | $626 | **$689** — los $29.520 extra compraron **+43** |
+
+🔑 **El promedio de Motorizados subió no porque se encareciera la audiencia, sino porque se dividió más
+plata entre los mismos 24 mensajes.** Eso no se ve en el promedio, solo en el marginal.
+
+**Límite real: $2.402 por conversación** (ahí la utilidad llega a cero, con cierre de 8,4%).
+El VIDEO va en $689 marginal → le quedan **3,5x** de espacio.
+
+### ⚖️ UN COSTO POR MENSAJE MÁS ALTO NO ES MALO — Y HAY UN PICO
+
+| $/mensaje | CPA | Utilidad/pedido | Pedidos/día | **Utilidad del día** |
+|---|---|---|---|---|
+| $655 | $7.798 | $20.838 | 22 | $458.444 |
+| $900 | $10.714 | $17.922 | 34 | $609.338 |
+| **$1.100** | $13.095 | $15.541 | 42 | **$652.712** ← pico |
+| $1.400 | $16.667 | $11.969 | 50 | $598.467 |
+
+🔴 **LLEGAR A 50 UNIDADES/DÍA PUEDE DAR MENOS PLATA QUE QUEDARSE EN 42.** La meta de 50 uds/día
+(`META-50-UNIDADES-DIARIAS.md`) **puede estar pasada del punto óptimo.** Revisar al llegar.
+*(Los pedidos/día de esa tabla son supuestos para mostrar la forma, no medidos.)*
+
+### 📋 PROTOCOLO DE ESCALAMIENTO (usar siempre)
+
+1. **Pasos de 20-25% máximo.** Más grande le reinicia el aprendizaje y da 2 días de datos basura.
+2. **Esperar 48-72 h entre pasos.** Meta promedia sobre 7 días; medir al día siguiente es medir ruido.
+3. **La alarma temprana es el ALCANCE, no el costo.** Si sube el presupuesto y el alcance no crece, se
+   está pagando por mostrarle el anuncio otra vez a la misma gente. **Avisa ANTES de que el costo suba.**
+4. **TRIPWIRE: costo marginal sobre $1.200 dos días seguidos → volver al escalón anterior.**
+   $1.200 es la mitad del equilibrio, así que aun disparándose se gana plata mientras se reacciona.
+
+⚠️ **LA DEUDA DEL SOBREGIRO:** el VIDEO gastó $64.520 con presupuesto de $35.000. **Meta prestó $29.520
+y los cobra durante la semana.** Al subirlo a $55.000 es probable que gaste igual o menos que el 3-sep y
+salgan menos conversaciones. **Eso NO es que se dañó: es la deuda pagándose. NO TOCAR.**
+
+### 🚫 MOTORIZADOS: TECHO CONFIRMADO POR TERCERA VEZ
+
+3-sep a $15.000: **$605** y 97% de utilización, casi su mejor marca histórica ($565). **Bajarlo de
+$25.000 a $15.000 fue correcto: −40% de presupuesto → −42% de costo.** Su audiencia está tapada en
+**~24 conversaciones diarias.** Para crecer por ahí hay que **cambiarle la audiencia, no el presupuesto.**
+
+### ✅ LA TABLA DE BANDAS DEL COLMENA ESTÁ BIEN — NO "CORREGIRLA"
+
+**Se intentó corregirla por error el 4-sep. La tabla es correcta. Guardado para que no vuelva a pasar.**
+
+Los márgenes de la tabla (**A $38.588 … E $26.063**) son **NETOS**: ya tienen restada la pauta, las
+devoluciones y la comisión de recaudo del 3% — una reserva de **~$13.400 por pedido**. Restarles el flete
+otra vez "deduce" un flete imposible de $38.837.
+
+| Banda | % | Flete | Bruto s/pauta | **Neto (tabla)** | Reserva |
+|---|---|---|---|---|---|
+| A | 16% | $12.871 | $52.029 | **$38.588** | $13.441 |
+| B | 2% | $16.811 | $48.089 | $34.733 | $13.356 |
+| C | 14% | $20.923 | $43.977 | $30.621 | $13.356 |
+| D | 25% | $23.030 | $41.870 | $28.514 | $13.356 |
+| E | **42%** | $25.029 | $39.871 | **$26.063** | $13.808 |
+
+✅ **Flete ponderado con la mezcla real: $21.594**, contra los **$23.120** medidos en 65 despachos del
+tradicional. **Coinciden** (la diferencia es el seguro). La tabla nunca dijo $38.837 de flete.
+
+🔑 **REGLA: nunca deducir un costo restándolo de un margen agregado sin verificar qué ya trae adentro.**
+Y **no comparar bruto contra neto, ni por-unidad contra por-pedido.** El equilibrio documentado de
+$39.632 (colmena) vs $23.800 (tradicional) es **por unidad** y cuadra con el modelo: $25.900 − $2.800/1,212 = **$23.590**.
+
+### 💎 EL COLMENA: EL PROBLEMA NO ES EL PRECIO, ES QUE NADIE LO VE
+
+Bruto antes de pauta, comparado apples-to-apples:
+
+| | Por pedido |
+|---|---|
+| **Colmena** (1 ud, flete ponderado $21.594) | **$43.306** |
+| Tradicional (1,212 uds) | $28.636 |
+| | **colmena +51%** |
+
+**Cierre mínimo que necesita el colmena** (sobre margen bruto): a $655/conv **1,6%** · a $900 **2,2%** ·
+a $1.200 **2,9%** · a $1.800 **4,3%**. **El tradicional cierra 8,4% → el colmena puede cerrar 3 veces
+peor y todavía gana.**
+
+🔑 **41 impresiones no venden nada, ni gratis.** Su CPM es **$7.439** contra $3.500-$5.300 del resto: no
+es que sea caro, es que **puja en desventaja dentro de la propia cuenta** contra conjuntos con historial
+que traen conversaciones a $626. Meta reparte hacia lo que ya funciona.
+
+**PLAN EN ORDEN (un frente a la vez, decidido por el dueño el 4-sep):**
+
+**Paso 0 — leer las impresiones del 4-sep cerrado** (republicado 3-sep 16:53, así que el 4-sep es su día 1):
+
+| Impresiones | Diagnóstico | Qué sigue |
+|---|---|---|
+| **> 3.000** | La subasta lo ahogaba, ya destrabó | Esperar conversaciones, no tocar |
+| 500 – 3.000 | Entrega a medias | Paso 1 |
+| **< 500** | Estructuralmente ahogado | Paso 1 urgente |
+
+**Paso 1 — campaña propia.** Presupuesto que nadie le quita, aprendizaje independiente, medición limpia.
+
+**Paso 2 — el ángulo, no el descuento.** 🔑 **El tradicional le roba el cliente al colmena en la cabeza
+del comprador, no solo en la subasta.** Mismo domiciliario viendo $59.900 y $149.900 escoge el barato.
+El colmena es para: **el que ya se compró uno barato y se le rompió** (el mejor), el de carretera o
+intermunicipal, y el de moto grande que no es domiciliario. Mensaje: **"no te vuelve a pasar"**, no precio.
+
+**Paso 3 — los que ya compraron.** Cientos de clientes que ya confiaron en pagar contraentrega. 300
+contactos × 3% = **$376.020** con pauta ~$0. ⚠️ **HACERLO POR AUDIENCIA PERSONALIZADA DE META, NO
+ESCRIBIENDO POR WHATSAPP.** Mensajes no solicitados = reporte = **si tumban el número se queda el
+negocio sin canal de ventas.** No vale el riesgo. Conecta con el pendiente **#77**.
+
+### 🧥 CHAQUETA REFLECTIVA: ORDEN CONFIRMADO POR EL DUEÑO
+
+**Primero el colmena vende, después la reflectiva.** Sigue trabada en **#68 (costo del proveedor)**, que
+**no toca ninguna campaña y se puede adelantar ya** — es una llamada. Con el costo se arma el precio.
+⚠️ **No subir su video a TikTok:** la IA de WhatsApp no conoce ese SKU y contesta mal.
+
+### 🖥️ CAMBIO EJECUTADO EL 4-SEP
+
+**Domiciliarios VIDEO: $35.000 → $55.000.** No fue apuesta: **ratifica lo que ya gastaba** ($64.520 a
+$626) y le quita a Meta la excusa para frenarlo por el sobregiro. **Único cambio del día.**
+El dueño confirmó: **inventario y caja tranquilos**, el miedo es que el costo por mensaje se dispare →
+de ahí el protocolo y el tripwire de arriba.
+
+📌 **6-sep: sacar el costo marginal del VIDEO contra el 3-sep.** Si sale bajo $1.200, siguiente escalón
+$65.000-$68.000 y **no más**.
+
+---
+
 ## 0-AB. 💰 EL CPA CASADO: $8.257 (−35%) Y LA REASIGNACIÓN AL VIDEO FUNCIONÓ (2026-09-01 al 2026-09-03)
 
 **Origen:** exports de Meta por anuncio × región × día (1, 2 y 3-sep) y export de 99 Envíos del 3-sep
@@ -1313,7 +1530,7 @@ el pendiente **#65** abierto desde el 25-ago.
 |---|---|
 | Pedidos despachados (lotes del 2 y 3-sep) | **55** |
 | Unidades | 67 |
-| **CPA** | **$8.257** |
+| **CPA** | ~~$8.257~~ → ⚠️ **$7.806** · corregido en **0-AC** (gasto del 3-sep parcial + faltaban 10 pedidos) |
 | CPA del 1-sep aislado | $12.639 |
 | **Mejora** | **−34,7%** |
 
@@ -4092,7 +4309,9 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 67. [ ] 💎 **VALIDAR LAS PRIMERAS 15-20 ENTREGAS DEL COLMENA ANTES DE ESCALAR.** Registrar por pedido:
     destino, flete, CPA atribuible, comisión de recaudo, prima/devolución y utilidad neta. Gate: no
     aumentar pauta si el promedio se aleja materialmente del escenario de **~$31.000 / 20,7%**.
-68. [ ] 🧥 **OBTENER DATOS DEL PROVEEDOR PARA LA CHAQUETA REFLECTIVA DOBLE FAZ.** Pedir costo, peso y
+68. [ ] 🧥⏫ **OBTENER DATOS DEL PROVEEDOR PARA LA CHAQUETA REFLECTIVA DOBLE FAZ.** ⚠️ **SUBIÓ DE
+    PRIORIDAD EL 4-SEP:** el dueño confirmó el orden *colmena vende → después reflectiva*. Esto **no
+    toca ninguna campaña y es una llamada**, así que se puede adelantar mientras el colmena resuelve. Pedir costo, peso y
     dimensiones empacadas, tallas, materiales, nivel de impermeabilidad, acabados y fotos reales.
     Después decidir precio y si el envío será gratis. **El guion final queda pausado hasta entonces.**
 69. [x] ✅ **CERRADO EL 1-SEP: GUION DE DOS SKU ESCRITO, PEGADO Y PROBADO.** Vive en
@@ -4107,7 +4326,13 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     80% de variantes con precio y 20% sin precio. Dar a cada anuncio un texto inicial de WhatsApp
     distinto y comparar pedidos, CPA y margen; CTR o conversaciones baratas por sí solos no deciden.
     ✅ **La parte de atribución arranca con el colmena el 2-sep**, que lleva mensaje prellenado propio.
-71. [ ] 🎬🔥 **EL 4-SEP: REASIGNAR PRESUPUESTO HACIA EL VIDEO NUEVO — la palanca más grande abierta.**
+71. [~] 🎬✅ **MITAD EJECUTADO EL 4-SEP: VIDEO YA ESTÁ EN $55.000.** Falta la otra mitad:
+    **Domiciliarios sigue en $45.000, no en $25.000.** Se dejó a propósito para no hacer dos cambios
+    el mismo día y poder atribuir. 📌 **El VIDEO ya venía gastando $64.520 con presupuesto de $35.000**,
+    así que subirlo no fue apuesta: fue ratificar el hecho y evitar que Meta le cobre el sobregiro de
+    $29.520 frenándolo. **Decidir Domiciliarios el 6-sep con el costo marginal en mano.** Ver **0-AC**.
+    ↓ *(texto original de la tarea, se conserva)*
+71b. [ ] 🎬🔥 **EL 4-SEP: REASIGNAR PRESUPUESTO HACIA EL VIDEO NUEVO — la palanca más grande abierta.**
     El video gana por **30,8% acumulado con 57 conversaciones** y su costo marginal es **4× más barato**
     que el control ($672 vs $2.653). Ver **0-AA**.
     **Movimiento propuesto:** Domiciliarios $60.000 → **$25.000** · Domiciliarios VIDEO $20.000 → **$55.000**.
@@ -4286,6 +4511,47 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     la fuga sigue corriendo.
 25. [ ] 📦💵 **[histórico] Vigilar INVENTARIO y CAJA** — ~25 pedidos en ruta = ~$850.000 amarrados.
     A 6-7 ventas/día son ~$238.000 de producto por día. **Es el freno real, ya no es Meta.**
+
+80. [ ] 📅🔑 **ANOTAR LA FECHA EN QUE EL CLIENTE ESCRIBIÓ — la columna que falta para medir la pauta.**
+    El 4-sep el CPA se calculó mal **dos veces** por esto: 99 Envíos da **fecha de despacho**, y los
+    pedidos de la tarde se despachan al otro día, así que todo día recién cerrado sale incompleto y el
+    CPA inflado. Diferencia medida entre casar bien o mal: **$7.806 vs $9.200 (18%)** y **$256.900 de
+    utilidad**. 📌 **Una sola columna lo arregla** y de paso dice cuánto se demora un cliente entre
+    escribir y comprar. Ver **0-AC**.
+
+81. [ ] 📦 **REGISTRAR LAS VENTAS DE BODEGA — hoy son invisibles y es el canal más rentable.**
+    El 3-sep se vendieron **2 unidades recogidas en bodega** ($51.800) que no quedaron en WhatsApp ni en
+    99 Envíos. Rompe tres cosas: **el inventario miente** (salieron 69 uds en 1-3 sep, no 67), **el CPA
+    se ve peor** (66 pedidos, no 65) y **no se puede hacer crecer lo que no se mide**.
+    🔑 En bodega la unidad deja **$25.900 contra $24.500** despachada, sin devolución, sin seguro y con
+    la plata el mismo día. **Vale la pena ofrecerla activamente en Medellín.**
+
+82. [ ] 💸🔴 **TAPAR LA FUGA DE FLETE: $2.800 POR DESPACHO = ~$1.848.000/MES.**
+    Se cobra **$20.320** de envío y se paga **$23.120**. Es un promedio: **en banda E se pierde más, o sea
+    que se subsidia más al cliente más lejano.** Tres caminos, de menor a mayor riesgo:
+    **(1)** subir el envío cobrado $3.000 — recupera todo, pero el envío es lo último que ve el cliente
+    antes de decidir · **(2)** empujar los dobles: **un pedido de 2 uds deja $49.000 contra $23.100 de uno
+    sencillo (2,1x, no 2x, porque el flete se paga una vez)**; con $5.000 de descuento en la segunda
+    todavía deja $44.000 y **la IA de WhatsApp puede ofrecerlo sola** · **(3)** recogida en bodega.
+
+83. [ ] 💎👁️ **LEER LAS IMPRESIONES DEL COLMENA DEL 4-SEP Y DECIDIR SI VA A CAMPAÑA PROPIA.**
+    Republicado 3-sep 16:53 → **el 4-sep es su día 1 real**. **Leer impresiones, NO ventas.**
+    **>3.000** = la subasta lo ahogaba, esperar · **500-3.000** = entrega a medias, campaña propia ·
+    **<500** = ahogado, campaña propia urgente.
+    🔑 **El problema no es el precio: el colmena deja $43.306 brutos por pedido (+51% sobre el tradicional)
+    y solo necesita cerrar 1,6-2,9%** contra el 8,4% del tradicional. **41 impresiones no venden ni gratis.**
+    Su CPM es $7.439 contra $3.500-$5.300 del resto porque **puja en desventaja dentro de la propia cuenta.**
+
+84. [ ] 📈⏱️ **EL 6-SEP: SACAR EL COSTO MARGINAL DEL VIDEO CONTRA EL 3-SEP.**
+    **El promedio engaña, el marginal no.** Motorizados lo probó: de $15.000 a $25.000 los **$10.000 extra
+    compraron CERO conversaciones** (24,8 → 24,0) y el promedio subió solo por dividir más plata entre los
+    mismos mensajes. El VIDEO en cambio compró **+43 conversaciones a $689** con $29.520 extra.
+    **Límite real: $2.402 por conversación.** Si el marginal sale bajo **$1.200**, siguiente escalón
+    **$65.000-$68.000 y no más**. ⚠️ **Alarma temprana = el ALCANCE, no el costo:** si sube el presupuesto
+    y el alcance no crece, se está pagando por mostrarle el anuncio otra vez a la misma gente.
+    ⚠️ **El 4-5 sep el VIDEO puede gastar MENOS que el 3-sep** (Meta cobrando el sobregiro de $29.520).
+    **Eso no es que se dañó. NO TOCAR.**
+
 
 ### 🟡 Prioridad media
 14. [ ] 🔧 **Arreglar zonas seguras en el generador** — el botón de WhatsApp queda tapado en Stories
