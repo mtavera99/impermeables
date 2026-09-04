@@ -116,7 +116,7 @@
 
   <div class="paso">
     <h2><span class="num">2</span> Ajusta y descarga</h2>
-    <p>Los textos ya están escritos. Si una foto queda mal encuadrada, mueve el control de <b>encuadre vertical</b>. Las zonas de la interfaz de TikTok (25% abajo, 15% derecha) ya están respetadas.</p>
+    <p>Los textos ya están escritos. Tienes tres controles por slide: <b>encuadre vertical</b> mueve la foto, <b>tamaño del texto</b> lo agranda o achica, y <b>subir / bajar el texto</b> lo reubica. Las zonas de la interfaz de TikTok (25% abajo, 15% derecha) ya están respetadas.</p>
     <div class="btnfila">
       <button class="btn" id="todas" style="max-width:280px">⬇︎ Descargar los 8 slides</button>
       <button class="btn sec" id="repintar" style="max-width:150px">Repintar</button>
@@ -138,7 +138,7 @@ const MX = 90, MAXW = W*(1-SAFE_R) - MX - 20;
 
 const SLIDES = [
   { id:'01-gancho',   rol:'Gancho · miniatura', tipo:'hook',
-    txt:'Parece una sudadera.\nPero es un impermeable 👉' },
+    txt:'Parece una sudadera.\nNo lo es 👉' },
   { id:'02-limpia',   rol:'Producto limpio',    tipo:'none',  txt:'' },
   { id:'03-limpia',   rol:'Producto limpio',    tipo:'none',  txt:'' },
   { id:'04-cierre',   rol:'Detalle',            tipo:'label', txt:'Cremallera frontal' },
@@ -150,7 +150,7 @@ const SLIDES = [
 ];
 
 let imgs = [];
-const state = SLIDES.map((s,i) => ({ foto: i, pos: 50, txt: s.txt }));
+const state = SLIDES.map((s,i) => ({ foto: i, pos: 50, txt: s.txt, size: 1, dy: 0 }));
 
 /* ---------- montar UI ---------- */
 const grid = document.getElementById('grid');
@@ -172,6 +172,14 @@ SLIDES.forEach((s,i) => {
     <div>
       <label class="lb">Texto</label>
       <textarea id="tx${i}">${s.txt}</textarea>
+    </div>
+    <div>
+      <label class="lb">Tamaño del texto</label>
+      <input type="range" id="sz${i}" min="55" max="130" value="100">
+    </div>
+    <div>
+      <label class="lb">Subir / bajar el texto</label>
+      <input type="range" id="dy${i}" min="-380" max="380" value="0">
     </div>`}
     <button class="btn" data-dl="${i}">⬇︎ Descargar</button>
   `;
@@ -205,6 +213,10 @@ function refrescar(){
     rg.oninput = () => { state[i].pos = +rg.value; pintar(i); };
     const tx = document.getElementById('tx'+i);
     if (tx) tx.oninput = () => { state[i].txt = tx.value; pintar(i); };
+    const sz = document.getElementById('sz'+i);
+    if (sz) sz.oninput = () => { state[i].size = +sz.value/100; pintar(i); };
+    const dy = document.getElementById('dy'+i);
+    if (dy) dy.oninput = () => { state[i].dy = +dy.value; pintar(i); };
     pintar(i);
   });
 }
@@ -265,26 +277,35 @@ function pintar(i){
 
   /* ---- GANCHO ---- */
   if (s.tipo === 'hook') {
-    velo(x, 0, 700, .62);
-    x.font = '92px Anton, sans-serif';
-    x.fillStyle = '#FFFFFF';
+    const fs = Math.round(88*st.size), lh = Math.round(100*st.size);
+    x.font = fs + 'px Anton, sans-serif';
     const ls = lineas(x, st.txt, MAXW);
-    let y = 150;
-    ls.forEach(l => { x.fillText(l, MX, y); y += 104; });
+    const y0 = 140 + st.dy;
+    velo(x, 0, y0 + ls.length*lh + 190, .66);
+    x.fillStyle = '#FFFFFF';
+    x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = 18; x.shadowOffsetY = 4;
+    let y = y0;
+    ls.forEach(l => { x.fillText(l, MX, y); y += lh; });
+    x.shadowColor = 'transparent'; x.shadowBlur = 0; x.shadowOffsetY = 0;
   }
 
   /* ---- ETIQUETA ---- */
   if (s.tipo === 'label') {
-    velo(x, H*SAFE_B*4.05, 900, 0);
-    const g = x.createLinearGradient(0, 950, 0, 1440);
-    g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.68)');
-    x.fillStyle = g; x.fillRect(0, 950, W, 490);
-
-    x.font = '400 52px Inter, sans-serif';
-    x.fillStyle = '#FFFFFF';
+    const fs = Math.round(52*st.size), lh = Math.round(64*st.size);
+    x.font = '400 ' + fs + 'px Inter, sans-serif';
     const ls = lineas(x, st.txt, MAXW);
-    let y = 1400 - ls.length*64;
-    ls.forEach(l => { x.fillText(l, MX, y); y += 64; });
+    const yfin = 1400 + st.dy;
+    const y0 = yfin - ls.length*lh;
+
+    const g = x.createLinearGradient(0, y0 - 300, 0, yfin + 120);
+    g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(0,0,0,.70)');
+    x.fillStyle = g; x.fillRect(0, Math.max(0, y0-300), W, (yfin+120) - Math.max(0, y0-300));
+
+    x.fillStyle = '#FFFFFF';
+    x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 14; x.shadowOffsetY = 3;
+    let y = y0;
+    ls.forEach(l => { x.fillText(l, MX, y); y += lh; });
+    x.shadowColor = 'transparent'; x.shadowBlur = 0; x.shadowOffsetY = 0;
   }
 
   /* ---- PRECIO ---- */
@@ -294,31 +315,32 @@ function pintar(i){
     x.fillStyle = g; x.fillRect(0, 720, W, 720);
 
     const p = st.txt.split('\n');
-    let y = 900;
+    const k = st.size;
+    let y = 900 + st.dy;
 
-    x.font = '150px Anton, sans-serif';
+    x.font = Math.round(150*k) + 'px Anton, sans-serif';
     x.fillStyle = '#FFC300';
     x.fillText(p[0] || '', MX, y);
-    y += 178;
+    y += Math.round(178*k);
 
     if (p[1]) {
-      x.font = '700 50px Inter, sans-serif';
+      x.font = '700 ' + Math.round(50*k) + 'px Inter, sans-serif';
       x.fillStyle = '#FFFFFF';
-      lineas(x, p[1], MAXW).forEach(l => { x.fillText(l, MX, y); y += 60; });
-      y += 12;
+      lineas(x, p[1], MAXW).forEach(l => { x.fillText(l, MX, y); y += Math.round(60*k); });
+      y += Math.round(12*k);
     }
     if (p[2]) {
-      x.font = '400 44px Inter, sans-serif';
+      x.font = '400 ' + Math.round(44*k) + 'px Inter, sans-serif';
       x.fillStyle = '#E8EEF9';
-      lineas(x, p[2], MAXW).forEach(l => { x.fillText(l, MX, y); y += 54; });
-      y += 18;
+      lineas(x, p[2], MAXW).forEach(l => { x.fillText(l, MX, y); y += Math.round(54*k); });
+      y += Math.round(18*k);
     }
     if (p[3]) {
-      x.font = '600 42px Inter, sans-serif';
+      x.font = '600 ' + Math.round(42*k) + 'px Inter, sans-serif';
       x.fillStyle = '#FFC300';
       x.fillText(p[3], MX, y);
       const w = x.measureText(p[3]).width;
-      x.fillRect(MX, y + 54, w, 4);
+      x.fillRect(MX, y + Math.round(54*k), w, 4);
     }
   }
 }
