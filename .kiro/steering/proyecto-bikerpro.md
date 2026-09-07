@@ -14,6 +14,8 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 **Si tenés 2 minutos:** leé el bloque "ESTADO VIGENTE AL 2026-08-28" y la lista de pendientes vivos.
 **Si tenés 15:** leé además las secciones 0-AD, 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
 
+**Documentos operativos aparte:** `SISTEMA-DE-RETIROS.md` (cómo repartir cada retiro de 99 Envíos: **59% proveedor / 11% publicidad / 30% tuyo**) · `GUION-COLMENA-BOT.md` (prompt del bot, mensaje de 125 caracteres y las 5 pruebas obligatorias) · `GUION-DOS-SKU.md` · `TARIFARIO-Y-GUION.md`.
+
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
 | **0-AD** | 🔄 **El video se deterioró (+14,4%)** · TEST Creativos nuevo ganador $541 · el A/B lo ganó el video · el colmena no estaba caro, la conversación estaba rota · Meta One se paga | **4 al 6-sep** |
@@ -4764,6 +4766,13 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     la plata el mismo día. **Vale la pena ofrecerla activamente en Medellín.**
 
 82. [ ] 💸🔴 **TAPAR LA FUGA DE FLETE: $2.800 POR DESPACHO = ~$1.848.000/MES.**
+    🆕 **7-SEP · CUANTIFICADO POR RETIRO:** subir el envío cobrado $3.000 lleva la parte del dueño de
+    **29,8% a 32,7%**, o sea **+$86.804 en cada retiro de $3.000.000**. Eso es casi lo mismo que
+    **triplicar** la tasa de dobles (de 2 a 6 de cada 10 da +$105.000), **pero depende de él y no del
+    cliente.** Es la palanca más grande que tiene sin tocar pauta ni producto.
+    📌 Y es la razón de que el neto por unidad sea **$57.590 y no los $60.000** que el dueño esperaba:
+    `neto = $59.900 × unidades − $2.800`. Con el ajuste pasa a `+$200` y sí quedan **$60.100/unidad**.
+    Ver **`SISTEMA-DE-RETIROS.md`**.
     Se cobra **$20.320** de envío y se paga **$23.120**. Es un promedio: **en banda E se pierde más, o sea
     que se subsidia más al cliente más lejano.** Tres caminos, de menor a mayor riesgo:
     **(1)** subir el envío cobrado $3.000 — recupera todo, pero el envío es lo último que ve el cliente
