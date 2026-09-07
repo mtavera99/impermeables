@@ -12,11 +12,12 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 # 🧭 ÍNDICE — POR DÓNDE EMPEZAR
 
 **Si tenés 2 minutos:** leé el bloque "ESTADO VIGENTE AL 2026-08-28" y la lista de pendientes vivos.
-**Si tenés 15:** leé además las secciones 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
+**Si tenés 15:** leé además las secciones 0-AD, 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
-| **0-AC** | 🎯 **CPA real $7.806 (−38%)** · modelo de margen · fuga de flete $2.800/despacho · costo marginal y protocolo de escalamiento · plan del colmena | **4-sep** |
+| **0-AD** | 🔄 **El video se deterioró (+14,4%)** · TEST Creativos nuevo ganador $541 · el A/B lo ganó el video · el colmena no estaba caro, la conversación estaba rota · Meta One se paga | **4 al 6-sep** |
+| 0-AC | 🎯 **CPA real $7.806 (−38%)** · modelo de margen · fuga de flete $2.800/despacho · costo marginal y protocolo de escalamiento · plan del colmena | **4-sep** |
 | 0-AB | 💰 CPA casado $8.257 ⚠️ **corregido a $7.806 en 0-AC** · utilidad 3 días $1.127.189 → **$1.374.789** · el video ganó · Valle destrabado · el colmena no se mostraba | 1 al 3-sep |
 | **0-AA** | 🌎 **La pauta solo cubría 2 ciudades** · el video nuevo gana 30,8% · Servientrega atascada · Valle abierto | 31-ago / 1-sep |
 | **0-Z** | 🆕 **catálogo de 3 productos** · precios · márgenes · guiones · anuncios · logo | 28-ago |
@@ -54,10 +55,15 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 > **Corte de producto y contenido:** 28-ago. **Último corte de métricas operativas:** 25-ago; no se
 > maquillaron como nuevas. El CPA de $7.167 sigue provisional hasta casar gasto y ventas del mismo día.
 >
-> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE. ESTÁ EN 0-AC (4-sep), 0-AB (1 al 3-sep) Y 0-AA (31-ago / 1-sep).**
+> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE. ESTÁ EN 0-AD (4 al 6-sep), 0-AC (4-sep), 0-AB (1 al 3-sep) Y 0-AA (31-ago / 1-sep).**
 > **Las métricas de abajo son del corte del 25-ago y NO reflejan el estado de la cuenta hoy.**
 >
-> **Estado real al 4-sep (ver 0-AC):** CPA real **$7.806** (−38%, corrige el $8.257) · utilidad de
+> **Estado real al 7-sep (ver 0-AD):** el VIDEO se deterioró a **$716** y ya NO es el más barato ·
+> **TEST Creativos es el ganador: $541** con 84 conversaciones, subido a $25.000 · el A/B del colmena
+> lo ganó el **video** ($1.883 vs $3.356), estático apagado · el colmena va **−$47.401** pero el **92%**
+> de la pérdida era el estático · **cuenta en $175.000/día**.
+>
+> **Estado al 4-sep (ver 0-AC):** CPA real **$7.806** (−38%, corrige el $8.257) · utilidad de
 > 3 días **$1.374.789** · margen = **$25.900/unidad − $2.800/despacho** · VIDEO subido a **$55.000** ·
 > el video nuevo ganó y se llevó el 62% del gasto de Medellín+Bogotá · Valle destrabado al 75% ·
 > el colmena no vendió porque **no se estaba mostrando** (1.068 impresiones en 2 días).
@@ -1293,6 +1299,220 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-AD. 🔄 EL VIDEO SE DETERIORÓ, TEST CREATIVOS ES EL NUEVO GANADOR, Y EL COLMENA NO ESTABA CARO (2026-09-04 al 2026-09-06)
+
+### 📊 LA FOTO DE LOS TRES DÍAS (4, 5 y 6 de sep · vie / sáb / dom)
+
+| Conjunto | Ppto | Gasto/día | Uso | Conv | $/conv |
+|---|---|---|---|---|---|
+| **TEST Creativos** | 20.000 | 15.138 | 76% | **84** | **$541** 🥇 |
+| Motorizados | 15.000 | 13.775 | 92% | 63 | $656 |
+| Domiciliarios | 45.000 | 45.796 | 102% | 204 | $673 |
+| **Domiciliarios VIDEO** | 55.000 | 53.460 | 97% | 224 | **$716** 🔴 |
+| Valle del Cauca | 15.000 | 6.713 | 45% | 18 | $1.119 |
+| **COLMENA · VIDEO** | 20.000 | 15.693 | 78% | 25 | **$1.883** |
+| **COLMENA · ESTÁTICO** | 20.000 | 14.543 | 73% | 13 | **$3.356** |
+| **CUENTA COMPLETA** | | **165.118** | | **631** | **$785** |
+| *solo campaña vieja* | | *134.882* | | *593* | *$682* |
+
+### 🔴 REVERSIÓN: EL VIDEO PASÓ DE SER EL MÁS BARATO A SER EL MÁS CARO
+
+| Conjunto | 3-sep | 4-6 sep | Cambio |
+|---|---|---|---|
+| **TEST Creativos** | $645 | **$541** | **−16,2%** |
+| Motorizados | $605 | $656 | +8,4% |
+| **Domiciliarios** | $671 | **$673** | **+0,4%** |
+| **Domiciliarios VIDEO** | $626 | **$716** | **+14,4%** 🔴 |
+| Valle | $1.560 | $1.119 | −28,3% |
+
+🔑 **No fue el fin de semana.** Domiciliarios corrió los mismos días, el mismo clima y la misma
+subasta, y se quedó clavado en $673. **Uno se deterioró y el otro no** — ese es el control perfecto.
+
+**Meta llegó a la misma conclusión sola.** El domingo movió la plata al revés de nuestra apuesta:
+
+| | Presupuesto | Gastó |
+|---|---|---|
+| Domiciliarios | $45.000 | **$67.997 (151%)** |
+| Domiciliarios VIDEO | $55.000 | $42.527 (77%) |
+
+⛔ **NO subir el video a $65-68.000.** El tripwire de **0-AC** dice lo contrario de lo esperado.
+✅ **Y quedó bien no haber ejecutado la 2ª mitad del #71** (bajar Domiciliarios a $25.000): habríamos
+matado al que resultó ser el bueno. **Domiciliarios se queda en $45.000.**
+
+### 🥇 TEST CREATIVOS: EL NUEVO GANADOR, Y ESTA VEZ SÍ ES REAL
+
+**$541 con 84 conversaciones y 76% de utilización.**
+
+Dos veces se dijo "no lo toques, es el patrón del conjunto hambriento que se queda con la nata".
+**Era correcto entonces: gastaba 16% de su presupuesto.** Ahora gasta **76% y sigue siendo el más
+barato**, con 84 conversaciones que pasan el umbral de 30.
+
+🔑 **Ya no es un artefacto. Es el candidato a escalar, no el video.** Subido a **$25.000** el 7-sep.
+
+### 🧪 EL A/B DEL COLMENA: EL VIDEO LE GANA AL ESTÁTICO
+
+| Conjunto | Gasto | Conv | $/conv |
+|---|---|---|---|
+| **VIDEO** | $47.078 | **25** | **$1.883** |
+| ESTÁTICO | $43.629 | 13 | **$3.356** |
+
+Gastaron casi lo mismo y el video trajo **92% más conversaciones**. Es **78% más barato** y la
+probabilidad de que 25-13 sea azar es **3,6%**. **Estático apagado el 7-sep.**
+
+⚠️ **ERROR CORREGIDO: se advirtió que dos conjuntos en la misma campaña con el mismo público amplio
+se canibalizarían y uno se ahogaría. NO PASÓ.** Se repartieron 50/50, 52/48 y 53/47.
+🔑 **La regla del 93%/$0 aplica a dos ANUNCIOS dentro de un conjunto, donde el presupuesto es uno
+solo. Con dos CONJUNTOS cada uno tiene su plata y nadie se la puede quitar.** El dueño lo dijo
+primero y tenía razón.
+
+### 💎 EL COLMENA: CUENTA FINAL Y DÓNDE ESTABA EL HUECO
+
+| | |
+|---|---|
+| Gasto 4-6 sep | $90.707 |
+| Conversaciones | 38 |
+| Ventas de colmena | **1** |
+| Ventas de tradicional | **0** |
+| **RESULTADO** | **−$47.401** |
+| Cierre | **2,6%** contra 5,5% necesario |
+
+**Pero la pérdida tiene un solo dueño:**
+
+| | Resultado | |
+|---|---|---|
+| **ESTÁTICO** | **−$43.629** | **92% de la pérdida, cero ventas** |
+| VIDEO | −$3.772 | empate |
+
+🔑 **No es un producto que no vende: es un creativo que se comió la plata.** El video está a
+**tres décimas** de ser rentable (4,0% de cierre contra 4,3% de equilibrio).
+
+### 🔍 LOS 37 CHATS PERDIDOS: EL COLMENA NO ESTABA CARO, LA CONVERSACIÓN ESTABA ROTA
+
+**De cinco formas de perder la venta, solo una tenía que ver con el precio.** Ver **`GUION-COLMENA-BOT.md`**.
+
+| Fuga | Diagnóstico |
+|---|---|
+| 🔴 **La IA pidió CÉDULA y el cliente se espantó dando los datos** | **Esa persona ya estaba comprando.** Y para una guía contraentrega **la cédula no se necesita** |
+| Solo mandaban el primer mensaje | El mensaje automático los mataba |
+| "¿Dónde están ubicados?" | Falta de confianza a $149.900 |
+| Preguntaban precio y desaparecían | Precio sin valor construido antes |
+| 🔴 **CERO de los 37 compró el tradicional** | El guion nunca ofreció la salida barata |
+
+### ❌ ERRORES PROPIOS DE ESTA VENTANA (los cuatro)
+
+**1. El copy con el precio "para filtrar" falló en las dos dimensiones.** Se argumentó: menos
+conversaciones pero mejor cierre. Resultado: conversaciones **carísimas** ($1.883 vs $655) **y**
+cierre **malo** (2,6% vs 8,4%). Peor: si el precio va en el anuncio, el que escribe **ya sabía** el
+precio — o sea que se estaba perdiendo gente **pre-calificada**.
+
+**2. El "arreglo" del mensaje automático salió MÁS LARGO que el problema.** Se criticó el mensaje de
+**263 caracteres** por ser un muro de texto y se propuso uno de **282**. Se le puso una regla al bot
+("nunca párrafos largos") que no se cumplió en el mensaje de al lado. **El dueño lo detectó.**
+El bueno tiene **125 caracteres**.
+
+**3. Se dijo "ofrecer recogida en bodega a los de Medellín".** 📌 **La bodega está en BOGOTÁ.**
+
+**4. La advertencia de canibalización entre conjuntos** (ver arriba, no ocurrió).
+
+### 📐 REGLA DE EVALUACIÓN CORREGIDA: MARGEN TOTAL, NO CIERRE DEL COLMENA
+
+Se había fijado "si el cierre del colmena no pasa de 4,3%, se apaga". **Eso estaba mal medido:
+juzgar una campaña por las ventas de un solo producto cuando puede producir dos es incorrecto.**
+
+**La fecha límite NO se mueve** (4 días, ~30 conversaciones). Cambia **qué se cuenta**.
+
+Ventana de $80.000 ($20.000 × 4 días). Combinaciones que empatan:
+
+| | Cierre exigido |
+|---|---|
+| 2 colmenas | empata sola |
+| 1 colmena + 1,3 tradicionales | 4,3% de tradicional |
+| 0 colmenas + 2,8 tradicionales | 9,3% de tradicional |
+
+🔑 **Con el cierre normal del tradicional (8,4%), 30 conversaciones darían ~2,5 ventas = $72.163.**
+La ventana casi se paga **sin vender un solo colmena**. Eso le pone **piso** a la campaña.
+
+### 🚫 TEST B FRANJA YA NO ES "EL 2º MEJOR CREATIVO"
+
+Su **$695 se midió en otra época.** Con los números de hoy quedaría **4º de 5**:
+
+| | |
+|---|---|
+| 1. TEST Creativos | $541 |
+| 2. Motorizados | $656 |
+| 3. Domiciliarios | $673 |
+| **4. TEST B Franja** | **$695** |
+| 5. Domiciliarios VIDEO | $716 |
+
+Y los mismos **$15.000/día** en TEST Creativos ($541) rinden **~$10.750 más al día** que en TEST B.
+**Apagado dentro de Domiciliarios** (sacaba $148 de $32.073 y solo ensuciaba la lectura).
+
+📌 **GATILLO para darle conjunto propio: que el video pase de $800.** Ahí deja de ser ruido de
+fin de semana y es desgaste, y TEST B se vuelve el reemplazo necesario. **Ver #78 actualizado.**
+
+⚠️ **La banca de creativos es corta** —Fondo azul, VIDEO y Prueba social— y eso es frágil justo
+cuando el VIDEO empezó a desgastarse.
+
+### 📋 EL EXPORT QUE NO SIRVE
+
+⚠️ **Si desglosas por REGIÓN, Meta devuelve la columna "Resultados" VACÍA** y el export no sirve
+para nada (no hay conversaciones, ni costo por conversación, ni CPA, ni cierre).
+📌 **Para decidir: exportar por CONJUNTO × DÍA, sin desglose por región.**
+
+### 💳 META ONE EXPERT: SE PAGA, Y NO ES EL PROBLEMA
+
+**$359.900/mes, mensual, y es el plan más barato** (no se puede bajar). Es el **Meta Business Agent**,
+la IA propia de Meta, que desde el **1-ago-2026** se cobra por tokens ($2 USD por millón, ~4-5
+centavos de dólar por mensaje). En la app gratuita el acceso es limitado y al topar el límite toca
+Meta One.
+
+| | |
+|---|---|
+| Por pedido | **$545** de $20.830 de utilidad |
+| Se paga con | **17 pedidos** de 660 al mes |
+| % de la utilidad | **2,62%** — 0,79 días de trabajo al mes |
+
+🔑 **El riesgo no es la suscripción, es el cierre.** Si un bot nuevo cierra 1,4 puntos peor, pierdes
+**$1.749.720/mes = 4,9x** el ahorro máximo posible ($209.900/mes). **No migrar.**
+
+📌 **DÓNDE ESTÁ LA PLATA DE VERDAD** (la suscripción es el 5º problema, no el 1º):
+
+| Fuga | Al mes | vs suscripción |
+|---|---|---|
+| **Fuga de flete** ($2.800 × despacho) | **$1.848.000** | **5,1x** |
+| Presupuesto sin gastar (viernes) | $1.368.780 | 3,8x |
+| "Reclame en oficina" *(una vez)* | $945.000 | 2,6x |
+| Servientrega congelada *(una vez)* | $794.000 | 2,2x |
+| Meta One Expert | $359.900 | 1,0x |
+
+⚠️ **Nunca usar herramientas de bot que se peguen a WhatsApp Web sin API oficial.** Va contra los
+términos y se paga con el número bloqueado. **Ese número es el negocio entero.**
+✅ **Carta a favor para octubre:** todo el tráfico entra por click-to-WhatsApp, que abre una ventana
+gratis de 72 horas. Si algún día hay que migrar a la API, los mensajes serían casi todos gratis.
+⚠️ **El 1-oct-2026 los mensajes de servicio dejan de ser gratis en la API** (no en la app gratuita).
+
+### 🖥️ CONFIGURACIÓN AL CIERRE DEL 2026-09-07
+
+| Campaña / Conjunto | Presupuesto | Estado |
+|---|---|---|
+| **Impermeables · Prospección Motociclistas** | **$155.000** | |
+| · Domiciliarios VIDEO | $55.000 | ⚠️ deteriorado, **no tocar** |
+| · Domiciliarios | $45.000 | ✅ el estable |
+| · **TEST Creativos** | **$25.000** | 🥇 **subido el 7-sep** |
+| · Motorizados | $15.000 | ✅ techo confirmado, no subir |
+| · Valle del Cauca | $15.000 | 🔔 18/30 conversaciones |
+| · *TEST B Franja (dentro de Domiciliarios)* | — | ⛔ **apagado** |
+| · *Domiciliarios \| Colmena* | — | ⛔ apagado (mudado) |
+| **Colmena Premium · Prospección** | **$20.000** | |
+| · Publico ABIERTO video | $20.000 | 🧪 en prueba, 4 días |
+| · *Publico ABIERTO - Creativo (estático)* | — | ⛔ **apagado el 7-sep** |
+| **TOTAL/DÍA** | **$175.000** | *(era $190.000)* |
+
+**Cambios ejecutados el 7-sep:** estático apagado · prompt nuevo pegado · mensaje automático de 125
+caracteres · TEST B apagado · TEST Creativos a $25.000 · video de Domiciliarios sin tocar.
 
 ---
 
@@ -4326,7 +4546,13 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     80% de variantes con precio y 20% sin precio. Dar a cada anuncio un texto inicial de WhatsApp
     distinto y comparar pedidos, CPA y margen; CTR o conversaciones baratas por sí solos no deciden.
     ✅ **La parte de atribución arranca con el colmena el 2-sep**, que lleva mensaje prellenado propio.
-71. [~] 🎬✅ **MITAD EJECUTADO EL 4-SEP: VIDEO YA ESTÁ EN $55.000.** Falta la otra mitad:
+71. [x] ✅⛔ **CERRADO EL 7-SEP: LA OTRA MITAD NO SE HACE. Domiciliarios se queda en $45.000.**
+    El video subió a $55.000 y **se deterioró: $626 → $716 (+14,4%)**, pasando de ser el más barato de los
+    cuatro al más caro. Domiciliarios corrió los mismos días y se quedó en **$673 (+0,4%)**.
+    🔑 **Bajar Domiciliarios a $25.000 habría matado al que resultó ser el bueno.** Meta lo confirmó solo:
+    el domingo le dio a Domiciliarios **151%** de su presupuesto y al VIDEO **77%**. Ver **0-AD**.
+    ↓ *(texto de la tarea a medio ejecutar, se conserva)*
+71c. [~] 🎬 **MITAD EJECUTADO EL 4-SEP: VIDEO YA ESTÁ EN $55.000.** Falta la otra mitad:
     **Domiciliarios sigue en $45.000, no en $25.000.** Se dejó a propósito para no hacer dos cambios
     el mismo día y poder atribuir. 📌 **El VIDEO ya venía gastando $64.520 con presupuesto de $35.000**,
     así que subirlo no fue apuesta: fue ratificar el hecho y evitar que Meta le cobre el sobregiro de
@@ -4391,7 +4617,18 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⚠️ **NO es problema de presupuesto: bajarlo no ahorra nada** (no gasta lo que tiene) y **subirlo
     tampoco sirve** si no puede ganar pujas. La salida es **audiencia distinta**, igual que se hizo con
     el colmena el 3-sep. Ver **0-AB**.
-78. [ ] 🧪🔴 **CONJUNTO PROPIO PARA TEST B FRANJA REFLECTIVA — es el 2º mejor creativo y está muerto.**
+78. [~] 🧪⛔ **REVERTIDO EL 7-SEP: TEST B FRANJA APAGADO, YA NO ES "EL 2º MEJOR CREATIVO".**
+    Su **$695 se midió en otra época**. Con los números del 4-6 sep quedaría **4º de 5** (TEST Creativos
+    $541 · Motorizados $656 · Domiciliarios $673 · **TEST B $695** · VIDEO $716). Y los mismos $15.000/día
+    en TEST Creativos rinden **~$10.750 más al día**.
+    Se reactivó dentro de Domiciliarios el 5-sep y sacó **$148 de $32.073 (0,46%)**, ensuciando la lectura
+    del conjunto que resultó bueno. **Apagado.**
+    📌 **GATILLO para darle conjunto propio: que el VIDEO pase de $800.** Ahí deja de ser ruido de finde
+    y es desgaste del creativo, y TEST B se vuelve el reemplazo necesario. Ver **0-AD**.
+    ⚠️ **La banca de creativos es corta** (Fondo azul, VIDEO, Prueba social) justo cuando el VIDEO
+    empezó a desgastarse. No es urgente, pero es frágil.
+    ↓ *(texto original de la tarea, se conserva)*
+78b. [ ] 🧪🔴 **CONJUNTO PROPIO PARA TEST B FRANJA REFLECTIVA — es el 2º mejor creativo y está muerto.**
     **$695 con 53 conversaciones** en 7 días = **17% más barato que Fondo azul ($841)**. Reactivado el
     2-sep dentro de Domiciliarios y Meta lo dejó en **1 impresión y $3** el 3-sep.
     ⚠️ **Se pausó por error** el 1-sep basándose en un día con **n=2** ($2.640) y en CTR/CPC como
@@ -4534,7 +4771,12 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     sencillo (2,1x, no 2x, porque el flete se paga una vez)**; con $5.000 de descuento en la segunda
     todavía deja $44.000 y **la IA de WhatsApp puede ofrecerlo sola** · **(3)** recogida en bodega.
 
-83. [ ] 💎👁️ **LEER LAS IMPRESIONES DEL COLMENA DEL 4-SEP Y DECIDIR SI VA A CAMPAÑA PROPIA.**
+83. [x] ✅ **CERRADO EL 4-SEP: ERA LA CAMPAÑA. El colmena en campaña propia despertó.**
+    Impresiones **41 → 2.734 (×67)** · gasto **$305 → $14.284 (×47)** · **0 → 10 conversaciones** · y
+    **CPM de $7.439 a $5.225 (−30%)** con el mismo anuncio, público, precio y presupuesto.
+    🔑 **Ese $7.439 no era el precio del colmena: era el peaje de competirle a sus propios hermanos.**
+    ↓ *(texto original, se conserva)*
+83b. [ ] 💎👁️ **LEER LAS IMPRESIONES DEL COLMENA DEL 4-SEP Y DECIDIR SI VA A CAMPAÑA PROPIA.**
     Republicado 3-sep 16:53 → **el 4-sep es su día 1 real**. **Leer impresiones, NO ventas.**
     **>3.000** = la subasta lo ahogaba, esperar · **500-3.000** = entrega a medias, campaña propia ·
     **<500** = ahogado, campaña propia urgente.
@@ -4542,7 +4784,12 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     y solo necesita cerrar 1,6-2,9%** contra el 8,4% del tradicional. **41 impresiones no venden ni gratis.**
     Su CPM es $7.439 contra $3.500-$5.300 del resto porque **puja en desventaja dentro de la propia cuenta.**
 
-84. [ ] 📈⏱️ **EL 6-SEP: SACAR EL COSTO MARGINAL DEL VIDEO CONTRA EL 3-SEP.**
+84. [x] ⛔ **CERRADO EL 7-SEP: EL VIDEO NO SE SUBE. Se deterioró en vez de mejorar.**
+    De **$626 a $716 (+14,4%)** mientras Domiciliarios se quedó en $673. **No es el fin de semana:**
+    corrieron los mismos días con la misma subasta. El escalón a $65-68.000 **queda descartado**.
+    📌 Tampoco se baja todavía: hace falta martes y miércoles limpios antes de tocarlo. Ver **0-AD**.
+    ↓ *(texto original, se conserva)*
+84b. [ ] 📈⏱️ **EL 6-SEP: SACAR EL COSTO MARGINAL DEL VIDEO CONTRA EL 3-SEP.**
     **El promedio engaña, el marginal no.** Motorizados lo probó: de $15.000 a $25.000 los **$10.000 extra
     compraron CERO conversaciones** (24,8 → 24,0) y el promedio subió solo por dividir más plata entre los
     mismos mensajes. El VIDEO en cambio compró **+43 conversaciones a $689** con $29.520 extra.
@@ -4551,6 +4798,34 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     y el alcance no crece, se está pagando por mostrarle el anuncio otra vez a la misma gente.
     ⚠️ **El 4-5 sep el VIDEO puede gastar MENOS que el 3-sep** (Meta cobrando el sobregiro de $29.520).
     **Eso no es que se dañó. NO TOCAR.**
+
+85. [ ] 💎⏳ **VEREDICTO DEL COLMENA A LAS ~30 CONVERSACIONES (jueves 10 o viernes 11-sep).**
+    Corre en **$20.000/día**, solo el conjunto del video. Exposición máxima **$80.000**.
+    🔑 **Se mide MARGEN TOTAL contra gasto, no el cierre del colmena** — la campaña puede producir
+    ventas de los dos productos y contar solo uno estaba mal medido. Combinaciones que empatan:
+    **2 colmenas** · **1 colmena + 1,3 tradicionales** · **0 colmenas + 2,8 tradicionales**.
+    Con el cierre normal del tradicional (8,4%), 30 conversaciones darían ~2,5 ventas = **$72.163**,
+    o sea que casi se paga sin vender un colmena. **Eso le pone piso.**
+    ⛔ **Si no cubre el gasto, se apaga. La fecha NO se vuelve a estirar.** Ya se estiró una vez.
+    📌 **Contar SIEMPRE las dos cosas:** ventas de colmena Y tradicionales salidos de esa campaña.
+
+86. [ ] 🤖✅ **CONFIRMAR QUE EL BOT PASÓ LAS CINCO PRUEBAS.** Escribirse desde otro número:
+    ubicación → responde **Bogotá** · "¿por qué vale más?" → 3 piezas contra 2 · "no tengo la plata
+    ahora" → agenda y no lo deja ir · **dar los datos y verificar que NO pide cédula** 🔴 · preguntarle
+    algo que no sepa → dice "déjame confirmarte" y **no inventa**.
+    🔑 **El de la cédula es el crítico:** tumbó una venta que ya estaba hecha, con el cliente
+    entregando la dirección. Ver **`GUION-COLMENA-BOT.md`**.
+
+87. [ ] 💳 **DEFINIR SI SE ACEPTA TRANSFERENCIA (Nequi / Bancolombia).**
+    Es la salida para la objeción "no tengo la plata ahora", y a $149.900 es el **sospechoso
+    principal**: el cliente necesita casi **el doble** de efectivo en la casa que con el tradicional
+    (~$80.000). Si se acepta, se agrega al guion del colmena.
+    ⚠️ **Y vigilar el RECHAZO del colmena aparte del tradicional** — a $149.900 la tasa puede ser
+    bastante más alta y no se ve hasta que empiezan a llegar las entregas.
+
+88. [ ] 🗣️ **CONSEGUIR EL NÚMERO REAL DE CLIENTES DESPACHADOS** para la prueba social del primer
+    mensaje del bot. **No inventarlo.** Hoy el mensaje tiene un espacio pendiente por ese dato.
+
 
 
 ### 🟡 Prioridad media
