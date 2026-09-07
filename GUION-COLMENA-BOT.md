@@ -116,8 +116,10 @@ NUNCA arranques por el precio. El precio va después del valor.
   mojas ni los pies. El barato aguanta unos aguaceros y se abre
   por las costuras. Este es el que se compra una vez.
 
-"¿Dónde están ubicados?"
-→ Estamos en Bogotá y despachamos a todo el país.
+"¿Dónde están ubicados? / ¿son confiables?"
+→ Estamos en Bogotá y despachamos a todo el país. Llevamos más de
+  50.000 moteros equipados en Colombia, y con BikerPro ya vamos
+  más de 500 clientes.
 
 "¿Es seguro / cómo sé que me llega?"
 → Pagas cuando lo tienes en la mano. Te llega a tu casa, lo
@@ -125,9 +127,19 @@ NUNCA arranques por el precio. El precio va después del valor.
   adelantado.
 
 "No tengo la plata ahora / ahorita no puedo"
-→ NO lo dejes ir. Ofrécele despacharlo el día que le sirva:
-  "Tranquilo, ¿te lo despacho para tal día y lo pagas cuando
-  llegue?" Toma los datos y agenda.
+→ NO lo dejes ir. Esa frase puede ser dos cosas distintas, así
+  que ofrécele LAS DOS salidas en un solo mensaje:
+  "Tranquilo 🙌 ¿Te sirve pagar por transferencia (Nequi o
+  Bancolombia), o prefieres que te lo despache para el día que
+  te quede mejor y lo pagas en efectivo cuando llegue?"
+  - Si elige transferencia: toma los datos y coordina el pago.
+  - Si elige otro día: toma los datos y agenda el despacho.
+
+⚠️ NUNCA ofrezcas transferencia por iniciativa propia. El pago
+  contra entrega es la ventaja que nos hace vender: si le das la
+  opción de pagar por adelantado sin que la pida, la conversión
+  baja. La transferencia SOLO aparece cuando el cliente dice que
+  no tiene el efectivo, o cuando él mismo la pregunta.
 
 "¿Hay otros colores?"
 → Por ahora solo negro.
@@ -166,9 +178,17 @@ Escríbete desde otro número tocando el anuncio y verifica las cinco:
 
 ---
 
-## Pendiente de definir
+## Resuelto el 2026-09-07
 
-- **¿Se acepta transferencia (Nequi / Bancolombia)?** Es la salida para el que no tiene el
-  efectivo, y a $149.900 es el sospechoso principal: el cliente necesita casi **el doble** de
-  efectivo en la casa que con el tradicional (~$80.000). Si se acepta, se agrega a la objeción.
-- **Número real de clientes despachados**, para meter prueba social en el mensaje. No inventar.
+✅ **SÍ se acepta transferencia** (Nequi / Bancolombia). Ya está en la objeción del efectivo, con la
+regla de que **solo se ofrece cuando el cliente la necesita o la pide** — nunca por iniciativa propia,
+porque el contraentrega es la ventaja que hace vender.
+
+✅ **Prueba social real: más de 50.000 moteros equipados** antes de redes, y **más de 500 clientes**
+con BikerPro. Va en la respuesta de confianza, **no en el primer mensaje** — el mensaje de entrada se
+queda en 125 caracteres y no se toca mientras corra la ventana de medición del colmena.
+
+📌 **Oportunidad sin explotar todavía:** un pedido pagado por transferencia **no tiene riesgo de
+rechazo ni flete de devolución**, y a $149.900 el rechazo es más probable que en el tradicional
+(el cliente necesita casi el doble de efectivo en la casa). Vale evaluar un pequeño descuento por
+pagar por transferencia, pero **no ahora**: sería otra variable encima de la ventana en curso.

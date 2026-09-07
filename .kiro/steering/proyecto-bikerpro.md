@@ -4822,14 +4822,30 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     🔑 **El de la cédula es el crítico:** tumbó una venta que ya estaba hecha, con el cliente
     entregando la dirección. Ver **`GUION-COLMENA-BOT.md`**.
 
-87. [ ] 💳 **DEFINIR SI SE ACEPTA TRANSFERENCIA (Nequi / Bancolombia).**
+87. [x] ✅💳 **CERRADO EL 7-SEP: SÍ SE ACEPTA TRANSFERENCIA (Nequi / Bancolombia).**
+    Ya está en el guion, con la regla clave: **solo se ofrece cuando el cliente dice que no tiene el
+    efectivo o cuando la pide** — nunca por iniciativa propia, porque el contraentrega es la ventaja
+    que hace vender. Y "no tengo la plata ahora" son **dos cosas**: sin efectivo en casa (lo arregla la
+    transferencia) o sin plata hasta el pago (lo arregla agendar). La IA ofrece **las dos en un mensaje**.
+    🔔 **SIGUE ABIERTO: vigilar el RECHAZO del colmena aparte del tradicional.** A $149.900 el cliente
+    necesita casi el doble de efectivo en la casa (~$80.000 del tradicional) y la tasa puede ser mucho
+    más alta. No se ve hasta que empiezan a llegar las entregas.
+    📌 **Palanca sin explotar:** un pedido por transferencia **no tiene riesgo de rechazo ni flete de
+    devolución**. Vale evaluar un descuento chico por pagar así — pero no mientras corra la ventana.
     Es la salida para la objeción "no tengo la plata ahora", y a $149.900 es el **sospechoso
     principal**: el cliente necesita casi **el doble** de efectivo en la casa que con el tradicional
     (~$80.000). Si se acepta, se agrega al guion del colmena.
     ⚠️ **Y vigilar el RECHAZO del colmena aparte del tradicional** — a $149.900 la tasa puede ser
     bastante más alta y no se ve hasta que empiezan a llegar las entregas.
 
-88. [ ] 🗣️ **CONSEGUIR EL NÚMERO REAL DE CLIENTES DESPACHADOS** para la prueba social del primer
+88. [x] ✅🗣️ **CERRADO EL 7-SEP: más de 50.000 moteros equipados antes de redes, y más de 500
+    clientes con BikerPro.** Va en la respuesta de confianza de la IA ("¿dónde están ubicados? / ¿son
+    confiables?"), que es donde de verdad sirve: esa pregunta era **desconfianza disfrazada de
+    logística**, una de las 5 fugas de los 37 chats.
+    ⛔ **NO va en el primer mensaje.** Se queda en 125 caracteres y no se toca mientras corra la
+    ventana de medición del colmena (#85), o el veredicto del jueves no se puede leer.
+    ↓ *(texto original, se conserva)*
+88b. [ ] 🗣️ **CONSEGUIR EL NÚMERO REAL DE CLIENTES DESPACHADOS** para la prueba social del primer
     mensaje del bot. **No inventarlo.** Hoy el mensaje tiene un espacio pendiente por ese dato.
 
 
