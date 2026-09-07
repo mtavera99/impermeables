@@ -4809,7 +4809,13 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⛔ **Si no cubre el gasto, se apaga. La fecha NO se vuelve a estirar.** Ya se estiró una vez.
     📌 **Contar SIEMPRE las dos cosas:** ventas de colmena Y tradicionales salidos de esa campaña.
 
-86. [ ] 🤖✅ **CONFIRMAR QUE EL BOT PASÓ LAS CINCO PRUEBAS.** Escribirse desde otro número:
+86. [x] ✅🤖 **CERRADO EL 7-SEP: EL BOT PASÓ LAS CINCO PRUEBAS.** Probado por el dueño desde otro
+    número con el flujo del colmena. **Ya NO pide cédula** — ese era el bug que tumbó una venta con el
+    cliente entregando la dirección. El guion nuevo de **`GUION-COLMENA-BOT.md`** queda vigente y en
+    producción, sumado a `GUION-DOS-SKU.md`.
+    📌 **Repetir estas cinco pruebas cada vez que se toque el prompt.** Ver **0-AD**.
+    ↓ *(texto original, se conserva)*
+86b. [ ] 🤖 **CONFIRMAR QUE EL BOT PASÓ LAS CINCO PRUEBAS.** Escribirse desde otro número:
     ubicación → responde **Bogotá** · "¿por qué vale más?" → 3 piezas contra 2 · "no tengo la plata
     ahora" → agenda y no lo deja ir · **dar los datos y verificar que NO pide cédula** 🔴 · preguntarle
     algo que no sepa → dice "déjame confirmarte" y **no inventa**.
