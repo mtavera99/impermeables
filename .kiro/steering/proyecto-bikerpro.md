@@ -4,7 +4,7 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-03** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
+Última actualización: **2026-09-08** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
 sandbox corre en UTC y puede marcar el día siguiente)*
 
 ---
@@ -12,10 +12,11 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 # 🧭 ÍNDICE — POR DÓNDE EMPEZAR
 
 **Si tenés 2 minutos:** leé el bloque "ESTADO VIGENTE AL 2026-08-28" y la lista de pendientes vivos.
-**Si tenés 15:** leé además las secciones 0-AD, 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
+**Si tenés 15:** leé además las secciones 0-AE, 0-AD, 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-AE** | 💰 **El costo bajó a $33.000** (+$752.527/mes) · el CPA nunca se deterioró: era la pauta del colmena · el video se estabilizó y empató · **la fuga de flete está solo en la promo de 2 uds** · Tadó duplica el flete · el seguro es 13,6% y da 0,85× · 3 al detal > 12 al mayor | **7 y 8-sep** |
 | **0-AD** | 🔄 **El video se deterioró (+14,4%)** · TEST Creativos nuevo ganador $541 · el A/B lo ganó el video · el colmena no estaba caro, la conversación estaba rota · Meta One se paga | **4 al 6-sep** |
 | 0-AC | 🎯 **CPA real $7.806 (−38%)** · modelo de margen · fuga de flete $2.800/despacho · costo marginal y protocolo de escalamiento · plan del colmena | **4-sep** |
 | 0-AB | 💰 CPA casado $8.257 ⚠️ **corregido a $7.806 en 0-AC** · utilidad 3 días $1.127.189 → **$1.374.789** · el video ganó · Valle destrabado · el colmena no se mostraba | 1 al 3-sep |
@@ -55,10 +56,22 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 > **Corte de producto y contenido:** 28-ago. **Último corte de métricas operativas:** 25-ago; no se
 > maquillaron como nuevas. El CPA de $7.167 sigue provisional hasta casar gasto y ventas del mismo día.
 >
-> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE. ESTÁ EN 0-AD (4 al 6-sep), 0-AC (4-sep), 0-AB (1 al 3-sep) Y 0-AA (31-ago / 1-sep).**
+> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE. ESTÁ EN 0-AE (7-8 sep), 0-AD (4 al 6-sep), 0-AC (4-sep), 0-AB (1 al 3-sep) Y 0-AA (31-ago / 1-sep).**
 > **Las métricas de abajo son del corte del 25-ago y NO reflejan el estado de la cuenta hoy.**
 >
-> **Estado real al 7-sep (ver 0-AD):** el VIDEO se deterioró a **$716** y ya NO es el más barato ·
+> 🔴🔴 **EL MODELO DE MARGEN VIGENTE ES `$26.900 × unidades − flete` (costo $33.000 desde el 8-sep).**
+> **Cualquier cuenta hecha con $25.900 está mal. Ver 0-AE.**
+>
+> **Estado real al 8-sep (ver 0-AE):** costo del producto **$33.000** (+$752.527/mes) · utilidad por
+> pedido **$24.129** · **el CPA real es $7.674, nunca se deterioró** (el $9.622 tenía adentro la pauta
+> del colmena) · **TEST Creativos es el ganador: $608 al 97% de utilización**, siguiente escalón
+> $30.000 · el VIDEO **se estabilizó en $714 y empató con Domiciliarios ($713)** → no tocar ninguno ·
+> Valle entrega el **21%** → bajar a $5.000 · el colmena quedó **sin colchón** (+$323 a +$9.317) ·
+> **la fuga de flete NO es de $2.800 parejo: los pedidos de 1 unidad dejan +$326 y los de 2-3 pierden
+> −$5.533** · Tadó duplica el flete en vez de compartirlo · el seguro es el **13,6%** del flete y su
+> relación ahorro/costo es **0,85×** · **cero guías de Servientrega y cero trabadas.**
+>
+> **Estado al 7-sep (ver 0-AD):** el VIDEO se deterioró a **$716** y ya NO es el más barato ·
 > **TEST Creativos es el ganador: $541** con 84 conversaciones, subido a $25.000 · el A/B del colmena
 > lo ganó el **video** ($1.883 vs $3.356), estático apagado · el colmena va **−$47.401** pero el **92%**
 > de la pérdida era el estático · **cuenta en $175.000/día**.
@@ -194,6 +207,20 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 
 ## ⚠️ ALARMAS VIVAS
 
+> **🆕 AL 8-SEP (0-AE):**
+> - 🟢 **LA LOGÍSTICA ESTÁ LIMPIA:** de las 54 guías del 7-8 sep, **cero son de Servientrega** y
+>   **cero están trabadas** (todas en Creado / Recolección / En terminal / Admitida). El
+>   enrutamiento a Interrapidísimo + Coordinadora quedó completo. *(Lo viejo de Servientrega sigue
+>   por reclamar: #74.)*
+> - 🔴 **TADÓ: $36.667 de descuadre** entre el registro interno (~$35.000) y 99 Envíos ($71.667)
+>   en una sola guía → **#90**
+> - 🔴 **$573.291 CONTRAENTREGA** en la guía del mayoreo a Granada, todavía sin recoger → **#92**
+> - 🔔 **EL SEGURO CUESTA $2.702.775/MES y su relación ahorro/costo es 0,85×** → **#91**
+> - 🔔 **EL SHARE DE MÚLTIPLES CAYÓ A 15,7%** (era 26,8%) y Caldas muestra que **la IA dejó de
+>   ofrecer la promo** → **#60**, **#40**
+> - 🔔 **EL COLMENA SE QUEDÓ SIN COLCHÓN:** +$323 a +$9.317 según la comisión de recaudo → **#28-1**
+> - 🔔 **Guachucal cobró $85.511** ($511 sobre la banda E): el guion vuelve a inventar cifras
+
 - 🔴 **17 guías trabadas, $406.346 de margen real en riesgo** (sección 0-O). Las 7 más viejas se
   gestionaron el 20-ago; **falta verificar cuántas terminaron entregadas (#34).**
 - 🔴 **Heka dejó 22 guías abiertas y no se sabe si siguen abiertas** ($622.560, sección 0-S, #55).
@@ -217,6 +244,27 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
   si la mezcla de bandas se va a los pueblos con envío gratis nacional) → **#79**.
 
 ## 🚦 LO SIGUIENTE, EN ORDEN
+
+> **🆕 LISTA VIGENTE AL 8-SEP (0-AE). Lo de abajo del punto 5 es de ventanas anteriores.**
+
+1. 🔧 **BAJAR VALLE DE $15.000 A $5.000.** Entrega el 21%: son **$11.899/día ociosos
+   ($356.969/mes)**. No se mata (va 19/30 del gate y su promedio de $1.331 está debajo del
+   equilibrio), pero no se le dejan $15.000 secuestrados → **0-AE**
+2. 📞 **PREGUNTAR EL % DE COMISIÓN DE RECAUDO (#28-1).** Ascendió a **crítico**: decide si el
+   colmena va en **+$323 o en +$9.317**. Es UNA llamada y lleva pendiente desde agosto
+3. 🔴 **TADÓ A COTIZACIÓN INDIVIDUAL Y SIN PROMO DE 2 UNIDADES.** Es el único destino del país
+   donde el flete se **duplica** (2,20×) en vez de compartirse (1,4-1,6× en el resto).
+   Y **revisar el extracto por el descuadre de $36.667** → **#90**
+4. 💡 **VOLVER A PONER LA PROMO DE 2 UNIDADES EN EL GUION.** El share cayó de 26,8% a **15,7%** y
+   Caldas da el mecanismo: **a un cliente que compró TRES no se la ofrecieron** → **#60**, **#40**
+5. 📈 **TEST CREATIVOS $25.000 → $30.000 (+20%)**, respetando las 48-72 h del protocolo.
+   Marginal $727-987, debajo del tripwire de $1.200, y ya gasta el 97% → **0-AE**
+6. ⛔ **NO TOCAR EL VIDEO NI TEST B.** El video se estabilizó en $714 y empató con Domiciliarios
+   ($713); el gatillo de #78 era $800 y no se disparó → **0-AE**
+7. ⛔ **NO subir el envío cobrado a todos (#82 opción 1).** Los pedidos de 1 unidad **dejan +$326**:
+   sería cobrarle a 43 clientes sanos para tapar el hueco de 2 → **0-AE**
+
+*(lo de abajo viene de ventanas anteriores y se conserva)*
 
 1. 🔴 **EL 4-SEP: ver si el colmena ya se muestra.** Republicado el 3-sep con Advantage+ amplio y
    Colombia. **La métrica es impresiones, no ventas:** tuvo 1.068 en dos días y cero pedidos porque
@@ -1302,6 +1350,317 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-AE. 💰 EL COSTO BAJÓ A $33.000, EL CPA NUNCA SE DETERIORÓ, Y LA FUGA DE FLETE NO ERA LO QUE DECÍAMOS (2026-09-07 al 2026-09-08)
+
+**Fuentes:** export Meta por campaña (4-7 sep) · export Meta por conjunto (7-8 sep) ·
+export completo de 99 Envíos con **54 guías** del 7-8 sep (primer export con la columna
+`valor_seguro_99` separada) · datos del dueño. Scripts: `analisis/costo-33mil.py`,
+`analisis/conjuntos-7-8sep.py`, `analisis/envios-7-8sep-corregido.py`, `analisis/mayoreo-40mil.py`,
+`analisis/campanas-4-7sep.py`.
+
+### 🥇 EL DATO MÁS RENTABLE DEL DÍA: EL COSTO BAJÓ A $33.000
+
+```
+ANTES:  Margen = $25.900 × unidades − flete
+AHORA:  Margen = $26.900 × unidades − flete
+```
+
+Costo **−2,9%** → margen **+3,9%**. El ahorro de costo entra **completo** al margen: no paga
+pauta, no paga flete, no depende del cierre. **Es el peso más limpio del negocio.**
+
+| | Antes | Ahora | |
+|---|---|---|---|
+| Margen bruto/pedido | $30.517 | **$31.803** | +4,2% |
+| **Utilidad/pedido** | $22.843 | **$24.129** | **+5,6%** |
+| **Al mes** (25,1 uds/día) | | **+$752.527** | 2,1× Meta One |
+
+**Umbrales que se mueven:** límite $/conversación **$2.402 → $2.503** · equilibrio de CPA por
+unidad **$23.590 → $24.590** · margen 1 ud **$24.100** · 2 uds **$51.000** · 2 uds en bodega **$53.800**.
+📌 El ratio del pedido doble **no** se movió (sigue 2,1×): el ahorro entra a los dos lados.
+
+⚠️ **CUATRO PREGUNTAS ABIERTAS ANTES DE DARLO POR PERMANENTE** → pendiente **#89**.
+La cuarta es la incómoda: **si el −2,9% es material más delgado, el ahorro se paga con rechazo.**
+
+### ✅ EL CPA NUNCA SE DETERIORÓ 23% — LE CARGUÉ EL EXPERIMENTO DEL COLMENA AL TRADICIONAL
+
+**El dueño lo detectó.** Se dividió TODO el gasto de Meta entre los pedidos del tradicional,
+incluyendo la campaña del colmena, que no produjo ni un tradicional.
+
+| Sáb + dom | |
+|---|---|
+| Campaña vieja (la que vende tradicional) | **$299.286** |
+| Campaña colmena (experimento) | $76.003 |
+
+| | Como se dijo | **Real** |
+|---|---|---|
+| CPA por pedido | $9.622 (+23%) | **$7.674 (−1,7%)** |
+| Utilidad del finde | $814.899 | **$890.888** |
+
+🔑 **El total estaba bien; la atribución estaba mal.** Con el costo nuevo, la utilidad del finde
+sube a **$941.045**.
+📌 **REGLA: el CPA de un producto se divide por la pauta de SU campaña, no por la de la cuenta.**
+Con dos campañas y dos SKU, el gasto total ya no es el denominador de nada.
+
+### 🔄 EL VIDEO SE ESTABILIZÓ Y EMPATÓ CON DOMICILIARIOS — MATIZA 0-AD
+
+| Conjunto | 4-6 sep | **7-8 sep** | Cambio |
+|---|---|---|---|
+| **TEST Creativos** | $541 | **$608** 🥇 | +12,4% |
+| Domiciliarios | $673 | **$713** | +5,9% |
+| **Domiciliarios VIDEO** | $716 | **$714** | **−0,3%** 🟢 |
+| Motorizados | $656 | $730 | +11,3% |
+| Colmena · VIDEO | $1.883 | $4.256 | +126% 🔴 |
+| Valle | $1.119 | $5.157 | +361% 🔴 |
+| **Cuenta vieja** | $682 | $708 | +3,8% |
+
+0-AD concluyó *"el video se deterioró +14,4% y Domiciliarios se quedó clavado = control perfecto"*.
+**Con dos días más, el video es el ÚNICO que aguantó** y los otros tres subieron 6-12%.
+**VIDEO $714 vs Domiciliarios $713 son el mismo número: la brecha del 14,4% se cerró sola.**
+
+⚠️ **Pero 4-6 era vie/sáb/dom y 7-8 es lun/mar.** El finde rinde +44% (0-Y), así que parte del
++3,8% general es día de semana. **Lo sólido: en la misma ventana y la misma subasta, el video
+aguantó y los demás no.**
+
+⛔ **EL GATILLO DE #78 NO SE DISPARA** (era $800, está en $714). **TEST B sigue apagado y el
+video no se toca, ni arriba ni abajo.**
+
+### 🥇 TEST CREATIVOS YA NO ES "LA NATA DE UN CONJUNTO HAMBRIENTO"
+
+Se subió de $20.000 a $25.000 el 7-sep. El promedio subió 12,4%, **pero el marginal no:**
+
+| Si el 8-sep va al... | Marginal |
+|---|---|
+| 50% | $727 |
+| **66%** | **$769** |
+| 100% | $987 |
+
+**En todos los casos debajo del tripwire de $1.200** y lejos del límite de $2.503.
+
+🟢 **Y la utilización pasó de 76% a 97%.** Dos veces se advirtió que su $541 era artefacto de
+estar hambriento. **Ya gasta casi todo y sigue siendo el más barato de la cuenta.** El +12% es
+el precio normal de crecer. **Siguiente escalón: $30.000 (+20%), respetando las 48-72 h.**
+
+### 🆕 NI EL +25% NI EL +57% REINICIARON EL APRENDIZAJE
+
+La columna **"Último cambio significativo"** marca **19-ago** para TEST Creativos (subido +25% el
+7-sep) y **2-sep** para VIDEO (subido **+57%** el 4-sep).
+
+🔑 **Meta no registró ninguno de los dos como cambio significativo.** Refuerza 0-M ("el reinicio
+no se puede predecir") y le quita miedo al paso 1 del protocolo: **el límite de 20-25% sigue
+siendo prudente, pero no por miedo al reinicio.**
+
+### 🔴 VALLE: EL PROBLEMA NO ES QUE SEA CARO, ES QUE NO GASTA
+
+| | |
+|---|---|
+| Acumulado 4-8 sep | $25.296 / 19 conv = **$1.331** |
+| vs equilibrio $2.671 | **está debajo — no pierde plata** |
+| Utilización 7-8 | **21%** ($3.101/día de $15.000) |
+
+El $5.157 del 7-8 es **n=1** y no mata nada. 🔑 **El costo real es otro: $11.899/día de
+presupuesto ocioso = $356.969/mes que no compra nada.**
+**→ Bajarlo a $5.000.** No se mata un test con n=1, pero tampoco se le dejan $15.000
+secuestrados a algo que entrega el 21%. Va 19/30 del gate.
+
+### 💎 EL COLMENA SE FRENÓ Y SE QUEDÓ SIN COLCHÓN
+
+| | 4-6 sep | 7-8 sep |
+|---|---|---|
+| Gasto/día | $15.693 | $15.357 |
+| **Conversaciones/día** | **8,3** | **3,6** |
+| CPM | $5.417 | **$7.318** |
+
+**La misma plata compró menos de la mitad** (patrón de Motorizados: marginal negativo). Y el CPM
+volvió al punto de partida: $7.439 (ahogado) → $5.225 (campaña propia) → $5.417 → **$7.318**.
+
+🔴 **HIPÓTESIS: apagar el estático dejó la campaña con un solo conjunto y $20.000 en vez de
+$40.000.** Quedó chica y perdió peso en la subasta. Apagarlo era correcto **por margen** (era el
+92% de la pérdida) **pero pudo costarle entrega al video.** La frecuencia de 1,13 descarta
+agotamiento de público. **Es hipótesis, no conclusión** — también puede ser lun/mar.
+
+**Y el margen real por colmena NO es $43.306:**
+
+| Venta | Flete real | Margen |
+|---|---|---|
+| San Francisco | $22.156 | $42.744 |
+| Puerto Gaitán | $25.709 | $39.191 |
+| **Promedio** | $23.932 | **$40.968** |
+
+| Resultado del video del colmena (4-8 sep, $72.618 de gasto) | |
+|---|---|
+| Con margen teórico $43.306 | +$13.994 |
+| **Con margen real** | **+$9.317** |
+| **Con margen real + comisión 3%** | **+$323** 🔔 |
+
+🔑 **Pasa de "+$13.994 cómodo" a estar en cero.** No cambia la decisión (#85: no se apaga) **pero
+ya no hay colchón: la tercera venta decide de verdad.**
+
+### 🚨 LA FUGA DE FLETE NO ES DE $2.800 PAREJO — Y ESO CAMBIA LA SOLUCIÓN
+
+| | n | Absorción total | Por pedido |
+|---|---|---|---|
+| **1 unidad** | 43 | **+$14.030** | **+$326** 🟢 |
+| **2 o 3 unidades** | 8 | **−$44.263** | **−$5.533** 🔴 |
+| Todos | 51 | −$30.233 | −$593 |
+| *Múltiples sin Tadó* | 7 | −$5.596 | −$799 |
+
+🔑 **LOS PEDIDOS DE UNA UNIDAD NO TIENEN FUGA: DEJAN PLATA.** La fuga está entera en la promo de
+2 unidades, y dentro de esa, concentrada en dos destinos.
+
+| Ciudad | uds | Cobrado | Flete | Absorción |
+|---|---|---|---|---|
+| **TADÓ** | 2 | $33.000 | **$71.667** | **−$38.667** 🔴 |
+| **BARRANCABERMEJA** | 2 | $28.000 | $34.083 | **−$6.083** 🔴 |
+| Bogotá ×2 | 2 | $18.000 | $20.647 | −$2.647 c/u |
+| Mocoa | 2 | $33.000 | $34.450 | −$1.450 |
+| Caldas | 3 | $33.300 | $33.639 | −$339 |
+| Rionegro | 2 | $29.000 | $28.470 | +$530 🟢 |
+| Cartagena | 2 | $36.000 | $28.959 | **+$7.041** 🟢 |
+
+⛔ **ESTO MATA LA OPCIÓN (1) DE #82** ("subir el envío cobrado $3.000 a todos"). Sería cobrarle a
+43 clientes que ya dejan plata para tapar el hueco de 2. **Arreglar 3 o 4 ciudades vale más.**
+
+### 🔴 TADÓ: EL FLETE NO SE COMPARTE, SE DUPLICA EXACTO
+
+El dueño dijo *"Tadó cobró como 35.000, no 70.000"*. **Tiene razón en el número: $35.834 es el
+flete POR UNIDAD.** Pero esa guía llevaba **dos** unidades y el cargo total fue **$71.667**.
+
+**La prueba está en el seguro**, que es 13,6% del flete en las 54 guías sin excepción:
+
+| | Flete | Seguro | Seguro/flete |
+|---|---|---|---|
+| Tadó 2 ud | $71.667 | $9.846 | **13,74%** ✓ |
+| Tadó 1 ud | $32.510 | $4.455 | 13,70% ✓ |
+| *si el flete fuera $35.834* | $35.834 | $9.846 | **27,48%** 🔴 rompe el patrón |
+
+El seguro es **exactamente el doble** del de una unidad. Son dos paquetes en una guía.
+
+| Ciudad | 1 ud | 2 uds | Ratio |
+|---|---|---|---|
+| Bogotá | $12.956 | $20.647 | 1,59× 🟢 |
+| Cartagena | $20.895 | $28.959 | 1,39× 🟢 |
+| Caldas (3 uds) | $20.895 | $33.639 | 1,61× 🟢 |
+| **Tadó** | $32.510 | **$71.667** | **2,20×** 🔴 |
+
+Esa guía pierde: $143.000 − producto $66.000 − flete $71.667 = $5.333 − comisión − pauta = **−$6.631**.
+
+⚠️ **Y HAY UN DESCUADRE QUE VALE MÁS QUE EL PEDIDO:** si el registro interno dice $35.000 y 99
+Envíos reporta $71.667, hay **$36.667 de diferencia**. O cobraron doble (y se reclama), o el
+cargo real es el doble de lo que se cree. → **#90**
+
+### ✅ CALDAS RESUELTO — Y ES LA MEJOR VENTA DE LA VENTANA
+
+**3 unidades del tradicional a precio LLENO:** 3 × $59.900 = $179.700 + $33.300 de envío = $213.000 ✓
+
+| | |
+|---|---|
+| Absorción | −$339 (cero) |
+| **Neto** | **$66.297** |
+| Por unidad | **$22.099** |
+
+🔑 **Y el flete SÍ se compartió: $33.639 por 3 unidades contra ~$20.895 por una = 1,6×.**
+El gancho del envío compartido es real en el 97% del país.
+
+⚠️ **PERO PAGÓ PRECIO LLENO POR LAS TRES.** Con la promo habría pagado $169.900: dio **$9.800
+más** de lo que dice el tarifario. Bueno para este pedido, **grave como síntoma: si a alguien que
+compra TRES no le ofrecieron la promo, no se la están ofreciendo a nadie.** → conecta con #40 y #60.
+
+### 🔔 EL SHARE DE MÚLTIPLES CAYÓ A 15,7% — Y CALDAS EXPLICA POR QUÉ
+
+| | |
+|---|---|
+| 6,8% | antes del gancho |
+| **26,8%** | después (el "hallazgo más importante del proyecto") |
+| 37,5% | 25-ago (n=8) |
+| **15,7%** | **7-8 sep (n=51)** · 2 uds solas: 13,7% · uds/pedido **1,176** |
+
+Con n=51 el intervalo roza el 26,8% por el borde, así que **técnicamente no se puede declarar la
+caída** — pero es la muestra más grande medida y viene claramente por debajo. **Es la señal más
+fuerte hasta hoy de que el gancho se aflojó**, y Caldas da el mecanismo: **la IA dejó de
+ofrecerlo.** → **#60** y **#40** suben de prioridad.
+
+### 🆕 EL SEGURO ES EXACTAMENTE EL 13,6% DEL FLETE — Y PUEDE NO VALER LA PENA
+
+54 guías, mínimo **13,47%**, máximo **13,74%**. **Proporción fija**, no prima por valor declarado:
+confirma que va **dentro** del `valor_servicio` (0-H).
+
+| | |
+|---|---|
+| Seguro pagado en 54 guías | **$180.185** |
+| Al mes (27 guías/día) | **$2.702.775** |
+| Ahorro esperado (8,3 devoluciones × $18.574) | $153.458 |
+| **Relación ahorro/costo** | **0,85×** 🔔 |
+
+🔔 **Está al filo, y del lado malo.** Si el rechazo real de 99 Envíos es **menor** al 15,3%
+histórico (#31 sigue sin medirse), **el seguro cuesta más de lo que ahorra.** Es el tercer costo
+más grande del negocio y nunca se había mirado. → **#91**
+
+### 🚚 COORDINADORA YA ES EL 39% DEL VOLUMEN — SU COBERTURA QUEDÓ PROBADA
+
+| | Guías | Flete promedio |
+|---|---|---|
+| interrapidísimo | 33 (61%) | $25.426 |
+| **coordinadora** | **21 (39%)** | $23.056 |
+
+Llegó a Cartagena, Armenia, Medellín, Sincelejo, Soledad, Barranquilla, Cúcuta, Bello, Rionegro,
+**Tadó**, Sabaneta, Pereira, Montería, **Puerto Gaitán** y Caldas. **NO es solo ciudades grandes.**
+
+Misma ciudad, por unidad: Barranquilla **−8,7%** · Tadó **−9,3%** a favor de coordinadora.
+⚠️ **Con solo 2 ciudades comparables no se concluye precio.** Lo que queda probado es la
+**cobertura**, que era justo lo que preguntaba **#50**.
+
+### 💰 EL MAYOREO: 3 UNIDADES AL DETAL LE GANAN A 12 AL MAYOR
+
+El pedido de 12 unidades salió a **$40.000/ud** y el cliente **sí pagó el flete** ($93.291
+cobrado contra $94.006 pagado, absorción $715).
+
+| | Unidades | Neto | Por unidad |
+|---|---|---|---|
+| **Caldas · 3 al detal** | 3 | **$66.297** | **$22.099** |
+| Granada · 12 al mayor | 12 | $58.412 | $4.868 |
+
+🔑 **Un pedido de 3 unidades al detal dejó $7.884 MÁS que uno de 12 al mayor, con cuatro veces
+menos producto. 4,5× por unidad.** Ya no es teoría: son dos pedidos reales del mismo día.
+
+**Piso de lista: $45.000** (margen $12.000/ud con el costo nuevo). **$40.000 se reserva para
+50+ unidades, no para 12.** El mismo $1.000 de ahorro de costo vale **+3,9% en retail y +16,7% en
+mayoreo**, porque ahí el margen es delgado — pero no alcanza para cerrar la brecha.
+
+🔴 **Y SALIÓ CONTRAENTREGA: $573.291 en efectivo en la puerta**, la exposición más grande en una
+sola guía en la historia del proyecto. Se advirtió el 7-sep y quedó sin ejecutar. → **#92**
+
+### 🟢 LA LOGÍSTICA ESTÁ LIMPIA (por primera vez en semanas)
+
+**Cero guías de Servientrega** (el enrutamiento a Interrapidísimo/Coordinadora quedó completo) y
+**cero guías trabadas**: las 54 están en Creado / Recolección programada / En terminal / Admitida.
+
+### 📌 RAREZAS DE DATOS DE ESTE EXPORT
+
+- **Guachucal $85.511:** banda E es $85.000. Sobran **$511**. El guion no debería inventar cifras.
+- **Dagua $80.000:** descuento de cierre de $1.000, dentro del tope de $3.000. ✅ Correcto.
+- ⚠️ **El export de Meta a nivel CAMPAÑA no sirve para decidir creativos** (2 filas, todo sumado).
+  Para eso: pestaña **"Conjuntos de anuncios" × día, sin desglose por región**.
+- ⚠️ **"Contactos de mensajes totales" ≠ "Resultados"** (747 vs 719 = 3,9%). Usar siempre
+  *Resultados*, que es la columna de todo el proyecto.
+- 🆕 **"Nuevos contactos de mensajes"** permite ver quién repite: **7-10%** en el tradicional,
+  **38%** en el colmena (n=8). Si se confirma, el mensaje de seguimiento vale más en el colmena.
+
+### 🖥️ CONFIGURACIÓN AL CIERRE DEL 2026-09-08
+
+| Campaña / Conjunto | Presupuesto | Estado |
+|---|---|---|
+| **Impermeables · Prospección Motociclistas** | **$155.000** | |
+| · Domiciliarios VIDEO | $55.000 | 🟢 estabilizado en $714, **no tocar** |
+| · Domiciliarios | $45.000 | ✅ $713 |
+| · **TEST Creativos** | **$25.000** | 🥇 **$608 al 97%** — siguiente escalón $30.000 |
+| · Motorizados | $15.000 | 🔔 $730, techo confirmado |
+| · Valle del Cauca | $15.000 | 🔴 **21% de utilización → bajar a $5.000** |
+| **Colmena Premium · Prospección** | **$20.000** | |
+| · Publico ABIERTO video | $20.000 | 🔔 CPM $7.318, sin colchón |
+| **TOTAL/DÍA** | **$175.000** | → **$165.000** al bajar Valle |
+
+---
+
 ## 0-AD. 🔄 EL VIDEO SE DETERIORÓ, TEST CREATIVOS ES EL NUEVO GANADOR, Y EL COLMENA NO ESTABA CARO (2026-09-04 al 2026-09-06)
 
 ### 📊 LA FOTO DE LOS TRES DÍAS (4, 5 y 6 de sep · vie / sáb / dom)
@@ -1553,6 +1912,14 @@ día, así que **todo día recién cerrado está incompleto** y el CPA sale infl
 | Despacho | 99 Envíos | logística y flete |
 
 ### 💵 EL MODELO DE MARGEN (reemplaza el promedio de "$28.751 por pedido")
+
+> 🔴🔴 **SUPERADO EL 8-SEP POR 0-AE, EN DOS FRENTES:**
+> **(1) el costo bajó a $33.000**, así que el coeficiente es **$26.900**, no $25.900.
+> **(2) el `− $2.800 × despachos` es FALSO como promedio parejo:** medido en 51 guías, los pedidos
+> de **1 unidad dejan +$326** y los de **2-3 unidades pierden −$5.533**, concentrado en Tadó y
+> Barrancabermeja. **La fuga está en la promo, no en el flete.**
+> **Modelo vigente: `Margen = $26.900 × unidades − flete real de la guía`.**
+> Lo de abajo se conserva porque la derivación y el razonamiento siguen siendo válidos.
 
 ```
 Margen = $25.900 × unidades  −  $2.800 × despachos
@@ -4825,6 +5192,46 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 
 88. [ ] 🗣️ **CONSEGUIR EL NÚMERO REAL DE CLIENTES DESPACHADOS** para la prueba social del primer
     mensaje del bot. **No inventarlo.** Hoy el mensaje tiene un espacio pendiente por ese dato.
+
+89. [ ] 💰🔴 **CERRAR LAS 4 PREGUNTAS DEL COSTO A $33.000 ANTES DE DARLO POR PERMANENTE.**
+    El modelo ya se cambió a `$26.900 × unidades − flete` porque es el dato del dueño, pero falta:
+    **(a) ¿es permanente o por este lote?** Si está condicionado a volumen, es excepción, no modelo.
+    **(b) ¿aplica a las 5.000 en consignación?** No están pagadas; si cubre lo no liquidado, el
+    beneficio es **retroactivo** sobre el inventario en mano.
+    **(c) ¿bajó también el colmena ($85.000)?** Un −2,9% serían ~$2.500/ud y el colmena está justo
+    en el filo de su equilibrio: ahí vale doble.
+    **(d) 🔴 ¿CAMBIÓ ALGO DEL PRODUCTO?** Es la incómoda. Puede ser negociación por volumen
+    (perfecto) o material más delgado / costura / cremallera. **Si es lo segundo, el ahorro se paga
+    con RECHAZO**, y una devolución cuesta prima + flete + reputación.
+    📌 **Vigilar la tasa de rechazo las próximas 2 semanas contra el 15,3% histórico.** Si sube,
+    ese $1.000 sale carísimo. Se cruza con **#31**.
+    ⛔ **Y NO bajar el precio de venta.** El ahorro se queda como margen. Ver **0-AE**.
+
+90. [ ] 🚚🔴 **EL DESCUADRE DE TADÓ: $36.667.** El dueño registra ~$35.000 de flete en esa guía y
+    99 Envíos reporta **$71.667**. El seguro ($9.846 = 13,74% del flete, exactamente el doble del de
+    una unidad) confirma que el cargo de 99 Envíos es por **dos** paquetes.
+    **Dos salidas y las dos importan:** si el cargo real es $71.667, el registro interno está
+    subestimando fletes en toda la operación; si el dueño pagó $35.000, **hay un cobro doble que
+    reclamar.** 📌 Mirar el extracto de 99 Envíos de esa guía. Ver **0-AE**.
+
+91. [ ] 🛡️🔔 **PREGUNTAR SI EL SEGURO 99 ES OPCIONAL — SU RELACIÓN AHORRO/COSTO ES 0,85×.**
+    Medido en 54 guías: el seguro es **exactamente el 13,6% del `valor_servicio`** (proporción fija,
+    no prima por valor declarado), o sea **$2.702.775/mes** a 27 guías/día.
+    Contra eso ahorra ~$18.574 por devolución (0-L): a 15,3% de rechazo son $153.458 por cada 54
+    guías, contra $180.185 de costo. **Está al filo y del lado malo.**
+    🔑 **Y si el rechazo real de 99 Envíos es MENOR al 15,3% (nunca se midió, #31), el seguro pasa a
+    costar claramente más de lo que ahorra.** Es el tercer costo más grande del negocio y nunca se
+    había mirado. 📌 **Medir #31 antes de decidir**, pero preguntar ya si se puede desactivar.
+
+92. [ ] 💳🔴 **EL MAYOREO SE COBRA POR TRANSFERENCIA O ANTICIPO — NO CONTRAENTREGA.**
+    El pedido de 12 unidades salió **contraentrega con $573.291** por cobrar en la puerta: la
+    exposición más grande en una sola guía en la historia del proyecto. Se advirtió el 7-sep y quedó
+    sin ejecutar.
+    📌 **Piso de lista para mayoreo: $45.000** (margen $12.000/ud con el costo nuevo). **$40.000 se
+    reserva para 50+ unidades.** La razón ya no es teórica: el mismo día, **3 unidades al detal
+    (Caldas) dejaron $66.297 y 12 al mayor (Granada) $58.412** — 4,5× por unidad a favor del detal.
+    ⚠️ Y falta la pregunta que decide si el canal se cultiva o se acota: **¿dónde revende?**
+    En Medellín o Bogotá te compite con tu propia pauta. Ver **0-AE** y `analisis/mayoreo-40mil.py`.
 
 
 
