@@ -1,33 +1,35 @@
 # Seguimiento a los chats del colmena — 2026-09-10
 
 **Respuesta corta a "¿le enviamos un mensaje a todos?": NO a todos, y no el mismo día.**
-Son **~13 personas**, no 37. Y el mensaje **no vende** — solo reabre la puerta.
+Son **17 personas**, no 37. Y el mensaje **no vende** — solo reabre la puerta.
 
 ---
 
-## Por qué son ~13 y no 37
+## Por qué son 17 y no 37
 
-De las 37 conversaciones de la campaña, **el 57,8% históricamente son vacías**: un clic que abrió el
-chat y **nunca escribió nada**. A esos no hay a quién escribirle.
+De las 37 conversaciones de la campaña, **el dueño contó ~17 vacías**: un clic que abrió el chat y
+**nunca escribió nada**. A esos no hay a quién escribirle.
 
 | | |
 |---|---|
 | Conversaciones de la campaña | 37 |
-| Vacías estimadas (57,8%) | ~21 |
-| **Reales** | **~16** |
-| Menos las 3 que ya compraron | **~13** |
+| **Vacías (contadas)** | **17** = 45,9% |
+| **Reales** | **20** |
+| Menos las 3 que ya compraron | **17** |
 
-🔑 **Y eso mejora la apuesta, no la empeora:** el retorno espontáneo pasa de 1 de 34 (2,9%) a
-**1 de 13 = 7,7%**. La persona de hoy no fue suerte entre muchos: fue 1 de 13.
+🔑 **Y eso mejora la apuesta:** el retorno espontáneo pasa de 1 de 34 (2,9%) a **1 de 17 = 5,9%**.
+La persona de hoy no fue suerte entre muchos.
 
-**Antes de escribir, contá.** Abrí la bandeja y separá los que escribieron algo de los que no. Si
-resultan 20 en vez de 13, mejor; si son 8, también sirve. **El número real lo tenés vos en 5 minutos.**
+🟢 **Dato bueno que salió de tu conteo: el colmena tiene MENOS fantasmas que el tradicional**
+(45,9% de vacías contra 57,8%). Su anuncio filtra mejor — el precio espanta al curioso antes del clic.
+
+
 
 ---
 
 ## ⛔ Lo que NO se hace
 
-- **No un mensaje idéntico a 30 números el mismo día.** Ese es el patrón que WhatsApp lee como
+- **No un mensaje idéntico a los 17 el mismo día.** Ese es el patrón que WhatsApp lee como
   difusión → reportes → **número bloqueado**. Y el 313 861 5813 no es "un canal": es el único.
   La asimetría es brutal: **arriba hay ~$82.000, abajo está el negocio entero.**
 - **No descuento.** Cierra al 18,8% de las conversaciones reales a $149.900. No hay nada que
@@ -45,10 +47,10 @@ conversación que él empezó. El riesgo aparece con el volumen y con el copiar-
 
 | | |
 |---|---|
-| **6 o 7 por día**, dos días | no los 13 de golpe |
+| **6 por día**, tres días | no los 17 de golpe |
 | Espaciados, no seguidos | entre uno y otro, unos minutos |
 | **Horario:** 7-9 am o 6-9 pm | es cuando el motociclista tiene el celular en la mano |
-| Cambiale una palabra a cada uno | que no sean 13 mensajes calcados |
+| Cambiale una palabra a cada uno | que no sean 17 mensajes calcados |
 
 ---
 
@@ -100,8 +102,8 @@ Tres columnas en la hoja, y con esto queda cerrado el caso del colmena:
 | A cuántos escribí | Cuántos contestaron | Cuántos compraron |
 |---|---|---|
 
-Y el dato que falta para poder comparar bien: **de las 37, cuántas estaban vacías.** Con eso se sabe
-si el colmena cierra mejor o peor que el tradicional, que hoy no se puede decir con honestidad.
+✅ **El dato que faltaba ya lo diste (17 vacías), y el veredicto es:** sobre conversaciones reales el
+tradicional cierra **19,9%** y el colmena **15,0%**. **El colmena atrae mejor y cierra peor.**
 
 ---
 
@@ -113,7 +115,7 @@ si el colmena cierra mejor o peor que el tradicional, que hoy no se puede decir 
 | **Base** | **2** | **$81.936** |
 | Bueno | 3 | $122.904 |
 
-**~20 minutos de trabajo.** En el escenario base son **$252.111 por hora**: la hora mejor pagada del
+**~25 minutos de trabajo.** En el escenario base son **$189.083 por hora**: la hora mejor pagada del
 negocio, y sin gastar un peso de pauta.
 
 📌 **Y no interfiere con la medición del lunes 14:** esto no toca la pauta. Solo asegurate de anotar

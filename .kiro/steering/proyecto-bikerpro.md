@@ -16,7 +16,7 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
-| **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · las 37 conversaciones son ~16 reales, así que el seguimiento es a **~13** y el retorno espontáneo es **7,7%**, no 2,9% | **10-sep** |
+| **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · **17 de 37 conversaciones estaban vacías**, y con base limpia **el colmena ATRAE mejor (45,9% vs 57,8% de vacías) y CIERRA peor (15,0% vs 19,9%)** · el CPA se descompone exacto: paga 2,6× por conversación real y cierra 1,33× peor = 3,4× · seguimiento a **17** | **10-sep** |
 | **0-AF** | 🧮 **La comisión de recaudo ya venía DENTRO del flete: se estaba restando dos veces** (todo corrige hacia arriba, #28-1 cerrado) · ⛔ **no se lee un día abierto** (la descomposición CPM ÷ conv-por-mil) · **predicción fallida: Motorizados cerró en $1.970** y su audiencia se está encogiendo (−56%) · **el colmena no fracasó, fracasó su canal** (CPM $10.062) y quedó pausado · **tres regiones nuevas de $5.000** · **cinco parches al guion** (el bot vendía con MENÚ) · colmena = la textura, no la tela · el catálogo maestro estaba viejo en 21 lugares | **9 y 10-sep** |
 | **0-AE** | 💰 **El costo bajó a $33.000** (+$752.527/mes) · el CPA nunca se deterioró: era la pauta del colmena · el video se estabilizó y empató · **la fuga de flete está solo en la promo de 2 uds** · Tadó duplica el flete · el seguro es 13,6% y da 0,85× · 3 al detal > 12 al mayor | **7 y 8-sep** |
 | **0-AD** | 🔄 **El video se deterioró (+14,4%)** · TEST Creativos nuevo ganador $541 · el A/B lo ganó el video · el colmena no estaba caro, la conversación estaba rota · Meta One se paga | **4 al 6-sep** |
@@ -260,8 +260,8 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 >   $149.900 exactos. Solo el dueño puede confirmarlo
 > - 💎 **EL COLMENA VENDIÓ SOLO, CON LA CAMPAÑA APAGADA, Y PREPAGADO** (0-AG): la campaña cerró en
 >   **+$37.060** y no en −$3.908. Era un lead **de la propia campaña**, no del upsell, así que
->   **los chats que quedaron son esa misma población**. Universo real: **~13 personas** (de 37
->   conversaciones, ~21 son vacías), con retorno espontáneo de **7,7% sin hacer nada**. Guion listo
+>   **los chats que quedaron son esa misma población**. Universo real: **17 personas** (de 37
+>   conversaciones, **17 vacías contadas por el dueño**), con retorno espontáneo de **5,9%**. Guion listo
 >   en `SEGUIMIENTO-COLMENA-10SEP.md` → **#96**
 > - 🔔 **EL UPSELL DEL COLMENA SIGUE SIN MEDIR.** Esta venta no lo prueba. No contarla como evidencia
 > - 🔴 **MOTORIZADOS SE ESTÁ ENCOGIENDO**, no está topado: conv/mil 4,04 → **1,77 (−56%)** con CPM
@@ -1905,30 +1905,56 @@ acaba de producir una venta sola, sin seguimiento, sin recordatorio y sin descue
 **Puerto Gaitán SÍ es un colmena** — solo quedó mal etiquetado en la guía. Y las 37 son el total de
 los días que la campaña estuvo prendida.
 
-### 🔑 PERO LAS 37 NO SON 37 LEADS — Y ESO MEJORA TODO
+### ✅ EL DUEÑO CONTÓ LA BANDEJA: ~17 VACÍAS DE 37 — Y ESO CIERRA EL CASO DEL COLMENA
 
-| | |
-|---|---|
-| Conversaciones de la campaña | 37 |
-| **Vacías** estimadas (57,8%, medido en 0-K) | ~21 |
-| **Reales** | **~16** |
-| Menos las 3 que compraron | **~13** |
+Script: `analisis/colmena-cierre-base-limpia.py`. **Por primera vez se puede comparar colmena contra
+tradicional sobre la MISMA base.**
 
-**Una conversación vacía no tiene ni un mensaje del cliente: es un clic que nunca escribió.** A esos
-no hay a quién escribirle.
-
-| | Contando las vacías | **Universo real** |
+| | Colmena | Tradicional |
 |---|---|---|
-| Retorno espontáneo | 1 de 34 = 2,9% | **1 de 13 = 7,7%** |
-| **Cierre del colmena** | 8,1% sobre 37 | **18,8% sobre ~16** |
+| Conversaciones | 37 | — |
+| **% vacías** | **45,9%** (17) | 57,8% (0-K) |
+| **% que sí escribe** | **54,1%** 🟢 | 42,2% |
 
-⚠️⚠️ **Y ACÁ HAY UN ERROR MÍO QUE HAY QUE DEJAR MARCADO:** comparé el **8,1% del colmena sobre
-conversaciones totales** contra el **8,4% del tradicional sobre conversaciones totales**, y concluí
-"cierran casi igual". Eso está bien construido. Pero **el 18,8% sobre reales NO se puede comparar
-contra el 8,4% sobre totales** — son bases distintas.
-📌 **Falta el único dato que cierra el caso del colmena: de las 37, cuántas estaban vacías.** Lo tiene
-el dueño en la bandeja, y sin eso no se puede afirmar si el colmena cierra mejor o peor que el
-tradicional.
+🔑 **PRIMER HALLAZGO, Y ES NUEVO: EL COLMENA TIENE MENOS FANTASMAS.** Su anuncio **filtra mejor** —
+un aviso de $149.900 espanta al curioso **antes** del clic. **Eso es una ventaja del colmena.**
+
+| Cierre, sobre... | Colmena | Tradicional | |
+|---|---|---|---|
+| **TOTALES** | 8,1% | 8,4% | empate |
+| **REALES** | **15,0%** | **19,9%** | 🔴 **gana el tradicional (1,33×)** |
+
+🔑🔑 **SEGUNDO HALLAZGO, Y ME CORRIGE OTRA VEZ.** Dije *"el colmena cierra casi igual que el
+tradicional"*. Sobre conversaciones **reales** el tradicional cierra **19,9% contra 15,0% = 33%
+mejor.** Y ahora se entiende **por qué parecían empatados sobre totales: los dos efectos se
+cancelaban.**
+
+> **EL COLMENA ATRAE MEJOR Y CIERRA PEOR.**
+
+**Y la descomposición del CPA por fin cuadra exacto:**
+
+| | Colmena | Tradicional |
+|---|---|---|
+| $ por conversación **real** | **$4.292** | $1.678 |
+| ÷ cierre sobre reales | 15,0% | 19,9% |
+| **= CPA por venta** | **$28.614** ✓ | $8.429 |
+
+*(chequeo: $85.843 ÷ 3 = $28.614. Cuadra.)*
+
+🔑 **EL COLMENA PIERDE POR LOS DOS LADOS: paga 2,6× más por cada conversación real Y cierra 1,33×
+peor cuando la tiene. 2,6 × 1,33 = 3,4× de desventaja en CPA.**
+📌 **Pero de los dos, el que se puede arreglar es el primero:** el costo por conversación **es CPM, y
+el CPM es audiencia** (#77). El cierre del 15% ya es lo que es a $149.900 — **no está roto, es el
+precio.**
+📌 **Y refuerza 0-AD** (*"el colmena no estaba caro, la conversación estaba rota"*): con base limpia
+sigue siendo la conversación.
+
+⚠️ **TAMAÑO DE MUESTRA, obligatorio decirlo:** 3 ventas sobre 20 conversaciones reales. **El
+intervalo al 95% de ese 15% va de ~3% a ~38%**, o sea que es compatible con "mucho peor" y con
+"mejor" que el tradicional. **La dirección informa; el número no.**
+⚠️ **Y el 57,8% del tradicional es de agosto (n=90) y nunca se volvió a medir.** Si hoy fuera 45%, el
+tradicional cerraría 15,3% sobre reales y **la brecha se cerraría**. → **Vale contar vacías del
+tradicional una semana.**
 
 ### 📋 EL PROTOCOLO DE SEGUIMIENTO — `SEGUIMIENTO-COLMENA-10SEP.md`
 
@@ -1936,11 +1962,11 @@ A la pregunta del dueño *"¿le enviamos un mensaje a todos?"*: **NO a todos, y 
 
 | | |
 |---|---|
-| **A cuántos** | **~13**, no 37 (a las vacías no hay a quién escribirle) |
-| **Ritmo** | 6-7 por día, dos días, espaciados, 7-9 am o 6-9 pm |
+| **A cuántos** | **17** (37 − 17 vacías − 3 que compraron) |
+| **Ritmo** | **6 por día, tres días**, espaciados, 7-9 am o 6-9 pm |
 | **El mensaje** | **no argumenta, no convence, no insiste** — solo avisa que sigue disponible |
 | **Si no contesta** | **nada.** No hay segundo mensaje |
-| **Tiempo total** | ~20 minutos |
+| **Tiempo total** | ~25 minutos |
 
 🔑 **El mensaje no vende porque el hallazgo de hoy es que el que quiere llega decidido y paga.**
 
@@ -1950,7 +1976,7 @@ A la pregunta del dueño *"¿le enviamos un mensaje a todos?"*: **NO a todos, y 
 | **Base** | **2** | **$81.936** |
 | Bueno | 3 | $122.904 |
 
-**$252.111 por hora en el escenario base**, sin gastar un peso de pauta.
+**$189.083 por hora en el escenario base**, sin gastar un peso de pauta.
 
 ⛔ **LA ASIMETRÍA ES LO QUE MANDA EL RITMO: arriba hay ~$82.000; abajo está el negocio entero.** Un
 mensaje idéntico a 30 números el mismo día es el patrón que WhatsApp lee como difusión → reportes →
@@ -5998,16 +6024,16 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
 
 
 
-96. [ ] 💬🥇 **RETOMAR LOS ~13 CHATS REALES DEL COLMENA — CPA $0. GUION LISTO EN `SEGUIMIENTO-COLMENA-10SEP.md`.**
+96. [ ] 💬🥇 **RETOMAR LOS 17 CHATS REALES DEL COLMENA — CPA $0. GUION LISTO EN `SEGUIMIENTO-COLMENA-10SEP.md`.**
     El 10-sep una persona que había escrito **la semana pasada** volvió sola, pidió el colmena y
     **pagó anticipado**. Eso prueba que **el CPA de esas conversaciones ya está pagado y hundido**, y
     que el colmena **tarda ~7 días en decidirse** porque vale $149.900.
     | | |
     |---|---|
-    | **A cuántos escribir** | **~13** (de 37 conversaciones, ~21 son vacías y 3 ya compraron) |
-    | Retorno espontáneo sobre el universo real | **1 de 13 = 7,7%** |
+    | **A cuántos escribir** | **17** (de 37 conversaciones, **17 son vacías** —contadas por el dueño— y 3 ya compraron) |
+    | Retorno espontáneo sobre el universo real | **1 de 17 = 5,9%** |
     | Cada venta | **$40.968 limpios, CPA $0** |
-    | Escenario base (2 ventas) | **$81.936 en ~20 minutos = $252.111/hora** |
+    | Escenario base (2 ventas) | **$81.936 en ~25 minutos = $189.083/hora** |
     ✅ **Es legítimo: ellos escribieron primero.** Es retomar una conversación abierta, no un mensaje
     no solicitado.
     ⛔ **6-7 por día, dos días, y cambiándole una palabra a cada uno. NUNCA un copiar-pegar a los 30
