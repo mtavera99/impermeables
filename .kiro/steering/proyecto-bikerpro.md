@@ -4,7 +4,7 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-08** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
+Última actualización: **2026-09-10** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
 sandbox corre en UTC y puede marcar el día siguiente)*
 
 ---
@@ -12,10 +12,11 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 # 🧭 ÍNDICE — POR DÓNDE EMPEZAR
 
 **Si tenés 2 minutos:** leé el bloque "ESTADO VIGENTE AL 2026-08-28" y la lista de pendientes vivos.
-**Si tenés 15:** leé además las secciones 0-AE, 0-AD, 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
+**Si tenés 15:** leé además las secciones 0-AF, 0-AE, 0-AD, 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-AF** | 🧮 **La comisión de recaudo ya venía DENTRO del flete: se estaba restando dos veces** (todo corrige hacia arriba, #28-1 cerrado) · ⛔ **no se lee un día abierto** (la descomposición CPM ÷ conv-por-mil) · **predicción fallida: Motorizados cerró en $1.970** y su audiencia se está encogiendo (−56%) · **el colmena no fracasó, fracasó su canal** (CPM $10.062) y quedó pausado · **tres regiones nuevas de $5.000** · **cinco parches al guion** (el bot vendía con MENÚ) · colmena = la textura, no la tela · el catálogo maestro estaba viejo en 21 lugares | **9 y 10-sep** |
 | **0-AE** | 💰 **El costo bajó a $33.000** (+$752.527/mes) · el CPA nunca se deterioró: era la pauta del colmena · el video se estabilizó y empató · **la fuga de flete está solo en la promo de 2 uds** · Tadó duplica el flete · el seguro es 13,6% y da 0,85× · 3 al detal > 12 al mayor | **7 y 8-sep** |
 | **0-AD** | 🔄 **El video se deterioró (+14,4%)** · TEST Creativos nuevo ganador $541 · el A/B lo ganó el video · el colmena no estaba caro, la conversación estaba rota · Meta One se paga | **4 al 6-sep** |
 | 0-AC | 🎯 **CPA real $7.806 (−38%)** · modelo de margen · fuga de flete $2.800/despacho · costo marginal y protocolo de escalamiento · plan del colmena | **4-sep** |
@@ -56,13 +57,25 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 > **Corte de producto y contenido:** 28-ago. **Último corte de métricas operativas:** 25-ago; no se
 > maquillaron como nuevas. El CPA de $7.167 sigue provisional hasta casar gasto y ventas del mismo día.
 >
-> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE. ESTÁ EN 0-AE (7-8 sep), 0-AD (4 al 6-sep), 0-AC (4-sep), 0-AB (1 al 3-sep) Y 0-AA (31-ago / 1-sep).**
+> 🆕 **LO MÁS NUEVO NO ESTÁ EN ESTE BLOQUE. ESTÁ EN 0-AF (9-10 sep), 0-AE (7-8 sep), 0-AD (4 al 6-sep), 0-AC (4-sep), 0-AB (1 al 3-sep) Y 0-AA (31-ago / 1-sep).**
 > **Las métricas de abajo son del corte del 25-ago y NO reflejan el estado de la cuenta hoy.**
 >
 > 🔴🔴 **EL MODELO DE MARGEN VIGENTE ES `$26.900 × unidades − flete` (costo $33.000 desde el 8-sep).**
 > **Cualquier cuenta hecha con $25.900 está mal. Ver 0-AE.**
+> 🔴🔴 **Y NO SE RESTA COMISIÓN DE RECAUDO APARTE: ya viene dentro del `valor_servicio`. Ver 0-AF.**
 >
-> **Estado real al 8-sep (ver 0-AE):** costo del producto **$33.000** (+$752.527/mes) · utilidad por
+> **Estado al 10-sep (ver 0-AF) — ESTE ES EL VIGENTE:** cuenta en **$154.000/día** ·
+> **tres regiones nuevas de $5.000** (Santanderes · Eje Cafetero · Tolima Huila), entregando desde el
+> día 1, **veredicto el lunes 14** · Valle podado a $5.000 dio **69% de utilización y $1.379** ·
+> **Motorizados $15.000 → $9.000**: cerró en $1.970 y su audiencia se **encoge** (conv/mil 4,04 → 1,77) ·
+> **colmena PAUSADO** (CPM $10.062 = 2,7× la cuenta; no falló el producto, falló el canal) ·
+> **TEST Creativos NO sube a $30.000**: es el #77 en números (mejor creativo, peor subasta, $554 a CPM
+> normal) · **la comisión de recaudo ya estaba dentro del flete** y todo corrige hacia arriba
+> (#28-1 cerrado) · **cinco parches al guion** (el bot vendía con MENÚ y descontaba $4.000 de entrada) ·
+> catálogo real: **S a 3XL** y **SEIS** colores de franja · ⛔ **un día abierto no se lee: el
+> termómetro es el CPM.**
+>
+> **Estado al 8-sep (ver 0-AE):** costo del producto **$33.000** (+$752.527/mes) · utilidad por
 > pedido **$24.129** · **el CPA real es $7.674, nunca se deterioró** (el $9.622 tenía adentro la pauta
 > del colmena) · **TEST Creativos es el ganador: $608 al 97% de utilización**, siguiente escalón
 > $30.000 · el VIDEO **se estabilizó en $714 y empató con Domiciliarios ($713)** → no tocar ninguno ·
@@ -81,7 +94,31 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 > el video nuevo ganó y se llevó el 62% del gasto de Medellín+Bogotá · Valle destrabado al 75% ·
 > el colmena no vendió porque **no se estaba mostrando** (1.068 impresiones en 2 días).
 
-## 🖥️ CONFIGURACIÓN DE LA CUENTA AL CIERRE DEL 2026-09-03
+## 🖥️ CONFIGURACIÓN DE LA CUENTA AL 2026-09-10 (LA VIGENTE)
+
+| Conjunto | Presup. | Creativo | Geografía | Estado |
+|---|---|---|---|---|
+| **Domiciliarios VIDEO** | **$55.000** | VIDEO | Med+Bog | 🟢 $947 al cierre del 9-sep. **No tocar** |
+| **Domiciliarios** | **$45.000** | Fondo azul | Med+Bog | 🟢 $911 al cierre. Es **el control** de todo. No tocar |
+| **TEST Creativos** | $25.000 | Prueba social | Med+Bog | 🥇 mejor creativo, **peor subasta** (CPM $7.968). ⛔ NO subir a $30.000 → **#77** |
+| **Motorizados** | **$9.000** | Fondo azul | Med+Bog | 🔴 bajado de $15.000 el 10-sep (cerró $1.970, audiencia encogiéndose). Gate lunes 14 |
+| Domiciliarios \| Valle del cauca | **$5.000** | Fondo azul | Valle del Cauca | 🟢 podado el 9-sep: 21% → **69%** de utilización, $5.157 → **$1.379** |
+| 🆕 **Domiciliarios \| Santanderes** | **$5.000** | Fondo azul | Santander + N. de Santander | creado 9-sep noche. Aprendizaje |
+| 🆕 **Domiciliarios \| Eje Cafetero** | **$5.000** | Fondo azul | Risaralda + Quindío + Caldas | creado 9-sep noche. Aprendizaje |
+| 🆕 **Domiciliarios \| Tolima Huila** | **$5.000** | Fondo azul | Tolima + Huila | creado 9-sep noche. Aprendizaje |
+| ~~Domiciliarios \| Colmena~~ | — | — | — | 🔴 **PAUSADO el 9-sep** (`not_delivering`). Ver 0-AF |
+| **Total** | **$154.000** | | | |
+
+📌 **Advantage+ de campaña: DESACTIVADO** (ABO, cada conjunto con su plata) · **un conjunto, un
+anuncio** (confirmado cuatro veces) · casilla "Llegar a más personas" **marcada en Domiciliarios y
+desmarcada en las regiones** — así se mantiene comparable región contra región.
+⛔ **NO aplicar recomendaciones de Meta** ("puntuación de oportunidad", "N mejoras Advantage+"):
+modifican los creativos solos y hay tres regiones midiendo.
+⛔ **NO tocar NADA hasta el sábado 12, y el veredicto es el lunes 14.** En 24 h se movieron tres
+regiones, Valle, Motorizados, el colmena y cinco parches al guion: ese es el límite de variables que
+todavía se pueden separar.
+
+## 🖥️ CONFIGURACIÓN DE LA CUENTA AL CIERRE DEL 2026-09-03 *(histórica)*
 
 **Esta es la foto exacta de cómo quedó la cuenta.** Si se pierde el hilo, esto es el punto de partida.
 
@@ -207,7 +244,27 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 
 ## ⚠️ ALARMAS VIVAS
 
-> **🆕 AL 8-SEP (0-AE):**
+> **🆕🆕 AL 10-SEP (0-AF) — ESTAS SON LAS VIGENTES:**
+> - 🟢 **EL REPRESADO BAJÓ.** El dueño reporta novedades resueltas y poco represado. Descarga buena
+>   parte de **#74** y **#75**, pero **falta el número de cuánto se recuperó** para bajarlos de acá
+> - 🔴 **$573.291 CONTRAENTREGA sin recoger** (mayoreo a Granada, guía **240060772823**, en "Creado"
+>   desde el 7-sep). Es la exposición más grande en una sola guía del proyecto → **#92**
+> - 🔔 **Las 2 guías del colmena son la primera medición de rechazo a $149.900:**
+>   **240060773268** (San Francisco) y **64532758224** (Puerto Gaitán). Y **hay que confirmar que la
+>   segunda sí es colmena** — venía etiquetada como "impermeable"
+> - 🔴 **MOTORIZADOS SE ESTÁ ENCOGIENDO**, no está topado: conv/mil 4,04 → **1,77 (−56%)** con CPM
+>   normal. Bajado a $9.000. **Gate el lunes 14: sobre $1.500 se apaga** → **#93**
+> - 🔔 **TEST CREATIVOS: CPM $7.968 = 2,4× la cuenta, y subiendo** ($5.240 → $6.679 → $7.968).
+>   Es el mejor creativo pujando contra Domiciliarios. **La palanca es audiencia, no plata** → **#77**
+> - 🔴 **LOS CREATIVOS EN VIVO DICEN "S a 2XL" Y HAY 3XL**, y no anuncian el azul. Es demanda que
+>   nunca se vuelve conversación. ⏸️ **No tocarlos hasta el lunes 14** (reinicia aprendizaje) → **#94**
+> - 🔔 **EL BOT DESCONTÓ $4.000 DE ENTRADA** inventando un descuento por pago anticipado. Parche
+>   pegado, **pero falta reprobarlo con "está muy caro"**. Riesgo: ~$482.400/mes → **#95**
+> - ✅ **#28-1 CERRADO:** la comisión de recaudo ya venía dentro del flete. Todas las cuentas por
+>   pedido corrigen **hacia arriba** (ver 0-AF)
+> - ✅ **#85 CERRADO:** el colmena quedó pausado el 9-sep con ~37 conversaciones y 2 ventas
+
+> **AL 8-SEP (0-AE):**
 > - 🟢 **LA LOGÍSTICA ESTÁ LIMPIA:** de las 54 guías del 7-8 sep, **cero son de Servientrega** y
 >   **cero están trabadas** (todas en Creado / Recolección / En terminal / Admitida). El
 >   enrutamiento a Interrapidísimo + Coordinadora quedó completo. *(Lo viejo de Servientrega sigue
@@ -245,20 +302,43 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 
 ## 🚦 LO SIGUIENTE, EN ORDEN
 
-> **🆕 LISTA VIGENTE AL 8-SEP (0-AE). Lo de abajo del punto 5 es de ventanas anteriores.**
+> **🆕🆕 LISTA VIGENTE AL 10-SEP (0-AF). La de abajo, del 8-sep, ya está ejecutada casi completa.**
 
-1. 🔧 **BAJAR VALLE DE $15.000 A $5.000.** Entrega el 21%: son **$11.899/día ociosos
+1. ⛔⛔ **NO TOCAR NINGÚN PRESUPUESTO HASTA EL SÁBADO 12, Y NO DECIDIR NADA HASTA EL LUNES 14.**
+   Y **no sacar exports de un día suelto:** mínimo 3 días cerrados. En 24 h se movieron tres
+   regiones, Valle, Motorizados, el colmena y cinco parches al guion → **0-AF**
+2. 📦 **RASTREAR LAS TRES GUÍAS.** La de Granada (**240060772823**, $573.291 contraentrega, en
+   "Creado" desde el 7-sep) y las dos de colmena (**240060773268** y **64532758224**), que son la
+   primera medición de rechazo a $149.900. **Y confirmar que la segunda sí es colmena** → **#92**
+3. 🧪 **CONFIRMAR QUE LOS CINCO PARCHES DEL GUION QUEDARON.** Faltan de probar los dos que sangran:
+   escribir **"está muy caro"** (no debe ofrecer descuento de entrada, tope $3.000, nunca bajar el
+   precio del producto) y **"soy de Tadó"** (debe dar $93.000) → **#95**
+4. ▪ **CONSEGUIR LOS EXPORTS HISTÓRICOS CON TELÉFONO (99 Envíos Y Heka).** Es lo único que
+   desbloquea la audiencia del colmena; sin eso el plan queda parado en el paso 1 → **#88**
+5. 📞 **EL EXTRACTO DE LA GUÍA DE TADÓ: $36.667 de descuadre.** (La otra llamada, la del % de
+   comisión, **ya no hace falta**: el dato salió de los propios datos y #28-1 quedó cerrado) → **#90**
+6. 🎨 **CORREGIR LOS CREATIVOS EN VIVO: dicen "S a 2XL" y hay 3XL**, y no anuncian el azul. Y la
+   foto `colores.png` muestra 5 colores. ⏸️ **El lunes 14, no antes** → **#94**
+7. ⛔ **TEST CREATIVOS NO SUBE A $30.000.** Su problema es la subasta, no el presupuesto: CPM $7.968
+   (2,4× la cuenta). **La palanca es audiencia propia** → **#77**
+8. ⛔ **NO TOCAR DOMICILIARIOS NI EL VIDEO.** Son el control con el que se miden las tres regiones
+   y Motorizados en la misma ventana → **0-AF**
+
+*(la lista del 8-sep, ya ejecutada casi completa, se conserva abajo)*
+
+1. ✅ **BAJAR VALLE DE $15.000 A $5.000.** *(hecho el 9-sep: 21% → 69% de utilización y $1.379)* Entrega el 21%: son **$11.899/día ociosos
    ($356.969/mes)**. No se mata (va 19/30 del gate y su promedio de $1.331 está debajo del
    equilibrio), pero no se le dejan $15.000 secuestrados → **0-AE**
-2. 📞 **PREGUNTAR EL % DE COMISIÓN DE RECAUDO (#28-1).** Ascendió a **crítico**: decide si el
-   colmena va en **+$323 o en +$9.317**. Es UNA llamada y lleva pendiente desde agosto
+2. ✅ ~~**PREGUNTAR EL % DE COMISIÓN DE RECAUDO (#28-1).**~~ **CERRADO EL 10-SEP: ya venía dentro del
+   flete y se estaba restando dos veces.** Todo corrige hacia arriba → **0-AF**
 3. 🔴 **TADÓ A COTIZACIÓN INDIVIDUAL Y SIN PROMO DE 2 UNIDADES.** Es el único destino del país
    donde el flete se **duplica** (2,20×) en vez de compartirse (1,4-1,6× en el resto).
    Y **revisar el extracto por el descuadre de $36.667** → **#90**
-4. 💡 **VOLVER A PONER LA PROMO DE 2 UNIDADES EN EL GUION.** El share cayó de 26,8% a **15,7%** y
-   Caldas da el mecanismo: **a un cliente que compró TRES no se la ofrecieron** → **#60**, **#40**
-5. 📈 **TEST CREATIVOS $25.000 → $30.000 (+20%)**, respetando las 48-72 h del protocolo.
-   Marginal $727-987, debajo del tripwire de $1.200, y ya gasta el 97% → **0-AE**
+4. ✅ **VOLVER A PONER LA PROMO DE 2 UNIDADES EN EL GUION.** *(hecho el 9-sep con momento fijo, y
+   probado: la línea ya sale sola después del total. El mecanismo real era el MENÚ de dos productos
+   → ver 0-AF)*
+5. ⛔ ~~**TEST CREATIVOS $25.000 → $30.000 (+20%)**~~ **CANCELADO EL 9-SEP.** Su CPM es 2,4× la
+   cuenta y sube cada ventana: darle más plata es comprar más caro. **Audiencia propia** → **0-AF**
 6. ⛔ **NO TOCAR EL VIDEO NI TEST B.** El video se estabilizó en $714 y empató con Domiciliarios
    ($713); el gatillo de #78 era $800 y no se disparó → **0-AE**
 7. ⛔ **NO subir el envío cobrado a todos (#82 opción 1).** Los pedidos de 1 unidad **dejan +$326**:
@@ -1347,6 +1427,351 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-AF. 🧮 LA COMISIÓN YA ESTABA ADENTRO, EL DÍA ABIERTO NO SE LEE, Y EL COLMENA NO FRACASÓ: FRACASÓ SU CANAL (2026-09-09 al 2026-09-10)
+
+**Fuentes:** export Meta por conjunto 8-9 sep · export Meta del 9-sep parcial (~2 pm) · export Meta
+del 9-sep **cerrado** · export de 99 Envíos con 54 guías del 7-8 sep (relectura) · confirmaciones del
+dueño sobre comisión, catálogo y material. Scripts: `analisis/conjuntos-8-9sep.py`,
+`analisis/dia-parcial-9sep.py`, `analisis/motorizados-se-esta-muriendo.py`,
+`analisis/comision-ya-estaba-adentro.py`, `analisis/colmena-sin-pauta.py`,
+`analisis/como-expandir-9sep.py`.
+
+### 🥇 LA COMISIÓN DE RECAUDO YA VENÍA DENTRO DEL FLETE — LA ESTABA RESTANDO DOS VECES
+
+**El dueño lo aclaró:** la comisión es la misma para los dos productos y **ya está incluida en el
+`valor_servicio`** que reporta 99 Envíos. Los datos le dan la razón sin ambigüedad:
+
+| Ciudad (coordinadora, 1 ud) | Recaudo | `valor_servicio` |
+|---|---|---|
+| Cartagena · Medellín · Soledad · Barranquilla · Armenia · Pereira | $81.000 | **$20.895,39** |
+| Sincelejo · Cúcuta · Bello · Montería | $83.000 | **$21.034,86** |
+
+🔑 **Seis ciudades distintas con el cobro EXACTAMENTE igual**, y cuando el recaudo sube $2.000 el
+cobro sube $139,47 = **6,97% del valor recaudado**. Eso solo se explica si el `valor_servicio` trae
+adentro un cargo proporcional al recaudo.
+
+**Todo corrige hacia arriba:**
+
+| | Como se dijo | **Real** |
+|---|---|---|
+| Mayoreo Granada (12 uds) | $58.412 | **$75.611** |
+| Caldas 3 uds al detal | $66.297 | **$72.687** |
+| Tadó 2 uds | −$6.631 | **−$2.341** (sigue perdiendo) |
+| Colmena · video 4-9 sep | −$16.455 | **−$3.908** (el agujero era 4× más chico) |
+
+⚖️ **Y una autocorrección de algo que se afirmó fuerte en 0-AE:** *"3 unidades al detal le ganan a 12
+al mayor"* **estaba mal.** Con la cuenta corregida el mayoreo gana por **$2.924 en total**. El
+argumento de fondo se sostiene por el número que decide, que es **por unidad: $24.229 contra $6.301 =
+retail rinde 3,8×**. El piso de lista de $45.000 se mantiene.
+
+📌 **LO QUE NO CAMBIA:** el modelo de margen (**$26.900 × unidades − flete**) **nunca tuvo el error**
+— ahí solo se resta flete. El doble conteo estaba en los cálculos individuales (colmena, mayoreo,
+Caldas, Tadó). La absorción por banda se calculaba contra `valor_servicio`, así que tampoco se mueve.
+El seguro sigue siendo el 13,6%.
+
+✅ **#28-1 SE CIERRA a efectos de cálculo.** Queda la curiosidad del % exacto, pero ya no bloquea
+ninguna decisión. **Y el colmena siguió bien pausado: su problema era el CPM, no la comisión.**
+
+### ⛔ LA REGLA NUEVA MÁS ÚTIL: UN DÍA ABIERTO NO SE PUEDE LEER
+
+```
+$/conversación  =  CPM  ÷  (conversaciones por cada 1.000 impresiones)
+                    ↑                    ↑
+          se mide SIN retraso     se mide CON retraso (7 días)
+```
+
+El gasto se cuenta al instante; las conversaciones se atribuyen después. **En un día a medias tenés
+todo el gasto contra la mitad de las conversaciones.**
+
+| Ventana | CPM | conv/1.000 | $/conv |
+|---|---|---|---|
+| 7-8 sep | $3.609 | 5,10 | $708 |
+| 8-9 sep | $3.979 | 4,38 | $909 |
+| **9-sep a las ~2 pm** | $3.671 | **2,69** | **$1.363** 🔴 |
+| **9-sep CERRADO** | $3.611 | 3,44 | **$1.049** |
+
+🔑 **El +28% del 8-9 se descompone: 10 puntos son CPM real (la subasta estuvo más cara el martes) y
+el resto es sesgo de atribución.** Y el susto del martes no era tendencia: **el CPM volvió**
+($3.609 → $3.979 → $3.671 → $3.611). La frecuencia siguió plana en 1,12-1,17, así que no era
+audiencia quemada.
+
+📌 **EL TERMÓMETRO DE MEDIA TARDE ES EL CPM, NO EL COSTO POR CONVERSACIÓN.** Si el CPM está entre
+$3.300 y $3.700, la cuenta está normal por horrible que se vea el $/conv. **Decisiones solo con 3
+días cerrados.**
+
+⚠️ **Y el número contra el que hay que comparar no es $682: es el equilibrio de $2.657.** A $1.049 la
+cuenta estaba al **39% del límite**, con 2,5× de espacio.
+
+### ⚖️ PREDICCIÓN FALLIDA — Y LA LECCIÓN VALE MÁS QUE EL ACIERTO
+
+Se predijo que Motorizados cerraría el 9-sep entre **$650 y $950**, con **$1.500 como umbral de error
+declarado de antemano**. **Cerró en $1.970.**
+
+| Conjunto | Predicho | **Cerrado** |
+|---|---|---|
+| Domiciliarios | ~$800-1.000 | **$911** ✓ |
+| Domiciliarios VIDEO | ~$800-1.000 | **$947** ✓ |
+| TEST Creativos | — | $1.109 |
+| **Motorizados** | **$650-950** | **$1.970** 🔴 |
+| Cuenta | $720-870 | $1.049 |
+
+**Qué sirvió:** el mecanismo del sesgo de atribución es real y enorme ($4.021 a media tarde →
+$1.970 al cierre = **51% de corrección sin tocar nada**), y para Domiciliarios y VIDEO el marco
+aterrizó donde dijo.
+
+**En qué falló:** se asumió que al cerrar el día la tasa de conversión de Motorizados volvería al
+promedio. No volvió, porque había una tendencia despachada como ruido: **$605 → $656 → $730 → $966 →
+$1.970**, cinco lecturas seguidas peores con el presupuesto clavado en $15.000.
+
+🔑 **LAS DOS REGLAS QUE SALEN DE ACÁ:**
+1. **El sesgo de atribución dice CUÁNTO se corrige un número fresco, no EN CUÁNTO aterriza.**
+2. **Oscilación es ruido; monotonía es tendencia.** El día anterior se llamó ruido al +75% de TEST
+   Creativos **y se acertó** — la diferencia era que TEST Creativos **oscilaba** y Motorizados
+   **subía monótonamente**. Cinco lecturas en la misma dirección son señal aunque cada una esté
+   contaminada.
+
+### 🔴 MOTORIZADOS YA NO ESTÁ TOPADO: SE ESTÁ ENCOGIENDO
+
+Conversaciones por mil impresiones, 8-9 sep → 9-sep cerrado:
+
+| Conjunto | Antes | Después | |
+|---|---|---|---|
+| TEST Creativos | 6,28 | 5,96 | −5% |
+| Domiciliarios | 4,38 | 3,64 | −17% |
+| VIDEO | 4,06 | 3,36 | −17% |
+| **Motorizados** | 4,04 | **1,77** | **−56%** 🔴 |
+
+Todo lo demás cayó 5-17% (miércoles). **Motorizados cayó 56% con el CPM normal ($3.480)**: compra
+impresiones al mismo precio que los demás y la mitad de la gente escribe. **No es la subasta ni el
+presupuesto: es a quién se le muestra.** Y encima sobregiró: **$17.733 sobre $15.000 = 118%**.
+
+📌 Estaba anticipado desde el 4-sep en 0-AC: *"techo confirmado por tercera vez, hay que cambiarle la
+audiencia, no el presupuesto"*. **Ya no está solo topado: se encoge.**
+
+✅ **ACCIÓN: $15.000 → $9.000 (−40%).** Es el mismo recorte que a **este mismo conjunto** ya le
+funcionó en agosto (−40% de presupuesto → −42% de costo). **No se pausa:** a $1.970 sigue sobre el
+equilibrio de $2.657 y su tráfico fue históricamente el mejor de la cuenta (clic→chat 52%).
+**Gate del lunes 14: bajo $1.200 se queda · sobre $1.500 se apaga y se le arma audiencia nueva.**
+
+### 🥇 TEST CREATIVOS ES EL #77 EN NÚMEROS: EL MEJOR CREATIVO CON LA PEOR SUBASTA
+
+Separando las dos mitades del costo (9-sep):
+
+| Conjunto | CPM | conv/1.000 | $/conv | **$/conv a CPM normal** |
+|---|---|---|---|---|
+| **TEST Creativos** | $7.968 | **6,63** 🥇 | $1.202 | **$554** |
+| Colmena · VIDEO | $10.062 | 3,55 | $2.838 | $1.035 |
+| Domiciliarios | $3.369 | 3,24 | $1.039 | $1.132 |
+| VIDEO | $3.271 | 2,40 | $1.361 | $1.527 |
+| Motorizados | $3.545 | 0,88 | $4.021 | $4.164 |
+
+**Convierte 2,0× mejor por impresión que Domiciliarios y paga 2,4× su CPM.** A CPM promedio costaría
+**$554/conversación — el más barato en la historia de la cuenta.** Y su CPM sube consistente:
+**$5.240 → $6.679 → $7.968 (+52% en tres ventanas).**
+
+🔑 **Su problema no es el creativo (es el mejor) ni el presupuesto (gasta lo que le dan): puja contra
+Domiciliarios por la misma audiencia guardada, y Domiciliarios tiene el historial.**
+⛔ **No subir a $30.000** (el plan del 8-sep queda cancelado) · ⛔ **no bajar** · ✅ **audiencia
+propia (#77)**. Es la única palanca que le sirve.
+
+⚖️ **Autocorrección del 9-sep:** a media tarde se dijo *"el problema real es TEST Creativos, subió
+75%"*. Al cierre era el **2º más barato** de la campaña. Ese +75% era ruido y la lectura se adelantó.
+
+### 💎 EL COLMENA NO FRACASÓ POR EL PRODUCTO: FRACASÓ PORQUE NO PUEDE GANAR LA SUBASTA
+
+**CPM: $7.318 → $8.990 → $10.062 = 2,7× la cuenta.** Y su tasa de conversión (3,55/mil) es
+**parecida a Domiciliarios (3,24)**. El creativo no es malo.
+
+| Pregunta | Veredicto |
+|---|---|
+| ¿El producto interesa? | ✅ **SÍ** — 3,55 conv/mil contra 3,24 del tradicional |
+| ¿El precio deja plata? | ✅ **SÍ** — $40.968 contra $31.634 (+30%) |
+| ¿La conversación cierra? | ✅ **SÍ** — 5,4% contra el 2,5% que necesitaría a CPM normal |
+| **¿Se puede comprar el tráfico?** | 🔴 **NO** — CPM $10.062, y subió cada día durante 6 días |
+
+**A CPM normal costaría $1.035/conv y necesitaría cerrar 2,5%. Cierra 5,4%: sería rentable.** Pagando
+$10.062 necesita **6,9-7,9%**, o sea prácticamente lo mismo que cierra el tradicional (8,4%) — se le
+está pidiendo al producto caro que cierre igual que el barato.
+
+🔴 **PAUSADO EL 9-SEP** (por decisión del dueño, ejecutando la recomendación). Cerró **#85** con
+~37 conversaciones, 2 ventas y ~$85.843 de gasto.
+
+**EL PLAN DE TRES CANALES, EN ORDEN:**
+
+| | Qué es | Cuánto |
+|---|---|---|
+| 🥇 **Upsell en la conversación que ya pagás** | permanente, pauta **$0** | **$188.000-376.000/mes** ($282.260 al 7,5%) |
+| 🥈 **Tu base de ~450 clientes** (audiencia personalizada) | **un solo tiro** de ~$14.000 | devuelve $55.000-82.000 **y ENTRENA el conjunto** |
+| 🥉 **TikTok orgánico** | CPM = $0, que es su único problema | lento, 2-3 meses |
+
+🔑 **La base de 450 clientes se agota:** de 450 números Meta empareja 50-70% → ~300 personas × ~5
+impresiones útiles = **~1.500 impresiones en total, no por día.** A CPM $10.000 son **~$14.000 de
+gasto TOTAL**. **No es un canal, es un tiro** — y su valor real es que si de ahí salen 10-15 ventas,
+Meta por fin tiene datos de quién compra colmenas y el **lookalike arranca con señal**.
+
+⛔ **NUNCA escribirles por WhatsApp uno por uno.** Mensajes no solicitados = reportes = número
+bloqueado, y ese número **es** el canal de ventas completo.
+⛔ **No volver a pautarlo en subasta abierta** — está pagado con $85.843 de evidencia.
+⛔ **No bajarle el precio.** El precio nunca fue el problema (1 de las 5 fugas).
+
+### 🌎 TRES REGIONES NUEVAS DE $5.000 — ABIERTAS EL 9-SEP POR LA NOCHE
+
+**La lección de Valle no era "la geografía no sirve", era "no le des $15.000 a una región chica":**
+
+| | $15.000 | **$5.000** |
+|---|---|---|
+| Utilización | 21% | **69%** |
+| $/conversación | $5.157 | **$1.379** (48% del equilibrio) |
+
+| Conjunto creado | Departamentos | Venta previa (de 402 guías) |
+|---|---|---|
+| `Domiciliarios \| Santanderes` | Santander + N. de Santander | 19 guías (4,7%) · índice 0,62 |
+| `Domiciliarios \| Eje Cafetero` | Risaralda + Quindío + Caldas | 31 guías (7,7%) · índice 1,57 |
+| `Domiciliarios \| Tolima Huila` | Tolima + Huila | 13 guías (3,2%) · Tolima casi virgen (2) |
+
+🔑 **No son tres apuestas iguales, son tres hipótesis:** ¿la pauta amplifica donde ya vende (Eje
+Cafetero)? ¿responde el sub-explotado con buena entrega (Santanderes, 71%)? ¿arranca un territorio
+casi virgen solo con pauta (Tolima)? **Eso vale más que tres apuestas seguras: enseña con qué
+criterio elegir las próximas diez regiones.**
+⏸️ **Atlántico quedó afuera** aunque sea el más sub-explotado (índice 0,45): su entrega del 50% hunde
+el margen esperado a $3.616.
+
+**Primer día (10-sep, parcial):** Tolima Huila $382/1 conv · Eje Cafetero $346/0 · Santander $452/0.
+🟢 **Las tres entregan desde el día 1** — a Valle le tomó una semana por el problema de los 5
+anuncios. El molde se copió bien.
+
+**EL GATE, ESCRITO ANTES DE PRENDER — se mide el lunes 14 con los 5 días cerrados:**
+
+| Criterio absoluto | Decisión |
+|---|---|
+| bajo $2.000 | 🟢 funciona → replicar el molde |
+| $2.000 – $2.657 | 🔔 una semana más |
+| sobre $2.657 | 🔴 se apaga (es el equilibrio) |
+
+🔑 **Y el criterio bueno es el RELATIVO: comparar cada región contra DOMICILIARIOS en los mismos
+cinco días.** La ventana 10-14 incluye finde (+44%), así que contra el $1.379 de Valle (días
+hábiles) las regiones se verían mejor de lo que son. Hasta **1,5×** el costo de Domiciliarios se
+replica · 1,5-2,5× es marginal · **más de 2,5× se apaga**. *(Valle marcó 1,33×.)*
+
+📌 **Total de la cuenta: $145.000 → $160.000/día, y con Motorizados a $9.000 queda en $154.000.**
+Es la única subida que se justifica: **no es más plata sobre la misma gente, es gente nueva** — que
+es exactamente lo que la elasticidad de 0,63 manda hacer.
+
+### 💬 CINCO PARCHES AL GUION — Y EL HALLAZGO DEL "MENÚ"
+
+**Probando el bot desde otro número apareció la causa probable de que el share de 2 unidades se
+cayera de 26,8% a 15,7%:**
+
+> *"¿Te interesa el conjunto tradicional de 4 piezas ($59.900 + envío) **o** el premium tipo colmena
+> ($149.900 con envío gratis)?"* — respuesta del bot a un simple "Hola"
+
+🔑 **EL BOT VENDÍA CON UN MENÚ.** A todo el que escribía le ponía los dos productos enfrente y lo
+obligaba a elegir, y lo repetía después ("¿cuál de los dos te gustaría pedir?"), incluso reabriendo
+decisiones ya tomadas. **La energía del cliente se iba a decidir entre $59.900 y $149.900 en vez de a
+"¿me llevo dos?".** Y cuadra con las fechas: el 1-sep se pegó `GUION-DOS-SKU.md`; el share cayó
+después.
+
+| Parche | Qué hace |
+|---|---|
+| **A — Regla Cero** | La IA nunca ofrece los dos productos juntos. Por defecto vende el de $59.900. **Prohibido preguntar "¿cuál de los dos?"** y prohibido reabrir una decisión tomada |
+| **B — La 2ª unidad** | La línea del envío compartido va **SIEMPRE**, sola, en su propio mensaje, **justo después del total y antes de pedir datos**. Antes decía "primero ofrezco" sin decir **cuándo** |
+| **C — Nada inventado del colmena** | Prohibido describir calibre, tela técnica o transpirabilidad. Prohibido decir que protege MÁS |
+| **D — La escalera del descuento** | 🔴 El bot ofreció **$55.900 con pago anticipado** en la PRIMERA objeción: se saltó los 4 escalones gratis, pasó el tope de $3.000 y **le bajó el precio al producto** |
+| **E — El forro** | El tradicional **NO tiene forro**. El bot lo inventó, y es la invención que más daño hace |
+
+🔴 **EL PARCHE D ERA EL QUE SANGRABA:** si descuenta en cada objeción, el share con descuento pasa de
+6,7% a ~30% = **$16.080/día ≈ $482.400/mes regalados.** Y el número que eligió solo era casi exacto
+al beneficio del anticipo (comisión $2.430 + rechazo evitado ~$1.622 = **~$4.052**), o sea que
+**descontar $4.000 regala el beneficio completo.** Si algún día se decide dar descuento por anticipo,
+va en **$2.000-2.500 y lo decide el dueño, no el bot.**
+
+🔴 **EL PARCHE E ERA EL QUE MATABA EL COLMENA:** el forro es la ventaja principal del colmena. Si la
+IA dice que el tradicional también lo trae, **no queda ninguna razón para pagar $149.900.**
+
+✅ **RESULTADO DE LA PRUEBA (después de pegar A y B):** a "Hola" habló solo del tradicional, sin
+menú; a "soy de Cali" dio **$81.000** y **la línea de los dos salió sola**, sin que la pidieran; el
+upsell mencionó el colmena **una vez** y cerró invitando al de $59.900; "quiero tres" dio $59.900 c/u
+y **no inventó el total del envío**. Los precios de la tabla salieron exactos.
+
+📌 **Un afinamiento identificado pero NO aplicado a propósito:** la línea de la 2ª unidad podría
+cerrar con *"¿Te lo aparto sencillo o te llevas los dos?"* (las dos respuestas son "sí compro").
+**No se cambió el mismo día** para poder medir cuánto vale la línea sola. Se afina después del
+veredicto.
+
+### ✅ RESUELTO: DE QUÉ ESTÁ HECHO EL COLMENA — "COLMENA" ES LA TEXTURA, NO LA TELA
+
+**Confirmado por el dueño con el proveedor**, y contrastado con la descripción pública de la misma
+categoría en el mercado colombiano
+([Over Racing](https://overracing.com.co/producto/conjunto-impermeable-tipo-sudadera-ligero-over-new-nacional/)
+describe el conjunto tipo sudadera como un derivado de lona revestido en PVC con diseño de colmena,
+costuras termoselladas con cinta y forro interno en tafeta — *contenido reformulado por restricciones
+de licencia*).
+
+| | Tradicional $59.900 | Colmena $149.900 |
+|---|---|---|
+| Material | **Lámina de PVC siliconado calibre 8** | **Lona revestida en PVC**, textura de panal |
+| Costuras | Termoselladas | **Termoselladas con cinta** ✅ |
+| Forro interno | **no** | **SÍ** ✅ |
+| Piezas | **4** (con bolsa) | 3 |
+| Apariencia | se ve de impermeable | **se ve como tela** |
+
+1. ✅ **Los dos son impermeables de verdad.** Las costuras selladas son lo que decide y las dos las
+   tienen. **Se cae la alarma de que el colmena pudiera proteger menos.**
+2. ✅ **La ventaja del colmena es concreta: el FORRO.** No se pega al cuerpo, no suena a bolsa, y por
+   fuera se ve como tela. *Eso* explica los $149.900 — **no es "el bueno contra el malo".**
+3. ⚠️ **Hay un argumento de resistencia defendible por construcción** (lona por debajo del
+   recubrimiento aguanta mejor el roce), pero es una propiedad del material, **no una durabilidad
+   medida. No prometer años ni "se compra una vez".**
+4. ⛔ **Sigue prohibido decir que el colmena protege MÁS de la lluvia.**
+
+### 🔢 EL CATÁLOGO MAESTRO ESTABA VIEJO EN 21 LUGARES — Y EL BOT TENÍA RAZÓN
+
+Se dudó de tres cifras que dijo el bot. **Marcador: 2 a 1 a favor del bot.**
+
+| Lo que dijo el bot | Veredicto |
+|---|---|
+| "talla S a 3XL" | ✅ **el BOT tenía razón.** El repo decía S a 2XL en 21 lugares |
+| "franja azul" | ✅ **el BOT tenía razón.** El repo listaba 5 colores; **son SEIS** |
+| "el tradicional trae forro" | 🔴 **el bot LO INVENTÓ** — y es la peor de las tres |
+
+**CATÁLOGO REAL VIGENTE:** tradicional **S a 3XL** · colmena **S a 2XL** · franja en **SEIS** colores
+(blanco, negro, rojo, verde, morado, **azul**) · amarillo agotado.
+
+Corregido en `prompt.js`, `media.js`, `index.html`, `creativos.html` y este archivo.
+
+🔔 **Y esto puede estar costando ventas sin aparecer en ninguna métrica:** los creativos dicen
+"S a 2XL" cuando hay 3XL. El domiciliario grande lee el anuncio, ve que no le sirve y **no escribe** —
+nunca fue una conversación. Lo mismo con el azul, que existe y no se anuncia (el 77% de los clientes
+pregunta por color).
+
+⏸️ **Pendiente y NO tocar hasta el lunes 14:** los creativos **en vivo** en Meta y la foto
+`colores.png` (muestra 5 colores, no 6). Editar un anuncio le reinicia el aprendizaje y hay tres
+regiones midiendo.
+
+### 🟢 LOGÍSTICA: EL REPRESADO BAJÓ (dueño, 10-sep)
+
+El dueño reporta que **las novedades se resolvieron y queda muy poco represado**, con más entregas
+saliendo. Eso descarga buena parte de **#74** y **#75** (los $3,1 M de las alarmas), **pero falta el
+número de cuánto se recuperó** para bajarlo formalmente de la lista.
+
+**Guías a rastrear (del export del 7-8 sep):**
+
+| Qué | Guía | Transportadora | Recaudo | Último estado visto |
+|---|---|---|---|---|
+| 🔴 **Mayoreo Granada** (Edwar Mena) | **240060772823** | Interrapidísimo | **$573.291** contraentrega | "Creado" al 8-sep = **sin recoger** |
+| 💎 Colmena · San Francisco (Eddy Rodriguez) | **240060773268** | Interrapidísimo | $149.900 | "Admitida" |
+| 💎 Colmena · Puerto Gaitán (Eduar A. Pérez) | **64532758224** | Coordinadora | $149.900 | "En terminal de origen" |
+
+⚠️ **La segunda de colmena venía etiquetada como "impermeable", no "impermeable colmena"** — se
+identificó por el precio exacto. **Hay que confirmar que sí es colmena**, porque si no, solo existe
+**una** venta de colmena y toda la cuenta del canal empeora.
+
+📌 **Las dos guías de colmena son la primera medición de rechazo a $149.900 contraentrega.** Si las
+dos se entregaron y pagaron, es señal buena para el plan de tres canales. Si una se devolvió, hay que
+replantear.
 
 ---
 
@@ -4292,12 +4717,22 @@ Es **la primera evidencia directa**, es débil por tamaño, y **apunta ligeramen
 > Los anuncios viejos aún pueden mencionar colores mal. Copy vigente: **“$59.900 + envío según
 > ciudad”**; no prometer envío gratis ni “contraentrega en toda Colombia” antes de conocer la ciudad.
 
-### 2-B. Tipo colmena — PREMIUM EN VALIDACIÓN
+### 2-B. Tipo colmena — PREMIUM · PAUTA PAUSADA, SE VENDE POR UPSELL
 
-- Apariencia tipo sudadera; mostrar costuras, cremalleras, capota y acabados en el contenido.
-- **Costo proveedor:** $85.000. **Precio final:** **$149.900 con envío gratis**.
-- SKU separado: **no reemplaza** al tradicional. Validar 15-20 entregas antes de escalar.
-- Falta pesar/cotizar flete real y configurar su tarifario/guion de WhatsApp (**#66, #67 y #69**).
+- 🆕 **MATERIAL CONFIRMADO (9-sep, dueño + proveedor):** **"colmena" NO es un material, es la TEXTURA**
+  en relieve (el panal). Es **lona revestida en PVC**, **costuras termoselladas CON CINTA** y
+  **forro interno**. Ver 0-AF.
+- 🔑 **El argumento de venta es el FORRO y la apariencia, NO la protección.** Los dos productos son
+  impermeables de verdad (los dos llevan costura sellada). ⛔ **Prohibido decir que protege más.**
+- **3 piezas** (chaqueta, pantalón, zapatones) · **negro** · **tallas S a 2XL** *(el tradicional llega
+  a 3XL)*.
+- **Costo proveedor:** $85.000. **Precio final:** **$149.900 con envío gratis**. Margen real medido
+  con fletes de verdad: **$40.968** (no $43.306).
+- 🔴 **PAUTA PAUSADA EL 9-SEP (#85).** No falló el producto, falló el canal: CPM $10.062 = 2,7× la
+  cuenta. **Se vende dentro de la conversación del tradicional (upsell), después por audiencia de
+  clientes, y en paralelo TikTok orgánico.** Reglas quirúrgicas en `GUION-UPSELL-COLMENA.md`.
+- SKU separado: **no reemplaza** al tradicional. **Solo hay 2 ventas y las dos están en tránsito** —
+  primera medición de rechazo a $149.900 pendiente.
 
 ### 2-C. Chaqueta reflectiva doble faz — EN PAUSA
 
@@ -5175,6 +5610,12 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     o sea que casi se paga sin vender un colmena. **Eso le pone piso.**
     ⛔ **Si no cubre el gasto, se apaga. La fecha NO se vuelve a estirar.** Ya se estiró una vez.
     📌 **Contar SIEMPRE las dos cosas:** ventas de colmena Y tradicionales salidos de esa campaña.
+    ✅ **CERRADO EL 9-SEP: SE APAGÓ.** Llegó a ~37 conversaciones con 2 ventas y ~$85.843 de gasto, y
+    no cubrió. **El diagnóstico final es que no falló el producto, falló el canal:** su CPM llegó a
+    **$10.062 (2,7× la cuenta)** con una tasa de conversión parecida a Domiciliarios — a CPM normal
+    costaría $1.035/conv y necesitaría cerrar 2,5% cuando cierra 5,4%. **No puede ganar la subasta
+    en frío.** El plan que reemplaza a la pauta (upsell → audiencia de clientes → TikTok orgánico)
+    está en **0-AF** y en `analisis/colmena-sin-pauta.py`.
 
 86. [ ] 🤖✅ **CONFIRMAR QUE EL BOT PASÓ LAS CINCO PRUEBAS.** Escribirse desde otro número:
     ubicación → responde **Bogotá** · "¿por qué vale más?" → 3 piezas contra 2 · "no tengo la plata
@@ -5232,6 +5673,42 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     (Caldas) dejaron $66.297 y 12 al mayor (Granada) $58.412** — 4,5× por unidad a favor del detal.
     ⚠️ Y falta la pregunta que decide si el canal se cultiva o se acota: **¿dónde revende?**
     En Medellín o Bogotá te compite con tu propia pauta. Ver **0-AE** y `analisis/mayoreo-40mil.py`.
+    🆕 **CORRECCIÓN DEL 10-SEP (0-AF):** con la comisión bien contada, Granada dejó **$75.611** y
+    Caldas **$72.687**, o sea que **el mayoreo gana por $2.924 en total** y la frase "3 al detal le
+    ganan a 12 al mayor" estaba mal. **Por unidad sigue 3,8× a favor del detal ($24.229 vs $6.301)**,
+    así que el piso de $45.000 no se mueve.
+    🔴 **Y la guía sigue sin recoger: 240060772823, en "Creado" desde el 7-sep. Rastrearla es el
+    primer punto de la lista de hoy.**
+
+93. [ ] 🏍️🔴 **MOTORIZADOS: BAJADO A $9.000 Y CON GATE PARA EL LUNES 14.**
+    No está topado, **se está encogiendo**: conversaciones por mil impresiones **4,04 → 1,77 (−56%)**
+    mientras el resto de la cuenta cayó 5-17%, y **con el CPM normal ($3.480)**. Compra impresiones
+    al mismo precio que los demás y la mitad de la gente escribe → **el problema es a quién se le
+    muestra**. Cerró el 9-sep en **$1.970** (predicción fallida: se dijo $650-950).
+    ✅ Recortado **$15.000 → $9.000 (−40%)**, el mismo recorte que a este conjunto ya le funcionó en
+    agosto (−40% de presupuesto → −42% de costo).
+    **Gate con jueves-domingo cerrados:** bajo **$1.200** se queda · $1.200-1.500 una semana más ·
+    **sobre $1.500 se apaga y se le arma audiencia nueva.** Ver **0-AF**.
+
+94. [ ] 🎨🔴 **LOS CREATIVOS EN VIVO DICEN "S a 2XL" Y HAY HASTA 3XL — Y NO ANUNCIAN EL AZUL.**
+    Es demanda que **nunca se vuelve conversación**: el domiciliario grande lee el anuncio, ve que no
+    le sirve y no escribe. Nunca aparece en las métricas. Lo mismo con el azul, cuando el **77% de
+    los clientes pregunta por color**.
+    Ya se corrigió en `prompt.js`, `media.js`, `index.html`, `creativos.html` y este archivo.
+    **Falta:** los anuncios en Meta y la foto `colores.png` (muestra 5 colores, no 6).
+    ⏸️ **NO tocar antes del lunes 14:** editar un anuncio reinicia el aprendizaje y hay tres regiones
+    midiendo. Ver **0-AF**.
+
+95. [ ] 🧪🔴 **REPROBAR EL GUION CON "ESTÁ MUY CARO" Y "SOY DE TADÓ".**
+    De los cinco parches del 9-sep se probaron tres. Los dos que faltan son justamente los que
+    sangran plata:
+    - **"está muy caro"** → debe recorrer la escalera (valor → la cuenta → **la 2ª unidad** → avisar
+      al asesor) y solo al final un descuento de **máximo $3.000**. El bot había ofrecido **$55.900
+      con pago anticipado en la primera objeción**, inventándose la política: riesgo **~$482.400/mes**
+    - **"soy de Tadó"** → debe dar **$93.000**, no $85.000, y **no ofrecer la promo de 2 unidades**
+    📌 Si algún día se decide dar descuento por pago anticipado, el beneficio real es **~$4.052**
+    (comisión $2.430 + rechazo evitado ~$1.622), así que **va en $2.000-2.500 y lo decide el dueño**.
+    Ver **0-AF**.
 
 
 
@@ -5529,3 +6006,56 @@ El dueño reportó que al publicar anuncios, algunos salían **sin el texto prin
 - **Regla específica de esta cuenta:** un creativo que deba mantenerse vivo necesita su propio
   conjunto; al compartir con un ganador establecido puede recibir $0. La vieja pauta de “1-3 anuncios
   fuertes por conjunto” queda reemplazada por la evidencia de esta cuenta.
+
+
+### 🆕 CÓMO LEER UN EXPORT SIN ASUSTARSE (aprendido el 9-10 sep, ver 0-AF)
+
+**La fórmula que hay que tener en la cabeza:**
+
+```
+$/conversación  =  CPM  ÷  (conversaciones por cada 1.000 impresiones)
+                    ↑                      ↑
+      se mide SIN retraso        se mide CON retraso (indicador de 7 días)
+```
+
+1. 🔑 **EL TERMÓMETRO DE MEDIA TARDE ES EL CPM, NO EL COSTO POR CONVERSACIÓN.** El gasto se cuenta al
+   instante y las conversaciones se atribuyen después, así que todo día abierto sale inflado.
+   **Si el CPM está entre $3.300 y $3.700, la cuenta está normal** por horrible que se vea el $/conv.
+2. 📌 **Si sube el CPM, la publicidad se encareció de verdad. Si baja la tasa de conversión de un día
+   fresco, casi siempre es conteo.** Descomponer siempre las dos mitades antes de opinar.
+3. ⚠️ **Precedentes medidos:** el 1-sep aislado marcó $12.639 y la ventana cerrada 1-3 sep dio $8.257
+   (−34%). El 9-sep marcó $1.363 a las 2 pm y cerró en $1.049. Motorizados marcó **$4.021** a media
+   tarde y **$1.970** al cierre (−51%).
+4. 🔑 **EL SESGO DE ATRIBUCIÓN DICE CUÁNTO SE CORRIGE UN NÚMERO, NO EN CUÁNTO ATERRIZA.** Se puede
+   predecir la magnitud de la corrección; no el punto de llegada.
+5. 🔑 **OSCILACIÓN ES RUIDO; MONOTONÍA ES TENDENCIA.** El +75% de TEST Creativos era ruido (venía
+   oscilando y al día siguiente era el 2º más barato). El de Motorizados era señal (cinco lecturas
+   seguidas peores: $605 → $656 → $730 → $966 → $1.970). **Cinco lecturas en la misma dirección son
+   señal aunque cada una esté contaminada.**
+6. 📌 **Un conjunto se diagnostica separando CPM de tasa de conversión.** CPM alto + buena conversión
+   = problema de **subasta** (la palanca es audiencia). CPM normal + conversión baja = problema de
+   **audiencia** (la palanca es cambiarla, no el presupuesto). Los dos casos reales: TEST Creativos
+   y el colmena son subasta; Motorizados es audiencia.
+7. ⛔ **No sacar exports de un solo día abierto.** Mínimo **3 días cerrados** para cualquier decisión.
+8. 📌 **El número contra el que se compara NO es el mejor día histórico: es el equilibrio ($2.657).**
+   A $1.049 la cuenta está al 39% del límite, no "el 54% peor que el finde".
+
+### 🆕 EL MOLDE PARA ABRIR REGIONES (aprendido con Valle, aplicado el 9-sep)
+
+- 🔑 **Muchos conjuntos chicos de $5.000, no pocos grandes.** Valle con $15.000 entregaba el 21% y
+  marcaba $5.157; con **$5.000** entregó el **69%** y marcó **$1.379**. **No era caro: estaba mal
+  dimensionado.**
+- **Se DUPLICA el conjunto que funciona y se le cambia SOLO el departamento.** Nada más.
+- 🔴 **El duplicado se trae todos los anuncios: hay que dejar UNO.** Es el error que le costó una
+  semana a Valle (nació con 5 anuncios).
+- **Geografía = el departamento completo**, buscándolo en Meta como **"Estado/provincia"** (si ofrece
+  "+ 40 km" es una ciudad, no el departamento; y ojo con los barrios que se llaman igual).
+- **"Guardar como nuevo", nunca "Actualizar"** el público guardado: Domiciliarios y TEST Creativos lo
+  comparten y se le cambiaría la geografía al control.
+- **Días 1-2 se ven feos** (aprendizaje + retraso de atribución). **No leer nada antes del día 3.**
+- 🔑 **El gate bueno es RELATIVO: cada región contra DOMICILIARIOS en los mismos días** (mismo clima,
+  misma subasta, mismo día de semana). Hasta **1,5×** se replica · **más de 2,5×** se apaga.
+  Comparar contra un número medido en otra ventana infla el resultado.
+- 📌 **Abrir varias regiones a la vez es válido: son geografías disjuntas y no se canibalizan.** Y
+  conviene que no sean tres apuestas iguales, sino tres hipótesis distintas (donde ya vende / donde
+  falta / territorio virgen): eso enseña **con qué criterio** elegir las siguientes diez.
