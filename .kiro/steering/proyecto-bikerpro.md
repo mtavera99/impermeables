@@ -16,7 +16,7 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
-| **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · **17 de 37 conversaciones estaban vacías**, y con base limpia **el colmena ATRAE mejor (45,9% vs 57,8% de vacías) y CIERRA peor (15,0% vs 19,9%)** · el CPA se descompone exacto: paga 2,6× por conversación real y cierra 1,33× peor = 3,4× · seguimiento a **17** | **10-sep** |
+| **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · 🔄 **y estaba comparando promedio contra promedio: contra el peso MARGINAL del tradicional (+$0,16) el colmena rinde +$0,43 = 2,7× más** · **no pierde plata: corre al 85% de SU equilibrio** · **se vuelve a prender después del 14** con audiencia de clientes, $8-10.000/día y ventana de 14 días · **diversificar ES el plan de crecimiento** · el manual para la chaqueta reflectiva · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · **17 de 37 conversaciones estaban vacías**, y con base limpia **el colmena ATRAE mejor (45,9% vs 57,8% de vacías) y CIERRA peor (15,0% vs 19,9%)** · el CPA se descompone exacto: paga 2,6× por conversación real y cierra 1,33× peor = 3,4× · seguimiento a **17** | **10-sep** |
 | **0-AF** | 🧮 **La comisión de recaudo ya venía DENTRO del flete: se estaba restando dos veces** (todo corrige hacia arriba, #28-1 cerrado) · ⛔ **no se lee un día abierto** (la descomposición CPM ÷ conv-por-mil) · **predicción fallida: Motorizados cerró en $1.970** y su audiencia se está encogiendo (−56%) · **el colmena no fracasó, fracasó su canal** (CPM $10.062) y quedó pausado · **tres regiones nuevas de $5.000** · **cinco parches al guion** (el bot vendía con MENÚ) · colmena = la textura, no la tela · el catálogo maestro estaba viejo en 21 lugares | **9 y 10-sep** |
 | **0-AE** | 💰 **El costo bajó a $33.000** (+$752.527/mes) · el CPA nunca se deterioró: era la pauta del colmena · el video se estabilizó y empató · **la fuga de flete está solo en la promo de 2 uds** · Tadó duplica el flete · el seguro es 13,6% y da 0,85× · 3 al detal > 12 al mayor | **7 y 8-sep** |
 | **0-AD** | 🔄 **El video se deterioró (+14,4%)** · TEST Creativos nuevo ganador $541 · el A/B lo ganó el video · el colmena no estaba caro, la conversación estaba rota · Meta One se paga | **4 al 6-sep** |
@@ -264,6 +264,10 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 >   conversaciones, **17 vacías contadas por el dueño**), con retorno espontáneo de **5,9%**. Guion listo
 >   en `SEGUIMIENTO-COLMENA-10SEP.md` → **#96**
 > - 🔔 **EL UPSELL DEL COLMENA SIGUE SIN MEDIR.** Esta venta no lo prueba. No contarla como evidencia
+> - ✅ **DECISIÓN 10-SEP: LA CAMPAÑA DEL COLMENA SE VUELVE A PRENDER DESPUÉS DEL VEREDICTO DEL 14**,
+>   con **audiencia de clientes propios**, **$8-10.000/día** y **ventana de 14 días**, medida contra
+>   **su** equilibrio de **$3.322/conversación**. Motivo: contra el peso **marginal** del tradicional
+>   (+$0,16 a $154.000/día) el colmena devuelve **+$0,43** → **0-AG**
 > - 🔴 **MOTORIZADOS SE ESTÁ ENCOGIENDO**, no está topado: conv/mil 4,04 → **1,77 (−56%)** con CPM
 >   normal. Bajado a $9.000. **Gate el lunes 14: sobre $1.500 se apaga** → **#93**
 > - 🔔 **TEST CREATIVOS: CPM $7.968 = 2,4× la cuenta, y subiendo** ($5.240 → $6.679 → $7.968).
@@ -2072,10 +2076,104 @@ mide la pauta a 5 días, ni se le tiran los leads a la basura a los 5 días: se 
 3. 🥉 **Ya hay 3 compradores de colmena identificados.** Semilla del lookalike. Con 3 no alcanza,
    pero el contador corre: **anotarlos aparte en la hoja** → **#81**.
 
+### 🔄 REVISIÓN DEL 10-SEP POR LA NOCHE: ESTABA COMPARANDO PROMEDIO CONTRA PROMEDIO
+
+**El dueño reencuadró la pregunta, y el reencuadre es correcto:**
+
+> *"No se trata de decir este es mejor o este es peor. Lo que quiero es diversificar mis productos y
+> ganar plata de los dos. No importa si me gano $20.000, $30.000 o $50.000 con el colmena, desde que
+> me deje plata."*
+
+Yo venía respondiendo **"¿cuál producto es mejor?"**, y para eso comparar promedios está bien. Pero la
+pregunta real es **"¿dónde va el próximo peso?"**, y para eso hay que comparar **MARGINALES**.
+Script: `analisis/colmena-marginal-vs-promedio.py`.
+
+| | Lo que comparé | Lo que había que comparar |
+|---|---|---|
+| Tradicional | promedio **3,93×** | **peso marginal a $154.000/día: +$0,16** |
+| Colmena | promedio 1,43× | **su peso: +$0,43** |
+
+🔑🔑 **EL PESO DEL COLMENA RINDE 2,7× MÁS QUE EL PESO MARGINAL DEL TRADICIONAL. LA CONCLUSIÓN SE
+INVIERTE.** El promedio del tradicional incluye sus primeros pesos, que son los más rentables de
+todos — **pero el peso que se le quitara al colmena no va al promedio, va al margen**, y ahí el
+tradicional está en **la parte plana de su curva** (elasticidad 0,63, utilidad plana entre $125.000 y
+$200.000). El colmena arranca en su propia curva desde cero.
+
+⚠️ **Caveat:** la curva de 0-W salió de un solo escalón y con el margen viejo. **Lo robusto es su
+forma, no el +$0,16 exacto.** Para que el tradicional ganara, su peso marginal tendría que devolver
++$0,43, que es el **72% de lo que devolvía cuando la cuenta estaba en $98.000/día** — o sea que el
+peso 154.000 tendría que rendir casi como el peso 98.000, y toda la evidencia dice lo contrario.
+
+### 🟢 ¿PIERDE PLATA EL COLMENA? NO. PERO CORRE SIN COLCHÓN
+
+**El gate correcto es SU equilibrio, no el tradicional.** Esa es la consecuencia práctica de que el
+objetivo sea diversificar y no ganar una carrera.
+
+| | Colmena | Tradicional |
+|---|---|---|
+| $/conversación de **equilibrio** | **$3.322** | $2.533 |
+| $/conversación real (**su peor día**, CPM $10.062) | **$2.838** | $708 |
+| **% del límite** | **85%** 🔔 | 28% |
+| Colchón | 1,17× | 3,58× |
+
+🟢 **NUNCA CRUZÓ SU PROPIO EQUILIBRIO, ni en su peor día.** El problema no es que pierda: es que
+**corre al 85% del límite** contra el 28% del tradicional. **Eso es lo que hay que arreglar, y es
+distinto de "no funciona".**
+
+### ✅ DECISIÓN: SE VUELVE A PRENDER — PERO NO IGUAL, Y NO HOY
+
+**El error no fue prenderla: fue cómo estaba armada.** Tres cambios, y el gate nuevo:
+
+1. 🎯 **AUDIENCIA DE LOS PROPIOS CLIENTES, no público frío.**
+   ⚠️ **Y el mecanismo NO es bajar el CPM** — una audiencia chica suele tener CPM **más alto**.
+   **El mecanismo es el CIERRE:** ya te compraron (confianza hecha), son motociclistas confirmados
+   (no "interesados en motos"), y el colmena es literalmente el upgrade de lo que tienen.
+   | Si el cierre es… | CPA | Utilidad por venta |
+   |---|---|---|
+   | 1,5× (12,2%) | $23.335 | **$17.633** |
+   | 2,0× (16,2%) | $17.501 | **$23.467** |
+   | 2,5× (20,3%) | $14.001 | **$26.967** |
+   *(todo al mismo $2.838 por conversación, sin mejorar el CPM en nada)*
+2. 💵 **PRESUPUESTO CHICO: $8.000-10.000/día, no $20.000.** La audiencia son ~450 personas y **se
+   agota**: meterle $20.000 la quema en días y el CPM se dispara — **que es exactamente lo que pasó.**
+   **Audiencia chica, presupuesto chico.**
+3. ⏳ **VENTANA DE 14 DÍAS, NO DE 5.** Está demostrado que tarda ~7 días en cerrar una venta.
+
+📌 **Y se mide contra su propio equilibrio de $3.322/conversación.** No contra el tradicional.
+
+### 🔑 Y EL ARGUMENTO MÁS GRANDE: DIVERSIFICAR **ES** EL PLAN DE CRECIMIENTO
+
+El archivo ya tiene medido que el tradicional está cerca de su techo: **elasticidad 0,63** (duplicar
+el gasto sube las ventas 31%), **utilidad plana entre $125.000 y $200.000/día**, y `TECHO-REALISTA.md`
+dice que para llegar a 50 uds/día hay que bajar la elasticidad a ~0,41 **"y eso solo pasa metiendo
+audiencia nueva"**.
+
+**El tradicional ya no crece con más plata. Crece con productos nuevos y audiencias nuevas.**
+**Diversificar no es una distracción del plan de crecimiento: es el plan de crecimiento.**
+
+### 🧥 EL MANUAL QUE EL COLMENA DEJA PARA LA CHAQUETA REFLECTIVA
+
+**Vale más que las 3 ventas del colmena.** Antes de lanzarla:
+
+- ⏳ **No juzgarla en 5 días.** Ticket alto = decisión lenta.
+- 💵 **No arrancar con público frío y presupuesto grande.**
+- 🎯 **Medirla contra SU equilibrio** (`margen × su cierre`), no contra el tradicional.
+- 🔢 **Contar las conversaciones vacías aparte desde el día 1** — sin eso no se puede comparar nada.
+- 🚚 **Sacarle el margen real con fletes de verdad**, no teóricos (al colmena el margen teórico le
+  sobraba $2.338 por venta).
+- 💳 **Ofrecer pago anticipado desde el principio** en cualquier producto de ticket alto.
+
 ### ⛔ LO QUE NO CAMBIA
 
+- ⛔ **No se prende HOY.** Serían **6 variables movidas en 48 h** y el lunes 14 no se podría leer ni
+  las regiones ni Motorizados. **Prenderla después del veredicto del 14.**
+- ⛔ **No se prende igual que estaba** (público frío, $20.000): eso ya está probado y su CPM subió
+  seis días seguidos.
+- ⛔ **No se le baja el precio.** Cierra al 15% de las conversaciones reales a $149.900 y su margen es
+  el 30% mayor del negocio.
+- ⛔ **No se espera que reemplace al tradicional.** No va a pasar y no hace falta que pase.
 - **El diagnóstico del CPM sigue intacto:** $10.062 = 2,7× la cuenta, y subió seis días seguidos.
-  **No puede comprar tráfico en frío.**
+  **No puede comprar tráfico en frío** — de ahí el cambio de audiencia.
 - **La campaña sigue apagada HOY.** Prenderla sería la **sexta** variable movida en 48 h (tres
   regiones + Valle + Motorizados + guion) y el lunes 14 no se podría leer nada.
 - **El precio no se toca:** cierra al 8,1% a $149.900.
