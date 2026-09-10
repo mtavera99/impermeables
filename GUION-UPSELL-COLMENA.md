@@ -45,17 +45,35 @@ Perdés las dos.
 
 **→ BORRAR esa línea. Nunca, en ninguna circunstancia, se habla mal del tradicional.**
 
-## ❓ Y una pregunta que necesito antes de escribir el argumento
+## ✅ RESUELTO EL 9-SEP: DE QUÉ ESTÁ HECHO EL COLMENA
 
-**¿El colmena es realmente más durable, o solo más discreto?**
+**Confirmado por el dueño con el proveedor**, y contrastado con la descripción pública de la misma
+categoría de producto en el mercado colombiano
+([Over Racing](https://overracing.com.co/producto/conjunto-impermeable-tipo-sudadera-ligero-over-new-nacional/)
+describe el conjunto tipo sudadera como un derivado de lona revestido en PVC con diseño de colmena,
+costuras termoselladas con cinta y forro interno en tafeta — *contenido reformulado por
+restricciones de licencia*).
 
-Lo único verificable que tengo es que **no parece impermeable, parece sudadera**, más capota y
-cremallera frontal. La durabilidad la estoy infiriendo del costo ($85.000 contra $33.000), y eso
-**no es un dato.**
+🔑 **"Colmena" NO es un material: es la TEXTURA en relieve de la superficie, el panal.**
 
-📌 **Por eso el bloque de abajo NO promete durabilidad.** Vende lo que sí es verificable. Si me
-confirmás que el material es superior (y en qué: calibre, costura, tela), te agrego esa línea — y
-ahí el argumento se vuelve mucho más fuerte.
+| | Tradicional $59.900 | Colmena $149.900 |
+|---|---|---|
+| Material | **Lámina de PVC siliconado calibre 8** | **Lona revestida en PVC**, textura de panal |
+| Costuras | Termoselladas | **Termoselladas con cinta** ✅ |
+| Forro interno | no | **SÍ** ✅ |
+| Piezas | **4** (con bolsa) | 3 |
+| Apariencia | se ve de impermeable | **se ve como tela** |
+
+### Lo que esto cambia
+
+1. ✅ **Los dos son impermeables de verdad.** Las costuras selladas son lo que decide, y las dos
+   las tienen. **Se cae la alarma de que el colmena pudiera proteger menos.**
+2. ✅ **La ventaja del colmena es concreta y deseable: el FORRO.** No se pega al cuerpo, no suena a
+   bolsa, y por fuera se ve como tela. *Eso* explica los $149.900.
+3. ✅ **Y hay un argumento de resistencia defendible por construcción:** el tradicional es lámina;
+   el colmena tiene **tela por debajo del recubrimiento**, y eso resiste mejor el roce y el rasgado.
+   ⚠️ Es una propiedad del material, **no una durabilidad medida.** No prometer años.
+4. ⛔ **Lo que sigue prohibido:** decir que el colmena protege MÁS de la lluvia. Los dos protegen.
 
 ---
 
