@@ -4278,17 +4278,17 @@ Es **la primera evidencia directa**, es débil por tamaño, y **apunta ligeramen
   (cubrebotas) y bolsa.
 - **Material:** **PVC siliconado calibre 8**, costura **TERMOSELLADA** (no se filtra agua).
 - **COLOR (modelo de franja):** el impermeable SIEMPRE es NEGRO; lo que va en color es la
-  **FRANJA REFLECTIVA**. Colores de franja disponibles: **blanco, negro, rojo, verde, morado**.
+  **FRANJA REFLECTIVA**. Colores de franja disponibles: **blanco, negro, rojo, verde, morado, azul** (son SEIS).
   - ⚠️ El **amarillo está AGOTADO** (si lo piden, avisar y ofrecer otro).
 - **Capota:** sí. **Bolsillos:** NO (a propósito, para no filtrar agua). **Reflectivo:** sí (las
-  franjas de color). **Pantalón:** bota recta. **Tallas:** S, M, L, XL, 2XL.
+  franjas de color). **Pantalón:** bota recta. **Tallas:** S, M, L, XL, 2XL, 3XL. *(el Colmena solo S a 2XL)*
 - **Precio:** **$59.900 + envío según ciudad**. Promo: **2 por $110.000 + un solo envío cotizado**.
 - **Pago:** contraentrega O pago anticipado (ambos; ver sección 8).
 - **Economía vigente:** costo $34.000 · empaque $0 · margen bruto $25.900 · CPA $7.167 todavía
   provisional · margen proyectado de cohorte ~28,93% antes de recaudo. Ver caveats en 0-Z.
 
 > ✅ **INCONSISTENCIA DE COLORES: CORREGIDA (2026-07-24).** La web (`index.html`) ya dice
-> "franja reflectiva en 5 colores" (blanco, negro, rojo, verde, morado), sin fucsia ni amarillo.
+> "franja reflectiva en 6 colores" (blanco, negro, rojo, verde, morado, azul), sin fucsia ni amarillo.
 > Los anuncios viejos aún pueden mencionar colores mal. Copy vigente: **“$59.900 + envío según
 > ciudad”**; no prometer envío gratis ni “contraentrega en toda Colombia” antes de conocer la ciudad.
 
