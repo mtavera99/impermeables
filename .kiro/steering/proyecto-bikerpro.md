@@ -16,7 +16,7 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
-| **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · quedan ~34 chats vivos con **CPA $0** | **10-sep** |
+| **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · quedan ~34 chats vivos con **CPA $0** | **10-sep** |
 | **0-AF** | 🧮 **La comisión de recaudo ya venía DENTRO del flete: se estaba restando dos veces** (todo corrige hacia arriba, #28-1 cerrado) · ⛔ **no se lee un día abierto** (la descomposición CPM ÷ conv-por-mil) · **predicción fallida: Motorizados cerró en $1.970** y su audiencia se está encogiendo (−56%) · **el colmena no fracasó, fracasó su canal** (CPM $10.062) y quedó pausado · **tres regiones nuevas de $5.000** · **cinco parches al guion** (el bot vendía con MENÚ) · colmena = la textura, no la tela · el catálogo maestro estaba viejo en 21 lugares | **9 y 10-sep** |
 | **0-AE** | 💰 **El costo bajó a $33.000** (+$752.527/mes) · el CPA nunca se deterioró: era la pauta del colmena · el video se estabilizó y empató · **la fuga de flete está solo en la promo de 2 uds** · Tadó duplica el flete · el seguro es 13,6% y da 0,85× · 3 al detal > 12 al mayor | **7 y 8-sep** |
 | **0-AD** | 🔄 **El video se deterioró (+14,4%)** · TEST Creativos nuevo ganador $541 · el A/B lo ganó el video · el colmena no estaba caro, la conversación estaba rota · Meta One se paga | **4 al 6-sep** |
@@ -259,7 +259,10 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 > - ⚠️ **Puerto Gaitán (64532758224) sigue sin confirmar si es colmena** — dice "impermeable" y cobra
 >   $149.900 exactos. Solo el dueño puede confirmarlo
 > - 💎 **EL COLMENA VENDIÓ SOLO, CON LA CAMPAÑA APAGADA, Y PREPAGADO** (0-AG): la campaña cerró en
->   **+$37.060** y no en −$3.908. **Quedan ~34 chats vivos con CPA $0** → **#96**
+>   **+$37.060** y no en −$3.908. Era un lead **de la propia campaña**, no del upsell, así que
+>   **los ~34 chats que quedaron son esa misma población** y su retorno espontáneo es 2,9% **sin
+>   hacer nada** → **#96**
+> - 🔔 **EL UPSELL DEL COLMENA SIGUE SIN MEDIR.** Esta venta no lo prueba. No contarla como evidencia
 > - 🔴 **MOTORIZADOS SE ESTÁ ENCOGIENDO**, no está topado: conv/mil 4,04 → **1,77 (−56%)** con CPM
 >   normal. Bajado a $9.000. **Gate el lunes 14: sobre $1.500 se apaga** → **#93**
 > - 🔔 **TEST CREATIVOS: CPM $7.968 = 2,4× la cuenta, y subiendo** ($5.240 → $6.679 → $7.968).
@@ -1881,9 +1884,22 @@ una ventana más corta: el promedio real del 2 al 8 era 19,5%.)*
 
 ## 0-AG. 💎 LA TERCERA VENTA DEL COLMENA LLEGÓ CON LA CAMPAÑA APAGADA — Y CORRIGE MI VEREDICTO (2026-09-10)
 
-**Reporte del dueño:** una persona que había escrito **la semana pasada** volvió **hoy por su cuenta**,
-pidió el colmena y **pagó anticipado los $149.900**. Nadie le escribió. La campaña está pausada desde
-el 9-sep. Script: `analisis/colmena-venta-rezagada.py`.
+**Reporte del dueño, con la conversación revisada:** una persona que había escrito **días antes,
+cuando la publicidad del colmena estaba prendida**, volvió **hoy por su cuenta**, preguntó por el
+colmena, dijo que lo quería y **pagó anticipado los $149.900**. Nadie le escribió, nadie le vendió.
+La campaña está pausada desde el 9-sep. Script: `analisis/colmena-venta-rezagada.py`.
+
+🔑 **EL ORIGEN IMPORTA Y ESTÁ CONFIRMADO: era un lead de la CAMPAÑA DEL COLMENA, no del upsell.**
+
+| Lo que esto **NO** es | Lo que **SÍ** es |
+|---|---|
+| ⛔ **No es evidencia de que el upsell funcione.** El bloque no tuvo nada que ver: sigue **sin medir** | ✅ Una venta **atribuible al gasto de la campaña pausada** |
+| ⛔ **No es evidencia de que el guion venda.** El cliente llegó resuelto | ✅ **Demanda del PRODUCTO**, no del argumento: el colmena se vende solo si se le da tiempo |
+
+📌 **Y por lo tanto las ~34 conversaciones que quedaron NO son leads muertos: son la misma población
+que acaba de producir una venta sola, sin seguimiento, sin recordatorio y sin descuento.**
+**Tasa de retorno espontáneo: 1 de ~34 = 2,9%.** Es n=1, pero es el piso: **es lo que rinde no hacer
+nada.** Cualquier seguimiento razonable debería superarlo.
 
 ### ⚖️ ME EQUIVOQUÉ EN EL VEREDICTO DE #85, Y POR UN ERROR QUE YO MISMO YA TENÍA ESCRITO
 
@@ -1932,6 +1948,28 @@ pérdida.** Y eso es una conclusión distinta, con una consecuencia distinta:
 **Hay que bajar el costo de conversación 3,4×.** Eso **no lo da más presupuesto** (su CPM era $10.062
 = 2,7× la cuenta): lo da **audiencia propia**. El plan de tres canales de 0-AF sigue en pie, ahora
 con un número concreto al que apuntar.
+
+### ⚠️ Y MI PROPIO 1,43× TAMBIÉN ESTÁ CENSURADO — LOS LIBROS DE ESA CAMPAÑA SIGUEN ABIERTOS
+
+Si los leads de esa campaña **siguen** convirtiendo, su CPA sigue bajando. **El 1,43× es un piso, no
+el número final.** Sería el mismo error dos veces darlo por cerrado:
+
+| Ventas | CPA | Utilidad total | Margen por $1 de pauta |
+|---|---|---|---|
+| 2 | $42.922 | −$3.908 | 0,95× |
+| **3** | **$28.614** | **+$37.060** | **1,43×** ← hoy |
+| 4 | $21.461 | +$78.027 | 1,91× |
+| 5 | $17.169 | +$118.995 | 2,39× |
+| 6 | $14.307 | +$159.963 | 2,86× |
+| **8,2** | $10.424 | — | **3,93×** ← empate con el tradicional |
+
+🔑 **LA CONCLUSIÓN QUE SÍ AGUANTA:** empatar con el tradicional exigiría **8,2 ventas de 37
+conversaciones = 22% de cierre**, que no es plausible. **Aunque entren 2 o 3 ventas más, el colmena
+no empata.** *"Rendía menos"* se sostiene; lo que se suaviza es **cuánto** menos.
+
+📌 **PERO EL DIAGNÓSTICO CAMBIA DE NOMBRE, Y ESO SÍ CAMBIA LA OPERACIÓN:** no es *"el colmena
+fracasó"*, es **"el colmena es un producto de cola larga"**. Y a un producto de cola larga **no se le
+mide la pauta a 5 días, ni se le tiran los leads a la basura a los 5 días: se le hace seguimiento.**
 
 ### 💰 LO QUE SÍ CAMBIA HOY
 
