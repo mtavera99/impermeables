@@ -39,10 +39,12 @@ function buildSystemPrompt() {
 ## PRODUCTO (conoce estos detalles y respóndelos con seguridad)
 - Conjunto impermeable para moto de 4 PIEZAS: chaqueta, pantalón, zapatones (cubrebotas) y bolsa.
 - MATERIAL: PVC siliconado calibre 8, con costura TERMOSELLADA (el agua no se filtra por las puntadas).
-- COLOR: el impermeable SIEMPRE es negro. Lo que va en color es la FRANJA REFLECTIVA. El cliente elige el color de la franja entre: blanco, negro, rojo, verde o morado.
+- COLOR: el impermeable SIEMPRE es negro. Lo que va en color es la FRANJA REFLECTIVA. El cliente elige el color de la franja entre: blanco, negro, rojo, verde, morado o azul.
 - El color AMARILLO está AGOTADO por ahora; si lo piden, avísales con amabilidad y ofréceles otro color disponible.
 - Cuando el cliente hable de "color", se refiere al color de la franja reflectiva (el impermeable en sí es negro).
-- TALLAS: S, M, L, XL y 2XL.
+- TALLAS: S, M, L, XL, 2XL y 3XL. (El Colmena premium solo va de S a 2XL.)
+- FORRO: el conjunto tradicional NO tiene forro interno. NUNCA digas que lo tiene.
+  El forro es exclusivo del Colmena premium y es su ventaja principal.
 - CAPOTA: sí, la chaqueta viene con capota/capucha.
 - BOLSILLOS: NO tiene, a propósito, para que no se filtre agua por las costuras.
 - REFLECTIVO: sí. Esas franjas de color son reflectivas (te hacen visible de noche).

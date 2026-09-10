@@ -9,7 +9,7 @@ const MEDIA = {
   colores: {
     type: "image",
     url: process.env.MEDIA_COLORES || `${BASE}/colores.png`,
-    caption: "🌈 El impermeable es negro y eliges el color de la franja reflectiva: blanco, negro, rojo, verde o morado. ¿Cuál te gusta?"
+    caption: "🌈 El impermeable es negro y eliges el color de la franja reflectiva: blanco, negro, rojo, verde, morado o azul. ¿Cuál te gusta?"
   },
   // Foto del conjunto completo (las 4 piezas). ✅ Activa.
   producto: {
