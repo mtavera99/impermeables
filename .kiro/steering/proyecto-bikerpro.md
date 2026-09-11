@@ -4,8 +4,12 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-10** *(ojo: verificar siempre la fecha en `TZ=America/Bogota`; el
-sandbox corre en UTC y puede marcar el día siguiente)*
+Última actualización: **2026-09-11 04:10 Bogotá** *(ojo: verificar siempre la fecha en
+`TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
+
+> 🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA: andá directo al bloque "TRASPASO A LA SESIÓN NUEVA" de la
+> sección 12.** Ahí está qué hacer primero (incluido el MCP de Meta Ads), el estado confirmado de la
+> cuenta, los tres checkpoints y lo que quedó abierto.
 
 ---
 
@@ -103,7 +107,7 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 | **Domiciliarios VIDEO** | **$55.000** | VIDEO | Med+Bog | 🟢 $947 al cierre del 9-sep. **No tocar** |
 | **Domiciliarios** | **$45.000** | Fondo azul | Med+Bog | 🟢 $911 al cierre. Es **el control** de todo. No tocar |
 | **TEST Creativos** | $25.000 | Prueba social | Med+Bog | 🥇 mejor creativo, **peor subasta** (CPM $7.968). ⛔ NO subir a $30.000 → **#77** |
-| **Motorizados** | **$9.000** ⚠️ | Fondo azul | Med+Bog | 🔴 **recorte RECOMENDADO el 10-sep, NUNCA CONFIRMADO como ejecutado** (cerró $1.970, audiencia encogiéndose). **Verificar antes del gate del 14** — si sigue en $15.000 la cuenta está en $160.000, no en $154.000 |
+| **Motorizados** | **$9.000** ✅ | Fondo azul | Med+Bog | 🔴 recortado de $15.000 (cerró $1.970, audiencia encogiéndose). **✅ EJECUTADO Y CONFIRMADO por el dueño.** Gate lunes 14 |
 | Domiciliarios \| Valle del cauca | **$5.000** | Fondo azul | Valle del Cauca | 🟢 podado el 9-sep: 21% → **69%** de utilización, $5.157 → **$1.379** |
 | 🆕 **Domiciliarios \| Santanderes** | **$5.000** | Fondo azul | Santander + N. de Santander | creado 9-sep noche. Aprendizaje |
 | 🆕 **Domiciliarios \| Eje Cafetero** | **$5.000** | Fondo azul | Risaralda + Quindío + Caldas | creado 9-sep noche. Aprendizaje |
@@ -1685,6 +1689,21 @@ anuncios. El molde se copió bien.
 cinco días.** La ventana 10-14 incluye finde (+44%), así que contra el $1.379 de Valle (días
 hábiles) las regiones se verían mejor de lo que son. Hasta **1,5×** el costo de Domiciliarios se
 replica · 1,5-2,5× es marginal · **más de 2,5× se apaga**. *(Valle marcó 1,33×.)*
+
+⚠️⚠️ **PERO EL RECORTE DE MOTORIZADOS LE METIÓ UN SESGO A ESE GATE, Y VA EN CONTRA DE LAS REGIONES.**
+Motorizados gastaba **~$17.733/día reales** y quedó en **$9.000**: eso liberó **~$8.700/día de
+presión en la subasta de Medellín+Bogotá**, que es exactamente donde corre **Domiciliarios, el
+control**. Son ~7% del pool de Med+Bog.
+🔑 **Menos competencia interna = Domiciliarios se abarata un poco = las regiones se ven peor de lo
+que son**, porque el denominador de la comparación mejoró por un motivo ajeno a ellas.
+📌 **CÓMO SE CORRIGE EL LUNES, sin inventar un ajuste numérico:**
+1. **El criterio ABSOLUTO pasa a ser el principal:** bajo $2.000 funciona · sobre **$2.657**
+   (el equilibrio) se apaga. Ese umbral **no depende** de Domiciliarios.
+2. **El relativo se usa como segunda opinión, y con la duda A FAVOR de la región:** si una cae en la
+   zona gris de **1,5× a 2,5×**, no se apaga — **Domiciliarios corrió con viento a favor.**
+3. **Y se chequea el sesgo directamente:** si Domiciliarios mejora del 9-sep al 14 **más de lo que
+   mejora el VIDEO** (que está en la misma subasta y no se tocó), parte de esa mejora es el aire que
+   dejó Motorizados y no mérito propio.
 
 📌 **Total de la cuenta: $145.000 → $160.000/día, y con Motorizados a $9.000 queda en $154.000.**
 Es la única subida que se justifica: **no es más plata sobre la misma gente, es gente nueva** — que
@@ -5283,6 +5302,58 @@ creativos nuevos en el mismo conjunto del ganador: no se mostrarían.**
 
 ---
 
+## 4-B. 🔌 MCP DE META ADS — REGLA DE USO (agregado 2026-09-11)
+
+**El servidor es real y oficial de Meta:** `https://mcp.facebook.com/ads`. Verificado el 11-sep:
+responde `401 Failed to authenticate MCP request` a un `initialize` de JSON-RPC, publica metadata
+OAuth en `/.well-known/oauth-protected-resource/ads`, y un path inventado en el mismo host da 404
+(o sea que `/ads` está ruteado de verdad, no es comodín).
+
+**Scopes que declara:** `ads_management` · `ads_read` · `catalog_management` · `business_management`
+· `pages_show_list` · `instagram_basic` · `ads_mcp_management`.
+📌 **Se configura en `/projects/.kiro/settings/mcp.json` y se carga al INICIAR la sesión:** si se
+agrega con la sesión abierta, no aparece hasta abrir una nueva.
+
+### 🔴🔴 REGLA PERMANENTE: EL AGENTE LEE, EL DUEÑO EJECUTA
+
+> **Kiro NUNCA hace cambios de escritura en Meta Ads, aunque el token tenga `ads_management`.**
+
+**Permitido** (lectura): listar cuentas · leer insights, campañas, conjuntos, anuncios y creativos ·
+CPM, frecuencia, impresiones, conversaciones · desgloses por región y por día.
+
+⛔ **PROHIBIDO, sin excepción:** cambiar presupuestos · pausar o activar campañas, conjuntos o
+anuncios · crear o editar creativos, públicos o segmentación · aplicar recomendaciones de Meta ·
+tocar Advantage+ · cualquier `POST`/`DELETE` a la Marketing API.
+**Todo cambio se PROPONE con el número que lo justifica, y lo ejecuta el dueño a mano.**
+
+### Por qué esta regla es más estricta acá que en otros proyectos
+
+1. **Todo el método del proyecto depende de no mover variables.** Hay ventanas de medición abiertas
+   (las tres regiones, Motorizados) donde **un cambio automático destruye la lectura** — y las
+   lecciones más caras del archivo son justamente de leer ventanas contaminadas (0-AF, 0-AG).
+2. **Editar un anuncio reinicia el aprendizaje** y eso no se puede predecir (0-M).
+3. **El riesgo de cuenta no viene de conectar el MCP**, viene de un agente escribiendo sin control y
+   reintentando ante errores. Con lectura sola, ese riesgo no existe.
+4. **El scope es el techo; el rol sobre la cuenta es la puerta.** Si el token se emite con un usuario
+   admin, hereda permisos de admin **aunque el scope sea mínimo**. El único candado técnico real es
+   autorizar con una identidad que tenga rol **Analista** (solo ver rendimiento) sobre la cuenta.
+   **Mientras eso no exista, esta regla escrita ES el control.**
+
+### Qué autorizar
+
+✅ Mínimo necesario: **`ads_read`** + **`business_management`** (para listar cuentas) +
+**`ads_mcp_management`**.
+⛔ **No conceder `ads_management`, `catalog_management`, `instagram_basic` ni `pages_show_list`** si
+la pantalla de consentimiento permite destildarlos.
+
+### Si algo se ve raro
+
+- **Registro de actividad** de la cuenta publicitaria: dice quién cambió qué y cuándo. Es la red de
+  seguridad y conviene revisarlo la primera semana después de conectar.
+- **Revocar:** quitar la app desde la configuración de integraciones de negocio de Meta.
+
+---
+
 ## 5-B. ✅ LA IA QUE SÍ ESTÁ ATENDIENDO (desde ~2026-08-12) — ALCANCE REAL, CORREGIDO EL 2026-08-14
 
 **El dueño resolvió la atención automática con la IA nativa de WhatsApp Business (Meta AI), NO con el
@@ -6525,6 +6596,75 @@ $/conversación  =  CPM  ÷  (conversaciones por cada 1.000 impresiones)
 > ellas y qué quedó abierto**, para poder retomar en frío sin volver a preguntar lo mismo.
 > **Si se perdió un chat, empezá por acá y después leé la sección 0-* correspondiente.**
 
+---
+
+# 🚀 TRASPASO A LA SESIÓN NUEVA — leer esto PRIMERO (escrito 2026-09-11, 04:10 Bogotá)
+
+**El chat del 10-sep se cierra acá. Esta es la única cosa que hay que leer para arrancar.**
+
+## Lo primero que tiene que hacer la sesión nueva
+
+1. 🔌 **VERIFICAR SI EL MCP `meta-ads` ESTÁ CARGADO.** Se configuró en
+   `/projects/.kiro/settings/mcp.json` el 11-sep a las 03:53 Bogotá, apuntando a
+   `https://mcp.facebook.com/ads`. **En la sesión anterior NO estaba cargado** porque los servidores
+   MCP se cargan al iniciar la sesión.
+   - **Si aparecen tools de Meta:** pedir autorización y **listar las cuentas publicitarias**.
+     ⚠️ **Antes de que el dueño acepte la pantalla de permisos, pedirle una captura** — quedó
+     acordado revisarla juntos para conceder lo mínimo y **solo la cuenta de BikerPro**.
+   - **Si NO aparecen:** revisar `mcp.json` y decirlo. **No inventar métricas nunca.**
+2. 🔴 **APLICAR LA SECCIÓN 4-B DESDE EL MINUTO UNO: SOLO LECTURA.** El agente **no** cambia
+   presupuestos, no pausa, no edita creativos, no aplica recomendaciones de Meta. **Propone con el
+   número que lo justifica; el dueño ejecuta.**
+3. 📌 **Si el MCP funciona, el veredicto del lunes 14 se saca directo de la API** y el dueño no
+   necesita exportar nada. Eso es la mejora concreta que habilita esta conexión.
+
+## El estado de la cuenta (confirmado, no supuesto)
+
+**$154.000/día.** Configuración completa en el bloque "CONFIGURACIÓN DE LA CUENTA AL 2026-09-10".
+
+| Conjunto | Presup. | Estado |
+|---|---|---|
+| Domiciliarios VIDEO | $55.000 | 🟢 control, **no tocar** |
+| Domiciliarios | $45.000 | 🟢 **es EL control del gate**, no tocar |
+| TEST Creativos | $25.000 | ⛔ **no subir a $30.000** — su problema es la subasta (#77) |
+| **Motorizados** | **$9.000** | ✅ recortado y **confirmado por el dueño** |
+| Valle · Santanderes · Eje Cafetero · Tolima Huila | $5.000 c/u | 🆕 las 3 nuevas arrancaron el 9-sep de noche |
+| ~~Colmena~~ | — | 🔴 pausada el 9-sep. **Se vuelve a prender después del 14** (ver 0-AG) |
+
+## 📅 Los tres checkpoints
+
+| Cuándo | Qué |
+|---|---|
+| **Viernes 11 (HOY)** | **Nada de pauta.** Lo único que importa: **los exports históricos con teléfono de 99 Envíos y Heka (#88)** — es lo que habilita prender el colmena el lunes con audiencia de clientes |
+| **Sábado 12** | **Primer día que los datos de las tres regiones significan algo** (día 3). **Mirar, no tocar** |
+| **Lunes 14** | **VEREDICTO:** las 3 regiones · Motorizados · share de 2 unidades con la semana cerrada · **prender el colmena** ($8-10.000/día, audiencia de clientes, ventana de 14 días) · y **recién ahí** tocar los creativos en vivo (#94) |
+
+⚠️ **Y el gate del lunes tiene un sesgo ya documentado:** el recorte de Motorizados liberó ~$8.700/día
+en la subasta de Med+Bog, donde corre Domiciliarios (el control), **así que las regiones se ven peor
+de lo que son.** Usar el criterio **absoluto** ($2.657 = equilibrio) como principal y el relativo con
+la duda **a favor** de la región. Está explicado en el gate de 0-AF.
+
+## ⏳ Lo que quedó ABIERTO al cerrar el chat
+
+| | Qué falta | Por qué importa |
+|---|---|---|
+| 🔴 | **Autorizar el MCP de Meta** (con captura de la pantalla antes de aceptar) | Es lo que habilita leer métricas sin exportar |
+| 🔴 | **Los exports con teléfono (99 Envíos y Heka)** → **#88** | Sin eso, el lunes **no se puede ejecutar** lo que ya se decidió para el colmena |
+| 🔔 | ¿Cuántos de los 17 del colmena contestaron? | Es la medición del canal de seguimiento |
+| 🔔 | ¿Cuántos de los contactados en oficina recogieron? | Ese % decide si el rechazo sigue en 5,0% |
+| 🔔 | **Contar vacías del TRADICIONAL una semana** | El 57,8% es de agosto (n=90). De eso depende la comparación de cierre con el colmena |
+| 🔔 | **Anotar colmena vs tradicional por pedido** → **#81** | **El upsell sigue sin medir** |
+| 🔔 | El extracto de la guía de Tadó ($36.667) → **#90** | Única llamada pendiente a 99 Envíos |
+| 🧥 | **La chaqueta reflectiva:** el dueño ya tiene el video y quiere sacarla | **Lanzarla con el manual de 0-AG.** Y lo primero es **costo, peso y flete real**, antes de gastar un peso |
+
+## ⚠️ Nota de proceso para no repetir un error
+
+**Los PR #43 y #44 se fusionaron ANTES de que terminara de subir los últimos commits**, y en las dos
+veces quedaron cambios afuera que hubo que arrastrar a una rama nueva.
+📌 **Conviene fusionar cuando el trabajo esté cerrado, no mientras la sesión sigue.**
+
+---
+
 ## Sesión del 2026-09-10 (jueves) — "lee todo de BikerPro y seguimos donde quedamos"
 
 **Contexto de arranque:** el chat anterior se cayó con error justo cuando el dueño mandó el export
@@ -6594,7 +6734,7 @@ TEST Creativos (oscilaba) y **tendencia** a la serie de Motorizados (subía mon�
 
 | | Qué falta | Por qué importa |
 |---|---|---|
-| 🔴 | **¿Se bajó Motorizados de $15.000 a $9.000?** **NUNCA SE CONFIRMÓ** — la tabla de configuración lo da por hecho | Si no se hizo, la cuenta está en $160.000 y no en $154.000, y el gate del 14 se lee distinto |
+| ✅ | ~~¿Se bajó Motorizados a $9.000?~~ **CONFIRMADO EJECUTADO.** La cuenta está en **$154.000** | Cerrado. Pero generó un sesgo en el gate del 14 — ver el gate en 0-AF |
 | 🔴 | **Los exports históricos con teléfono** (99 Envíos y Heka) → **#88** | **Es lo que habilita prender el colmena el lunes** con audiencia de clientes. Sin eso, el lunes no se puede ejecutar lo que se decidió |
 | 🔔 | **¿Cuántos de los contactados en oficina terminaron recogiendo?** | Ese % decide si el rechazo se queda en 5,0% |
 | 🔔 | **¿Cuántos contestaron de los 17 del colmena?** | Es la medición del canal de seguimiento |
@@ -6609,3 +6749,55 @@ TEST Creativos (oscilaba) y **tendencia** a la serie de Motorizados (subía mon�
 | **Viernes 11** | Nada de pauta. Conseguir los exports con teléfono (#88) |
 | **Sábado 12** | **Primer día que los datos de las tres regiones significan algo** (día 3). Mirar, no tocar |
 | **Lunes 14** | **VEREDICTO** con 5 días cerrados: las 3 regiones (gate relativo contra Domiciliarios, ≤1,5× se replica / >2,5× se apaga) · **Motorizados** (bajo $1.200 se queda, sobre $1.500 se apaga) · **share de 2 unidades** con la semana cerrada · **prender el colmena** con audiencia de clientes, $8-10.000/día y ventana de 14 días · **y recién ahí tocar los creativos en vivo** (#94) |
+
+
+### 🔌 Cierre del chat del 10-sep: el episodio del MCP de Meta Ads (madrugada del 11)
+
+**Cómo pasó, en orden, porque incluye otra autocorrección mía:**
+
+1. El dueño pidió **conectar el MCP `meta-ads`** y listar sus cuentas. **No existía:** se verificó en
+   `mcp.json`, en los powers instalados y en las tools cargadas. Se le dijo que no, en vez de
+   improvisar. **Nunca se inventaron cuentas ni métricas.**
+2. Preguntó de nuevo si ya podía leerlas → **el dueño lo había configurado a las 03:53** apuntando a
+   `https://mcp.facebook.com/ads`.
+3. 🔴 **ME EQUIVOQUÉ (la 5ª de la sesión): sospeché que la URL era inventada.** Es **real y oficial de
+   Meta.** La evidencia:
+   | Prueba | Resultado |
+   |---|---|
+   | `POST` con `initialize` de JSON-RPC | `{"detail":"Failed to authenticate **MCP request**","status":401}` |
+   | `www-authenticate` | challenge OAuth con `resource_metadata` y scopes, incluido **`ads_mcp_management`** |
+   | Path inventado en el mismo host | **404** → `/ads` está ruteado de verdad, no es comodín del edge |
+   | `/.well-known/oauth-protected-resource/ads` | devuelve `authorization_servers` y `scopes_supported` |
+   📌 **La lección:** que un dominio de Facebook resuelva no prueba nada (resuelve cualquier
+   subdominio) y **un 405 en `GET` es ambiguo porque MCP usa `POST`.** La prueba buena es el
+   `initialize`.
+4. Se explicó por qué igual no se podía leer nada: **los MCP se cargan al iniciar sesión**, y el login
+   OAuth **lo tiene que aprobar el dueño**, no el agente.
+5. Preguntó **cómo dejarlo en solo lectura**. Respuesta: **el scope es el techo, el rol sobre la
+   cuenta es la puerta** — con `ads_management` en el token pero rol **Analista** en la cuenta, la
+   escritura falla igual. **Pero siendo él admin del negocio, el token hereda admin**, así que el
+   único candado técnico real sería una identidad aparte. **Mientras no exista, el control es la regla
+   escrita** → por eso quedó como **sección 4-B**, no solo en el chat.
+6. Preguntó **cómo destildar permisos**. Se le dijo honestamente que **el login de negocios de Meta
+   normalmente NO deja rechazar permisos sueltos** (solo elegir activos), y que **mande captura de la
+   pantalla antes de aceptar.** **Eso quedó pendiente.**
+
+**Y el dato de riesgo que ordena la prioridad:** conectar un MCP no hace que baneen la cuenta; lo que
+genera problemas es **un agente escribiendo sin control y reintentando ante cada error**
+([Porter Metrics](https://portermetrics.com/en/tutorial/meta-ads-mcp-ban/) — *contenido reformulado
+por restricciones de licencia*). **Con lectura sola, ese riesgo desaparece** — que es exactamente lo
+que fija 4-B.
+
+### 📊 Marcador final de la sesión del 10-sep: 5 errores propios, todos de la misma familia
+
+| # | Lo que dije | Lo que era |
+|---|---|---|
+| 1 | *"el colmena no cubrió"* | **+$37.060** con la 3ª venta (ventana censurada) |
+| 2 | *"cierra casi igual"* | 15,0% vs **19,9%** sobre reales (base equivocada) |
+| 3 | *"el tradicional rinde 2,7× más"* | su **marginal** es +$0,16 vs **+$0,43** (promedio vs marginal) |
+| 4 | listé **#75** como pendiente | el dueño lo hace **a diario** |
+| 5 | *"la URL del MCP parece inventada"* | **es real y oficial de Meta** |
+
+🔑 **Las cinco son el mismo patrón: sacar conclusión antes de tener la base correcta.** Y las cinco
+las destapó el dueño, no yo. **Eso es la parte más valiosa de esta bitácora: cuando él dice "según mi
+cabeza esto no cuadra", suele tener razón — conviene recalcular antes de defender el número.**
