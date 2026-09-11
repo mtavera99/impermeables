@@ -5298,6 +5298,58 @@ creativos nuevos en el mismo conjunto del ganador: no se mostrarían.**
 
 ---
 
+## 4-B. 🔌 MCP DE META ADS — REGLA DE USO (agregado 2026-09-11)
+
+**El servidor es real y oficial de Meta:** `https://mcp.facebook.com/ads`. Verificado el 11-sep:
+responde `401 Failed to authenticate MCP request` a un `initialize` de JSON-RPC, publica metadata
+OAuth en `/.well-known/oauth-protected-resource/ads`, y un path inventado en el mismo host da 404
+(o sea que `/ads` está ruteado de verdad, no es comodín).
+
+**Scopes que declara:** `ads_management` · `ads_read` · `catalog_management` · `business_management`
+· `pages_show_list` · `instagram_basic` · `ads_mcp_management`.
+📌 **Se configura en `/projects/.kiro/settings/mcp.json` y se carga al INICIAR la sesión:** si se
+agrega con la sesión abierta, no aparece hasta abrir una nueva.
+
+### 🔴🔴 REGLA PERMANENTE: EL AGENTE LEE, EL DUEÑO EJECUTA
+
+> **Kiro NUNCA hace cambios de escritura en Meta Ads, aunque el token tenga `ads_management`.**
+
+**Permitido** (lectura): listar cuentas · leer insights, campañas, conjuntos, anuncios y creativos ·
+CPM, frecuencia, impresiones, conversaciones · desgloses por región y por día.
+
+⛔ **PROHIBIDO, sin excepción:** cambiar presupuestos · pausar o activar campañas, conjuntos o
+anuncios · crear o editar creativos, públicos o segmentación · aplicar recomendaciones de Meta ·
+tocar Advantage+ · cualquier `POST`/`DELETE` a la Marketing API.
+**Todo cambio se PROPONE con el número que lo justifica, y lo ejecuta el dueño a mano.**
+
+### Por qué esta regla es más estricta acá que en otros proyectos
+
+1. **Todo el método del proyecto depende de no mover variables.** Hay ventanas de medición abiertas
+   (las tres regiones, Motorizados) donde **un cambio automático destruye la lectura** — y las
+   lecciones más caras del archivo son justamente de leer ventanas contaminadas (0-AF, 0-AG).
+2. **Editar un anuncio reinicia el aprendizaje** y eso no se puede predecir (0-M).
+3. **El riesgo de cuenta no viene de conectar el MCP**, viene de un agente escribiendo sin control y
+   reintentando ante errores. Con lectura sola, ese riesgo no existe.
+4. **El scope es el techo; el rol sobre la cuenta es la puerta.** Si el token se emite con un usuario
+   admin, hereda permisos de admin **aunque el scope sea mínimo**. El único candado técnico real es
+   autorizar con una identidad que tenga rol **Analista** (solo ver rendimiento) sobre la cuenta.
+   **Mientras eso no exista, esta regla escrita ES el control.**
+
+### Qué autorizar
+
+✅ Mínimo necesario: **`ads_read`** + **`business_management`** (para listar cuentas) +
+**`ads_mcp_management`**.
+⛔ **No conceder `ads_management`, `catalog_management`, `instagram_basic` ni `pages_show_list`** si
+la pantalla de consentimiento permite destildarlos.
+
+### Si algo se ve raro
+
+- **Registro de actividad** de la cuenta publicitaria: dice quién cambió qué y cuándo. Es la red de
+  seguridad y conviene revisarlo la primera semana después de conectar.
+- **Revocar:** quitar la app desde la configuración de integraciones de negocio de Meta.
+
+---
+
 ## 5-B. ✅ LA IA QUE SÍ ESTÁ ATENDIENDO (desde ~2026-08-12) — ALCANCE REAL, CORREGIDO EL 2026-08-14
 
 **El dueño resolvió la atención automática con la IA nativa de WhatsApp Business (Meta AI), NO con el
