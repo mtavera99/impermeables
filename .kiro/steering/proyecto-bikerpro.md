@@ -22,6 +22,7 @@ está en Domiciliarios.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-AI** | 🔴🔴🔴 **LA CAUSA RAÍZ DE TODO: la cuenta se queda sin saldo a medio día y el rebote compra basura.** El 9-sep estuvo **MUERTA de 14 a 17h** ($30 en una hora) y a las **18:00 Meta metió $49.334 de golpe** → esa hora arruinó el $/conv del día **de todos los conjuntos a la vez**. **ESO fue "Motorizados se muere", no la audiencia.** Costó **$55.000-$130.000 de utilidad en un día** · hoy 11-sep pasó igual (11-13h seco) · **Meta protege a los grandes y ahoga a los chicos** = las 3 regiones que se están midiendo · 🔑 **el 10-sep es el ÚNICO día limpio** · la solución no es recargar más sino **recargar ANTES: colchón de 2-3 días** | **11-sep** |
 | **0-AH** | 🔑 **LA API YA LEE SOLA** (el token funciona, el veredicto del lunes sale sin exports) · 🔴 **Motorizados nunca se estaba encogiendo: era UN día, y el 9-sep fue malo para toda la cuenta** (+21%) — el recorte funcionó pero por el motivo contrario · 🔴🔴 **el que se diluye es DOMICILIARIOS, el control: +70% de costo en 5 días con CPM BAJANDO** = elasticidad 0,63 en vivo, vale **+26 conv/día** · **el CPM de TEST Creativos oscila, no sube** · 🔴 **la cuenta gasta $202.095, no $154.000** (Meta sobre-entrega 31% → el peso marginal ya devuelve $0) · **dos conjuntos del colmena no estaban en la tabla** y corroboran 0-AG (78,6% de su equilibrio) · regiones preliminares: **Tolima y Santander entregan, Eje Cafetero flojo** · **el sesgo del gate ahora tiene dos signos → solo criterio absoluto** | **11-sep** |
 | **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · 🔄 **y estaba comparando promedio contra promedio: contra el peso MARGINAL del tradicional (+$0,16) el colmena rinde +$0,43 = 2,7× más** · **no pierde plata: corre al 85% de SU equilibrio** · **se vuelve a prender después del 14** con audiencia de clientes, $8-10.000/día y ventana de 14 días · **diversificar ES el plan de crecimiento** · el manual para la chaqueta reflectiva · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · **17 de 37 conversaciones estaban vacías**, y con base limpia **el colmena ATRAE mejor (45,9% vs 57,8% de vacías) y CIERRA peor (15,0% vs 19,9%)** · el CPA se descompone exacto: paga 2,6× por conversación real y cierra 1,33× peor = 3,4× · seguimiento a **17** | **10-sep** |
 | **0-AF** | 🧮 **La comisión de recaudo ya venía DENTRO del flete: se estaba restando dos veces** (todo corrige hacia arriba, #28-1 cerrado) · ⛔ **no se lee un día abierto** (la descomposición CPM ÷ conv-por-mil) · **predicción fallida: Motorizados cerró en $1.970** y su audiencia se está encogiendo (−56%) · **el colmena no fracasó, fracasó su canal** (CPM $10.062) y quedó pausado · **tres regiones nuevas de $5.000** · **cinco parches al guion** (el bot vendía con MENÚ) · colmena = la textura, no la tela · el catálogo maestro estaba viejo en 21 lugares | **9 y 10-sep** |
@@ -1494,6 +1495,125 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-AI. 🔴🔴🔴 LA CAUSA RAÍZ DE TODO: LA CUENTA SE QUEDA SIN SALDO A MEDIO DÍA, Y EL REBOTE COMPRA BASURA (2026-09-11, 16:00 Bogotá)
+
+**Esto explica el 9-sep, corrige 0-AF y 0-AH, y es la fuga de plata más grande encontrada hasta hoy.**
+Salió de pedirle a la API el gasto **hora por hora** (`hourly_stats_aggregated_by_advertiser_time_zone`),
+algo que nunca se había mirado en este proyecto.
+
+### La pistola humeante: el 9-sep la cuenta estuvo MUERTA cuatro horas
+
+| Hora | Gasto | |
+|---|---|---|
+| 13:00 | $4.671 | normal |
+| 14:00 | **$901** | 🔴 |
+| 15:00 | **$655** | 🔴 |
+| 16:00 | **$96** | 🔴 |
+| 17:00 | **$30** | 🔴 **la cuenta no existía** |
+| **18:00** | **$49.334** | 💥 **34× la hora anterior, en UNA hora** |
+| 19:00 | $10.344 | vuelve a la normalidad |
+
+**Cuatro horas seguidas con $1.682 en total = se acabó el saldo.** Y a las 18:00 Meta metió **$49.334
+en una sola hora** para recuperar el presupuesto del día.
+
+📌 **Esto ya estaba escrito en la sección 11 del manual y nadie lo conectó con las métricas:**
+*"tras estar apagado por falta de fondos, Meta acelera"* y *"el saldo se explota en 1-2 horas"*.
+**Estaba documentado como curiosidad de facturación. Es, en realidad, el mayor contaminante de datos
+del proyecto.**
+
+### 🔑 ESTO ES LO QUE PASÓ EL 9-SEP — NO ERA MOTORIZADOS, NI LA SUBASTA, NI LA AUDIENCIA
+
+0-AF concluyó *"la audiencia de Motorizados se está encogiendo −56%"* y por eso lo recortó.
+0-AH corrigió a *"fue un día malo para toda la cuenta"* pero no supo **por qué**. Acá está el por qué:
+
+🔴 **El 9-sep la cuenta se quedó sin plata a las 14:00 y a las 18:00 Meta gastó $49.334 de golpe.**
+Una hora con 34× el gasto normal **compra el inventario más barato y más frío que encuentra**, porque
+tiene que quemar presupuesto rápido. Esa hora arruinó el promedio del día entero **de todos los
+conjuntos a la vez** — que es exactamente el patrón que 0-AH midió y no pudo explicar.
+
+**La cadena completa, por fin cerrada:**
+
+```
+no hay saldo  ->  4 h sin entrega  ->  Meta acelera para recuperar
+   ->  compra impresiones basura  ->  conv/mil se derrumba
+   ->  $/conv del DIA sube  ->  yo leo "Motorizados se muere"  ->  recorte equivocado
+```
+
+### 💸 Lo que costó ESE día
+
+| | |
+|---|---|
+| Gasto del 9-sep | $144.451 |
+| Conversaciones reales | **129** |
+| A ritmo de día sano ($925, el del 8-sep) | **156** |
+| **Conversaciones perdidas** | **27** |
+| Utilidad perdida (cierre conservador 8,4%) | **~$55.055** |
+| Utilidad perdida (base limpia 19,9%) | **~$130.429** |
+
+🔑 **Entre $55.000 y $130.000 de utilidad, en UN día, por quedarse sin saldo cuatro horas.**
+Y el gasto **no se ahorró**: se gastó igual, peor comprado.
+
+### Y hoy 11-sep pasó lo mismo, cuatro horas más temprano
+
+| Hora | Gasto |
+|---|---|
+| 07:00 | $23.645 (pico normal) |
+| **10:00 – 13:00** | **$4.718 en CUATRO horas** 🔴 |
+| **14:00** | **$16.693** 💥 el rebote |
+
+**Entrega perdida hoy: ~$35.282.** Un día normal en esas 4 horas mueve ~$40.000.
+
+### 🔴 Y el que paga el rebote son los conjuntos CHICOS
+
+Cuando el saldo escasea, Meta no frena a todos igual: **protege a los grandes y ahoga a los chicos.**
+Utilización de presupuesto hoy vs. el 10-sep (día sin hueco de medio día):
+
+| Conjunto | 10-sep | Hoy | |
+|---|---|---|---|
+| Domiciliarios VIDEO | 132% | **105% ya a las 15:30** | 🟢 protegido |
+| Domiciliarios | 179% | **101% ya a las 15:30** | 🟢 protegido |
+| TEST Creativos | 87% | ~57% | 🟠 |
+| **Santander** | 78% | **~23%** | 🔴 ahogado |
+| **Valle** | 78% | **~15%** | 🔴 |
+| **Eje Cafetero** | 80% | **~11%** | 🔴 |
+| **Tolima Huila** | 80% | **~11%** | 🔴 |
+
+⛔ **Y las tres regiones ahogadas son justo las que se están midiendo para el veredicto del lunes.**
+
+### ⚠️⚠️ LO QUE ESTO LE HACE AL GATE DEL LUNES 14
+
+🔑 **El problema no es que falte plata: es que los días NO SON COMPARABLES ENTRE SÍ.**
+Un día con hueco de saldo tiene otra **forma de entrega** que un día sin hueco. Comparar región contra
+control, o región contra región, cuando cada día tuvo un hueco distinto a distinta hora,
+**mide el horario de la recarga, no la geografía.**
+
+📌 **El dueño confirmó que recarga a diario, "pendiente de que llegue un pago".** Eso evita que la
+cuenta muera del todo — **pero no evita el hueco**, porque la recarga es *reactiva*: llega cuando llega.
+**Recargar todos los días y recargar ANTES de llegar a cero no son lo mismo.**
+
+### ✅ LA RECOMENDACIÓN (y no es "cargar más plata": es cargar ANTES)
+
+| | |
+|---|---|
+| ⛔ **Lo que NO sirve** | recargar cuando el saldo llega a cero, aunque sea todos los días |
+| ✅ **Lo que sirve** | mantener **2-3 días de colchón** (~$400.000-$600.000) para que el saldo **nunca** toque cero |
+
+**Por qué vale la pena:** un solo hueco cuesta entre **$55.000 y $130.000** de utilidad. Mantener
+$600.000 quietos en la cuenta no cuesta nada — es plata que igual se va a gastar en pauta, solo que
+adelantada. **El colchón se paga con evitar UN hueco.**
+
+### 📌 Nueva regla de lectura, para el manual
+
+🔴 **ANTES DE COMPARAR DOS DÍAS, MIRAR SU CURVA HORARIA.** Si uno tuvo un hueco de saldo y una hora de
+rebote, ese día **no se compara con nada**: su $/conv está inflado por el rebote y su volumen
+subestimado por el hueco. Comando:
+
+```bash
+python3 analisis/saldo-por-hora.py 2026-09-08 2026-09-11
+```
 
 ---
 
