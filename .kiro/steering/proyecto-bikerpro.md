@@ -103,7 +103,7 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 | **Domiciliarios VIDEO** | **$55.000** | VIDEO | Med+Bog | 🟢 $947 al cierre del 9-sep. **No tocar** |
 | **Domiciliarios** | **$45.000** | Fondo azul | Med+Bog | 🟢 $911 al cierre. Es **el control** de todo. No tocar |
 | **TEST Creativos** | $25.000 | Prueba social | Med+Bog | 🥇 mejor creativo, **peor subasta** (CPM $7.968). ⛔ NO subir a $30.000 → **#77** |
-| **Motorizados** | **$9.000** ⚠️ | Fondo azul | Med+Bog | 🔴 **recorte RECOMENDADO el 10-sep, NUNCA CONFIRMADO como ejecutado** (cerró $1.970, audiencia encogiéndose). **Verificar antes del gate del 14** — si sigue en $15.000 la cuenta está en $160.000, no en $154.000 |
+| **Motorizados** | **$9.000** ✅ | Fondo azul | Med+Bog | 🔴 recortado de $15.000 (cerró $1.970, audiencia encogiéndose). **✅ EJECUTADO Y CONFIRMADO por el dueño.** Gate lunes 14 |
 | Domiciliarios \| Valle del cauca | **$5.000** | Fondo azul | Valle del Cauca | 🟢 podado el 9-sep: 21% → **69%** de utilización, $5.157 → **$1.379** |
 | 🆕 **Domiciliarios \| Santanderes** | **$5.000** | Fondo azul | Santander + N. de Santander | creado 9-sep noche. Aprendizaje |
 | 🆕 **Domiciliarios \| Eje Cafetero** | **$5.000** | Fondo azul | Risaralda + Quindío + Caldas | creado 9-sep noche. Aprendizaje |
@@ -1685,6 +1685,21 @@ anuncios. El molde se copió bien.
 cinco días.** La ventana 10-14 incluye finde (+44%), así que contra el $1.379 de Valle (días
 hábiles) las regiones se verían mejor de lo que son. Hasta **1,5×** el costo de Domiciliarios se
 replica · 1,5-2,5× es marginal · **más de 2,5× se apaga**. *(Valle marcó 1,33×.)*
+
+⚠️⚠️ **PERO EL RECORTE DE MOTORIZADOS LE METIÓ UN SESGO A ESE GATE, Y VA EN CONTRA DE LAS REGIONES.**
+Motorizados gastaba **~$17.733/día reales** y quedó en **$9.000**: eso liberó **~$8.700/día de
+presión en la subasta de Medellín+Bogotá**, que es exactamente donde corre **Domiciliarios, el
+control**. Son ~7% del pool de Med+Bog.
+🔑 **Menos competencia interna = Domiciliarios se abarata un poco = las regiones se ven peor de lo
+que son**, porque el denominador de la comparación mejoró por un motivo ajeno a ellas.
+📌 **CÓMO SE CORRIGE EL LUNES, sin inventar un ajuste numérico:**
+1. **El criterio ABSOLUTO pasa a ser el principal:** bajo $2.000 funciona · sobre **$2.657**
+   (el equilibrio) se apaga. Ese umbral **no depende** de Domiciliarios.
+2. **El relativo se usa como segunda opinión, y con la duda A FAVOR de la región:** si una cae en la
+   zona gris de **1,5× a 2,5×**, no se apaga — **Domiciliarios corrió con viento a favor.**
+3. **Y se chequea el sesgo directamente:** si Domiciliarios mejora del 9-sep al 14 **más de lo que
+   mejora el VIDEO** (que está en la misma subasta y no se tocó), parte de esa mejora es el aire que
+   dejó Motorizados y no mérito propio.
 
 📌 **Total de la cuenta: $145.000 → $160.000/día, y con Motorizados a $9.000 queda en $154.000.**
 Es la única subida que se justifica: **no es más plata sobre la misma gente, es gente nueva** — que
@@ -6594,7 +6609,7 @@ TEST Creativos (oscilaba) y **tendencia** a la serie de Motorizados (subía mon�
 
 | | Qué falta | Por qué importa |
 |---|---|---|
-| 🔴 | **¿Se bajó Motorizados de $15.000 a $9.000?** **NUNCA SE CONFIRMÓ** — la tabla de configuración lo da por hecho | Si no se hizo, la cuenta está en $160.000 y no en $154.000, y el gate del 14 se lee distinto |
+| ✅ | ~~¿Se bajó Motorizados a $9.000?~~ **CONFIRMADO EJECUTADO.** La cuenta está en **$154.000** | Cerrado. Pero generó un sesgo en el gate del 14 — ver abajo |
 | 🔴 | **Los exports históricos con teléfono** (99 Envíos y Heka) → **#88** | **Es lo que habilita prender el colmena el lunes** con audiencia de clientes. Sin eso, el lunes no se puede ejecutar lo que se decidió |
 | 🔔 | **¿Cuántos de los contactados en oficina terminaron recogiendo?** | Ese % decide si el rechazo se queda en 5,0% |
 | 🔔 | **¿Cuántos contestaron de los 17 del colmena?** | Es la medición del canal de seguimiento |
