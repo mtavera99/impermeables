@@ -82,9 +82,20 @@ def conjuntos(act):
         print("no hay dato")
         return
     print(f"{'presup/dia':>12}  {'estado':<16} conjunto")
+    total_activo = 0
     for s in sorted(filas, key=lambda x: -int(x.get("daily_budget") or 0)):
-        p = int(s.get("daily_budget") or 0) / 100  # la API devuelve centavos
+        # 🔴 OJO: la API devuelve el presupuesto en la unidad MENOR de la moneda.
+        # En USD eso son centavos y hay que dividir por 100. EN COP NO: el peso no
+        # tiene centavos, asi que el crudo YA esta en pesos.
+        # Verificado el 11-sep: Domiciliarios VIDEO devuelve 55000 y el archivo dice
+        # $55.000. Dividir por 100 daba $550 y era un error de este script.
+        p = int(s.get("daily_budget") or 0)
+        activo = s.get("effective_status") == "ACTIVE"
+        if activo:
+            total_activo += p
         print(f"{p:>12,.0f}  {s.get('effective_status',''):<16} {s.get('name','')}")
+    print("-" * 60)
+    print(f"{total_activo:>12,.0f}  {'ACTIVOS':<16} TOTAL/DIA de lo que esta entregando")
 
 
 def insights(act, desde, hasta):

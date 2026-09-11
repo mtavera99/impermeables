@@ -1464,7 +1464,115 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
-## 0-AF. 🧮 LA COMISIÓN YA ESTABA ADENTRO, EL DÍA ABIERTO NO SE LEE, Y EL COLMENA NO FRACASÓ: FRACASÓ SU CANAL (2026-09-09 al 2026-09-10)
+## 0-AH. 🔌 PRIMERA LECTURA DE LA CUENTA POR API: EL ARCHIVO SE VALIDA, PERO EL COLMENA TUVO 52 CONVERSACIONES, NO 37 (2026-09-11, 05:30)
+
+**Contexto:** el MCP no se pudo conectar en Kiro Web, así que se hizo con un token de usuario de
+sistema (`Kiro Lectura`, rol **Analista**, solo `ads_read`) y `analisis/meta-api-lectura.py`, que
+**solo sabe hacer `GET`**. Cuenta: **`act_4330882710457791` · BikerPro · COP**.
+
+### ✅ LO PRIMERO: EL ARCHIVO SE VALIDA CONTRA LA API. NO HABÍA NADA MAQUILLADO
+
+| Lo que decía el archivo | Lo que dice la API |
+|---|---|
+| Cuenta en **$154.000/día** | **$154.000 exactos** sumando los 8 conjuntos ACTIVE |
+| Motorizados recortado a **$9.000** | **$9.000 ACTIVE** ✅ |
+| Colmena **pausado** el 9-sep | **PAUSED / CAMPAIGN_PAUSED**, gastó **$0 el 10-sep** ✅ |
+| Tres regiones creadas el 9-sep de noche | **created_time 2026-09-09**, las tres ACTIVE ✅ |
+| A/B del colmena: video **$1.883** vs estático **$3.356** (0-AD) | **$1.892** vs **$3.364** |
+
+🔑 **Esos dos últimos números, calculados a mano en su momento y ahora reproducidos por la API con
+menos de 0,5% de diferencia, son la mejor prueba de que el método del archivo es sólido.** Y de que
+la herramienta nueva es confiable.
+
+### 🔴 HALLAZGO 1 — LA CAMPAÑA DEL COLMENA NO SE LLAMA COMO DICE EL ARCHIVO, Y ESO ESCONDIÓ EL GASTO
+
+El archivo llama al conjunto del colmena **"Domiciliarios | Colmena"**. Ese conjunto existe, está en
+la campaña de impermeables, y **gastó $83 en toda su vida.** El colmena real corrió en una **campaña
+aparte**:
+
+| Campaña | Conjunto | Gasto | Conv |
+|---|---|---|---|
+| **Colmena Premium · Prospección** | **Publico ABIERTO video** | **$93.526** | 39 |
+| **Colmena Premium · Prospección** | **Publico ABIERTO - Creativo** *(el estático)* | **$43.739** | 13 |
+| Impermeables · Prospección | ~~Domiciliarios \| Colmena~~ | $83 | 0 |
+| | **TOTAL COLMENA** | **$137.265** | **52** |
+
+📌 **Por eso ninguna búsqueda por "colmena" en el panel encontraba el gasto.** Anotar los nombres
+reales en cualquier análisis futuro.
+
+### 🔴🔴 HALLAZGO 2 — FUERON 52 CONVERSACIONES, NO 37. Y ESO ES PLATA SIN COBRAR
+
+**El dueño contó 37 en su bandeja. Meta registró 52 conversaciones iniciadas.** Son **15 de
+diferencia**, y toda la sección **0-AG está construida dividiendo por 37** (17 vacías → 20 reales →
+17 a los que escribir).
+
+⚠️ **NO ES UNA CONCLUSIÓN TODAVÍA, y hay que resistir la tentación de sacarla** — es exactamente la
+familia de error que costó 5 equivocaciones el 10-sep. Las tres explicaciones posibles:
+1. Meta cuenta "conversación iniciada" de forma más laxa que lo que aterriza en la bandeja.
+2. El conteo de 37 fue parcial (se hizo a ojo, de noche).
+3. Hay 15 conversaciones reales que nunca se vieron.
+
+🥇 **Si es (2) o (3), hay hasta 15 personas más a las que escribirles con CPA $0.** A $40.968 por
+venta, eso es la plata más barata que hay disponible. **Verificarlo es de las cosas más rentables
+del negocio ahora mismo.**
+
+### 🔴 HALLAZGO 3 — LA CAMPAÑA DEL COLMENA NO CIERRA EN +$37.060. ESTÁ A **UNA VENTA** DE POSITIVO
+
+| | |
+|---|---|
+| Gasto medido por la API | **$137.265** |
+| Ventas confirmadas | **3** |
+| Margen por venta (0-AG) | $40.968 |
+| **Resultado con lo cobrado hoy** | **3 × $40.968 − $137.265 = −$14.361** |
+| **Con una venta más** | **+$26.607** |
+
+⚠️ **Y acá aplica la lección #1 del 10-sep: la ventana está censurada.** El colmena tarda ~7 días en
+decidirse, la campaña corrió del 4 al 9-sep, y **una venta ya entró sola el 10-sep con la campaña
+apagada.** Así que **−$14.361 es la lectura de hoy, no el cierre.**
+
+🔑 **Y esto no cambia la decisión de 0-AG, la REFUERZA:** el colmena corre a **$2.640/conversación**
+contra su equilibrio de **$3.322** (79% del equilibrio), y **está a una sola venta de quedar en
+positivo.** Eso hace que escribirle a los que faltan —los 17 confirmados, y los hasta 15 en duda—
+sea *más* urgente, no menos. **No es un argumento para no prenderlo el lunes.**
+📌 **Lo que sí queda invalidado es el número +$37.060.** No se pudo reconstruir de dónde salió;
+el gasto real de la campaña es $137.265 y hay que usar ese.
+
+### 🟢 HALLAZGO 4 — LAS TRES REGIONES ARRANCARON BIEN (día 1-2, ⛔ NO ES EL VEREDICTO)
+
+Ventana **8 al 10-sep**, días cerrados. Equilibrio del tradicional: **$2.657/conv**.
+
+| Conjunto | Gasto | CPM | Conv | **$/conv** | |
+|---|---|---|---|---|---|
+| **Domiciliarios VIDEO** | $164.195 | $3.247 | 205 | **$801** | 🏆 el mejor de la cuenta |
+| Domiciliarios *(el control)* | $162.224 | $3.222 | 166 | **$977** | 🟢 |
+| TEST Creativos | $64.299 | **$6.159** | 68 | $946 | 🔔 ver hallazgo 5 |
+| **🆕 Tolima Huila** | $4.362 | $4.013 | 5 | **$872** | 🟢 **le gana al control** |
+| 🆕 Santander | $4.329 | $4.645 | 3 | **$1.443** | 🟢 bajo equilibrio |
+| Valle del Cauca | $10.535 | $4.366 | 6 | $1.756 | 🟢 bajo equilibrio |
+| 🆕 Eje Cafetero | $4.342 | $4.585 | 1 | **$4.342** | 🔴 pero **n=1** |
+| Motorizados | $49.175 | $3.745 | 44 | **$1.118** | 🟢 **bajo el gate de $1.200** |
+
+⛔ **NO TOCAR NADA. Son 1-3 conversaciones por región: cualquier lectura es ruido.** El sábado 12 es
+el día 3 y el veredicto sigue siendo el lunes 14.
+📌 **Motorizados a $1.118 está bajo el gate de $1.200**, y es mejor que el $1.970 con el que se
+justificó el recorte. **Pero esta ventana es casi toda a $15.000**, así que no prueba el $9.000.
+
+### 🔔 HALLAZGO 5 — EL CPM DE TEST CREATIVOS BAJÓ, NO SUBIÓ: LA SERIE DE #77 SE ROMPIÓ
+
+El pendiente **#77** dice que su CPM sube cada ventana: **$5.240 → $6.679 → $7.968**. La API mide
+**$6.159** en el 8-10 sep. **La tendencia se cortó.**
+📌 **La decisión no cambia** (no subirlo a $30.000, su $/conv de $946 sigue peor que el control),
+**pero el diagnóstico "su CPM sube y sube" ya no se sostiene** y hay que remirarlo el lunes.
+
+### 🧰 DOS TRAMPAS TÉCNICAS PARA CUALQUIER LECTURA FUTURA
+
+1. 🔴 **`daily_budget` viene en la unidad MENOR de la moneda. En USD son centavos; EN COP NO**, porque
+   el peso no tiene centavos. **El crudo ya está en pesos.** El script dividía por 100 y mostraba
+   Domiciliarios VIDEO en $550. **Corregido.** Verificación: la suma de los ACTIVE tiene que dar
+   $154.000; si da $1.540, está mal.
+2. ⚠️ **La API tiene límite de llamadas** y devuelve `code 4 · Application request limit reached`
+   (transitorio). **Pedir ventanas amplias en una sola llamada en vez de muchas chicas**, y si
+   aparece el error, esperar — no reintentar en bucle.
 
 **Fuentes:** export Meta por conjunto 8-9 sep · export Meta del 9-sep parcial (~2 pm) · export Meta
 del 9-sep **cerrado** · export de 99 Envíos con 54 guías del 7-8 sep (relectura) · confirmaciones del
@@ -6659,15 +6767,19 @@ $/conversación  =  CPM  ÷  (conversaciones por cada 1.000 impresiones)
 
 ## Lo primero que tiene que hacer esta sesión
 
-1. 🔑 **PROBAR EL TOKEN DE META, QUE YA EXISTE.** El dueño creó el usuario de sistema
-   **`Kiro Lectura`** con rol **Analista ("Ver rendimiento")** sobre la cuenta de BikerPro y
-   generó un token con **solo `ads_read`**, y lo guardó como secreto **`META_ADS_TOKEN`**.
+1. ✅✅ **LA LECTURA DE META YA FUNCIONA. PRIMERA LECTURA HECHA EL 11-SEP → VER SECCIÓN 0-AH.**
+   Usuario de sistema **`Kiro Lectura`**, rol **Analista ("Ver rendimiento")**, token con solo
+   **`ads_read`**. Cuenta: **`act_4330882710457791` · BikerPro · COP**.
    ```bash
-   python3 analisis/meta-api-lectura.py cuentas          # saca el act_id
-   python3 analisis/meta-api-lectura.py insights act_XXX 2026-09-08 2026-09-10
+   python3 analisis/meta-api-lectura.py cuentas
+   python3 analisis/meta-api-lectura.py conjuntos act_4330882710457791
+   python3 analisis/meta-api-lectura.py insights  act_4330882710457791 2026-09-08 2026-09-10
    ```
-   - Si `$META_ADS_TOKEN` sale vacío, el secreto no se propagó: **decirlo, no inventar métricas.**
-   - **Con esto el veredicto del lunes 14 sale de la API y el dueño no exporta nada.**
+   - El token se lee de **`$META_ADS_TOKEN`** o de **`/projects/.meta-ads-token`** (fuera del repo).
+     Si los dos están vacíos, el token no viajó a esta sesión: **decirlo, no inventar métricas.**
+   - **El veredicto del lunes 14 sale de la API. El dueño ya no exporta nada de Meta.**
+   - 🔴 **Lo más importante que salió de la primera lectura: el colmena tuvo 52 conversaciones, no
+     37**, y su gasto real fue **$137.265** → sección **0-AH**.
 2. 🔴 **SIGUE RIGIENDO 4-B: SOLO LECTURA.** Ahora es candado técnico, no solo regla: el rol
    Analista hace que Meta **rechace** cualquier escritura. El script solo sabe hacer `GET`.
 3. ⛔ **EL MCP `meta-ads` NO SE PUEDE CONECTAR EN KIRO WEB. No volver a intentarlo.** El OAuth
