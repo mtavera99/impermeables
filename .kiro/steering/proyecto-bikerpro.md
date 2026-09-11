@@ -12,10 +12,11 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 # 🧭 ÍNDICE — POR DÓNDE EMPEZAR
 
 **Si tenés 2 minutos:** leé el bloque "ESTADO VIGENTE AL 2026-08-28" y la lista de pendientes vivos.
-**Si tenés 15:** leé además las secciones 0-AF, 0-AE, 0-AD, 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
+**Si tenés 15:** leé además las secciones 0-AG, 0-AF, 0-AE, 0-AD, 0-AC, 0-AB, 0-AA, 0-Z, 0-Y y 0-X, que contienen las decisiones más recientes.
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · 🔄 **y estaba comparando promedio contra promedio: contra el peso MARGINAL del tradicional (+$0,16) el colmena rinde +$0,43 = 2,7× más** · **no pierde plata: corre al 85% de SU equilibrio** · **se vuelve a prender después del 14** con audiencia de clientes, $8-10.000/día y ventana de 14 días · **diversificar ES el plan de crecimiento** · el manual para la chaqueta reflectiva · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · **17 de 37 conversaciones estaban vacías**, y con base limpia **el colmena ATRAE mejor (45,9% vs 57,8% de vacías) y CIERRA peor (15,0% vs 19,9%)** · el CPA se descompone exacto: paga 2,6× por conversación real y cierra 1,33× peor = 3,4× · seguimiento a **17** | **10-sep** |
 | **0-AF** | 🧮 **La comisión de recaudo ya venía DENTRO del flete: se estaba restando dos veces** (todo corrige hacia arriba, #28-1 cerrado) · ⛔ **no se lee un día abierto** (la descomposición CPM ÷ conv-por-mil) · **predicción fallida: Motorizados cerró en $1.970** y su audiencia se está encogiendo (−56%) · **el colmena no fracasó, fracasó su canal** (CPM $10.062) y quedó pausado · **tres regiones nuevas de $5.000** · **cinco parches al guion** (el bot vendía con MENÚ) · colmena = la textura, no la tela · el catálogo maestro estaba viejo en 21 lugares | **9 y 10-sep** |
 | **0-AE** | 💰 **El costo bajó a $33.000** (+$752.527/mes) · el CPA nunca se deterioró: era la pauta del colmena · el video se estabilizó y empató · **la fuga de flete está solo en la promo de 2 uds** · Tadó duplica el flete · el seguro es 13,6% y da 0,85× · 3 al detal > 12 al mayor | **7 y 8-sep** |
 | **0-AD** | 🔄 **El video se deterioró (+14,4%)** · TEST Creativos nuevo ganador $541 · el A/B lo ganó el video · el colmena no estaba caro, la conversación estaba rota · Meta One se paga | **4 al 6-sep** |
@@ -43,6 +44,7 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 | 5-B | 🤖 La IA de WhatsApp que sí atiende (Meta AI, no el bot) | 14-ago |
 | **9** | 📋 **PENDIENTES PRIORIZADOS — la lista de trabajo** | vivo |
 | **11** | 📚 **MANUAL OPERATIVO DE META ADS** — reglas aprendidas | vivo |
+| **12** | 🗒️ **BITÁCORAS DE SESIÓN — 👉 SI SE PERDIÓ UN CHAT, EMPEZÁ ACÁ.** Cómo se llegó a las conclusiones, **en qué me equivoqué**, qué quedó abierto y los checkpoints acordados | vivo |
 
 **Documentos aparte (fuera de este archivo):**
 `GUION-PARA-PEGAR.md` (el guion listo para la IA) · `TARIFARIO-Y-GUION.md` (el tarifario explicado) ·
@@ -101,7 +103,7 @@ sandbox corre en UTC y puede marcar el día siguiente)*
 | **Domiciliarios VIDEO** | **$55.000** | VIDEO | Med+Bog | 🟢 $947 al cierre del 9-sep. **No tocar** |
 | **Domiciliarios** | **$45.000** | Fondo azul | Med+Bog | 🟢 $911 al cierre. Es **el control** de todo. No tocar |
 | **TEST Creativos** | $25.000 | Prueba social | Med+Bog | 🥇 mejor creativo, **peor subasta** (CPM $7.968). ⛔ NO subir a $30.000 → **#77** |
-| **Motorizados** | **$9.000** | Fondo azul | Med+Bog | 🔴 bajado de $15.000 el 10-sep (cerró $1.970, audiencia encogiéndose). Gate lunes 14 |
+| **Motorizados** | **$9.000** ⚠️ | Fondo azul | Med+Bog | 🔴 **recorte RECOMENDADO el 10-sep, NUNCA CONFIRMADO como ejecutado** (cerró $1.970, audiencia encogiéndose). **Verificar antes del gate del 14** — si sigue en $15.000 la cuenta está en $160.000, no en $154.000 |
 | Domiciliarios \| Valle del cauca | **$5.000** | Fondo azul | Valle del Cauca | 🟢 podado el 9-sep: 21% → **69%** de utilización, $5.157 → **$1.379** |
 | 🆕 **Domiciliarios \| Santanderes** | **$5.000** | Fondo azul | Santander + N. de Santander | creado 9-sep noche. Aprendizaje |
 | 🆕 **Domiciliarios \| Eje Cafetero** | **$5.000** | Fondo azul | Risaralda + Quindío + Caldas | creado 9-sep noche. Aprendizaje |
@@ -245,13 +247,32 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 ## ⚠️ ALARMAS VIVAS
 
 > **🆕🆕 AL 10-SEP (0-AF) — ESTAS SON LAS VIGENTES:**
-> - 🟢 **EL REPRESADO BAJÓ.** El dueño reporta novedades resueltas y poco represado. Descarga buena
->   parte de **#74** y **#75**, pero **falta el número de cuánto se recuperó** para bajarlos de acá
-> - 🔴 **$573.291 CONTRAENTREGA sin recoger** (mayoreo a Granada, guía **240060772823**, en "Creado"
->   desde el 7-sep). Es la exposición más grande en una sola guía del proyecto → **#92**
-> - 🔔 **Las 2 guías del colmena son la primera medición de rechazo a $149.900:**
->   **240060773268** (San Francisco) y **64532758224** (Puerto Gaitán). Y **hay que confirmar que la
->   segunda sí es colmena** — venía etiquetada como "impermeable"
+> - 🎉 **CERRADAS COBRADAS (export de 141 guías, 0-AF):** el mayoreo de Granada **$573.291 ENTREGADO**
+>   (#92) y el **colmena de San Francisco ENTREGADO** — primera medición de rechazo a $149.900 y
+>   **no hubo rechazo**
+> - 🟢 **EL RECHAZO REAL ES 5,0%**, no 15,3% (que era de la época de Heka). 10× de colchón
+> - 🟢 **Y EL 5,0% NO ES SUERTE: ES GESTIÓN DIARIA DEL DUEÑO.** Las 15 guías en "Reclame en oficina"
+>   ($1.540.000) y las de "Intento de entrega" **ya fueron llamadas Y contactadas por WhatsApp el
+>   mismo 10-sep**, y el dueño confirma que revisa las novedades **todos los días** (venía de ~30
+>   acumuladas y bajó mucho). 🔑 **Eso convierte #75 de "pendiente" en "rutina funcionando", y es la
+>   causa del rechazo bajo** — si se dejara de hacer, el 5,0% subiría y el seguro (hoy 0,24×) volvería
+>   a tener sentido. **NO se puede apagar el seguro Y aflojar la gestión al mismo tiempo.**
+> - 🔔 **EL SEGURO DA 0,24×, NO 0,85×.** Cuesta $460.365 por 141 guías y ahorró $110.625. Se paga
+>   solo si el rechazo pasa de **~21%**; está en 5,0%. **La pregunta es si se puede apagar** → **#91**
+> - 🔴 **EL CHARCO: −$28.663 en UNA guía.** Cobró $59.900 (precio sin envío) contra un flete de
+>   $55.563. Mismo patrón que Guachucal y Tadó: **el guion se equivoca en los destinos raros** → **#97**
+> - ⚠️ **Puerto Gaitán (64532758224) sigue sin confirmar si es colmena** — dice "impermeable" y cobra
+>   $149.900 exactos. Solo el dueño puede confirmarlo
+> - 💎 **EL COLMENA VENDIÓ SOLO, CON LA CAMPAÑA APAGADA, Y PREPAGADO** (0-AG): la campaña cerró en
+>   **+$37.060** y no en −$3.908. Era un lead **de la propia campaña**, no del upsell, así que
+>   **los chats que quedaron son esa misma población**. Universo real: **17 personas** (de 37
+>   conversaciones, **17 vacías contadas por el dueño**), con retorno espontáneo de **5,9%**. Guion listo
+>   en `SEGUIMIENTO-COLMENA-10SEP.md` → **#96**
+> - 🔔 **EL UPSELL DEL COLMENA SIGUE SIN MEDIR.** Esta venta no lo prueba. No contarla como evidencia
+> - ✅ **DECISIÓN 10-SEP: LA CAMPAÑA DEL COLMENA SE VUELVE A PRENDER DESPUÉS DEL VEREDICTO DEL 14**,
+>   con **audiencia de clientes propios**, **$8-10.000/día** y **ventana de 14 días**, medida contra
+>   **su** equilibrio de **$3.322/conversación**. Motivo: contra el peso **marginal** del tradicional
+>   (+$0,16 a $154.000/día) el colmena devuelve **+$0,43** → **0-AG**
 > - 🔴 **MOTORIZADOS SE ESTÁ ENCOGIENDO**, no está topado: conv/mil 4,04 → **1,77 (−56%)** con CPM
 >   normal. Bajado a $9.000. **Gate el lunes 14: sobre $1.500 se apaga** → **#93**
 > - 🔔 **TEST CREATIVOS: CPM $7.968 = 2,4× la cuenta, y subiendo** ($5.240 → $6.679 → $7.968).
@@ -307,21 +328,30 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 1. ⛔⛔ **NO TOCAR NINGÚN PRESUPUESTO HASTA EL SÁBADO 12, Y NO DECIDIR NADA HASTA EL LUNES 14.**
    Y **no sacar exports de un día suelto:** mínimo 3 días cerrados. En 24 h se movieron tres
    regiones, Valle, Motorizados, el colmena y cinco parches al guion → **0-AF**
-2. 📦 **RASTREAR LAS TRES GUÍAS.** La de Granada (**240060772823**, $573.291 contraentrega, en
-   "Creado" desde el 7-sep) y las dos de colmena (**240060773268** y **64532758224**), que son la
-   primera medición de rechazo a $149.900. **Y confirmar que la segunda sí es colmena** → **#92**
-3. 🧪 **CONFIRMAR QUE LOS CINCO PARCHES DEL GUION QUEDARON.** Faltan de probar los dos que sangran:
+2. 💬🥇 **RETOMAR LOS ~34 CHATS DEL COLMENA — CADA VENTA VALE $40.968 CON CPA $0.**
+   Ya está probado que se cierran solos días después. Uno por uno, con contexto, **no un
+   copiar-pegar el mismo día**. Es la plata más barata que hay hoy → **#96**
+3. 📞 **EMPUJAR LAS 15 GUÍAS DE "RECLAME EN OFICINA" ($1.531.000) — 11 llevan 6+ días.**
+   No es solo cobrar: **esas guías deciden la tasa de rechazo del negocio** (5,0% hoy, 32,1% si
+   todas se caen) → **#75**
+4. 🛡️ **PREGUNTARLE A 99 ENVÍOS SI EL SEGURO SE PUEDE APAGAR.** Da **0,24×**: cuesta $460.365 por
+   141 guías y ahorró $110.625. Se paga solo con rechazo sobre ~21% y está en 5,0% → **#91**
+5. 🔴 **ARREGLAR EL GUION PARA LOS DESTINOS RAROS.** El Charco perdió **$28.663** en una guía por
+   cobrar $59.900 sin envío. **Si la ciudad no está en la tabla, no se cotiza: se escala** → **#97**
+6. ⚠️ **CONFIRMAR SI LA GUÍA DE PUERTO GAITÁN (64532758224) ES COLMENA.** Dice "impermeable" y cobra
+   $149.900 exactos. Solo el dueño puede saberlo, y de eso depende la cuenta del canal
+7. 🧪 **CONFIRMAR QUE LOS CINCO PARCHES DEL GUION QUEDARON.** Faltan de probar los dos que sangran:
    escribir **"está muy caro"** (no debe ofrecer descuento de entrada, tope $3.000, nunca bajar el
    precio del producto) y **"soy de Tadó"** (debe dar $93.000) → **#95**
-4. ▪ **CONSEGUIR LOS EXPORTS HISTÓRICOS CON TELÉFONO (99 Envíos Y Heka).** Es lo único que
+8. ▪ **CONSEGUIR LOS EXPORTS HISTÓRICOS CON TELÉFONO (99 Envíos Y Heka).** Es lo único que
    desbloquea la audiencia del colmena; sin eso el plan queda parado en el paso 1 → **#88**
-5. 📞 **EL EXTRACTO DE LA GUÍA DE TADÓ: $36.667 de descuadre.** (La otra llamada, la del % de
+9. 📞 **EL EXTRACTO DE LA GUÍA DE TADÓ: $36.667 de descuadre.** (La otra llamada, la del % de
    comisión, **ya no hace falta**: el dato salió de los propios datos y #28-1 quedó cerrado) → **#90**
-6. 🎨 **CORREGIR LOS CREATIVOS EN VIVO: dicen "S a 2XL" y hay 3XL**, y no anuncian el azul. Y la
+10. 🎨 **CORREGIR LOS CREATIVOS EN VIVO: dicen "S a 2XL" y hay 3XL**, y no anuncian el azul. Y la
    foto `colores.png` muestra 5 colores. ⏸️ **El lunes 14, no antes** → **#94**
-7. ⛔ **TEST CREATIVOS NO SUBE A $30.000.** Su problema es la subasta, no el presupuesto: CPM $7.968
+11. ⛔ **TEST CREATIVOS NO SUBE A $30.000.** Su problema es la subasta, no el presupuesto: CPM $7.968
    (2,4× la cuenta). **La palanca es audiencia propia** → **#77**
-8. ⛔ **NO TOCAR DOMICILIARIOS NI EL VIDEO.** Son el control con el que se miden las tres regiones
+12. ⛔ **NO TOCAR DOMICILIARIOS NI EL VIDEO.** Son el control con el que se miden las tres regiones
    y Motorizados en la misma ventana → **0-AF**
 
 *(la lista del 8-sep, ya ejecutada casi completa, se conserva abajo)*
@@ -1751,27 +1781,410 @@ pregunta por color).
 `colores.png` (muestra 5 colores, no 6). Editar un anuncio le reinicia el aprendizaje y hay tres
 regiones midiendo.
 
-### 🟢 LOGÍSTICA: EL REPRESADO BAJÓ (dueño, 10-sep)
+### 🟢 EL EXPORT DE 141 GUÍAS (2 al 10-sep) — LAS TRES ALARMAS SE CIERRAN COBRADAS
 
-El dueño reporta que **las novedades se resolvieron y queda muy poco represado**, con más entregas
-saliendo. Eso descarga buena parte de **#74** y **#75** (los $3,1 M de las alarmas), **pero falta el
-número de cuánto se recuperó** para bajarlo formalmente de la lista.
+**Primer export que cubre nueve días seguidos.** Script: `analisis/envios-completos-10sep.py`,
+datos en `analisis/envios-completos-10sep.csv`.
 
-**Guías a rastrear (del export del 7-8 sep):**
+| Qué estaba en el aire | Guía | **Estado real** |
+|---|---|---|
+| 🔴 **Mayoreo Granada** — $573.291 contraentrega, la exposición más grande del proyecto | 240060772823 | 🟢 **ENTREGADA** |
+| 💎 **Colmena · San Francisco** | 240060773268 | 🟢 **ENTREGADA** |
+| 💎 Colmena · Puerto Gaitán | 64532758224 | En terminal de destino |
 
-| Qué | Guía | Transportadora | Recaudo | Último estado visto |
+🎉 **#92 SE CIERRA COBRADA.** Los $573.291 entraron. *(La lección de cobrar el mayoreo por
+transferencia sigue viva para el próximo: se ganó, no se acertó.)*
+🎉 **PRIMERA MEDICIÓN DE RECHAZO A $149.900 CONTRAENTREGA: NO HUBO RECHAZO.**
+⚠️ **Puerto Gaitán sigue sin confirmar:** dice `impermeable`, no `impermeable colmena`, y cobra
+$149.900 exactos. El único que puede confirmarlo es el dueño.
+
+### 📦 EL RECHAZO REAL ES 5,0%, NO 15,3% — Y EL DATO ES DURO
+
+| | |
+|---|---|
+| Guías **resueltas** (entregada o devuelta) | **60** |
+| Entregadas | 57 |
+| **Devoluciones ratificadas** | **3** |
+| **RECHAZO** | **5,0%** |
+
+El archivo venía usando **15,3%** (auditoría 0-G, de agosto, **con Heka**). Con 99 Envíos +
+Interrapidísimo es **5,0%**, y el break-even es ~49%: **10× de colchón.**
+
+⚠️ **CAVEAT, y es grande:** hay **15 guías en "Reclame en oficina"** y **9 en "Intento de entrega"**
+sin resolver. Si TODAS se cayeran el rechazo subiría a **32,1%**. **Ese es exactamente el valor de
+#75:** no es cobrar plata parada, es que esas guías **deciden la tasa de rechazo del negocio.**
+
+### 🛡️ RESUELTO #91: UNA DEVOLUCIÓN NO PAGA FLETE — PAGA SOLO EL SEGURO
+
+| Ciudad | Recaudo | `valor_servicio` | `seguro` |
+|---|---|---|---|
+| Palmar de Varela | $85.000 | **$3.162,00** | $3.162 |
+| Barranquilla | $81.000 | **$3.124,00** | $3.124 |
+| Bogotá | $73.000 | **$1.754,00** | $1.754 |
+
+🔑🔑 **En las tres, `valor_servicio` es EXACTAMENTE igual al seguro.** En una devolución 99 Envíos
+**no cobra flete, ni siquiera la ida.** Eso es lo que compra el seguro, y ahora está medido:
+
+| | |
+|---|---|
+| Costo del seguro en las 141 guías | **$460.365** |
+| Ahorro en las 3 devoluciones (vs. pagar ida y vuelta) | **$110.625** |
+| **Relación ahorro/costo** | **0,24×** 🔴 |
+
+**El seguro se paga a partir de ~12,5 devoluciones en 141 guías = ~21% de rechazo.**
+El rechazo real es **5,0%**.
+
+📌 **#91 QUEDA RESUELTO CON NÚMERO EXACTO: al rechazo actual, el seguro NO se paga.** El 0,85× de
+0-AE era optimista; con datos duros es **0,24×**. **La pregunta a 99 Envíos ya no es "¿cuánto
+cubre?" sino una sola: ¿SE PUEDE APAGAR?** Son ~$2,7 M/mes comprando una cobertura que se usa 4×
+menos de lo que cuesta.
+⚠️ **Pero no apagarlo a ciegas:** el escudo vale poco *porque el rechazo es bajo*, y el rechazo es
+bajo *en parte* porque la operación está limpia. Si se apaga, el gatillo de re-encenderlo es
+**rechazo sobre 21%**.
+
+### 🔴 UNA FUGA NUEVA, Y NO ES TADÓ: EL CHARCO PERDIÓ $28.663 EN UNA GUÍA
+
+| Ciudad | uds | Cobrado | Flete | **Margen** |
 |---|---|---|---|---|
-| 🔴 **Mayoreo Granada** (Edwar Mena) | **240060772823** | Interrapidísimo | **$573.291** contraentrega | "Creado" al 8-sep = **sin recoger** |
-| 💎 Colmena · San Francisco (Eddy Rodriguez) | **240060773268** | Interrapidísimo | $149.900 | "Admitida" |
-| 💎 Colmena · Puerto Gaitán (Eduar A. Pérez) | **64532758224** | Coordinadora | $149.900 | "En terminal de origen" |
+| **EL CHARCO** (Nariño) | 1 | **$59.900** | **$55.563** | **−$28.663** 🔴 |
+| Tadó | 2 | $143.000 | $71.667 | +$5.333 |
+| Tadó | 1 | $85.000 | $32.510 | +$19.490 |
 
-⚠️ **La segunda de colmena venía etiquetada como "impermeable", no "impermeable colmena"** — se
-identificó por el precio exacto. **Hay que confirmar que sí es colmena**, porque si no, solo existe
-**una** venta de colmena y toda la cuenta del canal empeora.
+🔑 **Cobró $59.900, que es el precio SIN envío.** No es un problema de tarifa: **la venta se cerró
+sin sumarle el flete**, y le tocó justo el destino más caro de las 141 guías (El Charco es por río).
 
-📌 **Las dos guías de colmena son la primera medición de rechazo a $149.900 contraentrega.** Si las
-dos se entregaron y pagaron, es señal buena para el plan de tres canales. Si una se devolvió, hay que
-replantear.
+📌 **Es el mismo patrón de Guachucal ($85.511) y de Tadó: el guion se equivoca en los destinos
+raros, que es donde más cuesta.** Los tres casos son la misma falla, no tres incidentes.
+**→ Regla para el guion: si la ciudad no está en la tabla, NO se cotiza — se escala al dueño.**
+
+### 🔔 EL SHARE DE 2 UNIDADES SUBIÓ A 30% — PERO NO SE CANTA VICTORIA
+
+| Fecha | Guías | Múltiples | Share | |
+|---|---|---|---|---|
+| 2-sep | 32 | 5 | 15,6% | |
+| 3-sep | 24 | 8 | 33,3% | |
+| 4-sep | 11 | 2 | 18,2% | |
+| 7-sep | 36 | 7 | 19,4% | |
+| 8-sep | 15 | 1 | **6,7%** | el piso |
+| **9-sep** | 6 | 2 | **33,3%** | 🆕 con el bloque pegado |
+| **10-sep** | 14 | 4 | **28,6%** | 🆕 con el bloque pegado |
+
+**Antes del bloque (2-8 sep): 19,5%** (n=118) · **después (9-10 sep): 30,0%** (n=20).
+
+⚠️⚠️ **Y se aplica la regla propia de esta misma sección: "oscilación es ruido, monotonía es
+tendencia".** La serie **oscila**: 16% → 33% → 18% → 19% → 7% → 33% → 29%. **El 3-sep ya marcó
+33% SIN el bloque.** Con n=20, esto es compatible con que el bloque funcione **y** con puro ruido.
+📌 **El dato bueno es el lunes 14 con la semana cerrada.** *(Y el 15,7% que se venía citando era de
+una ventana más corta: el promedio real del 2 al 8 era 19,5%.)*
+
+### 💰 LA VENTANA COMPLETA, CON EL MODELO CORREGIDO
+
+| | |
+|---|---|
+| Pedidos del tradicional | **138** |
+| Unidades | 168 (**1,22** por pedido) |
+| Margen bruto ($26.900×u − flete) | $4.162.125 |
+| Menos pauta (138 × $7.674) | −$1.059.012 |
+| **UTILIDAD DE LA VENTANA (9 días)** | **$3.103.113** |
+| **por pedido** | **$22.486** |
+
+⚠️ **Es utilidad devengada, no caja:** 24 guías todavía pueden caerse.
+
+---
+
+## 0-AG. 💎 LA TERCERA VENTA DEL COLMENA LLEGÓ CON LA CAMPAÑA APAGADA — Y CORRIGE MI VEREDICTO (2026-09-10)
+
+**Reporte del dueño, con la conversación revisada:** una persona que había escrito **días antes,
+cuando la publicidad del colmena estaba prendida**, volvió **hoy por su cuenta**, preguntó por el
+colmena, dijo que lo quería y **pagó anticipado los $149.900**. Nadie le escribió, nadie le vendió.
+La campaña está pausada desde el 9-sep. Script: `analisis/colmena-venta-rezagada.py`.
+
+🔑 **EL ORIGEN IMPORTA Y ESTÁ CONFIRMADO: era un lead de la CAMPAÑA DEL COLMENA, no del upsell.**
+
+| Lo que esto **NO** es | Lo que **SÍ** es |
+|---|---|
+| ⛔ **No es evidencia de que el upsell funcione.** El bloque no tuvo nada que ver: sigue **sin medir** | ✅ Una venta **atribuible al gasto de la campaña pausada** |
+| ⛔ **No es evidencia de que el guion venda.** El cliente llegó resuelto | ✅ **Demanda del PRODUCTO**, no del argumento: el colmena se vende solo si se le da tiempo |
+
+📌 **Y por lo tanto las conversaciones que quedaron NO son leads muertos: son la misma población que
+acaba de producir una venta sola, sin seguimiento, sin recordatorio y sin descuento.**
+
+### ✅ CONFIRMADO POR EL DUEÑO (10-sep): 37 CONVERSACIONES Y **3 VENTAS**
+
+**Puerto Gaitán SÍ es un colmena** — solo quedó mal etiquetado en la guía. Y las 37 son el total de
+los días que la campaña estuvo prendida.
+
+### ✅ EL DUEÑO CONTÓ LA BANDEJA: ~17 VACÍAS DE 37 — Y ESO CIERRA EL CASO DEL COLMENA
+
+Script: `analisis/colmena-cierre-base-limpia.py`. **Por primera vez se puede comparar colmena contra
+tradicional sobre la MISMA base.**
+
+| | Colmena | Tradicional |
+|---|---|---|
+| Conversaciones | 37 | — |
+| **% vacías** | **45,9%** (17) | 57,8% (0-K) |
+| **% que sí escribe** | **54,1%** 🟢 | 42,2% |
+
+🔑 **PRIMER HALLAZGO, Y ES NUEVO: EL COLMENA TIENE MENOS FANTASMAS.** Su anuncio **filtra mejor** —
+un aviso de $149.900 espanta al curioso **antes** del clic. **Eso es una ventaja del colmena.**
+
+| Cierre, sobre... | Colmena | Tradicional | |
+|---|---|---|---|
+| **TOTALES** | 8,1% | 8,4% | empate |
+| **REALES** | **15,0%** | **19,9%** | 🔴 **gana el tradicional (1,33×)** |
+
+🔑🔑 **SEGUNDO HALLAZGO, Y ME CORRIGE OTRA VEZ.** Dije *"el colmena cierra casi igual que el
+tradicional"*. Sobre conversaciones **reales** el tradicional cierra **19,9% contra 15,0% = 33%
+mejor.** Y ahora se entiende **por qué parecían empatados sobre totales: los dos efectos se
+cancelaban.**
+
+> **EL COLMENA ATRAE MEJOR Y CIERRA PEOR.**
+
+**Y la descomposición del CPA por fin cuadra exacto:**
+
+| | Colmena | Tradicional |
+|---|---|---|
+| $ por conversación **real** | **$4.292** | $1.678 |
+| ÷ cierre sobre reales | 15,0% | 19,9% |
+| **= CPA por venta** | **$28.614** ✓ | $8.429 |
+
+*(chequeo: $85.843 ÷ 3 = $28.614. Cuadra.)*
+
+🔑 **EL COLMENA PIERDE POR LOS DOS LADOS: paga 2,6× más por cada conversación real Y cierra 1,33×
+peor cuando la tiene. 2,6 × 1,33 = 3,4× de desventaja en CPA.**
+📌 **Pero de los dos, el que se puede arreglar es el primero:** el costo por conversación **es CPM, y
+el CPM es audiencia** (#77). El cierre del 15% ya es lo que es a $149.900 — **no está roto, es el
+precio.**
+📌 **Y refuerza 0-AD** (*"el colmena no estaba caro, la conversación estaba rota"*): con base limpia
+sigue siendo la conversación.
+
+⚠️ **TAMAÑO DE MUESTRA, obligatorio decirlo:** 3 ventas sobre 20 conversaciones reales. **El
+intervalo al 95% de ese 15% va de ~3% a ~38%**, o sea que es compatible con "mucho peor" y con
+"mejor" que el tradicional. **La dirección informa; el número no.**
+⚠️ **Y el 57,8% del tradicional es de agosto (n=90) y nunca se volvió a medir.** Si hoy fuera 45%, el
+tradicional cerraría 15,3% sobre reales y **la brecha se cerraría**. → **Vale contar vacías del
+tradicional una semana.**
+
+### 📋 EL PROTOCOLO DE SEGUIMIENTO — `SEGUIMIENTO-COLMENA-10SEP.md`
+
+A la pregunta del dueño *"¿le enviamos un mensaje a todos?"*: **NO a todos, y no el mismo día.**
+
+| | |
+|---|---|
+| **A cuántos** | **17** (37 − 17 vacías − 3 que compraron) |
+| **Ritmo** | **6 por día, tres días**, espaciados, 7-9 am o 6-9 pm |
+| **El mensaje** | **no argumenta, no convence, no insiste** — solo avisa que sigue disponible |
+| **Si no contesta** | **nada.** No hay segundo mensaje |
+| **Tiempo total** | ~25 minutos |
+
+🔑 **El mensaje no vende porque el hallazgo de hoy es que el que quiere llega decidido y paga.**
+
+| Escenario | Ventas | Plata |
+|---|---|---|
+| Piso *(lo que ya daba haciendo nada)* | 1 | $40.968 |
+| **Base** | **2** | **$81.936** |
+| Bueno | 3 | $122.904 |
+
+**$189.083 por hora en el escenario base**, sin gastar un peso de pauta.
+
+⛔ **LA ASIMETRÍA ES LO QUE MANDA EL RITMO: arriba hay ~$82.000; abajo está el negocio entero.** Un
+mensaje idéntico a 30 números el mismo día es el patrón que WhatsApp lee como difusión → reportes →
+número bloqueado, y el 313 861 5813 no es *un* canal: es **el** canal.
+✅ **Responder dentro del hilo que el cliente abrió es seguro** — no es mensaje frío. El riesgo está
+en el volumen y en el copiar-pegar.
+📌 **No interfiere con el veredicto del lunes 14** porque no toca la pauta — **siempre que las ventas
+de colmena se anoten aparte** de las del tradicional (#81).
+
+### ⚖️ ME EQUIVOQUÉ EN EL VEREDICTO DE #85, Y POR UN ERROR QUE YO MISMO YA TENÍA ESCRITO
+
+| | Con 2 ventas | **Con 3** |
+|---|---|---|
+| Cierre sobre 37 conversaciones | 5,4% | **8,1%** |
+| Margen total | $81.935 | **$122.903** |
+| **Contra el gasto de $85.843** | **−$3.908** 🔴 | **+$37.060** 🟢 |
+
+🔑 **Dije "no cubrió, se apaga". SÍ CUBRIÓ.** Y el argumento central se cae solo: dije *"necesita
+cerrar 6,9-7,9% y cierra 5,4%"*. **Cierra 8,1%, y el tradicional cierra 8,4%.**
+**El colmena cierra casi igual que el tradicional.**
+
+**Por qué me equivoqué:** el 9-sep escribí que *"el gasto se cuenta al instante y las conversaciones
+se atribuyen después, así que un día abierto sale inflado"* — y **apliqué esa regla al CPM pero no a
+las VENTAS.** Es el mismo sesgo un escalón más abajo del embudo.
+
+🔑 **EL COLMENA TIENE CICLO DE VENTA MÁS LARGO, Y TIENE QUE TENERLO: son $149.900 contra $81.000.**
+Esta venta tardó **~7 días**. Cerrar su gate a los 5 días fue **medir un producto de decisión lenta
+con el reloj de uno de decisión rápida**: la ventana estaba censurada y el número salió bajo por
+construcción.
+
+📌 **REGLA NUEVA: el colmena no se juzga con menos de 10-14 días cerrados.** El tradicional sí,
+porque se decide en el día. **El ticket define la ventana de medición.**
+
+### 🚦 ¿SE VUELVE A PRENDER? NO — PERO POR LA RAZÓN BUENA, Y ESO CAMBIA EL GATILLO
+
+| | Colmena | Tradicional |
+|---|---|---|
+| Margen por pedido | $40.968 | $30.160 |
+| CPA real | **$28.614** | **$7.674** |
+| Utilidad limpia | $12.353 | **$22.486** |
+| **Margen por $1 de pauta** | **1,43×** | **3,93×** |
+
+🔑 **EL COLMENA NO PERDÍA PLATA: RENDÍA MENOS.** Cada peso de pauta en el tradicional devuelve
+**2,7× más**. Con presupuesto limitado se apaga igual — **pero por costo de oportunidad, no por
+pérdida.** Y eso es una conclusión distinta, con una consecuencia distinta:
+
+**EL GATILLO PARA REACTIVARLA YA NO ES "QUE SEA RENTABLE" (ya lo es). ES "QUE EMPATE CON EL TRADICIONAL":**
+
+| Objetivo | Hoy |
+|---|---|
+| CPA **$10.424** | $28.614 |
+| **$845 por conversación** | $2.838 |
+
+**Hay que bajar el costo de conversación 3,4×.** Eso **no lo da más presupuesto** (su CPM era $10.062
+= 2,7× la cuenta): lo da **audiencia propia**. El plan de tres canales de 0-AF sigue en pie, ahora
+con un número concreto al que apuntar.
+
+### ⚠️ Y MI PROPIO 1,43× TAMBIÉN ESTÁ CENSURADO — LOS LIBROS DE ESA CAMPAÑA SIGUEN ABIERTOS
+
+Si los leads de esa campaña **siguen** convirtiendo, su CPA sigue bajando. **El 1,43× es un piso, no
+el número final.** Sería el mismo error dos veces darlo por cerrado:
+
+| Ventas | CPA | Utilidad total | Margen por $1 de pauta |
+|---|---|---|---|
+| 2 | $42.922 | −$3.908 | 0,95× |
+| **3** | **$28.614** | **+$37.060** | **1,43×** ← hoy |
+| 4 | $21.461 | +$78.027 | 1,91× |
+| 5 | $17.169 | +$118.995 | 2,39× |
+| 6 | $14.307 | +$159.963 | 2,86× |
+| **8,2** | $10.424 | — | **3,93×** ← empate con el tradicional |
+
+🔑 **LA CONCLUSIÓN QUE SÍ AGUANTA:** empatar con el tradicional exigiría **8,2 ventas de 37
+conversaciones = 22% de cierre**, que no es plausible. **Aunque entren 2 o 3 ventas más, el colmena
+no empata.** *"Rendía menos"* se sostiene; lo que se suaviza es **cuánto** menos.
+
+📌 **PERO EL DIAGNÓSTICO CAMBIA DE NOMBRE, Y ESO SÍ CAMBIA LA OPERACIÓN:** no es *"el colmena
+fracasó"*, es **"el colmena es un producto de cola larga"**. Y a un producto de cola larga **no se le
+mide la pauta a 5 días, ni se le tiran los leads a la basura a los 5 días: se le hace seguimiento.**
+
+### 💰 LO QUE SÍ CAMBIA HOY
+
+1. 🥇 **LOS ~34 CHATS DEL COLMENA QUE NO CERRARON SIGUEN VIVOS.** Esta venta lo prueba: **el CPA de
+   esas conversaciones ya está pagado y hundido.** Cada venta que salga de ahí entra con **CPA $0** y
+   vale **$40.968 limpios**. Tres más = **$122.903**.
+   ✅ **Es legítimo escribirles: ellos escribieron primero.** No es mensaje no solicitado, es retomar
+   una conversación abierta.
+   ⛔ **Uno por uno y con contexto. NO un copiar-pegar a los 34 el mismo día** — eso sí dispara
+   reportes, y ese número **es** el canal de ventas completo. → **#96**
+2. 🥈 **EL PAGO ANTICIPADO FUNCIONA A $149.900.** Primero a ese precio. En el producto de mayor
+   exposición **borra el riesgo de rechazo completo** y ahorra la comisión de recaudo.
+   ✅ **Ofrecerlo como opción normal para el colmena.** ⛔ **Sin descuento:** el beneficio del prepago
+   es ~$4.052 y descontar $4.000 lo regala entero (parche D de 0-AF).
+3. 🥉 **Ya hay 3 compradores de colmena identificados.** Semilla del lookalike. Con 3 no alcanza,
+   pero el contador corre: **anotarlos aparte en la hoja** → **#81**.
+
+### 🔄 REVISIÓN DEL 10-SEP POR LA NOCHE: ESTABA COMPARANDO PROMEDIO CONTRA PROMEDIO
+
+**El dueño reencuadró la pregunta, y el reencuadre es correcto:**
+
+> *"No se trata de decir este es mejor o este es peor. Lo que quiero es diversificar mis productos y
+> ganar plata de los dos. No importa si me gano $20.000, $30.000 o $50.000 con el colmena, desde que
+> me deje plata."*
+
+Yo venía respondiendo **"¿cuál producto es mejor?"**, y para eso comparar promedios está bien. Pero la
+pregunta real es **"¿dónde va el próximo peso?"**, y para eso hay que comparar **MARGINALES**.
+Script: `analisis/colmena-marginal-vs-promedio.py`.
+
+| | Lo que comparé | Lo que había que comparar |
+|---|---|---|
+| Tradicional | promedio **3,93×** | **peso marginal a $154.000/día: +$0,16** |
+| Colmena | promedio 1,43× | **su peso: +$0,43** |
+
+🔑🔑 **EL PESO DEL COLMENA RINDE 2,7× MÁS QUE EL PESO MARGINAL DEL TRADICIONAL. LA CONCLUSIÓN SE
+INVIERTE.** El promedio del tradicional incluye sus primeros pesos, que son los más rentables de
+todos — **pero el peso que se le quitara al colmena no va al promedio, va al margen**, y ahí el
+tradicional está en **la parte plana de su curva** (elasticidad 0,63, utilidad plana entre $125.000 y
+$200.000). El colmena arranca en su propia curva desde cero.
+
+⚠️ **Caveat:** la curva de 0-W salió de un solo escalón y con el margen viejo. **Lo robusto es su
+forma, no el +$0,16 exacto.** Para que el tradicional ganara, su peso marginal tendría que devolver
++$0,43, que es el **72% de lo que devolvía cuando la cuenta estaba en $98.000/día** — o sea que el
+peso 154.000 tendría que rendir casi como el peso 98.000, y toda la evidencia dice lo contrario.
+
+### 🟢 ¿PIERDE PLATA EL COLMENA? NO. PERO CORRE SIN COLCHÓN
+
+**El gate correcto es SU equilibrio, no el tradicional.** Esa es la consecuencia práctica de que el
+objetivo sea diversificar y no ganar una carrera.
+
+| | Colmena | Tradicional |
+|---|---|---|
+| $/conversación de **equilibrio** | **$3.322** | $2.533 |
+| $/conversación real (**su peor día**, CPM $10.062) | **$2.838** | $708 |
+| **% del límite** | **85%** 🔔 | 28% |
+| Colchón | 1,17× | 3,58× |
+
+🟢 **NUNCA CRUZÓ SU PROPIO EQUILIBRIO, ni en su peor día.** El problema no es que pierda: es que
+**corre al 85% del límite** contra el 28% del tradicional. **Eso es lo que hay que arreglar, y es
+distinto de "no funciona".**
+
+### ✅ DECISIÓN: SE VUELVE A PRENDER — PERO NO IGUAL, Y NO HOY
+
+**El error no fue prenderla: fue cómo estaba armada.** Tres cambios, y el gate nuevo:
+
+1. 🎯 **AUDIENCIA DE LOS PROPIOS CLIENTES, no público frío.**
+   ⚠️ **Y el mecanismo NO es bajar el CPM** — una audiencia chica suele tener CPM **más alto**.
+   **El mecanismo es el CIERRE:** ya te compraron (confianza hecha), son motociclistas confirmados
+   (no "interesados en motos"), y el colmena es literalmente el upgrade de lo que tienen.
+   | Si el cierre es… | CPA | Utilidad por venta |
+   |---|---|---|
+   | 1,5× (12,2%) | $23.335 | **$17.633** |
+   | 2,0× (16,2%) | $17.501 | **$23.467** |
+   | 2,5× (20,3%) | $14.001 | **$26.967** |
+   *(todo al mismo $2.838 por conversación, sin mejorar el CPM en nada)*
+2. 💵 **PRESUPUESTO CHICO: $8.000-10.000/día, no $20.000.** La audiencia son ~450 personas y **se
+   agota**: meterle $20.000 la quema en días y el CPM se dispara — **que es exactamente lo que pasó.**
+   **Audiencia chica, presupuesto chico.**
+3. ⏳ **VENTANA DE 14 DÍAS, NO DE 5.** Está demostrado que tarda ~7 días en cerrar una venta.
+
+📌 **Y se mide contra su propio equilibrio de $3.322/conversación.** No contra el tradicional.
+
+### 🔑 Y EL ARGUMENTO MÁS GRANDE: DIVERSIFICAR **ES** EL PLAN DE CRECIMIENTO
+
+El archivo ya tiene medido que el tradicional está cerca de su techo: **elasticidad 0,63** (duplicar
+el gasto sube las ventas 31%), **utilidad plana entre $125.000 y $200.000/día**, y `TECHO-REALISTA.md`
+dice que para llegar a 50 uds/día hay que bajar la elasticidad a ~0,41 **"y eso solo pasa metiendo
+audiencia nueva"**.
+
+**El tradicional ya no crece con más plata. Crece con productos nuevos y audiencias nuevas.**
+**Diversificar no es una distracción del plan de crecimiento: es el plan de crecimiento.**
+
+### 🧥 EL MANUAL QUE EL COLMENA DEJA PARA LA CHAQUETA REFLECTIVA
+
+**Vale más que las 3 ventas del colmena.** Antes de lanzarla:
+
+- ⏳ **No juzgarla en 5 días.** Ticket alto = decisión lenta.
+- 💵 **No arrancar con público frío y presupuesto grande.**
+- 🎯 **Medirla contra SU equilibrio** (`margen × su cierre`), no contra el tradicional.
+- 🔢 **Contar las conversaciones vacías aparte desde el día 1** — sin eso no se puede comparar nada.
+- 🚚 **Sacarle el margen real con fletes de verdad**, no teóricos (al colmena el margen teórico le
+  sobraba $2.338 por venta).
+- 💳 **Ofrecer pago anticipado desde el principio** en cualquier producto de ticket alto.
+
+### ⛔ LO QUE NO CAMBIA
+
+- ⛔ **No se prende HOY.** Serían **6 variables movidas en 48 h** y el lunes 14 no se podría leer ni
+  las regiones ni Motorizados. **Prenderla después del veredicto del 14.**
+- ⛔ **No se prende igual que estaba** (público frío, $20.000): eso ya está probado y su CPM subió
+  seis días seguidos.
+- ⛔ **No se le baja el precio.** Cierra al 15% de las conversaciones reales a $149.900 y su margen es
+  el 30% mayor del negocio.
+- ⛔ **No se espera que reemplace al tradicional.** No va a pasar y no hace falta que pase.
+- **El diagnóstico del CPM sigue intacto:** $10.062 = 2,7× la cuenta, y subió seis días seguidos.
+  **No puede comprar tráfico en frío** — de ahí el cambio de audiencia.
+- **La campaña sigue apagada HOY.** Prenderla sería la **sexta** variable movida en 48 h (tres
+  regiones + Valle + Motorizados + guion) y el lunes 14 no se podría leer nada.
+- **El precio no se toca:** cierra al 8,1% a $149.900.
+- **El upsell dentro del chat del tradicional sigue siendo el canal #1.**
+
+📌 **n = 3 ventas: esto es dirección, no precisión. Pero la dirección cambió de signo.**
 
 ---
 
@@ -5399,9 +5812,15 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     de Chía** ($73.000, Interrapidísimo, 7 días en "Creado") nunca la recogieron.
     📌 **Abrir una tercera transportadora** (Envía, Coordinadora o TCC) aunque sea sin volumen: enrutar
     el 100% por Interrapidísimo deja el negocio sin plan B, y tampoco es perfecta.
-75. [ ] 💵 **EMPUJAR LOS 15 "RECLAME EN OFICINA" — $1.841.000 esperando que el cliente recoja.**
-    Un recordatorio por WhatsApp a esos 15. **Si no reclaman se vuelven devoluciones.** Es la plata más
-    fácil disponible: no requiere publicidad, ni producto, ni precio.
+75. [~] 💵🟢 **RUTINA YA FUNCIONANDO — no es un pendiente. NO volver a pedirlo como tarea.**
+    Un recordatorio por WhatsApp a los que están en oficina. **Si no reclaman se vuelven devoluciones.**
+    ✅ **CONFIRMADO EL 10-SEP:** el dueño **llamó y escribió por WhatsApp a las 15** el mismo día, y
+    **revisa las novedades a diario** (venía de ~30 acumuladas y bajó mucho).
+    🔑 **Y acá está la relación causal que faltaba escrita: el rechazo de 5,0% no es suerte, es esta
+    rutina.** Por eso el seguro da 0,24× (#91). **Las dos cosas están atadas: no se puede apagar el
+    seguro Y aflojar la gestión al mismo tiempo.**
+    📌 Lo que sí sigue abierto es **medir**: cuántos de los contactados terminan recogiendo. Ese % es
+    el que dice si el rechazo se queda en 5,0% o sube.
 76. [ ] 🌎🌎 **EL SEGUNDO LAGO, SI VALLE FUNCIONA — hay 40 millones de colombianos sin pautar.**
     La pauta cubre ~23% de la población y el 77% restante **ya genera el 61% de los pedidos** (60%/57%/61%
     en tres periodos). Valle es el molde; si responde, se replica región por región. Ver **0-AA**.
@@ -5601,7 +6020,7 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     ⚠️ **El 4-5 sep el VIDEO puede gastar MENOS que el 3-sep** (Meta cobrando el sobregiro de $29.520).
     **Eso no es que se dañó. NO TOCAR.**
 
-85. [ ] 💎⏳ **VEREDICTO DEL COLMENA A LAS ~30 CONVERSACIONES (jueves 10 o viernes 11-sep).**
+85. [~] 💎⚖️ **VEREDICTO DEL COLMENA — SE APAGÓ EL 9-SEP, PERO EL VEREDICTO ESTABA MAL (ver 0-AG).**
     Corre en **$20.000/día**, solo el conjunto del video. Exposición máxima **$80.000**.
     🔑 **Se mide MARGEN TOTAL contra gasto, no el cierre del colmena** — la campaña puede producir
     ventas de los dos productos y contar solo uno estaba mal medido. Combinaciones que empatan:
@@ -5655,7 +6074,7 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     subestimando fletes en toda la operación; si el dueño pagó $35.000, **hay un cobro doble que
     reclamar.** 📌 Mirar el extracto de 99 Envíos de esa guía. Ver **0-AE**.
 
-91. [ ] 🛡️🔔 **PREGUNTAR SI EL SEGURO 99 ES OPCIONAL — SU RELACIÓN AHORRO/COSTO ES 0,85×.**
+91. [ ] 🛡️🔴 **PREGUNTAR SI EL SEGURO 99 SE PUEDE APAGAR — DA 0,24×, NO 0,85× (medido, 0-AF).**
     Medido en 54 guías: el seguro es **exactamente el 13,6% del `valor_servicio`** (proporción fija,
     no prima por valor declarado), o sea **$2.702.775/mes** a 27 guías/día.
     Contra eso ahorra ~$18.574 por devolución (0-L): a 15,3% de rechazo son $153.458 por cada 54
@@ -5664,7 +6083,7 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     costar claramente más de lo que ahorra.** Es el tercer costo más grande del negocio y nunca se
     había mirado. 📌 **Medir #31 antes de decidir**, pero preguntar ya si se puede desactivar.
 
-92. [ ] 💳🔴 **EL MAYOREO SE COBRA POR TRANSFERENCIA O ANTICIPO — NO CONTRAENTREGA.**
+92. [x] 💳✅ **CERRADA COBRADA — EL MAYOREO SE COBRA POR TRANSFERENCIA O ANTICIPO (regla vigente).**
     El pedido de 12 unidades salió **contraentrega con $573.291** por cobrar en la puerta: la
     exposición más grande en una sola guía en la historia del proyecto. Se advirtió el 7-sep y quedó
     sin ejecutar.
@@ -5677,8 +6096,10 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     Caldas **$72.687**, o sea que **el mayoreo gana por $2.924 en total** y la frase "3 al detal le
     ganan a 12 al mayor" estaba mal. **Por unidad sigue 3,8× a favor del detal ($24.229 vs $6.301)**,
     así que el piso de $45.000 no se mueve.
-    🔴 **Y la guía sigue sin recoger: 240060772823, en "Creado" desde el 7-sep. Rastrearla es el
-    primer punto de la lista de hoy.**
+    ✅ **CERRADA COBRADA EL 10-SEP:** la guía **240060772823 está ENTREGADA** y los **$573.291
+    entraron**. Se ganó, no se acertó: la regla de cobrar el mayoreo por transferencia o anticipo
+    **sigue en pie para el próximo**, porque la exposición era real aunque esta vez saliera bien.
+    Ver el export de 141 guías en **0-AF**.
 
 93. [ ] 🏍️🔴 **MOTORIZADOS: BAJADO A $9.000 Y CON GATE PARA EL LUNES 14.**
     No está topado, **se está encogiendo**: conversaciones por mil impresiones **4,04 → 1,77 (−56%)**
@@ -5711,6 +6132,41 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     Ver **0-AF**.
 
 
+
+96. [ ] 💬🥇 **RETOMAR LOS 17 CHATS REALES DEL COLMENA — CPA $0. GUION LISTO EN `SEGUIMIENTO-COLMENA-10SEP.md`.**
+    El 10-sep una persona que había escrito **la semana pasada** volvió sola, pidió el colmena y
+    **pagó anticipado**. Eso prueba que **el CPA de esas conversaciones ya está pagado y hundido**, y
+    que el colmena **tarda ~7 días en decidirse** porque vale $149.900.
+    | | |
+    |---|---|
+    | **A cuántos escribir** | **17** (de 37 conversaciones, **17 son vacías** —contadas por el dueño— y 3 ya compraron) |
+    | Retorno espontáneo sobre el universo real | **1 de 17 = 5,9%** |
+    | Cada venta | **$40.968 limpios, CPA $0** |
+    | Escenario base (2 ventas) | **$81.936 en ~25 minutos = $189.083/hora** |
+    ✅ **Es legítimo: ellos escribieron primero.** Es retomar una conversación abierta, no un mensaje
+    no solicitado.
+    ⛔ **6-7 por día, dos días, y cambiándole una palabra a cada uno. NUNCA un copiar-pegar a los 30
+    el mismo día** — eso dispara reportes y ese número **es** el canal de ventas completo.
+    **La asimetría manda el ritmo: arriba hay ~$82.000, abajo está el negocio entero.**
+    🔑 **Y el mensaje NO vende:** el hallazgo del 10-sep es que el que quiere llega decidido y paga.
+    Solo avisa que sigue disponible. **Si no contesta, no hay segundo mensaje.**
+    📌 **Falta el dato que cierra el caso: de las 37, cuántas estaban vacías.** Sin eso no se puede
+    comparar el cierre del colmena contra el 8,4% del tradicional.
+    📌 Y **ofrecer pago anticipado**, que ya está probado a $149.900 — **pero sin descuento**
+    (el beneficio del prepago es ~$4.052 y descontar $4.000 lo regala entero). Ver **0-AG**.
+
+97. [ ] 🔴🚚 **EL GUION NO PUEDE COTIZAR DESTINOS QUE NO ESTÁN EN LA TABLA.**
+    Tres casos, el mismo error, y el tercero es el más caro:
+    | Ciudad | Qué pasó | Costo |
+    |---|---|---|
+    | **EL CHARCO** (Nariño, por río) | cobró **$59.900** = el precio **sin envío**, flete real **$55.563** | **−$28.663** |
+    | TADÓ | el flete se **duplica** con 2 unidades en vez de compartirse | −$2.341 |
+    | GUACHUCAL | cobró $85.511, $511 sobre la banda E | −$511 |
+    🔑 **No es un problema de tarifa: es que el guion improvisa donde no tiene dato**, y los destinos
+    raros son justo los de flete más alto. **Una sola guía de El Charco se comió el margen de 1,3
+    pedidos buenos.**
+    ✅ **REGLA A PEGAR: si la ciudad no aparece en la tabla del tarifario, NO se cotiza — se le dice
+    al cliente que se confirma en un momento y se escala al dueño.** Ver **0-AF**.
 
 ### 🟡 Prioridad media
 14. [ ] 🔧 **Arreglar zonas seguras en el generador** — el botón de WhatsApp queda tapado en Stories
@@ -6059,3 +6515,97 @@ $/conversación  =  CPM  ÷  (conversaciones por cada 1.000 impresiones)
 - 📌 **Abrir varias regiones a la vez es válido: son geografías disjuntas y no se canibalizan.** Y
   conviene que no sean tres apuestas iguales, sino tres hipótesis distintas (donde ya vende / donde
   falta / territorio virgen): eso enseña **con qué criterio** elegir las siguientes diez.
+
+
+---
+
+# 12. 🗒️ BITÁCORAS DE SESIÓN — el chat, por si se pierde
+
+> **Para qué sirve esto:** las secciones 0-* guardan las CONCLUSIONES. Esto guarda **cómo se llegó a
+> ellas y qué quedó abierto**, para poder retomar en frío sin volver a preguntar lo mismo.
+> **Si se perdió un chat, empezá por acá y después leé la sección 0-* correspondiente.**
+
+## Sesión del 2026-09-10 (jueves) — "lee todo de BikerPro y seguimos donde quedamos"
+
+**Contexto de arranque:** el chat anterior se cayó con error justo cuando el dueño mandó el export
+`Envios_Completos_2026-09-10.xlsx`. Se reconstruyó el estado leyendo este archivo, los scripts del
+9-10 sep y el PR #43 abierto. **El archivo madre estaba dos días atrasado** (última sección 0-AE, del
+7-8 sep): todo lo del 9 y 10 vivía solo en scripts. Eso se cerró escribiendo **0-AF**.
+
+### Orden en que pasaron las cosas
+
+| # | Qué pasó | Dónde quedó |
+|---|---|---|
+| 1 | El adjunto del chat viejo **no existía** en la sesión nueva. Se dijo en vez de inventar el análisis, y se usó el tiempo en escribir 0-AF | **0-AF** |
+| 2 | El dueño reenvió el export: **141 guías, 2 al 10-sep** | `analisis/envios-completos-10sep.csv` |
+| 3 | Las 3 guías en el aire: **Granada $573.291 ENTREGADA**, **colmena San Francisco ENTREGADA**, Puerto Gaitán en terminal | **#92 cerrada cobrada** |
+| 4 | **Rechazo real 5,0%** (no 15,3%, que era de la época Heka) | 0-AF |
+| 5 | **Hallazgo:** en las 3 devoluciones el cobro **es exactamente el seguro** → el seguro da **0,24×** | **#91** |
+| 6 | **Fuga nueva: El Charco −$28.663** por cobrar $59.900 sin envío | **#97** |
+| 7 | El dueño cuenta que **una venta de colmena entró sola, con la campaña apagada, y prepagada** | **0-AG** |
+| 8 | Se aclara: **el lead era de la campaña del colmena, NO del upsell** | 0-AG |
+| 9 | El dueño cuenta las vacías: **17 de 37** → el colmena **atrae mejor y cierra peor** | 0-AG |
+| 10 | **El dueño reencuadra: no quiere saber cuál es mejor, quiere ganar plata de los dos** | 0-AG |
+| 11 | Se rehace la comparación con **marginales**: el colmena gana → **se vuelve a prender después del 14** | 0-AG |
+| 12 | Checklist de la noche | `HOY-10SEP.md` |
+| 13 | El dueño confirma que **hizo las tres cosas** | ver abajo |
+
+### 🔴 LAS CUATRO VECES QUE ME EQUIVOQUÉ EN ESTA SESIÓN (lo más útil de la bitácora)
+
+**Las cuatro son la misma familia de error: leer una ventana censurada o una base equivocada.**
+
+| # | Lo que dije | Lo que era | La lección |
+|---|---|---|---|
+| 1 | *"el colmena no cubrió, se apaga"* (−$3.908) | **+$37.060** con la 3ª venta | **El ticket define la ventana:** $149.900 tarda ~7 días en decidirse. Apliqué el sesgo de atribución al CPM y no a las **ventas** |
+| 2 | *"el colmena cierra casi igual (8,1 vs 8,4)"* | sobre **reales**: 15,0% vs **19,9%** | Comparar siempre **sobre la misma base**. Parecían empatados porque **dos efectos se cancelaban** |
+| 3 | *"el tradicional rinde 2,7× más, se apaga el colmena"* | promedio 3,93× pero **marginal +$0,16** vs **+$0,43** del colmena | Para *"¿cuál es mejor?"* van promedios. Para *"¿dónde va el próximo peso?"* van **marginales** |
+| 4 | Listé **#75** como pendiente | el dueño lo hace **a diario** | No pedir como tarea lo que ya es rutina. **Y el 5,0% de rechazo ES esa rutina** |
+
+📌 **Y una que sí acerté por poco margen, pero por el motivo correcto:** llamar **ruido** al +75% de
+TEST Creativos (oscilaba) y **tendencia** a la serie de Motorizados (subía monótona).
+
+### 🔑 Lo que el dueño dejó claro sobre el objetivo (y cambia cómo se evalúa todo)
+
+> *"No se trata de decir este es mejor o este es peor. Lo que quiero es diversificar mis productos y
+> ganar plata de los dos. No importa si me gano $20.000, $30.000 o $50.000 con el colmena, desde que
+> me deje plata. Lo que quiero evitar es una campaña que pierda dinero. No estoy buscando el próximo
+> producto que le gane a impermeables: estoy buscando productos que nos hagan ganar dinero."*
+
+**Consecuencias operativas, que ya están aplicadas:**
+1. **Cada producto se mide contra SU propio equilibrio**, no contra el tradicional. El del colmena es
+   **$3.322/conversación**.
+2. **La pregunta de asignación se resuelve con marginales**, y el tradicional está en la parte plana
+   de su curva.
+3. **Diversificar no es una distracción del plan de crecimiento: ES el plan** (elasticidad 0,63 +
+   `TECHO-REALISTA.md`).
+4. **Y la chaqueta reflectiva** —el siguiente producto, ya tiene video— se lanza con el manual de
+   0-AG, no repitiendo los errores del colmena.
+
+### ✅ Ejecutado y confirmado por el dueño el 10-sep por la noche
+
+- ✅ **El bot pasó las dos pruebas que sangraban:** *"está muy caro"* (no ofreció descuento) y
+  *"soy de Tadó"*. **#95 verificado.**
+- ✅ **Las 15 guías de "Reclame en oficina": llamadas Y contactadas por WhatsApp** el mismo día.
+  Revisa novedades **a diario**; venía de ~30 acumuladas. **#75 es rutina, no pendiente.**
+- ✅ **Los mensajes del colmena: enviados** (los 17 del universo real).
+- ✅ **Se acordó dejar TODO lo demás quieto** hasta el sábado 12 / lunes 14.
+
+### ⏳ Lo que quedó ABIERTO al cierre de la sesión
+
+| | Qué falta | Por qué importa |
+|---|---|---|
+| 🔴 | **¿Se bajó Motorizados de $15.000 a $9.000?** **NUNCA SE CONFIRMÓ** — la tabla de configuración lo da por hecho | Si no se hizo, la cuenta está en $160.000 y no en $154.000, y el gate del 14 se lee distinto |
+| 🔴 | **Los exports históricos con teléfono** (99 Envíos y Heka) → **#88** | **Es lo que habilita prender el colmena el lunes** con audiencia de clientes. Sin eso, el lunes no se puede ejecutar lo que se decidió |
+| 🔔 | **¿Cuántos de los contactados en oficina terminaron recogiendo?** | Ese % decide si el rechazo se queda en 5,0% |
+| 🔔 | **¿Cuántos contestaron de los 17 del colmena?** | Es la medición del canal de seguimiento |
+| 🔔 | **Contar vacías del TRADICIONAL una semana** | El 57,8% es de agosto (n=90) y nunca se remidió. De eso depende la comparación del cierre |
+| 🔔 | **Anotar colmena vs tradicional por pedido** → **#81** | Sin eso no se mide el upsell, que **sigue sin medir** |
+| 🔔 | **El extracto de la guía de Tadó** ($36.667) → **#90** | Único pendiente de llamada a 99 Envíos que sigue vivo (#28-1 se cerró solo) |
+
+### 📅 Los tres checkpoints acordados
+
+| Cuándo | Qué se hace |
+|---|---|
+| **Viernes 11** | Nada de pauta. Conseguir los exports con teléfono (#88) |
+| **Sábado 12** | **Primer día que los datos de las tres regiones significan algo** (día 3). Mirar, no tocar |
+| **Lunes 14** | **VEREDICTO** con 5 días cerrados: las 3 regiones (gate relativo contra Domiciliarios, ≤1,5× se replica / >2,5× se apaga) · **Motorizados** (bajo $1.200 se queda, sobre $1.500 se apaga) · **share de 2 unidades** con la semana cerrada · **prender el colmena** con audiencia de clientes, $8-10.000/día y ventana de 14 días · **y recién ahí tocar los creativos en vivo** (#94) |
