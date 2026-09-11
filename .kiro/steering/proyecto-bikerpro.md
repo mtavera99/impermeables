@@ -4,7 +4,9 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-11 04:10 Bogotá** *(ojo: verificar siempre la fecha en
+Última actualización: **2026-09-11 05:35 Bogotá** — 🆕 **sección 0-AH: primera lectura en vivo de la
+API. Corrige dos diagnósticos de 0-AF (Motorizados y TEST Creativos) y encuentra que el problema real
+está en Domiciliarios.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
 > 🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA: andá directo al bloque "TRASPASO A LA SESIÓN NUEVA" de la
@@ -20,6 +22,7 @@
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-AH** | 🔑 **LA API YA LEE SOLA** (el token funciona, el veredicto del lunes sale sin exports) · 🔴 **Motorizados nunca se estaba encogiendo: era UN día, y el 9-sep fue malo para toda la cuenta** (+21%) — el recorte funcionó pero por el motivo contrario · 🔴🔴 **el que se diluye es DOMICILIARIOS, el control: +70% de costo en 5 días con CPM BAJANDO** = elasticidad 0,63 en vivo, vale **+26 conv/día** · **el CPM de TEST Creativos oscila, no sube** · 🔴 **la cuenta gasta $202.095, no $154.000** (Meta sobre-entrega 31% → el peso marginal ya devuelve $0) · **dos conjuntos del colmena no estaban en la tabla** y corroboran 0-AG (78,6% de su equilibrio) · regiones preliminares: **Tolima y Santander entregan, Eje Cafetero flojo** · **el sesgo del gate ahora tiene dos signos → solo criterio absoluto** | **11-sep** |
 | **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · 🔄 **y estaba comparando promedio contra promedio: contra el peso MARGINAL del tradicional (+$0,16) el colmena rinde +$0,43 = 2,7× más** · **no pierde plata: corre al 85% de SU equilibrio** · **se vuelve a prender después del 14** con audiencia de clientes, $8-10.000/día y ventana de 14 días · **diversificar ES el plan de crecimiento** · el manual para la chaqueta reflectiva · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · **17 de 37 conversaciones estaban vacías**, y con base limpia **el colmena ATRAE mejor (45,9% vs 57,8% de vacías) y CIERRA peor (15,0% vs 19,9%)** · el CPA se descompone exacto: paga 2,6× por conversación real y cierra 1,33× peor = 3,4× · seguimiento a **17** | **10-sep** |
 | **0-AF** | 🧮 **La comisión de recaudo ya venía DENTRO del flete: se estaba restando dos veces** (todo corrige hacia arriba, #28-1 cerrado) · ⛔ **no se lee un día abierto** (la descomposición CPM ÷ conv-por-mil) · **predicción fallida: Motorizados cerró en $1.970** y su audiencia se está encogiendo (−56%) · **el colmena no fracasó, fracasó su canal** (CPM $10.062) y quedó pausado · **tres regiones nuevas de $5.000** · **cinco parches al guion** (el bot vendía con MENÚ) · colmena = la textura, no la tela · el catálogo maestro estaba viejo en 21 lugares | **9 y 10-sep** |
 | **0-AE** | 💰 **El costo bajó a $33.000** (+$752.527/mes) · el CPA nunca se deterioró: era la pauta del colmena · el video se estabilizó y empató · **la fuga de flete está solo en la promo de 2 uds** · Tadó duplica el flete · el seguro es 13,6% y da 0,85× · 3 al detal > 12 al mayor | **7 y 8-sep** |
@@ -112,8 +115,14 @@
 | 🆕 **Domiciliarios \| Santanderes** | **$5.000** | Fondo azul | Santander + N. de Santander | creado 9-sep noche. Aprendizaje |
 | 🆕 **Domiciliarios \| Eje Cafetero** | **$5.000** | Fondo azul | Risaralda + Quindío + Caldas | creado 9-sep noche. Aprendizaje |
 | 🆕 **Domiciliarios \| Tolima Huila** | **$5.000** | Fondo azul | Tolima + Huila | creado 9-sep noche. Aprendizaje |
-| ~~Domiciliarios \| Colmena~~ | — | — | — | 🔴 **PAUSADO el 9-sep** (`not_delivering`). Ver 0-AF |
-| **Total** | **$154.000** | | | |
+| ~~Domiciliarios \| Colmena~~ | $20.000 | — | — | 🔴 **PAUSADO el 9-sep** (`not_delivering`). Ver 0-AF |
+| ~~**Publico ABIERTO - Creativo**~~ | $20.000 | Estático colmena | — | 🔴 `PAUSED`. 🆕 **apareció en la API el 11-sep**, no estaba en esta tabla. $4.044/conv → 0-AH |
+| ~~**Publico ABIERTO video**~~ | $20.000 | Video colmena | — | 🔴 `CAMPAIGN_PAUSED`. 🆕 ídem. **$2.611/conv = 78,6% de su equilibrio → corroboró 0-AG** |
+| **Total ACTIVOS** | **$154.000** | | | 🔴 **pero el gasto real del 10-sep fue $202.095 (+31,2%) → 0-AH** |
+| *(presupuesto dormido)* | *$60.000* | | | los 3 conjuntos del colmena apagados |
+
+🆕 **Nombre real del conjunto (verificado en la API el 11-sep): `Domiciliarios | Santander`**, no
+"Santanderes".
 
 📌 **Advantage+ de campaña: DESACTIVADO** (ABO, cada conjunto con su plata) · **un conjunto, un
 anuncio** (confirmado cuatro veces) · casilla "Llegar a más personas" **marcada en Domiciliarios y
@@ -326,6 +335,30 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
   si la mezcla de bandas se va a los pueblos con envío gratis nacional) → **#79**.
 
 ## 🚦 LO SIGUIENTE, EN ORDEN
+
+> **🆕🆕🆕 AGREGADO EL 11-SEP DESDE LA API EN VIVO (0-AH) — ESTO ES LO PRIMERO DEL VEREDICTO DEL LUNES:**
+>
+> 1. 🔴🔴 **PODAR DOMICILIARIOS.** Es el que se está diluyendo, no Motorizados: **+70% de costo en
+>    5 días** ($655 → $1.116) con **conv/mil a la mitad** (4,55 → 2,78), **CPM BAJANDO** y frecuencia
+>    1,06. Duplicó alcance hacia audiencia fría. Volver a su conv/mil del 8-sep vale **+26
+>    conversaciones/día sin poner un peso.** ⛔ **No antes del lunes: es el control del gate** → **0-AH**
+> 2. 🔴 **LA CUENTA GASTA $202.095, NO $154.000** (+31,2% de sobre-entrega). Contra la tabla de
+>    elasticidad del proyecto, a $200.000/día **el peso marginal ya devuelve $0** y el óptimo es
+>    ~$178.000. **"No subir presupuesto" se cumple en la interfaz y no en la realidad.** Confirmar el
+>    sábado con 3 días → **0-AH**
+> 3. ✅ **MOTORIZADOS SE QUEDA EN $9.000.** Pasa el gate con **$884** (el umbral era $1.500). Y el
+>    diagnóstico de 0-AF era falso: no se encogía, estaba **estirado**. conv/mil rebotó 1,73 → **4,91**
+>    al recortarlo → **0-AH**
+> 4. ⚠️ **RE-MIRAR #77 (TEST Creativos) CON DATOS NUEVOS.** El argumento que lo bloqueaba (*"su CPM
+>    sube cada ventana: $5.240 → $6.679 → $7.968"*) **no está en los datos diarios**: oscila en ~$5.800
+>    y nunca tocó $7.968. Y tiene **conv/mil 7,78 = 2,8× el control**, cerrando en **$776 vs $1.116**.
+>    No es "subirlo automáticamente": es que **la razón por la que no se sube ya no es válida** → **0-AH**
+> 5. 🟢 **REGIONES, SEÑAL TEMPRANA (n=1 a 4, NO es veredicto):** Tolima Huila **$995** y Santander
+>    **$1.292** entregando bajo el equilibrio desde el día 1; **Eje Cafetero $3.995 (n=1)** flojo;
+>    **Valle es el caso serio** ($1.756 en 8-10 sep, serie mala de 6 días) → **0-AH**
+> 6. 📌 **El sesgo del gate tiene ahora DOS signos opuestos** (Motorizados liberó subasta ⇒ regiones
+>    peor · el control se diluye ⇒ regiones mejor). **El criterio relativo queda inservible: usar
+>    solo el absoluto de $2.657/conv** → **0-AH**
 
 > **🆕🆕 LISTA VIGENTE AL 10-SEP (0-AF). La de abajo, del 8-sep, ya está ejecutada casi completa.**
 
@@ -1461,6 +1494,178 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-AH. 🔑 LA API YA LEE SOLA — Y EL PRIMER DATO EN VIVO DICE QUE MOTORIZADOS NUNCA SE ESTABA MURIENDO: ES DOMICILIARIOS EL QUE SE ESTÁ DILUYENDO (2026-09-11, 05:30 Bogotá)
+
+**Fuente: la Marketing API en vivo, no un export.** Primera vez en todo el proyecto que los números
+salen sin que el dueño exporte nada. Token `Kiro Lectura` (`ads_read`, rol Analista), cuenta
+`act_4330882710457791` (BikerPro, COP). Lector: `analisis/meta-api-lectura.py`.
+
+### ✅ Lo que quedó habilitado
+
+| | |
+|---|---|
+| ✅ | **El token funciona.** `debug_token`: válido, `SYSTEM_USER`, app Kiro, **no expira** (`expires_at: 0`), scopes **`ads_read` + `public_profile`** |
+| ✅ | **4-B ahora es candado técnico:** sin `ads_management`, Meta **rechaza** cualquier escritura. No es disciplina, es permiso |
+| ✅ | **El veredicto del lunes 14 sale de la API.** El dueño no exporta nada |
+| 🐛 | **BUG ARREGLADO en el lector:** dividía el presupuesto por 100 siempre. **El COP no tiene centavos** (su unidad menor es el peso), así que mostraba *"Domiciliarios VIDEO $550"* en vez de $55.000. Ya lee la moneda de la cuenta y solo divide cuando corresponde |
+
+### 🆕 Aparecieron dos conjuntos que NO están en la tabla de configuración
+
+La tabla "CONFIGURACIÓN DE LA CUENTA AL 2026-09-10" lista 9 conjuntos. En vivo hay **11**:
+
+| Conjunto | Presup. | Estado real |
+|---|---|---|
+| **Publico ABIERTO - Creativo** | $20.000 | `PAUSED` |
+| **Publico ABIERTO video** | $20.000 | `CAMPAIGN_PAUSED` |
+
+Son **el A/B del colmena** (el estático y el video de 0-AD), no un conjunto nuevo del tradicional.
+Los dos están apagados, así que **no hay fuga hoy**, pero hay que anotarlos: son **$40.000/día de
+presupuesto dormido** que reaparece si alguien prende esa campaña sin mirar.
+
+📌 **Y de paso CORROBORAN 0-AG con datos de la API:** `Publico ABIERTO video` cerró la ventana 5-9 sep
+en **$2.611/conversación** contra el equilibrio del colmena de **$3.322** → corría al **78,6% de su
+equilibrio**, casi exactamente el *"85% de SU equilibrio"* que dice 0-AG. **El canal del colmena no
+perdía plata.** El estático sí: **$4.044/conv = 1,22× su equilibrio** — y es el que justifica apagar.
+
+📌 **Nombre real:** el conjunto se llama **`Domiciliarios | Santander`**, no *"Santanderes"*.
+
+### 🔴 CORRECCIÓN GRANDE 1: Motorizados no se estaba encogiendo. Era UN día, y era un día malo para TODA la cuenta
+
+0-AF dijo *"su audiencia se encoge, conv/mil 4,04 → 1,77 (−56%)"* y por eso se recortó a $9.000.
+**La serie completa dice otra cosa:**
+
+| Día | 5-sep | 6-sep | 7-sep | 8-sep | **9-sep** | **10-sep** |
+|---|---|---|---|---|---|---|
+| **conv/mil** | 3,99 | 8,63 | 5,95 | 4,16 | **1,73** 🔴 | **4,91** 🟢 |
+| **$/conv** | $923 | $529 | $711 | $895 | **$2.001** | **$884** |
+
+**No es monótona: es un pozo de un día que ya rebotó.** Y el 9-sep fue malo para todo:
+
+| Día | Gasto cuenta | Conv | **$/conv cuenta** |
+|---|---|---|---|
+| 8-sep | $147.002 | 159 | **$924** |
+| **9-sep** | $144.451 | 129 | **$1.120** 🔴 **+21%** |
+| 10-sep | $202.095 | 220 | **$919** |
+
+🔑 **El recorte de Motorizados se decidió leyendo el peor día de la cuenta.** Es la misma familia de
+error que las cuatro de la bitácora del 10-sep: **ventana censurada.** La diferencia es que esta vez
+el error salió gratis, porque **el recorte igual funcionó** — pero por el motivo contrario:
+
+| Motorizados | 9-sep ($15.000) | 10-sep ($9.000) | |
+|---|---|---|---|
+| Alcance | 5.093 | **2.531** | ▼ mitad |
+| CPM | $3.466 | **$4.340** | ▲ +25% **paga MÁS** |
+| **conv/mil** | 1,73 | **4,91** | ▲ **2,8×** |
+| **$/conv** | $2.001 | **$884** | ▼ **−56%** |
+
+**Con menos plata se replegó a su núcleo, paga un CPM 25% más caro y convierte 2,8× mejor.**
+No era una audiencia que se agotaba: era una audiencia **estirada de más**. Y **frecuencia 1,02-1,05**
+lo confirma: nunca hubo fatiga de repetición.
+✅ **El gate del lunes ($1.500) lo pasa cómodo con $884.** Se queda en $9.000.
+
+### 🔴🔴 CORRECCIÓN GRANDE 2: el que se está diluyendo es DOMICILIARIOS — el control del gate
+
+**Y esta sí es monótona, 5 días seguidos:**
+
+| Día | 5-sep | 6-sep | 7-sep | 8-sep | 9-sep | 10-sep |
+|---|---|---|---|---|---|---|
+| **$/conv** | $655 | $727 | $697 | $816 | $928 | **$1.116** |
+| **conv/mil** | 4,55 | 5,21 | 4,70 | 4,16 | 3,57 | **2,78** |
+
+**+70% de costo en 5 días, y la calidad de audiencia a la mitad.** ¿Por qué? **No es la subasta, y no
+es fatiga:**
+
+| Domiciliarios | 9-sep | 10-sep |
+|---|---|---|
+| Alcance | 12.214 | **24.359** ▲ **2,0×** |
+| **CPM** | $3.310 | **$3.100** ▼ **BAJA** |
+| Frecuencia | 1,06 | 1,06 → sin fatiga |
+| **conv/mil** | 3,57 | **2,78** ▼ |
+
+🔑 **Duplicó el alcance, el CPM BAJÓ, y convierte peor.** Eso es exactamente la elasticidad 0,63 en
+vivo: **compró el doble de impresiones más baratas y más frías.** Es el mismo mecanismo de
+Motorizados, pero en el conjunto grande y al revés — **Domiciliarios está en la posición en la que
+estaba Motorizados el 9-sep.**
+
+📌 **Cuánto vale:** si al podarlo volviera a su conv/mil del 8-sep (4,16) con su CPM de ~$3.400, el
+$/conv iría a ~$818. Sobre los $80.354 que gastó el 10-sep son **~98 conversaciones en vez de 72:
++26/día sin poner un peso más.**
+⛔ **PERO NO SE TOCA HASTA EL LUNES 14:** es el control con el que se miden las tres regiones. Se
+anota como **el punto 1 del veredicto**, con el número puesto.
+
+### 🔴 CORRECCIÓN 3: el CPM de TEST Creativos NO viene subiendo. Oscila
+
+0-AF dijo *"CPM $7.968 y subiendo ($5.240 → $6.679 → $7.968)"*. La serie diaria completa:
+
+| Día | 5-sep | 6-sep | 7-sep | 8-sep | 9-sep | 10-sep |
+|---|---|---|---|---|---|---|
+| **CPM** | $5.110 | $5.967 | $5.076 | $5.914 | $6.562 | **$6.040** |
+| **conv/mil** | 7,23 | 10,58 | 9,70 | 5,84 | 5,85 | **7,78** |
+| **$/conv** | $707 | $564 | $523 | $1.012 | $1.121 | **$776** |
+
+**Oscila alrededor de ~$5.800 con deriva leve. Nunca llegó a $7.968 en un día cerrado.** La bitácora
+del 10-sep se felicitó por llamarle **ruido** al +75% de TEST Creativos… y en el mismo párrafo trató su
+CPM como **tendencia**. Era ruido las dos veces.
+
+Y el dato que importa: **TEST Creativos tiene conv/mil 7,78 = 2,8× el control (2,78), y cierra el
+10-sep en $776 contra los $1.116 de Domiciliarios.** Con CPM casi el doble, **igual sale 30% más
+barato.** ⚠️ Esto **no** reabre "subirlo a $30.000" por sí solo — pero sí obliga a re-mirar #77 el
+lunes, porque el argumento que lo bloqueaba (*"su CPM sube cada ventana"*) **no está en los datos.**
+
+### 🔴 ALARMA NUEVA: la cuenta gasta $202.095, no $154.000 — Meta sobre-entrega 31%
+
+| | |
+|---|---|
+| Presupuesto de los conjuntos ACTIVOS | **$154.000** |
+| **Gasto real del 10-sep** | **$202.095** |
+| **Sobre-entrega** | **+31,2%** |
+
+🔑 **Contra la tabla de elasticidad del propio proyecto, a $200.000/día el último peso devuelve
+−$0,00 y el óptimo es ~$178.000.** O sea: **la cuenta ya está gastando en el punto donde el peso
+marginal no devuelve nada**, aunque en la tabla de configuración figure como $154.000.
+📌 **La orden de "no subir presupuesto" se está cumpliendo en la interfaz y NO en la realidad.** Y
+encaja perfecto con la dilución de Domiciliarios: la plata de más se va a audiencia fría.
+⚠️ **Un día de sobre-entrega no es una serie.** Verificar el sábado 12 con 8-9-10 completos antes de
+tratarlo como estructural.
+
+### 📊 Las tres regiones — LECTURA PRELIMINAR, NO ES EL VEREDICTO
+
+Se crearon la **noche del 9-sep** (gastaron $347-$454 ese día: nada). **El 10-sep es su único día
+completo.** Equilibrio absoluto: **$2.657/conv**.
+
+| Región | Gasto 10-sep | Conv | **$/conv** | conv/mil | Lectura |
+|---|---|---|---|---|---|
+| **Tolima Huila** | $3.980 | **4** | **$995** | 3,78 | 🟢 2,7× bajo el equilibrio |
+| **Santander** | $3.875 | **3** | **$1.292** | 3,42 | 🟢 2,1× bajo el equilibrio |
+| **Eje Cafetero** | $3.995 | **1** | **$3.995** | 1,12 | 🔴 arriba — pero **n=1** |
+| Valle *(podado)* | $3.919 | **1** | **$3.919** | 1,11 | 🔴 y su serie de 6 días es mala |
+
+⛔ **n = 1, 3 y 4. NO SE DECIDE NADA CON ESTO.** Se cumple el plan: mirar el sábado, decidir el lunes.
+🟢 **Señal temprana, con toda la cautela: Tolima Huila y Santander están entregando** conversaciones a
+mitad de precio del equilibrio desde el día 1. **Eje Cafetero es el único que se ve flojo.**
+🔴 **Valle es el caso serio:** su serie 5→10 sep es $699 · $2.921 · $3.894 · $871 · $2.002 · $3.919, y
+la ventana 8-10 sep cierra en **$1.756**. El *"$1.379"* que anotó 0-AF era la lectura del 9-sep.
+
+### ⚠️ El sesgo del gate del lunes ahora tiene DOS signos opuestos
+
+| Sesgo | Dirección |
+|---|---|
+| El recorte de Motorizados liberó ~$8.700/día en Med+Bog, donde corre el control *(0-AF)* | las regiones se ven **peor** |
+| 🆕 **El control se está diluyendo: +70% de costo en 5 días** | las regiones se ven **mejor** |
+
+🔑 **Se cancelan en dirección desconocida → el criterio relativo queda inservible para este gate.**
+**Usar el criterio ABSOLUTO ($2.657/conv) como único principal.** Es lo que ya decía 0-AF, y ahora hay
+una segunda razón independiente para hacerlo.
+
+### 📌 Lo que este bloque NO dice
+
+- **No** dice que haya que tocar algo antes del lunes 14. **Nada se toca.** 4-B: el agente lee.
+- **No** cierra el gate de las regiones: `n` es de 1 a 4 conversaciones.
+- **No** mide ventas, solo **conversaciones**. El puente conversación → venta sigue viniendo de los
+  exports de 99 Envíos. **#32 sigue abierto: la API por conjunto no dice qué creativo genera ventas.**
 
 ---
 
@@ -6333,6 +6538,39 @@ abrir el PR #19 aparte).
 
 ## 11. 📚 MANUAL OPERATIVO DE META ADS (aprendido en la práctica, 2026-07-28)
 
+### 🆕 REGLA DE LECTURA AGREGADA EL 11-SEP (0-AH) — LA MÁS IMPORTANTE DE TODAS LAS DE MEDICIÓN
+
+🔴 **VENTANAS QUE SE SOLAPAN NO SON UNA SERIE. Para decidir si algo es tendencia, los puntos tienen
+que ser días DISJUNTOS.**
+
+El diagnóstico *"Motorizados se está muriendo"* se construyó con esta serie:
+
+> 3-sep $605 · **4-6 sep** $656 · **7-8 sep** $730 · **8-9 sep** $966 · 9-sep $1.970
+
+**"7-8 sep" y "8-9 sep" comparten el 8-sep**, y el último punto es un día atípico suelto. Cuando un
+día malo entra en varias ventanas promediadas, **aparece varias veces y fabrica una pendiente que en
+los datos diarios no existe.** La serie diaria real era **3,99 · 8,63 · 5,95 · 4,16 · 1,73 · 4,91**:
+un pozo de un día que rebotó, no una caída.
+
+📌 **Corolario práctico, ahora que la API lee sola:** pedir siempre `time_increment=1` y mirar la
+serie **por día**. Ya no hay excusa para leer ventanas acumuladas.
+
+### 🆕 Y EL TERMÓMETRO SE DESCOMPONE EN DOS, NO EN UNO
+
+$/conversación = **CPM ÷ conv-por-mil**. Hay que mirar **los dos factores por separado**, porque el
+tratamiento es opuesto:
+
+| Qué se ve | Qué es | Qué se hace |
+|---|---|---|
+| $/conv sube y **el CPM sube** | **subasta**: se está pagando más caro | palanca = audiencia nueva / creativo |
+| $/conv sube y **el CPM baja o está quieto** | **audiencia**: Meta se fue a bolsillos más fríos | palanca = **PODAR presupuesto** |
+| $/conv sube y **la frecuencia sube** | **fatiga** de repetición | palanca = creativo nuevo |
+
+🔑 **El caso de Domiciliarios el 10-sep era el segundo: alcance ×2, CPM BAJANDO, frecuencia quieta en
+1,06.** Sin descomponer, se ve igual que una subasta cara y se trata al revés.
+🔑 **Y Motorizados lo probó en la dirección contraria:** al recortarlo pagó un CPM **25% más alto** y
+el costo por conversación **bajó 56%**, porque volvió a su núcleo. **Un CPM más alto puede ser bueno.**
+
 ### 💸 Cómo funciona el gasto (dudas resueltas del dueño)
 - **El presupuesto se gasta cuando Meta MUESTRA el anuncio**, NO cuando uno paga ni cuando la gente escribe.
   Pagar/recargar = llenar el tanque. El gasto ocurre al entregar impresiones.
@@ -6653,21 +6891,26 @@ $/conversación  =  CPM  ÷  (conversaciones por cada 1.000 impresiones)
 
 ---
 
-# ⚡ ARRANQUE — 2026-09-11, 05:20 Bogotá (LO MÁS NUEVO, LEER ANTES DEL TRASPASO DE ABAJO)
+# ⚡ ARRANQUE — 2026-09-11, 05:35 Bogotá (LO MÁS NUEVO, LEER ANTES DEL TRASPASO DE ABAJO)
 
-**El punto 1 del traspaso de abajo (verificar el MCP) YA SE HIZO Y QUEDÓ RESUELTO. No repetirlo.**
+**Los puntos 1 de este bloque Y del traspaso de abajo YA ESTÁN CERRADOS. No repetirlos.**
+👉 **Lo que salió de probar el token está en la sección 0-AH, y corrige dos diagnósticos de 0-AF.**
 
 ## Lo primero que tiene que hacer esta sesión
 
-1. 🔑 **PROBAR EL TOKEN DE META, QUE YA EXISTE.** El dueño creó el usuario de sistema
-   **`Kiro Lectura`** con rol **Analista ("Ver rendimiento")** sobre la cuenta de BikerPro y
-   generó un token con **solo `ads_read`**, y lo guardó como secreto **`META_ADS_TOKEN`**.
+1. ✅ ~~**PROBAR EL TOKEN DE META.**~~ **PROBADO Y FUNCIONANDO (11-sep, 05:30).** Token
+   `Kiro Lectura`, `SYSTEM_USER`, **no expira**, scopes `ads_read` + `public_profile`. Cuenta
+   **`act_4330882710457791`** (BikerPro, COP). **El veredicto del lunes 14 sale de la API: el dueño
+   no exporta nada.** Comandos:
    ```bash
-   python3 analisis/meta-api-lectura.py cuentas          # saca el act_id
-   python3 analisis/meta-api-lectura.py insights act_XXX 2026-09-08 2026-09-10
+   python3 analisis/meta-api-lectura.py cuentas
+   python3 analisis/meta-api-lectura.py conjuntos act_4330882710457791
+   python3 analisis/meta-api-lectura.py insights act_4330882710457791 2026-09-08 2026-09-10
    ```
    - Si `$META_ADS_TOKEN` sale vacío, el secreto no se propagó: **decirlo, no inventar métricas.**
-   - **Con esto el veredicto del lunes 14 sale de la API y el dueño no exporta nada.**
+   - 🆕 **Lo que hay que mirar el sábado 12** (día 3 de las regiones, ventana 10-11-12 sep cerrada):
+     (a) ¿**Domiciliarios** siguió subiendo de $1.116? (b) ¿la **sobre-entrega del 31%** se repite?
+     (c) las tres regiones contra **$2.657 absoluto**. Todo explicado en **0-AH**.
 2. 🔴 **SIGUE RIGIENDO 4-B: SOLO LECTURA.** Ahora es candado técnico, no solo regla: el rol
    Analista hace que Meta **rechace** cualquier escritura. El script solo sabe hacer `GET`.
 3. ⛔ **EL MCP `meta-ads` NO SE PUEDE CONECTAR EN KIRO WEB. No volver a intentarlo.** El OAuth
