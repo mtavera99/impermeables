@@ -5354,6 +5354,45 @@ la pantalla de consentimiento permite destildarlos.
 
 ---
 
+### 🔴 ACTUALIZACIÓN 2026-09-11 (mañana): EL MCP NO SE PUEDE CONECTAR EN KIRO WEB — Y EL CAMINO BUENO ES OTRO
+
+**Se diagnosticaron DOS bloqueos distintos. El primero se arregló; el segundo es estructural.**
+
+**Bloqueo 1 — RESUELTO: el agente `bikerpro-meta-buyer` no arrancaba.** Su config traía
+`"model": "opus 5"`, que no es un ID de modelo válido, y fallaba con *"Invalid model ID"*.
+✅ **Arreglado creando el agente a nivel de proyecto en `.kiro/agents/bikerpro-meta-buyer.json`**
+(el agente de proyecto le gana al global con el mismo nombre, y recarga en caliente). Se le quitó el
+campo `model` — sin ese campo hereda el modelo por defecto, que es lo robusto. **El agente ya corre.**
+
+**Bloqueo 2 — ESTRUCTURAL: en Kiro Web el MCP remoto no puede completar el login OAuth.**
+El flujo OAuth de MCP usa un `redirectUri` de loopback (`127.0.0.1`) y está soportado en el IDE y la
+CLI, **no en el navegador**; además en Web los servidores MCP **se cargan al arrancar el sandbox**.
+Verificado el 11-sep: el agente corre, el endpoint responde, y **expone CERO tools de `meta-ads`**.
+📌 **No es un error de configuración. Insistir con `mcp.json` en Web no lo va a resolver.**
+
+**🥇 Y hay un hallazgo que CORRIGE el punto 4 de arriba:** la pantalla de consentimiento del MCP pide
+`ads_management` + `ads_mcp_management` **en el mismo bloque, sin opción de solo `ads_read`**. O sea
+que **el camino del MCP obliga a un token con permiso de escritura** — exactamente lo que 4-B quiere
+evitar. **El camino alternativo es más seguro, no menos.**
+
+### ✅ EL CAMINO VIGENTE: TOKEN DE USUARIO DE SISTEMA CON ROL ANALISTA + SOLO `GET`
+
+**Esto convierte 4-B de regla escrita en candado técnico**, que es lo que el punto 4 decía que no
+existía:
+
+| Capa | Candado |
+|---|---|
+| **Identidad** | Usuario de sistema con rol **Analista** (*Ver rendimiento*) sobre la cuenta. Con ese rol, **una escritura falla del lado de Meta** aunque el token la pida |
+| **Permiso** | El token se emite **solo con `ads_read`** |
+| **Herramienta** | `analisis/meta-api-lectura.py` **solo sabe hacer `GET`**. No tiene una línea capaz de `POST`/`PUT`/`DELETE` |
+
+**Comandos:** `cuentas` · `conjuntos act_XXX` · `insights act_XXX 2026-09-08 2026-09-10`
+El token se lee de `META_ADS_TOKEN` o de `/projects/.meta-ads-token` (**fuera del repo**, no se puede
+commitear). **Nunca se pega el token en el chat ni se imprime.**
+📌 Versión de API confirmada viva el 11-sep: **v25.0** (el script detecta y cae a la anterior sola).
+
+---
+
 ## 5-B. ✅ LA IA QUE SÍ ESTÁ ATENDIENDO (desde ~2026-08-12) — ALCANCE REAL, CORREGIDO EL 2026-08-14
 
 **El dueño resolvió la atención automática con la IA nativa de WhatsApp Business (Meta AI), NO con el
