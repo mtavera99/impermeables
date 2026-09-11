@@ -250,8 +250,12 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
 >   (#92) y el **colmena de San Francisco ENTREGADO** — primera medición de rechazo a $149.900 y
 >   **no hubo rechazo**
 > - 🟢 **EL RECHAZO REAL ES 5,0%**, no 15,3% (que era de la época de Heka). 10× de colchón
-> - 🔴 **PERO 15 GUÍAS EN "RECLAME EN OFICINA" ($1.531.000) Y 9 EN "INTENTO DE ENTREGA" ($783.000)
->   DECIDEN ESA TASA.** Si todas se cayeran el rechazo sería 32,1%. **11 llevan 6+ días** → **#75**
+> - 🟢 **Y EL 5,0% NO ES SUERTE: ES GESTIÓN DIARIA DEL DUEÑO.** Las 15 guías en "Reclame en oficina"
+>   ($1.540.000) y las de "Intento de entrega" **ya fueron llamadas Y contactadas por WhatsApp el
+>   mismo 10-sep**, y el dueño confirma que revisa las novedades **todos los días** (venía de ~30
+>   acumuladas y bajó mucho). 🔑 **Eso convierte #75 de "pendiente" en "rutina funcionando", y es la
+>   causa del rechazo bajo** — si se dejara de hacer, el 5,0% subiría y el seguro (hoy 0,24×) volvería
+>   a tener sentido. **NO se puede apagar el seguro Y aflojar la gestión al mismo tiempo.**
 > - 🔔 **EL SEGURO DA 0,24×, NO 0,85×.** Cuesta $460.365 por 141 guías y ahorró $110.625. Se paga
 >   solo si el rechazo pasa de **~21%**; está en 5,0%. **La pregunta es si se puede apagar** → **#91**
 > - 🔴 **EL CHARCO: −$28.663 en UNA guía.** Cobró $59.900 (precio sin envío) contra un flete de
@@ -5807,9 +5811,15 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     de Chía** ($73.000, Interrapidísimo, 7 días en "Creado") nunca la recogieron.
     📌 **Abrir una tercera transportadora** (Envía, Coordinadora o TCC) aunque sea sin volumen: enrutar
     el 100% por Interrapidísimo deja el negocio sin plan B, y tampoco es perfecta.
-75. [ ] 💵 **EMPUJAR LOS 15 "RECLAME EN OFICINA" — $1.841.000 esperando que el cliente recoja.**
-    Un recordatorio por WhatsApp a esos 15. **Si no reclaman se vuelven devoluciones.** Es la plata más
-    fácil disponible: no requiere publicidad, ni producto, ni precio.
+75. [~] 💵🟢 **RUTINA YA FUNCIONANDO — no es un pendiente. NO volver a pedirlo como tarea.**
+    Un recordatorio por WhatsApp a los que están en oficina. **Si no reclaman se vuelven devoluciones.**
+    ✅ **CONFIRMADO EL 10-SEP:** el dueño **llamó y escribió por WhatsApp a las 15** el mismo día, y
+    **revisa las novedades a diario** (venía de ~30 acumuladas y bajó mucho).
+    🔑 **Y acá está la relación causal que faltaba escrita: el rechazo de 5,0% no es suerte, es esta
+    rutina.** Por eso el seguro da 0,24× (#91). **Las dos cosas están atadas: no se puede apagar el
+    seguro Y aflojar la gestión al mismo tiempo.**
+    📌 Lo que sí sigue abierto es **medir**: cuántos de los contactados terminan recogiendo. Ese % es
+    el que dice si el rechazo se queda en 5,0% o sube.
 76. [ ] 🌎🌎 **EL SEGUNDO LAGO, SI VALLE FUNCIONA — hay 40 millones de colombianos sin pautar.**
     La pauta cubre ~23% de la población y el 77% restante **ya genera el 61% de los pedidos** (60%/57%/61%
     en tres periodos). Valle es el molde; si responde, se replica región por región. Ver **0-AA**.
