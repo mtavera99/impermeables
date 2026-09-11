@@ -65,14 +65,91 @@ const BANDAS = {
     nombre: "Pueblos y zona extendida",
     flete: 25481,
     total: 85000,
-    ciudades: ["GUACHENE", "GOMEZ PLATA", "ALGECIRAS", "REMEDIOS", "TUQUERRES", "TURBO", "PUERTO GAITAN", "ANSERMA", "LA UNION", "EL SANTUARIO", "LLORENTE", "SAN CARLOS DE GUAROA", "BUENAVISTA", "SAN GIL", "INZA", "MALAGA", "CAUCASIA", "SANTA ROSA DE CABAL", "RIOSUCIO", "MACEO", "PARATEBUENO", "SANTIAGO DE TOLU", "SAN ANDRES DE SOTAVENTO", "HISPANIA", "GUACARI", "SAN ESTANISLAO", "ACEVEDO", "PUERTO ASIS", "FUNES", "MAGANGUE", "SANTA ROSA DE OSOS", "DIBULLA", "URIBE", "EL TAMBO", "GUARNE", "LA MONTANITA"],
+    // GUACHUCAL agregado el 11-sep: cobró $85.511 por no estar en ninguna lista
+    // (solo $511 de más, pero era "no reconocida" y podía caer a un default peor).
+    ciudades: ["GUACHENE", "GOMEZ PLATA", "ALGECIRAS", "REMEDIOS", "TUQUERRES", "TURBO", "PUERTO GAITAN", "ANSERMA", "LA UNION", "EL SANTUARIO", "LLORENTE", "SAN CARLOS DE GUAROA", "BUENAVISTA", "SAN GIL", "INZA", "MALAGA", "CAUCASIA", "SANTA ROSA DE CABAL", "RIOSUCIO", "MACEO", "PARATEBUENO", "SANTIAGO DE TOLU", "SAN ANDRES DE SOTAVENTO", "HISPANIA", "GUACARI", "SAN ESTANISLAO", "ACEVEDO", "PUERTO ASIS", "FUNES", "MAGANGUE", "SANTA ROSA DE OSOS", "DIBULLA", "URIBE", "EL TAMBO", "GUARNE", "LA MONTANITA", "GUACHUCAL"],
   },
+};
+
+// ============================================================================
+// 🔴 BANDA F — DIFÍCIL ACCESO: NO SE COTIZA SOLO (agregado 2026-09-11, #97)
+//
+// LA FUGA QUE ORIGINA ESTO: la guía de EL CHARCO (Nariño, se llega por río)
+// se cobró en $59.900 —el precio SIN envío— contra un flete real de $55.563.
+// Pérdida: −$28.663 en UNA guía = el margen de 1,3 pedidos buenos.
+//
+// 🔑 LA CAUSA NO ERA LA TARIFA, ERA EL DEFAULT. Con `BANDA_POR_DEFECTO = "E"`
+// cualquier destino desconocido se cotizaba a $85.000 (flete $25.481). Para un
+// pueblo de carretera eso está bien y es el 43% del volumen. Pero para un
+// destino fluvial, aéreo o insular el flete real es 2-3× ese número, y el
+// default lo convertía en una venta a pérdida SIN QUE NADIE SE ENTERARA.
+//
+// LA REGLA: estos municipios NO usan la banda por defecto. O tienen un total
+// MEDIDO, o se escalan al dueño. La IA no improvisa donde no tiene dato.
+//
+// Criterio de la lista: Pacífico fluvial (Chocó, Nariño, Cauca), Amazonía,
+// Orinoquía profunda e insular. NO incluye los puertos y capitales con vía
+// terrestre, que ya están tarifados: Buenaventura ($81.000), Quibdó ($83.000),
+// Puerto Asís y Puerto Gaitán (banda E).
+// ============================================================================
+const ZONA_DIFICIL_ACCESO = {
+  // ---- CON TOTAL MEDIDO: se puede cotizar, y es el número que va ----
+  // TADÓ: confirmado por el dueño. Y ojo, es el único destino del país donde el
+  // flete se DUPLICA con 2 unidades en vez de compartirse (2,20× vs 1,4-1,6×).
+  TADO: { total: 93000, nota: "confirmado por el dueño", sinPromo2: true },
+  // EL CHARCO: flete observado $55.563 en la guía del 10-sep (n=1).
+  // 59.900 + 55.563 = 115.463 → se redondea hacia arriba, nunca hacia abajo.
+  "EL CHARCO": { total: 115500, nota: "flete medido $55.563, n=1", sinPromo2: true },
+
+  // ---- SIN DATO: total = null → NO SE COTIZA, SE ESCALA AL DUEÑO ----
+  // Chocó fluvial
+  ISTMINA: { total: null }, CONDOTO: { total: null }, NUQUI: { total: null },
+  "BAHIA SOLANO": { total: null }, ACANDI: { total: null }, UNGUIA: { total: null },
+  "EL CARMEN DE ATRATO": { total: null }, BOJAYA: { total: null },
+  // Nariño fluvial / Pacífico
+  TUMACO: { total: null }, BARBACOAS: { total: null }, "MAGUI PAYAN": { total: null },
+  "ROBERTO PAYAN": { total: null }, "OLAYA HERRERA": { total: null },
+  "BOCAS DE SATINGA": { total: null }, MOSQUERA: { total: null }, "LA TOLA": { total: null },
+  "SANTA BARBARA DE ISCUANDE": { total: null }, "FRANCISCO PIZARRO": { total: null },
+  // Cauca Pacífico
+  GUAPI: { total: null }, TIMBIQUI: { total: null }, "LOPEZ DE MICAY": { total: null },
+  // Antioquia fluvial (Atrato medio)
+  "VIGIA DEL FUERTE": { total: null }, MURINDO: { total: null },
+  // Amazonía
+  LETICIA: { total: null }, "PUERTO NARINO": { total: null },
+  "PUERTO LEGUIZAMO": { total: null }, MITU: { total: null },
+  // Orinoquía profunda
+  INIRIDA: { total: null }, "PUERTO CARRENO": { total: null },
+  "LA PRIMAVERA": { total: null }, CUMARIBO: { total: null },
+  // Insular
+  "SAN ANDRES": { total: null }, PROVIDENCIA: { total: null },
+};
+
+// ============================================================================
+// ⚠️ NOMBRES QUE SE REPITEN EN VARIOS DEPARTAMENTOS — HAY QUE PREGUNTAR
+//
+// Trampa real: RIOSUCIO está en banda E ($85.000) por Riosucio, CALDAS. Pero
+// existe Riosucio, CHOCÓ, que es fluvial y cuesta mucho más. Si el cliente
+// dice solo "Riosucio" y se asume Caldas, se repite exactamente el error de
+// El Charco. Lo mismo con La Unión y El Tambo.
+// ============================================================================
+const CIUDADES_AMBIGUAS = {
+  RIOSUCIO: ["Caldas", "Chocó"],
+  "LA UNION": ["Nariño", "Valle", "Antioquia", "Sucre"],
+  "EL TAMBO": ["Cauca", "Nariño"],
+  "SANTA BARBARA": ["Antioquia", "Nariño", "Santander"],
+  "SAN CARLOS": ["Antioquia", "Córdoba"],
+  ARGELIA: ["Cauca", "Antioquia", "Valle"],
 };
 
 // Si la ciudad no está en ninguna lista, se asume la banda MÁS CARA.
 // Antes el default era $18.000 y se quedaba corto en todos los pueblos, que son
 // justo los destinos que no aparecen en ninguna lista. Errar hacia arriba cuesta
 // una objeción de precio; errar hacia abajo cuesta $4.900 de margen por venta.
+//
+// ⚠️ 11-sep: este default es correcto SOLO para pueblos de carretera. Los
+// destinos fluviales/aéreos/insulares se atajan antes en ZONA_DIFICIL_ACCESO,
+// porque para ellos $85.000 es una venta a pérdida (ver El Charco).
 const BANDA_POR_DEFECTO = "E";
 
 // ============================================================================
@@ -167,6 +244,27 @@ function bandaDe(ciudad) {
 }
 
 /**
+ * ¿Es un destino de difícil acceso? (#97)
+ * @returns {{total:number|null, nota?:string, sinPromo2?:boolean}|null}
+ */
+function zonaDificilDe(ciudad) {
+  const c = normalizar(ciudad);
+  if (!c) return null;
+  return ZONA_DIFICIL_ACCESO[c] || null;
+}
+
+/**
+ * ¿El nombre de la ciudad existe en varios departamentos? (#97)
+ * Si devuelve algo, HAY QUE PREGUNTAR el departamento antes de cotizar.
+ * @returns {string[]|null} departamentos posibles
+ */
+function departamentosPosibles(ciudad) {
+  const c = normalizar(ciudad);
+  if (!c) return null;
+  return CIUDADES_AMBIGUAS[c] || null;
+}
+
+/**
  * Cotiza un pedido. Es la única función que debe usarse para dar precios.
  * @param {string} ciudad
  * @param {number} unidades
@@ -175,6 +273,43 @@ function bandaDe(ciudad) {
  */
 function cotizar(ciudad, unidades = 1) {
   const uds = Math.max(1, Number(unidades) || 1);
+
+  // ---- ATAJO #97: nombre ambiguo → no se cotiza, se pregunta el departamento ----
+  const deptos = departamentosPosibles(ciudad);
+  if (deptos) {
+    return {
+      banda: null,
+      nombreBanda: "Nombre repetido en varios departamentos",
+      flete: null,
+      total: null,
+      unidades: uds,
+      reconocida: false,
+      preguntarDepartamento: deptos,
+      requiereConfirmacion: true,
+    };
+  }
+
+  // ---- ATAJO #97: difícil acceso → total medido, o se ESCALA al dueño ----
+  const dificil = zonaDificilDe(ciudad);
+  if (dificil) {
+    return {
+      banda: "F",
+      nombreBanda: "Difícil acceso — cotización individual",
+      flete: null,
+      // null = la IA NO tiene permiso de dar un número. Se escala.
+      total: dificil.total,
+      unidades: uds,
+      reconocida: true,
+      dificilAcceso: true,
+      // En estos destinos el flete NO se comparte al llevar 2 (Tadó lo duplica),
+      // así que la promo de 2 unidades no aplica hasta cotizar a mano.
+      sinPromo2: dificil.sinPromo2 === true || uds > 1,
+      escalar: dificil.total === null || uds > 1,
+      nota: dificil.nota,
+      requiereConfirmacion: true,
+    };
+  }
+
   const clave = bandaDe(ciudad);
   const reconocida = clave !== null;
   const banda = BANDAS[clave || BANDA_POR_DEFECTO];
@@ -230,25 +365,55 @@ function cotizar(ciudad, unidades = 1) {
 // Texto que se inyecta en el prompt de la IA. Da TOTALES por banda, no fletes
 // sueltos: la IA no debe hacer aritmética ni improvisar un rango.
 function tablaFletesTexto() {
-  return Object.entries(BANDAS)
+  const bandas = Object.entries(BANDAS)
     .map(([clave, b]) => {
       const ejemplos = b.ciudades.slice(0, 6).join(", ");
       return `- ${b.nombre} (${ejemplos}...): TOTAL ${fmt(b.total)} al recibir (producto ${fmt(PRECIO_PRODUCTO)} + envío ${fmt(b.flete)})`;
     })
     .join("\n");
+
+  const conDato = Object.entries(ZONA_DIFICIL_ACCESO)
+    .filter(([, v]) => v.total !== null)
+    .map(([c, v]) => `${c} ${fmt(v.total)}`)
+    .join(" · ");
+  const sinDato = Object.entries(ZONA_DIFICIL_ACCESO)
+    .filter(([, v]) => v.total === null)
+    .map(([c]) => c)
+    .join(", ");
+  const ambiguas = Object.entries(CIUDADES_AMBIGUAS)
+    .map(([c, d]) => `${c} (${d.join(" / ")})`)
+    .join(" · ");
+
+  return `${bandas}
+
+🔴 DIFÍCIL ACCESO — ESTOS NO SE COTIZAN CON LA TABLA DE ARRIBA
+Se llega por río, avión o barco y el envío cuesta 2-3× lo de un pueblo normal.
+- CON precio confirmado, usá ESTE número: ${conDato}
+- SIN precio: ${sinDato}
+  → NO des ningún número. Decí: "Dejame confirmarte el envío a tu ciudad y te
+    escribo en un momento 📦" y avisá al dueño. Cobrar $85.000 acá es vender a
+    pérdida: en El Charco el envío real fue $55.563.
+
+⚠️ NOMBRES QUE EXISTEN EN VARIOS DEPARTAMENTOS — PREGUNTÁ ANTES DE COTIZAR
+${ambiguas}
+→ Ejemplo: "¿Riosucio de Caldas o de Chocó? Es que el envío cambia bastante 🙂"`;
 }
 
 module.exports = {
   BANDAS,
   BANDA_POR_DEFECTO,
+  CIUDADES_AMBIGUAS,
   FLETE_2_OBSERVADO,
   PRECIO_PRODUCTO,
   PROMO_2_TOTAL,
   PROMO_2_UNIDADES,
   RECARGO_UNIDAD_EXTRA,
+  ZONA_DIFICIL_ACCESO,
   bandaDe,
   cotizar,
+  departamentosPosibles,
   fmt,
   normalizar,
   tablaFletesTexto,
+  zonaDificilDe,
 };

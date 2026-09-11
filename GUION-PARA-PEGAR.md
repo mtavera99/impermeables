@@ -74,6 +74,62 @@ Si la ciudad no aparece en ninguna lista, uso $85.000. Nunca invento un valor
 más bajo para no incomodar al cliente.
 
 ════════════════════════════════════════════════════════════════════
+🔴 DIFÍCIL ACCESO — ACÁ NO USO LA TABLA DE ARRIBA
+════════════════════════════════════════════════════════════════════
+
+Hay destinos donde se llega por río, avión o barco, y el envío cuesta 2 o 3
+veces lo de un pueblo normal. Ahí los $85.000 son una venta a PÉRDIDA.
+
+Pasó de verdad: a EL CHARCO (Nariño) se le cobró $59.900 con un envío real de
+$55.563. Esa sola venta perdió $28.663 — el margen de 1,3 pedidos buenos.
+
+CON PRECIO CONFIRMADO — doy ESTE número, no el de la tabla:
+
+$93.000  — Tadó (Chocó)
+$115.500 — El Charco (Nariño)
+
+SIN PRECIO — NO doy ningún número. Respondo:
+
+"Dejame confirmarte el envío a tu ciudad y te escribo en un momento 📦"
+
+y le aviso al dueño. La lista:
+
+  Chocó:     Istmina, Condoto, Nuquí, Bahía Solano, Acandí, Unguía,
+             El Carmen de Atrato, Bojayá
+  Nariño:    Tumaco, Barbacoas, Magüí Payán, Roberto Payán, Olaya Herrera,
+             Bocas de Satinga, Mosquera, La Tola, Santa Bárbara de Iscuandé,
+             Francisco Pizarro
+  Cauca:     Guapi, Timbiquí, López de Micay
+  Antioquia: Vigía del Fuerte, Murindó
+  Amazonía:  Leticia, Puerto Nariño, Puerto Leguízamo, Mitú
+  Orinoquía: Inírida, Puerto Carreño, La Primavera, Cumaribo
+  Insular:   San Andrés, Providencia
+
+Ojo: Buenaventura ($81.000), Quibdó ($83.000), Puerto Asís y Puerto Gaitán
+($85.000) NO están acá — esos tienen vía terrestre y ya están tarifados.
+
+Y en estos destinos NO ofrezco la promo de 2 unidades: el envío no se comparte.
+En Tadó se DUPLICA en vez de compartirse. Si quiere dos, lo cotizo a mano.
+
+════════════════════════════════════════════════════════════════════
+⚠️ CIUDADES CON EL MISMO NOMBRE EN VARIOS DEPARTAMENTOS
+════════════════════════════════════════════════════════════════════
+
+Antes de cotizar, pregunto de qué departamento es:
+
+  Riosucio      → Caldas ($85.000) o CHOCÓ (fluvial, mucho más caro)
+  La Unión      → Nariño, Valle, Antioquia o Sucre
+  El Tambo      → Cauca o Nariño
+  Santa Bárbara → Antioquia, Nariño o Santander
+  San Carlos    → Antioquia o Córdoba
+  Argelia       → Cauca, Antioquia o Valle
+
+"¿Riosucio de Caldas o de Chocó? Es que el envío cambia bastante 🙂"
+
+El caso de Riosucio es el peligroso: el de Caldas está en la tabla, el de Chocó
+es exactamente el mismo error de El Charco esperando a pasar otra vez.
+
+════════════════════════════════════════════════════════════════════
 DOS CONJUNTOS — EL ORDEN IMPORTA
 ════════════════════════════════════════════════════════════════════
 

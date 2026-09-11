@@ -6277,6 +6277,22 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     pedidos buenos.**
     ✅ **REGLA A PEGAR: si la ciudad no aparece en la tabla del tarifario, NO se cotiza — se le dice
     al cliente que se confirma en un momento y se escala al dueño.** Ver **0-AF**.
+    ---
+    🟢 **PARCHEADO EN CÓDIGO EL 11-SEP (falta pegarlo en la IA de WhatsApp y probarlo).**
+    **La causa raíz no era la tarifa: era el `BANDA_POR_DEFECTO = "E"`.** Cualquier destino
+    desconocido se cotizaba a $85.000. Para un pueblo de carretera está bien y es el 43% del
+    volumen; para uno fluvial el flete real es 2-3× eso, **y el default convertía la venta en
+    pérdida sin que nadie se enterara.**
+    | Qué se agregó | Dónde |
+    |---|---|
+    | **Banda F "Difícil acceso"** con 33 municipios (Pacífico de Chocó/Nariño/Cauca, Amazonía, Orinoquía, insular). Con precio medido: **Tadó $93.000 · El Charco $115.500**. Sin precio: **`total: null` → la IA no puede dar número, escala** | `bot/src/fletes.js` |
+    | **6 nombres ambiguos** → se pregunta el departamento antes de cotizar. **El peligroso es Riosucio:** el de Caldas está en banda E, el de Chocó es fluvial = el mismo error de El Charco esperando | `bot/src/fletes.js` |
+    | Reglas **4-B y 4-C** en el prompt, y el bloque nuevo en el guion de pegar | `bot/src/prompt.js` · `GUION-PARA-PEGAR.md` |
+    | **GUACHUCAL** agregado a banda E (era "no reconocida" y por eso cobró $85.511) | `bot/src/fletes.js` |
+    ✅ Probado: El Charco → $115.500 · Guapi → escala sin número · Riosucio → pregunta departamento ·
+    Tadó con 2 unidades → escala (no aplica promo) · **y Cali/Turbo/Bogotá siguen igual.**
+    ⏳ **Lo que falta: pegar el guion actualizado en la IA de WhatsApp y probar con "soy de El Charco"
+    y "soy de Riosucio".** Hasta que eso pase, la fuga sigue abierta en producción.
 
 ### 🟡 Prioridad media
 14. [ ] 🔧 **Arreglar zonas seguras en el generador** — el botón de WhatsApp queda tapado en Stories
