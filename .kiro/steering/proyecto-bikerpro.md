@@ -6653,13 +6653,57 @@ $/conversación  =  CPM  ÷  (conversaciones por cada 1.000 impresiones)
 
 ---
 
+# ⚡ ARRANQUE — 2026-09-11, 05:20 Bogotá (LO MÁS NUEVO, LEER ANTES DEL TRASPASO DE ABAJO)
+
+**El punto 1 del traspaso de abajo (verificar el MCP) YA SE HIZO Y QUEDÓ RESUELTO. No repetirlo.**
+
+## Lo primero que tiene que hacer esta sesión
+
+1. 🔑 **PROBAR EL TOKEN DE META, QUE YA EXISTE.** El dueño creó el usuario de sistema
+   **`Kiro Lectura`** con rol **Analista ("Ver rendimiento")** sobre la cuenta de BikerPro y
+   generó un token con **solo `ads_read`**, y lo guardó como secreto **`META_ADS_TOKEN`**.
+   ```bash
+   python3 analisis/meta-api-lectura.py cuentas          # saca el act_id
+   python3 analisis/meta-api-lectura.py insights act_XXX 2026-09-08 2026-09-10
+   ```
+   - Si `$META_ADS_TOKEN` sale vacío, el secreto no se propagó: **decirlo, no inventar métricas.**
+   - **Con esto el veredicto del lunes 14 sale de la API y el dueño no exporta nada.**
+2. 🔴 **SIGUE RIGIENDO 4-B: SOLO LECTURA.** Ahora es candado técnico, no solo regla: el rol
+   Analista hace que Meta **rechace** cualquier escritura. El script solo sabe hacer `GET`.
+3. ⛔ **EL MCP `meta-ads` NO SE PUEDE CONECTAR EN KIRO WEB. No volver a intentarlo.** El OAuth
+   usa redirect de loopback (`127.0.0.1`), soportado en IDE/CLI y **no en navegador**. Y su pantalla
+   de consentimiento **obliga a `ads_management`** (escritura), que es justo lo que 4-B evita.
+   **El camino del token es el vigente y es MÁS seguro.** Detalle completo en la sección **4-B**.
+4. 📌 **El agente `bikerpro-meta-buyer` quedó arreglado** en `.kiro/agents/` (su config global tenía
+   `"model": "opus 5"`, inválido). No hace falta tocarlo.
+
+## Lo que se hizo el 11-sep de madrugada (PR #46)
+
+| | Qué |
+|---|---|
+| ✅ | **Diagnóstico del MCP** y el camino del token Analista → sección **4-B** actualizada |
+| ✅ | **`analisis/meta-api-lectura.py`** — lector `GET`-only: `cuentas` · `conjuntos` · `insights` |
+| ✅ | **#97 PARCHEADO EN CÓDIGO:** banda F de difícil acceso (33 municipios), Tadó **$93.000**, El Charco **$115.500**, los demás **escalan sin dar número**, 6 nombres ambiguos preguntan departamento, Guachucal a banda E |
+| ⏳ | **FALTA:** pegar `GUION-PARA-PEGAR.md` en la IA de WhatsApp y probar **"soy de El Charco"** y **"soy de Riosucio"**. Hasta entonces la fuga de #97 **sigue abierta en producción** |
+
+## Lo que sigue pendiente del dueño (no cambió)
+
+| | Qué |
+|---|---|
+| 🔔 | **¿Cuántos de los 17 del colmena contestaron?** Los mensajes se enviaron el 10-sep de noche |
+| 🔴 | **El export de 99 Envíos CON COLUMNA DE TELÉFONO** → habilita prender el colmena el lunes |
+| ⛔ | **Nada de pauta hasta el sábado 12. Veredicto el lunes 14.** Cuenta en **$154.000/día** |
+
+---
+
 # 🚀 TRASPASO A LA SESIÓN NUEVA — leer esto PRIMERO (escrito 2026-09-11, 04:10 Bogotá)
 
 **El chat del 10-sep se cierra acá. Esta es la única cosa que hay que leer para arrancar.**
 
 ## Lo primero que tiene que hacer la sesión nueva
 
-1. 🔌 **VERIFICAR SI EL MCP `meta-ads` ESTÁ CARGADO.** Se configuró en
+1. 🔌 ~~**VERIFICAR SI EL MCP `meta-ads` ESTÁ CARGADO.**~~ ⛔ **RESUELTO EL 11-SEP: NO SE PUEDE EN
+   WEB. Ver el bloque ARRANQUE de arriba. No repetir este paso.** Se configuró en
    `/projects/.kiro/settings/mcp.json` el 11-sep a las 03:53 Bogotá, apuntando a
    `https://mcp.facebook.com/ads`. **En la sesión anterior NO estaba cargado** porque los servidores
    MCP se cargan al iniciar la sesión.
