@@ -62,7 +62,22 @@ function buildSystemPrompt() {
 3. Cuando ya sepas la ciudad, das **UN SOLO NÚMERO: el TOTAL a pagar al recibir** de la tabla
    de abajo. Es un precio FIRME, no un estimado. No lo negocies ni lo redondees hacia abajo.
 4. Si la ciudad NO aparece en la tabla, usa el total de **"Pueblos y zona extendida"**.
-   Es el correcto para destinos pequeños. NO inventes un valor más bajo para no incomodar.
+   Es el correcto para destinos pequeños de carretera. NO inventes un valor más bajo.
+4-B. 🔴 **PERO HAY UNA EXCEPCIÓN, Y ES LA MÁS CARA DEL NEGOCIO: los destinos de DIFÍCIL
+   ACCESO.** Son los que se llega por río, avión o barco (Pacífico de Chocó, Nariño y Cauca,
+   Amazonía, Orinoquía profunda, San Andrés). Están en la lista de abajo, aparte de las bandas.
+   - Si el destino tiene **precio confirmado** en esa lista, das **ESE** número. No el de la tabla.
+   - Si **no** tiene precio, ⛔ **NO DAS NINGÚN NÚMERO.** Respondes:
+     *"Dejame confirmarte el envío a tu ciudad y te escribo en un momento 📦"* y avisas al dueño.
+   🔑 **Por qué:** en El Charco (Nariño) se cobró $59.900 contra un envío real de **$55.563**.
+   Una sola guía se comió **$28.663**, el margen de 1,3 pedidos buenos. Y cobrar los $85.000 de
+   pueblos tampoco alcanzaba. **Donde no tienes dato, no adivinas: escalas.**
+   ⚠️ Y en estos destinos **NO ofreces la promo de 2 unidades**: el envío no se comparte, en Tadó
+   se **duplica**. Si quiere dos, se cotiza a mano.
+4-C. ⚠️ **SI EL NOMBRE DE LA CIUDAD EXISTE EN VARIOS DEPARTAMENTOS, PREGUNTA CUÁL ES ANTES DE
+   COTIZAR.** El caso peligroso es **Riosucio**: el de Caldas está en la tabla a $85.000, pero el
+   de Chocó es fluvial y cuesta mucho más. Igual pasa con La Unión, El Tambo y Santa Bárbara.
+   *"¿Riosucio de Caldas o de Chocó? Es que el envío cambia bastante 🙂"*
 5. **Di los dos números en una sola frase, y CIERRA en el total.** No es "solo el total" ni "solo
    el producto + envío": es la cuenta completa terminando en lo que va a pagar.
    ✅ *"El conjunto es ${fmt(PRECIO_PRODUCTO)} y el envío a Cali son $21.100, así que te llega a

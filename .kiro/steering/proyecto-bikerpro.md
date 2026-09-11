@@ -5354,6 +5354,45 @@ la pantalla de consentimiento permite destildarlos.
 
 ---
 
+### 🔴 ACTUALIZACIÓN 2026-09-11 (mañana): EL MCP NO SE PUEDE CONECTAR EN KIRO WEB — Y EL CAMINO BUENO ES OTRO
+
+**Se diagnosticaron DOS bloqueos distintos. El primero se arregló; el segundo es estructural.**
+
+**Bloqueo 1 — RESUELTO: el agente `bikerpro-meta-buyer` no arrancaba.** Su config traía
+`"model": "opus 5"`, que no es un ID de modelo válido, y fallaba con *"Invalid model ID"*.
+✅ **Arreglado creando el agente a nivel de proyecto en `.kiro/agents/bikerpro-meta-buyer.json`**
+(el agente de proyecto le gana al global con el mismo nombre, y recarga en caliente). Se le quitó el
+campo `model` — sin ese campo hereda el modelo por defecto, que es lo robusto. **El agente ya corre.**
+
+**Bloqueo 2 — ESTRUCTURAL: en Kiro Web el MCP remoto no puede completar el login OAuth.**
+El flujo OAuth de MCP usa un `redirectUri` de loopback (`127.0.0.1`) y está soportado en el IDE y la
+CLI, **no en el navegador**; además en Web los servidores MCP **se cargan al arrancar el sandbox**.
+Verificado el 11-sep: el agente corre, el endpoint responde, y **expone CERO tools de `meta-ads`**.
+📌 **No es un error de configuración. Insistir con `mcp.json` en Web no lo va a resolver.**
+
+**🥇 Y hay un hallazgo que CORRIGE el punto 4 de arriba:** la pantalla de consentimiento del MCP pide
+`ads_management` + `ads_mcp_management` **en el mismo bloque, sin opción de solo `ads_read`**. O sea
+que **el camino del MCP obliga a un token con permiso de escritura** — exactamente lo que 4-B quiere
+evitar. **El camino alternativo es más seguro, no menos.**
+
+### ✅ EL CAMINO VIGENTE: TOKEN DE USUARIO DE SISTEMA CON ROL ANALISTA + SOLO `GET`
+
+**Esto convierte 4-B de regla escrita en candado técnico**, que es lo que el punto 4 decía que no
+existía:
+
+| Capa | Candado |
+|---|---|
+| **Identidad** | Usuario de sistema con rol **Analista** (*Ver rendimiento*) sobre la cuenta. Con ese rol, **una escritura falla del lado de Meta** aunque el token la pida |
+| **Permiso** | El token se emite **solo con `ads_read`** |
+| **Herramienta** | `analisis/meta-api-lectura.py` **solo sabe hacer `GET`**. No tiene una línea capaz de `POST`/`PUT`/`DELETE` |
+
+**Comandos:** `cuentas` · `conjuntos act_XXX` · `insights act_XXX 2026-09-08 2026-09-10`
+El token se lee de `META_ADS_TOKEN` o de `/projects/.meta-ads-token` (**fuera del repo**, no se puede
+commitear). **Nunca se pega el token en el chat ni se imprime.**
+📌 Versión de API confirmada viva el 11-sep: **v25.0** (el script detecta y cae a la anterior sola).
+
+---
+
 ## 5-B. ✅ LA IA QUE SÍ ESTÁ ATENDIENDO (desde ~2026-08-12) — ALCANCE REAL, CORREGIDO EL 2026-08-14
 
 **El dueño resolvió la atención automática con la IA nativa de WhatsApp Business (Meta AI), NO con el
@@ -6238,6 +6277,22 @@ varias versiones o fotografiar las 4 piezas reales (más honesto y suele rendir 
     pedidos buenos.**
     ✅ **REGLA A PEGAR: si la ciudad no aparece en la tabla del tarifario, NO se cotiza — se le dice
     al cliente que se confirma en un momento y se escala al dueño.** Ver **0-AF**.
+    ---
+    🟢 **PARCHEADO EN CÓDIGO EL 11-SEP (falta pegarlo en la IA de WhatsApp y probarlo).**
+    **La causa raíz no era la tarifa: era el `BANDA_POR_DEFECTO = "E"`.** Cualquier destino
+    desconocido se cotizaba a $85.000. Para un pueblo de carretera está bien y es el 43% del
+    volumen; para uno fluvial el flete real es 2-3× eso, **y el default convertía la venta en
+    pérdida sin que nadie se enterara.**
+    | Qué se agregó | Dónde |
+    |---|---|
+    | **Banda F "Difícil acceso"** con 33 municipios (Pacífico de Chocó/Nariño/Cauca, Amazonía, Orinoquía, insular). Con precio medido: **Tadó $93.000 · El Charco $115.500**. Sin precio: **`total: null` → la IA no puede dar número, escala** | `bot/src/fletes.js` |
+    | **6 nombres ambiguos** → se pregunta el departamento antes de cotizar. **El peligroso es Riosucio:** el de Caldas está en banda E, el de Chocó es fluvial = el mismo error de El Charco esperando | `bot/src/fletes.js` |
+    | Reglas **4-B y 4-C** en el prompt, y el bloque nuevo en el guion de pegar | `bot/src/prompt.js` · `GUION-PARA-PEGAR.md` |
+    | **GUACHUCAL** agregado a banda E (era "no reconocida" y por eso cobró $85.511) | `bot/src/fletes.js` |
+    ✅ Probado: El Charco → $115.500 · Guapi → escala sin número · Riosucio → pregunta departamento ·
+    Tadó con 2 unidades → escala (no aplica promo) · **y Cali/Turbo/Bogotá siguen igual.**
+    ⏳ **Lo que falta: pegar el guion actualizado en la IA de WhatsApp y probar con "soy de El Charco"
+    y "soy de Riosucio".** Hasta que eso pase, la fuga sigue abierta en producción.
 
 ### 🟡 Prioridad media
 14. [ ] 🔧 **Arreglar zonas seguras en el generador** — el botón de WhatsApp queda tapado en Stories
@@ -6598,13 +6653,57 @@ $/conversación  =  CPM  ÷  (conversaciones por cada 1.000 impresiones)
 
 ---
 
+# ⚡ ARRANQUE — 2026-09-11, 05:20 Bogotá (LO MÁS NUEVO, LEER ANTES DEL TRASPASO DE ABAJO)
+
+**El punto 1 del traspaso de abajo (verificar el MCP) YA SE HIZO Y QUEDÓ RESUELTO. No repetirlo.**
+
+## Lo primero que tiene que hacer esta sesión
+
+1. 🔑 **PROBAR EL TOKEN DE META, QUE YA EXISTE.** El dueño creó el usuario de sistema
+   **`Kiro Lectura`** con rol **Analista ("Ver rendimiento")** sobre la cuenta de BikerPro y
+   generó un token con **solo `ads_read`**, y lo guardó como secreto **`META_ADS_TOKEN`**.
+   ```bash
+   python3 analisis/meta-api-lectura.py cuentas          # saca el act_id
+   python3 analisis/meta-api-lectura.py insights act_XXX 2026-09-08 2026-09-10
+   ```
+   - Si `$META_ADS_TOKEN` sale vacío, el secreto no se propagó: **decirlo, no inventar métricas.**
+   - **Con esto el veredicto del lunes 14 sale de la API y el dueño no exporta nada.**
+2. 🔴 **SIGUE RIGIENDO 4-B: SOLO LECTURA.** Ahora es candado técnico, no solo regla: el rol
+   Analista hace que Meta **rechace** cualquier escritura. El script solo sabe hacer `GET`.
+3. ⛔ **EL MCP `meta-ads` NO SE PUEDE CONECTAR EN KIRO WEB. No volver a intentarlo.** El OAuth
+   usa redirect de loopback (`127.0.0.1`), soportado en IDE/CLI y **no en navegador**. Y su pantalla
+   de consentimiento **obliga a `ads_management`** (escritura), que es justo lo que 4-B evita.
+   **El camino del token es el vigente y es MÁS seguro.** Detalle completo en la sección **4-B**.
+4. 📌 **El agente `bikerpro-meta-buyer` quedó arreglado** en `.kiro/agents/` (su config global tenía
+   `"model": "opus 5"`, inválido). No hace falta tocarlo.
+
+## Lo que se hizo el 11-sep de madrugada (PR #46)
+
+| | Qué |
+|---|---|
+| ✅ | **Diagnóstico del MCP** y el camino del token Analista → sección **4-B** actualizada |
+| ✅ | **`analisis/meta-api-lectura.py`** — lector `GET`-only: `cuentas` · `conjuntos` · `insights` |
+| ✅ | **#97 PARCHEADO EN CÓDIGO:** banda F de difícil acceso (33 municipios), Tadó **$93.000**, El Charco **$115.500**, los demás **escalan sin dar número**, 6 nombres ambiguos preguntan departamento, Guachucal a banda E |
+| ⏳ | **FALTA:** pegar `GUION-PARA-PEGAR.md` en la IA de WhatsApp y probar **"soy de El Charco"** y **"soy de Riosucio"**. Hasta entonces la fuga de #97 **sigue abierta en producción** |
+
+## Lo que sigue pendiente del dueño (no cambió)
+
+| | Qué |
+|---|---|
+| 🔔 | **¿Cuántos de los 17 del colmena contestaron?** Los mensajes se enviaron el 10-sep de noche |
+| 🔴 | **El export de 99 Envíos CON COLUMNA DE TELÉFONO** → habilita prender el colmena el lunes |
+| ⛔ | **Nada de pauta hasta el sábado 12. Veredicto el lunes 14.** Cuenta en **$154.000/día** |
+
+---
+
 # 🚀 TRASPASO A LA SESIÓN NUEVA — leer esto PRIMERO (escrito 2026-09-11, 04:10 Bogotá)
 
 **El chat del 10-sep se cierra acá. Esta es la única cosa que hay que leer para arrancar.**
 
 ## Lo primero que tiene que hacer la sesión nueva
 
-1. 🔌 **VERIFICAR SI EL MCP `meta-ads` ESTÁ CARGADO.** Se configuró en
+1. 🔌 ~~**VERIFICAR SI EL MCP `meta-ads` ESTÁ CARGADO.**~~ ⛔ **RESUELTO EL 11-SEP: NO SE PUEDE EN
+   WEB. Ver el bloque ARRANQUE de arriba. No repetir este paso.** Se configuró en
    `/projects/.kiro/settings/mcp.json` el 11-sep a las 03:53 Bogotá, apuntando a
    `https://mcp.facebook.com/ads`. **En la sesión anterior NO estaba cargado** porque los servidores
    MCP se cargan al iniciar la sesión.
