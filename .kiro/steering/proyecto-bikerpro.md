@@ -7983,3 +7983,47 @@ en la costa, y eso NO está probado.** El motivo real es de **diseño de medici�
 Mandarla a Bogotá y Medellín **no es un castigo ni una precaución de calidad: es para poder medirla**
 contra una línea base que ya existe (Bogotá Interrapidísimo: 7/23 = 30% maduro). **Nada dice que
 Coordinadora sea mala en la costa. Lo que pasa es que en la costa no se puede medir nada.**
+
+
+### 0-AÑ.1 · El pendiente resuelto: TRES conjuntos con la segmentación IDÉNTICA
+
+Leí la segmentación real de los 8 conjuntos activos. Resultado:
+
+| conjunto | $/día | geo | edad | intereses |
+|---|---|---|---|---|
+| **Domiciliarios VIDEO** | $55.000 | **Bogotá, Medellín** | 20-65 | **Rappi, Delivery Person, Delivery** |
+| **Domiciliarios** | $45.000 | **Bogotá, Medellín** | 20-65 | **Rappi, Delivery Person, Delivery** |
+| **TEST Creativos** | $25.000 | **Bogotá, Medellín** | 20-65 | **Rappi, Delivery Person, Delivery** |
+| Motorizados | $9.000 | Distrito Especial (Bogotá) | 18-65 | ninguno (abierto) |
+| Tolima Huila | $5.000 | Huila, Tolima | 20-65 | Rappi, Delivery Person, Delivery |
+| Eje Cafetero | $5.000 | Quindío, Risaralda, Caldas | 20-65 | idem |
+| Santander | $5.000 | Santander | 20-65 | idem |
+| Valle del Cauca | $5.000 | Valle del Cauca | 20-65 | idem |
+
+**Los tres primeros son la MISMA audiencia, palabra por palabra: $125.000/día compitiendo por
+exactamente las mismas personas.** Más Motorizados, que con público abierto en Bogotá los contiene.
+**~$134.000/día sobre el mismo pozo.**
+
+Es probablemente **deliberado**: es una prueba de creativos (video vs imagen vs creativos nuevos)
+sobre una audiencia fija. Como diseño de test tiene sentido. El costo es que la entrega se reparte
+desigual y las cifras de cada conjunto **no son comparables entre sí** — se están robando usuarios.
+
+**Esto es la explicación más probable de por qué VIDEO va al 66% y Domiciliarios al 31%.**
+Pero ⚠️ **no la afirmo cerrada**, porque hay un dato que no encaja: hoy **Domiciliarios tiene MEJOR
+$/conv que VIDEO ($831 vs $917) y aun así recibe menos plata.** Si Meta simplemente estuviera
+premiando al ganador, sería al revés. Falta algo por entender.
+
+#### ❌ Y de paso mata mi otra hipótesis sobre las regiones
+
+Yo había dicho que las regiones podían estar perdiendo la subasta contra los conjuntos grandes.
+**Falso: no hay solapamiento geográfico.** Los grandes son Bogotá+Medellín; las regiones son
+Huila/Tolima, Eje Cafetero, Santander, Valle. **No se cruzan.**
+
+Las regiones no compiten con nadie. **Están caras por mérito propio ($1.576/conv contra $880).**
+Eso ya quedaba confirmado por el costo; ahora también por la segmentación.
+
+#### Candidato para DESPUÉS del 15-sep (no antes)
+
+Evaluar consolidar VIDEO + Domiciliarios + TEST Creativos, o al menos aceptar que sus números
+individuales no se pueden leer por separado. ⛔ **Es un cambio estructural, el más contaminante de
+todos: no se toca antes del martes 15.**
