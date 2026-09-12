@@ -1498,7 +1498,87 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-AJ. 🔴🔴 NO ES LA PAUTA: ES EL CIERRE. EL MISMO GASTO PRODUCE 35% MENOS UNIDADES (2026-09-11, 17:00 Bogotá)
+
+**Este bloque CORRIGE dos cosas que yo mismo escribí hoy.** Salió de que el dueño preguntó
+*"12 ventas de promedio del 8-11? Pensé eran más"*. Tenía razón, y al revisarlo se cayó mi conclusión.
+
+### Los tres errores del número
+
+| | Error | Corrección |
+|---|---|---|
+| 1 | Conté **guías**, no unidades | son **1,21 unidades por guía** |
+| 2 | Tomé el **11-sep como completo** | su último lote salió **14:53** Bogotá y el export se sacó 15:30. Todos los otros días el último lote sale entre **15:40 y 17:13**. **Falta el lote de la tarde** |
+| 3 | Metí el **9-sep** (día con hueco de saldo) dentro del promedio | se separa |
+
+### 🔴 Y EL ERROR GRANDE: dije "el gasto subió 60% y las ventas no". FALSO
+
+Comparé contra el corte del **25-ago ($105.000/día)**, dos semanas y mil cambios antes. Con el gasto
+diario real de septiembre traído de la API, **descontando el colmena** (que no podía producir guías del
+tradicional: vendió 2 unidades en toda la ventana), y comparando **por bloques de días de despacho**:
+
+| Bloque | Días | Gasto tradicional | **/día** | Uds | **Uds/día** | **$/unidad** | Conv/día | **Cierre uds/conv** |
+|---|---|---|---|---|---|---|---|---|
+| **A. 1-4 sep** | 4 | $614.854 | **$153.714** | 82 | **20,5** | **$7.498** | 213 | **9,6%** |
+| **B. 5-7 sep** | 3 | $475.959 | **$158.653** | 44 | **14,7** | **$10.817** | 237 | **6,2%** 🔴 |
+| **C. 8-10 sep** | 3 | $464.555 | **$154.852** | 40 | **13,3** | **$11.614** | 169 | **7,9%** |
+
+🔑 **EL GASTO ESTUVO PLANO: ~$154.000/día en los tres bloques.** Y las unidades/día cayeron
+**20,5 → 13,3 = −35%**.
+
+📌 **Y el método se valida solo:** el bloque A da **$7.498/unidad**, contra el **$7.806** que 0-AC midió
+con exports y el **$7.664** del 25-ago. Los tres coinciden. El método sirve; lo que cambió es el negocio.
+
+### 🔑 DÓNDE SE ROMPIÓ: LAS CONVERSACIONES NO CAYERON, EL CIERRE SÍ
+
+| | A (1-4 sep) | B (5-7 sep) | C (8-10 sep) |
+|---|---|---|---|
+| conversaciones/día | 213 | **237** | 169 |
+| **cierre uds/conv** | **9,6%** | **6,2%** | **7,9%** |
+
+**Las conversaciones subieron en el bloque B y las ventas se cayeron.** No es Meta: **es el cierre.**
+
+Y **el archivo madre ya documentaba la causa exactamente en esa fecha:**
+- 0-AE (8-sep): *"la IA dejó de ofrecer la promo"* → **#60**, y el share de 2 uds cayó a **6,7%**
+- 0-AF (9-sep): *"cinco parches al guion: el bot vendía con **MENÚ**"*, *"el bot descontó **$4.000** de
+  entrada"*
+
+✅ **Y el parche del 9-sep ya está revirtiéndolo:** el cierre subió de 6,2% a 7,9%, y el share de 2
+unidades volvió a **33,3% el 9-sep, 33,3% el 10 y 26,7% el 11** (venía de 6,7%).
+
+### 💰 Lo que vale recuperar el cierre — y por qué manda sobre cualquier movida de pauta
+
+| Cierre | Uds/día |
+|---|---|
+| **7,9%** (hoy) | 13,4 |
+| **9,6%** (como el 1-4 sep) | **16,3** |
+
+**+2,9 unidades/día = $69.459/día = ~$2.083.780/mes.** Sin tocar un peso de presupuesto.
+
+### ⛔ Lo que esto le hace a la lista del lunes
+
+🔴 **SE CAE "bajar el gasto porque la elasticidad se cumplió".** No hay evidencia: el gasto estuvo plano.
+✅ **PRIORIDAD 1 DEL LUNES 14: confirmar los cinco parches del guion (#95)**, sobre todo los dos que
+sangran — escribir **"está muy caro"** y **"soy de Tadó"**. Es la palanca más grande medida hoy.
+
+### ⚠️ Y una corrección más, a 0-AI
+
+**Dije que el rebote de $49.334 del 9-sep "compró basura" porque las guías cayeron 60%. NO ESTÁ
+PROBADO.** El despacho del 9-sep salió a las **16:56** y el rebote fue a las **18:00**: esas 6 guías se
+cerraron **antes** de que el rebote existiera. La caída de guías del 9-sep es de lote (regla 0-Y), no
+del rebote.
+✅ **Lo que sí queda probado de 0-AI:** hubo **4 horas sin entrega** (14:00-17:00), eso es plata que no
+se gastó en la mejor franja, y el colchón de saldo sigue siendo la recomendación. Pero el costo de
+**$217.161** que calculé con guías **no es válido**. El estimado honesto sigue siendo el de
+conversaciones: **$55.000-$130.000**.
+
+---
+
 ## 0-AI. 🔴🔴🔴 LA CAUSA RAÍZ DE TODO: LA CUENTA SE QUEDA SIN SALDO A MEDIO DÍA, Y EL REBOTE COMPRA BASURA (2026-09-11, 16:00 Bogotá)
+
+> ⚠️ **LEER 0-AJ ANTES QUE ESTA SECCIÓN.** 0-AJ corrige el costo estimado de acá: el rebote de las
+> 18:00 **no puede** explicar las 6 guías del 9-sep, porque el despacho salió a las 16:56. El hueco de
+> entrega es real; la atribución de las ventas perdidas al rebote **no está probada**.
 
 **Esto explica el 9-sep, corrige 0-AF y 0-AH, y es la fuga de plata más grande encontrada hasta hoy.**
 Salió de pedirle a la API el gasto **hora por hora** (`hourly_stats_aggregated_by_advertiser_time_zone`),
