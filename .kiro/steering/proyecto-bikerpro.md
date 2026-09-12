@@ -4,7 +4,9 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-11 04:10 Bogotá** *(ojo: verificar siempre la fecha en
+Última actualización: **2026-09-11 05:35 Bogotá** — 🆕 **sección 0-AH: primera lectura en vivo de la
+API. Corrige dos diagnósticos de 0-AF (Motorizados y TEST Creativos) y encuentra que el problema real
+está en Domiciliarios.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
 > 🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA: andá directo al bloque "TRASPASO A LA SESIÓN NUEVA" de la
@@ -20,6 +22,8 @@
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-AI** | 🔴🔴🔴 **LA CAUSA RAÍZ DE TODO: la cuenta se queda sin saldo a medio día y el rebote compra basura.** El 9-sep estuvo **MUERTA de 14 a 17h** ($30 en una hora) y a las **18:00 Meta metió $49.334 de golpe** → esa hora arruinó el $/conv del día **de todos los conjuntos a la vez**. **ESO fue "Motorizados se muere", no la audiencia.** Costó **$55.000-$130.000 de utilidad en un día** · hoy 11-sep pasó igual (11-13h seco) · **Meta protege a los grandes y ahoga a los chicos** = las 3 regiones que se están midiendo · 🔑 **el 10-sep es el ÚNICO día limpio** · la solución no es recargar más sino **recargar ANTES: colchón de 2-3 días** | **11-sep** |
+| **0-AH** | 🔑 **LA API YA LEE SOLA** (el token funciona, el veredicto del lunes sale sin exports) · 🔴 **Motorizados nunca se estaba encogiendo: era UN día, y el 9-sep fue malo para toda la cuenta** (+21%) — el recorte funcionó pero por el motivo contrario · 🔴🔴 **el que se diluye es DOMICILIARIOS, el control: +70% de costo en 5 días con CPM BAJANDO** = elasticidad 0,63 en vivo, vale **+26 conv/día** · **el CPM de TEST Creativos oscila, no sube** · 🔴 **la cuenta gasta $202.095, no $154.000** (Meta sobre-entrega 31% → el peso marginal ya devuelve $0) · **dos conjuntos del colmena no estaban en la tabla** y corroboran 0-AG (78,6% de su equilibrio) · regiones preliminares: **Tolima y Santander entregan, Eje Cafetero flojo** · **el sesgo del gate ahora tiene dos signos → solo criterio absoluto** | **11-sep** |
 | **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · 🔄 **y estaba comparando promedio contra promedio: contra el peso MARGINAL del tradicional (+$0,16) el colmena rinde +$0,43 = 2,7× más** · **no pierde plata: corre al 85% de SU equilibrio** · **se vuelve a prender después del 14** con audiencia de clientes, $8-10.000/día y ventana de 14 días · **diversificar ES el plan de crecimiento** · el manual para la chaqueta reflectiva · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · **17 de 37 conversaciones estaban vacías**, y con base limpia **el colmena ATRAE mejor (45,9% vs 57,8% de vacías) y CIERRA peor (15,0% vs 19,9%)** · el CPA se descompone exacto: paga 2,6× por conversación real y cierra 1,33× peor = 3,4× · seguimiento a **17** | **10-sep** |
 | **0-AF** | 🧮 **La comisión de recaudo ya venía DENTRO del flete: se estaba restando dos veces** (todo corrige hacia arriba, #28-1 cerrado) · ⛔ **no se lee un día abierto** (la descomposición CPM ÷ conv-por-mil) · **predicción fallida: Motorizados cerró en $1.970** y su audiencia se está encogiendo (−56%) · **el colmena no fracasó, fracasó su canal** (CPM $10.062) y quedó pausado · **tres regiones nuevas de $5.000** · **cinco parches al guion** (el bot vendía con MENÚ) · colmena = la textura, no la tela · el catálogo maestro estaba viejo en 21 lugares | **9 y 10-sep** |
 | **0-AE** | 💰 **El costo bajó a $33.000** (+$752.527/mes) · el CPA nunca se deterioró: era la pauta del colmena · el video se estabilizó y empató · **la fuga de flete está solo en la promo de 2 uds** · Tadó duplica el flete · el seguro es 13,6% y da 0,85× · 3 al detal > 12 al mayor | **7 y 8-sep** |
@@ -112,8 +116,14 @@
 | 🆕 **Domiciliarios \| Santanderes** | **$5.000** | Fondo azul | Santander + N. de Santander | creado 9-sep noche. Aprendizaje |
 | 🆕 **Domiciliarios \| Eje Cafetero** | **$5.000** | Fondo azul | Risaralda + Quindío + Caldas | creado 9-sep noche. Aprendizaje |
 | 🆕 **Domiciliarios \| Tolima Huila** | **$5.000** | Fondo azul | Tolima + Huila | creado 9-sep noche. Aprendizaje |
-| ~~Domiciliarios \| Colmena~~ | — | — | — | 🔴 **PAUSADO el 9-sep** (`not_delivering`). Ver 0-AF |
-| **Total** | **$154.000** | | | |
+| ~~Domiciliarios \| Colmena~~ | $20.000 | — | — | 🔴 **PAUSADO el 9-sep** (`not_delivering`). Ver 0-AF |
+| ~~**Publico ABIERTO - Creativo**~~ | $20.000 | Estático colmena | — | 🔴 `PAUSED`. 🆕 **apareció en la API el 11-sep**, no estaba en esta tabla. $4.044/conv → 0-AH |
+| ~~**Publico ABIERTO video**~~ | $20.000 | Video colmena | — | 🔴 `CAMPAIGN_PAUSED`. 🆕 ídem. **$2.611/conv = 78,6% de su equilibrio → corroboró 0-AG** |
+| **Total ACTIVOS** | **$154.000** | | | 🔴 **pero el gasto real del 10-sep fue $202.095 (+31,2%) → 0-AH** |
+| *(presupuesto dormido)* | *$60.000* | | | los 3 conjuntos del colmena apagados |
+
+🆕 **Nombre real del conjunto (verificado en la API el 11-sep): `Domiciliarios | Santander`**, no
+"Santanderes".
 
 📌 **Advantage+ de campaña: DESACTIVADO** (ABO, cada conjunto con su plata) · **un conjunto, un
 anuncio** (confirmado cuatro veces) · casilla "Llegar a más personas" **marcada en Domiciliarios y
@@ -326,6 +336,30 @@ pasa metiendo audiencia nueva. Ver `TECHO-REALISTA.md`.
   si la mezcla de bandas se va a los pueblos con envío gratis nacional) → **#79**.
 
 ## 🚦 LO SIGUIENTE, EN ORDEN
+
+> **🆕🆕🆕 AGREGADO EL 11-SEP DESDE LA API EN VIVO (0-AH) — ESTO ES LO PRIMERO DEL VEREDICTO DEL LUNES:**
+>
+> 1. 🔴🔴 **PODAR DOMICILIARIOS.** Es el que se está diluyendo, no Motorizados: **+70% de costo en
+>    5 días** ($655 → $1.116) con **conv/mil a la mitad** (4,55 → 2,78), **CPM BAJANDO** y frecuencia
+>    1,06. Duplicó alcance hacia audiencia fría. Volver a su conv/mil del 8-sep vale **+26
+>    conversaciones/día sin poner un peso.** ⛔ **No antes del lunes: es el control del gate** → **0-AH**
+> 2. 🔴 **LA CUENTA GASTA $202.095, NO $154.000** (+31,2% de sobre-entrega). Contra la tabla de
+>    elasticidad del proyecto, a $200.000/día **el peso marginal ya devuelve $0** y el óptimo es
+>    ~$178.000. **"No subir presupuesto" se cumple en la interfaz y no en la realidad.** Confirmar el
+>    sábado con 3 días → **0-AH**
+> 3. ✅ **MOTORIZADOS SE QUEDA EN $9.000.** Pasa el gate con **$884** (el umbral era $1.500). Y el
+>    diagnóstico de 0-AF era falso: no se encogía, estaba **estirado**. conv/mil rebotó 1,73 → **4,91**
+>    al recortarlo → **0-AH**
+> 4. ⚠️ **RE-MIRAR #77 (TEST Creativos) CON DATOS NUEVOS.** El argumento que lo bloqueaba (*"su CPM
+>    sube cada ventana: $5.240 → $6.679 → $7.968"*) **no está en los datos diarios**: oscila en ~$5.800
+>    y nunca tocó $7.968. Y tiene **conv/mil 7,78 = 2,8× el control**, cerrando en **$776 vs $1.116**.
+>    No es "subirlo automáticamente": es que **la razón por la que no se sube ya no es válida** → **0-AH**
+> 5. 🟢 **REGIONES, SEÑAL TEMPRANA (n=1 a 4, NO es veredicto):** Tolima Huila **$995** y Santander
+>    **$1.292** entregando bajo el equilibrio desde el día 1; **Eje Cafetero $3.995 (n=1)** flojo;
+>    **Valle es el caso serio** ($1.756 en 8-10 sep, serie mala de 6 días) → **0-AH**
+> 6. 📌 **El sesgo del gate tiene ahora DOS signos opuestos** (Motorizados liberó subasta ⇒ regiones
+>    peor · el control se diluye ⇒ regiones mejor). **El criterio relativo queda inservible: usar
+>    solo el absoluto de $2.657/conv** → **0-AH**
 
 > **🆕🆕 LISTA VIGENTE AL 10-SEP (0-AF). La de abajo, del 8-sep, ya está ejecutada casi completa.**
 
@@ -1461,6 +1495,663 @@ Pide **MEDIR**, que es justo lo contrario.
   que es la herramienta que este archivo usa para separar "efecto del día" de "efecto de una decisión".
   **Es la pérdida más dolorosa de este export.**
 - **Desglose POR ANUNCIO** → el pendiente #32 sigue abierto: no se sabe qué creativo genera **ventas**.
+
+---
+
+## 0-AM. 📏 LA REGLA DEL DESPACHO — LA VERSIÓN DEFINITIVA, Y LOS UMBRALES PARA ALARMARSE (2026-09-12, 04:00 Bogotá)
+
+**El dueño explicó la mecánica exacta y tiene razón en todo.** Y dijo lo más importante:
+*"no quiero justificar que el CPA está mejor, quiero que entiendas muy bien esta regla para que podamos
+ser muy objetivos y saber cuándo tenemos que alarmarnos"*.
+**Esta sección reemplaza el criterio de conteo de 0-Y, que se quedaba corto.** Script:
+`analisis/regla-del-despacho.py`.
+
+### 🔴 Hoy revisé el mismo número TRES veces. Esta es la razón, y el método que lo cierra
+
+| Intento | Número | Por qué estaba mal |
+|---|---|---|
+| 1 | 12,0 ped/día · CPA $12.920 | conté guías como si fueran ventas del día |
+| 2 | 17,2 uds/día · CPA $9.123 | sumé las 8 sin despachar pero al día equivocado |
+| **3 (este)** | **13,0 ped/día · CPA $13.478** | **ventanas alineadas por despacho, hora a hora** |
+
+### LA REGLA, EN TRES PARTES
+
+**1. UN LOTE NO ES UN DÍA.** El corte medido en el export va de las **14:53 a las 17:13 Bogotá**.
+Entonces **cada lote arrastra la tarde y la noche del día anterior.**
+
+**2. EL FINDE ENTRA COMPLETO EN EL LOTE DEL LUNES.** Del viernes ~17:00 al lunes ~17:00 son **~3,0 días
+de venta en UN solo lote**, porque las transportadoras no trabajan sábado ni domingo. **Se vende igual:
+se guarda.**
+
+**3. LAS VENTAS SIN DESPACHAR NO ESTÁN EN EL EXPORT.** Hoy hay **8 del viernes** que se despachan el
+lunes. Si no se suman a mano, **el viernes se ve peor de lo que fue y el lunes se va a ver mejor de lo
+que es.**
+
+📌 **Corolario: no se compara un día contra otro NUNCA.** Se comparan **ventanas delimitadas por
+despachos**, divididas por los días **fraccionarios** que cubren.
+
+### El corte real, medido
+
+| Día | Último lote | Ped | Uds |
+|---|---|---|---|
+| 2-sep | 17:03 | 32 | 37 |
+| 3-sep | 17:04 | 24 | 32 |
+| 4-sep | 16:40 | 11 | 13 |
+| 7-sep | 16:37 | 36 | 44 |
+| 8-sep | **15:49** | 15 | 16 |
+| 9-sep | 16:55 | 6 | 8 |
+| 10-sep | **17:13** | 12 | 16 |
+| 11-sep | **14:52** | 15 | 19 | *(+8 pedidos / ~10 uds sin despachar)* |
+
+### ✅ Las ventanas bien alineadas (gasto y conversaciones **hora a hora**)
+
+| Ventana | Días | Ped | Uds | **Ped/día** | Uds/día | **$/pedido** | Cierre |
+|---|---|---|---|---|---|---|---|
+| **POST-PAGO 3-4 sep** | 1,98 | 35 | 45 | **17,6** | 22,7 | **$7.506** | 10,5% |
+| **FINDE 5-7 sep** | 3,00 | 36 | 44 | **12,0** | 14,7 | $14.504 | 6,8% |
+| **VALLE 8-11 sep** | 4,31 | 56 | 69 | **13,0** | 16,0 | **$13.478** | 8,2% |
+
+🎯 **VALIDACIÓN:** la ventana post-pago da **$7.506/pedido** contra el **$7.806** que 0-AC midió con
+exports y el **$7.664** del 25-ago. **Coincide. El método es correcto.**
+
+### Qué se movió de verdad
+
+| | Post-pago | Valle | Cambio |
+|---|---|---|---|
+| gasto/día | $132.407 | $175.219 | **+32%** |
+| conversaciones/día | 217 | 196 | −10% |
+| **cierre uds/conv** | 10,5% | 8,2% | **−22%** |
+| unidades/día | 22,7 | 16,0 | −29% |
+| **CPA por pedido** | **$7.506** | **$13.478** | **+80%** |
+
+🔴 **HONESTIDAD: los tres factores se movieron un poco y ninguno domina.** No puedo atribuirlo a una
+sola causa. Y el cierre **sí** bajó 22% —lo que en 0-AL dije que estaba plano era efecto de comparar
+conversaciones de día calendario contra unidades de lote. **Con las horas alineadas, bajó.**
+⚠️ **Y sigue el confundido de quincena de 0-AK: post-pago vs valle son fases distintas del ciclo.**
+
+## 🚨 LOS UMBRALES PARA ALARMARSE — esto es lo que hay que memorizar
+
+Utilidad por pedido **antes de pauta: $24.129** (0-AE, costo $33.000). Entonces:
+
+| CPA por pedido | | Qué hacer |
+|---|---|---|
+| **< $9.000** | 🟢 **NORMAL** | como el post-pago. **No tocar nada** |
+| **$9.000 - $14.000** | 🟡 **VIGILAR** | mirar conv/mil y CPM. Puede ser el ciclo |
+| **$14.000 - $18.000** | 🟠 **ALARMA** | ¿ya son 3 días? entonces **actuar** |
+| **$18.000 - $24.129** | 🔴 **GRAVE** | se está comiendo la utilidad entera |
+| **> $24.129** | ⛔ **PÉRDIDA** | cada pedido pierde plata |
+
+### 📍 HOY, ventana del valle bien medida: **$13.478/pedido → 🟡 VIGILAR**
+
+**No es alarma. Es vigilar.** El negocio deja **$10.651 limpios por pedido** y no hay que tocar nada
+todavía.
+
+### ⛔ Las tres reglas para NO alarmarse en falso
+
+1. **Mínimo 3 días de ventana.** Un lote solo no dice nada.
+2. **Sumar SIEMPRE las ventas sin despachar** antes de concluir.
+3. **No comparar post-pago contra valle.** Valle contra valle, post-pago contra post-pago.
+
+### ⚠️ Y para el lote del lunes 14, que es una trampa
+
+**Va a traer viernes-tarde + sábado + domingo + lunes ≈ 3,1 días.** Va a parecer un día enorme.
+⛔ **NO leerlo como un día**, y **restarle las 8 que ya están contadas en el viernes** para no contarlas
+dos veces.
+
+---
+
+## 0-AL. ✅ FALTABAN 8 GUÍAS, Y CON ELLAS EL DIAGNÓSTICO QUEDA LIMPIO: EL CIERRE NUNCA SE ROMPIÓ (2026-09-12, 03:00 Bogotá)
+
+> ⚠️ **LEER 0-AM PRIMERO.** El *"cierre plano en 9,7%"* de esta sección es un artefacto: comparaba
+> conversaciones de día calendario contra unidades de lote. Con las horas alineadas (0-AM) el cierre
+> **bajó 22%**. Los CPA correctos son los de 0-AM.
+
+**El dueño avisó que el viernes 11 entraron 8 pedidos MÁS después del despacho** (*"no las he
+despachado porque entraron después de que hice el despacho"*, y algunas con pedidos dobles).
+Con eso el 11-sep pasa de 15 a **23 pedidos**, y **todo el análisis de ayer se ordena.**
+
+### El 11-sep completo: el mejor día del mes
+
+| | |
+|---|---|
+| Gasto del día (cerrado) | **$164.961** |
+| Conversaciones | **205** |
+| **Pedidos** | **23** (15 despachados + 8 posteriores) |
+| Unidades (estimadas) | **~29** (19 + ~10; el ratio del día es 1,27 uds/guía) |
+| **CPA por pedido** | **$7.172** |
+| **CPA por unidad** | **$5.688** |
+
+🔑 **$7.172/pedido contra $7.806 del 4-sep y $7.664 del 25-ago: el viernes 11 es el mejor día medido
+del mes.**
+
+### 🟢 Y la caída es la MITAD de lo que dije
+
+| | Antes (con el 11 incompleto) | **Ahora (11 completo)** |
+|---|---|---|
+| uds/día | 20,5 → 13,3 = **−35%** | 20,5 → 17,2 = **−16%** |
+| $/unidad | $7.498 → $11.614 = **+55%** | $7.498 → $9.123 = **+22%** |
+
+### 🔑🔑 LO IMPORTANTE: EL CIERRE NO SE ROMPIÓ. ESTÁ IGUAL
+
+Con el 11-sep completo, la cadena entera queda así:
+
+| | A (1-4 sep) | C (8-11 sep) | |
+|---|---|---|---|
+| gasto/día | $159.306 | $164.900 | **+4% → plano** |
+| CPM | $3.657 | $3.622 | **−1% → igual** |
+| **conv/mil** | **4,90** | **3,92** | 🔴 **−20% ← ACÁ SE CAYÓ** |
+| conversaciones/día | 213 | 178 | 🔴 −16% (consecuencia) |
+| **cierre uds/conv** | **9,6%** | **9,7%** | 🟢 **+1% → NO SE MOVIÓ** |
+| unidades/día | 20,5 | 17,2 | −16% |
+
+🔴 **SE CAE COMPLETA LA HIPÓTESIS DE 0-AJ ("es el guion").** El cierre está idéntico: **9,6% → 9,7%.**
+Lo que yo leí como "el cierre se rompió" era **el hueco de las 8 guías que faltaban en el export.**
+
+✅ **Y el diagnóstico verdadero es el que ya estaba medido en 0-AH:** lo que se cayó es la **conv/mil**
+—la calidad de la audiencia— con el CPM y el gasto **planos**. Menos conversaciones por la misma plata,
+y las que llegan **cierran igual de bien que siempre**.
+
+**Es la pauta, no el guion. Y es la dilución de Domiciliarios.**
+
+### 📌 Y también se aclara la quincena
+
+El cierre plano en **9,7%** durante el valle (8-11 sep) es evidencia **en contra** de que la quincena
+esté frenando el cierre: **la gente del valle cierra igual que la del post-pago.** Lo que baja en el
+valle —si baja— es **cuánta gente escribe**, no cuánta compra.
+⚠️ **El test del 15-sep sigue en pie** (0-AK), pero ahora mide una cosa más precisa: **si la conv/mil
+rebota sola después del pago, o si hay que podar Domiciliarios.**
+
+### 🧮 Lo que queda pendiente de contar
+
+**Las 8 guías del viernes están SIN DESPACHAR.** Cuando salgan van a aparecer en el lote del sábado 12
+o del lunes 14, **con fecha de despacho posterior a la venta.** ⚠️ **No contarlas dos veces**: ya están
+contadas como ventas del 11-sep en este bloque.
+📌 Y el número de unidades (~29) es **estimado**. El dueño dijo *"algunas con pedidos dobles"* sin
+precisar cuántas; se usó el ratio del propio día (1,27). **Confirmar con el próximo export.**
+
+### 🎯 La lista del lunes queda así
+
+| | |
+|---|---|
+| 🥇 | **Podar Domiciliarios.** Es la causa medida: conv/mil −20% con CPM plano → **0-AH** y este bloque |
+| 🥈 | **Prender el colmena** con el público de clientes (los teléfonos ya están) → **0-AG** |
+| 🥉 | **Darle ese público a TEST Creativos** (#77): mejor creativo, peor subasta |
+| ✅ | **Motorizados se queda en $9.000** (cerró en $884) |
+| ⚠️ | **El guion NO es la prioridad para el volumen** — el cierre está sano. Sí conviene reprobar los dos parches que sangran (#95: *"está muy caro"*, *"soy de Tadó"*), pero eso protege **margen**, no volumen |
+| ⛔ | **NO subir el gasto total.** El CPM está plano: el problema no es plata, es a quién se le muestra |
+
+---
+
+## 0-AK. 🗓️ EL CPA EXACTO — Y LA QUINCENA DESARMA LA CONCLUSIÓN DE 0-AJ (2026-09-11, 17:30 Bogotá)
+
+> ⚠️ **LEER 0-AL PRIMERO.** Los CPA de acá están calculados con el 11-sep incompleto (faltaban 8
+> pedidos). Los números corregidos están en 0-AL. Lo que **sí** se sostiene de esta sección es el
+> planteo del confundido de quincena y el test registrado del 15-sep.
+
+**El dueño preguntó dos cosas y la segunda tumba mi conclusión:** *"¿cuánto fue el CPA entonces?"* y
+*"¿no es normal que se caiga un poco por las fechas, porque unos días fueron quincena?"*
+
+### 1️⃣ EL CPA, en las dos unidades que usa el proyecto
+
+| Bloque | Gasto trad./día | Ped/día | **CPA/pedido** | Uds/día | **CPA/unidad** |
+|---|---|---|---|---|---|
+| **A. 1-4 sep** | $153.714 | 16,8 | **$9.177** | 20,5 | **$7.498** |
+| **B. 5-7 sep** | $158.653 | 12,3 | **$12.864** | 14,7 | $10.817 |
+| **C. 8-10 sep** | $154.852 | 11,0 | **$14.077** | 13,3 | $11.614 |
+
+📌 **El archivo madre usa CPA POR PEDIDO.** Históricos: **$7.664** (25-ago, 0-Y) · **$7.806** (4-sep, 0-AC).
+
+### 2️⃣ No está perdiendo plata. Gana mucho menos
+
+Utilidad por pedido antes de pauta: **$24.129** (0-AE, costo $33.000).
+
+| Bloque | CPA/pedido | **Utilidad neta/pedido** | Ped/día | **Utilidad/día** |
+|---|---|---|---|---|
+| **A. 1-4 sep** | $9.177 | **$14.952** | 16,8 | **$250.447** |
+| **B. 5-7 sep** | $12.864 | $11.265 | 12,3 | $138.938 |
+| **C. 8-10 sep** | $14.077 | **$10.052** | 11,0 | **$110.567** |
+
+🔴 **Diferencia: $139.880 de utilidad POR DÍA = ~$4.196.398/mes.** El negocio sigue rentable —
+cada pedido deja $10.052 limpios— pero se le fue esa plata.
+
+### 3️⃣ 🔴 LA QUINCENA: EL DUEÑO TIENE RAZÓN Y MI COMPARACIÓN ESTABA VICIADA
+
+**El pago en Colombia es el 30/31 y el 15.** Septiembre 2026: el 1 fue martes.
+
+| Bloque | Días del mes | Fase del ciclo | Uds/día |
+|---|---|---|---|
+| **A** | 1 al 4 | **post-pago del 31-ago** 🟢 | 20,5 |
+| **B** | 5 al 7 | finde + lunes, bajando | 14,7 |
+| **C** | 8 al 10 | **VALLE, antes del 15** 🔴 | 13,3 |
+
+🔑 **Comparé el mejor tramo del ciclo contra el peor.** Es la misma familia de error de siempre
+—ventana censurada— pero en versión calendario. **La caída de 20,5 a 13,3 puede ser el ciclo y no el
+guion.**
+
+### 4️⃣ Y lo peor: las dos hipótesis predicen EXACTAMENTE lo mismo
+
+Mi argumento en 0-AJ fue *"las conversaciones no cayeron, el cierre sí → es el guion"*.
+**La quincena predice idéntico:** sin plata la gente **escribe lo mismo** (*"¿cuánto vale?"*) y
+**no compra** (*"te escribo cuando me paguen"*).
+
+⛔ **Conversaciones planas + cierre caído es la firma de las DOS. Con estos datos NO SE PUEDEN SEPARAR.**
+La conclusión de 0-AJ **no está identificada** y hay que degradarla de "hallazgo" a "hipótesis".
+
+### 5️⃣ Lo único que SÍ discrimina: el share de 2 unidades
+
+| Día | 2 sep | 3 | 4 | 7 | **8** | **9** | 10 | 11 |
+|---|---|---|---|---|---|---|---|---|
+| **share 2+ uds** | 15,6% | 33,3% | 18,2% | 19,4% | **6,7%** 🔴 | **33,3%** | 33,3% | 26,7% |
+
+🔑 **Salto de 6,7% a 33,3% en UN día, y ese día es exactamente el del parche del guion.** El 9-sep no es
+pago ni quincena: está en mitad del valle. **Un ciclo de pago no produce un 5× de un día al otro en
+mitad del valle.**
+✅ **Esa parte queda confirmada: el guion estaba roto y el parche funcionó.**
+⚠️ **Pero el share explica el TAMAÑO del pedido, no CUÁNTOS pedidos hay.** La caída de volumen sigue
+sin identificar.
+
+### 6️⃣ 🧪 EL TEST QUE LO RESUELVE — REGISTRADO ANTES DE VER EL RESULTADO
+
+**El pago del 15-sep (martes) es el experimento natural.** 0-L ya usó este método con el pago del
+15-ago y funcionó.
+
+**PREDICCIÓN REGISTRADA EL 11-SEP:**
+
+| Si el 16-18 sep… | Entonces |
+|---|---|
+| uds/día vuelve a **~20** y cierre a **~9,6%** | **era EL CICLO.** El guion ya está bien |
+| uds/día se queda en **~13-15** | **era EL GUION** y falta arreglar más |
+| sube a **~16-17** | **son las dos**, mitad y mitad |
+
+⛔⛔ **NO TOCAR PRESUPUESTOS ANTES DE ESO.** Si se mueve la pauta el lunes 14 y el 15 entra el pago,
+los dos efectos se mezclan y **se pierde el único experimento limpio que da el calendario.**
+
+### 📌 El estado real de la evidencia sobre la quincena (importante, porque se ha usado mal)
+
+| Sección | Qué dice |
+|---|---|
+| **0-I** (14-ago) | *"no hay ni un dato que respalde la quincena"*, y el corte crudo apuntaba **EN CONTRA** (pre-pago 9,3 guías/día vs post-pago 7,8) |
+| **0-Y** (25-ago) | el rango *"valle 26-29"* estaba **escrito a mano** en `ciclo-quincena.py` como etiqueta, y se usó como si fuera medido |
+| **0-L** (19-ago) | ✅ el rebote post-pago del 15-ago **sí se cumplió**, y era una **predicción registrada antes**. Es la única evidencia buena a favor |
+
+🔑 **El ciclo tiene UNA confirmación seria y varias suposiciones. El pago del 15-sep es la segunda
+oportunidad de medirlo bien — y esta vez con el gasto de la API, que antes no se tenía.**
+
+---
+
+## 0-AJ. 🔴🔴 NO ES LA PAUTA: ES EL CIERRE. EL MISMO GASTO PRODUCE 35% MENOS UNIDADES (2026-09-11, 17:00 Bogotá)
+
+> ⚠️ **LEER 0-AK PRIMERO.** La conclusión de esta sección (*"es el guion"*) **no está identificada**: el
+> bloque A cae justo después del pago del 31-ago y el bloque C en el valle previo al 15. La quincena
+> explica los mismos datos. Lo que **sí** se sostiene de acá es el share de 2 unidades (salto de 6,7% a
+> 33,3% el día del parche) y los números del CPA.
+
+**Este bloque CORRIGE dos cosas que yo mismo escribí hoy.** Salió de que el dueño preguntó
+*"12 ventas de promedio del 8-11? Pensé eran más"*. Tenía razón, y al revisarlo se cayó mi conclusión.
+
+### Los tres errores del número
+
+| | Error | Corrección |
+|---|---|---|
+| 1 | Conté **guías**, no unidades | son **1,21 unidades por guía** |
+| 2 | Tomé el **11-sep como completo** | su último lote salió **14:53** Bogotá y el export se sacó 15:30. Todos los otros días el último lote sale entre **15:40 y 17:13**. **Falta el lote de la tarde** |
+| 3 | Metí el **9-sep** (día con hueco de saldo) dentro del promedio | se separa |
+
+### 🔴 Y EL ERROR GRANDE: dije "el gasto subió 60% y las ventas no". FALSO
+
+Comparé contra el corte del **25-ago ($105.000/día)**, dos semanas y mil cambios antes. Con el gasto
+diario real de septiembre traído de la API, **descontando el colmena** (que no podía producir guías del
+tradicional: vendió 2 unidades en toda la ventana), y comparando **por bloques de días de despacho**:
+
+| Bloque | Días | Gasto tradicional | **/día** | Uds | **Uds/día** | **$/unidad** | Conv/día | **Cierre uds/conv** |
+|---|---|---|---|---|---|---|---|---|
+| **A. 1-4 sep** | 4 | $614.854 | **$153.714** | 82 | **20,5** | **$7.498** | 213 | **9,6%** |
+| **B. 5-7 sep** | 3 | $475.959 | **$158.653** | 44 | **14,7** | **$10.817** | 237 | **6,2%** 🔴 |
+| **C. 8-10 sep** | 3 | $464.555 | **$154.852** | 40 | **13,3** | **$11.614** | 169 | **7,9%** |
+
+🔑 **EL GASTO ESTUVO PLANO: ~$154.000/día en los tres bloques.** Y las unidades/día cayeron
+**20,5 → 13,3 = −35%**.
+
+📌 **Y el método se valida solo:** el bloque A da **$7.498/unidad**, contra el **$7.806** que 0-AC midió
+con exports y el **$7.664** del 25-ago. Los tres coinciden. El método sirve; lo que cambió es el negocio.
+
+### 🔑 DÓNDE SE ROMPIÓ: LAS CONVERSACIONES NO CAYERON, EL CIERRE SÍ
+
+| | A (1-4 sep) | B (5-7 sep) | C (8-10 sep) |
+|---|---|---|---|
+| conversaciones/día | 213 | **237** | 169 |
+| **cierre uds/conv** | **9,6%** | **6,2%** | **7,9%** |
+
+**Las conversaciones subieron en el bloque B y las ventas se cayeron.** No es Meta: **es el cierre.**
+
+Y **el archivo madre ya documentaba la causa exactamente en esa fecha:**
+- 0-AE (8-sep): *"la IA dejó de ofrecer la promo"* → **#60**, y el share de 2 uds cayó a **6,7%**
+- 0-AF (9-sep): *"cinco parches al guion: el bot vendía con **MENÚ**"*, *"el bot descontó **$4.000** de
+  entrada"*
+
+✅ **Y el parche del 9-sep ya está revirtiéndolo:** el cierre subió de 6,2% a 7,9%, y el share de 2
+unidades volvió a **33,3% el 9-sep, 33,3% el 10 y 26,7% el 11** (venía de 6,7%).
+
+### 💰 Lo que vale recuperar el cierre — y por qué manda sobre cualquier movida de pauta
+
+| Cierre | Uds/día |
+|---|---|
+| **7,9%** (hoy) | 13,4 |
+| **9,6%** (como el 1-4 sep) | **16,3** |
+
+**+2,9 unidades/día = $69.459/día = ~$2.083.780/mes.** Sin tocar un peso de presupuesto.
+
+### ⛔ Lo que esto le hace a la lista del lunes
+
+🔴 **SE CAE "bajar el gasto porque la elasticidad se cumplió".** No hay evidencia: el gasto estuvo plano.
+✅ **PRIORIDAD 1 DEL LUNES 14: confirmar los cinco parches del guion (#95)**, sobre todo los dos que
+sangran — escribir **"está muy caro"** y **"soy de Tadó"**. Es la palanca más grande medida hoy.
+
+### ⚠️ Y una corrección más, a 0-AI
+
+**Dije que el rebote de $49.334 del 9-sep "compró basura" porque las guías cayeron 60%. NO ESTÁ
+PROBADO.** El despacho del 9-sep salió a las **16:56** y el rebote fue a las **18:00**: esas 6 guías se
+cerraron **antes** de que el rebote existiera. La caída de guías del 9-sep es de lote (regla 0-Y), no
+del rebote.
+✅ **Lo que sí queda probado de 0-AI:** hubo **4 horas sin entrega** (14:00-17:00), eso es plata que no
+se gastó en la mejor franja, y el colchón de saldo sigue siendo la recomendación. Pero el costo de
+**$217.161** que calculé con guías **no es válido**. El estimado honesto sigue siendo el de
+conversaciones: **$55.000-$130.000**.
+
+---
+
+## 0-AI. 🔴🔴🔴 LA CAUSA RAÍZ DE TODO: LA CUENTA SE QUEDA SIN SALDO A MEDIO DÍA, Y EL REBOTE COMPRA BASURA (2026-09-11, 16:00 Bogotá)
+
+> ⚠️ **LEER 0-AJ ANTES QUE ESTA SECCIÓN.** 0-AJ corrige el costo estimado de acá: el rebote de las
+> 18:00 **no puede** explicar las 6 guías del 9-sep, porque el despacho salió a las 16:56. El hueco de
+> entrega es real; la atribución de las ventas perdidas al rebote **no está probada**.
+
+**Esto explica el 9-sep, corrige 0-AF y 0-AH, y es la fuga de plata más grande encontrada hasta hoy.**
+Salió de pedirle a la API el gasto **hora por hora** (`hourly_stats_aggregated_by_advertiser_time_zone`),
+algo que nunca se había mirado en este proyecto.
+
+### La pistola humeante: el 9-sep la cuenta estuvo MUERTA cuatro horas
+
+| Hora | Gasto | |
+|---|---|---|
+| 13:00 | $4.671 | normal |
+| 14:00 | **$901** | 🔴 |
+| 15:00 | **$655** | 🔴 |
+| 16:00 | **$96** | 🔴 |
+| 17:00 | **$30** | 🔴 **la cuenta no existía** |
+| **18:00** | **$49.334** | 💥 **34× la hora anterior, en UNA hora** |
+| 19:00 | $10.344 | vuelve a la normalidad |
+
+**Cuatro horas seguidas con $1.682 en total = se acabó el saldo.** Y a las 18:00 Meta metió **$49.334
+en una sola hora** para recuperar el presupuesto del día.
+
+📌 **Esto ya estaba escrito en la sección 11 del manual y nadie lo conectó con las métricas:**
+*"tras estar apagado por falta de fondos, Meta acelera"* y *"el saldo se explota en 1-2 horas"*.
+**Estaba documentado como curiosidad de facturación. Es, en realidad, el mayor contaminante de datos
+del proyecto.**
+
+### 🔑 ESTO ES LO QUE PASÓ EL 9-SEP — NO ERA MOTORIZADOS, NI LA SUBASTA, NI LA AUDIENCIA
+
+0-AF concluyó *"la audiencia de Motorizados se está encogiendo −56%"* y por eso lo recortó.
+0-AH corrigió a *"fue un día malo para toda la cuenta"* pero no supo **por qué**. Acá está el por qué:
+
+🔴 **El 9-sep la cuenta se quedó sin plata a las 14:00 y a las 18:00 Meta gastó $49.334 de golpe.**
+Una hora con 34× el gasto normal **compra el inventario más barato y más frío que encuentra**, porque
+tiene que quemar presupuesto rápido. Esa hora arruinó el promedio del día entero **de todos los
+conjuntos a la vez** — que es exactamente el patrón que 0-AH midió y no pudo explicar.
+
+**La cadena completa, por fin cerrada:**
+
+```
+no hay saldo  ->  4 h sin entrega  ->  Meta acelera para recuperar
+   ->  compra impresiones basura  ->  conv/mil se derrumba
+   ->  $/conv del DIA sube  ->  yo leo "Motorizados se muere"  ->  recorte equivocado
+```
+
+### 💸 Lo que costó ESE día
+
+| | |
+|---|---|
+| Gasto del 9-sep | $144.451 |
+| Conversaciones reales | **129** |
+| A ritmo de día sano ($925, el del 8-sep) | **156** |
+| **Conversaciones perdidas** | **27** |
+| Utilidad perdida (cierre conservador 8,4%) | **~$55.055** |
+| Utilidad perdida (base limpia 19,9%) | **~$130.429** |
+
+🔑 **Entre $55.000 y $130.000 de utilidad, en UN día, por quedarse sin saldo cuatro horas.**
+Y el gasto **no se ahorró**: se gastó igual, peor comprado.
+
+### Y hoy 11-sep pasó lo mismo, cuatro horas más temprano
+
+| Hora | Gasto |
+|---|---|
+| 07:00 | $23.645 (pico normal) |
+| **10:00 – 13:00** | **$4.718 en CUATRO horas** 🔴 |
+| **14:00** | **$16.693** 💥 el rebote |
+
+**Entrega perdida hoy: ~$35.282.** Un día normal en esas 4 horas mueve ~$40.000.
+
+### 🔴 Y el que paga el rebote son los conjuntos CHICOS
+
+Cuando el saldo escasea, Meta no frena a todos igual: **protege a los grandes y ahoga a los chicos.**
+Utilización de presupuesto hoy vs. el 10-sep (día sin hueco de medio día):
+
+| Conjunto | 10-sep | Hoy | |
+|---|---|---|---|
+| Domiciliarios VIDEO | 132% | **105% ya a las 15:30** | 🟢 protegido |
+| Domiciliarios | 179% | **101% ya a las 15:30** | 🟢 protegido |
+| TEST Creativos | 87% | ~57% | 🟠 |
+| **Santander** | 78% | **~23%** | 🔴 ahogado |
+| **Valle** | 78% | **~15%** | 🔴 |
+| **Eje Cafetero** | 80% | **~11%** | 🔴 |
+| **Tolima Huila** | 80% | **~11%** | 🔴 |
+
+⛔ **Y las tres regiones ahogadas son justo las que se están midiendo para el veredicto del lunes.**
+
+### ⚠️⚠️ LO QUE ESTO LE HACE AL GATE DEL LUNES 14
+
+🔑 **El problema no es que falte plata: es que los días NO SON COMPARABLES ENTRE SÍ.**
+Un día con hueco de saldo tiene otra **forma de entrega** que un día sin hueco. Comparar región contra
+control, o región contra región, cuando cada día tuvo un hueco distinto a distinta hora,
+**mide el horario de la recarga, no la geografía.**
+
+📌 **El dueño confirmó que recarga a diario, "pendiente de que llegue un pago".** Eso evita que la
+cuenta muera del todo — **pero no evita el hueco**, porque la recarga es *reactiva*: llega cuando llega.
+**Recargar todos los días y recargar ANTES de llegar a cero no son lo mismo.**
+
+### ✅ LA RECOMENDACIÓN (y no es "cargar más plata": es cargar ANTES)
+
+| | |
+|---|---|
+| ⛔ **Lo que NO sirve** | recargar cuando el saldo llega a cero, aunque sea todos los días |
+| ✅ **Lo que sirve** | mantener **2-3 días de colchón** (~$400.000-$600.000) para que el saldo **nunca** toque cero |
+
+**Por qué vale la pena:** un solo hueco cuesta entre **$55.000 y $130.000** de utilidad. Mantener
+$600.000 quietos en la cuenta no cuesta nada — es plata que igual se va a gastar en pauta, solo que
+adelantada. **El colchón se paga con evitar UN hueco.**
+
+### 📌 Nueva regla de lectura, para el manual
+
+🔴 **ANTES DE COMPARAR DOS DÍAS, MIRAR SU CURVA HORARIA.** Si uno tuvo un hueco de saldo y una hora de
+rebote, ese día **no se compara con nada**: su $/conv está inflado por el rebote y su volumen
+subestimado por el hueco. Comando:
+
+```bash
+python3 analisis/saldo-por-hora.py 2026-09-08 2026-09-11
+```
+
+---
+
+## 0-AH. 🔑 LA API YA LEE SOLA — Y EL PRIMER DATO EN VIVO DICE QUE MOTORIZADOS NUNCA SE ESTABA MURIENDO: ES DOMICILIARIOS EL QUE SE ESTÁ DILUYENDO (2026-09-11, 05:30 Bogotá)
+
+**Fuente: la Marketing API en vivo, no un export.** Primera vez en todo el proyecto que los números
+salen sin que el dueño exporte nada. Token `Kiro Lectura` (`ads_read`, rol Analista), cuenta
+`act_4330882710457791` (BikerPro, COP). Lector: `analisis/meta-api-lectura.py`.
+
+### ✅ Lo que quedó habilitado
+
+| | |
+|---|---|
+| ✅ | **El token funciona.** `debug_token`: válido, `SYSTEM_USER`, app Kiro, **no expira** (`expires_at: 0`), scopes **`ads_read` + `public_profile`** |
+| ✅ | **4-B ahora es candado técnico:** sin `ads_management`, Meta **rechaza** cualquier escritura. No es disciplina, es permiso |
+| ✅ | **El veredicto del lunes 14 sale de la API.** El dueño no exporta nada |
+| 🐛 | **BUG ARREGLADO en el lector:** dividía el presupuesto por 100 siempre. **El COP no tiene centavos** (su unidad menor es el peso), así que mostraba *"Domiciliarios VIDEO $550"* en vez de $55.000. Ya lee la moneda de la cuenta y solo divide cuando corresponde |
+
+### 🆕 Aparecieron dos conjuntos que NO están en la tabla de configuración
+
+La tabla "CONFIGURACIÓN DE LA CUENTA AL 2026-09-10" lista 9 conjuntos. En vivo hay **11**:
+
+| Conjunto | Presup. | Estado real |
+|---|---|---|
+| **Publico ABIERTO - Creativo** | $20.000 | `PAUSED` |
+| **Publico ABIERTO video** | $20.000 | `CAMPAIGN_PAUSED` |
+
+Son **el A/B del colmena** (el estático y el video de 0-AD), no un conjunto nuevo del tradicional.
+Los dos están apagados, así que **no hay fuga hoy**, pero hay que anotarlos: son **$40.000/día de
+presupuesto dormido** que reaparece si alguien prende esa campaña sin mirar.
+
+📌 **Y de paso CORROBORAN 0-AG con datos de la API:** `Publico ABIERTO video` cerró la ventana 5-9 sep
+en **$2.611/conversación** contra el equilibrio del colmena de **$3.322** → corría al **78,6% de su
+equilibrio**, casi exactamente el *"85% de SU equilibrio"* que dice 0-AG. **El canal del colmena no
+perdía plata.** El estático sí: **$4.044/conv = 1,22× su equilibrio** — y es el que justifica apagar.
+
+📌 **Nombre real:** el conjunto se llama **`Domiciliarios | Santander`**, no *"Santanderes"*.
+
+### 🔴 CORRECCIÓN GRANDE 1: Motorizados no se estaba encogiendo. Era UN día, y era un día malo para TODA la cuenta
+
+0-AF dijo *"su audiencia se encoge, conv/mil 4,04 → 1,77 (−56%)"* y por eso se recortó a $9.000.
+**La serie completa dice otra cosa:**
+
+| Día | 5-sep | 6-sep | 7-sep | 8-sep | **9-sep** | **10-sep** |
+|---|---|---|---|---|---|---|
+| **conv/mil** | 3,99 | 8,63 | 5,95 | 4,16 | **1,73** 🔴 | **4,91** 🟢 |
+| **$/conv** | $923 | $529 | $711 | $895 | **$2.001** | **$884** |
+
+**No es monótona: es un pozo de un día que ya rebotó.** Y el 9-sep fue malo para todo:
+
+| Día | Gasto cuenta | Conv | **$/conv cuenta** |
+|---|---|---|---|
+| 8-sep | $147.002 | 159 | **$924** |
+| **9-sep** | $144.451 | 129 | **$1.120** 🔴 **+21%** |
+| 10-sep | $202.095 | 220 | **$919** |
+
+🔑 **El recorte de Motorizados se decidió leyendo el peor día de la cuenta.** Es la misma familia de
+error que las cuatro de la bitácora del 10-sep: **ventana censurada.** La diferencia es que esta vez
+el error salió gratis, porque **el recorte igual funcionó** — pero por el motivo contrario:
+
+| Motorizados | 9-sep ($15.000) | 10-sep ($9.000) | |
+|---|---|---|---|
+| Alcance | 5.093 | **2.531** | ▼ mitad |
+| CPM | $3.466 | **$4.340** | ▲ +25% **paga MÁS** |
+| **conv/mil** | 1,73 | **4,91** | ▲ **2,8×** |
+| **$/conv** | $2.001 | **$884** | ▼ **−56%** |
+
+**Con menos plata se replegó a su núcleo, paga un CPM 25% más caro y convierte 2,8× mejor.**
+No era una audiencia que se agotaba: era una audiencia **estirada de más**. Y **frecuencia 1,02-1,05**
+lo confirma: nunca hubo fatiga de repetición.
+✅ **El gate del lunes ($1.500) lo pasa cómodo con $884.** Se queda en $9.000.
+
+### 🔴🔴 CORRECCIÓN GRANDE 2: el que se está diluyendo es DOMICILIARIOS — el control del gate
+
+**Y esta sí es monótona, 5 días seguidos:**
+
+| Día | 5-sep | 6-sep | 7-sep | 8-sep | 9-sep | 10-sep |
+|---|---|---|---|---|---|---|
+| **$/conv** | $655 | $727 | $697 | $816 | $928 | **$1.116** |
+| **conv/mil** | 4,55 | 5,21 | 4,70 | 4,16 | 3,57 | **2,78** |
+
+**+70% de costo en 5 días, y la calidad de audiencia a la mitad.** ¿Por qué? **No es la subasta, y no
+es fatiga:**
+
+| Domiciliarios | 9-sep | 10-sep |
+|---|---|---|
+| Alcance | 12.214 | **24.359** ▲ **2,0×** |
+| **CPM** | $3.310 | **$3.100** ▼ **BAJA** |
+| Frecuencia | 1,06 | 1,06 → sin fatiga |
+| **conv/mil** | 3,57 | **2,78** ▼ |
+
+🔑 **Duplicó el alcance, el CPM BAJÓ, y convierte peor.** Eso es exactamente la elasticidad 0,63 en
+vivo: **compró el doble de impresiones más baratas y más frías.** Es el mismo mecanismo de
+Motorizados, pero en el conjunto grande y al revés — **Domiciliarios está en la posición en la que
+estaba Motorizados el 9-sep.**
+
+📌 **Cuánto vale:** si al podarlo volviera a su conv/mil del 8-sep (4,16) con su CPM de ~$3.400, el
+$/conv iría a ~$818. Sobre los $80.354 que gastó el 10-sep son **~98 conversaciones en vez de 72:
++26/día sin poner un peso más.**
+⛔ **PERO NO SE TOCA HASTA EL LUNES 14:** es el control con el que se miden las tres regiones. Se
+anota como **el punto 1 del veredicto**, con el número puesto.
+
+### 🔴 CORRECCIÓN 3: el CPM de TEST Creativos NO viene subiendo. Oscila
+
+0-AF dijo *"CPM $7.968 y subiendo ($5.240 → $6.679 → $7.968)"*. La serie diaria completa:
+
+| Día | 5-sep | 6-sep | 7-sep | 8-sep | 9-sep | 10-sep |
+|---|---|---|---|---|---|---|
+| **CPM** | $5.110 | $5.967 | $5.076 | $5.914 | $6.562 | **$6.040** |
+| **conv/mil** | 7,23 | 10,58 | 9,70 | 5,84 | 5,85 | **7,78** |
+| **$/conv** | $707 | $564 | $523 | $1.012 | $1.121 | **$776** |
+
+**Oscila alrededor de ~$5.800 con deriva leve. Nunca llegó a $7.968 en un día cerrado.** La bitácora
+del 10-sep se felicitó por llamarle **ruido** al +75% de TEST Creativos… y en el mismo párrafo trató su
+CPM como **tendencia**. Era ruido las dos veces.
+
+Y el dato que importa: **TEST Creativos tiene conv/mil 7,78 = 2,8× el control (2,78), y cierra el
+10-sep en $776 contra los $1.116 de Domiciliarios.** Con CPM casi el doble, **igual sale 30% más
+barato.** ⚠️ Esto **no** reabre "subirlo a $30.000" por sí solo — pero sí obliga a re-mirar #77 el
+lunes, porque el argumento que lo bloqueaba (*"su CPM sube cada ventana"*) **no está en los datos.**
+
+### 🔴 ALARMA NUEVA: la cuenta gasta $202.095, no $154.000 — Meta sobre-entrega 31%
+
+| | |
+|---|---|
+| Presupuesto de los conjuntos ACTIVOS | **$154.000** |
+| **Gasto real del 10-sep** | **$202.095** |
+| **Sobre-entrega** | **+31,2%** |
+
+🔑 **Contra la tabla de elasticidad del propio proyecto, a $200.000/día el último peso devuelve
+−$0,00 y el óptimo es ~$178.000.** O sea: **la cuenta ya está gastando en el punto donde el peso
+marginal no devuelve nada**, aunque en la tabla de configuración figure como $154.000.
+📌 **La orden de "no subir presupuesto" se está cumpliendo en la interfaz y NO en la realidad.** Y
+encaja perfecto con la dilución de Domiciliarios: la plata de más se va a audiencia fría.
+⚠️ **Un día de sobre-entrega no es una serie.** Verificar el sábado 12 con 8-9-10 completos antes de
+tratarlo como estructural.
+
+### 📊 Las tres regiones — LECTURA PRELIMINAR, NO ES EL VEREDICTO
+
+Se crearon la **noche del 9-sep** (gastaron $347-$454 ese día: nada). **El 10-sep es su único día
+completo.** Equilibrio absoluto: **$2.657/conv**.
+
+| Región | Gasto 10-sep | Conv | **$/conv** | conv/mil | Lectura |
+|---|---|---|---|---|---|
+| **Tolima Huila** | $3.980 | **4** | **$995** | 3,78 | 🟢 2,7× bajo el equilibrio |
+| **Santander** | $3.875 | **3** | **$1.292** | 3,42 | 🟢 2,1× bajo el equilibrio |
+| **Eje Cafetero** | $3.995 | **1** | **$3.995** | 1,12 | 🔴 arriba — pero **n=1** |
+| Valle *(podado)* | $3.919 | **1** | **$3.919** | 1,11 | 🔴 y su serie de 6 días es mala |
+
+⛔ **n = 1, 3 y 4. NO SE DECIDE NADA CON ESTO.** Se cumple el plan: mirar el sábado, decidir el lunes.
+🟢 **Señal temprana, con toda la cautela: Tolima Huila y Santander están entregando** conversaciones a
+mitad de precio del equilibrio desde el día 1. **Eje Cafetero es el único que se ve flojo.**
+🔴 **Valle es el caso serio:** su serie 5→10 sep es $699 · $2.921 · $3.894 · $871 · $2.002 · $3.919, y
+la ventana 8-10 sep cierra en **$1.756**. El *"$1.379"* que anotó 0-AF era la lectura del 9-sep.
+
+### ⚠️ El sesgo del gate del lunes ahora tiene DOS signos opuestos
+
+| Sesgo | Dirección |
+|---|---|
+| El recorte de Motorizados liberó ~$8.700/día en Med+Bog, donde corre el control *(0-AF)* | las regiones se ven **peor** |
+| 🆕 **El control se está diluyendo: +70% de costo en 5 días** | las regiones se ven **mejor** |
+
+🔑 **Se cancelan en dirección desconocida → el criterio relativo queda inservible para este gate.**
+**Usar el criterio ABSOLUTO ($2.657/conv) como único principal.** Es lo que ya decía 0-AF, y ahora hay
+una segunda razón independiente para hacerlo.
+
+### 📌 Lo que este bloque NO dice
+
+- **No** dice que haya que tocar algo antes del lunes 14. **Nada se toca.** 4-B: el agente lee.
+- **No** cierra el gate de las regiones: `n` es de 1 a 4 conversaciones.
+- **No** mide ventas, solo **conversaciones**. El puente conversación → venta sigue viniendo de los
+  exports de 99 Envíos. **#32 sigue abierto: la API por conjunto no dice qué creativo genera ventas.**
 
 ---
 
@@ -6333,6 +7024,39 @@ abrir el PR #19 aparte).
 
 ## 11. 📚 MANUAL OPERATIVO DE META ADS (aprendido en la práctica, 2026-07-28)
 
+### 🆕 REGLA DE LECTURA AGREGADA EL 11-SEP (0-AH) — LA MÁS IMPORTANTE DE TODAS LAS DE MEDICIÓN
+
+🔴 **VENTANAS QUE SE SOLAPAN NO SON UNA SERIE. Para decidir si algo es tendencia, los puntos tienen
+que ser días DISJUNTOS.**
+
+El diagnóstico *"Motorizados se está muriendo"* se construyó con esta serie:
+
+> 3-sep $605 · **4-6 sep** $656 · **7-8 sep** $730 · **8-9 sep** $966 · 9-sep $1.970
+
+**"7-8 sep" y "8-9 sep" comparten el 8-sep**, y el último punto es un día atípico suelto. Cuando un
+día malo entra en varias ventanas promediadas, **aparece varias veces y fabrica una pendiente que en
+los datos diarios no existe.** La serie diaria real era **3,99 · 8,63 · 5,95 · 4,16 · 1,73 · 4,91**:
+un pozo de un día que rebotó, no una caída.
+
+📌 **Corolario práctico, ahora que la API lee sola:** pedir siempre `time_increment=1` y mirar la
+serie **por día**. Ya no hay excusa para leer ventanas acumuladas.
+
+### 🆕 Y EL TERMÓMETRO SE DESCOMPONE EN DOS, NO EN UNO
+
+$/conversación = **CPM ÷ conv-por-mil**. Hay que mirar **los dos factores por separado**, porque el
+tratamiento es opuesto:
+
+| Qué se ve | Qué es | Qué se hace |
+|---|---|---|
+| $/conv sube y **el CPM sube** | **subasta**: se está pagando más caro | palanca = audiencia nueva / creativo |
+| $/conv sube y **el CPM baja o está quieto** | **audiencia**: Meta se fue a bolsillos más fríos | palanca = **PODAR presupuesto** |
+| $/conv sube y **la frecuencia sube** | **fatiga** de repetición | palanca = creativo nuevo |
+
+🔑 **El caso de Domiciliarios el 10-sep era el segundo: alcance ×2, CPM BAJANDO, frecuencia quieta en
+1,06.** Sin descomponer, se ve igual que una subasta cara y se trata al revés.
+🔑 **Y Motorizados lo probó en la dirección contraria:** al recortarlo pagó un CPM **25% más alto** y
+el costo por conversación **bajó 56%**, porque volvió a su núcleo. **Un CPM más alto puede ser bueno.**
+
 ### 💸 Cómo funciona el gasto (dudas resueltas del dueño)
 - **El presupuesto se gasta cuando Meta MUESTRA el anuncio**, NO cuando uno paga ni cuando la gente escribe.
   Pagar/recargar = llenar el tanque. El gasto ocurre al entregar impresiones.
@@ -6653,21 +7377,26 @@ $/conversación  =  CPM  ÷  (conversaciones por cada 1.000 impresiones)
 
 ---
 
-# ⚡ ARRANQUE — 2026-09-11, 05:20 Bogotá (LO MÁS NUEVO, LEER ANTES DEL TRASPASO DE ABAJO)
+# ⚡ ARRANQUE — 2026-09-11, 05:35 Bogotá (LO MÁS NUEVO, LEER ANTES DEL TRASPASO DE ABAJO)
 
-**El punto 1 del traspaso de abajo (verificar el MCP) YA SE HIZO Y QUEDÓ RESUELTO. No repetirlo.**
+**Los puntos 1 de este bloque Y del traspaso de abajo YA ESTÁN CERRADOS. No repetirlos.**
+👉 **Lo que salió de probar el token está en la sección 0-AH, y corrige dos diagnósticos de 0-AF.**
 
 ## Lo primero que tiene que hacer esta sesión
 
-1. 🔑 **PROBAR EL TOKEN DE META, QUE YA EXISTE.** El dueño creó el usuario de sistema
-   **`Kiro Lectura`** con rol **Analista ("Ver rendimiento")** sobre la cuenta de BikerPro y
-   generó un token con **solo `ads_read`**, y lo guardó como secreto **`META_ADS_TOKEN`**.
+1. ✅ ~~**PROBAR EL TOKEN DE META.**~~ **PROBADO Y FUNCIONANDO (11-sep, 05:30).** Token
+   `Kiro Lectura`, `SYSTEM_USER`, **no expira**, scopes `ads_read` + `public_profile`. Cuenta
+   **`act_4330882710457791`** (BikerPro, COP). **El veredicto del lunes 14 sale de la API: el dueño
+   no exporta nada.** Comandos:
    ```bash
-   python3 analisis/meta-api-lectura.py cuentas          # saca el act_id
-   python3 analisis/meta-api-lectura.py insights act_XXX 2026-09-08 2026-09-10
+   python3 analisis/meta-api-lectura.py cuentas
+   python3 analisis/meta-api-lectura.py conjuntos act_4330882710457791
+   python3 analisis/meta-api-lectura.py insights act_4330882710457791 2026-09-08 2026-09-10
    ```
    - Si `$META_ADS_TOKEN` sale vacío, el secreto no se propagó: **decirlo, no inventar métricas.**
-   - **Con esto el veredicto del lunes 14 sale de la API y el dueño no exporta nada.**
+   - 🆕 **Lo que hay que mirar el sábado 12** (día 3 de las regiones, ventana 10-11-12 sep cerrada):
+     (a) ¿**Domiciliarios** siguió subiendo de $1.116? (b) ¿la **sobre-entrega del 31%** se repite?
+     (c) las tres regiones contra **$2.657 absoluto**. Todo explicado en **0-AH**.
 2. 🔴 **SIGUE RIGIENDO 4-B: SOLO LECTURA.** Ahora es candado técnico, no solo regla: el rol
    Analista hace que Meta **rechace** cualquier escritura. El script solo sabe hacer `GET`.
 3. ⛔ **EL MCP `meta-ads` NO SE PUEDE CONECTAR EN KIRO WEB. No volver a intentarlo.** El OAuth
