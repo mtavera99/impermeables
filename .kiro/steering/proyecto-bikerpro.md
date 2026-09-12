@@ -7865,3 +7865,121 @@ Y un error #7, que alcancé a corregir solo antes de mandarlo:
 
 🔑 **Es la misma trampa de siempre con otra cara: comparar dos grupos que no son comparables.
 Antes: ventanas de distinta madurez. Ahora: transportadoras con distinta mezcla de ciudades.**
+
+
+---
+
+## 0-AÑ · ⛔ CORRECCIÓN DE 0-AN: EL FRENO **NO** ERA POR EL SALDO (sáb 12-sep-2026, 17:00)
+
+> **El dueño desconfió de la conclusión de 0-AN y tenía razón. Esta sección la anula parcialmente.
+> Lo que sigue reemplaza el diagnóstico y la recomendación de saldo de 0-AN.**
+
+Su pregunta fue exactamente la correcta: *"¿Meta dice que si el saldo no es tan alto puede haber
+afectaciones en la campaña?"* — y él aclaró que **nunca deja llegar la cuenta a cero**; lo que sí sabe
+(y está bien documentado en 0-AI) es que **cuando llega a cero** el gasto se dispara al recargar.
+
+### Lo que dice el dato: las regiones no están asfixiadas, están CARAS
+
+| conjunto | gasto 9-12 sep | conv | $/conv |
+|---|---|---|---|
+| Domiciliarios \| Eje Cafetero | $4.825 | 2 | **$2.413** |
+| Domiciliarios \| Santander | $5.359 | 5 | $1.072 |
+| Domiciliarios \| Tolima Huila | $4.860 | 5 | $972 |
+| Domiciliarios \| Valle del cauca | $8.592 | 3 | **$2.864** |
+| **las 4 juntas** | **$23.636** | **15** | **$1.576** |
+| referencia de la cuenta | — | — | **$880** |
+
+**Las 4 regiones cuestan 79% más que el promedio de la cuenta.** El 10-sep (su primer día completo)
+Meta les dio presupuesto de exploración: gastaron ~$4.000 cada una y trajeron 1, 3, 4 y 1
+conversaciones. Midió $1.576/conv contra $880 disponibles en otra parte, **y las apagó. Meta hizo lo
+correcto.**
+
+No era el saldo. **Era el optimizador funcionando bien.**
+
+### De dónde salió realmente el "hueco" de gasto del sábado
+
+Sábado 5-sep vs sábado 12-sep, mismo tramo (00:00–14:59), conjunto por conjunto:
+
+| conjunto | 5-sep | 12-sep | dif |
+|---|---|---|---|
+| Domiciliarios VIDEO | $42.527 (conv $709) | $36.664 (conv $917) | −$5.863 |
+| Domiciliarios | $18.897 ($787) | $14.134 ($831) | −$4.763 |
+| **Publico ABIERTO video** | **$10.595 (conv $3.532)** | **$0 — PAUSADO** | **−$10.595** |
+| **Publico ABIERTO - Creativo** | **$10.397 (conv $3.466)** | **$0 — PAUSADO** | **−$10.397** |
+| Motorizados | $9.483 ($862) | $3.169 ($792) | −$6.314 |
+| TEST Creativos | $9.212 ($837) | $5.454 ($909) | −$3.758 |
+| Valle del cauca | $3.791 ($632) | $83 | −$3.708 |
+| **TOTAL** | **$104.902 · $889/conv** | **$59.726 · $878/conv** | |
+
+**$20.992 del hueco — casi la mitad — son los dos conjuntos "Publico ABIERTO" que están pausados
+desde el 9-sep. Y estaban comprando a $3.532 y $3.466 por conversación**, o sea **4 veces más caro**
+que la cuenta. Pausarlos fue una decisión correcta que **mejoró** la cuenta.
+
+### ⛔ El número que estaba mal en 0-AN
+
+0-AN dijo: *"~$54.000 sin gastar × $884/conv = 3 a 7 pedidos perdidos = $72.000–169.000 de utilidad
+perdida hoy."*
+
+**Está mal, y el error es grave: asumió que la plata que no se gastó se habría convertido a $884.**
+La única evidencia que hay de qué pasa cuando se empuja más plata en esta cuenta es justamente
+"Publico ABIERTO": **la volumen extra costaba $3.500/conv, no $884.** A ese precio no hay utilidad,
+hay pérdida.
+
+**Es la misma trampa de siempre, disfrazada otra vez:** valorar volumen que no existe al precio del
+volumen que sí existe. El $/conv promedio **no** es el $/conv marginal.
+
+### ✅ Lo que realmente hay que concluir del sábado 12-sep
+
+- **La campaña está BIEN.** $878/conv contra $889 del sábado pasado. Banda normal ($732–$925).
+- El gasto es menor porque **se apagó lo caro**, no porque falte plata.
+- Las regiones seguirán apagadas mientras cuesten $1.576/conv. **Eso es correcto.**
+- ⛔ **NO hay que meter colchón de saldo por razones de rendimiento.** La recomendación de 0-AN queda
+  anulada.
+
+### Sobre el saldo: qué está probado y qué no
+
+| afirmación | estado |
+|---|---|
+| Saldo en **$0** → la entrega se detiene y al recargar Meta gasta de golpe, arruinando el $/conv del día | ✅ **PROBADO** en esta cuenta (0-AI, evento del 9-sep, verificado hora por hora) |
+| Saldo **bajo pero positivo** → Meta frena la entrega gradualmente | ❌ **SIN EVIDENCIA.** Hoy la cuenta amaneció con el saldo MÁS ALTO de la semana ($129.663) y fue el día de menos entrega. **El dato lo contradice.** |
+| Meta documenta oficialmente que un saldo bajo afecta la entrega | ❌ **NO ENCONTRADO.** Solo blogs de marketing que lo afirman sin fuente. Lo único documentado de verdad es el **límite de gasto de la cuenta** (account spending limit), que es un **techo duro que detiene todo**, no un freno gradual — y es otra cosa distinta del saldo prepago. |
+
+**Regla operativa que SÍ sirve:** recargar para que **nunca toque $0** (Meta corta bajo ~$16.000–20.000,
+no bajo cero — eso sí se midió). Por encima de eso, **más saldo no compra mejor rendimiento.**
+El goteo diario del dueño está bien. No hay que cambiarlo.
+
+### 🔧 Lo que queda sin explicar (y hay que decirlo, no rellenarlo)
+
+VIDEO va al 66% de su presupuesto, pero Domiciliarios al 31%, TEST Creativos al 21% y Motorizados al
+34% — **y su $/conv es bueno ($831, $909, $792).** No sé por qué Meta no les da más plata. Hipótesis
+posibles (ninguna verificada): audiencia solapada con VIDEO, que se está comiendo a los mismos
+usuarios; o techo real de audiencia a ese precio.
+
+**No lo voy a afirmar sin medirlo.** Se mide mirando el solapamiento de segmentación y el alcance
+incremental. Pendiente.
+
+### ⚠️ Errores #8 y #9
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 8 | *"el saldo bajo está frenando la entrega; meter colchón de $310.000–460.000"* | **falso. Hoy tenía el saldo más alto de la semana y fue el día de menos entrega. Las regiones están apagadas porque cuestan $1.576/conv contra $880.** |
+| 9 | *"el presupuesto sin gastar son $72.000–169.000 de utilidad perdida hoy"* | **falso. Valoré volumen inexistente al precio promedio. La evidencia de "Publico ABIERTO" dice que el volumen marginal cuesta $3.500/conv: a ese precio es pérdida, no utilidad.** |
+
+🔑 **Lección: presenté una hipótesis con tabla, umbrales y plan de acción, y eso la hizo parecer un
+hallazgo. La ceremonia de presentación no es evidencia.** El dueño la frenó con una sola pregunta:
+*"¿Meta dice eso?"* — y no, Meta no lo dice.
+
+### Corrección al veredicto de transportadoras (matiz, no error)
+
+0-AN recomendó "evitar Coordinadora en la costa". **La razón que dio suena a que Coordinadora es mala
+en la costa, y eso NO está probado.** El motivo real es de **diseño de medición**:
+
+- **La costa es mala con cualquiera.** Cartagena: 4 de 7 = **57%** de devolución, sumando todas.
+- Hoy Coordinadora carga Cartagena(6), Barranquilla(3), Montería(2), Sincelejo(2)... e Interrapidísimo
+  carga Bogotá(11).
+- Con esa reparto **es imposible saber** si las devoluciones son culpa de la transportadora o del
+  destino. **Los dos efectos van pegados.**
+
+Mandarla a Bogotá y Medellín **no es un castigo ni una precaución de calidad: es para poder medirla**
+contra una línea base que ya existe (Bogotá Interrapidísimo: 7/23 = 30% maduro). **Nada dice que
+Coordinadora sea mala en la costa. Lo que pasa es que en la costa no se puede medir nada.**
