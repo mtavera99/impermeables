@@ -1498,7 +1498,113 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-AM. 📏 LA REGLA DEL DESPACHO — LA VERSIÓN DEFINITIVA, Y LOS UMBRALES PARA ALARMARSE (2026-09-12, 04:00 Bogotá)
+
+**El dueño explicó la mecánica exacta y tiene razón en todo.** Y dijo lo más importante:
+*"no quiero justificar que el CPA está mejor, quiero que entiendas muy bien esta regla para que podamos
+ser muy objetivos y saber cuándo tenemos que alarmarnos"*.
+**Esta sección reemplaza el criterio de conteo de 0-Y, que se quedaba corto.** Script:
+`analisis/regla-del-despacho.py`.
+
+### 🔴 Hoy revisé el mismo número TRES veces. Esta es la razón, y el método que lo cierra
+
+| Intento | Número | Por qué estaba mal |
+|---|---|---|
+| 1 | 12,0 ped/día · CPA $12.920 | conté guías como si fueran ventas del día |
+| 2 | 17,2 uds/día · CPA $9.123 | sumé las 8 sin despachar pero al día equivocado |
+| **3 (este)** | **13,0 ped/día · CPA $13.478** | **ventanas alineadas por despacho, hora a hora** |
+
+### LA REGLA, EN TRES PARTES
+
+**1. UN LOTE NO ES UN DÍA.** El corte medido en el export va de las **14:53 a las 17:13 Bogotá**.
+Entonces **cada lote arrastra la tarde y la noche del día anterior.**
+
+**2. EL FINDE ENTRA COMPLETO EN EL LOTE DEL LUNES.** Del viernes ~17:00 al lunes ~17:00 son **~3,0 días
+de venta en UN solo lote**, porque las transportadoras no trabajan sábado ni domingo. **Se vende igual:
+se guarda.**
+
+**3. LAS VENTAS SIN DESPACHAR NO ESTÁN EN EL EXPORT.** Hoy hay **8 del viernes** que se despachan el
+lunes. Si no se suman a mano, **el viernes se ve peor de lo que fue y el lunes se va a ver mejor de lo
+que es.**
+
+📌 **Corolario: no se compara un día contra otro NUNCA.** Se comparan **ventanas delimitadas por
+despachos**, divididas por los días **fraccionarios** que cubren.
+
+### El corte real, medido
+
+| Día | Último lote | Ped | Uds |
+|---|---|---|---|
+| 2-sep | 17:03 | 32 | 37 |
+| 3-sep | 17:04 | 24 | 32 |
+| 4-sep | 16:40 | 11 | 13 |
+| 7-sep | 16:37 | 36 | 44 |
+| 8-sep | **15:49** | 15 | 16 |
+| 9-sep | 16:55 | 6 | 8 |
+| 10-sep | **17:13** | 12 | 16 |
+| 11-sep | **14:52** | 15 | 19 | *(+8 pedidos / ~10 uds sin despachar)* |
+
+### ✅ Las ventanas bien alineadas (gasto y conversaciones **hora a hora**)
+
+| Ventana | Días | Ped | Uds | **Ped/día** | Uds/día | **$/pedido** | Cierre |
+|---|---|---|---|---|---|---|---|
+| **POST-PAGO 3-4 sep** | 1,98 | 35 | 45 | **17,6** | 22,7 | **$7.506** | 10,5% |
+| **FINDE 5-7 sep** | 3,00 | 36 | 44 | **12,0** | 14,7 | $14.504 | 6,8% |
+| **VALLE 8-11 sep** | 4,31 | 56 | 69 | **13,0** | 16,0 | **$13.478** | 8,2% |
+
+🎯 **VALIDACIÓN:** la ventana post-pago da **$7.506/pedido** contra el **$7.806** que 0-AC midió con
+exports y el **$7.664** del 25-ago. **Coincide. El método es correcto.**
+
+### Qué se movió de verdad
+
+| | Post-pago | Valle | Cambio |
+|---|---|---|---|
+| gasto/día | $132.407 | $175.219 | **+32%** |
+| conversaciones/día | 217 | 196 | −10% |
+| **cierre uds/conv** | 10,5% | 8,2% | **−22%** |
+| unidades/día | 22,7 | 16,0 | −29% |
+| **CPA por pedido** | **$7.506** | **$13.478** | **+80%** |
+
+🔴 **HONESTIDAD: los tres factores se movieron un poco y ninguno domina.** No puedo atribuirlo a una
+sola causa. Y el cierre **sí** bajó 22% —lo que en 0-AL dije que estaba plano era efecto de comparar
+conversaciones de día calendario contra unidades de lote. **Con las horas alineadas, bajó.**
+⚠️ **Y sigue el confundido de quincena de 0-AK: post-pago vs valle son fases distintas del ciclo.**
+
+## 🚨 LOS UMBRALES PARA ALARMARSE — esto es lo que hay que memorizar
+
+Utilidad por pedido **antes de pauta: $24.129** (0-AE, costo $33.000). Entonces:
+
+| CPA por pedido | | Qué hacer |
+|---|---|---|
+| **< $9.000** | 🟢 **NORMAL** | como el post-pago. **No tocar nada** |
+| **$9.000 - $14.000** | 🟡 **VIGILAR** | mirar conv/mil y CPM. Puede ser el ciclo |
+| **$14.000 - $18.000** | 🟠 **ALARMA** | ¿ya son 3 días? entonces **actuar** |
+| **$18.000 - $24.129** | 🔴 **GRAVE** | se está comiendo la utilidad entera |
+| **> $24.129** | ⛔ **PÉRDIDA** | cada pedido pierde plata |
+
+### 📍 HOY, ventana del valle bien medida: **$13.478/pedido → 🟡 VIGILAR**
+
+**No es alarma. Es vigilar.** El negocio deja **$10.651 limpios por pedido** y no hay que tocar nada
+todavía.
+
+### ⛔ Las tres reglas para NO alarmarse en falso
+
+1. **Mínimo 3 días de ventana.** Un lote solo no dice nada.
+2. **Sumar SIEMPRE las ventas sin despachar** antes de concluir.
+3. **No comparar post-pago contra valle.** Valle contra valle, post-pago contra post-pago.
+
+### ⚠️ Y para el lote del lunes 14, que es una trampa
+
+**Va a traer viernes-tarde + sábado + domingo + lunes ≈ 3,1 días.** Va a parecer un día enorme.
+⛔ **NO leerlo como un día**, y **restarle las 8 que ya están contadas en el viernes** para no contarlas
+dos veces.
+
+---
+
 ## 0-AL. ✅ FALTABAN 8 GUÍAS, Y CON ELLAS EL DIAGNÓSTICO QUEDA LIMPIO: EL CIERRE NUNCA SE ROMPIÓ (2026-09-12, 03:00 Bogotá)
+
+> ⚠️ **LEER 0-AM PRIMERO.** El *"cierre plano en 9,7%"* de esta sección es un artefacto: comparaba
+> conversaciones de día calendario contra unidades de lote. Con las horas alineadas (0-AM) el cierre
+> **bajó 22%**. Los CPA correctos son los de 0-AM.
 
 **El dueño avisó que el viernes 11 entraron 8 pedidos MÁS después del despacho** (*"no las he
 despachado porque entraron después de que hice el despacho"*, y algunas con pedidos dobles).
