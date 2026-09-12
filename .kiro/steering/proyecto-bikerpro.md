@@ -1498,7 +1498,105 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-AK. 🗓️ EL CPA EXACTO — Y LA QUINCENA DESARMA LA CONCLUSIÓN DE 0-AJ (2026-09-11, 17:30 Bogotá)
+
+**El dueño preguntó dos cosas y la segunda tumba mi conclusión:** *"¿cuánto fue el CPA entonces?"* y
+*"¿no es normal que se caiga un poco por las fechas, porque unos días fueron quincena?"*
+
+### 1️⃣ EL CPA, en las dos unidades que usa el proyecto
+
+| Bloque | Gasto trad./día | Ped/día | **CPA/pedido** | Uds/día | **CPA/unidad** |
+|---|---|---|---|---|---|
+| **A. 1-4 sep** | $153.714 | 16,8 | **$9.177** | 20,5 | **$7.498** |
+| **B. 5-7 sep** | $158.653 | 12,3 | **$12.864** | 14,7 | $10.817 |
+| **C. 8-10 sep** | $154.852 | 11,0 | **$14.077** | 13,3 | $11.614 |
+
+📌 **El archivo madre usa CPA POR PEDIDO.** Históricos: **$7.664** (25-ago, 0-Y) · **$7.806** (4-sep, 0-AC).
+
+### 2️⃣ No está perdiendo plata. Gana mucho menos
+
+Utilidad por pedido antes de pauta: **$24.129** (0-AE, costo $33.000).
+
+| Bloque | CPA/pedido | **Utilidad neta/pedido** | Ped/día | **Utilidad/día** |
+|---|---|---|---|---|
+| **A. 1-4 sep** | $9.177 | **$14.952** | 16,8 | **$250.447** |
+| **B. 5-7 sep** | $12.864 | $11.265 | 12,3 | $138.938 |
+| **C. 8-10 sep** | $14.077 | **$10.052** | 11,0 | **$110.567** |
+
+🔴 **Diferencia: $139.880 de utilidad POR DÍA = ~$4.196.398/mes.** El negocio sigue rentable —
+cada pedido deja $10.052 limpios— pero se le fue esa plata.
+
+### 3️⃣ 🔴 LA QUINCENA: EL DUEÑO TIENE RAZÓN Y MI COMPARACIÓN ESTABA VICIADA
+
+**El pago en Colombia es el 30/31 y el 15.** Septiembre 2026: el 1 fue martes.
+
+| Bloque | Días del mes | Fase del ciclo | Uds/día |
+|---|---|---|---|
+| **A** | 1 al 4 | **post-pago del 31-ago** 🟢 | 20,5 |
+| **B** | 5 al 7 | finde + lunes, bajando | 14,7 |
+| **C** | 8 al 10 | **VALLE, antes del 15** 🔴 | 13,3 |
+
+🔑 **Comparé el mejor tramo del ciclo contra el peor.** Es la misma familia de error de siempre
+—ventana censurada— pero en versión calendario. **La caída de 20,5 a 13,3 puede ser el ciclo y no el
+guion.**
+
+### 4️⃣ Y lo peor: las dos hipótesis predicen EXACTAMENTE lo mismo
+
+Mi argumento en 0-AJ fue *"las conversaciones no cayeron, el cierre sí → es el guion"*.
+**La quincena predice idéntico:** sin plata la gente **escribe lo mismo** (*"¿cuánto vale?"*) y
+**no compra** (*"te escribo cuando me paguen"*).
+
+⛔ **Conversaciones planas + cierre caído es la firma de las DOS. Con estos datos NO SE PUEDEN SEPARAR.**
+La conclusión de 0-AJ **no está identificada** y hay que degradarla de "hallazgo" a "hipótesis".
+
+### 5️⃣ Lo único que SÍ discrimina: el share de 2 unidades
+
+| Día | 2 sep | 3 | 4 | 7 | **8** | **9** | 10 | 11 |
+|---|---|---|---|---|---|---|---|---|
+| **share 2+ uds** | 15,6% | 33,3% | 18,2% | 19,4% | **6,7%** 🔴 | **33,3%** | 33,3% | 26,7% |
+
+🔑 **Salto de 6,7% a 33,3% en UN día, y ese día es exactamente el del parche del guion.** El 9-sep no es
+pago ni quincena: está en mitad del valle. **Un ciclo de pago no produce un 5× de un día al otro en
+mitad del valle.**
+✅ **Esa parte queda confirmada: el guion estaba roto y el parche funcionó.**
+⚠️ **Pero el share explica el TAMAÑO del pedido, no CUÁNTOS pedidos hay.** La caída de volumen sigue
+sin identificar.
+
+### 6️⃣ 🧪 EL TEST QUE LO RESUELVE — REGISTRADO ANTES DE VER EL RESULTADO
+
+**El pago del 15-sep (martes) es el experimento natural.** 0-L ya usó este método con el pago del
+15-ago y funcionó.
+
+**PREDICCIÓN REGISTRADA EL 11-SEP:**
+
+| Si el 16-18 sep… | Entonces |
+|---|---|
+| uds/día vuelve a **~20** y cierre a **~9,6%** | **era EL CICLO.** El guion ya está bien |
+| uds/día se queda en **~13-15** | **era EL GUION** y falta arreglar más |
+| sube a **~16-17** | **son las dos**, mitad y mitad |
+
+⛔⛔ **NO TOCAR PRESUPUESTOS ANTES DE ESO.** Si se mueve la pauta el lunes 14 y el 15 entra el pago,
+los dos efectos se mezclan y **se pierde el único experimento limpio que da el calendario.**
+
+### 📌 El estado real de la evidencia sobre la quincena (importante, porque se ha usado mal)
+
+| Sección | Qué dice |
+|---|---|
+| **0-I** (14-ago) | *"no hay ni un dato que respalde la quincena"*, y el corte crudo apuntaba **EN CONTRA** (pre-pago 9,3 guías/día vs post-pago 7,8) |
+| **0-Y** (25-ago) | el rango *"valle 26-29"* estaba **escrito a mano** en `ciclo-quincena.py` como etiqueta, y se usó como si fuera medido |
+| **0-L** (19-ago) | ✅ el rebote post-pago del 15-ago **sí se cumplió**, y era una **predicción registrada antes**. Es la única evidencia buena a favor |
+
+🔑 **El ciclo tiene UNA confirmación seria y varias suposiciones. El pago del 15-sep es la segunda
+oportunidad de medirlo bien — y esta vez con el gasto de la API, que antes no se tenía.**
+
+---
+
 ## 0-AJ. 🔴🔴 NO ES LA PAUTA: ES EL CIERRE. EL MISMO GASTO PRODUCE 35% MENOS UNIDADES (2026-09-11, 17:00 Bogotá)
+
+> ⚠️ **LEER 0-AK PRIMERO.** La conclusión de esta sección (*"es el guion"*) **no está identificada**: el
+> bloque A cae justo después del pago del 31-ago y el bloque C en el valle previo al 15. La quincena
+> explica los mismos datos. Lo que **sí** se sostiene de acá es el share de 2 unidades (salto de 6,7% a
+> 33,3% el día del parche) y los números del CPA.
 
 **Este bloque CORRIGE dos cosas que yo mismo escribí hoy.** Salió de que el dueño preguntó
 *"12 ventas de promedio del 8-11? Pensé eran más"*. Tenía razón, y al revisarlo se cayó mi conclusión.
