@@ -1498,7 +1498,89 @@ Pide **MEDIR**, que es justo lo contrario.
 
 ---
 
+## 0-AL. ✅ FALTABAN 8 GUÍAS, Y CON ELLAS EL DIAGNÓSTICO QUEDA LIMPIO: EL CIERRE NUNCA SE ROMPIÓ (2026-09-12, 03:00 Bogotá)
+
+**El dueño avisó que el viernes 11 entraron 8 pedidos MÁS después del despacho** (*"no las he
+despachado porque entraron después de que hice el despacho"*, y algunas con pedidos dobles).
+Con eso el 11-sep pasa de 15 a **23 pedidos**, y **todo el análisis de ayer se ordena.**
+
+### El 11-sep completo: el mejor día del mes
+
+| | |
+|---|---|
+| Gasto del día (cerrado) | **$164.961** |
+| Conversaciones | **205** |
+| **Pedidos** | **23** (15 despachados + 8 posteriores) |
+| Unidades (estimadas) | **~29** (19 + ~10; el ratio del día es 1,27 uds/guía) |
+| **CPA por pedido** | **$7.172** |
+| **CPA por unidad** | **$5.688** |
+
+🔑 **$7.172/pedido contra $7.806 del 4-sep y $7.664 del 25-ago: el viernes 11 es el mejor día medido
+del mes.**
+
+### 🟢 Y la caída es la MITAD de lo que dije
+
+| | Antes (con el 11 incompleto) | **Ahora (11 completo)** |
+|---|---|---|
+| uds/día | 20,5 → 13,3 = **−35%** | 20,5 → 17,2 = **−16%** |
+| $/unidad | $7.498 → $11.614 = **+55%** | $7.498 → $9.123 = **+22%** |
+
+### 🔑🔑 LO IMPORTANTE: EL CIERRE NO SE ROMPIÓ. ESTÁ IGUAL
+
+Con el 11-sep completo, la cadena entera queda así:
+
+| | A (1-4 sep) | C (8-11 sep) | |
+|---|---|---|---|
+| gasto/día | $159.306 | $164.900 | **+4% → plano** |
+| CPM | $3.657 | $3.622 | **−1% → igual** |
+| **conv/mil** | **4,90** | **3,92** | 🔴 **−20% ← ACÁ SE CAYÓ** |
+| conversaciones/día | 213 | 178 | 🔴 −16% (consecuencia) |
+| **cierre uds/conv** | **9,6%** | **9,7%** | 🟢 **+1% → NO SE MOVIÓ** |
+| unidades/día | 20,5 | 17,2 | −16% |
+
+🔴 **SE CAE COMPLETA LA HIPÓTESIS DE 0-AJ ("es el guion").** El cierre está idéntico: **9,6% → 9,7%.**
+Lo que yo leí como "el cierre se rompió" era **el hueco de las 8 guías que faltaban en el export.**
+
+✅ **Y el diagnóstico verdadero es el que ya estaba medido en 0-AH:** lo que se cayó es la **conv/mil**
+—la calidad de la audiencia— con el CPM y el gasto **planos**. Menos conversaciones por la misma plata,
+y las que llegan **cierran igual de bien que siempre**.
+
+**Es la pauta, no el guion. Y es la dilución de Domiciliarios.**
+
+### 📌 Y también se aclara la quincena
+
+El cierre plano en **9,7%** durante el valle (8-11 sep) es evidencia **en contra** de que la quincena
+esté frenando el cierre: **la gente del valle cierra igual que la del post-pago.** Lo que baja en el
+valle —si baja— es **cuánta gente escribe**, no cuánta compra.
+⚠️ **El test del 15-sep sigue en pie** (0-AK), pero ahora mide una cosa más precisa: **si la conv/mil
+rebota sola después del pago, o si hay que podar Domiciliarios.**
+
+### 🧮 Lo que queda pendiente de contar
+
+**Las 8 guías del viernes están SIN DESPACHAR.** Cuando salgan van a aparecer en el lote del sábado 12
+o del lunes 14, **con fecha de despacho posterior a la venta.** ⚠️ **No contarlas dos veces**: ya están
+contadas como ventas del 11-sep en este bloque.
+📌 Y el número de unidades (~29) es **estimado**. El dueño dijo *"algunas con pedidos dobles"* sin
+precisar cuántas; se usó el ratio del propio día (1,27). **Confirmar con el próximo export.**
+
+### 🎯 La lista del lunes queda así
+
+| | |
+|---|---|
+| 🥇 | **Podar Domiciliarios.** Es la causa medida: conv/mil −20% con CPM plano → **0-AH** y este bloque |
+| 🥈 | **Prender el colmena** con el público de clientes (los teléfonos ya están) → **0-AG** |
+| 🥉 | **Darle ese público a TEST Creativos** (#77): mejor creativo, peor subasta |
+| ✅ | **Motorizados se queda en $9.000** (cerró en $884) |
+| ⚠️ | **El guion NO es la prioridad para el volumen** — el cierre está sano. Sí conviene reprobar los dos parches que sangran (#95: *"está muy caro"*, *"soy de Tadó"*), pero eso protege **margen**, no volumen |
+| ⛔ | **NO subir el gasto total.** El CPM está plano: el problema no es plata, es a quién se le muestra |
+
+---
+
 ## 0-AK. 🗓️ EL CPA EXACTO — Y LA QUINCENA DESARMA LA CONCLUSIÓN DE 0-AJ (2026-09-11, 17:30 Bogotá)
+
+> ⚠️ **LEER 0-AL PRIMERO.** Los CPA de acá están calculados con el 11-sep incompleto (faltaban 8
+> pedidos). Los números corregidos están en 0-AL. Lo que **sí** se sostiene de esta sección es el
+> planteo del confundido de quincena y el test registrado del 15-sep.
 
 **El dueño preguntó dos cosas y la segunda tumba mi conclusión:** *"¿cuánto fue el CPA entonces?"* y
 *"¿no es normal que se caiga un poco por las fechas, porque unos días fueron quincena?"*
