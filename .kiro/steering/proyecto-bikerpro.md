@@ -7629,3 +7629,239 @@ que fija 4-B.
 🔑 **Las cinco son el mismo patrón: sacar conclusión antes de tener la base correcta.** Y las cinco
 las destapó el dueño, no yo. **Eso es la parte más valiosa de esta bitácora: cuando él dice "según mi
 cabeza esto no cuadra", suele tener razón — conviene recalcular antes de defender el número.**
+
+
+---
+
+## 0-AN · EL SALDO SÍ SE PUEDE LEER · EL FRENO DE META · VEREDICTO DE TRANSPORTADORAS (sáb 12-sep-2026, 15:00)
+
+### 🔓 HALLAZGO 1: el saldo de la cuenta prepago SÍ se lee con el token de solo lectura
+
+Llevábamos días **estimando** el saldo porque el campo `balance` responde `(#10) Permission Denied`.
+No hacía falta. En una cuenta prepago:
+
+```
+SALDO DISPONIBLE  =  spend_cap  −  amount_spent
+```
+
+Los dos campos se leen sin problema con `ads_read`. Prueba de que `spend_cap` **no** es un tope que
+alguien puso a mano, sino el acumulado de todo lo recargado:
+
+| momento | `spend_cap` | `amount_spent` | resta | pantalla de facturación |
+|---|---|---|---|---|
+| 11-sep tarde | $4.582.000 | $4.486.558 | **$95.442** | *"Saldo actual COP$ 93.973"* ✅ |
+| 12-sep 15:00 | $4.682.000 | $4.587.967 | **$94.033** | — |
+
+`spend_cap` subió exactamente **+$100.000**, que es exactamente la recarga de las 02:41 del 12-sep.
+**No es un tope: es el acumulado de recargas.** Por eso la alarma del 11-sep ("se apaga en 12h por el
+spend_cap") era correcta en el fondo pero por la razón equivocada: no era un límite que hubiera que
+levantar, era el saldo que se estaba acabando.
+
+### 🔓 HALLAZGO 2: `/activities` se lee con `ads_read` → libro de caja completo
+
+`GET act_.../activities` **sí funciona** con el token de lectura. Ahí queda grabado:
+
+- `"Dinero agregado al saldo"` → cada recarga, con monto y hora exacta
+- `"Cuenta facturada"` → el cobro diario de Meta (~06:15 Bogotá, cobra el día anterior completo)
+- todo el historial de cambios: presupuestos, estados, creación de conjuntos, segmentación
+
+Script: `analisis/saldo-reconstruido-12sep.py` (libro de caja + quién movió qué)
+Script: `analisis/saldo-hora-a-hora-modelo.py` (saldo hora por hora, anclado al dato duro)
+
+⚠️ Los tiempos de `/activities` vienen en **UTC (+0000)**. Bogotá = UTC−5. Hay que restar 5 horas.
+
+**Umbral real de corte:** Meta deja de entregar cuando el saldo baja de **~$16.000–20.000**, no de $0.
+El 11-sep la entrega murió 11:00–13:00 con el saldo modelado en $16.687. El 10-sep a las 22:00 con
+$19.756. Sirve como línea de alarma.
+
+### 🚨 HALLAZGO 3: el goteo diario de recargas es MENOR que el presupuesto → freno permanente
+
+Recargas del 5 al 12-sep: **$1.171.000 en 8 días = $146.375/día**.
+Presupuesto activo: **$154.000/día**. Gasto real varios días: $165.000–203.000.
+
+**Déficit estructural de $10.000–50.000 por día.** El saldo hace trinquete hacia abajo hasta que
+Meta empieza a frenar. La cuenta lleva 8 días seguidos con menos de un día de presupuesto en reserva
+(hoy: $94.033 = 61% de un día).
+
+**La firma del racionamiento es la curva horaria PLANA.** Un día con plata tiene forma (picos de
+audiencia); un día racionado es una línea recta:
+
+| día | curva | pico | señal |
+|---|---|---|---|
+| 8-sep | con forma | $21.129 a las 19:00 | 🟢 audiencia manda |
+| 11-sep | con forma | $23.892 a las 07:00 | 🟢 audiencia manda (+ hueco 11-13h) |
+| **12-sep (hoy)** | **plana** | 09:00–13:00 todo entre $4.978 y $5.925 | 🔴 **Meta está racionando** |
+
+### 📉 CÓMO VA LA CAMPAÑA HOY (sáb 12-sep, corte 15:00)
+
+Sábado contra sábado, **mismo tramo del día** (00:00–14:59), para no repetir el error de la ventana censurada:
+
+| fecha | gasto | conv | $/conv |
+|---|---|---|---|
+| 29-ago sáb | $57.023 | 47 | $1.213 |
+| 05-sep sáb | $104.903 | 118 | $889 |
+| **12-sep sáb (hoy)** | **$58.910** | **67** | **$879** |
+
+**La eficiencia está intacta. Lo que falta es volumen.** $/conv de los últimos 8 días: $879, $806,
+$732, $925, $1.120 (9-sep, día con hueco), $924, $807, **$884 hoy**. Hoy está en la banda normal.
+
+Uso del presupuesto hoy, conjunto por conjunto (62% del día corrido → lo normal sería ~62%):
+
+| conjunto | presup | gastado | uso | conv | $/conv |
+|---|---|---|---|---|---|
+| 🟢 Domiciliarios VIDEO | $55.000 | $36.205 | 66% | 40 | $905 |
+| 🟡 Domiciliarios | $45.000 | $13.992 | 31% | 17 | $823 |
+| 🔴 TEST Creativos | $25.000 | $5.286 | 21% | 5 | $1.057 |
+| 🟡 Motorizados | $9.000 | $3.091 | 34% | 4 | $773 |
+| 🔴 4 regiones ($5.000 c/u) | $20.000 | $341 | **2%** | 1 | — |
+| | **$154.000** | **$58.915** | **38%** | 67 | $884 |
+
+**Meta protege al conjunto grande y asfixia a los chicos.** Las 4 regiones llegaron al 78-80% el
+10-sep (día con plata) y se desplomaron a 8-18% el 11-sep y a 2% hoy. Los 3 de Santander/Eje/Tolima
+nacieron el 9-sep, así que **no es arranque en frío: es un desplome.**
+
+Descartado como causa (todo verificado hoy):
+- ❌ anuncios rechazados → los 8 están `ACTIVE` sin `issues_info`
+- ❌ desgaste de audiencia → frecuencia **1.03–1.10** en todos los conjuntos
+- ❌ CPM disparado → $3.660–$5.201, normal
+- ❌ hueco de saldo hoy → curva limpia, sin racha seca
+
+**Costo del freno, solo hoy:** ~$54.000 de presupuesto sin gastar, a un $/conv **probado** de $884 =
+~61 conversaciones que no entraron. A la tasa conocida de conversación→pedido (5–11%):
+**3 a 7 pedidos perdidos × $24.129 = $72.000 a $169.000 de utilidad, en un solo día.**
+
+> ⚠️ Esto NO es ahorro. La eficiencia está buena hoy ($884/conv), así que la plata que no se gastó
+> se habría convertido igual de bien. Es utilidad dejada sobre la mesa.
+
+### ✅ RECOMENDACIÓN META (sin tocar presupuestos, respetando el candado del 15-sep)
+
+1. **Meter un colchón de una sola vez**, no subir el goteo diario. Que el saldo quede en
+   **$310.000–460.000** (2–3 días de presupuesto). Eso desactiva el freno sin cambiar ni un
+   presupuesto, así que **no contamina el experimento del pago del 15-sep**.
+2. Después, goteo diario de **$160.000+** (no $100.000) para no volver al déficit.
+3. **Prueba falsable:** si la explicación del freno es correcta, al meter el colchón las 4 regiones
+   deben volver a 60-80% de su presupuesto **dentro de las 24 horas siguientes**, sin tocar nada más.
+   Si no vuelven, la causa es otra y hay que buscarla.
+4. ⛔ **Sigue prohibido mover presupuestos hasta después del martes 15-sep.** Meter saldo no es mover
+   presupuesto.
+5. Vigilar el saldo con `spend_cap − amount_spent`. Alarma por debajo de **$40.000**.
+
+### 🚚 VEREDICTO DE TRANSPORTADORAS
+
+#### ⚠️ Primero: un error mío que daba el veredicto al revés
+
+Mi primer clasificador buscaba las palabras "entrega" y "devolución" dentro del estado. Dos desastres:
+
+1. **`ENTREGADO A REMITENTE`** (Servientrega, 9 guías) contiene "ENTREGADO" → lo contaba como
+   **entrega exitosa**. Es lo contrario: el paquete volvió al remitente. **Es una devolución.**
+   Con el error, Servientrega salía con **0% de devoluciones**.
+2. **Coordinadora no usa nunca la palabra "devolución".** Usa `Destinatario no cancela recaudo`,
+   `No se entrega no cancela recaudo`, `Cerrado por incidencia`, `Deterioro en validacion GP`.
+   Ninguno hacía match → Coordinadora salía con **0 devoluciones y cara de ser la mejor.**
+
+**Regla nueva: cada transportadora escribe los estados en su propio idioma. Hay que mapearlos a mano,
+uno por uno, y que el script grite si aparece un estado sin clasificar.** Los 23 estados quedaron
+mapeados explícitamente en `analisis/veredicto-transportadoras-12sep.py`.
+
+#### Tasa de devolución sobre guías maduras (≥10 días) y resueltas
+
+| transportadora | guías | maduras | resueltas | dev | tasa | IC 95% |
+|---|---|---|---|---|---|---|
+| coordinadora | 42 | 5 | 5 | 1 | 20,0% | **3,6% – 62,4%** |
+| interrapidisimo | 245 | 160 | 153 | 30 | 19,6% | 14,1% – 26,6% |
+| servientrega | 62 | 62 | 53 | 9 | 17,0% | 9,2% – 29,2% |
+
+**Los tres intervalos se solapan casi por completo. Estadísticamente son indistinguibles.**
+
+#### Lo que parecía una diferencia real, y por qué no lo es
+
+En la ventana 07–11 sep (las dos operando a la vez) Coordinadora se veía mucho peor:
+entregadas 17% vs 44% (p=0,009), guías en problema 51% vs 23% (p=0,006).
+
+**Pero la mezcla de ciudades está torcida:**
+
+| | guías | en ciudad difícil | ciudades principales |
+|---|---|---|---|
+| coordinadora | 35 | **43%** | Cartagena(6), Barranquilla(3), Medellín(3), Montería(2), Neiva(2), Sincelejo(2) |
+| interrapidisimo | 52 | 25% | **Bogotá(11)**, Granada(2), y pueblos sueltos |
+
+A Coordinadora le están dando **la costa y el interior difícil**; a Interrapidísimo, **Bogotá**.
+Bogotá entrega rápido con cualquiera. Al estratificar (sacando Bogotá de los dos lados):
+
+| métrica | coordinadora | interrapidisimo | p | veredicto |
+|---|---|---|---|---|
+| ya entregada | 6/34 (18%) | 13/41 (32%) | 0,163 | ❌ **se cayó, no concluyente** |
+| en problema | 18/34 (53%) | 11/41 (27%) | 0,021 | ⚠️ sobrevive, pero ver abajo |
+
+La diferencia de velocidad **desaparece** al controlar por ciudad. La de "guías en problema"
+sobrevive, **pero no es confiable** por dos razones: (a) las dos usan vocabularios distintos y
+Coordinadora reporta con más granularidad — `No se localiza dirección` y `Se visita no se logra
+entrega` pueden ser el mismo evento físico que Interrapidísimo llama `Intento de entrega`;
+(b) en Cartagena, la ciudad de mayor coincidencia, **Coordinadora tiene 6 guías e Interrapidísimo 0.**
+Las mezclas casi no se cruzan.
+
+#### 🔴 El dato que decide la estrategia
+
+Para detectar una diferencia de 20% vs 30% de devolución (80% de poder, 95% de confianza) hacen falta
+**~293 guías RESUELTAS por transportadora.** Coordinadora tiene **5 maduras**. A ~7 guías/día más
+10 días de rezago, son **~51 días más de espera.**
+
+**Conclusión: alternar 50/50 al azar nacional es el peor de los mundos.** Parte el volumen para que
+ninguna junte dato suficiente, y como no aleatoriza por ciudad, lo poco que junta está contaminado.
+**No se aprende nada Y se carga el riesgo.**
+
+#### ✅ RECOMENDACIÓN TRANSPORTADORAS
+
+1. **Interrapidísimo como default** de aquí en adelante. No porque esté probado mejor — **no lo está**
+   —, sino porque: tiene 245 guías de historia y una tasa estable y conocida (19,6%), es la única con
+   volumen suficiente para **detectar si se degrada**, y su flete queda en la mitad ($20.283 promedio).
+2. **Coordinadora NO se descarta, pero se prueba bien:** mandarla **solo a Bogotá y Medellín**,
+   alternando guía por guía contra Interrapidísimo en esas mismas ciudades. Ahí hay volumen y hay
+   línea base de comparación (Bogotá Interrapidísimo: 7/23 = 30% maduro). Así en 2–3 semanas hay una
+   comparación pareada limpia, en vez de 51 días de ruido.
+3. **Dejar de mandar Coordinadora a la costa** hasta que haya veredicto. Hoy está cargando Cartagena,
+   Barranquilla, Montería y Sincelejo, que es justo donde cualquier transportadora se ve mal, y eso
+   la condena sin juicio.
+4. **Reclamar las 6 mal enrutadas**, pero sin sacar conclusión: 4 de las 6 salieron **el mismo día
+   (10-sep, de un lote de 9)**. Eso es **un evento**, no una tasa.
+5. **Servientrega sigue vetada** (0-AA). Su 17,0% no es mejor que el resto y en Medellín ya falló.
+
+#### 💰 Dónde está la plata de verdad (para priorizar)
+
+| palanca | tamaño | acción |
+|---|---|---|
+| 🔴 **freno de Meta** | **$72.000–169.000 por DÍA** | meter colchón de saldo — hoy mismo |
+| 🟠 tasa de devolución 19,0% | $2.464.218/mes (60 dev × $40.970) | bajar 3 puntos = $389.962/mes |
+| 🟡 ciudades malas | $60.949/mes solo en fletes quemados | Cartagena **4/7 = 57%**, Bogotá 7/23 = 30% |
+| ⚪ elegir transportadora | **indistinguible con el dato actual** | no es una palanca todavía |
+
+**El orden importa: el freno de Meta cuesta en UN día lo que la elección de transportadora podría
+ahorrar en un mes entero — y esa elección, además, todavía no se puede hacer con evidencia.**
+
+Cartagena con **57% de devolución** (4 de 7) quema más plata que cualquier diferencia entre
+transportadoras. **Ninguna transportadora arregla una ciudad que devuelve más de la mitad.** Eso se
+arregla con política de venta (recaudo anticipado o confirmación reforzada), no cambiando de guía.
+
+### Scripts nuevos de esta sección
+
+| script | qué hace |
+|---|---|
+| `analisis/campana-hoy-12sep.py` | sábado vs sábado mismo tramo + uso de presupuesto por conjunto |
+| `analisis/saldo-reconstruido-12sep.py` | libro de caja desde `/activities` + historial de cambios |
+| `analisis/saldo-hora-a-hora-modelo.py` | saldo hora por hora anclado a `spend_cap − amount_spent` |
+| `analisis/veredicto-transportadoras-12sep.py` | 23 estados mapeados a mano + IC + estratificación |
+
+### ⚠️ Error #6 para la lista de la sección anterior
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 6 | *"Servientrega tiene 0% de devoluciones y Coordinadora 0%"* | **bug de clasificación: `ENTREGADO A REMITENTE` es una devolución, y Coordinadora nunca escribe la palabra "devolución". Reales: 17,0% y 20,0%** |
+
+Y un error #7, que alcancé a corregir solo antes de mandarlo:
+
+| # | lo que iba a afirmar | lo que era |
+|---|---|---|
+| 7 | *"Coordinadora es significativamente peor, p=0,006"* | **confundido por la mezcla de ciudades: le dan Cartagena y la costa, a Interrapidísimo le dan Bogotá. Al estratificar, la diferencia de entrega se cae (p=0,163)** |
+
+🔑 **Es la misma trampa de siempre con otra cara: comparar dos grupos que no son comparables.
+Antes: ventanas de distinta madurez. Ahora: transportadoras con distinta mezcla de ciudades.**
