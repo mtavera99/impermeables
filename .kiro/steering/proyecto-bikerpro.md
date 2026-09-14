@@ -9930,3 +9930,109 @@ permite, entonces:
 porque el primero es el que más recupera.
 
 **Hay que probarlo con un caso real antes de montar cualquier rutina.**
+
+
+---
+
+## 0-BE · ⛔ LAS 24 HORAS Y LAS PLANTILLAS NO APLICAN: ÉL USA LA APP, NO LA API (14-sep, 22:30)
+
+### El dato que lo cambia todo
+
+> Dueño: *"sí me deja escribir después de 24 horas del último mensaje, **y las veces que quieras**."*
+
+**Correcto, y yo le estaba aplicando el reglamento equivocado.**
+
+| | |
+|---|---|
+| la regla de las **24 horas** + plantillas aprobadas | es de la **API (WhatsApp Business Platform)** |
+| la ventana **gratis de 72 horas** | es un concepto de **facturación de la API** |
+| **la app de WhatsApp Business** | es un cliente normal: **le escribe a quien quiera, cuando quiera, gratis** |
+
+🔴 **Entonces todo lo de 0-BC y 0-BD sobre plantillas, ventanas y los 3 pasos dentro de 72 horas
+NO APLICA a su operación.** Aplicaría solo si migrara a la API.
+
+🔑 **Y la oportunidad es MÁS GRANDE de lo que calculé:** no está limitado a 72 horas.
+**Puede re-contactar gente de hace semanas.** El pozo no son los ~2.372 del mes: es **todo el
+histórico acumulado.**
+
+### Por qué él NO quiere migrar a la API (y tiene razón)
+
+> *"eso es una de las cosas que me gusta del agente de Meta: no es como el API que yo pierdo el acceso
+> al teléfono, sino que yo puedo estar pendiente en tiempo real de qué está respondiendo el bot e ir
+> interviniendo para tener un mejor cierre."*
+
+**Ese argumento es sólido y hay que respetarlo.** El agente de Meta le da:
+
+| | |
+|---|---|
+| responde el **99%** de las conversaciones solo | |
+| le pasa a él solo lo puntual | |
+| **y él ve todo en tiempo real y puede intervenir** | ← esto la API se lo quitaría |
+
+**Su tasa de cierre depende de esas intervenciones.** Migrar a la API para automatizar el seguimiento
+podría costarle más en cierre de lo que gane en re-contactos. **No se recomienda migrar.**
+
+### Cómo trabaja hoy (para no volver a suponer)
+
+| | |
+|---|---|
+| dispositivos | **celular** (pendiente todo el día) **y computador** (para lo masivo) |
+| etiquetas que ya usa | `nuevo pedido sin guía` · `pedido completado` · `pago pendiente` · **`cliente potencial`** · y más |
+| mensajes rápidos | **ya los usa** con `/` para tomar pedidos |
+| quién responde | el agente de Meta el 99%, él interviene en lo puntual |
+
+👉 **Ya tiene las dos piezas que hacen falta: la etiqueta `cliente potencial` y los mensajes rápidos.**
+No hay que instalar nada.
+
+### ✅ El circuito real, sin plantillas ni ventanas
+
+Como no hay límite de 24h ni de 72h, **el seguimiento no tiene que ser diario ni urgente.**
+Eso permite **agruparlo**, que es lo que de verdad quita la tedio:
+
+| | |
+|---|---|
+| **cuándo** | un bloque fijo al día (o incluso día de por medio), desde el **computador** |
+| **a quién** | filtrar por la etiqueta **`cliente potencial`** |
+| **qué mandar** | un mensaje rápido nuevo, por ejemplo `/seg1`, `/seg2`, `/seg3` |
+| **cómo no repetir** | etiquetas nuevas `SEG-1`, `SEG-2`, `SEG-3` que reemplacen a `cliente potencial` |
+
+**El costo real es de tiempo, no de plata:**
+
+| | |
+|---|---|
+| por chat, con mensaje rápido y desde el computador | **3 a 5 segundos** |
+| ~170 conversaciones/día que no compran | **9 a 14 minutos** |
+| contra el margen recuperable | **$558.000–$1.090.000/mes** |
+
+### ⚠️ El límite real ya no es técnico: es el riesgo de que lo reporten
+
+Como la app no bloquea nada, **el único freno verdadero es que la gente lo marque como spam.**
+Demasiados reportes bloquean el número, y por ahí entra el 100% de las ventas.
+
+**Por eso el diseño importa:**
+
+| regla | por qué |
+|---|---|
+| **máximo 3 mensajes** y después se deja quieto | insistir más genera reportes |
+| **el mensaje tiene que aportar algo**, no *"¿ya decidiste?"* | un recordatorio útil no se reporta; una insistencia vacía sí |
+| **respetar de inmediato** a quien diga que no | y etiquetarlo para nunca volver a escribirle |
+| **empezar por los más recientes** | el que preguntó ayer se acuerda; el de hace un mes no, y es más probable que reporte |
+
+### 🔔 El dato que falta para dimensionarlo
+
+**¿Cuántos chats tiene hoy con la etiqueta `cliente potencial`?**
+
+Ese número es el pozo real. Con él se calcula cuántos días de trabajo son y cuánto vale.
+Y si son miles acumulados, **la recomendación NO es escribirles a todos**: es empezar por los últimos
+7 días —los que se acuerdan— y medir la tasa de recuperación antes de ir más atrás.
+
+### ⚠️ Errores #19 y #20
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 19 | *"el seguimiento pasadas las 24h necesita plantillas aprobadas de Meta"* | **falso para él.** Esa regla es de la API. Desde la app escribe cuando quiera, las veces que quiera |
+| 20 | *"la oportunidad son los ~2.372 del mes, dentro de la ventana de 72 horas"* | **la ventana no existe en su caso.** El pozo es todo el histórico acumulado, no un mes |
+
+🔑 **Las dos salen del mismo error: apliqué el reglamento de la API a alguien que usa la app.**
+**Regla: antes de citar un límite de plataforma, confirmar CUÁL de las dos WhatsApp está usando.**
+Son productos distintos con reglas distintas.

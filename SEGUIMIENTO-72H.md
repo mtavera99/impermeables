@@ -9,8 +9,12 @@
 > **Entonces nada de lo que sigue está corriendo hoy.** Queda documentado por si algún día migra al
 > bot propio, que es la única forma de automatizar el seguimiento.
 >
-> **Para lo que se puede hacer HOY con el agente de Meta (manual, con etiquetas y mensajes rápidos),
-> ver la sección 0-BD del archivo madre.**
+> **Y hay algo más importante todavía (sección 0-BE):** las reglas de las 24 horas, las plantillas
+> aprobadas y la ventana gratis de 72 horas **son de la API, no de la app.** Desde la app de WhatsApp
+> Business él le escribe a quien quiera, cuando quiera, las veces que quiera, gratis.
+>
+> **Para lo que se puede hacer HOY (manual, con etiquetas y mensajes rápidos), ver las secciones
+> 0-BD y 0-BE del archivo madre.**
 
 ---
 
