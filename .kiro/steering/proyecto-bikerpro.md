@@ -8841,3 +8841,95 @@ $1,63 × (1 ÷ 0,60) = 2,72 ✓ **Las dos causas se multiplican, y pesan casi ig
    casi nunca es la cuenta: es la subasta. **Fechas colombianas que hay que tener en el radar:**
    Amor y Amistad (3er sábado de septiembre), Halloween, Black Friday, navidad, día de la madre,
    día del padre.
+
+
+---
+
+## 0-AV · EL BOT PROMETIÓ UNA OFICINA QUE NO EXISTE, Y EL TARIFARIO MANDABA CARTAGENA POR LA PEOR OPCIÓN (14-sep, 15:30)
+
+### El caso que lo destapó
+
+Pedido #2 del despacho del 14-sep (Potosí, Nariño, $85.000). El bot escribió:
+
+> *"Podemos enviarlo a la oficina de **Servientrega** en Potosí"*
+> …y en el campo Dirección: *"**Oficina interrapidisimo**"*
+
+El dueño explicó el fondo: **Servientrega no presta el servicio de recoger en oficina** como sí lo
+prestan Interrapidísimo y Coordinadora. Él corrigió la dirección, pero **la clienta leyó "Servientrega".**
+
+**No es un error de un pedido: es un error del guion, y se va a repetir.**
+
+### 🔧 Arreglo 1: regla nueva en `GUION-PARA-PEGAR.md`
+
+Se agregó el bloque **"ENTREGA EN OFICINA — QUÉ TRANSPORTADORA PUEDO NOMBRAR"** dentro del guion
+pegable:
+
+| regla | |
+|---|---|
+| 1º | la única que se nombra es **Interrapidísimo** (124 municipios de cobertura medida) |
+| 2º | en Bogotá y alrededores también vale **coordinadora** |
+| 3º | ⛔ **nunca Servientrega para recoger en oficina** — no presta ese servicio |
+| 4º | si no se sabe qué oficina hay, **no decir "la oficina de la transportadora"**: el cliente no sabría a dónde ir |
+
+📌 **El fondo:** el nombre de la transportadora en el cuadro de confirmación **es una promesa**.
+El cliente camina hasta ahí. Equivocarse = devolución autoinfligida.
+
+### 🔴 Arreglo 2: el tarifario mandaba Cartagena por Servientrega
+
+`TARIFARIO-Y-GUION.md` decía, en tabla y con negrilla:
+
+> | **Cartagena** | **servientrega** ($20.771) | con interrapidísimo ($22.793) faltan $1.693 |
+
+**La cuenta está al revés:**
+
+| | |
+|---|---|
+| devoluciones de Cartagena (guías maduras) | **4 de 7 = 57%** |
+| ahorro de servientrega vs interrapidísimo | **$2.022** |
+| costo de UNA devolución | flete ida+vuelta ~$41.000 + utilidad no hecha $24.129 = **~$65.000** |
+
+**Se estaba arriesgando $65.000 con 57% de probabilidad para ahorrar $2.022.** Y encima
+**Servientrega está vetada desde 0-AA.** Corregido: Cartagena y la costa van por Interrapidísimo.
+
+🔑 **El patrón del error: el tarifario optimizaba UNA sola variable (el flete) en un problema de dos
+(flete + devolución).** Y la variable que ignoraba es 30 veces más grande.
+**Regla: ninguna decisión de transportadora se toma solo por flete.** El costo real es
+`flete + tasa_de_devolución × (flete + utilidad)`.
+
+### ✅ Arreglo 3: resuelta una pregunta abierta del tarifario — y también estaba al revés
+
+El documento preguntaba: *"¿qué cobertura tiene coordinadora? Es la más barata de las tres ($15.440
+promedio contra ~$20.800) pero solo se ha usado en 5 destinos. Si cubre el país, es el ahorro más
+grande que tenés hoy."*
+
+**Medido sobre las 349 guías:**
+
+| transportadora | guías | municipios distintos | flete promedio real |
+|---|---|---|---|
+| **interrapidisimo** | 244 | **124** | $20.283 |
+| servientrega | 61 | 10 | $19.676 |
+| **coordinadora** | 42 | **5** | **$22.837** |
+
+**Las dos premisas eran falsas:**
+
+1. **No cubre el país:** 5 municipios contra 124.
+2. **Y NO es la más barata: es la MÁS CARA** ($22.837). El "$15.440" salía de sus primeras guías,
+   que fueron casi todas a **Bogotá — el destino más barato del país.** **Era mezcla de destinos,
+   no precio bajo.**
+
+🔑 **Otra vez el mismo error de siempre, ahora en el tarifario: comparar promedios de grupos con
+mezcla distinta.** Es el hermano gemelo del error de las transportadoras (0-AN) y del error de las
+regiones (#14).
+
+⚠️ **Matiz honesto:** *"usada en 5 municipios"* no es *"solo cubre 5 municipios"* — el enrutamiento
+lo decidía 99 Envíos. Pero para un municipio pequeño **hoy**, la única con cobertura demostrada es
+Interrapidísimo.
+
+### Archivos tocados
+
+| archivo | cambio |
+|---|---|
+| `GUION-PARA-PEGAR.md` | bloque nuevo: qué transportadora se puede nombrar para oficina |
+| `TARIFARIO-Y-GUION.md` | Cartagena servientrega → interrapidísimo · cobertura de coordinadora resuelta · flete real corregido |
+| `analisis/despacho-14sep.csv` | los 30 pedidos, sin PII |
+| `analisis/asignar-transportadora-14sep.py` | la asignación, con la regla de la oficina primero |

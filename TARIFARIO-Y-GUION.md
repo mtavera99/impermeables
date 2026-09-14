@@ -59,17 +59,54 @@ bien.** Las dos reglas que hacen que el tarifario cierre:
 | Destino | Elegí | Por qué |
 |---|---|---|
 | **Bogotá y sabana** | **coordinadora** (o interrapidísimo) | con servientrega ($14.674) el total de $73.000 se queda corto $1.574 |
-| **Cartagena** | **servientrega** ($20.771) | con interrapidísimo ($22.793) faltan $1.693 |
+| **Cartagena** | ~~servientrega~~ → **interrapidísimo** | 🔴 **CORREGIDO 14-sep, ver abajo** |
+| **Municipios pequeños** | **interrapidísimo** | 🆕 es la única con cobertura demostrada (124 municipios) |
 
-⚠️ **La excepción de Cartagena:** es la ciudad que más rechaza de todas. Si interrapidísimo entrega
-mejor allá, **pagá los $2.022 y listo** — una devolución cuesta muchísimo más. Eso es decisión de
-negocio, no de tarifa.
+### 🔴 CORRECCIÓN 14-SEP: Cartagena ya NO va por Servientrega
 
-📌 **Y la pregunta que vale plata: ¿qué cobertura tiene coordinadora?** Es la más barata de las tres
-($15.440 promedio contra ~$20.800 de las otras dos) pero solo se ha usado en **5 destinos**. Si cubre
-el país, es el ahorro más grande que tenés disponible hoy. **Metelo en la misma llamada de los días
-de pago.** Solo en Bogotá, elegirla en vez de interrapidísimo son **$991 por envío** — y hubo
-8 envíos a Bogotá que se fueron por la más cara teniendo la barata disponible.
+La regla anterior mandaba Cartagena por **servientrega para ahorrar $2.022 de flete.**
+**Con los datos de devoluciones que ya existen, esa cuenta está al revés:**
+
+| | |
+|---|---|
+| tasa de devolución de Cartagena (guías maduras) | **4 de 7 = 57%** |
+| ahorro de flete de servientrega vs interrapidísimo | $2.022 |
+| costo de UNA devolución | flete ida+vuelta ~$41.000 **+** utilidad no hecha $24.129 = **~$65.000** |
+
+**Se estaba jugando $65.000 con 57% de probabilidad para ahorrar $2.022.** Es la peor apuesta del
+tarifario. Y además **servientrega está vetada desde 0-AA** (Medellín: 3 devoluciones de 13 = 23%).
+
+👉 **Cartagena y toda la costa: interrapidísimo, y absorber los $2.022.** Y más importante que la
+transportadora: **Cartagena necesita confirmación reforzada antes de despachar.** Ninguna
+transportadora arregla una ciudad que devuelve más de la mitad.
+
+### ✅ RESUELTO: la cobertura de coordinadora (pregunta abierta desde este documento)
+
+Este documento preguntaba: *"¿qué cobertura tiene coordinadora? solo se ha usado en 5 destinos.
+Si cubre el país, es el ahorro más grande que tenés disponible hoy."*
+
+**Medido el 14-sep sobre las 349 guías del histórico:**
+
+| transportadora | guías | **municipios distintos** | flete promedio |
+|---|---|---|---|
+| **interrapidisimo** | 244 | **124** | $20.283 |
+| servientrega | 61 | 10 | $19.676 |
+| **coordinadora** | 42 | **5** | $22.837 |
+
+**Dos respuestas, y las dos tumban la esperanza:**
+
+1. **Coordinadora no cubre el país** — al menos no en el histórico. 5 municipios contra 124.
+2. **Y NO es la más barata.** Este documento decía "$15.440 promedio contra ~$20.800". **Falso hoy:
+   su flete promedio real es $22.837, el MÁS ALTO de las tres.** El $15.440 salía de sus primeras
+   guías, que fueron casi todas a Bogotá — el destino más barato del país. **Era mezcla de destinos,
+   no precio bajo.**
+
+⚠️ **Matiz honesto:** "usada en 5 municipios" no es lo mismo que "solo cubre 5 municipios" — quién
+despacha lo decidía 99 Envíos. Pero para un municipio pequeño hoy, **la única con cobertura
+demostrada es interrapidísimo.**
+
+👉 **Coordinadora queda solo para Bogotá y área metropolitana**, y ahí sí conviene por costo en ese
+destino puntual, alternándola contra interrapidísimo para por fin poder compararlas (0-AR).
 
 ### Tres decisiones que conviene conocer
 
