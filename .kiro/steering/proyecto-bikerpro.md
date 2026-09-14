@@ -9717,3 +9717,99 @@ por mensaje se paga solo.
 | ✅ **Sí** tenga presente que escalar cuesta | de $4.114 a $8.186 es real y no se devuelve |
 | ⏳ **El pico de ahora es temporal** | Amor y Amistad pasa el 19-sep |
 | 💰 **Y hay $558k–$1.09M sin tocar** | en los contactos que ya pagó |
+
+
+---
+
+## 0-BC · COTIZACIÓN DE LA API DE WHATSAPP: COLOMBIA ES DE LAS MÁS BARATAS, Y EL RE-CONTACTO ES GRATIS (14-sep, 21:00)
+
+### 💥 EL HALLAZGO: la ventana gratis de 72 horas de los anuncios Click-to-WhatsApp
+
+**Cuando alguien llega por un anuncio Click-to-WhatsApp y el negocio le responde dentro de las
+primeras 24 horas, se abre una ventana de 72 HORAS en la que TODOS los mensajes salientes son
+gratis — incluidas las plantillas de marketing.**
+
+Fuentes: [360dialog](https://360dialog.com/blog/72-hour-click-to-whatsapp-ad-window/) ·
+[doubletick](https://learn.doubletick.io/click-to-whatsapp-ctwa/understanding-the-72-hour-free-messaging-window-for-ctwa-leads) ·
+[SleekFlow](https://sleekflow.helpjuice.com/whatsapp/understanding-click-to-whatsapp-ads-ctwa-and-the-72-hour-free-window) ·
+[wati](https://www.wati.io/en/blog/whatsapp-advertising-messages/). *Contenido reformulado por
+restricciones de licencia.*
+
+🔑 **TODO el tráfico de BikerPro entra por Click-to-WhatsApp.** Y la práctica que el dueño describió
+—*"les escribía mañana o pasado mañana y así hacía como tres contactos"*— **cae exactamente dentro de
+esa ventana de 72 horas.**
+
+> **Su práctica antigua de re-contactar 3 veces no cuesta nada. Cero. Ni por la API oficial.**
+
+### 💵 Tarifa de Meta por mensaje — Colombia está entre las 3 más baratas del mundo
+
+| categoría | USD por mensaje |
+|---|---|
+| **Marketing** (fuera de la ventana) | **$0,0144** |
+| Utilidad / Autenticación / Servicio | $0,0009 |
+
+**Para comparar:** Colombia $0,0144 · India $0,0136 · Turquía $0,0125 · México $0,0457 ·
+Brasil $0,0719 · Chile $0,1022 · Alemania $0,1570.
+Fuente: [tabla de tarifas por país](https://docs.gallabox.com/pricing-and-billing/whatsapp-pricing/rate-card).
+
+**Colombia cuesta 7× menos que Chile y 11× menos que Alemania.** Es una ventaja estructural del país.
+
+### La cuenta de re-contactar a los ~2.372 que no compraron
+
+| escenario | costo de los mensajes |
+|---|---|
+| **dentro de las 72h del clic** (su práctica de siempre) | **$0** |
+| fuera de la ventana, los 2.372 como marketing | 2.372 × $0,0144 = **~$34 USD ≈ $137.000 COP** |
+
+| contra el beneficio | |
+|---|---|
+| recuperar 1% = 24 ventas | **~$558.000** de margen |
+| recuperar 2% = 47 ventas | **~$1.090.000** de margen |
+
+> **Aun en el peor escenario (todos fuera de la ventana), el costo de los mensajes es $137.000
+> contra $558.000–$1.090.000 de margen. Y dentro de las 72 horas es GRATIS.**
+
+⚠️ **La tasa de cambio usada es ~$4.000 COP/USD y hay que verificarla.** No cambia la conclusión: el
+costo es despreciable en cualquier escenario.
+
+### ⚠️ Dónde SÍ está el costo real: el proveedor, no los mensajes
+
+Meta cobra por mensaje, pero para usar la API se necesita un **BSP** (proveedor), y esos **suelen
+cobrar una mensualidad de plataforma.** **Ese es el número que hay que cotizar, no el de Meta.**
+
+🔔 **Pendiente concreto:** pedir cotización a 2-3 BSP en Colombia preguntando específicamente:
+
+1. **Mensualidad de la plataforma** (el costo real)
+2. Si respetan la **ventana gratis de 72 horas** sin cobrar sobrecargo propio por mensaje
+3. Si permiten **cargar una lista y disparar plantillas por lote**
+4. Si el bot actual de WhatsApp **se puede migrar** o hay que rehacerlo
+5. Si dan **API para leer los pedidos** (mataría dos pájaros: el pendiente de 99 Envíos era justamente
+   no tener API de lectura)
+
+### ⛔ Y lo que NO se debe hacer
+
+| | |
+|---|---|
+| 🔴 apps de envío masivo no oficiales | **bloquean el número.** El 100% de las ventas de BikerPro entra por ahí. No vale por ninguna herramienta gratis |
+| ⚠️ listas de difusión de la app gratis | topan en **256 contactos** y **solo llegan a quien tenga el número guardado** — la mayoría de los prospectos no lo tienen |
+
+### ✅ Recomendación: empiece hoy sin esperar la API
+
+**La ventana de 72 horas ya está disponible y es gratis. No necesita API para aprovecharla — necesita
+disciplina de seguimiento.**
+
+| día | acción |
+|---|---|
+| día 0 | conversación que entra del anuncio |
+| **día 1** | primer re-contacto (dentro de 72h → gratis) |
+| **día 2** | segundo re-contacto (dentro de 72h → gratis) |
+| **día 3** | tercero y último (borde de las 72h) |
+| después | se deja quieto |
+
+**Eso es exactamente lo que él hacía antes.** El problema no era el costo: era el **volumen manual**.
+👉 **La API no habilita la práctica: la hace escalable.** La práctica ya es gratis hoy.
+
+📌 **Y hay un dato que hay que medir y no existe:** de las ~2.372 conversaciones que no compraron,
+**cuántas recibieron al menos un re-contacto.** Si la respuesta es "casi ninguna", ahí está la
+oportunidad más grande y más barata de toda la operación — más grande que cualquier ajuste de pauta,
+transportadora o precio que se haya discutido en todo el día.
