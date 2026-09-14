@@ -1,0 +1,9 @@
+# Volcados temporales de la API de Meta (se regeneran corriendo los scripts de analisis/)
+a.json
+d.json
+gasto.json
+sep.json
+
+# Cache de Python
+__pycache__/
+*.pyc
