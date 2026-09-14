@@ -8651,3 +8651,86 @@ de los tres:
 3. El secarse dispara el **rebote de 0-AI**: Meta gasta de golpe comprando el inventario más frío
 
 **Total a tener disponible al arrancar el 15: ~$250.000.**
+
+
+---
+
+## 0-AT · ⛔ LA QUINCENA NO EXPLICA EL LUNES 14. LA CULPA ES DEL RITMO DE GASTO (14-sep, 14:00)
+
+El dueño preguntó: *"¿la razón por la que subió costos hoy fue por ser día antes de quincena?"*
+Fui a buscar la evidencia histórica en vez de repetir la hipótesis. **No la sostiene.**
+
+### Prueba 1: el día antes de la quincena ANTERIOR fue normal
+
+| fecha | posición en el ciclo | gasto (tradicional) | conv | $/conv |
+|---|---|---|---|---|
+| 28-ago vie | −2 del pago | $112.912 | 113 | $999 |
+| **29-ago sáb** | **día antes del pago** | $114.337 | 128 | **$893** 🟢 |
+| 30-ago dom | pago | $103.142 | 119 | $867 |
+| 31-ago lun | pago | $158.283 | 179 | $884 |
+| … | | | | |
+| 13-sep dom | −2 del pago | $119.457 | 116 | $1.030 |
+| **14-sep lun** | **día antes del pago** | $125.373 | 73 | **$1.717** 🔴 |
+
+**El 29-ago, mismo lugar del ciclo, dio $893 — dentro de la banda normal.** No hubo pico.
+Si "día antes de quincena" fuera la causa, se habría visto ahí también.
+
+### Prueba 2 (la que decide): en un valle de demanda Meta gastaría MENOS, y hoy gastó MÁS
+
+Horas 06:00–12:59, **solo tradicional** (el presupuesto del tradicional NO cambió: sigue en $154.000):
+
+| | gasto | conv | $/conv |
+|---|---|---|---|
+| lunes 7-sep | $57.298 | **79** | **$725** |
+| **lunes 14-sep** | **$98.550** | **54** | **$1.825** |
+
+**Gastó 72% MÁS y trajo 32% MENOS.**
+
+🔑 **Ese es el argumento lógico decisivo: si la gente no tiene plata, Meta no logra gastar — el gasto
+BAJARÍA.** Lo que pasó es lo contrario. Meta compró mucho, rápido, y trajo poco.
+
+### La curva de saturación por hora (224 horas de dato, 1-14 sep, solo tradicional)
+
+| gasto en esa hora | horas | conv | $/conv |
+|---|---|---|---|
+| menos de $5.000 | 85 | 404 | **$583** |
+| $5.000 – $10.000 | 73 | 661 | $770 |
+| $10.000 – $15.000 | 36 | 461 | $892 |
+| **más de $15.000** | 30 | 646 | **$1.024** |
+
+**Monótona: mientras más rápido gasta Meta en una hora, más cara sale cada conversación.**
+Hoy a las 07:00 gastó **$21.706** y trajo **4** conversaciones = **$5.427/conv**.
+
+### ⚠️ El límite honesto de esta conclusión
+
+**La curva de arriba NO prueba causalidad, y hay que decirlo.** Puede ir al revés: cuando las
+conversaciones escasean, Meta **igual gasta el presupuesto**, y eso produce a la vez gasto alto y
+$/conv alto. Sería el mismo dato con la causa invertida.
+
+Lo que **sí** es sólido y no tiene esa vuelta: **el presupuesto del tradicional no cambió, y aun así
+Meta gastó 72% más en la mañana que el lunes pasado.** Eso no lo explica el pacing de un presupuesto
+fijo. **Por qué se aceleró sigue sin explicación** (igual que el desplome de las regiones el 11-sep).
+
+### 🎯 Esto DEBILITA el test de mañana, y hay que ajustar la lectura
+
+Mañana es quincena. Si el $/conv mejora, **ya no prueba que la causa era la quincena**: la demanda
+extra del día de pago puede tapar un problema de ritmo de gasto. El test es **asimétrico**:
+
+| resultado del 15 | qué se puede concluir |
+|---|---|
+| $/conv **sigue malo** (>$1.200) | ✅ **concluyente: NO era la quincena.** Es el ritmo de gasto |
+| $/conv **mejora** (≤$900) | ⚠️ **NO concluyente.** Puede ser la quincena o puede ser la quincena tapando el problema del ritmo |
+
+**Para separarlo de verdad hace falta otra cosa:** comparar el $/conv a **igual gasto por hora** entre
+días, no a igual día. Con la tabla de 224 horas ya se puede: si el 15 las horas de $15.000+ siguen
+dando ~$1.024, el problema es el ritmo; si dan $600-700, era demanda.
+
+### ⚠️ Error #15
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 15 | *"hoy es el día antes de la quincena, el fondo del valle, y la escalada de 4 días encaja perfecto"* | **el 29-ago —mismo lugar del ciclo— dio $893, normal. Y hoy Meta gastó 72% MÁS que el lunes pasado con el mismo presupuesto: un valle de demanda hace lo contrario, gastar menos. Presenté una hipótesis que encajaba con el relato sin buscar el contraejemplo, que estaba a dos semanas de distancia en el mismo dato.** |
+
+🔑 **Regla nueva: antes de aceptar una explicación cíclica ("es la quincena", "es el fin de semana"),
+buscar el ciclo ANTERIOR en el mismo dato.** Si el patrón no se repitió, la explicación no sirve.
+Estaba a un `grep` de distancia y no lo hice.
