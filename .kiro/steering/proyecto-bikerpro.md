@@ -9360,3 +9360,105 @@ Liquidado vs sin liquidar.
 **Regla: no abreviar nunca un campo de texto que después se va a usar para clasificar.** La palabra que
 se cae puede ser la que cambia el significado — aquí *"solicita la entrega en una fecha posterior"*
 convirtió un envío sano en una devolución imaginaria.
+
+
+---
+
+## 0-AZ · CÓMO FUNCIONA EL SEGURO DE 99 ENVÍOS, Y EL SEÑALADOR DE TELÉFONOS QUE NADIE ESTABA USANDO (14-sep, 18:30)
+
+### Explicación del dueño (y queda confirmada en el dato)
+
+99 Envíos cobra **dos cosas** por envío: el **flete** y el **seguro**. Y hay dos niveles:
+
+| | qué cubre | qué paga el dueño si se devuelve |
+|---|---|---|
+| **Seguro 99** (normal, el default) | el **flete** de ida y vuelta | **solo la prima**, ~$2.000–4.300 |
+| **Seguro 99 Plus** (más caro) | el flete **y la prima** | **$0. Absolutamente nada** |
+
+**Prueba en el histórico:** hay **2 guías devueltas con `valor_servicio` = $0** (28-ago
+interrapidísimo *"Devolución ratificada"* y 20-ago servientrega *"ENTREGADO A REMITENTE"*), contra
+todas las demás que quedaron en la prima ($1.754–$4.334). **Esas dos iban con Plus.**
+
+### 🎯 Y el criterio con que el dueño elige el Plus — esto es lo importante
+
+> *"99 Envíos tiene una función que me muestra qué personas según su número de teléfono tienen
+> historial de haber devuelto un pedido. Cuando veo uno de esos, le mando seguro Plus."*
+
+**99 Envíos tiene un señalador de riesgo por número de teléfono, y se puede ver ANTES de despachar.**
+Eso no estaba escrito en ninguna parte de este archivo y **cambia el problema de las devoluciones.**
+
+### El punto de equilibrio del Plus: 50%
+
+Medido con la guía #11 (San Luis de Sincé, $85.000, 1 unidad) contra las otras guías de $85.000 del
+mismo lote:
+
+| | |
+|---|---|
+| con Plus | `valor_servicio` $27.865 (prima $5.876) |
+| con normal habría sido | `valor_servicio` $25.914 (prima $3.917) |
+| **costo extra del Plus** | **$1.951** |
+| si se entrega | pagó $1.951 de más y no sirvió |
+| si se devuelve | con normal paga $3.917 · con Plus paga $0 → **ahorra $3.917** |
+
+> **El Plus se paga solo si la probabilidad de devolución de ese teléfono supera el 50%.**
+> ($1.951 ÷ $3.917 = 49,8%)
+
+Contra una tasa general del 19%, ese teléfono tendría que devolver **2,6 veces más** que un cliente
+normal. **Es un volado razonable, pero es un volado.** No hay dato todavía de cuánto devuelven de
+verdad los teléfonos marcados.
+
+📌 **Y hay que anotar el sesgo de medición que esto crea:** las guías con Plus son justamente las de
+mayor riesgo. **Si en el futuro se compara "tasa de devolución con Plus vs sin Plus", el Plus va a
+salir peor — no porque cause devoluciones, sino porque se le asigna a los casos malos.** Es selección,
+no causalidad.
+
+### 🔑 LO GRANDE: el seguro protege el 16% del problema
+
+| en una devolución se pierde | monto | peso |
+|---|---|---|
+| la prima (lo que cubre el Plus) | $3.917 | **16%** |
+| **la utilidad que no se hizo** | **$24.129** | **84%** |
+
+**Comprar mejor seguro para un teléfono riesgoso protege la parte chica.** La grande sigue
+completamente expuesta:
+
+| si el teléfono marcado devuelve… | utilidad esperada contraentrega | lo que el Plus le ahorra |
+|---|---|---|
+| 30% | $16.890 | $1.175 |
+| 50% | $12.064 | $1.958 |
+| 70% | $7.239 | $2.742 |
+
+### ✅ La jugada correcta en un teléfono marcado: cambiar el PAGO, no el seguro
+
+| opción | resultado esperado (con 50% de riesgo) |
+|---|---|
+| contraentrega + seguro normal | $12.064 − $1.959 de prima ≈ **$10.105** |
+| contraentrega + Plus | $12.064 − $1.951 ≈ **$10.113** (empata) |
+| **pago anticipado** | **$24.129 × (tasa de aceptación)** |
+
+> **El pago anticipado le gana a las dos si más del **42%** de los clientes marcados acepta pagar
+> por adelantado.** ($10.105 ÷ $24.129)
+
+**Y si no acepta, no se pierde nada:** ese pedido tenía 50% de probabilidad de devolverse igual.
+
+### 🔔 Esto RESUELVE la pregunta que quedó abierta en 0-AW
+
+En 0-AW dije: *"no voy a recomendar un proceso de confirmación porque el 53% de las devoluciones no
+dice el motivo, y no sé qué confirmar."*
+
+**Ya no hace falta saber el POR QUÉ. 99 Envíos dice el QUIÉN.**
+
+El señalador de teléfonos es un predictor que ya está disponible y gratis. **No hay que entender la
+causa para actuar sobre el riesgo.**
+
+### Acciones concretas
+
+| # | qué | por qué |
+|---|---|---|
+| 1 | **En teléfono marcado: ofrecer pago anticipado antes de despachar** (con descuento si hace falta) | se paga solo con 42% de aceptación, y protege $24.129 en vez de $3.917 |
+| 2 | **Registrar cuántos pedidos vienen marcados y cuántos de esos se devuelven** | sin eso no se sabe si el umbral del 50% del Plus se cumple. Hoy no hay ni un dato |
+| 3 | Seguir usando Plus en los marcados **mientras no haya dato** | el costo del error es chico ($1.951) y va en la dirección correcta |
+| 4 | 🔔 Preguntar a 99 Envíos **cómo se llama y dónde está ese señalador**, y si se puede consultar por lote | con 30 pedidos/día, revisar uno por uno es trabajo. Si hay consulta masiva o API, cambia todo |
+
+📌 **De 30 pedidos del 14-sep, solo 1 llevó Plus.** O el señalador marca poco, o no se revisan todos.
+**Vale la pena saber cuál de las dos.**
