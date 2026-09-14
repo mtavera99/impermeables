@@ -9047,3 +9047,89 @@ Estaba recomendando confirmar la plata cuando la plata es el 8% del problema.
 | # | lo que afirmé | lo que era |
 |---|---|---|
 | 17 | *"cada devolución cuesta el flete de ida + vuelta ≈ $40.970; el lote de hoy arriesga $412.325"* | **el seguro antidevolución cubre los fletes: 94% de las devoluciones pagaron solo la prima ($2.941). Costo real $4.208 = 10× menos. El lote arriesga $202.781, y el 88% de eso es margen no hecho, no flete. Estaba en 0-L desde siempre.** |
+
+
+### 0-AW.1 · 💰 LAS 3 DEVOLUCIONES CARAS SON TODAS DE COORDINADORA — $61.796 PARA RECLAMAR
+
+El dueño preguntó: *"¿cuáles tres pagaron flete completo si yo mando todo con seguro?"*
+Fui a buscarlas una por una. **Las tres son de Coordinadora.**
+
+| fecha | ciudad | estado | flete cobrado | prima que igual pagó |
+|---|---|---|---|---|
+| 07-sep | CARTAGENA DE INDIAS | No se entrega no cancela recaudo | **$28.959** | $3.930 |
+| 08-sep | SINCELEJO | Destinatario no cancela recaudo | **$21.035** | $2.867 |
+| 07-sep | SOLEDAD | Deterioro en validacion GP | **$20.895** | $2.849 |
+
+**Pagó la prima del seguro Y el flete completo en las tres.** El seguro se cobró en **349 de 349
+guías (100%)**, así que no es que estas fueran sin seguro.
+
+#### El control descarta que sea "porque son recientes"
+
+| edad | transportadora | n | solo prima | flete completo |
+|---|---|---|---|---|
+| **0-9 días** | **coordinadora** | 3 | **0** | **3** |
+| **0-9 días** | **interrapidisimo** | 2 | **2** | **0** |
+| 10-14 d | interrapidisimo | 9 | 9 | 0 |
+| 15-21 d | interrapidisimo | 7 | 7 | 0 |
+| 22+ d | todas | 24 | 24 | 0 |
+
+🔑 **Interrapidísimo tiene 2 devoluciones del MISMO DÍA (07-sep) y las dos pagaron solo prima
+($2.324 y $2.286).** Las de Coordinadora son del 07 y 08-sep. **Misma fecha, resultado opuesto.**
+No es el tiempo de liquidación.
+
+**Fisher exacto: 3 de 4 (Coordinadora) contra 0 de 45 (las otras dos) → p = 0,000217.** No es azar.
+
+#### Costo real de una devolución, por transportadora
+
+| transportadora | n | costo promedio |
+|---|---|---|
+| servientrega | 9 | $2.729 |
+| **interrapidisimo** | 36 | **$3.031** |
+| **coordinadora** | 4 | **$18.124** ← **6×** |
+
+#### 💰 Para reclamar a 99 Envíos: $61.796
+
+| guía | cobro de más vs una devolución normal ($3.031) |
+|---|---|
+| 07-sep Cartagena | $25.928 |
+| 08-sep Sincelejo | $18.004 |
+| 07-sep Soledad | $17.864 |
+| **TOTAL** | **$61.796** |
+
+#### ⚠️ La explicación alternativa que NO se puede descartar con n=4
+
+Los 3 estados de Coordinadora son de **tipo distinto** a los de Interrapidísimo:
+
+- Coordinadora: *"no cancela recaudo"* (×2) y *"deterioro"*
+- Interrapidísimo: *"Devolución ratificada"* (sin decir motivo)
+
+**Puede que el seguro no cubra "el cliente no pagó el recaudo" ni "deterioro", y que Interrapidísimo
+llame a todo "devolución ratificada" y por eso sí quede cubierto.** Si es así, **no es un problema de
+Coordinadora: es un hueco de cobertura del seguro que Coordinadora simplemente hace visible.**
+
+**Con 4 guías no se puede separar. Y las dos explicaciones importan mucho:**
+
+| si es… | entonces |
+|---|---|
+| **la transportadora** | Coordinadora cuesta ~$2.900 más por envío en costo esperado de devolución → no usarla |
+| **el tipo de evento** | hay un hueco en el seguro que aplica a **todas** las transportadoras, y está oculto porque Interrapidísimo no reporta motivos |
+
+#### 🔔 Pregunta exacta para 99 Envíos (con las guías en la mano)
+
+> *"En estas 3 guías (07-sep Cartagena, 08-sep Sincelejo, 07-sep Soledad, todas Coordinadora) me
+> cobraron el flete completo ADEMÁS de la prima del seguro. En las 45 devoluciones de Interrapidísimo
+> y Servientrega del mismo período solo me cobraron la prima. ¿El seguro antidevolución no cubre
+> 'no cancela recaudo' ni 'deterioro', o no cubre Coordinadora? Y ¿me pueden devolver los $61.796?"*
+
+#### ✅ Cambio de decisión para el despacho de hoy
+
+En 0-AV recomendé mandar el pedido #21 (Bogotá) por Coordinadora para arrancar el A/B.
+**Se aplaza hasta que 99 Envíos explique el cobro.**
+
+Razón: **hay ahora una señal financiera dura contra Coordinadora que no entendemos.** Pagar por
+aprender cuando existe una respuesta gratis (preguntar) es mal orden. **Los 30 pedidos van por
+Interrapidísimo.**
+
+⚠️ Y esto **reencuadra toda la pregunta de transportadoras**, que llevábamos tres días midiendo mal:
+**el diferenciador no era la TASA de devolución (indistinguible entre las tres) sino el COSTO de
+cada devolución.** Estábamos mirando la variable equivocada.
