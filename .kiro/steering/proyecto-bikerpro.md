@@ -9833,3 +9833,100 @@ disciplina de seguimiento.**
 **cuántas recibieron al menos un re-contacto.** Si la respuesta es "casi ninguna", ahí está la
 oportunidad más grande y más barata de toda la operación — más grande que cualquier ajuste de pauta,
 transportadora o precio que se haya discutido en todo el día.
+
+
+---
+
+## 0-BD · ⛔ EL BOT DE RENDER NO SE ESTÁ USANDO. LO QUE CORRE ES EL AGENTE DE META (14-sep, 22:00)
+
+> **El dueño lo aclaró: no usa el bot de `bot/` que corre en Render. Usa el AGENTE DE IA DE META
+> integrado en WhatsApp Business** (Meta Business Agent), al que le pega el guion de
+> `GUION-PARA-PEGAR.md`.
+>
+> 🔴 **Y yo acabo de implementar el seguimiento de 72h dentro del bot de Render. No le sirve de nada
+> hoy.** Queda en el repo por si algún día migra, pero **no está corriendo.**
+
+🔑 **Error de contexto mío, y grave porque me costó una implementación completa:** el repo tiene una
+carpeta `bot/` con un servidor funcional, un README de instalación y variables de entorno. **Asumí que
+eso era lo que estaba en producción porque el código existía.** El nombre del archivo que él sí usa lo
+decía desde el principio: *"Guion **para pegar en la IA de WhatsApp Business**"*.
+
+**Regla: la existencia de código en el repo NO prueba que esté corriendo. Antes de construir sobre una
+pieza, preguntar si está en producción.**
+
+### Qué puede y qué NO puede el agente de Meta
+
+Según lo publicado sobre Meta Business Agent, es **reactivo**: responde preguntas, recomienda
+productos del catálogo, califica leads, agenda y deriva a un humano.
+Fuentes: [Cliengo](https://guiawabusiness.cliengo.com/meta-business-agent) ·
+[SleekFlow](https://www.sleekflow.io/blog/meta-whatsapp-business-ai-vs-ai-agents) ·
+[wati](https://www.wati.io/en/blog/meta-business-agent/) ·
+[Agentik — *"qué no resuelve"*](https://agentik.lat/blog/ia-meta-whatsapp-limites/).
+*Contenido reformulado por restricciones de licencia.*
+
+| | |
+|---|---|
+| ✅ responder al que escribe | sí, es lo que hace |
+| ✅ calificar, recomendar, derivar | sí |
+| ❌ **iniciar conversación él solo a las 20 horas** | **no. No hay agendador.** |
+
+👉 **El seguimiento de 72 horas NO se puede automatizar con el agente de Meta.** El agente contesta;
+no sale a buscar. **Para que salga solo hace falta la API (el bot de Render) o una herramienta externa.**
+
+📌 **Y un dato de costo que hay que verificar:** hay reportes de que Meta **empezó a cobrar el uso del
+Business Agent desde el 1-ago-2026** (~USD $2 por millón de tokens, según
+[360dialog](https://360dialog.com/blog/meta-business-agent-complete-guide-whatsapp-api/)).
+🔔 **Revisar si a la cuenta le está llegando ese cobro y cuánto es.** Antes era gratis.
+
+### ✅ Lo que SÍ se puede hacer hoy, sin código y gratis
+
+**Manual, pero rápido.** Dos funciones que la app de WhatsApp Business ya tiene:
+
+| función | para qué |
+|---|---|
+| **Etiquetas** | marcar en qué paso va cada uno: `SEG-1`, `SEG-2`, `SEG-3` |
+| **Mensajes rápidos** (atajos `/`) | escribir el seguimiento en 2 segundos en vez de teclearlo |
+
+**El circuito diario:**
+
+1. Al cerrar el día, a cada conversación que no compró se le pone la etiqueta **`SEG-1`**
+2. Al día siguiente se filtra por `SEG-1`, se manda el mensaje rápido y se cambia a **`SEG-2`**
+3. Al otro día igual, `SEG-2` → **`SEG-3`**
+4. Después de `SEG-3` se quita la etiqueta y se deja quieto
+
+**Cuánto tiempo cuesta de verdad:**
+
+| | |
+|---|---|
+| conversaciones que no compran | ~170/día |
+| con mensaje rápido, por chat | 3-5 segundos |
+| **total al día** | **~9 a 14 minutos** |
+
+⚠️ **Y hay que hacerlo desde el computador** (WhatsApp Business Web / Meta Business Suite), no desde el
+celular. En el celular es 3-4 veces más lento.
+
+**Contra $558.000–$1.090.000 de margen recuperable al mes, 10-15 minutos diarios es la mejor tarifa
+horaria de toda la operación.**
+
+### ❓ Preguntas que hay que responder para diseñarlo bien
+
+1. **¿Trabaja los chats desde el celular o desde el computador?** (define si son 10 o 40 minutos)
+2. **¿Ya usa etiquetas?** ¿Cuáles tiene?
+3. **¿El agente de Meta atiende TODAS las conversaciones o usted interviene en muchas?**
+4. **¿Cuántas conversaciones ve al día en la app?** (para cuadrar con las ~185/día que reporta Meta)
+5. **¿La app le muestra de cuáles ya pasó de 24 horas?** (después de 24h, la app tampoco deja mandar
+   texto libre — es la misma regla de Meta, no una limitación del bot)
+
+### 🔴 Y la duda técnica que hay que confirmar antes de prometer nada
+
+**¿La app de WhatsApp Business permite escribirle a alguien pasadas las 24 horas de su último
+mensaje?** La regla de las 24h/plantillas es de la **plataforma**, no de la API. Si la app tampoco lo
+permite, entonces:
+
+- **el seguimiento del día 1 (~20h) sí se puede hacer a mano** ✅
+- **los de los días 2 y 3 no**, ni a mano ni automático, sin plantillas aprobadas
+
+👉 **Eso reduciría el plan a UN solo seguimiento manual** — que sigue siendo la mayor parte del valor,
+porque el primero es el que más recupera.
+
+**Hay que probarlo con un caso real antes de montar cualquier rutina.**

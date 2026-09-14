@@ -1,5 +1,19 @@
 # Seguimiento de 72 horas — cómo prenderlo
 
+> ## 🔴 AVISO IMPORTANTE — LEER ANTES
+>
+> **Este documento describe el seguimiento implementado en el bot de `bot/` que corre en Render.**
+> El dueño aclaró el 14-sep que **NO está usando ese bot**: usa el **agente de IA de Meta** integrado
+> en WhatsApp Business, al que le pega `GUION-PARA-PEGAR.md`.
+>
+> **Entonces nada de lo que sigue está corriendo hoy.** Queda documentado por si algún día migra al
+> bot propio, que es la única forma de automatizar el seguimiento.
+>
+> **Para lo que se puede hacer HOY con el agente de Meta (manual, con etiquetas y mensajes rápidos),
+> ver la sección 0-BD del archivo madre.**
+
+---
+
 **Qué hace:** le vuelve a escribir automáticamente a la gente que preguntó y no compró, hasta 3 veces,
 **dentro de la ventana gratis de 72 horas** que abren los anuncios Click-to-WhatsApp. Es la práctica
 que ya hacías a mano, pero sin que se te quede nadie.
