@@ -9769,6 +9769,26 @@ Fuente: [tabla de tarifas por país](https://docs.gallabox.com/pricing-and-billi
 > **Aun en el peor escenario (todos fuera de la ventana), el costo de los mensajes es $137.000
 > contra $558.000–$1.090.000 de margen. Y dentro de las 72 horas es GRATIS.**
 
+#### ⚠️ Corrección al punto de equilibrio (afirmé mal)
+
+Escribí que *"recuperar medio punto porcentual ya paga 3 veces la inversión"*. **Falso**, por un
+redondeo mío en la tabla.
+
+Peor escenario real: **3 mensajes a cada uno de los 2.372, todos pagados = $409.882.**
+
+| recupera | ventas | margen | resultado |
+|---|---|---|---|
+| 0,50% | 11,9 | $275.674 | **−$134.208** 🔴 pierde |
+| **0,74%** | 17,6 | $407.997 | **$0 — equilibrio** |
+| 1,00% | 23,7 | $551.348 | +$141.466 |
+| 2,00% | 47,4 | $1.102.695 | +$692.814 |
+| 3,00% | 71,2 | $1.654.043 | +$1.244.161 |
+
+**El punto de equilibrio es 0,74%, no 0,5%.**
+
+🔑 **Pero eso aplica solo si paga TODOS los mensajes. Dentro de la ventana de 72 horas el costo es $0
+y no hay punto de equilibrio que superar: cualquier venta recuperada es ganancia pura.**
+
 ⚠️ **La tasa de cambio usada es ~$4.000 COP/USD y hay que verificarla.** No cambia la conclusión: el
 costo es despreciable en cualquier escenario.
 
