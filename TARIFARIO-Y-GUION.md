@@ -59,26 +59,55 @@ bien.** Las dos reglas que hacen que el tarifario cierre:
 | Destino | Elegí | Por qué |
 |---|---|---|
 | **Bogotá y sabana** | **coordinadora** (o interrapidísimo) | con servientrega ($14.674) el total de $73.000 se queda corto $1.574 |
-| **Cartagena** | ~~servientrega~~ → **interrapidísimo** | 🔴 **CORREGIDO 14-sep, ver abajo** |
+| **Cartagena** | **cualquiera** (la diferencia es ruido) → **lo que decide es CONFIRMAR** | 🔴 **CORREGIDO 14-sep, ver abajo** |
 | **Municipios pequeños** | **interrapidísimo** | 🆕 es la única con cobertura demostrada (124 municipios) |
 
-### 🔴 CORRECCIÓN 14-SEP: Cartagena ya NO va por Servientrega
+### 🔴 CORRECCIÓN 14-SEP: el flete NO es la variable que importa en Cartagena
 
-La regla anterior mandaba Cartagena por **servientrega para ahorrar $2.022 de flete.**
-**Con los datos de devoluciones que ya existen, esa cuenta está al revés:**
+> ⚠️ **Esta sección se escribió mal una primera vez y el dueño la corrigió.** La versión anterior
+> decía "cambiá Cartagena a interrapidísimo porque una devolución cuesta ~$65.000 en fletes".
+> **Ese número era falso: la devolución está asegurada.**
+
+**Lo que cuesta de verdad una devolución, medido en las 49 devoluciones reales del histórico:**
 
 | | |
 |---|---|
-| tasa de devolución de Cartagena (guías maduras) | **4 de 7 = 57%** |
-| ahorro de flete de servientrega vs interrapidísimo | $2.022 |
-| costo de UNA devolución | flete ida+vuelta ~$41.000 **+** utilidad no hecha $24.129 = **~$65.000** |
+| **46 de 49 (94%)** pagaron **solo la prima del seguro** | promedio **$2.941** |
+| 3 de 49 (6%) pagaron flete completo | $20.895 · $21.035 · $28.959 |
+| **costo esperado en flete por devolución** | **$4.208** |
 
-**Se estaba jugando $65.000 con 57% de probabilidad para ahorrar $2.022.** Es la peor apuesta del
-tarifario. Y además **servientrega está vetada desde 0-AA** (Medellín: 3 devoluciones de 13 = 23%).
+**No son $40.970. Son $4.208.** El seguro antidevolución cubre ida y vuelta (ver 0-L). Se pagó
+**10 veces de más** en el cálculo anterior.
 
-👉 **Cartagena y toda la costa: interrapidísimo, y absorber los $2.022.** Y más importante que la
-transportadora: **Cartagena necesita confirmación reforzada antes de despachar.** Ninguna
-transportadora arregla una ciudad que devuelve más de la mitad.
+#### Entonces la cuenta real de una devolución es otra
+
+| componente | monto | peso |
+|---|---|---|
+| flete (cubierto por el seguro) | $4.208 | **12%** |
+| **utilidad que no se hizo** | **$24.129 por unidad** | **88%** |
+
+👉 **El flete es el 12% del problema. La devolución duele por el MARGEN que no se hizo, no por el
+envío.** Y los $2.022 de diferencia entre transportadoras son el **8%** de lo que está en juego:
+**es ruido.**
+
+#### Y para Cartagena, el dato no alcanza para elegir
+
+| transportadora | devueltas / resueltas en Cartagena | |
+|---|---|---|
+| servientrega | **1/4 = 25%** | n=4 |
+| coordinadora | **1/2 = 50%** | n=2 |
+| interrapidisimo | **3/3 = 100%** | n=3 |
+
+**Ninguna llega a 5 guías. No se puede decidir, y el poco dato que hay apunta justo al contrario de
+lo que se había recomendado.** (El veto a servientrega de 0-AA viene de **Medellín** —3 de 13—,
+no de Cartagena.)
+
+✅ **La regla honesta para Cartagena y la costa:**
+
+1. **La transportadora no es la palanca.** Elegí por costo si querés: la diferencia es ruido.
+2. **La palanca es la confirmación antes de despachar.** Cartagena devuelve 4 de 7 = 57% **con
+   todas**. Ahí lo que salva $24.129 es una llamada, no una guía distinta.
+3. **Ninguna transportadora arregla una ciudad que devuelve más de la mitad.**
 
 ### ✅ RESUELTO: la cobertura de coordinadora (pregunta abierta desde este documento)
 
