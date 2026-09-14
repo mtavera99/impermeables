@@ -8132,3 +8132,103 @@ contar doble.
 | # | lo que iba a afirmar | lo que era |
 |---|---|---|
 | 10 | *"VIDEO se está dañando ($718→$1.375) y encima se lleva el presupuesto"* | **ruido de un día con 35 conv. En 10 días VIDEO es el que MENOS se degradó (+22%). La degradación es uniforme en los 4 = demanda, no creativo.** |
+
+
+---
+
+## 0-AP · COLMENA Y LAS REGIONES: QUÉ DICE EL DATO (lun 14-sep, 00:30)
+
+### 🚨 "Colmena" no es lo que el nombre dice
+
+Leí la segmentación real de los 3 conjuntos pausados. **Ninguno usa un público de clientes:**
+
+| conjunto | estado | presup | geo | intereses | público personalizado |
+|---|---|---|---|---|---|
+| Publico ABIERTO - Creativo | PAUSED | $20.000 | **toda Colombia** | ninguno | ❌ **NINGUNO** |
+| Publico ABIERTO video | CAMPAIGN_PAUSED | $20.000 | **toda Colombia** | ninguno | ❌ **NINGUNO** |
+| Domiciliarios \| Colmena | PAUSED | $20.000 | **toda Colombia** | ninguno | ❌ **NINGUNO** |
+
+Y más importante:
+
+```
+GET act_.../customaudiences  ->  ❌ NO HAY NINGÚN PÚBLICO PERSONALIZADO EN LA CUENTA
+```
+
+**Los tres son público abierto de toda Colombia, 18-65, sin ningún filtro.** El nombre "Colmena"
+no corresponde a lo que el conjunto realmente hace. **Prender "colmena" hoy no es prender el público
+de clientes: es prender público abierto nacional.**
+
+### Y ese público abierto está PROBADO malo (no es ruido)
+
+Rendimiento acumulado 25-ago a 14-sep, con IC 95% del $/conv (Poisson sobre el conteo de conversaciones):
+
+| conjunto | gasto | conv | $/conv | IC 95% | veredicto |
+|---|---|---|---|---|---|
+| Publico ABIERTO video | $93.526 | 39 | $2.398 | **$1.825 – $3.495** | 🔴 **todo el intervalo por encima de la cuenta** |
+| Publico ABIERTO - Creativo | $43.739 | 13 | $3.365 | **$2.180 – $7.372** | 🔴 **todo el intervalo por encima** |
+| Domiciliarios \| Colmena | $7.667 | 4 | $1.917 | $968 – $95.837 | ⛔ sin dato útil |
+| **los tres juntos** | **$144.932** | **56** | **$2.588** | | vs cuenta **~$800-900** |
+
+Los dos primeros **no son "caros por mala suerte": el intervalo completo de confianza está por encima
+del promedio de la cuenta.** Son ~3× más caros, con evidencia suficiente. Pausarlos el 9-sep fue
+correcto y **volver a prenderlos sería tirar plata.**
+
+### ✅ Lo que sí habría que hacer con la colmena (y en qué orden)
+
+La idea original —usar el **público de clientes** del export con teléfonos— **sigue siendo buena, pero
+todavía no existe.** El requisito previo es crear el público personalizado, que hoy no está.
+
+Orden correcto:
+
+1. **Crear el público personalizado** subiendo la lista de teléfonos de clientes. ⚠️ Esto **NO afecta
+   la entrega**, así que se puede hacer sin contaminar el test del 15.
+2. ⚠️ **Advertencia de tamaño:** con ~350 clientes en el último mes, el público va a quedar **muy
+   chico**. Meta necesita unos cuantos cientos de coincidencias para entregar decente, y para un
+   *lookalike* decente se recomiendan **1.000–5.000** registros. Con 350 el lookalike va a salir flojo.
+   **Conviene juntar todos los clientes históricos, no solo el último mes.**
+3. Recién con el público creado, **crear un conjunto nuevo** que lo use. **No reciclar los conjuntos
+   "ABIERTO"**, que arrastran historial malo.
+4. Nada de esto antes del test del 15-16.
+
+### ⚠️ CORRECCIÓN: condené las 4 regiones y solo UNA tiene evidencia
+
+Dije que "las 4 regiones cuestan $1.576/conv, están caras por mérito propio". **Fue demasiado
+general.** Con IC 95%:
+
+| conjunto | gasto | conv | $/conv | IC 95% | veredicto honesto |
+|---|---|---|---|---|---|
+| **Valle del Cauca** | **$57.864** | **46** | **$1.258** | **$976 – $1.769** | 🔴 **PROBADO peor.** Intervalo completo por encima de ~$900 |
+| Santander | $5.576 | 5 | $1.115 | $594 – $9.033 | ⛔ **sin veredicto.** Se solapa con la banda normal |
+| Tolima Huila | $4.981 | 5 | $996 | $531 – $8.069 | ⛔ **sin veredicto.** Se solapa |
+| Eje Cafetero | $5.026 | 2 | $2.513 | — | ⛔ **sin veredicto.** 2 conversaciones |
+
+**Solo Valle del Cauca está probado peor**, y es el único con dato real (46 conversaciones, intervalo
+estrecho). **Los otros tres tienen 2 a 5 conversaciones cada uno: no alcanza para condenarlos ni para
+absolverlos.** Santander a $1.115 y Tolima a $996 podrían estar perfectamente bien.
+
+### El problema real de las 3 regiones nuevas: están en el limbo
+
+Reciben ~$50/día cada una porque Meta las frenó. A ese ritmo **nunca van a juntar dato.** Están
+gastando un poco y aprendiendo nada — el peor de los dos mundos.
+
+**Decisión necesaria después del 15** (no antes), y son solo dos opciones honestas:
+
+| opción | qué implica |
+|---|---|
+| **A. Probarlas en serio** | darles presupuesto suficiente para ~30-40 conversaciones cada una en una ventana limpia de 7 días. Con $1.000/conv eso son ~$5.000/día **de verdad entregados**, no $50. |
+| **B. Apagarlas** | y volver a la concentración en Bogotá+Medellín, que es donde está el dato bueno. |
+
+**Dejarlas como están es la peor opción de las tres.**
+
+Valle del Cauca sí tiene veredicto: **apagarlo o rediseñarlo**, ya está probado a $1.258 con intervalo
+estrecho.
+
+### ⚠️ Error #11
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 11 | *"las 4 regiones cuestan $1.576/conv, están caras por mérito propio"* | **solo Valle del Cauca está probado (46 conv, IC $976-$1.769). Santander (5 conv), Tolima (5) y Eje Cafetero (2) NO tienen dato suficiente. Promedié cuatro cosas de las cuales tres eran ruido.** |
+
+🔑 **Patrón repetido: promediar un grupo y tratar el promedio como veredicto de cada miembro.** Es
+primo hermano del error de las transportadoras (promediar ciudades distintas). **Antes de condenar un
+conjunto, mirar cuántas conversaciones tiene ÉL, no el grupo.**
