@@ -9277,3 +9277,86 @@ respuesta al hueco de los $61.796.**
 - **Las 9 de "reclame en oficina Interrapidísimo" salieron todas por Interrapidísimo** — la restricción se respetó
 - **Seguro activo en las 30**
 - Potosí quedó consistente entre guía y transportadora
+
+
+---
+
+## 0-AY · ⛔ ANULA 0-AW.1 COMPLETO: NUNCA LE COBRARON NINGÚN FLETE DE DEVOLUCIÓN (14-sep, 18:00)
+
+> El dueño preguntó: *"¿me estás diciendo que los fletes de Coordinadora me los cobraron?"*
+> **Fui a mirar los estados completos del export nuevo. La respuesta es NO, y todo 0-AW.1 se cae.**
+
+### El error: los estados del CSV viejo estaban TRUNCADOS y perdieron el significado
+
+| lo que decía `transportadoras-12sep.csv` | el estado REAL, completo |
+|---|---|
+| `Destinatario no cancela recaudo` | **`Destinatario no cancela el recaudo, solicita la entrega en una fecha posterior`** |
+| `No se entrega no cancela recaudo` | **`Se visita, no se logra entrega`** |
+| `Deterioro en validacion GP` | `Deterioro en validación - GP` |
+
+🔴 **La truncada le quitó lo esencial: *"solicita la entrega en una fecha posterior"*.**
+El cliente **pidió recibirlo otro día.** No es una devolución: **es un envío EN CURSO.**
+
+Los tres casos son envíos activos, no devoluciones cerradas. **El flete que se ve ($20.895, $28.400,
+$28.959) es el flete NORMAL DE IDA de un envío que todavía está andando.**
+
+### 🔑 Cómo se ve una devolución LIQUIDADA de verdad
+
+| ciudad | estado | `valor_servicio` | `valor_seguro_99` | ¿iguales? |
+|---|---|---|---|---|
+| DAGUA | Devolución ratificada | $3.434 | $3.434 | **SÍ** |
+| IBAGUÉ | Devolución ratificada | $2.324 | $2.324 | **SÍ** |
+| TOCANCIPÁ | Devolución ratificada | $2.286 | $2.286 | **SÍ** |
+| APARTADÓ | Devolución ratificada | $3.162 | $3.162 | **SÍ** |
+| BOGOTÁ | Devolución ratificada | $1.754 | $1.754 | **SÍ** |
+| CHINCHINÁ | Devolucion Regional | $3.114 | $3.114 | **SÍ** |
+| TURBACO | Devolución ratificada | $3.482 | $3.482 | **SÍ** |
+| FLORIDABLANCA | Devolución ratificada | $4.334 | $4.334 | **SÍ** |
+
+**8 de 8 idénticos al peso.** Cuando una devolución se liquida, **99 Envíos reemplaza el
+`valor_servicio` por la prima del seguro.** Eso es el seguro funcionando exactamente como el dueño
+dijo que funciona.
+
+### ✅ REGLA NUEVA para no repetirlo (mejor que leer estados)
+
+> **Una devolución está LIQUIDADA cuando `valor_servicio == valor_seguro_99`.**
+> Si son distintos, el envío **NO está resuelto** y su flete **no se puede leer como costo de
+> devolución.** Es un criterio numérico, exacto, y no depende de cómo cada transportadora
+> escriba los estados.
+
+### Lo que queda anulado
+
+| afirmación de 0-AW.1 | estado |
+|---|---|
+| *"$61.796 para reclamarle a 99 Envíos"* | ⛔ **no hay nada que reclamar** |
+| *"una devolución de Coordinadora cuesta $18.124 vs $3.031"* | ⛔ **falso** |
+| *"3 de 4 devoluciones de Coordinadora pagaron flete completo, p=0,0002"* | ⛔ **no eran devoluciones** |
+| *"el diferenciador no es la TASA sino el COSTO de la devolución"* | ⛔ **falso: el costo es igual, lo cubre el seguro** |
+| *"aplazar el A/B de Coordinadora"* | ⛔ **el motivo desaparece** |
+
+### Y el dato honesto que queda sobre Coordinadora
+
+**Coordinadora no tiene NI UNA devolución liquidada.** Cero. Todas sus guías están en curso
+(`En reparto`, `En terminal de destino`, `Se visita no se logra entrega`, `No se localiza dirección`,
+`Cerrado por incidencia`, `Pedido cancelado`, `Deterioro en validación`).
+
+👉 **No sabemos cuánto cuesta una devolución de Coordinadora. No hay dato. Ni bueno ni malo.**
+
+⛔ **Y también se cae el cálculo que estaba a punto de escribir en el tarifario** (*"en Bogotá
+Coordinadora cuesta $4.064 de riesgo contra $755 de ahorro"*): estaba construido sobre el $18.124
+inventado. **Se descarta.**
+
+### ⚠️ Error #18 — y es el peor de todos
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 18 | *"3 devoluciones de Coordinadora pagaron el flete completo además del seguro; hay $61.796 para reclamar; una devolución suya cuesta 6× más"* | **ninguna era devolución. Eran envíos EN CURSO, y el flete visible era el de ida normal. El CSV que yo mismo armé tenía los estados truncados y la truncada borró *"solicita la entrega en una fecha posterior"*. Comparé devoluciones LIQUIDADAS de Interrapidísimo contra envíos SIN RESOLVER de Coordinadora.** |
+
+🔑 **Es la ventana censurada otra vez, con la máscara más difícil de ver hasta ahora: no comparé dos
+períodos distintos, comparé dos ESTADOS DE MADUREZ distintos del mismo tipo de registro.**
+Liquidado vs sin liquidar.
+
+🔑 **Y la causa raíz es mía y evitable: yo construí `transportadoras-12sep.csv` truncando los estados.**
+**Regla: no abreviar nunca un campo de texto que después se va a usar para clasificar.** La palabra que
+se cae puede ser la que cambia el significado — aquí *"solicita la entrega en una fecha posterior"*
+convirtió un envío sano en una devolución imaginaria.

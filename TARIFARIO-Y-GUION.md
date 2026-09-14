@@ -45,8 +45,11 @@ sección 0-H. Y **la banda E es 20 de 72 guías (28% del volumen)**, no un caso 
 ### 🔑 Por qué el precio cubre el peor caso: **no existe "el flete de Bogotá"**
 
 **99 Envíos reparte entre tres transportadoras y cada una cobra distinto por el mismo destino.**
-Quién despacha lo decide 99 Envíos, no vos — así que no se puede saber de antemano cuánto va a
-costar ese envío:
+
+> 🔴 **CORREGIDO 14-SEP:** este documento decía *"quién despacha lo decide 99 Envíos, no vos"* y tres
+> líneas después *"como vos ELEGÍS la transportadora"*. **Las dos cosas no pueden ser ciertas.**
+> **Confirmado por el dueño: la transportadora la elige ÉL, envío por envío.** La frase de que
+> lo decide 99 Envíos era falsa y se elimina — llevó a analizar la elección como si no existiera.
 
 | Destino | coordinadora | interrapidísimo | servientrega |
 |---|---|---|---|
