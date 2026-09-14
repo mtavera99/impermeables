@@ -8477,3 +8477,87 @@ rezago (la misma trampa de la ventana censurada, otra vez).
 
 🔑 **Lección nueva: partir una muestra chica en dos y comparar las mitades no es medir elasticidad.
 Antes de creer una comparación de subgrupos, mover el punto de corte y ver si la conclusión sobrevive.**
+
+
+---
+
+## 0-AR · ⛔ CORRIGE 0-AP: VALLE DEL CAUCA ES RENTABLE, Y SUBIR PRESUPUESTO NO SIRVE DE NADA (lun 14-sep, 01:30)
+
+### El error, otra vez el mismo
+
+En 0-AP declaré Valle del Cauca *"🔴 PROBADO peor"* comparándolo contra **el promedio de la cuenta
+($880)**. El promedio no es el umbral. El umbral está escrito en este archivo:
+
+> **"Límite real: $2.402 por conversación** (ahí la utilidad llega a cero, con cierre de 8,4%)."
+
+**Es exactamente el error #12 del colmena, cometido dos veces el mismo día:** confundir *"más caro que
+el promedio"* con *"pierde plata"*. Una región puede costar más que Bogotá y ser muy rentable.
+
+### Las 4 regiones contra el umbral CORRECTO ($2.402)
+
+| conjunto | gasto | conv | alcance | frec | $/conv | % del límite | veredicto |
+|---|---|---|---|---|---|---|---|
+| **Valle del Cauca** | $57.864 | **46** | 12.760 | 1,31 | **$1.258** | **52%** | 🟢 **RENTABLE Y PROBADO** |
+| Santander | $5.576 | 5 | 1.074 | 1,11 | $1.115 | 46% | 🟡 apunta bien, 5 conv |
+| Tolima Huila | $4.981 | 5 | 1.100 | 1,13 | $996 | 41% | 🟡 apunta bien, 5 conv |
+| Eje Cafetero | $5.026 | 2 | 982 | 1,12 | $2.513 | 105% | ⛔ 2 conv, sin dato |
+
+**Tres de las cuatro apuntan a rentables, y Valle del Cauca está PROBADA** (46 conversaciones, IC 95%
+$976–$1.769, **el intervalo completo debajo de $2.402**).
+
+Y las frecuencias de 1,11–1,31 dicen que **ninguna audiencia está agotada.**
+
+### 🔑 Pero la pregunta del dueño ("¿subo o bajo?") tiene una respuesta incómoda: NINGUNA DE LAS DOS
+
+**Subir el presupuesto no haría absolutamente nada**, porque no están topadas: están usando una
+fracción mínima de lo que ya tienen.
+
+Valle del Cauca día por día desde que nació:
+
+| fecha | gasto | conv | $/conv |
+|---|---|---|---|
+| 31-ago | $2.299 | 2 | $1.150 🟢 |
+| 02-sep | $11.251 | 13 | $865 🟢 |
+| 05-sep | $8.387 | 12 | **$699 🟢** |
+| 08-sep | $2.612 | 3 | $871 🟢 |
+| 09-sep | $4.004 | 2 | $2.002 🟢 |
+| 10-sep | $3.924 | 1 | $3.924 🔴 |
+| **11-sep** | **$581** | 0 | — |
+| **12-sep** | **$108** | 0 | — |
+| **13-sep** | **$117** | 0 | — |
+
+**Entregó bien 10 días seguidos y se murió el 11-sep.** Con un presupuesto de $5.000 está gastando
+$108–$581. **El techo no es el problema. Subirlo de $5.000 a $20.000 cambiaría exactamente nada.**
+
+Y las otras tres se murieron **el mismo día 11-sep**. 🔴 **Eso sigue sin explicación** (ya estaba
+anotado como pendiente en 0-AÑ, y hoy queda confirmado que tampoco es solapamiento de audiencia
+—no hay cruce geográfico— ni saldo —había plata— ni frecuencia —1,11-1,31—).
+
+### ✅ Qué hacer con las regiones
+
+| cuándo | qué |
+|---|---|
+| **hoy 14-sep** | **nada.** Ya se prendió el colmena hoy; meter otra variable antes del test del 15 lo arruina |
+| **16-17 sep**, con el test leído | **Valle del Cauca es la única que amerita acción**: está probada rentable y entregó 10 días. Lo que hay que resolver es **por qué dejó de entregar**, no cuánto presupuesto tiene |
+| Santander / Tolima | **2 y 5 conversaciones. No hay nada que decidir.** Ni subir ni bajar: no hay dato |
+| Eje Cafetero | 2 conversaciones. Igual: sin dato |
+
+**Paso práctico para Valle (después del 15):** cuando un conjunto que entregaba se queda pegado en 2%
+del presupuesto, lo que se suele hacer es **duplicarlo** para que arranque limpio, en vez de editarlo.
+⚠️ **No está probado que eso lo arregle** — es práctica común, no evidencia. Pero es reversible y barato.
+
+⛔ **Y NO bajarlas ni apagarlas.** Estaba a punto de recomendar apagar Valle del Cauca basado en el
+umbral equivocado, y es la región con mejor evidencia de la cuenta.
+
+### ⚠️ Error #14
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 14 | *"Valle del Cauca está PROBADO peor ($1.258/conv), apagarlo o rediseñarlo"* | **usé el promedio de la cuenta ($880) como umbral en vez del límite real ($2.402). Valle corre al 52% del límite: es RENTABLE, y con 46 conversaciones es la región mejor probada. Casi recomiendo apagar lo que funciona.** |
+
+🔑 **El mismo error que el #12, el mismo día, en otro producto.** Queda una regla dura:
+
+> **NUNCA usar el promedio de la cuenta como umbral de decisión.** El promedio dice *cómo va lo que ya
+> funciona*; el umbral dice *desde dónde se pierde plata*. Son números distintos y muy separados:
+> **promedio del tradicional ~$880 · límite del tradicional $2.402 · límite del colmena $3.322.**
+> Antes de declarar algo "malo", escribir cuál es su umbral y de dónde salió.
