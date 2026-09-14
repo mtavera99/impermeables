@@ -8232,3 +8232,98 @@ estrecho.
 🔑 **Patrón repetido: promediar un grupo y tratar el promedio como veredicto de cada miembro.** Es
 primo hermano del error de las transportadoras (promediar ciudades distintas). **Antes de condenar un
 conjunto, mirar cuántas conversaciones tiene ÉL, no el grupo.**
+
+
+---
+
+## 0-AQ · ⛔ ANULA 0-AP: EL COLMENA ES OTRO PRODUCTO Y SU EQUILIBRIO ES $3.322, NO $900 (lun 14-sep, 01:00)
+
+> **El dueño frenó la conclusión de 0-AP. Tenía razón, y el error es de los peores de esta bitácora:
+> el número correcto YA ESTABA EN ESTE ARCHIVO y no lo consulté.**
+
+### El error
+
+En 0-AP comparé el $/conversación de los conjuntos del colmena contra **"el promedio de la cuenta,
+~$800-900"** y los declaré *"PROBADOS malos"*.
+
+**Eso es comparar dos productos con márgenes distintos:**
+
+| | Tradicional | **Colmena** |
+|---|---|---|
+| precio | $59.900 + envío | **$149.900 con envío gratis** |
+| costo | — | $85.000 |
+| utilidad por venta | $24.129 | **$40.968** |
+| **equilibrio por conversación** | ~$845 | **$3.322** |
+
+Un producto que deja **$40.968** por venta puede pagar mucho más por conversación que uno que deja
+$24.129. **El promedio de la cuenta (~$800-900) es el equilibrio del TRADICIONAL. Aplicárselo al
+colmena no tiene sentido.**
+
+### Los mismos datos, contra el equilibrio correcto
+
+| conjunto | gasto | conv | $/conv | IC 95% | vs equilibrio **$3.322** | veredicto |
+|---|---|---|---|---|---|---|
+| **Publico ABIERTO video** | $93.526 | 39 | **$2.398** | $1.825 – $3.495 | **72% del equilibrio** | 🟢 **DA PLATA** |
+| Publico ABIERTO - Creativo (estático) | $43.739 | 13 | $3.365 | $2.180 – $7.372 | **101%** | 🔴 justo en el equilibrio → sigue apagado |
+| Domiciliarios \| Colmena | $7.667 | 4 | $1.917 | $968 – $95.837 | 58% | ⛔ sin dato (4 conv) |
+
+**El video del colmena NO estaba malo: corría al 72% de SU equilibrio, o sea ganando.** Y esto
+**coincide con lo que ya decía 0-AH**: *"$2.611/conversación contra el equilibrio del colmena de
+$3.322 → 78,6% de su equilibrio. El canal del colmena no perdía plata."*
+
+El estático a $3.365 sí está en el filo (0-AH lo midió en $4.044 = 1,22× su equilibrio) — **y por eso
+0-AD ya había decidido apagarlo. Esa parte estaba bien.**
+
+### Y había una decisión tomada que yo contradije
+
+**0-AG, decisión del 10-sep:** *"La campaña del colmena se vuelve a prender **después del veredicto
+del 14**, con audiencia de clientes, **$8-10.000/día** y ventana de 14 días."*
+
+**Hoy es el 14.** Yo dije *"no la prenda, es tirar plata"* — **contra una decisión ya tomada, ya
+documentada y bien fundamentada.** No la revisé antes de opinar.
+
+### ✅ Recomendación corregida
+
+**Sí, préndala.** Concretamente:
+
+| qué | cómo |
+|---|---|
+| **cuál conjunto** | **solo el VIDEO** (`Publico ABIERTO video`). El estático NO — está en su equilibrio |
+| **presupuesto** | **$8.000–10.000/día**, como dice 0-AG |
+| **ventana** | 14 días. El colmena cierra lento (8,1%) y necesita ventana larga |
+| **gatillo de alarma** | **$3.322/conversación.** Por debajo gana; por encima se apaga |
+| **público de clientes** | ⚠️ **no existe todavía** (ver 0-AP: la cuenta no tiene ningún público personalizado). **Es una MEJORA, no un requisito**: el video ya daba plata con público abierto |
+
+**Lo único que 0-AP acertó sobre la colmena:** no hay público personalizado creado. Pero eso no
+bloquea prenderla — el video rendía al 72% de su equilibrio **con público abierto**.
+
+### Sobre el test del 15 (la duda legítima)
+
+Prender el colmena hoy mete una variable un día antes del test de la quincena. Es aceptable **si el
+test se lee por conjunto, no a nivel de cuenta** — que además es como hay que leerlo:
+
+- El test es sobre los **4 conjuntos del tradicional** (VIDEO, Domiciliarios, TEST Creativos, Motorizados).
+- El colmena es **otro producto, otra campaña, otro embudo**. Sus conversaciones no se mezclan.
+- $8-10.000/día contra $134.000/día = **7% más de gasto**. Efecto chico.
+- ⚠️ **Riesgo real a vigilar:** el colmena es Colombia amplio y los del tradicional son Bogotá+Medellín.
+  **Hay solapamiento de subasta ahí.** Si el 15-16 los 4 del tradicional se mueven raro, hay que
+  descontar este cambio antes de culpar a la quincena.
+- 📌 **Anotar la hora exacta del encendido** para poder separar los efectos.
+
+**Costo de esperar al 17 en vez de prender hoy:** cada venta de colmena vale **$40.968**. Tres días de
+espera no son gratis. Por eso la recomendación es prender hoy y leer el test por conjunto.
+
+### ⚠️ Error #12 — el más grave hasta ahora
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 12 | *"los conjuntos del colmena están PROBADOS malos: $2.398 y $3.365 contra el promedio de la cuenta de $800-900"* | **comparé un producto de $149.900 (equilibrio $3.322) contra el equilibrio de uno de $59.900. El video del colmena corría al 72% de SU equilibrio: DABA PLATA. Y el número correcto ($3.322) ya estaba escrito en 0-AG y 0-AH, en este mismo archivo.** |
+
+🔑 **Dos lecciones, y la segunda es la importante:**
+
+1. **Nunca comparar $/conversación entre productos de margen distinto.** El umbral es
+   *utilidad × tasa de cierre*, y es propio de cada SKU. **Cada producto tiene su propio equilibrio:**
+   tradicional ~$845, colmena **$3.322**.
+2. 🔴 **Antes de opinar sobre algo que ya se analizó, LEER EL ARCHIVO.** Tenía 7.600 líneas de memoria
+   con el número exacto y el plan ya decidido, y opiné desde cero. **Buscar en el archivo madre por
+   palabra clave (`grep -i colmena`) es obligatorio antes de contradecir una decisión pasada.**
