@@ -8392,3 +8392,88 @@ el número que justamente no conocemos.
 | **Revisión a los 7 y a los 14 días** | no antes |
 | **Solo el VIDEO** | el estático corre a 101% de su equilibrio. Sigue apagado |
 | **Anotar la hora del encendido** | el 15-16 es el test de la quincena del tradicional; hay solapamiento de subasta en Bogotá+Medellín |
+
+
+### 0-AQ.2 · ⛔ CORRIGE 0-AQ.1: el presupuesto es **$16.000/día**, no $10.000
+
+Al poner $10.000 en Ads Manager, Meta muestra:
+
+> ⚠️ **"Es posible que tu anuncio no genere conversaciones."**
+> *Gastaremos aproximadamente $10.000 por día. El gasto diario máximo es de $17.500 y el gasto semanal
+> máximo es de $70.000.*
+
+**Ese aviso es información, no ruido.** Y al revisarlo encontré que había leído de más un dato.
+
+#### ⚠️ Retracto la "elasticidad": el signo se invierte según dónde se corte
+
+En 0-AQ.1 afirmé *"no se encarece al escalar: los días de mayor gasto dieron $2.346 vs $2.491"*.
+**Con 6 días y 39 conversaciones eso no es una señal, es el punto de corte que yo elegí:**
+
+| corte | gasto BAJO | gasto ALTO | conclusión |
+|---|---|---|---|
+| $12.000 | $1.871 (2d) | $2.580 (4d) | ALTO más **caro** |
+| $16.000 | $1.871 (2d) | $2.580 (4d) | ALTO más **caro** |
+| $18.000 | $2.491 (3d) | $2.346 (3d) | ALTO más **barato** |
+| $19.000 | $2.680 (4d) | $2.102 (2d) | ALTO más **barato** |
+
+**El signo se da vuelta.** No hay evidencia de elasticidad en ningún sentido. Escogí el corte que me
+daba la respuesta que quería sin darme cuenta.
+
+#### Lo que sí queda firme, y por qué obliga a $16.000
+
+| | |
+|---|---|
+| $/conv medido | **$2.398** (39 conversaciones) |
+| **gasto diario promedio al que se midió** | **$15.588/día** |
+| a $10.000/día | ⚠️ **no hay ni un solo día de evidencia**, y Meta avisa que puede no entregar |
+
+**El riesgo de poner $10.000 no es gastar poco: es medir mal.** Si el conjunto entrega mal por
+presupuesto insuficiente, el $/conv va a salir peor de lo real y vamos a **matar un producto que
+funciona**. Eso es exactamente el tipo de error que esta bitácora lleva doce entradas combatiendo.
+
+**Se corre al presupuesto donde el número fue medido: ~$16.000/día.**
+
+#### La exposición se controla con la VENTANA, no bajando el ritmo
+
+⚠️ **Ventana de gasto ≠ ventana de medición.** El colmena cierra lento, así que las ventas llegan con
+rezago (la misma trampa de la ventana censurada, otra vez).
+
+| | |
+|---|---|
+| presupuesto | **$16.000/día** |
+| **ventana de GASTO** | **7 días** → exposición total **$112.000** |
+| **ventana de MEDICIÓN** | **14 días** → las ventas del día 7 todavía no han cerrado al día 7 |
+| conversaciones esperadas | ~47 |
+
+| si el cierre es | ventas | utilidad | resultado sobre $112.000 |
+|---|---|---|---|
+| 8,1% (lo medido) | 3,8 | $155.700 | **+$43.700** |
+| 5,85% (equilibrio) | 2,7 | $112.000 | $0 |
+| 4% (malo) | 1,9 | $77.800 | **−$34.200** |
+
+**Misma exposición que el plan anterior, pero gastada a un ritmo donde la medición sí vale.**
+
+#### 🚫 Dos botones que NO hay que tocar en esa pantalla
+
+| botón | por qué no |
+|---|---|
+| **"Aplicar presupuesto recomendado" ($204.000/día)** | dice *"negocios similares gastan ~$204.000 y consiguen 14 conversaciones"* = **$14.571 por conversación**. Es **6× peor** que los $2.398 de esta cuenta. Ese benchmark son negocios que rinden mucho peor. Aplicarlo sería poner $204.000/día en un producto sin validar |
+| **"Aplicar" el presupuesto de campaña Advantage+ (−4,6%)** | mueve el control del presupuesto **al nivel de campaña**, donde se comparte con `Publico ABIERTO - Creativo` (el estático, a **101% de su equilibrio = pierde plata**). Meta podría desviarle plata al perdedor. **Mantener el presupuesto a nivel de conjunto** |
+
+#### Pasos concretos en la pantalla
+
+1. Presupuesto diario del conjunto `Publico ABIERTO video`: **$16.000**
+2. Dejar `Publico ABIERTO - Creativo` (el estático) **PAUSADO**
+3. La cabecera dice **"Campaña desactivada"** → hay que activar **la campaña**, no solo el conjunto
+4. Hay **"Cambios sin publicar"** → darle **Publicar**
+5. **Anotar la hora exacta** del encendido (el 15-16 es el test de la quincena del tradicional)
+6. Con $16.000/día el tope diario de Meta sube a ~$28.000 y el semanal a ~$112.000. **No asustarse** si un día gasta $25.000: se compensa en la semana
+
+#### ⚠️ Error #13
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 13 | *"el colmena no se encarece al escalar (elasticidad plana), así que $10.000/día alcanza"* | **con 6 días y 39 conv el signo se invierte según el punto de corte: no hay señal. Y el $2.398 se midió a $15.588/día promedio, así que $10.000 es extrapolar a un rango sin un solo día de evidencia — donde Meta además avisa que puede no entregar.** |
+
+🔑 **Lección nueva: partir una muestra chica en dos y comparar las mitades no es medir elasticidad.
+Antes de creer una comparación de subgrupos, mover el punto de corte y ver si la conclusión sobrevive.**
