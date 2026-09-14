@@ -230,6 +230,48 @@ Totales de 2 conjuntos que ya están confirmados (estos sí los puedo dar direct
   Santa Rosa de Cabal $139.000 · Hispania $145.000 · Cartagena $146.000
 ```
 
+### 🔬 MEDICIÓN 14-SEP: la banda de 2 unidades de Bogotá/sabana quedó corta
+
+Primera guía del despacho del 14-sep, medida contra el export de 99 Envíos:
+
+| | |
+|---|---|
+| guía | 240061278692 · **SOACHA** · 2 unidades · interrapidísimo |
+| cobrado al cliente | $128.000 |
+| menos promo 2× | −$110.000 |
+| **= envío que le cobró** | **$18.000** |
+| **costo real** (`valor_servicio`, seguro incluido) | **$20.994** |
+| **absorbió** | **−$2.994** |
+
+El guion dice **`$128.000 — Bogotá y sabana (zona de $73.000)`**. Con ese total el envío queda en
+$18.000 y el costo real fue $20.994. **El total correcto habría sido $131.000.**
+
+**Este es el caso 7 de la fuga que ya describía la sección 2-bis** (*"los 6 pedidos de 2 unidades
+cobraron 6 precios distintos y en 2 de ellos se absorbió flete"*). **La fuga sigue viva y sigue
+estando SOLO en la promo de 2 unidades.**
+
+#### ⛔ Por qué NO se cambia el precio todavía
+
+**Es UNA sola medición.** Subir la banda a $131.000 con n=1 sería el mismo error de leer de más un
+dato que ya costó cuatro correcciones esta semana. Y hay un antecedente en este mismo documento:
+la banda A se dejó en $73.000 aceptando *"absorber $1.574 esporádicos"* en vez de castigar al 24%
+del volumen.
+
+**La pregunta real es si $2.994 es esporádico o sistemático**, y eso se responde con la segunda
+medición:
+
+| | |
+|---|---|
+| 🔔 **segundo dato disponible HOY** | pedido **#3 del lote, Bogotá, 2 unidades, cobrado $128.000** |
+| si su `valor_servicio` sale ~$21.000 | **la banda es sistemáticamente corta → subir a $131.000** |
+| si sale ~$18.000 o menos | Soacha fue un caso puntual → se acepta absorber |
+
+⚠️ **Y no se le cambia el precio a los clientes de hoy: ya se les prometió.** Esto es para el
+tarifario de mañana.
+
+📌 **Dato de referencia del seguro en esta guía:** `valor_seguro_99` = **$3.137** sobre un
+`valor_servicio` de $20.994 = **14,9%** (el documento venía usando 13,6%).
+
 ```
 CUADRO DE CONFIRMACIÓN — SIEMPRE CON TODOS LOS DATOS LLENOS
 
