@@ -8027,3 +8027,108 @@ Eso ya quedaba confirmado por el costo; ahora también por la segmentación.
 Evaluar consolidar VIDEO + Domiciliarios + TEST Creativos, o al menos aceptar que sus números
 individuales no se pueden leer por separado. ⛔ **Es un cambio estructural, el más contaminante de
 todos: no se toca antes del martes 15.**
+
+
+---
+
+## 0-AO · FIN DE SEMANA 12-13 SEP: DEGRADACIÓN UNIFORME = SEÑAL DE DEMANDA, NO DE CREATIVO (lun 14-sep, 00:00)
+
+### Sábado normal, domingo malo
+
+Comparación sábado-contra-sábado y domingo-contra-domingo, **tramo 00:00–16:59** (se corta a las 17:00
+porque ahí el domingo 13 tuvo una caída, ver abajo):
+
+| fecha | gasto | conv | $/conv |
+|---|---|---|---|
+| 05-sep Sat | $137.191 | 152 | $903 |
+| **12-sep Sat** | $66.033 | 73 | **$905** ← idéntico |
+| 06-sep Sun | $114.887 | 134 | $857 |
+| **13-sep Sun** | $106.971 | 97 | **$1.103** ← +29% |
+
+El sábado quedó **exactamente igual** que el sábado anterior. El domingo se encareció 29%.
+
+### ⚠️ CORRECCIÓN: la caída del domingo 17:00–21:00 NO fue hueco de saldo
+
+`saldo-por-hora.py` marcó `<-- SECO` las horas 17:00–21:00 del domingo. **Está mal.** El libro de caja
+dice que a esa hora había **~$59.000 disponibles** (recarga de $100.000 a las 11:13 Bogotá).
+
+Lo que pasó de verdad, mirando el gasto acumulado por conjunto:
+
+| conjunto | presup | a 14h | a 16h | a 17h | final | % |
+|---|---|---|---|---|---|---|
+| Domiciliarios VIDEO | $55.000 | $38.498 | $47.950 | $47.952 | $48.120 | 87% |
+| **Domiciliarios** | **$45.000** | $38.029 | **$46.599** | $46.601 | $46.670 | **104%** ← topado |
+| TEST Creativos | $25.000 | $5.561 | $6.972 | $7.675 | $15.536 | 62% |
+
+**Domiciliarios agotó su presupuesto diario a las 16:00** y se apagó. VIDEO se frenó casi al mismo
+tiempo (87%, sin llegar al tope). Solo TEST Creativos siguió y duplicó su gasto en la noche.
+
+🔧 **Limitación del script, anotada:** `saldo-por-hora.py` deduce "SECO" **solo del gasto bajo**, sin
+mirar el saldo. Por eso confunde *"se quedó sin plata en la cuenta"* con *"se topó con el presupuesto
+del conjunto"*, que son cosas distintas y llevan a acciones opuestas. **Antes de creerle un `SECO`,
+cruzar con `spend_cap − amount_spent`.**
+
+### 🎯 EL HALLAZGO: los CUATRO conjuntos se encarecieron a la vez
+
+$/conv por bloque (04-08 sep = después del pago del 30-ago · 09-13 sep = valle antes del 15):
+
+| conjunto | 04-08 sep | 09-13 sep | cambio |
+|---|---|---|---|
+| Domiciliarios VIDEO | $726 | $888 | **+22%** |
+| Domiciliarios | $702 | $946 | **+35%** |
+| TEST Creativos | $599 | $833 | **+39%** |
+| Motorizados | $718 | $1.131 | **+58%** |
+
+**Los cuatro, sin excepción, entre +22% y +58%.**
+
+Esto es lo que discrimina:
+
+- Un problema de **creativo o audiencia** golpea a **uno o dos** conjuntos (el que tiene el creativo
+  gastado, el que tiene la audiencia saturada). **No a los cuatro parejo.**
+- Un problema de **demanda** — la gente sin plata antes de la quincena — golpea **a todos a la vez**,
+  porque el precio de la subasta no cambió: cambió cuánta gente contesta.
+
+Y la frecuencia sigue en **1.03–1.10** en todos (verificado el 12-sep), así que **no es desgaste**.
+
+> ⚠️ Casi mando otra conclusión falsa. El domingo VIDEO marcó **$1.375/conv** y parecía que se estaba
+> dañando y encima acaparando presupuesto. **Es ruido de un día con 35 conversaciones.** Al mirar los
+> 10 días, VIDEO (+22%) es el que **menos** se degradó de los cuatro. La lectura de un solo día habría
+> señalado al conjunto equivocado.
+
+### 🧪 EL TEST DE MAÑANA (martes 15-sep) — predicción escrita ANTES de ver el dato
+
+Esta hipótesis quedó registrada en 0-AK **antes** de este fin de semana. Es la forma honesta de
+probarla: predecir primero, mirar después.
+
+**Predicción:** si la causa es la quincena, el 15 y 16-sep el $/conv debe **volver a la banda
+$600–$750** en los cuatro conjuntos a la vez, sin tocar nada.
+
+| resultado el 15-16 sep | conclusión |
+|---|---|
+| $/conv baja a $600–750 en los 4 | ✅ **es la quincena.** El ciclo de pago manda. Se planea el gasto alrededor de las quincenas y no se toca nada más. |
+| $/conv baja solo en algunos | ⚠️ hay quincena **y** además un problema de conjunto. Separar. |
+| $/conv NO baja | ❌ **la hipótesis de la quincena muere.** Hay algo estructural y hay que buscarlo en serio (creativo, competencia, mercado). |
+
+⛔ **Por esto mismo NO se toca nada hoy 14-sep.** Cualquier cambio hoy arruina la única lectura limpia
+que vamos a tener este mes.
+
+### Estado operativo al lunes 14-sep 00:00
+
+| | |
+|---|---|
+| saldo (`spend_cap − amount_spent`) | **$47.784** |
+| consumo del domingo | $118.167 |
+| piso de corte medido | ~$16.000–20.000 |
+| **se seca** | **~06:00 del lunes si no recarga** |
+
+**Acción del día: recargar. Nada más.**
+
+📦 **Recordatorio del despacho (regla 0-AM):** el lote del lunes 14 arrastra **viernes noche + sábado +
+domingo ≈ 3 días de ventas**. Hay que **restarle las 8 guías del viernes que ya se contaron** para no
+contar doble.
+
+### ⚠️ Error #10 (evitado, no cometido)
+
+| # | lo que iba a afirmar | lo que era |
+|---|---|---|
+| 10 | *"VIDEO se está dañando ($718→$1.375) y encima se lleva el presupuesto"* | **ruido de un día con 35 conv. En 10 días VIDEO es el que MENOS se degradó (+22%). La degradación es uniforme en los 4 = demanda, no creativo.** |
