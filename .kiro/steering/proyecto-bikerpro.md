@@ -9139,23 +9139,29 @@ cada devolución.** Estábamos mirando la variable equivocada.
 
 ## 0-AX · AUDITORÍA DEL DESPACHO DEL 14-SEP CONTRA EL EXPORT (30 guías, 39 unidades)
 
-### 🔴 CONFLICTO DE OFICINA EN EL PEDIDO #28 (NECHÍ, $143.000)
+### ⛔ FALSA ALARMA MÍA EN EL PEDIDO #28 (NECHÍ) — ya estaba resuelto
 
-| | |
-|---|---|
-| la guía salió por | **COORDINADORA** (64532764636) |
-| la guía dice | *"Oficina principal **Coordinadora**"* |
-| al cliente se le dijo por WhatsApp | *"Oficina principal **Inter Rapidísimo**"* |
+Alerté que había conflicto: la guía salió por **Coordinadora** ("Oficina principal Coordinadora")
+mientras el cuadro de confirmación de WhatsApp decía *"Oficina principal Inter Rapidísimo"*.
 
-**El cliente va a caminar hasta Interrapidísimo y el paquete está en Coordinadora.**
-Es el **mismo error de Potosí, en espejo**, y esta vez son **$143.000 y 2 unidades**
-(≈$48.258 de utilidad).
+**No era un conflicto.** El dueño ya le había avisado al cliente que tocaba recogerlo en la oficina de
+**Coordinadora porque la de Interrapidísimo no estaba disponible en Nechí.**
 
-👉 **Hay que escribirle hoy.** Y confirma que la regla nueva de 0-AV era necesaria: **el nombre de la
-transportadora en el cuadro es una promesa.**
+🔑 **El error de método, y es importante para no repetirlo:** yo traté el **cuadro de confirmación
+como si fuera el estado final de lo que el cliente sabe.** No lo es — es **una foto de un momento** de
+una conversación que siguió después. **Los cuadros que me pasa por WhatsApp no son la conversación
+completa.**
 
-📌 Potosí (#2) **sí quedó bien**: salió por interrapidísimo y la guía dice "Oficina Interrapidísimo".
-Pero la clienta leyó *"Servientrega"*, así que **igual hay que avisarle.**
+**Regla:** antes de declarar un conflicto entre la guía y lo que sabe el cliente, **preguntar si hubo
+conversación posterior.** El export y el cuadro pueden estar desactualizados los dos.
+
+📌 **Y esto sí es dato nuevo de cobertura:** **Interrapidísimo NO tiene oficina disponible en Nechí
+(Antioquia).** Eso matiza los "124 municipios" de 0-AV: cubre mucho, pero no todo, y **Coordinadora
+cubrió donde Interrapidísimo no llegaba.** Es un punto a favor de Coordinadora que no estaba medido.
+
+📌 Potosí (#2) quedó consistente: salió por interrapidísimo y la guía dice "Oficina Interrapidísimo".
+⚠️ Pero **ahí sí puede quedar un pendiente real**: la clienta leyó *"Servientrega"* en el mensaje del
+bot. **Confirmar si se le aclaró después.**
 
 ### Se despacharon 3 por Coordinadora, no 1
 

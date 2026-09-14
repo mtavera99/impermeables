@@ -26,6 +26,6 @@ n,ciudad,unidades,recaudo,transportadora,valor_servicio,seguro,tipo_seguro,direc
 25,MONTELIBANO,1,85000,interrapidisimo,25914.30,3917,Seguro 99,domicilio,
 26,CANDELARIA,1,85000,interrapidisimo,25914.30,3917,Seguro 99,Oficina Interrapidisimo Candelaria,interrapidisimo
 27,SINCELEJO,1,81000,interrapidisimo,23266.86,3514,Seguro 99,domicilio,
-28,NECHI,2,143000,coordinadora,45562.32,6891,Seguro 99,Oficina principal COORDINADORA,INTERRAPIDISIMO (conflicto)
+28,NECHI,2,143000,coordinadora,45562.32,6891,Seguro 99,Oficina principal COORDINADORA,coordinadora (aclarado por el dueno: inter no tenia oficina en Nechi)
 29,ARMENIA,2,138000,interrapidisimo,32312.45,4865,Seguro 99,domicilio,
 30,QUIBDO,1,81000,interrapidisimo,25616.43,3874,Seguro 99,domicilio,
