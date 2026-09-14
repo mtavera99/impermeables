@@ -8933,3 +8933,117 @@ Interrapidísimo.
 | `TARIFARIO-Y-GUION.md` | Cartagena servientrega → interrapidísimo · cobertura de coordinadora resuelta · flete real corregido |
 | `analisis/despacho-14sep.csv` | los 30 pedidos, sin PII |
 | `analisis/asignar-transportadora-14sep.py` | la asignación, con la regla de la oficina primero |
+
+
+---
+
+## 0-AW · ⛔ ERROR #17: LA DEVOLUCIÓN CUESTA $4.208, NO $40.970 — Y NO SÉ POR QUÉ SE DEVUELVEN (14-sep, 16:00)
+
+### El dueño frenó el número, y los datos le dan la razón exacta
+
+Yo venía calculando cada devolución como **"flete de ida + flete de vuelta = $40.970"**.
+Él respondió: *"acuérdate que yo pago un seguro, yo solamente pago como 2000 3000 pesos cuando me
+devuelven un pedido"*.
+
+**Medido en las 49 devoluciones reales del histórico:**
+
+| | |
+|---|---|
+| **46 de 49 (94%)** pagaron **solo la prima del seguro** | promedio **$2.941** |
+| 3 de 49 (6%) pagaron flete completo | $20.895 · $21.035 · $28.959 |
+| **costo esperado en flete por devolución** | **$4.208** |
+
+**Me pasé 10 veces.** Y el dato estaba en el archivo desde 0-L: *"en una devolución solo se paga la
+prima ($1.742 / $3.111)"*. **Tercera vez hoy que el número correcto ya estaba escrito y no lo busqué.**
+
+### La consecuencia: el flete es el 12% del problema
+
+| componente de una devolución | monto | peso |
+|---|---|---|
+| flete (lo cubre el seguro) | $4.208 | **12%** |
+| **utilidad que no se hizo** | **$24.129 por unidad** | **88%** |
+
+**El lote de hoy, corregido:**
+
+| | yo dije | de verdad |
+|---|---|---|
+| flete quemado | $233.529 | **$23.985** |
+| utilidad no hecha | $178.796 | $178.796 ✓ |
+| **total** | **$412.325** | **$202.781** |
+
+🔑 **Y esto cambia toda la lógica de elegir transportadora: los $2.022 de diferencia de flete son el
+8% de lo que está en juego. Es ruido.** Ninguna decisión de transportadora se justifica por flete.
+
+### Y tumba mi propio cambio a `TARIFARIO-Y-GUION.md` (revertido)
+
+Yo había cambiado Cartagena de servientrega a interrapidísimo argumentando *"una devolución cuesta
+$65.000, pagá los $2.022"*. **Con el costo real ($4.208) el argumento se cae.** Y el poco dato que
+hay en Cartagena apunta **al contrario**:
+
+| en Cartagena | devueltas/resueltas | |
+|---|---|---|
+| servientrega | **1/4 = 25%** | n=4 |
+| coordinadora | 1/2 = 50% | n=2 |
+| **interrapidisimo** | **3/3 = 100%** | n=3 |
+
+Ninguna llega a 5 guías → **no se puede decidir.** Revertido en el tarifario.
+(El veto a servientrega de 0-AA viene de **Medellín** —3 de 13—, no de Cartagena.)
+
+### 🔴 Y aquí está el hueco de verdad: NO SABEMOS POR QUÉ SE DEVUELVEN
+
+El dueño preguntó *"¿cómo así llamar, a qué te refieres con llamar?"* — y tiene razón en preguntar,
+porque yo estaba recomendando "confirmación reforzada" **sin saber qué hay que confirmar.**
+
+Fui a mirar los motivos en los 86 estados que dicen algo:
+
+| motivo | guías | % |
+|---|---|---|
+| 🔴 **SIN DETALLE** (interrapidísimo: *"Devolución ratificada"*) | 36 | 41,9% |
+| esperando que la recojan en oficina | 15 | 17,4% |
+| **NO ESTABA / no contestó** | 12 | 14,0% |
+| 🔴 **SIN DETALLE** (servientrega) | 9 | 10,5% |
+| **ERROR DE LA TRANSPORTADORA** (mal enrutada) | 6 | 7,0% |
+| **DIRECCIÓN MALA** | 4 | 4,7% |
+| **NO PAGÓ** | 2 | 2,3% |
+| paquete averiado | 1 | 1,2% |
+
+**El 53% no dice el motivo.** De los 25 que sí:
+
+| motivo conocido | % |
+|---|---|
+| **NO ESTABA / no contestó** | **48%** |
+| error de la transportadora | 24% |
+| dirección mala | 16% |
+| **no pagó** | **8%** |
+
+### 👉 Lo que esto cambia en la recomendación
+
+**"Llamar" fue impreciso mío. Y peor: yo asumía que el problema era que el cliente no tiene la plata
+— y eso es apenas el 8% de los motivos conocidos.** El motivo más grande es que **no estaba cuando
+llegó el mensajero (48%)**, que se arregla distinto:
+
+| motivo | qué lo arregla |
+|---|---|
+| no estaba (48%) | acordar día, **o mandar a oficina** para que vaya cuando pueda |
+| error de transportadora (24%) | reclamar a la transportadora, no es del cliente |
+| dirección mala (16%) | verificar la dirección **antes** de generar la guía |
+| no pagó (8%) | confirmar que tendrá la plata ese día |
+
+⚠️ **Ojo con la conclusión fácil:** "mandar todo a oficina" cambia un riesgo por otro — hay
+**15 guías esperando que las recojan**, y esas también se pueden vencer. **No hay dato para decir
+cuál es mejor.**
+
+### 🔔 PENDIENTE NUEVO (y es el más importante de logística)
+
+**Pedirle a 99 Envíos los códigos de motivo de devolución.** Sin eso, el 53% de las devoluciones son
+una caja negra y cualquier plan de "confirmación" es adivinar. **Va en la misma comunicación donde ya
+están pendientes:** el denominador del 16%, el flete de Tadó ($36.667) y si el seguro se puede apagar.
+
+🔑 **Regla nueva: antes de recomendar una acción para bajar un número, saber qué lo causa.**
+Estaba recomendando confirmar la plata cuando la plata es el 8% del problema.
+
+### ⚠️ Error #17
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 17 | *"cada devolución cuesta el flete de ida + vuelta ≈ $40.970; el lote de hoy arriesga $412.325"* | **el seguro antidevolución cubre los fletes: 94% de las devoluciones pagaron solo la prima ($2.941). Costo real $4.208 = 10× menos. El lote arriesga $202.781, y el 88% de eso es margen no hecho, no flete. Estaba en 0-L desde siempre.** |
