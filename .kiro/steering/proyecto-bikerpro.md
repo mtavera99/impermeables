@@ -7629,3 +7629,851 @@ que fija 4-B.
 🔑 **Las cinco son el mismo patrón: sacar conclusión antes de tener la base correcta.** Y las cinco
 las destapó el dueño, no yo. **Eso es la parte más valiosa de esta bitácora: cuando él dice "según mi
 cabeza esto no cuadra", suele tener razón — conviene recalcular antes de defender el número.**
+
+
+---
+
+## 0-AN · EL SALDO SÍ SE PUEDE LEER · EL FRENO DE META · VEREDICTO DE TRANSPORTADORAS (sáb 12-sep-2026, 15:00)
+
+### 🔓 HALLAZGO 1: el saldo de la cuenta prepago SÍ se lee con el token de solo lectura
+
+Llevábamos días **estimando** el saldo porque el campo `balance` responde `(#10) Permission Denied`.
+No hacía falta. En una cuenta prepago:
+
+```
+SALDO DISPONIBLE  =  spend_cap  −  amount_spent
+```
+
+Los dos campos se leen sin problema con `ads_read`. Prueba de que `spend_cap` **no** es un tope que
+alguien puso a mano, sino el acumulado de todo lo recargado:
+
+| momento | `spend_cap` | `amount_spent` | resta | pantalla de facturación |
+|---|---|---|---|---|
+| 11-sep tarde | $4.582.000 | $4.486.558 | **$95.442** | *"Saldo actual COP$ 93.973"* ✅ |
+| 12-sep 15:00 | $4.682.000 | $4.587.967 | **$94.033** | — |
+
+`spend_cap` subió exactamente **+$100.000**, que es exactamente la recarga de las 02:41 del 12-sep.
+**No es un tope: es el acumulado de recargas.** Por eso la alarma del 11-sep ("se apaga en 12h por el
+spend_cap") era correcta en el fondo pero por la razón equivocada: no era un límite que hubiera que
+levantar, era el saldo que se estaba acabando.
+
+### 🔓 HALLAZGO 2: `/activities` se lee con `ads_read` → libro de caja completo
+
+`GET act_.../activities` **sí funciona** con el token de lectura. Ahí queda grabado:
+
+- `"Dinero agregado al saldo"` → cada recarga, con monto y hora exacta
+- `"Cuenta facturada"` → el cobro diario de Meta (~06:15 Bogotá, cobra el día anterior completo)
+- todo el historial de cambios: presupuestos, estados, creación de conjuntos, segmentación
+
+Script: `analisis/saldo-reconstruido-12sep.py` (libro de caja + quién movió qué)
+Script: `analisis/saldo-hora-a-hora-modelo.py` (saldo hora por hora, anclado al dato duro)
+
+⚠️ Los tiempos de `/activities` vienen en **UTC (+0000)**. Bogotá = UTC−5. Hay que restar 5 horas.
+
+**Umbral real de corte:** Meta deja de entregar cuando el saldo baja de **~$16.000–20.000**, no de $0.
+El 11-sep la entrega murió 11:00–13:00 con el saldo modelado en $16.687. El 10-sep a las 22:00 con
+$19.756. Sirve como línea de alarma.
+
+### 🚨 HALLAZGO 3: el goteo diario de recargas es MENOR que el presupuesto → freno permanente
+
+Recargas del 5 al 12-sep: **$1.171.000 en 8 días = $146.375/día**.
+Presupuesto activo: **$154.000/día**. Gasto real varios días: $165.000–203.000.
+
+**Déficit estructural de $10.000–50.000 por día.** El saldo hace trinquete hacia abajo hasta que
+Meta empieza a frenar. La cuenta lleva 8 días seguidos con menos de un día de presupuesto en reserva
+(hoy: $94.033 = 61% de un día).
+
+**La firma del racionamiento es la curva horaria PLANA.** Un día con plata tiene forma (picos de
+audiencia); un día racionado es una línea recta:
+
+| día | curva | pico | señal |
+|---|---|---|---|
+| 8-sep | con forma | $21.129 a las 19:00 | 🟢 audiencia manda |
+| 11-sep | con forma | $23.892 a las 07:00 | 🟢 audiencia manda (+ hueco 11-13h) |
+| **12-sep (hoy)** | **plana** | 09:00–13:00 todo entre $4.978 y $5.925 | 🔴 **Meta está racionando** |
+
+### 📉 CÓMO VA LA CAMPAÑA HOY (sáb 12-sep, corte 15:00)
+
+Sábado contra sábado, **mismo tramo del día** (00:00–14:59), para no repetir el error de la ventana censurada:
+
+| fecha | gasto | conv | $/conv |
+|---|---|---|---|
+| 29-ago sáb | $57.023 | 47 | $1.213 |
+| 05-sep sáb | $104.903 | 118 | $889 |
+| **12-sep sáb (hoy)** | **$58.910** | **67** | **$879** |
+
+**La eficiencia está intacta. Lo que falta es volumen.** $/conv de los últimos 8 días: $879, $806,
+$732, $925, $1.120 (9-sep, día con hueco), $924, $807, **$884 hoy**. Hoy está en la banda normal.
+
+Uso del presupuesto hoy, conjunto por conjunto (62% del día corrido → lo normal sería ~62%):
+
+| conjunto | presup | gastado | uso | conv | $/conv |
+|---|---|---|---|---|---|
+| 🟢 Domiciliarios VIDEO | $55.000 | $36.205 | 66% | 40 | $905 |
+| 🟡 Domiciliarios | $45.000 | $13.992 | 31% | 17 | $823 |
+| 🔴 TEST Creativos | $25.000 | $5.286 | 21% | 5 | $1.057 |
+| 🟡 Motorizados | $9.000 | $3.091 | 34% | 4 | $773 |
+| 🔴 4 regiones ($5.000 c/u) | $20.000 | $341 | **2%** | 1 | — |
+| | **$154.000** | **$58.915** | **38%** | 67 | $884 |
+
+**Meta protege al conjunto grande y asfixia a los chicos.** Las 4 regiones llegaron al 78-80% el
+10-sep (día con plata) y se desplomaron a 8-18% el 11-sep y a 2% hoy. Los 3 de Santander/Eje/Tolima
+nacieron el 9-sep, así que **no es arranque en frío: es un desplome.**
+
+Descartado como causa (todo verificado hoy):
+- ❌ anuncios rechazados → los 8 están `ACTIVE` sin `issues_info`
+- ❌ desgaste de audiencia → frecuencia **1.03–1.10** en todos los conjuntos
+- ❌ CPM disparado → $3.660–$5.201, normal
+- ❌ hueco de saldo hoy → curva limpia, sin racha seca
+
+**Costo del freno, solo hoy:** ~$54.000 de presupuesto sin gastar, a un $/conv **probado** de $884 =
+~61 conversaciones que no entraron. A la tasa conocida de conversación→pedido (5–11%):
+**3 a 7 pedidos perdidos × $24.129 = $72.000 a $169.000 de utilidad, en un solo día.**
+
+> ⚠️ Esto NO es ahorro. La eficiencia está buena hoy ($884/conv), así que la plata que no se gastó
+> se habría convertido igual de bien. Es utilidad dejada sobre la mesa.
+
+### ✅ RECOMENDACIÓN META (sin tocar presupuestos, respetando el candado del 15-sep)
+
+1. **Meter un colchón de una sola vez**, no subir el goteo diario. Que el saldo quede en
+   **$310.000–460.000** (2–3 días de presupuesto). Eso desactiva el freno sin cambiar ni un
+   presupuesto, así que **no contamina el experimento del pago del 15-sep**.
+2. Después, goteo diario de **$160.000+** (no $100.000) para no volver al déficit.
+3. **Prueba falsable:** si la explicación del freno es correcta, al meter el colchón las 4 regiones
+   deben volver a 60-80% de su presupuesto **dentro de las 24 horas siguientes**, sin tocar nada más.
+   Si no vuelven, la causa es otra y hay que buscarla.
+4. ⛔ **Sigue prohibido mover presupuestos hasta después del martes 15-sep.** Meter saldo no es mover
+   presupuesto.
+5. Vigilar el saldo con `spend_cap − amount_spent`. Alarma por debajo de **$40.000**.
+
+### 🚚 VEREDICTO DE TRANSPORTADORAS
+
+#### ⚠️ Primero: un error mío que daba el veredicto al revés
+
+Mi primer clasificador buscaba las palabras "entrega" y "devolución" dentro del estado. Dos desastres:
+
+1. **`ENTREGADO A REMITENTE`** (Servientrega, 9 guías) contiene "ENTREGADO" → lo contaba como
+   **entrega exitosa**. Es lo contrario: el paquete volvió al remitente. **Es una devolución.**
+   Con el error, Servientrega salía con **0% de devoluciones**.
+2. **Coordinadora no usa nunca la palabra "devolución".** Usa `Destinatario no cancela recaudo`,
+   `No se entrega no cancela recaudo`, `Cerrado por incidencia`, `Deterioro en validacion GP`.
+   Ninguno hacía match → Coordinadora salía con **0 devoluciones y cara de ser la mejor.**
+
+**Regla nueva: cada transportadora escribe los estados en su propio idioma. Hay que mapearlos a mano,
+uno por uno, y que el script grite si aparece un estado sin clasificar.** Los 23 estados quedaron
+mapeados explícitamente en `analisis/veredicto-transportadoras-12sep.py`.
+
+#### Tasa de devolución sobre guías maduras (≥10 días) y resueltas
+
+| transportadora | guías | maduras | resueltas | dev | tasa | IC 95% |
+|---|---|---|---|---|---|---|
+| coordinadora | 42 | 5 | 5 | 1 | 20,0% | **3,6% – 62,4%** |
+| interrapidisimo | 245 | 160 | 153 | 30 | 19,6% | 14,1% – 26,6% |
+| servientrega | 62 | 62 | 53 | 9 | 17,0% | 9,2% – 29,2% |
+
+**Los tres intervalos se solapan casi por completo. Estadísticamente son indistinguibles.**
+
+#### Lo que parecía una diferencia real, y por qué no lo es
+
+En la ventana 07–11 sep (las dos operando a la vez) Coordinadora se veía mucho peor:
+entregadas 17% vs 44% (p=0,009), guías en problema 51% vs 23% (p=0,006).
+
+**Pero la mezcla de ciudades está torcida:**
+
+| | guías | en ciudad difícil | ciudades principales |
+|---|---|---|---|
+| coordinadora | 35 | **43%** | Cartagena(6), Barranquilla(3), Medellín(3), Montería(2), Neiva(2), Sincelejo(2) |
+| interrapidisimo | 52 | 25% | **Bogotá(11)**, Granada(2), y pueblos sueltos |
+
+A Coordinadora le están dando **la costa y el interior difícil**; a Interrapidísimo, **Bogotá**.
+Bogotá entrega rápido con cualquiera. Al estratificar (sacando Bogotá de los dos lados):
+
+| métrica | coordinadora | interrapidisimo | p | veredicto |
+|---|---|---|---|---|
+| ya entregada | 6/34 (18%) | 13/41 (32%) | 0,163 | ❌ **se cayó, no concluyente** |
+| en problema | 18/34 (53%) | 11/41 (27%) | 0,021 | ⚠️ sobrevive, pero ver abajo |
+
+La diferencia de velocidad **desaparece** al controlar por ciudad. La de "guías en problema"
+sobrevive, **pero no es confiable** por dos razones: (a) las dos usan vocabularios distintos y
+Coordinadora reporta con más granularidad — `No se localiza dirección` y `Se visita no se logra
+entrega` pueden ser el mismo evento físico que Interrapidísimo llama `Intento de entrega`;
+(b) en Cartagena, la ciudad de mayor coincidencia, **Coordinadora tiene 6 guías e Interrapidísimo 0.**
+Las mezclas casi no se cruzan.
+
+#### 🔴 El dato que decide la estrategia
+
+Para detectar una diferencia de 20% vs 30% de devolución (80% de poder, 95% de confianza) hacen falta
+**~293 guías RESUELTAS por transportadora.** Coordinadora tiene **5 maduras**. A ~7 guías/día más
+10 días de rezago, son **~51 días más de espera.**
+
+**Conclusión: alternar 50/50 al azar nacional es el peor de los mundos.** Parte el volumen para que
+ninguna junte dato suficiente, y como no aleatoriza por ciudad, lo poco que junta está contaminado.
+**No se aprende nada Y se carga el riesgo.**
+
+#### ✅ RECOMENDACIÓN TRANSPORTADORAS
+
+1. **Interrapidísimo como default** de aquí en adelante. No porque esté probado mejor — **no lo está**
+   —, sino porque: tiene 245 guías de historia y una tasa estable y conocida (19,6%), es la única con
+   volumen suficiente para **detectar si se degrada**, y su flete queda en la mitad ($20.283 promedio).
+2. **Coordinadora NO se descarta, pero se prueba bien:** mandarla **solo a Bogotá y Medellín**,
+   alternando guía por guía contra Interrapidísimo en esas mismas ciudades. Ahí hay volumen y hay
+   línea base de comparación (Bogotá Interrapidísimo: 7/23 = 30% maduro). Así en 2–3 semanas hay una
+   comparación pareada limpia, en vez de 51 días de ruido.
+3. **Dejar de mandar Coordinadora a la costa** hasta que haya veredicto. Hoy está cargando Cartagena,
+   Barranquilla, Montería y Sincelejo, que es justo donde cualquier transportadora se ve mal, y eso
+   la condena sin juicio.
+4. **Reclamar las 6 mal enrutadas**, pero sin sacar conclusión: 4 de las 6 salieron **el mismo día
+   (10-sep, de un lote de 9)**. Eso es **un evento**, no una tasa.
+5. **Servientrega sigue vetada** (0-AA). Su 17,0% no es mejor que el resto y en Medellín ya falló.
+
+#### 💰 Dónde está la plata de verdad (para priorizar)
+
+| palanca | tamaño | acción |
+|---|---|---|
+| 🔴 **freno de Meta** | **$72.000–169.000 por DÍA** | meter colchón de saldo — hoy mismo |
+| 🟠 tasa de devolución 19,0% | $2.464.218/mes (60 dev × $40.970) | bajar 3 puntos = $389.962/mes |
+| 🟡 ciudades malas | $60.949/mes solo en fletes quemados | Cartagena **4/7 = 57%**, Bogotá 7/23 = 30% |
+| ⚪ elegir transportadora | **indistinguible con el dato actual** | no es una palanca todavía |
+
+**El orden importa: el freno de Meta cuesta en UN día lo que la elección de transportadora podría
+ahorrar en un mes entero — y esa elección, además, todavía no se puede hacer con evidencia.**
+
+Cartagena con **57% de devolución** (4 de 7) quema más plata que cualquier diferencia entre
+transportadoras. **Ninguna transportadora arregla una ciudad que devuelve más de la mitad.** Eso se
+arregla con política de venta (recaudo anticipado o confirmación reforzada), no cambiando de guía.
+
+### Scripts nuevos de esta sección
+
+| script | qué hace |
+|---|---|
+| `analisis/campana-hoy-12sep.py` | sábado vs sábado mismo tramo + uso de presupuesto por conjunto |
+| `analisis/saldo-reconstruido-12sep.py` | libro de caja desde `/activities` + historial de cambios |
+| `analisis/saldo-hora-a-hora-modelo.py` | saldo hora por hora anclado a `spend_cap − amount_spent` |
+| `analisis/veredicto-transportadoras-12sep.py` | 23 estados mapeados a mano + IC + estratificación |
+
+### ⚠️ Error #6 para la lista de la sección anterior
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 6 | *"Servientrega tiene 0% de devoluciones y Coordinadora 0%"* | **bug de clasificación: `ENTREGADO A REMITENTE` es una devolución, y Coordinadora nunca escribe la palabra "devolución". Reales: 17,0% y 20,0%** |
+
+Y un error #7, que alcancé a corregir solo antes de mandarlo:
+
+| # | lo que iba a afirmar | lo que era |
+|---|---|---|
+| 7 | *"Coordinadora es significativamente peor, p=0,006"* | **confundido por la mezcla de ciudades: le dan Cartagena y la costa, a Interrapidísimo le dan Bogotá. Al estratificar, la diferencia de entrega se cae (p=0,163)** |
+
+🔑 **Es la misma trampa de siempre con otra cara: comparar dos grupos que no son comparables.
+Antes: ventanas de distinta madurez. Ahora: transportadoras con distinta mezcla de ciudades.**
+
+
+---
+
+## 0-AÑ · ⛔ CORRECCIÓN DE 0-AN: EL FRENO **NO** ERA POR EL SALDO (sáb 12-sep-2026, 17:00)
+
+> **El dueño desconfió de la conclusión de 0-AN y tenía razón. Esta sección la anula parcialmente.
+> Lo que sigue reemplaza el diagnóstico y la recomendación de saldo de 0-AN.**
+
+Su pregunta fue exactamente la correcta: *"¿Meta dice que si el saldo no es tan alto puede haber
+afectaciones en la campaña?"* — y él aclaró que **nunca deja llegar la cuenta a cero**; lo que sí sabe
+(y está bien documentado en 0-AI) es que **cuando llega a cero** el gasto se dispara al recargar.
+
+### Lo que dice el dato: las regiones no están asfixiadas, están CARAS
+
+| conjunto | gasto 9-12 sep | conv | $/conv |
+|---|---|---|---|
+| Domiciliarios \| Eje Cafetero | $4.825 | 2 | **$2.413** |
+| Domiciliarios \| Santander | $5.359 | 5 | $1.072 |
+| Domiciliarios \| Tolima Huila | $4.860 | 5 | $972 |
+| Domiciliarios \| Valle del cauca | $8.592 | 3 | **$2.864** |
+| **las 4 juntas** | **$23.636** | **15** | **$1.576** |
+| referencia de la cuenta | — | — | **$880** |
+
+**Las 4 regiones cuestan 79% más que el promedio de la cuenta.** El 10-sep (su primer día completo)
+Meta les dio presupuesto de exploración: gastaron ~$4.000 cada una y trajeron 1, 3, 4 y 1
+conversaciones. Midió $1.576/conv contra $880 disponibles en otra parte, **y las apagó. Meta hizo lo
+correcto.**
+
+No era el saldo. **Era el optimizador funcionando bien.**
+
+### De dónde salió realmente el "hueco" de gasto del sábado
+
+Sábado 5-sep vs sábado 12-sep, mismo tramo (00:00–14:59), conjunto por conjunto:
+
+| conjunto | 5-sep | 12-sep | dif |
+|---|---|---|---|
+| Domiciliarios VIDEO | $42.527 (conv $709) | $36.664 (conv $917) | −$5.863 |
+| Domiciliarios | $18.897 ($787) | $14.134 ($831) | −$4.763 |
+| **Publico ABIERTO video** | **$10.595 (conv $3.532)** | **$0 — PAUSADO** | **−$10.595** |
+| **Publico ABIERTO - Creativo** | **$10.397 (conv $3.466)** | **$0 — PAUSADO** | **−$10.397** |
+| Motorizados | $9.483 ($862) | $3.169 ($792) | −$6.314 |
+| TEST Creativos | $9.212 ($837) | $5.454 ($909) | −$3.758 |
+| Valle del cauca | $3.791 ($632) | $83 | −$3.708 |
+| **TOTAL** | **$104.902 · $889/conv** | **$59.726 · $878/conv** | |
+
+**$20.992 del hueco — casi la mitad — son los dos conjuntos "Publico ABIERTO" que están pausados
+desde el 9-sep. Y estaban comprando a $3.532 y $3.466 por conversación**, o sea **4 veces más caro**
+que la cuenta. Pausarlos fue una decisión correcta que **mejoró** la cuenta.
+
+### ⛔ El número que estaba mal en 0-AN
+
+0-AN dijo: *"~$54.000 sin gastar × $884/conv = 3 a 7 pedidos perdidos = $72.000–169.000 de utilidad
+perdida hoy."*
+
+**Está mal, y el error es grave: asumió que la plata que no se gastó se habría convertido a $884.**
+La única evidencia que hay de qué pasa cuando se empuja más plata en esta cuenta es justamente
+"Publico ABIERTO": **la volumen extra costaba $3.500/conv, no $884.** A ese precio no hay utilidad,
+hay pérdida.
+
+**Es la misma trampa de siempre, disfrazada otra vez:** valorar volumen que no existe al precio del
+volumen que sí existe. El $/conv promedio **no** es el $/conv marginal.
+
+### ✅ Lo que realmente hay que concluir del sábado 12-sep
+
+- **La campaña está BIEN.** $878/conv contra $889 del sábado pasado. Banda normal ($732–$925).
+- El gasto es menor porque **se apagó lo caro**, no porque falte plata.
+- Las regiones seguirán apagadas mientras cuesten $1.576/conv. **Eso es correcto.**
+- ⛔ **NO hay que meter colchón de saldo por razones de rendimiento.** La recomendación de 0-AN queda
+  anulada.
+
+### Sobre el saldo: qué está probado y qué no
+
+| afirmación | estado |
+|---|---|
+| Saldo en **$0** → la entrega se detiene y al recargar Meta gasta de golpe, arruinando el $/conv del día | ✅ **PROBADO** en esta cuenta (0-AI, evento del 9-sep, verificado hora por hora) |
+| Saldo **bajo pero positivo** → Meta frena la entrega gradualmente | ❌ **SIN EVIDENCIA.** Hoy la cuenta amaneció con el saldo MÁS ALTO de la semana ($129.663) y fue el día de menos entrega. **El dato lo contradice.** |
+| Meta documenta oficialmente que un saldo bajo afecta la entrega | ❌ **NO ENCONTRADO.** Solo blogs de marketing que lo afirman sin fuente. Lo único documentado de verdad es el **límite de gasto de la cuenta** (account spending limit), que es un **techo duro que detiene todo**, no un freno gradual — y es otra cosa distinta del saldo prepago. |
+
+**Regla operativa que SÍ sirve:** recargar para que **nunca toque $0** (Meta corta bajo ~$16.000–20.000,
+no bajo cero — eso sí se midió). Por encima de eso, **más saldo no compra mejor rendimiento.**
+El goteo diario del dueño está bien. No hay que cambiarlo.
+
+### 🔧 Lo que queda sin explicar (y hay que decirlo, no rellenarlo)
+
+VIDEO va al 66% de su presupuesto, pero Domiciliarios al 31%, TEST Creativos al 21% y Motorizados al
+34% — **y su $/conv es bueno ($831, $909, $792).** No sé por qué Meta no les da más plata. Hipótesis
+posibles (ninguna verificada): audiencia solapada con VIDEO, que se está comiendo a los mismos
+usuarios; o techo real de audiencia a ese precio.
+
+**No lo voy a afirmar sin medirlo.** Se mide mirando el solapamiento de segmentación y el alcance
+incremental. Pendiente.
+
+### ⚠️ Errores #8 y #9
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 8 | *"el saldo bajo está frenando la entrega; meter colchón de $310.000–460.000"* | **falso. Hoy tenía el saldo más alto de la semana y fue el día de menos entrega. Las regiones están apagadas porque cuestan $1.576/conv contra $880.** |
+| 9 | *"el presupuesto sin gastar son $72.000–169.000 de utilidad perdida hoy"* | **falso. Valoré volumen inexistente al precio promedio. La evidencia de "Publico ABIERTO" dice que el volumen marginal cuesta $3.500/conv: a ese precio es pérdida, no utilidad.** |
+
+🔑 **Lección: presenté una hipótesis con tabla, umbrales y plan de acción, y eso la hizo parecer un
+hallazgo. La ceremonia de presentación no es evidencia.** El dueño la frenó con una sola pregunta:
+*"¿Meta dice eso?"* — y no, Meta no lo dice.
+
+### Corrección al veredicto de transportadoras (matiz, no error)
+
+0-AN recomendó "evitar Coordinadora en la costa". **La razón que dio suena a que Coordinadora es mala
+en la costa, y eso NO está probado.** El motivo real es de **diseño de medición**:
+
+- **La costa es mala con cualquiera.** Cartagena: 4 de 7 = **57%** de devolución, sumando todas.
+- Hoy Coordinadora carga Cartagena(6), Barranquilla(3), Montería(2), Sincelejo(2)... e Interrapidísimo
+  carga Bogotá(11).
+- Con esa reparto **es imposible saber** si las devoluciones son culpa de la transportadora o del
+  destino. **Los dos efectos van pegados.**
+
+Mandarla a Bogotá y Medellín **no es un castigo ni una precaución de calidad: es para poder medirla**
+contra una línea base que ya existe (Bogotá Interrapidísimo: 7/23 = 30% maduro). **Nada dice que
+Coordinadora sea mala en la costa. Lo que pasa es que en la costa no se puede medir nada.**
+
+
+### 0-AÑ.1 · El pendiente resuelto: TRES conjuntos con la segmentación IDÉNTICA
+
+Leí la segmentación real de los 8 conjuntos activos. Resultado:
+
+| conjunto | $/día | geo | edad | intereses |
+|---|---|---|---|---|
+| **Domiciliarios VIDEO** | $55.000 | **Bogotá, Medellín** | 20-65 | **Rappi, Delivery Person, Delivery** |
+| **Domiciliarios** | $45.000 | **Bogotá, Medellín** | 20-65 | **Rappi, Delivery Person, Delivery** |
+| **TEST Creativos** | $25.000 | **Bogotá, Medellín** | 20-65 | **Rappi, Delivery Person, Delivery** |
+| Motorizados | $9.000 | Distrito Especial (Bogotá) | 18-65 | ninguno (abierto) |
+| Tolima Huila | $5.000 | Huila, Tolima | 20-65 | Rappi, Delivery Person, Delivery |
+| Eje Cafetero | $5.000 | Quindío, Risaralda, Caldas | 20-65 | idem |
+| Santander | $5.000 | Santander | 20-65 | idem |
+| Valle del Cauca | $5.000 | Valle del Cauca | 20-65 | idem |
+
+**Los tres primeros son la MISMA audiencia, palabra por palabra: $125.000/día compitiendo por
+exactamente las mismas personas.** Más Motorizados, que con público abierto en Bogotá los contiene.
+**~$134.000/día sobre el mismo pozo.**
+
+Es probablemente **deliberado**: es una prueba de creativos (video vs imagen vs creativos nuevos)
+sobre una audiencia fija. Como diseño de test tiene sentido. El costo es que la entrega se reparte
+desigual y las cifras de cada conjunto **no son comparables entre sí** — se están robando usuarios.
+
+**Esto es la explicación más probable de por qué VIDEO va al 66% y Domiciliarios al 31%.**
+Pero ⚠️ **no la afirmo cerrada**, porque hay un dato que no encaja: hoy **Domiciliarios tiene MEJOR
+$/conv que VIDEO ($831 vs $917) y aun así recibe menos plata.** Si Meta simplemente estuviera
+premiando al ganador, sería al revés. Falta algo por entender.
+
+#### ❌ Y de paso mata mi otra hipótesis sobre las regiones
+
+Yo había dicho que las regiones podían estar perdiendo la subasta contra los conjuntos grandes.
+**Falso: no hay solapamiento geográfico.** Los grandes son Bogotá+Medellín; las regiones son
+Huila/Tolima, Eje Cafetero, Santander, Valle. **No se cruzan.**
+
+Las regiones no compiten con nadie. **Están caras por mérito propio ($1.576/conv contra $880).**
+Eso ya quedaba confirmado por el costo; ahora también por la segmentación.
+
+#### Candidato para DESPUÉS del 15-sep (no antes)
+
+Evaluar consolidar VIDEO + Domiciliarios + TEST Creativos, o al menos aceptar que sus números
+individuales no se pueden leer por separado. ⛔ **Es un cambio estructural, el más contaminante de
+todos: no se toca antes del martes 15.**
+
+
+---
+
+## 0-AO · FIN DE SEMANA 12-13 SEP: DEGRADACIÓN UNIFORME = SEÑAL DE DEMANDA, NO DE CREATIVO (lun 14-sep, 00:00)
+
+### Sábado normal, domingo malo
+
+Comparación sábado-contra-sábado y domingo-contra-domingo, **tramo 00:00–16:59** (se corta a las 17:00
+porque ahí el domingo 13 tuvo una caída, ver abajo):
+
+| fecha | gasto | conv | $/conv |
+|---|---|---|---|
+| 05-sep Sat | $137.191 | 152 | $903 |
+| **12-sep Sat** | $66.033 | 73 | **$905** ← idéntico |
+| 06-sep Sun | $114.887 | 134 | $857 |
+| **13-sep Sun** | $106.971 | 97 | **$1.103** ← +29% |
+
+El sábado quedó **exactamente igual** que el sábado anterior. El domingo se encareció 29%.
+
+### ⚠️ CORRECCIÓN: la caída del domingo 17:00–21:00 NO fue hueco de saldo
+
+`saldo-por-hora.py` marcó `<-- SECO` las horas 17:00–21:00 del domingo. **Está mal.** El libro de caja
+dice que a esa hora había **~$59.000 disponibles** (recarga de $100.000 a las 11:13 Bogotá).
+
+Lo que pasó de verdad, mirando el gasto acumulado por conjunto:
+
+| conjunto | presup | a 14h | a 16h | a 17h | final | % |
+|---|---|---|---|---|---|---|
+| Domiciliarios VIDEO | $55.000 | $38.498 | $47.950 | $47.952 | $48.120 | 87% |
+| **Domiciliarios** | **$45.000** | $38.029 | **$46.599** | $46.601 | $46.670 | **104%** ← topado |
+| TEST Creativos | $25.000 | $5.561 | $6.972 | $7.675 | $15.536 | 62% |
+
+**Domiciliarios agotó su presupuesto diario a las 16:00** y se apagó. VIDEO se frenó casi al mismo
+tiempo (87%, sin llegar al tope). Solo TEST Creativos siguió y duplicó su gasto en la noche.
+
+🔧 **Limitación del script, anotada:** `saldo-por-hora.py` deduce "SECO" **solo del gasto bajo**, sin
+mirar el saldo. Por eso confunde *"se quedó sin plata en la cuenta"* con *"se topó con el presupuesto
+del conjunto"*, que son cosas distintas y llevan a acciones opuestas. **Antes de creerle un `SECO`,
+cruzar con `spend_cap − amount_spent`.**
+
+### 🎯 EL HALLAZGO: los CUATRO conjuntos se encarecieron a la vez
+
+$/conv por bloque (04-08 sep = después del pago del 30-ago · 09-13 sep = valle antes del 15):
+
+| conjunto | 04-08 sep | 09-13 sep | cambio |
+|---|---|---|---|
+| Domiciliarios VIDEO | $726 | $888 | **+22%** |
+| Domiciliarios | $702 | $946 | **+35%** |
+| TEST Creativos | $599 | $833 | **+39%** |
+| Motorizados | $718 | $1.131 | **+58%** |
+
+**Los cuatro, sin excepción, entre +22% y +58%.**
+
+Esto es lo que discrimina:
+
+- Un problema de **creativo o audiencia** golpea a **uno o dos** conjuntos (el que tiene el creativo
+  gastado, el que tiene la audiencia saturada). **No a los cuatro parejo.**
+- Un problema de **demanda** — la gente sin plata antes de la quincena — golpea **a todos a la vez**,
+  porque el precio de la subasta no cambió: cambió cuánta gente contesta.
+
+Y la frecuencia sigue en **1.03–1.10** en todos (verificado el 12-sep), así que **no es desgaste**.
+
+> ⚠️ Casi mando otra conclusión falsa. El domingo VIDEO marcó **$1.375/conv** y parecía que se estaba
+> dañando y encima acaparando presupuesto. **Es ruido de un día con 35 conversaciones.** Al mirar los
+> 10 días, VIDEO (+22%) es el que **menos** se degradó de los cuatro. La lectura de un solo día habría
+> señalado al conjunto equivocado.
+
+### 🧪 EL TEST DE MAÑANA (martes 15-sep) — predicción escrita ANTES de ver el dato
+
+Esta hipótesis quedó registrada en 0-AK **antes** de este fin de semana. Es la forma honesta de
+probarla: predecir primero, mirar después.
+
+**Predicción:** si la causa es la quincena, el 15 y 16-sep el $/conv debe **volver a la banda
+$600–$750** en los cuatro conjuntos a la vez, sin tocar nada.
+
+| resultado el 15-16 sep | conclusión |
+|---|---|
+| $/conv baja a $600–750 en los 4 | ✅ **es la quincena.** El ciclo de pago manda. Se planea el gasto alrededor de las quincenas y no se toca nada más. |
+| $/conv baja solo en algunos | ⚠️ hay quincena **y** además un problema de conjunto. Separar. |
+| $/conv NO baja | ❌ **la hipótesis de la quincena muere.** Hay algo estructural y hay que buscarlo en serio (creativo, competencia, mercado). |
+
+⛔ **Por esto mismo NO se toca nada hoy 14-sep.** Cualquier cambio hoy arruina la única lectura limpia
+que vamos a tener este mes.
+
+### Estado operativo al lunes 14-sep 00:00
+
+| | |
+|---|---|
+| saldo (`spend_cap − amount_spent`) | **$47.784** |
+| consumo del domingo | $118.167 |
+| piso de corte medido | ~$16.000–20.000 |
+| **se seca** | **~06:00 del lunes si no recarga** |
+
+**Acción del día: recargar. Nada más.**
+
+📦 **Recordatorio del despacho (regla 0-AM):** el lote del lunes 14 arrastra **viernes noche + sábado +
+domingo ≈ 3 días de ventas**. Hay que **restarle las 8 guías del viernes que ya se contaron** para no
+contar doble.
+
+### ⚠️ Error #10 (evitado, no cometido)
+
+| # | lo que iba a afirmar | lo que era |
+|---|---|---|
+| 10 | *"VIDEO se está dañando ($718→$1.375) y encima se lleva el presupuesto"* | **ruido de un día con 35 conv. En 10 días VIDEO es el que MENOS se degradó (+22%). La degradación es uniforme en los 4 = demanda, no creativo.** |
+
+
+---
+
+## 0-AP · COLMENA Y LAS REGIONES: QUÉ DICE EL DATO (lun 14-sep, 00:30)
+
+### 🚨 "Colmena" no es lo que el nombre dice
+
+Leí la segmentación real de los 3 conjuntos pausados. **Ninguno usa un público de clientes:**
+
+| conjunto | estado | presup | geo | intereses | público personalizado |
+|---|---|---|---|---|---|
+| Publico ABIERTO - Creativo | PAUSED | $20.000 | **toda Colombia** | ninguno | ❌ **NINGUNO** |
+| Publico ABIERTO video | CAMPAIGN_PAUSED | $20.000 | **toda Colombia** | ninguno | ❌ **NINGUNO** |
+| Domiciliarios \| Colmena | PAUSED | $20.000 | **toda Colombia** | ninguno | ❌ **NINGUNO** |
+
+Y más importante:
+
+```
+GET act_.../customaudiences  ->  ❌ NO HAY NINGÚN PÚBLICO PERSONALIZADO EN LA CUENTA
+```
+
+**Los tres son público abierto de toda Colombia, 18-65, sin ningún filtro.** El nombre "Colmena"
+no corresponde a lo que el conjunto realmente hace. **Prender "colmena" hoy no es prender el público
+de clientes: es prender público abierto nacional.**
+
+### Y ese público abierto está PROBADO malo (no es ruido)
+
+Rendimiento acumulado 25-ago a 14-sep, con IC 95% del $/conv (Poisson sobre el conteo de conversaciones):
+
+| conjunto | gasto | conv | $/conv | IC 95% | veredicto |
+|---|---|---|---|---|---|
+| Publico ABIERTO video | $93.526 | 39 | $2.398 | **$1.825 – $3.495** | 🔴 **todo el intervalo por encima de la cuenta** |
+| Publico ABIERTO - Creativo | $43.739 | 13 | $3.365 | **$2.180 – $7.372** | 🔴 **todo el intervalo por encima** |
+| Domiciliarios \| Colmena | $7.667 | 4 | $1.917 | $968 – $95.837 | ⛔ sin dato útil |
+| **los tres juntos** | **$144.932** | **56** | **$2.588** | | vs cuenta **~$800-900** |
+
+Los dos primeros **no son "caros por mala suerte": el intervalo completo de confianza está por encima
+del promedio de la cuenta.** Son ~3× más caros, con evidencia suficiente. Pausarlos el 9-sep fue
+correcto y **volver a prenderlos sería tirar plata.**
+
+### ✅ Lo que sí habría que hacer con la colmena (y en qué orden)
+
+La idea original —usar el **público de clientes** del export con teléfonos— **sigue siendo buena, pero
+todavía no existe.** El requisito previo es crear el público personalizado, que hoy no está.
+
+Orden correcto:
+
+1. **Crear el público personalizado** subiendo la lista de teléfonos de clientes. ⚠️ Esto **NO afecta
+   la entrega**, así que se puede hacer sin contaminar el test del 15.
+2. ⚠️ **Advertencia de tamaño:** con ~350 clientes en el último mes, el público va a quedar **muy
+   chico**. Meta necesita unos cuantos cientos de coincidencias para entregar decente, y para un
+   *lookalike* decente se recomiendan **1.000–5.000** registros. Con 350 el lookalike va a salir flojo.
+   **Conviene juntar todos los clientes históricos, no solo el último mes.**
+3. Recién con el público creado, **crear un conjunto nuevo** que lo use. **No reciclar los conjuntos
+   "ABIERTO"**, que arrastran historial malo.
+4. Nada de esto antes del test del 15-16.
+
+### ⚠️ CORRECCIÓN: condené las 4 regiones y solo UNA tiene evidencia
+
+Dije que "las 4 regiones cuestan $1.576/conv, están caras por mérito propio". **Fue demasiado
+general.** Con IC 95%:
+
+| conjunto | gasto | conv | $/conv | IC 95% | veredicto honesto |
+|---|---|---|---|---|---|
+| **Valle del Cauca** | **$57.864** | **46** | **$1.258** | **$976 – $1.769** | 🔴 **PROBADO peor.** Intervalo completo por encima de ~$900 |
+| Santander | $5.576 | 5 | $1.115 | $594 – $9.033 | ⛔ **sin veredicto.** Se solapa con la banda normal |
+| Tolima Huila | $4.981 | 5 | $996 | $531 – $8.069 | ⛔ **sin veredicto.** Se solapa |
+| Eje Cafetero | $5.026 | 2 | $2.513 | — | ⛔ **sin veredicto.** 2 conversaciones |
+
+**Solo Valle del Cauca está probado peor**, y es el único con dato real (46 conversaciones, intervalo
+estrecho). **Los otros tres tienen 2 a 5 conversaciones cada uno: no alcanza para condenarlos ni para
+absolverlos.** Santander a $1.115 y Tolima a $996 podrían estar perfectamente bien.
+
+### El problema real de las 3 regiones nuevas: están en el limbo
+
+Reciben ~$50/día cada una porque Meta las frenó. A ese ritmo **nunca van a juntar dato.** Están
+gastando un poco y aprendiendo nada — el peor de los dos mundos.
+
+**Decisión necesaria después del 15** (no antes), y son solo dos opciones honestas:
+
+| opción | qué implica |
+|---|---|
+| **A. Probarlas en serio** | darles presupuesto suficiente para ~30-40 conversaciones cada una en una ventana limpia de 7 días. Con $1.000/conv eso son ~$5.000/día **de verdad entregados**, no $50. |
+| **B. Apagarlas** | y volver a la concentración en Bogotá+Medellín, que es donde está el dato bueno. |
+
+**Dejarlas como están es la peor opción de las tres.**
+
+Valle del Cauca sí tiene veredicto: **apagarlo o rediseñarlo**, ya está probado a $1.258 con intervalo
+estrecho.
+
+### ⚠️ Error #11
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 11 | *"las 4 regiones cuestan $1.576/conv, están caras por mérito propio"* | **solo Valle del Cauca está probado (46 conv, IC $976-$1.769). Santander (5 conv), Tolima (5) y Eje Cafetero (2) NO tienen dato suficiente. Promedié cuatro cosas de las cuales tres eran ruido.** |
+
+🔑 **Patrón repetido: promediar un grupo y tratar el promedio como veredicto de cada miembro.** Es
+primo hermano del error de las transportadoras (promediar ciudades distintas). **Antes de condenar un
+conjunto, mirar cuántas conversaciones tiene ÉL, no el grupo.**
+
+
+---
+
+## 0-AQ · ⛔ ANULA 0-AP: EL COLMENA ES OTRO PRODUCTO Y SU EQUILIBRIO ES $3.322, NO $900 (lun 14-sep, 01:00)
+
+> **El dueño frenó la conclusión de 0-AP. Tenía razón, y el error es de los peores de esta bitácora:
+> el número correcto YA ESTABA EN ESTE ARCHIVO y no lo consulté.**
+
+### El error
+
+En 0-AP comparé el $/conversación de los conjuntos del colmena contra **"el promedio de la cuenta,
+~$800-900"** y los declaré *"PROBADOS malos"*.
+
+**Eso es comparar dos productos con márgenes distintos:**
+
+| | Tradicional | **Colmena** |
+|---|---|---|
+| precio | $59.900 + envío | **$149.900 con envío gratis** |
+| costo | — | $85.000 |
+| utilidad por venta | $24.129 | **$40.968** |
+| **equilibrio por conversación** | ~$845 | **$3.322** |
+
+Un producto que deja **$40.968** por venta puede pagar mucho más por conversación que uno que deja
+$24.129. **El promedio de la cuenta (~$800-900) es el equilibrio del TRADICIONAL. Aplicárselo al
+colmena no tiene sentido.**
+
+### Los mismos datos, contra el equilibrio correcto
+
+| conjunto | gasto | conv | $/conv | IC 95% | vs equilibrio **$3.322** | veredicto |
+|---|---|---|---|---|---|---|
+| **Publico ABIERTO video** | $93.526 | 39 | **$2.398** | $1.825 – $3.495 | **72% del equilibrio** | 🟢 **DA PLATA** |
+| Publico ABIERTO - Creativo (estático) | $43.739 | 13 | $3.365 | $2.180 – $7.372 | **101%** | 🔴 justo en el equilibrio → sigue apagado |
+| Domiciliarios \| Colmena | $7.667 | 4 | $1.917 | $968 – $95.837 | 58% | ⛔ sin dato (4 conv) |
+
+**El video del colmena NO estaba malo: corría al 72% de SU equilibrio, o sea ganando.** Y esto
+**coincide con lo que ya decía 0-AH**: *"$2.611/conversación contra el equilibrio del colmena de
+$3.322 → 78,6% de su equilibrio. El canal del colmena no perdía plata."*
+
+El estático a $3.365 sí está en el filo (0-AH lo midió en $4.044 = 1,22× su equilibrio) — **y por eso
+0-AD ya había decidido apagarlo. Esa parte estaba bien.**
+
+### Y había una decisión tomada que yo contradije
+
+**0-AG, decisión del 10-sep:** *"La campaña del colmena se vuelve a prender **después del veredicto
+del 14**, con audiencia de clientes, **$8-10.000/día** y ventana de 14 días."*
+
+**Hoy es el 14.** Yo dije *"no la prenda, es tirar plata"* — **contra una decisión ya tomada, ya
+documentada y bien fundamentada.** No la revisé antes de opinar.
+
+### ✅ Recomendación corregida
+
+**Sí, préndala.** Concretamente:
+
+| qué | cómo |
+|---|---|
+| **cuál conjunto** | **solo el VIDEO** (`Publico ABIERTO video`). El estático NO — está en su equilibrio |
+| **presupuesto** | **$8.000–10.000/día**, como dice 0-AG |
+| **ventana** | 14 días. El colmena cierra lento (8,1%) y necesita ventana larga |
+| **gatillo de alarma** | **$3.322/conversación.** Por debajo gana; por encima se apaga |
+| **público de clientes** | ⚠️ **no existe todavía** (ver 0-AP: la cuenta no tiene ningún público personalizado). **Es una MEJORA, no un requisito**: el video ya daba plata con público abierto |
+
+**Lo único que 0-AP acertó sobre la colmena:** no hay público personalizado creado. Pero eso no
+bloquea prenderla — el video rendía al 72% de su equilibrio **con público abierto**.
+
+### Sobre el test del 15 (la duda legítima)
+
+Prender el colmena hoy mete una variable un día antes del test de la quincena. Es aceptable **si el
+test se lee por conjunto, no a nivel de cuenta** — que además es como hay que leerlo:
+
+- El test es sobre los **4 conjuntos del tradicional** (VIDEO, Domiciliarios, TEST Creativos, Motorizados).
+- El colmena es **otro producto, otra campaña, otro embudo**. Sus conversaciones no se mezclan.
+- $8-10.000/día contra $134.000/día = **7% más de gasto**. Efecto chico.
+- ⚠️ **Riesgo real a vigilar:** el colmena es Colombia amplio y los del tradicional son Bogotá+Medellín.
+  **Hay solapamiento de subasta ahí.** Si el 15-16 los 4 del tradicional se mueven raro, hay que
+  descontar este cambio antes de culpar a la quincena.
+- 📌 **Anotar la hora exacta del encendido** para poder separar los efectos.
+
+**Costo de esperar al 17 en vez de prender hoy:** cada venta de colmena vale **$40.968**. Tres días de
+espera no son gratis. Por eso la recomendación es prender hoy y leer el test por conjunto.
+
+### ⚠️ Error #12 — el más grave hasta ahora
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 12 | *"los conjuntos del colmena están PROBADOS malos: $2.398 y $3.365 contra el promedio de la cuenta de $800-900"* | **comparé un producto de $149.900 (equilibrio $3.322) contra el equilibrio de uno de $59.900. El video del colmena corría al 72% de SU equilibrio: DABA PLATA. Y el número correcto ($3.322) ya estaba escrito en 0-AG y 0-AH, en este mismo archivo.** |
+
+🔑 **Dos lecciones, y la segunda es la importante:**
+
+1. **Nunca comparar $/conversación entre productos de margen distinto.** El umbral es
+   *utilidad × tasa de cierre*, y es propio de cada SKU. **Cada producto tiene su propio equilibrio:**
+   tradicional ~$845, colmena **$3.322**.
+2. 🔴 **Antes de opinar sobre algo que ya se analizó, LEER EL ARCHIVO.** Tenía 7.600 líneas de memoria
+   con el número exacto y el plan ya decidido, y opiné desde cero. **Buscar en el archivo madre por
+   palabra clave (`grep -i colmena`) es obligatorio antes de contradecir una decisión pasada.**
+
+
+### 0-AQ.1 · CON CUÁNTO PRENDER EL COLMENA (decisión del 14-sep)
+
+#### Lo que dice el histórico del conjunto `Publico ABIERTO video`
+
+| fecha | gasto | conv | $/conv | % del equilibrio $3.322 |
+|---|---|---|---|---|
+| 04-sep vie | $7.361 | 6 | $1.227 | 37% 🟢 |
+| 05-sep sáb | $20.687 | 9 | $2.299 | 69% 🟢 |
+| 06-sep dom | $19.246 | 10 | $1.925 | 58% 🟢 |
+| **07-sep lun** | $16.165 | 4 | **$4.041** | **122% 🔴** |
+| 08-sep mar | $18.717 | 6 | $3.120 | 94% 🟢 |
+| 09-sep mié | $11.350 | 4 | $2.838 | 85% 🟢 |
+| **acumulado** | **$93.526** | **39** | **$2.398** | **72% 🟢** |
+
+**No se encarece al subir el gasto** (lo contrario de lo que pasa con el tradicional):
+
+| | gasto/día promedio | $/conv |
+|---|---|---|
+| los 3 días de MENOR gasto | $11.625 | $2.491 |
+| los 3 días de MAYOR gasto | $19.550 | **$2.346** |
+
+Entre $7.000 y $21.000/día **no hay castigo por escalar.** Eso vuelve conservador el rango de 0-AG.
+
+#### 🔴 Pero el número frágil no es el $/conv: es la TASA DE CIERRE
+
+El equilibrio de $3.322 sale de: **utilidad $40.968 × cierre 8,1% = $3.318**.
+
+Y ese **8,1% viene de 3 ventas sobre ~37 conversaciones** (0-AG). Con esa base, el IC 95% de la tasa de
+cierre va de **~2,8% a ~21,4%**, o sea el equilibrio real está entre **$1.147 y $8.767**.
+
+**Traducido:** a $2.398/conv el colmena gana si la tasa de cierre está por encima de
+**$2.398 ÷ $40.968 = 5,85%**. El dato dice 8,1%, pero con 3 ventas no alcanza para estar seguros.
+
+👉 **El $/conv ya está bien medido (39 conversaciones). Lo que falta medir es el cierre.**
+El presupuesto se dimensiona para **conseguir ventas**, no para conseguir conversaciones.
+
+#### ✅ DECISIÓN: $10.000/día
+
+El techo del rango de 0-AG, porque la elasticidad no castiga. Números a 14 días:
+
+| escenario de cierre | ventas esperadas | utilidad | gasto | resultado |
+|---|---|---|---|---|
+| 8,1% (lo medido) | 4,7 | $192.550 | $140.000 | **+$52.550** |
+| 5,85% (el punto de equilibrio) | 3,4 | $140.000 | $140.000 | **$0** |
+| 4% (escenario malo) | 2,3 | $95.000 | $140.000 | **−$45.000** |
+
+**Riesgo acotado a ~$45.000 en 14 días contra una ganancia esperada de ~$52.550.** Y en los tres casos
+se compra la información que falta: **pasa de 3 ventas acumuladas a 7-8**, que es lo que permite
+cerrar la pregunta del cierre.
+
+⛔ **NO subir a $15-20.000 todavía**, aunque la elasticidad lo aguante: multiplica la exposición sobre
+el número que justamente no conocemos.
+
+#### Reglas de lectura (para no repetir errores de esta bitácora)
+
+| regla | por qué |
+|---|---|
+| **NO juzgar por un día** | el 7-sep marcó $4.041 (122%) y era ruido de 4 conversaciones. Habría gatillado una falsa alarma |
+| **Gatillo real: $3.322/conv sostenido ~7 días** | con al menos 25-30 conversaciones acumuladas |
+| **Contar las ventas del colmena aparte** | la tasa de cierre es el número que decide todo, y **no está en Meta**: sale de WhatsApp y de las guías |
+| **Revisión a los 7 y a los 14 días** | no antes |
+| **Solo el VIDEO** | el estático corre a 101% de su equilibrio. Sigue apagado |
+| **Anotar la hora del encendido** | el 15-16 es el test de la quincena del tradicional; hay solapamiento de subasta en Bogotá+Medellín |
+
+
+### 0-AQ.2 · ⛔ CORRIGE 0-AQ.1: el presupuesto es **$16.000/día**, no $10.000
+
+Al poner $10.000 en Ads Manager, Meta muestra:
+
+> ⚠️ **"Es posible que tu anuncio no genere conversaciones."**
+> *Gastaremos aproximadamente $10.000 por día. El gasto diario máximo es de $17.500 y el gasto semanal
+> máximo es de $70.000.*
+
+**Ese aviso es información, no ruido.** Y al revisarlo encontré que había leído de más un dato.
+
+#### ⚠️ Retracto la "elasticidad": el signo se invierte según dónde se corte
+
+En 0-AQ.1 afirmé *"no se encarece al escalar: los días de mayor gasto dieron $2.346 vs $2.491"*.
+**Con 6 días y 39 conversaciones eso no es una señal, es el punto de corte que yo elegí:**
+
+| corte | gasto BAJO | gasto ALTO | conclusión |
+|---|---|---|---|
+| $12.000 | $1.871 (2d) | $2.580 (4d) | ALTO más **caro** |
+| $16.000 | $1.871 (2d) | $2.580 (4d) | ALTO más **caro** |
+| $18.000 | $2.491 (3d) | $2.346 (3d) | ALTO más **barato** |
+| $19.000 | $2.680 (4d) | $2.102 (2d) | ALTO más **barato** |
+
+**El signo se da vuelta.** No hay evidencia de elasticidad en ningún sentido. Escogí el corte que me
+daba la respuesta que quería sin darme cuenta.
+
+#### Lo que sí queda firme, y por qué obliga a $16.000
+
+| | |
+|---|---|
+| $/conv medido | **$2.398** (39 conversaciones) |
+| **gasto diario promedio al que se midió** | **$15.588/día** |
+| a $10.000/día | ⚠️ **no hay ni un solo día de evidencia**, y Meta avisa que puede no entregar |
+
+**El riesgo de poner $10.000 no es gastar poco: es medir mal.** Si el conjunto entrega mal por
+presupuesto insuficiente, el $/conv va a salir peor de lo real y vamos a **matar un producto que
+funciona**. Eso es exactamente el tipo de error que esta bitácora lleva doce entradas combatiendo.
+
+**Se corre al presupuesto donde el número fue medido: ~$16.000/día.**
+
+#### La exposición se controla con la VENTANA, no bajando el ritmo
+
+⚠️ **Ventana de gasto ≠ ventana de medición.** El colmena cierra lento, así que las ventas llegan con
+rezago (la misma trampa de la ventana censurada, otra vez).
+
+| | |
+|---|---|
+| presupuesto | **$16.000/día** |
+| **ventana de GASTO** | **7 días** → exposición total **$112.000** |
+| **ventana de MEDICIÓN** | **14 días** → las ventas del día 7 todavía no han cerrado al día 7 |
+| conversaciones esperadas | ~47 |
+
+| si el cierre es | ventas | utilidad | resultado sobre $112.000 |
+|---|---|---|---|
+| 8,1% (lo medido) | 3,8 | $155.700 | **+$43.700** |
+| 5,85% (equilibrio) | 2,7 | $112.000 | $0 |
+| 4% (malo) | 1,9 | $77.800 | **−$34.200** |
+
+**Misma exposición que el plan anterior, pero gastada a un ritmo donde la medición sí vale.**
+
+#### 🚫 Dos botones que NO hay que tocar en esa pantalla
+
+| botón | por qué no |
+|---|---|
+| **"Aplicar presupuesto recomendado" ($204.000/día)** | dice *"negocios similares gastan ~$204.000 y consiguen 14 conversaciones"* = **$14.571 por conversación**. Es **6× peor** que los $2.398 de esta cuenta. Ese benchmark son negocios que rinden mucho peor. Aplicarlo sería poner $204.000/día en un producto sin validar |
+| **"Aplicar" el presupuesto de campaña Advantage+ (−4,6%)** | mueve el control del presupuesto **al nivel de campaña**, donde se comparte con `Publico ABIERTO - Creativo` (el estático, a **101% de su equilibrio = pierde plata**). Meta podría desviarle plata al perdedor. **Mantener el presupuesto a nivel de conjunto** |
+
+#### Pasos concretos en la pantalla
+
+1. Presupuesto diario del conjunto `Publico ABIERTO video`: **$16.000**
+2. Dejar `Publico ABIERTO - Creativo` (el estático) **PAUSADO**
+3. La cabecera dice **"Campaña desactivada"** → hay que activar **la campaña**, no solo el conjunto
+4. Hay **"Cambios sin publicar"** → darle **Publicar**
+5. **Anotar la hora exacta** del encendido (el 15-16 es el test de la quincena del tradicional)
+6. Con $16.000/día el tope diario de Meta sube a ~$28.000 y el semanal a ~$112.000. **No asustarse** si un día gasta $25.000: se compensa en la semana
+
+#### ⚠️ Error #13
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 13 | *"el colmena no se encarece al escalar (elasticidad plana), así que $10.000/día alcanza"* | **con 6 días y 39 conv el signo se invierte según el punto de corte: no hay señal. Y el $2.398 se midió a $15.588/día promedio, así que $10.000 es extrapolar a un rango sin un solo día de evidencia — donde Meta además avisa que puede no entregar.** |
+
+🔑 **Lección nueva: partir una muestra chica en dos y comparar las mitades no es medir elasticidad.
+Antes de creer una comparación de subgrupos, mover el punto de corte y ver si la conclusión sobrevive.**

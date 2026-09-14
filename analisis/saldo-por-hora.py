@@ -39,6 +39,14 @@ lector = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(lector)
 
 ACT = "act_4330882710457791"
+# ⚠️ LIMITACION IMPORTANTE (anotada el 14-sep, seccion 0-AO)
+# Este script deduce "SECO" SOLO del gasto bajo. NO mira el saldo. Por eso confunde
+# dos cosas distintas que piden acciones opuestas:
+#   (a) la cuenta se quedo sin plata            -> recargar
+#   (b) un conjunto se topo con su presupuesto  -> subir el presupuesto (o nada)
+# El domingo 13-sep marco SECO de 17:00 a 21:00 y habia ~$59.000 en la cuenta:
+# era Domiciliarios agotando sus $45.000. ANTES DE CREERLE UN "SECO", cruzar con
+# `spend_cap - amount_spent` y con el gasto acumulado por conjunto.
 UMBRAL_SECO = 2_000      # una hora por debajo de esto, de dia, es sospechosa
 FACTOR_REBOTE = 3.0      # una hora que supera 3x el promedio del dia es un rebote
 
