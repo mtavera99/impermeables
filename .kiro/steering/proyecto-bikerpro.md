@@ -8734,3 +8734,110 @@ dando ~$1.024, el problema es el ritmo; si dan $600-700, era demanda.
 🔑 **Regla nueva: antes de aceptar una explicación cíclica ("es la quincena", "es el fin de semana"),
 buscar el ciclo ANTERIOR en el mismo dato.** Si el patrón no se repitió, la explicación no sirve.
 Estaba a un `grep` de distancia y no lo hice.
+
+
+---
+
+## 0-AU · 🎯 LA CAUSA REAL: AMOR Y AMISTAD (19-SEP) LE SUBIÓ EL CPM 57% (14-sep, 15:00)
+
+El dueño preguntó: *"¿cómo nos fue el 15 pero de agosto?"* — y esa pregunta destapó todo.
+
+### Respuesta directa: la quincena del 15-ago NO hizo lo de hoy
+
+| fecha | posición | gasto | conv | $/conv |
+|---|---|---|---|---|
+| 13-ago | −2 | $53.022 | 86 | $617 |
+| **14-ago** | **día antes del pago** | $58.429 | 83 | **$704** 🟢 |
+| **15-ago** | **💰 día de pago** | $72.483 | 102 | **$711** 🟢 |
+| 16-ago | +1 | $48.607 | 78 | $623 |
+| **17-ago** | **+2** | $49.738 | 133 | **$374** ⭐ |
+| 18-ago | +3 | $52.939 | 132 | $401 |
+
+**Los tres días antes de pago que existen en el dato:**
+
+| fecha | $/conv | |
+|---|---|---|
+| 14-ago | **$704** | 🟢 normal |
+| 29-ago | **$893** | 🟢 normal |
+| **14-sep** | **$1.667** | 🔴 **ANÓMALO** |
+
+**Dos de tres normales. La hipótesis de la quincena queda muerta**, ahora con dos contraejemplos.
+
+### 🆕 HALLAZGO 1: el efecto del pago existe, pero llega con 2-3 DÍAS DE RETRASO
+
+| ciclo | −1 | 💰 pago | +1 | +2 | +3 | +4 |
+|---|---|---|---|---|---|---|
+| **15-ago** | $704 | $711 | $623 | **$374** ⭐ | $401 | $531 |
+| **30-ago** | $893 | $867 | $884 | $1.056 | **$673** ⭐ | $662 |
+
+**El día del pago NO mejora nada** ($704→$711 y $893→$867: planos). La mejora llega en **+2 o +3**.
+
+Tiene sentido: la gente cobra, pero no compra el mismo día.
+
+⚠️ **Consecuencia inmediata: mañana 15-sep probablemente NO va a mejorar.** Si el ciclo se repite, la
+mejora aparece el **17-18 de septiembre**. No hay que leer el 15 como fracaso.
+
+### 🎯 HALLAZGO 2 (el grande): el CPM saltó 57% y arrancó justo una semana antes de AMOR Y AMISTAD
+
+| CPM promedio (solo tradicional) | |
+|---|---|
+| agosto | $4.270 |
+| 1–11 sep | **$3.582** |
+| **12–14 sep** | **$5.621** |
+| **salto** | **+57%** |
+
+Día por día: estable en $3.400–$4.100 del 1 al 11-sep, y después **12-sep $4.374 · 13-sep $6.865 ·
+14-sep $5.624.**
+
+**El Día del Amor y la Amistad en Colombia se celebra el tercer sábado de septiembre. En 2026 cae el
+sábado 19 de septiembre** ([calendariodecolombia.com](https://www.calendariodecolombia.com/fecha/2026/dia-de-amor-y-amistad),
+[Cablenoticias](https://www.cablenoticias.com/noticias/amor-y-amistad-2026-en-colombia-la-fecha-y-su-origen),
+[90minutos](https://90minutos.co/colombia/cuando-es-amor-y-amistad-en-colombia-fecha-02-09-2026/)).
+*Contenido reformulado por restricciones de licencia.*
+
+**El CPM empezó a subir el 12-sep = exactamente una semana antes.** Es la avalancha de anunciantes
+comprando subasta para la fecha comercial más grande de Colombia después de navidad.
+
+### La descomposición exacta del daño (4-sep → 14-sep)
+
+| | 4-sep | 14-sep | cambio |
+|---|---|---|---|
+| **CPM** (lo que cuesta mostrarse) | $3.455 | $5.632 | **+63%** ← la subasta |
+| **conv/mil** (cuánta gente contesta) | 5,62 | 3,38 | **−40%** ← la demanda |
+| **$/conv** | $614 | $1.667 | **+171%** |
+
+$1,63 × (1 ÷ 0,60) = 2,72 ✓ **Las dos causas se multiplican, y pesan casi igual.**
+
+- El **+63% de CPM** es Amor y Amistad: competencia externa, **no es culpa de la cuenta**
+- El **−40% de conv/mil** es demanda: parte ciclo de pago, parte que la gente está mirando regalos
+
+### 🔑 Lo que esto cambia
+
+1. ⛔ **EL TEST DEL 15 ESTÁ MUERTO.** No por el colmena: por el salto de CPM. **Ya no se puede separar
+   quincena de nada**, porque hay un shock externo encima. Y como el efecto del pago llega en +2/+3,
+   el 15 no iba a mostrar nada de todas formas. **Se libera la restricción de "no tocar nada".**
+2. ✅ **NO recortar por pánico.** La causa es **externa y con fecha de vencimiento**: el CPM debería
+   normalizarse después del sábado 19-sep. Recortar ahora sería castigar la cuenta por algo que no hizo.
+3. ⚠️ **Pero el peso marginal está malo esta semana.** Con CPM a $5.600 y la curva de saturación ya
+   medida (a más de $170.000/día el peso rinde 12,4 conv/$10.000 contra 18,6 por debajo de $60.000),
+   **esta es la semana para NO estar sobre-entregando al 124-139% del presupuesto.**
+4. 💡 **Y hay una oportunidad que nadie miró: un impermeable ES un regalo para un motociclista.**
+   Amor y Amistad es el 19-sep. Si el CPM está caro porque todo el mundo vende regalos, **la respuesta
+   no es esconderse: es entrar con ángulo de regalo.** ⚠️ **No está probado** — es una idea con fecha,
+   y quedan 5 días. Habría que probarla en `TEST Creativos`, que es el conjunto que existe para eso.
+
+### ⚠️ Errores #15 (ampliado) y #16
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 15 | *"es el día antes de la quincena"* | **ahora con DOS contraejemplos: 14-ago $704 y 29-ago $893, los dos normales** |
+| 16 | *"mañana 15-sep el $/conv debería volver a $600-750; ese es el test"* | **falso. En los dos ciclos anteriores el día de pago fue PLANO ($704→$711, $893→$867). La mejora llega en +2/+3. Mi gatillo del 15 habría dado un falso negativo y me habría hecho recortar sin razón.** |
+
+🔑 **Dos reglas nuevas:**
+
+1. **Antes de fijar la fecha de un test cíclico, medir el REZAGO del ciclo en los datos viejos.**
+   Yo puse el test el día del pago; el efecto llega dos días después.
+2. **Antes de culpar a la cuenta, mirar el CALENDARIO COMERCIAL del país.** Un salto de CPM del 57%
+   casi nunca es la cuenta: es la subasta. **Fechas colombianas que hay que tener en el radar:**
+   Amor y Amistad (3er sábado de septiembre), Halloween, Black Friday, navidad, día de la madre,
+   día del padre.
