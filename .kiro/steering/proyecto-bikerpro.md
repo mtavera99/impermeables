@@ -8327,3 +8327,68 @@ espera no son gratis. Por eso la recomendación es prender hoy y leer el test po
 2. 🔴 **Antes de opinar sobre algo que ya se analizó, LEER EL ARCHIVO.** Tenía 7.600 líneas de memoria
    con el número exacto y el plan ya decidido, y opiné desde cero. **Buscar en el archivo madre por
    palabra clave (`grep -i colmena`) es obligatorio antes de contradecir una decisión pasada.**
+
+
+### 0-AQ.1 · CON CUÁNTO PRENDER EL COLMENA (decisión del 14-sep)
+
+#### Lo que dice el histórico del conjunto `Publico ABIERTO video`
+
+| fecha | gasto | conv | $/conv | % del equilibrio $3.322 |
+|---|---|---|---|---|
+| 04-sep vie | $7.361 | 6 | $1.227 | 37% 🟢 |
+| 05-sep sáb | $20.687 | 9 | $2.299 | 69% 🟢 |
+| 06-sep dom | $19.246 | 10 | $1.925 | 58% 🟢 |
+| **07-sep lun** | $16.165 | 4 | **$4.041** | **122% 🔴** |
+| 08-sep mar | $18.717 | 6 | $3.120 | 94% 🟢 |
+| 09-sep mié | $11.350 | 4 | $2.838 | 85% 🟢 |
+| **acumulado** | **$93.526** | **39** | **$2.398** | **72% 🟢** |
+
+**No se encarece al subir el gasto** (lo contrario de lo que pasa con el tradicional):
+
+| | gasto/día promedio | $/conv |
+|---|---|---|
+| los 3 días de MENOR gasto | $11.625 | $2.491 |
+| los 3 días de MAYOR gasto | $19.550 | **$2.346** |
+
+Entre $7.000 y $21.000/día **no hay castigo por escalar.** Eso vuelve conservador el rango de 0-AG.
+
+#### 🔴 Pero el número frágil no es el $/conv: es la TASA DE CIERRE
+
+El equilibrio de $3.322 sale de: **utilidad $40.968 × cierre 8,1% = $3.318**.
+
+Y ese **8,1% viene de 3 ventas sobre ~37 conversaciones** (0-AG). Con esa base, el IC 95% de la tasa de
+cierre va de **~2,8% a ~21,4%**, o sea el equilibrio real está entre **$1.147 y $8.767**.
+
+**Traducido:** a $2.398/conv el colmena gana si la tasa de cierre está por encima de
+**$2.398 ÷ $40.968 = 5,85%**. El dato dice 8,1%, pero con 3 ventas no alcanza para estar seguros.
+
+👉 **El $/conv ya está bien medido (39 conversaciones). Lo que falta medir es el cierre.**
+El presupuesto se dimensiona para **conseguir ventas**, no para conseguir conversaciones.
+
+#### ✅ DECISIÓN: $10.000/día
+
+El techo del rango de 0-AG, porque la elasticidad no castiga. Números a 14 días:
+
+| escenario de cierre | ventas esperadas | utilidad | gasto | resultado |
+|---|---|---|---|---|
+| 8,1% (lo medido) | 4,7 | $192.550 | $140.000 | **+$52.550** |
+| 5,85% (el punto de equilibrio) | 3,4 | $140.000 | $140.000 | **$0** |
+| 4% (escenario malo) | 2,3 | $95.000 | $140.000 | **−$45.000** |
+
+**Riesgo acotado a ~$45.000 en 14 días contra una ganancia esperada de ~$52.550.** Y en los tres casos
+se compra la información que falta: **pasa de 3 ventas acumuladas a 7-8**, que es lo que permite
+cerrar la pregunta del cierre.
+
+⛔ **NO subir a $15-20.000 todavía**, aunque la elasticidad lo aguante: multiplica la exposición sobre
+el número que justamente no conocemos.
+
+#### Reglas de lectura (para no repetir errores de esta bitácora)
+
+| regla | por qué |
+|---|---|
+| **NO juzgar por un día** | el 7-sep marcó $4.041 (122%) y era ruido de 4 conversaciones. Habría gatillado una falsa alarma |
+| **Gatillo real: $3.322/conv sostenido ~7 días** | con al menos 25-30 conversaciones acumuladas |
+| **Contar las ventas del colmena aparte** | la tasa de cierre es el número que decide todo, y **no está en Meta**: sale de WhatsApp y de las guías |
+| **Revisión a los 7 y a los 14 días** | no antes |
+| **Solo el VIDEO** | el estático corre a 101% de su equilibrio. Sigue apagado |
+| **Anotar la hora del encendido** | el 15-16 es el test de la quincena del tradicional; hay solapamiento de subasta en Bogotá+Medellín |
