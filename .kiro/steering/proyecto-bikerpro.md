@@ -9133,3 +9133,116 @@ Interrapidísimo.**
 ⚠️ Y esto **reencuadra toda la pregunta de transportadoras**, que llevábamos tres días midiendo mal:
 **el diferenciador no era la TASA de devolución (indistinguible entre las tres) sino el COSTO de
 cada devolución.** Estábamos mirando la variable equivocada.
+
+
+---
+
+## 0-AX · AUDITORÍA DEL DESPACHO DEL 14-SEP CONTRA EL EXPORT (30 guías, 39 unidades)
+
+### 🔴 CONFLICTO DE OFICINA EN EL PEDIDO #28 (NECHÍ, $143.000)
+
+| | |
+|---|---|
+| la guía salió por | **COORDINADORA** (64532764636) |
+| la guía dice | *"Oficina principal **Coordinadora**"* |
+| al cliente se le dijo por WhatsApp | *"Oficina principal **Inter Rapidísimo**"* |
+
+**El cliente va a caminar hasta Interrapidísimo y el paquete está en Coordinadora.**
+Es el **mismo error de Potosí, en espejo**, y esta vez son **$143.000 y 2 unidades**
+(≈$48.258 de utilidad).
+
+👉 **Hay que escribirle hoy.** Y confirma que la regla nueva de 0-AV era necesaria: **el nombre de la
+transportadora en el cuadro es una promesa.**
+
+📌 Potosí (#2) **sí quedó bien**: salió por interrapidísimo y la guía dice "Oficina Interrapidísimo".
+Pero la clienta leyó *"Servientrega"*, así que **igual hay que avisarle.**
+
+### Se despacharon 3 por Coordinadora, no 1
+
+| # | ciudad | uds | recaudo | flete |
+|---|---|---|---|---|
+| **15** | **MANIZALES** | **3** | **$185.000** | $36.054 |
+| 21 | BOGOTÁ | 1 | $73.000 | $12.201 |
+| **28** | **NECHÍ** | 2 | $143.000 | **$45.562** |
+
+⚠️ En 0-AW.1 se había **aplazado** el A/B de Coordinadora hasta que 99 Envíos explique por qué sus
+devoluciones cuestan **$18.124 contra $3.031**. Se fueron tres, y **dos son de los pedidos más
+valiosos del lote.**
+
+**Y el flete de Coordinadora en Nechí es carísimo:** $45.562 por 2 unidades a un municipio de
+Antioquia, contra **$36.209 de Interrapidísimo a Concordia** (también Antioquia, también 2 unidades).
+**+$9.353 = 26% más caro** por un destino comparable.
+
+### ✅ CONFIRMADO CON n=2: la banda de 2 unidades de Bogotá/sabana está corta
+
+| # | ciudad | cobrado | envío implícito | costo real | resultado |
+|---|---|---|---|---|---|
+| 3 | BOGOTÁ | $128.000 | $18.000 | **$20.993,75** | **absorbe $2.994** |
+| 12 | SOACHA | $128.000 | $18.000 | **$20.993,75** | **absorbe $2.994** |
+
+**Los dos dieron el número EXACTAMENTE igual. No es ruido: es la tarifa.**
+
+👉 **Se cumple la condición que quedó escrita antes de ver el dato: subir la banda de
+`$128.000` a `$131.000`** en `GUION-PARA-PEGAR.md`.
+
+### Margen real del lote (recaudo − flete − costo $33.000/unidad)
+
+| | |
+|---|---|
+| margen bruto total (antes de pauta) | **$906.503** |
+| unidades | 39 |
+| **margen por unidad** | **$23.244** |
+
+📌 El archivo venía usando **$24.129/unidad**. El real de este lote es **$23.244 (−3,7%)**.
+
+**Los peores por unidad, y los dos son de Coordinadora:**
+
+| # | ciudad | uds | flete | margen/unidad |
+|---|---|---|---|---|
+| **28** | **NECHÍ** (coordinadora) | 2 | $45.562 | **$15.719** 🔴 |
+| **15** | **MANIZALES** (coordinadora) | 3 | $36.054 | **$16.649** 🔴 |
+| 29 | ARMENIA | 2 | $32.312 | $19.844 |
+
+**Los peores de 1 unidad** (donde el flete se come el margen):
+
+| # | ciudad | recaudo | flete | margen |
+|---|---|---|---|---|
+| 30 | QUIBDÓ | $81.000 | $25.616 | $22.384 |
+| 11 | SAN LUIS DE SINCÉ | $85.000 | $27.865 | $24.135 |
+| 4 | BUENAVENTURA | $81.000 | $23.267 | $24.733 |
+| 27 | SINCELEJO | $81.000 | $23.267 | $24.733 |
+
+⚠️ **Quibdó, Buenaventura y Sincelejo se cobraron a $81.000 y su flete pasa de $23.000.** Están en la
+banda equivocada: deberían estar en la de $85.000.
+
+### 🆕 Dos hallazgos sobre el seguro
+
+**1. El seguro ya no es 13,6%: es 15,1%.**
+
+| | |
+|---|---|
+| lo que usa el tarifario | 13,6% del `valor_servicio` |
+| **lo real hoy (29 guías)** | **15,1%** (rango 14,9%–15,1%, muy estable) |
+
+Sobre ~$25.000 de flete promedio son **~$375 más por guía**. A 300 envíos/mes = **~$112.500/mes**
+que el modelo no está contando.
+
+**2. Una guía trae "Seguro 99 **Plus**" y nadie lo pidió.**
+
+| | |
+|---|---|
+| pedido #11 · SAN LUIS DE SINCÉ · $85.000 | |
+| tipo | **Seguro 99 Plus** (las otras 29 son "Seguro 99") |
+| prima | **$5.876 = 21,1% del flete** (las demás ~15%) |
+| sobrecosto vs prima normal | **~$1.700** |
+
+**Es la única de 30.** 🔔 **Preguntar a 99 Envíos qué es el "Plus", por qué se aplicó solo a esa guía
+y si se puede desactivar.** Va con las otras preguntas pendientes (motivos de devolución, el
+denominador del 16%, Tadó, y los $61.796 de las 3 guías de Coordinadora).
+
+### Lo que salió bien ✅
+
+- **27 de 30 por Interrapidísimo**, como se recomendó
+- **Las 9 de "reclame en oficina Interrapidísimo" salieron todas por Interrapidísimo** — la restricción se respetó
+- **Seguro activo en las 30**
+- Potosí quedó consistente entre guía y transportadora
