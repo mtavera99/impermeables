@@ -8561,3 +8561,93 @@ umbral equivocado, y es la región con mejor evidencia de la cuenta.
 > funciona*; el umbral dice *desde dónde se pierde plata*. Son números distintos y muy separados:
 > **promedio del tradicional ~$880 · límite del tradicional $2.402 · límite del colmena $3.322.**
 > Antes de declarar algo "malo", escribir cuál es su umbral y de dónde salió.
+
+
+---
+
+## 0-AS · LUNES 14-SEP: DÍA 🔴 GRAVE, Y EL GATILLO ESCRITO ANTES DEL TEST (14-sep, 13:30)
+
+### El día en un número: CPA implícito **$20.275/pedido** → 🔴 GRAVE
+
+El dueño reportó **4-5 ventas** desde que arrancó el lunes. **Eso no desmiente el problema: lo
+confirma.**
+
+| | |
+|---|---|
+| gasto tradicional (corte 13:00) | $120.919 |
+| conversaciones | 71 |
+| $/conv | **$1.703** |
+| ventas esperadas de esas 71 (cierre 8,4%) | **6,0** |
+| ventas ya vistas | 4,5 → faltan ~1,5 por cerrar |
+| **CPA implícito** | **$20.275/pedido** |
+| utilidad por pedido después de pauta | **$3.854** (lo normal: $14.808) |
+
+⚠️ **El CPA crudo ($120.919 ÷ 4,5 = $26.871) está CENSURADO** — las conversaciones de hoy todavía no
+han cerrado. El número bueno es el implícito por tasa de cierre: **$20.275**. Misma trampa de la
+ventana censurada, evitada esta vez.
+
+### Escalada de cuatro días (mismo tramo 00:00-12:59)
+
+| día | $/conv | CPA implícito | banda |
+|---|---|---|---|
+| 11-sep vie | $751 | $8.940 | 🟢 NORMAL |
+| 12-sep sáb | $910 | $10.833 | 🟡 VIGILAR |
+| 13-sep dom | $1.139 | $13.560 | 🟡 VIGILAR |
+| **14-sep lun** | **$1.703** | **$20.274** | 🔴 **GRAVE** |
+
+**Costo del día contra el lunes pasado: ~$120.525 de utilidad.**
+
+### 🟢 Nada está en pérdida todavía — y el colmena arrancó bien
+
+Con **cada umbral en su producto** (la lección de los errores #12 y #14):
+
+| | gasto | conv | $/conv | umbral | |
+|---|---|---|---|---|---|
+| TRADICIONAL (suma) | $120.919 | 71 | $1.703 | $2.402 | 71% 🟢 |
+| **COLMENA** (`Publico ABIERTO video`) | $7.456 | 3 | **$2.485** | **$3.322** | **75% 🟢** |
+
+El colmena arrancó **dentro de rango** el primer día. Y el $1.732 que muestra Ads Manager a nivel de
+cuenta **es engañoso: mezcla dos productos con umbrales distintos.** No usarlo para decidir.
+
+### 🔀 DOS causas candidatas, y el 15 las separa
+
+| # | causa | qué predice para mañana |
+|---|---|---|
+| 1 | **Quincena.** Hoy es el día antes del pago, el fondo del valle. La escalada de 4 días encaja | mañana **se arregla solo** |
+| 2 | **Sobre-entrega.** Va a cerrar en ~$211.000 con presupuesto de $170.000 = **124-139%**, el más alto de la ventana. Y 0-AH ya midió que **el peso marginal devuelve $0** pasando ~$202.000 | mañana **sigue igual de mal**, porque el nivel de gasto no cambia |
+
+Las dos empujan el $/conv hacia arriba y **se pueden estar sumando.** El test del 15 las distingue.
+
+### 🎯 GATILLO ESCRITO ANTES DE VER EL DATO (15-sep, corte 13:00, tramo 00:00-12:59)
+
+**Se lee el $/conv del TRADICIONAL solo, sin el colmena.**
+
+| $/conv mañana | significa | acción |
+|---|---|---|
+| **≤ $900** | ✅ era la quincena | **no tocar nada.** Planear el gasto alrededor de las quincenas |
+| **$900 – $1.200** | ⚠️ recuperación parcial | vigilar un día más, sin tocar |
+| **> $1.200** | ❌ **la quincena NO era la causa** | **CORTAR.** Sería CPA >$14.286 el día mismo del pago = condenatorio. Primer recorte: el gasto por encima del presupuesto |
+
+Queda escrito **antes** para no acomodar la interpretación después.
+
+### 💰 PROBLEMA DE CAJA PARA MAÑANA — no alcanza
+
+Recarga de **+$100.000 a las 13:23**. Saldo actual **$117.170**. Pero:
+
+| | |
+|---|---|
+| gastado hoy hasta 13:00 | $129.391 |
+| ritmo últimas 4h | $8.195/hora |
+| proyección de cierre del día | **~$211.341** |
+| **saldo a medianoche** | **~$35.220** |
+| lo que necesita mañana (quincena, día fuerte) | **~$210.000** |
+| **faltante** | **~$175.000** |
+
+🔴 **Hay que recargar ~$200.000 más esta noche.** Quedarse seco **mañana** es el peor escenario posible
+de los tres:
+
+1. Es **quincena** = el mejor día de demanda del mes
+2. Es el **día del test** = se pierde la medición que define la estrategia del mes
+3. El secarse dispara el **rebote de 0-AI**: Meta gasta de golpe comprando el inventario más frío
+
+**Total a tener disponible al arrancar el 15: ~$250.000.**
