@@ -9547,3 +9547,173 @@ ser bastante peor: a CPA $20.440, el margen por pedido baja de $14.814 a **~$9.0
 | 🟡 Pero el CPA está en VIGILAR ($11.732) y el fin de semana anterior estaba en NORMAL ($8.512) | |
 | 🔴 El lunes está en GRAVE ($20.440) y esa cuenta llega mañana | |
 | 📌 La causa medida es externa: **CPM +57% por Amor y Amistad**, que debería aflojar después del sábado 19 | |
+
+
+---
+
+## 0-BB · ¿POR QUÉ SUBIÓ EL CPA? NO ES FATIGA DE CREATIVOS: ES DILUCIÓN POR ESCALA (14-sep, 20:00)
+
+El dueño preguntó cuatro cosas: si el alza del CPA es normal, si es fatiga de creativos, si conviene
+una promo de Amor y Amistad, y si vale la pena volver a escribirles a los que no compraron.
+**Las cuatro son medibles. Aquí está el dato.**
+
+### La historia completa del CPA por unidad, semana por semana
+
+| semana | gasto/semana | CPM | conv/mil | **CPA/unidad** |
+|---|---|---|---|---|
+| 06-jul | $36.521 | $8.642 | 12,07 | $6.558 |
+| 13-jul | $83.479 | $6.603 | 9,89 | $6.116 |
+| **20-jul** | $124.882 | $4.169 | 9,28 | **$4.114** ⭐ el mejor |
+| 27-jul | $267.982 | $3.717 | 7,35 | $4.630 |
+| 03-ago | $305.862 | $4.224 | 8,13 | $4.755 |
+| 10-ago | $385.813 | $3.818 | 6,09 | $5.745 |
+| 17-ago | $561.762 | $4.290 | 7,70 | $5.104 |
+| 24-ago | $738.409 | $4.464 | 5,39 | $7.581 |
+| 31-ago | $1.173.571 | $3.674 | 4,64 | $7.252 |
+| 07-sep | — | $3.905 | 5,08 | $8.186 |
+| **14-sep** | — | **$5.416** | — | **$17.346** |
+
+### ❌ NO es fatiga de creativos. Tres pruebas independientes
+
+**1. El CPM NO subió.** De finales de julio a principios de septiembre se movió entre **$3.674 y
+$4.464 sin tendencia**. La fatiga de creativo se manifiesta como **CPM que sube** (Meta cobra más por
+un anuncio gastado). **No pasó.** El $5.416 de esta semana es Amor y Amistad, no desgaste.
+
+**2. El creativo de 14 días rinde IGUAL que el de 65 días.** Los dos corren en Bogotá+Medellín con
+la misma segmentación (semana 8-14 sep):
+
+| conjunto | creativo | gasto | $/conv | conv/mil | frec |
+|---|---|---|---|---|---|
+| Domiciliarios VIDEO | **VIDEO, 14 días** | $438.439 | **$992** | **3,79** | 1,21 |
+| Domiciliarios | **estático, 65 días** | $359.635 | **$1.033** | **3,75** | 1,29 |
+| Motorizados | estático, 65 días | $78.634 | $1.035 | 4,08 | 1,19 |
+| **TEST Creativos** | prueba social, 45 días | $116.593 | **$904** | **7,41** | 1,45 |
+
+**El de 14 días y el de 65 días dan prácticamente lo mismo ($992 vs $1.033).** Si fuera fatiga, el
+nuevo tendría que ser mucho más barato. **No lo es.**
+
+**3. La frecuencia es de 1,19 a 1,45.** Para que un creativo se gaste, la gente tiene que verlo muchas
+veces. **Lo están viendo ~1,2 veces.** No hay desgaste posible con esa frecuencia.
+
+### ✅ Lo que SÍ está pasando: dilución de audiencia por escalar
+
+| | |
+|---|---|
+| **correlación gasto semanal ↔ conv/mil** | **−0,71** (negativa y fuerte) |
+| semanas de MENOS gasto | $140.651/sem → **8,73 conv/mil** |
+| semanas de MÁS gasto | $633.083/sem → **6,39 conv/mil** |
+| el gasto se multiplicó ×4,5 | la respuesta cayó **−27%** |
+
+**Y el alcance sigue creciendo, así que la audiencia NO está agotada:**
+
+| | alcance | frecuencia | conv/mil |
+|---|---|---|---|
+| julio | 56.268 | 1,60 | 8,88 |
+| agosto | 232.809 | 2,34 | 6,38 |
+| sep 1-14 | **309.739** | 1,88 | 4,45 |
+
+🔑 **La intuición del dueño era correcta** (*"lo mejor lo tiene uno al inicio"*) **pero el mecanismo no
+es el que él creía.** No es que el anuncio se gastó ni que el mercado se saturó: es que **la gente que
+mejor encaja se alcanzó primero.** Al pasar de $36.000 a $1.170.000 por semana (**×32**), Meta tiene
+que ir a buscar gente cada vez menos parecida al comprador ideal. **Eso es normal, es esperado, y es
+el precio de crecer.**
+
+### 📊 La descomposición del $17.346 de esta semana
+
+| tramo | de → a | causa |
+|---|---|---|
+| **$4.114 → $8.186** | julio a 7-sep | **dilución por escalar ×9. Estructural y normal.** |
+| **$8.186 → $17.346** | 7-sep a 14-sep | **Amor y Amistad (CPM +57%) + valle de quincena. Temporal, con fecha.** |
+
+👉 **La mitad del susto tiene fecha de vencimiento (sábado 19-sep). La otra mitad es el peaje de
+haber crecido 32 veces, y no se devuelve.**
+
+### 🎯 HALLAZGO: `TEST Creativos` rinde 2× mejor y está desfinanciado
+
+| | conv/mil | $/conv |
+|---|---|---|
+| **TEST Creativos** (*"Prueba social +50 clientes"*) | **7,41** | **$904** |
+| VIDEO | 3,79 | $992 |
+| Domiciliarios estático | 3,75 | $1.033 |
+
+**Casi el doble de respuesta por mil impresiones, y el $/conv más bajo.** Y solo tiene $25.000/día
+(usó 62% la semana pasada).
+
+⚠️ **Caveat honesto:** gasta 4× menos que VIDEO, y acabamos de demostrar que **a menos gasto, mejor
+respuesta**. Parte de esa ventaja es el mismo efecto de escala, no mérito del creativo. **Pero es la
+mejor señal disponible**, y el camino para saberlo es subirle presupuesto y ver si aguanta.
+
+👉 **La acción no es "refrescar creativos" (no hay fatiga). Es darle plata al que ya gana.**
+
+### 💝 La promo de Amor y Amistad: NO a $130.000 plano nacional
+
+Con los fletes **reales de 2 unidades medidos hoy**:
+
+| ciudad | flete real | hoy cobra | margen hoy | con promo $130.000 | |
+|---|---|---|---|---|---|
+| BOGOTÁ / SOACHA | $20.994 | $128.000 | $41.006 | **$43.006** | 🟢 **mejora** |
+| ARMENIA | $32.312 | $138.000 | $39.688 | $31.688 | 🟠 −$8.000 |
+| VILLAVIEJA | $32.685 | $143.000 | $44.315 | $31.315 | 🟠 −$13.000 |
+| ARAUQUITA | $35.034 | $143.000 | $41.966 | $28.966 | 🟠 −$13.000 |
+| CONCORDIA | $36.209 | $143.000 | $40.791 | $27.791 | 🟠 −$13.000 |
+| **NECHÍ** | **$45.562** | $143.000 | $31.438 | **$18.438** | 🔴 −$13.000 |
+
+**Un precio plano nacional le regala $13.000 en cada municipio lejano.** Es la fuga de flete, pero
+ahora a propósito.
+
+✅ **La versión que sí sirve, y es elegante:** **"$130.000 los dos con envío" SOLO en Bogotá y sabana.**
+Ahí el flete es $20.994, el margen **mejora** a $43.006 — y de paso **arregla la banda que está corta
+$2.994** (0-AX). Es promoción y corrección de precio en el mismo movimiento.
+
+📌 **Y lo que no cuesta nada: el ÁNGULO.** Un impermeable **es** un regalo para un motociclista.
+Cambiar el mensaje para Amor y Amistad no cuesta margen. Se prueba en `TEST Creativos`, que existe
+justo para eso **y es el que mejor responde.**
+
+### 💰 LA IDEA MÁS VALIOSA DE TODAS: volver a escribirle a los que no compraron
+
+El dueño lo hacía antes y dejó de hacerlo por volumen. **Es la palanca más grande que hay sobre la
+mesa, porque el CPA de esos contactos ya está pagado.**
+
+| | |
+|---|---|
+| conversaciones del 1 al 14 de sep | **2.590** |
+| que cerraron (8,4%) | ~218 |
+| **que NO compraron** | **~2.372** |
+| si se recupera el **1%** | 24 ventas = **~$558.000** de margen |
+| si se recupera el **2%** | 47 ventas = **~$1.090.000** de margen |
+| **CPA de esas ventas** | **$0. Ya está pagado.** |
+
+**Ni una decisión de transportadora, de creativo o de presupuesto compite con ese número.**
+
+#### ⚠️ Pero cuidado con la herramienta: hay riesgo de perder el número
+
+| opción | alcance real | riesgo |
+|---|---|---|
+| **Listas de difusión** (WhatsApp Business App, gratis) | máximo **256 contactos**, y **solo le llega a quien tenga su número guardado** | ninguno |
+| **WhatsApp Business Platform / Cloud API** (oficial) | escala real, con plantillas aprobadas y consentimiento | ninguno, pero se paga por mensaje |
+| **Apps de envío masivo no oficiales** | prometen miles | 🔴 **violan los términos y el número se bloquea** |
+
+🔴 **El riesgo del tercero es catastrófico para BikerPro: el 100% de las ventas entra por ese número.**
+No vale la pena por ninguna herramienta gratis.
+
+⚠️ **Y la trampa de las listas de difusión:** *solo llega a quien lo tenga guardado en su agenda.*
+La mayoría de los prospectos que escribieron una vez **no lo tienen guardado**, así que el alcance real
+sería una fracción.
+Fuentes: [useinvent](https://www.useinvent.com/es/blog/guia-completa-de-difusion-por-whatsapp) ·
+[goeva](https://www.goeva.ai/es/glosario/listas-de-difusion-whatsapp) ·
+[Infobip](https://www.infobip.com/es/blog/como-enviar-mensajes-masivos-por-whatsapp).
+*Contenido reformulado por restricciones de licencia.*
+
+👉 **Pendiente de investigar bien: cuánto costaría la API oficial para ~2.400 mensajes/mes en Colombia,
+y si el bot actual la puede usar.** A $558.000–$1.090.000 de margen recuperable, casi cualquier costo
+por mensaje se paga solo.
+
+### Respuesta corta a "¿debería preocuparme?"
+
+| | |
+|---|---|
+| ❌ **No** por fatiga de creativos | descartada con tres pruebas |
+| ❌ **No** por audiencia agotada | el alcance sigue creciendo y la frecuencia es 1,2 |
+| ✅ **Sí** tenga presente que escalar cuesta | de $4.114 a $8.186 es real y no se devuelve |
+| ⏳ **El pico de ahora es temporal** | Amor y Amistad pasa el 19-sep |
+| 💰 **Y hay $558k–$1.09M sin tocar** | en los contactos que ya pagó |
