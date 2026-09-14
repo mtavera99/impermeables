@@ -9462,3 +9462,88 @@ causa para actuar sobre el riesgo.**
 
 📌 **De 30 pedidos del 14-sep, solo 1 llevó Plus.** O el señalador marca poco, o no se revisan todos.
 **Vale la pena saber cuál de las dos.**
+
+
+---
+
+## 0-BA · CIERRE DEL FIN DE SEMANA 12-13 SEP: CPA $11.732 · UTILIDAD NETA $211.675 (14-sep, 19:00)
+
+### ⚠️ Primero: el cálculo que descarté
+
+Mi primer intento cargó al lote de hoy **todo el gasto del lunes hasta las 16:00 ($180.791)** contra
+los 30 pedidos del lote. Daba **CPA $18.364 → 🔴 GRAVE.**
+
+**Está mal.** Las guías se crearon a las **16:05 del lunes**. El gasto del lunes todavía está
+produciendo conversaciones que van a cerrar mañana y **despachar el martes.** Le estaba cobrando al
+fin de semana un gasto cuyos pedidos no han llegado.
+
+🔑 **Ventana censurada otra vez, en versión nueva: alinear el gasto con el LOTE en vez de con el DÍA
+mete el gasto de hoy contra los pedidos de ayer.** Para leer un fin de semana cerrado, el gasto y las
+conversaciones tienen que ser **del mismo día** (son simultáneos), y los pedidos se estiman con la
+tasa de cierre.
+
+### ✅ El resultado limpio
+
+| día | gasto | conv | $/conv | CPA implícito | banda |
+|---|---|---|---|---|---|
+| sábado 12 | $87.262 | 94 | $928 | **$11.051** | 🟡 VIGILAR |
+| domingo 13 | $119.690 | 116 | $1.032 | **$12.283** | 🟡 VIGILAR |
+| **FIN DE SEMANA** | **$206.952** | **210** | **$985** | **$11.732** | **🟡 VIGILAR** |
+
+### Utilidad
+
+| | |
+|---|---|
+| conversaciones | 210 |
+| pedidos esperados (cierre 8,4%) | **17,6** |
+| unidades (1,3 por pedido) | 22,9 |
+| margen bruto (22,9 × $23.244) | **$533.031** |
+| menos pauta | −$206.952 |
+| **utilidad antes de devoluciones** | **$326.079** |
+| menos devoluciones (19% = 3,4 pedidos) | −$114.404 |
+| **UTILIDAD NETA DEL FIN DE SEMANA** | **$211.675** |
+| por pedido entregado | **$14.814** |
+
+### ✅ Validación cruzada con las guías reales (los dos métodos coinciden)
+
+| | |
+|---|---|
+| pedidos estimados por conversaciones | **17,6** |
+| guías del lote de hoy | 30 |
+| menos las 8 del viernes (ya contadas en 0-AL) | 22 |
+| menos las del lunes por la mañana (~74 conv × 8,4%) | **~16** |
+
+**17,6 estimados contra ~16 reales.** Cierran. **La tasa de cierre del 8,4% se sostiene** y el número
+del fin de semana es confiable.
+
+### Contra el fin de semana anterior: se deterioró
+
+| | gasto | conv | $/conv | CPA |
+|---|---|---|---|---|
+| 5-6 sep | $301.747 | **422** | $715 | **$8.512** 🟢 |
+| **12-13 sep** | $206.952 | **210** | $985 | **$11.732** 🟡 |
+
+**El CPA empeoró +38% y las conversaciones cayeron −50%.**
+
+Encaja con lo de 0-AU: el CPM saltó **+57% desde el 12-sep** por Amor y Amistad (19-sep). El fin de
+semana pasado compró conversaciones a $715; este a $985.
+
+### 📌 Y el lunes 14 fue mucho peor, y NO está en estos números
+
+| día | CPA implícito |
+|---|---|
+| sábado 12 | $11.051 🟡 |
+| domingo 13 | $12.283 🟡 |
+| **lunes 14** | **$20.440** 🔴 **GRAVE** |
+
+**El lunes va a caer en el lote del martes.** Cuando llegue ese export, la utilidad por pedido va a
+ser bastante peor: a CPA $20.440, el margen por pedido baja de $14.814 a **~$9.000**.
+
+### Resumen para decidir
+
+| | |
+|---|---|
+| ✅ El fin de semana **dio plata**: $211.675 netos | |
+| 🟡 Pero el CPA está en VIGILAR ($11.732) y el fin de semana anterior estaba en NORMAL ($8.512) | |
+| 🔴 El lunes está en GRAVE ($20.440) y esa cuenta llega mañana | |
+| 📌 La causa medida es externa: **CPM +57% por Amor y Amistad**, que debería aflojar después del sábado 19 | |
