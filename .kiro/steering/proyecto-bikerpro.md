@@ -9233,18 +9233,43 @@ banda equivocada: deberían estar en la de $85.000.
 Sobre ~$25.000 de flete promedio son **~$375 más por guía**. A 300 envíos/mes = **~$112.500/mes**
 que el modelo no está contando.
 
-**2. Una guía trae "Seguro 99 **Plus**" y nadie lo pidió.**
+**2. ⛔ El "Seguro 99 Plus" de la guía #11 lo pidió el dueño — segunda falsa alarma mía.**
 
 | | |
 |---|---|
 | pedido #11 · SAN LUIS DE SINCÉ · $85.000 | |
-| tipo | **Seguro 99 Plus** (las otras 29 son "Seguro 99") |
-| prima | **$5.876 = 21,1% del flete** (las demás ~15%) |
-| sobrecosto vs prima normal | **~$1.700** |
+| tipo | **Seguro 99 Plus** — **elegido a propósito** |
+| prima | $5.876 = 21,1% del flete (las otras 29 con "Seguro 99": ~15%) |
+| costo extra vs la prima normal | **~$2.376** |
 
-**Es la única de 30.** 🔔 **Preguntar a 99 Envíos qué es el "Plus", por qué se aplicó solo a esa guía
-y si se puede desactivar.** Va con las otras preguntas pendientes (motivos de devolución, el
-denominador del 16%, Tadó, y los $61.796 de las 3 guías de Coordinadora).
+Lo marqué como anomalía a investigar. **No era una anomalía: era una decisión.**
+
+#### 🔑 El patrón de mis dos errores seguidos (Nechí y el Plus)
+
+Las dos veces hice lo mismo: **vi algo distinto al resto y lo llamé error, sin preguntar si había sido
+a propósito.** El export muestra el RESULTADO, no la INTENCIÓN.
+
+**Regla:** cuando una guía se sale del patrón, la primera pregunta no es *"¿qué falló?"* sino
+**"¿esto fue una decisión?"**. Un dato raro en una operación que alguien maneja a mano es, la mayoría
+de las veces, alguien decidiendo — no un error.
+
+#### 🔔 Pero queda una pregunta que sí vale plata
+
+**¿Qué cubre el "Plus" que el "Seguro 99" normal no cubre?**
+
+Porque en 0-AW.1 encontramos que **3 devoluciones de Coordinadora pagaron el flete completo
+($20.895–$28.959) ADEMÁS de la prima**, mientras 45 de Interrapidísimo y Servientrega solo pagaron la
+prima. Si el "Plus" cubre justo esos casos —*"no cancela recaudo"*, *"deterioro"*— entonces:
+
+| | |
+|---|---|
+| costo del Plus | **+$2.376 por guía** |
+| lo que evitaría | **~$18.000–25.000** de flete en una devolución no cubierta |
+| se paga solo si | la probabilidad de caer en ese hueco supera **~10-13%** |
+
+👉 **Vale la pena preguntarle a 99 Envíos qué cubre cada uno**, y con eso decidir si el Plus debería
+ser el default en los destinos de riesgo (o en todos). **No es un gasto a recortar: puede ser la
+respuesta al hueco de los $61.796.**
 
 ### Lo que salió bien ✅
 
