@@ -22,6 +22,22 @@ está en Domiciliarios.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BE** | ⛔ **LAS 24H Y LAS PLANTILLAS NO APLICAN: usa la APP, no la API.** Escribe a quien quiera, cuando quiera, gratis · **el pozo de re-contacto es TODO el histórico, no un mes** · **NO migrar a la API**: perdería la intervención en tiempo real que le mejora el cierre · ya usa etiqueta `cliente potencial` y mensajes rápidos `/` · el límite real es el **reporte por spam**, no la técnica · **errores #19 y #20** | **14-sep** |
+| **0-BD** | ⛔ **EL BOT DE `bot/` NO ESTÁ CORRIENDO.** Usa el **agente de IA de Meta** · el agente es **reactivo: no puede iniciar** → el seguimiento no se automatiza con él · 🔔 verificar si Meta ya le cobra el Business Agent (desde 1-ago-2026) · **regla: código en el repo ≠ código en producción** | **14-sep** |
+| **0-BC** | 💰 **Re-contactar a los que no compraron es la palanca más grande: $558.000–$1.090.000/mes con CPA $0** · Colombia es de las 3 más baratas del mundo en la API ($0,0144/mensaje) · ⚠️ apps de envío masivo no oficiales **bloquean el número** | **14-sep** |
+| **0-BB** | 🔑 **EL CPA NO SUBE POR FATIGA DE CREATIVOS.** Tres pruebas: el CPM no subió · el creativo de 14 días rinde igual que el de 65 ($992 vs $1.033) · frecuencia 1,19-1,45 · **es DILUCIÓN POR ESCALA: correlación gasto↔respuesta −0,71** · descomposición: $4.114→$8.186 es estructural, $8.186→$17.346 es Amor y Amistad · 🎯 **TEST Creativos rinde 2× (7,41 conv/mil) y está desfinanciado** · la promo de $130.000 plano regala $13.000 en municipio lejano | **14-sep** |
+| **0-BA** | Fin de semana 12-13 sep: **CPA $11.732/pedido, utilidad neta $211.675** · validado con las guías reales (17,6 estimados vs ~16) · vs 5-6 sep ($8.512) empeoró +38% · ⚠️ **el lunes 14 dio $20.440 = GRAVE** | **14-sep** |
+| **0-AZ** | 🎯 **99 Envíos tiene un señalador de teléfonos con historial de devolución, visible ANTES de despachar** · el Plus cubre también la prima ($0 si se devuelve) y su equilibrio es **50%** de probabilidad · **el seguro protege el 16% del problema; el 84% es la utilidad** · la jugada real en un marcado es **pago anticipado**, no mejor seguro (gana si >42% acepta) | **14-sep** |
+| **0-AY** | ⛔ **ANULA 0-AW.1: nunca le cobraron ningún flete de devolución** · los estados de mi CSV estaban **truncados** y borraron *"solicita la entrega en una fecha posterior"* · ✅ **REGLA: una devolución está liquidada cuando `valor_servicio == valor_seguro_99`** (8 de 8 idénticas) · **error #18, el peor** | **14-sep** |
+| **0-AX** | Auditoría del despacho: 30 guías / 39 unidades · ✅ **confirmado con n=2: la banda de 2 uds de Bogotá/sabana está corta $2.994 → subir a $131.000** · margen real **$23.244/unidad** (no $24.129) · **el seguro es 15,1%, no 13,6%** (~$112.500/mes sin contar) · Quibdó/Buenaventura/Sincelejo en banda equivocada | **14-sep** |
+| **0-AW** | ⛔ **error #17: una devolución cuesta $17.384, no $24.129** — la pauta es el 77%, el producto vuelve y se revende · 🔴 **el 53% de las devoluciones NO dice motivo**; de las que sí: *no estaba* 48%, error de transportadora 24%, dirección 16%, **no pagó solo 8%** | **14-sep** |
+| **0-AV** | 🔧 Regla nueva en el guion: **para oficina solo se nombra Interrapidísimo** (o Coordinadora en Bogotá), **nunca Servientrega** · 🔴 el tarifario mandaba **Cartagena por Servientrega** para ahorrar $2.022 en la ciudad que devuelve 57% · ✅ **coordinadora cubre 5 municipios, interrapidísimo 124** — y NO es la más barata ($22.837, la más cara) | **14-sep** |
+| **0-AU** | 🎯 **LA CAUSA REAL DEL ALZA: Amor y Amistad (sábado 19-sep) subió el CPM +57%** desde el 12-sep · 🆕 **el efecto del pago llega con 2-3 DÍAS DE RETRASO**, el día de pago es plano · **errores #15 y #16** · regla: mirar el calendario comercial antes de culpar a la cuenta | **14-sep** |
+| **0-AS/AT** | Lunes 14 fue día 🔴 GRAVE ($20.275/pedido) · ⛔ **la quincena NO lo explica**: el 14-ago dio $704 y el 29-ago $893, los dos normales · en un valle de demanda Meta gastaría MENOS y gastó 72% MÁS | **14-sep** |
+| **0-AR** | ⛔ **CORRIGE 0-AP: Valle del Cauca es RENTABLE** ($1.258 vs límite $2.402) y casi recomiendo apagarla · **subir presupuesto a las regiones no sirve: usan 2% del que ya tienen** · **error #14** | **14-sep** |
+| **0-AQ** | ⛔ **ANULA 0-AP: el colmena es otro producto, su equilibrio es $3.322/conv, no $900** · el video del colmena corría al **72% de su equilibrio: DABA PLATA** · **error #12, el más grave** · decisión: prender a **$16.000/día**, solo el video | **14-sep** |
+| **0-AÑ** | ⛔ **ANULA el diagnóstico de saldo de 0-AN** · las regiones están frenadas porque cuestan **$1.576/conv vs $880**, no por falta de plata · **$20.992 del hueco eran los "Publico ABIERTO" pausados, que compraban a $3.500/conv** · **errores #8 y #9** · 🔑 **VIDEO, Domiciliarios y TEST Creativos tienen la MISMA segmentación: $125.000/día sobre la misma audiencia** | **12-14 sep** |
+| **0-AN** | 🔓 **EL SALDO SE LEE: `spend_cap − amount_spent`** · 🔓 **`/activities` se lee con `ads_read`** = libro de caja completo · Meta corta bajo **~$16.000-20.000**, no bajo cero · transportadoras: bug de `ENTREGADO A REMITENTE` corregido, las tres son **indistinguibles** (20,0/19,6/17,0%) | **12-sep** |
 | **0-AI** | 🔴🔴🔴 **LA CAUSA RAÍZ DE TODO: la cuenta se queda sin saldo a medio día y el rebote compra basura.** El 9-sep estuvo **MUERTA de 14 a 17h** ($30 en una hora) y a las **18:00 Meta metió $49.334 de golpe** → esa hora arruinó el $/conv del día **de todos los conjuntos a la vez**. **ESO fue "Motorizados se muere", no la audiencia.** Costó **$55.000-$130.000 de utilidad en un día** · hoy 11-sep pasó igual (11-13h seco) · **Meta protege a los grandes y ahoga a los chicos** = las 3 regiones que se están midiendo · 🔑 **el 10-sep es el ÚNICO día limpio** · la solución no es recargar más sino **recargar ANTES: colchón de 2-3 días** | **11-sep** |
 | **0-AH** | 🔑 **LA API YA LEE SOLA** (el token funciona, el veredicto del lunes sale sin exports) · 🔴 **Motorizados nunca se estaba encogiendo: era UN día, y el 9-sep fue malo para toda la cuenta** (+21%) — el recorte funcionó pero por el motivo contrario · 🔴🔴 **el que se diluye es DOMICILIARIOS, el control: +70% de costo en 5 días con CPM BAJANDO** = elasticidad 0,63 en vivo, vale **+26 conv/día** · **el CPM de TEST Creativos oscila, no sube** · 🔴 **la cuenta gasta $202.095, no $154.000** (Meta sobre-entrega 31% → el peso marginal ya devuelve $0) · **dos conjuntos del colmena no estaban en la tabla** y corroboran 0-AG (78,6% de su equilibrio) · regiones preliminares: **Tolima y Santander entregan, Eje Cafetero flojo** · **el sesgo del gate ahora tiene dos signos → solo criterio absoluto** | **11-sep** |
 | **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · 🔄 **y estaba comparando promedio contra promedio: contra el peso MARGINAL del tradicional (+$0,16) el colmena rinde +$0,43 = 2,7× más** · **no pierde plata: corre al 85% de SU equilibrio** · **se vuelve a prender después del 14** con audiencia de clientes, $8-10.000/día y ventana de 14 días · **diversificar ES el plan de crecimiento** · el manual para la chaqueta reflectiva · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · **17 de 37 conversaciones estaban vacías**, y con base limpia **el colmena ATRAE mejor (45,9% vs 57,8% de vacías) y CIERRA peor (15,0% vs 19,9%)** · el CPA se descompone exacto: paga 2,6× por conversación real y cierra 1,33× peor = 3,4× · seguimiento a **17** | **10-sep** |
@@ -10036,3 +10052,88 @@ Y si son miles acumulados, **la recomendación NO es escribirles a todos**: es e
 🔑 **Las dos salen del mismo error: apliqué el reglamento de la API a alguien que usa la app.**
 **Regla: antes de citar un límite de plataforma, confirmar CUÁL de las dos WhatsApp está usando.**
 Son productos distintos con reglas distintas.
+
+
+---
+
+# 🔴 SI ESTE CHAT SE BORRÓ, EMPEZAR AQUÍ — cierre del lunes 14-sep-2026
+
+## Estado de la operación
+
+| | |
+|---|---|
+| **CPA/unidad ahora** | **$10.359** (banda normal histórica: $5.300–$6.500) 🟠 |
+| **margen real/unidad** | **$23.244** medido en 39 unidades (el archivo usaba $24.129) |
+| **le queda por unidad** | **$12.885** — sigue ganando bien |
+| causa del alza | **Amor y Amistad (sábado 19-sep) subió el CPM +57%** · mitad temporal, mitad estructural por escalar ×32 |
+| saldo Meta | leerlo con **`spend_cap − amount_spent`** · alarma bajo **$40.000** · Meta corta bajo ~$16.000-20.000 |
+| presupuesto activo | $154.000/día tradicional + **$16.000/día colmena** (prendido el 14-sep ~01:00) |
+
+## ⏰ Lo primero que hay que hacer (por fecha)
+
+| cuándo | qué |
+|---|---|
+| **martes 15** | leer el lote del martes: **el lunes dio CPA $20.440 = 🔴 GRAVE** y cae ahí |
+| **miér 16 – jue 17** | el efecto del pago llega con **2-3 días de retraso** (0-AU). Aquí debería mejorar |
+| **dom 20 – lun 21** | **si el CPM sigue en $5.400+ después de Amor y Amistad, hay algo estructural** y toca meterse |
+| **hasta el 28-sep** | ventana del colmena (14 días desde el 14). Gatillo: **$3.322/conv** |
+
+## ✅ Acciones concretas pendientes, en orden de plata
+
+| # | acción | valor |
+|---|---|---|
+| 1 | **Arrancar el re-contacto manual** con etiqueta `cliente potencial` + mensajes rápidos `/seg1 /seg2 /seg3` desde el computador. Máximo 3, empezando por los últimos 7 días | **$558.000–$1.090.000/mes con CPA $0** |
+| 2 | **Subir la banda de 2 uds de Bogotá/sabana de $128.000 a $131.000** en `GUION-PARA-PEGAR.md` (confirmado con n=2, las dos dieron $20.993,75) | $2.994 por pedido |
+| 3 | **Corregir Quibdó, Buenaventura y Sincelejo**: están en banda de $81.000 con fletes de $23.000+ | |
+| 4 | **Darle presupuesto a `TEST Creativos`**: rinde **7,41 conv/mil vs 3,75** de los demás y solo tiene $25.000/día | |
+| 5 | **Actualizar el seguro de 13,6% a 15,1%** en el modelo del tarifario | ~$112.500/mes sin contar |
+| 6 | **Promo Amor y Amistad: $130.000 los dos con envío SOLO en Bogotá/sabana** (ahí el margen mejora). ⛔ nunca plano nacional | |
+| 7 | **Pago anticipado a los teléfonos que 99 Envíos marca** con historial de devolución | protege $24.129 en vez de $3.917 |
+
+## 🔔 Preguntas pendientes para 99 Envíos (todas en un correo)
+
+1. Los **códigos de motivo de devolución** — el 53% no dice por qué
+2. Qué cubre exactamente **Seguro 99 vs Seguro 99 Plus**
+3. Cómo se llama y dónde está el **señalador de teléfonos con historial**, y si se consulta por lote
+4. El **denominador del 16%** que muestra la plataforma
+5. El flete de **Tadó ($36.667)**
+6. Si hay **API o webhook de solo lectura** de pedidos
+
+## 📊 Datos que faltan y sin los que no se puede decidir
+
+| dato | para qué |
+|---|---|
+| **¿cuántos chats hay con etiqueta `cliente potencial`?** | dimensionar el re-contacto |
+| cuántos pedidos vienen de teléfonos marcados y cuántos se devuelven | validar el umbral del 50% del Plus |
+| ventas del colmena contadas aparte | la tasa de cierre del 8,1% viene de solo 3 ventas |
+| devoluciones de septiembre | **no medibles hasta el 22-sep** (rezago de 10 días) |
+
+## ⚠️ Las 20 correcciones de esta bitácora — el patrón
+
+**De los errores #8 al #20, casi todos son la misma familia:**
+
+| trampa | ejemplos |
+|---|---|
+| **comparar cosas de distinta madurez** | ventanas censuradas (#9, #17, **#18**) · devoluciones liquidadas vs en curso |
+| **usar el promedio como umbral** | colmena vs cuenta (**#12**) · Valle del Cauca (#14) |
+| **promediar un grupo y sentenciar a cada miembro** | las 4 regiones (#14) · las transportadoras |
+| **aceptar una explicación sin buscar el contraejemplo** | la quincena (#15, #16) |
+| **leer de más un dato chico** | elasticidad del colmena (#13) · VIDEO en un día (#10) |
+| **llamar error a lo que fue una decisión** | Nechí y el Seguro Plus |
+| **aplicar el reglamento equivocado** | API vs app (#19, #20) |
+
+🔑 **Y lo más valioso de esta bitácora: el dueño destapó la mayoría.** Cuando dice *"no me cuadra"* o
+*"por qué contó eso"*, **casi siempre tiene razón. Recalcular antes de defender el número.**
+
+## Reglas duras que salieron hoy
+
+1. **Nunca usar el promedio de la cuenta como umbral.** Cada SKU tiene el suyo: tradicional **$2.402**/conv, colmena **$3.322**/conv
+2. **Una devolución está liquidada cuando `valor_servicio == valor_seguro_99`**
+3. **No abreviar un campo de texto que después se usa para clasificar**
+4. **Antes de aceptar una explicación cíclica, buscar el ciclo anterior en el mismo dato**
+5. **Antes de culpar a la cuenta, mirar el calendario comercial del país**
+6. **Antes de citar un límite de plataforma, confirmar si usa la APP o la API**
+7. **Código en el repo ≠ código en producción. Preguntar.**
+8. **Cuando algo se sale del patrón, primero preguntar si fue una decisión**
+9. **El costo de una transportadora es `flete + tasa_devolución × (flete + utilidad)`**, nunca solo el flete
+10. **Antes de recomendar una acción para bajar un número, saber qué lo causa**
