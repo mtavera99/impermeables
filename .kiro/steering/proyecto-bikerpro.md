@@ -4,9 +4,10 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-11 05:35 Bogotá** — 🆕 **sección 0-AH: primera lectura en vivo de la
-API. Corrige dos diagnósticos de 0-AF (Motorizados y TEST Creativos) y encuentra que el problema real
-está en Domiciliarios.** *(ojo: verificar siempre la fecha en
+Última actualización: **2026-09-15 01:30 Bogotá** — 🆕 **sección 0-BF: la descomposición del alza.
+Amor y Amistad explica el 41%, no el 100%. El otro 59% es caída de conv/mil concentrada en los dos
+conjuntos que tienen $100.000 de los $154.000. Corrige 0-AU y 0-AO (errores #21, #22, #23) y proyecta
+el Q4.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
 > 🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA: andá directo al bloque "TRASPASO A LA SESIÓN NUEVA" de la
@@ -22,6 +23,7 @@ está en Domiciliarios.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BF** | 🎯 **LA DESCOMPOSICIÓN: `$/conv = CPM ÷ conv-por-mil`. Amor y Amistad explica el 41%, la caída de audiencia el 59%** · ⛔ **corrige 0-AU** (el domingo 13 tuvo el CPM MÁS ALTO y salió bien: $1.032) · ⛔ **corrige 0-AO**: la degradación **NO fue uniforme** — Motorizados y el colmena tuvieron su MEJOR conv/mil mientras los dos grandes se derrumbaron · 🔑 **Motorizados pagó el peor CPM ($7.771) y trajo las conversaciones más baratas ($885)** · el lunes ganó **$16.700 vs $189.737 de promedio** (9%) · ✅ el CPM sube en TODOS los conjuntos a la vez = firma de la subasta · 📅 **proyección Q4: con conv/mil 2,76 el Cyber Monday PIERDE $57.652; con 4,45 GANA $60.380** · 🌧️ **nunca se midió si la lluvia mueve las ventas** (#98) · 🔴 **`balance` ≠ saldo** · 🔴 **leer a las 13:00 subestima el gasto 5,8%** · **errores #21, #22 y #23** | **15-sep** |
 | **0-BE** | ⛔ **LAS 24H Y LAS PLANTILLAS NO APLICAN: usa la APP, no la API.** Escribe a quien quiera, cuando quiera, gratis · **el pozo de re-contacto es TODO el histórico, no un mes** · **NO migrar a la API**: perdería la intervención en tiempo real que le mejora el cierre · ya usa etiqueta `cliente potencial` y mensajes rápidos `/` · el límite real es el **reporte por spam**, no la técnica · **errores #19 y #20** | **14-sep** |
 | **0-BD** | ⛔ **EL BOT DE `bot/` NO ESTÁ CORRIENDO.** Usa el **agente de IA de Meta** · el agente es **reactivo: no puede iniciar** → el seguimiento no se automatiza con él · 🔔 verificar si Meta ya le cobra el Business Agent (desde 1-ago-2026) · **regla: código en el repo ≠ código en producción** | **14-sep** |
 | **0-BC** | 💰 **Re-contactar a los que no compraron es la palanca más grande: $558.000–$1.090.000/mes con CPA $0** · Colombia es de las 3 más baratas del mundo en la API ($0,0144/mensaje) · ⚠️ apps de envío masivo no oficiales **bloquean el número** | **14-sep** |
@@ -10056,39 +10058,458 @@ Son productos distintos con reglas distintas.
 
 ---
 
-# 🔴 SI ESTE CHAT SE BORRÓ, EMPEZAR AQUÍ — cierre del lunes 14-sep-2026
+## 0-BF · ⛔ CORRIGE 0-AU Y 0-AO: AMOR Y AMISTAD EXPLICA EL 41%, NO EL 100% — EL OTRO 59% ES DESBALANCE DE PRESUPUESTO (mar 15-sep, 01:30 Bogotá)
+
+> **Todo lo de esta sección sale de la Marketing API en vivo, con el lunes 14 ya cerrado.**
+> El dueño preguntó dos cosas —*"¿qué tiene que ver Amor y Amistad?"* y *"¿hago algo o tengo
+> paciencia?"*— y las dos respuestas cambiaron cuando fui a buscar la evidencia en vez de repetir
+> el diagnóstico de 0-AU.
+>
+> **Reproducible entero con un comando:**
+> ```bash
+> python3 analisis/descomposicion-cpm-vs-audiencia-15sep.py
+> ```
+> ⚠️ **Los números pueden moverse ±1%** entre corridas: Meta revisa el gasto hacia arriba durante
+> horas (ver el hallazgo #2 del bloque de API, más abajo). Las conclusiones no se mueven.
+
+### 🕐 Primero: la trampa de la fecha, otra vez
+
+El sandbox corre en **UTC** y marcaba *"martes 15"* cuando en Bogotá todavía era **lunes 14 a las
+21:17**. Todo el trabajo de esta sección arrancó verificando `TZ=America/Bogota`.
+
+⚠️ **Y detectado de paso:** los encabezados de 0-BA a 0-BE dicen horas (19:00, 20:00, 21:00, 22:00,
+22:30) que **no coinciden con los commits** (18:28, 18:34, 18:42, 18:49, 20:22 Bogotá). Vienen
+corridos 3-4 horas. No cambia ninguna conclusión, pero **al reconstruir la cronología hay que creerle
+al `git log`, no al encabezado.**
+
+---
+
+### 🔑 EL HALLAZGO: la descomposición exacta del alza
+
+`$/conv` es una identidad, no una estimación:
+
+```
+$/conv  =  CPM  ÷  conv-por-mil
+           ↑            ↑
+      el PRECIO     la CALIDAD
+     (la subasta)  (la audiencia)
+```
+
+**TRADICIONAL solo (el colmena aparte, lección del error #12):**
+
+| día | impresiones | conv | CPM | conv/mil | $/conv |
+|---|---|---|---|---|---|
+| 06-sep | 38.260 | 223 | $4.089 | 5,83 | $702 |
+| 07-sep | 48.652 | 256 | $3.581 | 5,26 | $681 |
+| 08-sep | 34.677 | 153 | $3.699 | 4,41 | $838 |
+| 09-sep | 36.811 | 125 | $3.616 | 3,40 | $1.065 |
+| 10-sep | 59.346 | 220 | $3.424 | 3,71 | $924 |
+| 11-sep | 48.018 | 205 | $3.447 | 4,27 | $807 |
+| 12-sep | 19.950 | 94 | $4.374 | 4,71 | $928 |
+| 13-sep | 17.410 | 116 | **$6.877** | **6,66** | $1.032 |
+| **14-sep** | 43.438 | 120 | $5.143 | **2,76** | **$1.862** |
+
+| | base (6-11 sep, agrupada) | 14-sep | factor |
+|---|---|---|---|
+| **CPM** (el precio) | $3.615 | $5.143 | **×1,42** |
+| **conv/mil** (la respuesta) | 4,45 | 2,76 | **×1,61** |
+| **$/conv** | $813 | $1.862 | ×2,29 ✓ |
+
+## 🎯 **DEL ALZA TOTAL: LA SUBASTA EXPLICA EL 41%, LA AUDIENCIA EL 59%.**
+
+**0-AU dejó escrito que "la causa real" era Amor y Amistad. Es la causa MINORITARIA.**
+
+### 🔬 La prueba que lo decide: el domingo 13
+
+| | CPM | conv/mil | $/conv |
+|---|---|---|---|
+| **dom 13-sep** | **$6.877** ← el más alto de toda la ventana | 6,66 | **$1.032** 🟡 |
+| **lun 14-sep** | $5.143 ← **más barato** | 2,76 | **$1.862** 🔴 |
+
+**El domingo se pagó un CPM 34% MÁS CARO que el lunes y el día salió bien.** Si Amor y Amistad fuera
+la causa del daño, el domingo tenía que ser el peor día de los dos. Fue el mejor.
+
+👉 **El daño del lunes no vino del precio. Vino de que la audiencia dejó de responder.**
+
+---
+
+### ✅ Lo que SÍ hace Amor y Amistad (y queda confirmado)
+
+**Amor y Amistad es el tercer sábado de septiembre — en 2026, el sábado 19.** No es fecha religiosa
+ni histórica: fue una decisión comercial de 1969. Es la segunda temporada de regalos del país
+después de diciembre.
+Fuentes: [calendariodecolombia](https://www.calendariodecolombia.com/fecha/2026/dia-de-amor-y-amistad) ·
+[Cablenoticias](https://www.cablenoticias.com/noticias/amor-y-amistad-2026-en-colombia-la-fecha-y-su-origen).
+*Contenido reformulado por restricciones de licencia.*
+
+**El mecanismo no tiene nada que ver con el producto: es la subasta.** Meta no cobra un precio fijo;
+cobra lo que el siguiente anunciante esté dispuesto a pagar por el mismo par de ojos. Cuando
+floristerías, joyerías, restaurantes y ropa suben presupuesto sobre los mismos colombianos, **el precio
+de aparecer sube para todos los que estén en esa subasta.**
+
+🔑 **Y el solapamiento de público es casi total, aunque el producto no tenga nada que ver:** la
+floristería no le apunta a domiciliarios, le apunta a *"adultos en Bogotá y Medellín"* — un círculo
+grande que **contiene** a los domiciliarios de BikerPro.
+
+**LA PRUEBA (test propio, no referencia externa): si es la subasta, el CPM sube en TODOS los conjuntos
+a la vez, incluso los de audiencia distinta.**
+
+| conjunto | 09-08 | 09-11 | 09-12 | 09-13 | 09-14 |
+|---|---|---|---|---|---|
+| Motorizados | 3.722 | 3.449 | 5.699 | **8.219** | 7.771 |
+| Domiciliarios | 3.395 | 3.361 | 4.345 | **6.566** | 5.562 |
+| TEST Creativos | 5.914 | 5.194 | 7.335 | **13.192** | 6.985 |
+| Domiciliarios VIDEO | 3.351 | 3.317 | 3.925 | **6.028** | 4.529 |
+| **Publico ABIERTO video** *(colmena, otra audiencia)* | 8.170 | — | — | — | **16.122** |
+
+**Todos, el mismo día, incluido el colmena.** Esa es la firma de un alza de mercado. ✅ **Amor y
+Amistad es real, está medida en la cuenta propia, y vale ×1,42 sobre el CPM.**
+
+📌 **Regla nueva: cuando un costo sube en UN conjunto es de la cuenta. Cuando sube en TODOS el mismo
+día, es de la subasta. El test es gratis y descarta media hipótesis.**
+
+---
+
+### 🔴🔴 EL OTRO 60%: la caída de audiencia NO fue uniforme, y ahí está la plata
+
+**0-AO concluyó "degradación UNIFORME en los 4 conjuntos = señal de demanda". El lunes 14 NO fue
+uniforme, y eso cambia la conclusión.**
+
+**conv/mil por conjunto:**
+
+| conjunto | presup/día | 13-sep | **14-sep** | |
+|---|---|---|---|---|
+| **Motorizados** | $9.000 | 8,76 | **8,78** | 🟢 **su mejor día** |
+| **Publico ABIERTO video** (colmena) | $16.000 | — | **7,36** | 🟢 **su mejor día** |
+| **TEST Creativos** | $25.000 | 18,98 | **5,14** | 🟡 bajó, sigue sobre el promedio |
+| **Domiciliarios** | $45.000 | 6,96 | **2,70** | 🔴 se derrumbó |
+| **Domiciliarios VIDEO** | $55.000 | 4,35 | **2,25** | 🔴 se derrumbó |
+
+## 🔑 **LA CAÍDA ESTÁ CONCENTRADA EN LOS DOS CONJUNTOS QUE TIENEN $100.000 DE LOS $154.000. LOS DOS CHICOS MEJORARON.**
+
+**Y el remate, que mata "el mercado está malo" como explicación completa:**
+
+> **Motorizados pagó el CPM MÁS CARO de la cuenta el lunes ($7.771) y trajo las conversaciones MÁS
+> BARATAS ($885).** Pagó el peor precio del mercado y le fue **2,3× mejor** que al control.
+> El mercado estaba igual de malo para él.
+
+**$/conv por conjunto el lunes 14:**
+
+| conjunto | presup/día | $/conv | CPM |
+|---|---|---|---|
+| **Motorizados** | $9.000 | **$885** 🟢 | $7.771 |
+| **TEST Creativos** | $25.000 | **$1.360** 🟢 | $6.985 |
+| Domiciliarios VIDEO | $55.000 | **$2.012** 🔴 | $4.528 |
+| Domiciliarios | $45.000 | **$2.063** 🔴 | $5.563 |
+
+📌 **Encaja exacto con 0-AÑ:** *VIDEO, Domiciliarios y TEST Creativos tienen la MISMA segmentación.*
+Se están empujando **$100.000/día por dos conjuntos sobre una audiencia ya saturada**, mientras los
+dos que compran bien tienen $34.000 entre los dos. **No es fatiga de creativo ni es el mercado: es
+desbalance de presupuesto sobre una segmentación repetida.**
+
+---
+
+### 💰 EL LUNES EN PLATA — utilidad neta día por día
+
+Método de 0-BA (margen $23.244/ud · 1,3 ud/pedido · cierre 8,4% · devoluciones 19%):
+
+| día | pauta | conv | $/conv | pedidos | **utilidad neta** |
+|---|---|---|---|---|---|
+| 07-sep | $174.212 | 256 | $681 | 21,5 | **$338.101** |
+| 08-sep | $128.285 | 153 | $838 | 12,9 | $177.902 |
+| 09-sep | $133.101 | 125 | $1.065 | 10,5 | $117.052 |
+| 10-sep | $203.184 | 220 | $924 | 18,5 | $237.085 |
+| 11-sep | $165.495 | 205 | $807 | 17,2 | $244.756 |
+| 12-sep | $87.262 | 94 | $928 | 7,9 | $100.853 |
+| 13-sep | $119.732 | 116 | $1.032 | 9,7 | $112.410 |
+| **14-sep** | **$223.447** | **120** | **$1.862** | **10,1** | **$16.700** 🔴 |
+
+| | |
+|---|---|
+| promedio de los 7 días anteriores | **$189.737/día** |
+| **lunes 14** | **$16.700 = 9% de lo normal** |
+| **costo del día** | **~$173.000 de utilidad** |
+
+🟢 **NO se perdió plata: se ganó el 9% de lo normal.** Las dos cosas son verdad y hay que decir las
+dos. El dueño lo leyó bien de entrada (*"no me quiero alarmar, supongo que son cosas que pasan"*):
+**tenía razón en la calma y razón en la preocupación.**
+
+### 📌 Cierre del lunes 14, para el registro
+
+| | tradicional | colmena |
+|---|---|---|
+| gasto | $223.447 | $17.538 |
+| conversaciones | 120 | 8 |
+| **$/conv** | **$1.862** 🔴 | **$2.192** 🟢 |
+| % de su equilibrio | **78%** ($2.402) | **66%** ($3.322) |
+| CPA implícito | **$22.167**/pedido | — |
+
+**Gasto total del día: $240.985 sobre presupuesto de $170.000 = 142% de sobre-entrega.**
+🔴 **Rompe el techo de la predicción de 0-AS (124-139%).** La hipótesis de sobre-entrega ya no está
+pendiente del test: **está medida.**
+
+💎 **El colmena cerró en $2.192/conv = 66% de su equilibrio, su mejor día.** Tercer día en rango.
+La decisión de 0-AQ de prenderlo a $16.000 se sostiene, y hoy es **lo más sano de la cuenta.**
+
+### ⛔ Y una acusación mía que el dato NO sostiene
+
+Venía señalando la sobre-entrega del 142% como parte del daño del CPA. **Falso:**
+
+| tramo del lunes | $/conv |
+|---|---|
+| mañana (00:00–12:59) | $1.801 |
+| tarde-noche (13:00–24:00) | $1.959 |
+
+**Solo 9% peor.** El gasto de más **no compró basura** — compró casi lo mismo, caro. La sobre-entrega
+es un problema **de caja** (dos noches seguidas corto de saldo), **no la causa del CPA del lunes.**
+
+🔑 **Regla del proyecto que casi rompo: antes de recomendar una acción para bajar un número, saber qué
+lo causa. Y antes de sumar una causa a la lista, verificar que aporte al daño.**
+
+---
+
+### 📅 LO QUE VIENE: el Q4 y por qué esto es el ensayo general de diciembre
+
+Referencias de industria (⚠️ **de mercados grandes, NO medidas en esta cuenta** — el único número
+propio es el ×1,42 de Amor y Amistad):
+
+| | |
+|---|---|
+| Q4 (oct-dic) vs Q3 | CPM **+30% a +50%** ([leadenforce](https://leadenforce.com/blog/why-your-q4-facebook-ad-budget-should-shift-starting-in-fall-and-how-to-plan-it)) |
+| semana de Black Friday vs base de octubre | **+50% a +80%** ([metamktgagency](https://www.metamktgagency.com/blog/black-friday-meta-ads-structure)) |
+| noviembre vs enero | **+60% a +100%** ([stackmatix](https://www.stackmatix.com/blog/seasonal-ad-cost-fluctuations-2026)) |
+| **Cyber Monday** | **el día más caro del año en Meta, ~138% sobre el promedio anual** ([sociallyin](https://sociallyin.com/blog/black-friday-marketing-strategy-social-media/)) |
+
+*Contenido reformulado por restricciones de licencia.*
+
+**Proyección cruzando CPM contra las dos calidades de audiencia YA MEDIDAS en la cuenta:**
+
+| escenario de CPM | CPM | conv/mil **4,48** *(sana)* | conv/mil **2,76** *(como el 14)* |
+|---|---|---|---|
+| hoy sin evento | $3.615 | **$813** 🟢 | **$1.309** 🟢 |
+| Amor y Amistad *(medido)* | $5.097 | $1.146 🟢 | $1.845 🟡 |
+| Black Friday bajo (+50%) | $5.422 | $1.219 🟢 | $1.963 🟡 |
+| Black Friday alto (+80%) | $6.507 | $1.463 🟢 | $2.356 🟡 al filo |
+| **Cyber Monday (+138%)** | $8.604 | **$1.934** 🟡 | **$3.115** 🔴 **pierde** |
+
+**Utilidad por cada 100 conversaciones:**
+
+| escenario | audiencia **sana** | audiencia **como el 14** |
+|---|---|---|
+| hoy | $172.545 | $122.952 |
+| Amor y Amistad | $139.221 | $69.294 |
+| Black Friday (+80%) | $107.522 | $18.254 |
+| **Cyber Monday (+138%)** | **+$60.380** ✅ | **−$57.652** 🔴 |
+
+## 🔑 **EL MISMO EVENTO DEJA +$60.380 O QUITA $57.652. LA DIFERENCIA NO ES META, NI LA FECHA, NI EL CREATIVO: ES EL conv/mil.**
+
+> **Amor y Amistad no es el problema. Es el ensayo general de diciembre** — y el ensayo avisó que con
+> conv/mil 2,76 un evento de +41% ya baja la utilidad del día a $16.864. **Diciembre es 2-3× más
+> grande.** Con el conv/mil sano, el peor día del año se pasa ganando plata.
+
+### ⚠️ Y ajusta la expectativa del 19-sep
+
+**Cuando pase Amor y Amistad el `$/conv` NO vuelve a $813.** Vuelve a **~$1.309** si el conv/mil sigue
+en 2,76. **El sábado 19 devuelve el 40%, no el 100%.** No confundir eso con "ya se arregló".
+
+### 🗓️ El calendario del resto del año
+
+| fecha | qué es | qué hacer |
+|---|---|---|
+| **sáb 19-sep** | Amor y Amistad | aguantar, ya se está dentro |
+| **20-sep al 31-oct** | 🟢 **LA VENTANA LIMPIA DEL AÑO** — sin eventos, CPM normal | **aquí se arregla el conv/mil**, sin un evento encima. **6 semanas** |
+| sáb 31-oct | Halloween (moderado en Colombia) | vigilar, no planear |
+| **vie 27-nov** | **Black Friday** | llegar con audiencia sana y caja |
+| **lun 30-nov** | **Cyber Monday**, el día más caro del año | si el conv/mil no está arreglado, **evaluar BAJAR presupuesto ese día** |
+| **dic** | Navidad | el mes más caro y el de más demanda |
+
+📌 **Asimetría que importa y que el dueño tenía invertida:** él pensaba *"en Black Friday sí me afecta,
+en Amor y Amistad no porque no es mi público"*. **Es al contrario.** Amor y Amistad **sube el costo sin
+subir la demanda** de impermeables — se paga la fiesta sin ir a la fiesta. Black Friday y Navidad
+suben el costo **pero también la intención de compra general.** *(La segunda mitad es razonamiento, no
+medición: hay que verificarla con el dato de noviembre.)*
+
+---
+
+### 🌧️ PUNTO CIEGO GRANDE: nunca se midió si la lluvia mueve las ventas
+
+**Cuatro meses de proyecto vendiendo impermeables y no hay una sola línea sobre lluvia en toda esta
+memoria.** Es el driver de demanda más obvio del producto y está sin medir.
+
+Y es urgente ahora: el **IDEAM pronostica lluvias por encima de lo normal en octubre en al menos 10
+departamentos**, a pesar de que El Niño se recrudece — hasta 50% de probabilidad.
+Fuentes: [Vanguardia](https://www.vanguardia.com/colombia/2026/09/09/pese-a-el-nino-ideam-preve-lluvias-fuertes-en-10-departamentos-en-octubre/) ·
+[El Colombiano](https://www.elcolombiano.com/colombia/el-nino-lluvias-10-departamentos-octubre-ideam-BP40833299).
+*Contenido reformulado por restricciones de licencia.*
+
+**Por qué importa:** si la lluvia mueve el conv/mil, **octubre trae demanda gratis justo en la ventana
+de CPM barato** y eso reordena todo el plan del trimestre. Y si NO la mueve, también vale saberlo:
+se deja de atribuir a la lluvia días que eran otra cosa.
+
+**Es medible con lo que ya hay:** conversaciones diarias desde julio (API) contra lluvia diaria de
+Bogotá y Medellín. **Un análisis, un día de trabajo.** → **#98**
+
+---
+
+### 🔌 Tres hallazgos operativos de la API (van al manual, no al diagnóstico)
+
+#### 1. 🔴 El campo `balance` NO es el saldo. Es la deuda del día
+
+| | la noche del 14-sep |
+|---|---|
+| `balance` que devuelve la API | **$228.395** |
+| saldo real (`spend_cap − amount_spent`) | **$117.706** |
+| gasto del día 14-sep | $228.093 ≈ el `balance` |
+
+**`balance` = lo gastado que Meta todavía no ha cobrado.** Es una deuda, no plata disponible.
+Confirmado por el cobro de las 06:16 Bogotá del 14 ($119.211 ≈ el gasto del 13-sep, $119.732).
+
+⚠️ **Quien lea `balance` como saldo va a creer que tiene el doble.** La regla de 0-AN sigue siendo la
+única válida: **`spend_cap − amount_spent`.**
+
+#### 2. 🔴 Leer a las 13:00 subestima el gasto ~5,8% — y eso mueve los umbrales del gate
+
+Mismo tramo 00:00–12:59 del lunes, leído dos veces:
+
+| | a las 13:00 (lo anotado en 0-AS) | la API horas después |
+|---|---|---|
+| gasto tradicional | $120.919 | **$127.888** |
+| conversaciones | 71 | 71 |
+| **$/conv** | $1.703 | **$1.801** |
+
+**Las mismas 71 conversaciones, $6.969 más de gasto.** Meta revisa el gasto hacia arriba.
+
+**Los umbrales del gatillo de 0-AS, corregidos por el sesgo:**
+
+| banda escrita | lo que hay que leer a las 13:00 |
+|---|---|
+| ✅ era la quincena (≤ $900) | **≤ $850** |
+| ⚠️ parcial ($900–$1.200) | **$850 – $1.134** |
+| ❌ cortar (> $1.200) | **> $1.134** |
+
+👉 **Mejor todavía: leer el gate con el día CERRADO, no a las 13:00.** El gatillo dice "cortar el gasto
+por encima del presupuesto", que no es urgente a mediodía. Se pierde medio día y se elimina el sesgo.
+
+#### 3. `funding_source_details` → `(#10) Permission Denied` con el rol Analista
+
+**Desde la API no se puede ver el método de pago ni la tarjeta.** Las recargas se confirman por
+`/activities` (que sí se lee) o verificando que **`spend_cap` subió el monto exacto.**
+
+---
+
+### 💵 Movimientos de caja del 14 al 15-sep (del libro de `/activities`)
+
+| hora Bogotá | evento |
+|---|---|
+| 14-sep 00:07 | recarga **$100.000** |
+| 14-sep 06:16 | Meta cobra **$119.211** (el gasto del 13) |
+| 14-sep 13:23 | recarga **$100.000** |
+| 14-sep 18:27 | recarga **$100.000** |
+| **15-sep 00:58** | recarga **$100.000** → `spend_cap` 5.082.000 → **5.182.000** ✅ |
+
+**Saldo al arrancar el martes 15: $204.005.**
+
+⚠️ **Con $204.005 y el ritmo del lunes ($240.765/día), la proyección era: Meta frena ~16:00, seco
+~18:00.** El tramo del test (00:00–13:00) queda cubierto con ~$61.000 de colchón, así que **la lectura
+del gate sale limpia**. Lo que se puede perder es la tarde.
+
+⛔ **Y la regla que salió de ahí: si la cuenta se seca en la tarde, NO recargar hasta la medianoche.**
+Recargar a las 19:00 es exactamente lo que dispara el rebote de 0-AI (Meta suelta el gasto de golpe
+sobre el inventario más frío: costó $55.000-$130.000 en un día el 9-sep). **Mejor perder 6 horas
+apagado que comprar basura.** La mezcla mala es secarse a las 18:00 y recargar a las 19:00.
+
+---
+
+### ⚠️ Errores #21, #22 y #23
+
+| # | lo que estaba escrito | lo que dice el dato |
+|---|---|---|
+| **21** | 0-AU: *"la causa REAL del alza es Amor y Amistad"* | **es el 41%.** El 59% es caída de conv/mil concentrada en 2 conjuntos. **El domingo 13 tuvo CPM MÁS ALTO y $/conv de $1.032** |
+| **22** | 0-AO: *"degradación UNIFORME en los 4 conjuntos = demanda"* | **el 14 NO fue uniforme:** Motorizados y colmena tuvieron su MEJOR día de conv/mil mientras los dos grandes se derrumbaron |
+| **23** | (mío, de esta madrugada) *"la sobre-entrega del 142% es parte del daño del CPA"* | **no.** La tarde fue solo 9% peor que la mañana. Es problema de caja, no de calidad |
+
+🔑 **El patrón, otra vez el mismo de la lista de los errores #8 al #20:** *aceptar una explicación sin
+buscar el contraejemplo.* Amor y Amistad era **verdadera y suficiente-sonando**, así que se cerró el
+caso. El contraejemplo estaba a un día de distancia: el domingo 13.
+
+📌 **Y el dueño destapó este también.** Preguntó *"¿qué tiene que ver Amor y Amistad?"* — no lo aceptó
+porque se lo dijeran. **Van 3 de 3 secciones donde la pregunta escéptica del dueño encuentra un error.**
+
+### Reglas duras nuevas
+
+11. **Un `$/conv` nunca se diagnostica entero: se parte en `CPM ÷ conv-por-mil` primero.** Precio y
+    calidad tienen causas y remedios distintos, y confundirlos manda a esperar cuando hay que actuar
+12. **Si un costo sube en UN conjunto es de la cuenta; si sube en TODOS el mismo día, es de la
+    subasta.** El test es gratis
+13. **"Uniforme" se verifica conjunto por conjunto, no con el promedio de la cuenta.** El promedio de
+    5 conjuntos oculta que 2 mejoraron y 2 se derrumbaron
+14. **Antes de culpar al calendario comercial, buscar el día de CPM MÁS ALTO de la ventana.** Si ese
+    día salió bien, el calendario no es la causa principal
+15. **`balance` ≠ saldo.** Saldo es `spend_cap − amount_spent`, siempre
+16. **Un día abierto leído a mediodía subestima el gasto ~6%.** Cualquier umbral que se lea a las
+    13:00 hay que bajarlo ~6%, o leerlo con el día cerrado
+
+
+---
+
+# 🔴 SI ESTE CHAT SE BORRÓ, EMPEZAR AQUÍ — martes 15-sep-2026, 01:30 Bogotá
+
+> ⚠️ **PRIMERO: verificar la fecha con `TZ=America/Bogota date`.** El sandbox corre en UTC y marca el
+> día siguiente. Un diagnóstico entero se puede armar sobre el día equivocado.
 
 ## Estado de la operación
 
 | | |
 |---|---|
-| **CPA/unidad ahora** | **$10.359** (banda normal histórica: $5.300–$6.500) 🟠 |
-| **margen real/unidad** | **$23.244** medido en 39 unidades (el archivo usaba $24.129) |
-| **le queda por unidad** | **$12.885** — sigue ganando bien |
-| causa del alza | **Amor y Amistad (sábado 19-sep) subió el CPM +57%** · mitad temporal, mitad estructural por escalar ×32 |
-| saldo Meta | leerlo con **`spend_cap − amount_spent`** · alarma bajo **$40.000** · Meta corta bajo ~$16.000-20.000 |
-| presupuesto activo | $154.000/día tradicional + **$16.000/día colmena** (prendido el 14-sep ~01:00) |
+| **$/conv tradicional (lunes 14 cerrado)** | **$1.862** 🔴 — el doble de cualquier día anterior. Equilibrio $2.402 (78%) |
+| **$/conv colmena** | **$2.192** 🟢 — 66% de su equilibrio ($3.322). **Lo más sano de la cuenta** |
+| **CPA implícito** | **$22.167**/pedido (banda normal: $5.300–$6.500 por unidad) 🟠 |
+| **utilidad del lunes** | **$16.700** contra **$189.737** de promedio de los 7 días previos = **9%** |
+| **margen real/unidad** | **$23.244** medido en 39 unidades |
+| **causa del alza** | 🆕 **41% Amor y Amistad (CPM ×1,42) + 59% caída de conv/mil (4,45 → 2,76)** → **0-BF**. ⛔ **NO es "todo Amor y Amistad" como decía 0-AU** |
+| saldo Meta | **`spend_cap − amount_spent`** (⛔ `balance` NO es el saldo) · alarma bajo **$40.000** · Meta corta bajo ~$16.000-20.000 |
+| **saldo al arrancar el 15** | **$204.005** (recarga de $100.000 a las 00:58 confirmada) |
+| presupuesto activo | $154.000/día tradicional + $16.000/día colmena · 🔴 **pero el lunes gastó $240.985 = 142%** |
+
+## 🔑 El diagnóstico en una frase
+
+**No es fatiga de creativo, no es solo el calendario, y no es el mercado.** Son **$100.000/día
+empujados por dos conjuntos (`Domiciliarios` + `Domiciliarios VIDEO`) sobre la MISMA segmentación
+saturada**, mientras los dos que compran barato tienen $34.000 entre los dos:
+
+| conjunto | presup/día | $/conv del lunes | conv/mil |
+|---|---|---|---|
+| **Motorizados** | $9.000 | **$885** 🟢 | **8,78** ← su mejor día |
+| **TEST Creativos** | $25.000 | **$1.360** 🟢 | 5,14 |
+| Domiciliarios VIDEO | $55.000 | **$2.012** 🔴 | 2,25 |
+| Domiciliarios | $45.000 | **$2.063** 🔴 | 2,70 |
 
 ## ⏰ Lo primero que hay que hacer (por fecha)
 
 | cuándo | qué |
 |---|---|
-| **martes 15** | leer el lote del martes: **el lunes dio CPA $20.440 = 🔴 GRAVE** y cae ahí |
-| **miér 16 – jue 17** | el efecto del pago llega con **2-3 días de retraso** (0-AU). Aquí debería mejorar |
-| **dom 20 – lun 21** | **si el CPM sigue en $5.400+ después de Amor y Amistad, hay algo estructural** y toca meterse |
-| **hasta el 28-sep** | ventana del colmena (14 días desde el 14). Gatillo: **$3.322/conv** |
+| **martes 15, 13:00** | 🎯 **EL GATE.** `$/conv` del tradicional solo, tramo 00:00–12:59. **Umbrales corregidos por el sesgo del −5,8%: ≤$850 / $850–$1.134 / >$1.134.** Mejor todavía: leerlo el miércoles con el martes **cerrado** |
+| **martes 15, tarde** | ⚠️ con $204.005 y el ritmo del lunes, Meta frena ~16:00 y seco ~18:00. **Si se seca, NO recargar hasta medianoche** (rebote de 0-AI) |
+| **miér 16 – jue 17** | el efecto del pago llega con **2-3 días de retraso** (0-AU). Aquí debería mejorar. **Y aquí se decide el rebalanceo de presupuesto de 0-BF** |
+| **sáb 19-sep** | Amor y Amistad. ⚠️ **el `$/conv` NO vuelve a $813: vuelve a ~$1.320 si el conv/mil sigue en 2,76. Devuelve el 40%, no el 100%** |
+| **dom 20 – lun 21** | 🔴 **si el CPM sigue en $5.400+ después del 19, no es calendario** y toca meterse en serio |
+| **20-sep al 31-oct** | 🟢 **LA VENTANA LIMPIA DEL AÑO: 6 semanas sin eventos. Aquí se arregla el conv/mil** |
+| **27-30 nov** | Black Friday / Cyber Monday. **Con conv/mil 2,76 el Cyber Monday PIERDE $57.652 por cada 100 conv; con 4,45 GANA $60.380** → 0-BF |
+| **hasta el 28-sep** | ventana del colmena (14 días desde el 14). Gatillo: **$3.322/conv** — va en 66% |
 
 ## ✅ Acciones concretas pendientes, en orden de plata
 
 | # | acción | valor |
 |---|---|---|
-| 1 | **Arrancar el re-contacto manual** con etiqueta `cliente potencial` + mensajes rápidos `/seg1 /seg2 /seg3` desde el computador. Máximo 3, empezando por los últimos 7 días | **$558.000–$1.090.000/mes con CPA $0** |
+| 1 | **Arrancar el re-contacto manual** con etiqueta `cliente potencial` + mensajes rápidos `/seg1 /seg2 /seg3` desde el computador. Máximo 3, empezando por los últimos 7 días. 🆕 **Hoy vale el doble en términos relativos: cuando la conversación pagada cuesta $1.861, una venta a CPA $0 pesa más** | **$558.000–$1.090.000/mes con CPA $0** |
+| **1-B** | 🆕🔴 **REBALANCEAR EL PRESUPUESTO — el hallazgo de 0-BF.** `Motorizados` ($9.000, $885/conv) y `TEST Creativos` ($25.000, $1.360/conv) compran 1,5-2,3× más barato que `Domiciliarios` ($45.000, $2.063) y `Domiciliarios VIDEO` ($55.000, $2.012). ⛔ **NO antes del miércoles 16** (destruye el gate y editar reinicia el aprendizaje). ⚠️ Y recordar 0-AR: **subir presupuesto no sirve si el conjunto no lo usa** — hay que verificar utilización antes | **es lo que decide si el Q4 se gana o se pierde** |
 | 2 | **Subir la banda de 2 uds de Bogotá/sabana de $128.000 a $131.000** en `GUION-PARA-PEGAR.md` (confirmado con n=2, las dos dieron $20.993,75) | $2.994 por pedido |
 | 3 | **Corregir Quibdó, Buenaventura y Sincelejo**: están en banda de $81.000 con fletes de $23.000+ | |
-| 4 | **Darle presupuesto a `TEST Creativos`**: rinde **7,41 conv/mil vs 3,75** de los demás y solo tiene $25.000/día | |
+| 4 | **Darle presupuesto a `TEST Creativos`** *(absorbida en 1-B)*: rinde **7,41 conv/mil vs 3,75** de los demás y solo tiene $25.000/día | |
 | 5 | **Actualizar el seguro de 13,6% a 15,1%** en el modelo del tarifario | ~$112.500/mes sin contar |
 | 6 | **Promo Amor y Amistad: $130.000 los dos con envío SOLO en Bogotá/sabana** (ahí el margen mejora). ⛔ nunca plano nacional | |
 | 7 | **Pago anticipado a los teléfonos que 99 Envíos marca** con historial de devolución | protege $24.129 en vez de $3.917 |
+| **8** | 🆕🌧️ **MEDIR SI LA LLUVIA MUEVE LAS VENTAS** — 4 meses vendiendo impermeables sin una línea sobre esto. Conversaciones diarias desde julio (API) vs lluvia diaria de Bogotá y Medellín. **El IDEAM pronostica octubre por encima de lo normal en 10 departamentos** → **#98** | reordena el plan del trimestre |
 
 ## 🔔 Preguntas pendientes para 99 Envíos (todas en un correo)
 
@@ -10108,22 +10529,27 @@ Son productos distintos con reglas distintas.
 | ventas del colmena contadas aparte | la tasa de cierre del 8,1% viene de solo 3 ventas |
 | devoluciones de septiembre | **no medibles hasta el 22-sep** (rezago de 10 días) |
 
-## ⚠️ Las 20 correcciones de esta bitácora — el patrón
+## ⚠️ Las 23 correcciones de esta bitácora — el patrón
 
-**De los errores #8 al #20, casi todos son la misma familia:**
+**De los errores #8 al #23, casi todos son la misma familia:**
 
 | trampa | ejemplos |
 |---|---|
 | **comparar cosas de distinta madurez** | ventanas censuradas (#9, #17, **#18**) · devoluciones liquidadas vs en curso |
 | **usar el promedio como umbral** | colmena vs cuenta (**#12**) · Valle del Cauca (#14) |
-| **promediar un grupo y sentenciar a cada miembro** | las 4 regiones (#14) · las transportadoras |
-| **aceptar una explicación sin buscar el contraejemplo** | la quincena (#15, #16) |
+| **promediar un grupo y sentenciar a cada miembro** | las 4 regiones (#14) · las transportadoras · 🆕 **"degradación uniforme" (#22)** |
+| **aceptar una explicación sin buscar el contraejemplo** | la quincena (#15, #16) · 🆕 **Amor y Amistad (#21): el contraejemplo era el domingo 13** |
 | **leer de más un dato chico** | elasticidad del colmena (#13) · VIDEO en un día (#10) |
 | **llamar error a lo que fue una decisión** | Nechí y el Seguro Plus |
 | **aplicar el reglamento equivocado** | API vs app (#19, #20) |
+| 🆕 **sumar una causa a la lista sin verificar que aporte al daño** | **la sobre-entrega del 142% (#23)**: la tarde fue solo 9% peor que la mañana |
 
 🔑 **Y lo más valioso de esta bitácora: el dueño destapó la mayoría.** Cuando dice *"no me cuadra"* o
 *"por qué contó eso"*, **casi siempre tiene razón. Recalcular antes de defender el número.**
+
+📌 **Van 3 de 3 en las últimas secciones.** *"¿por qué contó eso?"* → #18 · *"sí me deja escribir
+después de 24 horas"* → #19 y #20 · *"¿qué tiene que ver Amor y Amistad?"* → **#21, #22 y #23.**
+**La pregunta escéptica del dueño es el mejor detector de errores que tiene el proyecto.**
 
 ## Reglas duras que salieron hoy
 
@@ -10137,3 +10563,18 @@ Son productos distintos con reglas distintas.
 8. **Cuando algo se sale del patrón, primero preguntar si fue una decisión**
 9. **El costo de una transportadora es `flete + tasa_devolución × (flete + utilidad)`**, nunca solo el flete
 10. **Antes de recomendar una acción para bajar un número, saber qué lo causa**
+
+### 🆕 Reglas del 15-sep (sección 0-BF)
+
+11. **Un `$/conv` nunca se diagnostica entero: se parte en `CPM ÷ conv-por-mil` primero.** El precio y
+    la calidad tienen causas y remedios distintos. Confundirlos manda a esperar cuando hay que actuar
+12. **Si un costo sube en UN conjunto es de la cuenta; si sube en TODOS el mismo día, es de la
+    subasta.** El test es gratis y descarta media hipótesis
+13. **"Uniforme" se verifica conjunto por conjunto, nunca con el promedio.** El promedio de 5 conjuntos
+    ocultó que 2 mejoraron y 2 se derrumbaron
+14. **Antes de culpar al calendario comercial, buscar el día de CPM MÁS ALTO de la ventana.** Si ese
+    día salió bien, el calendario no es la causa principal
+15. **`balance` ≠ saldo.** El saldo es `spend_cap − amount_spent`, siempre. `balance` es la deuda del día
+16. **Un día abierto leído a mediodía subestima el gasto ~6%.** Bajar los umbrales ~6% o leer cerrado
+17. **La subasta de Meta no está segmentada por industria.** Cualquier fecha comercial grande del país
+    sube el CPM de BikerPro, aunque el producto no tenga nada que ver con la fecha
