@@ -10284,7 +10284,7 @@ propio es el ×1,42 de Amor y Amistad):
 
 **Proyección cruzando CPM contra las dos calidades de audiencia YA MEDIDAS en la cuenta:**
 
-| escenario de CPM | CPM | conv/mil **4,48** *(sana)* | conv/mil **2,76** *(como el 14)* |
+| escenario de CPM | CPM | conv/mil **4,45** *(sana)* | conv/mil **2,76** *(como el 14)* |
 |---|---|---|---|
 | hoy sin evento | $3.615 | **$813** 🟢 | **$1.309** 🟢 |
 | Amor y Amistad *(medido)* | $5.097 | $1.146 🟢 | $1.845 🟡 |
@@ -10304,7 +10304,7 @@ propio es el ×1,42 de Amor y Amistad):
 ## 🔑 **EL MISMO EVENTO DEJA +$60.380 O QUITA $57.652. LA DIFERENCIA NO ES META, NI LA FECHA, NI EL CREATIVO: ES EL conv/mil.**
 
 > **Amor y Amistad no es el problema. Es el ensayo general de diciembre** — y el ensayo avisó que con
-> conv/mil 2,76 un evento de +41% ya baja la utilidad del día a $16.864. **Diciembre es 2-3× más
+> conv/mil 2,76 un evento de +42% ya baja la utilidad del día a $16.700. **Diciembre es 2-3× más
 > grande.** Con el conv/mil sano, el peor día del año se pasa ganando plata.
 
 ### ⚠️ Y ajusta la expectativa del 19-sep
