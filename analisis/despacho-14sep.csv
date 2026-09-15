@@ -1,0 +1,31 @@
+n,ciudad,departamento,unidades,recaudo,entrega,transportadora_dicha_al_cliente
+1,CUCUTA,Norte de Santander,1,83000,domicilio,
+2,POTOSI,Narino,1,85000,oficina,CONTRADICTORIO servientrega-vs-interrapidisimo
+3,BOGOTA,Bogota DC,2,128000,domicilio,
+4,BUENAVENTURA,Valle del Cauca,1,81000,domicilio,
+5,EL BAGRE,Antioquia,1,85000,oficina,generica
+6,EL BAGRE,Antioquia,1,85000,oficina,interrapidisimo
+7,PUERTO GAITAN,Meta,1,85000,oficina,interrapidisimo
+8,VILLAVICENCIO,Meta,1,77000,domicilio,
+9,VILLAVIEJA,Huila,2,143000,domicilio,
+10,CHITAGA,Norte de Santander,1,85000,oficina,interrapidisimo
+11,SAN LUIS,Sucre,1,85000,domicilio,
+12,SOACHA,Cundinamarca,2,128000,domicilio,
+13,FLORIDA,Valle del Cauca,1,85000,domicilio,
+14,PLANETA RICA,Cordoba,1,85000,domicilio,
+15,MANIZALES,Caldas,3,185000,domicilio,
+16,ARAUQUITA,Arauca,2,143000,domicilio,
+17,ISTMINA,Choco,1,85000,domicilio,
+18,SAN JOSE DEL GUAVIARE,Guaviare,1,85000,oficina,interrapidisimo
+19,MADRID,Cundinamarca,1,73000,domicilio,
+20,GUARNE,Antioquia,1,85000,oficina,interrapidisimo
+21,BOGOTA,Bogota DC,1,73000,domicilio,
+22,CONCORDIA,Antioquia,2,143000,oficina,interrapidisimo
+23,PEREIRA,Risaralda,1,85000,domicilio,
+24,TURBANA,Bolivar,1,85000,oficina,interrapidisimo
+25,MONTELIBANO,Cordoba,1,85000,domicilio,
+26,CANDELARIA,Atlantico,1,85000,oficina,interrapidisimo
+27,SINCELEJO,Sucre,1,81000,domicilio,
+28,NECHI,Antioquia,2,143000,oficina,interrapidisimo
+29,ARMENIA,Quindio,2,138000,domicilio,
+30,QUIBDO,Choco,1,81000,domicilio,

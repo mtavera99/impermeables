@@ -45,8 +45,11 @@ sección 0-H. Y **la banda E es 20 de 72 guías (28% del volumen)**, no un caso 
 ### 🔑 Por qué el precio cubre el peor caso: **no existe "el flete de Bogotá"**
 
 **99 Envíos reparte entre tres transportadoras y cada una cobra distinto por el mismo destino.**
-Quién despacha lo decide 99 Envíos, no vos — así que no se puede saber de antemano cuánto va a
-costar ese envío:
+
+> 🔴 **CORREGIDO 14-SEP:** este documento decía *"quién despacha lo decide 99 Envíos, no vos"* y tres
+> líneas después *"como vos ELEGÍS la transportadora"*. **Las dos cosas no pueden ser ciertas.**
+> **Confirmado por el dueño: la transportadora la elige ÉL, envío por envío.** La frase de que
+> lo decide 99 Envíos era falsa y se elimina — llevó a analizar la elección como si no existiera.
 
 | Destino | coordinadora | interrapidísimo | servientrega |
 |---|---|---|---|
@@ -59,17 +62,83 @@ bien.** Las dos reglas que hacen que el tarifario cierre:
 | Destino | Elegí | Por qué |
 |---|---|---|
 | **Bogotá y sabana** | **coordinadora** (o interrapidísimo) | con servientrega ($14.674) el total de $73.000 se queda corto $1.574 |
-| **Cartagena** | **servientrega** ($20.771) | con interrapidísimo ($22.793) faltan $1.693 |
+| **Cartagena** | **cualquiera** (la diferencia es ruido) → **lo que decide es CONFIRMAR** | 🔴 **CORREGIDO 14-sep, ver abajo** |
+| **Municipios pequeños** | **interrapidísimo** | 🆕 es la única con cobertura demostrada (124 municipios) |
 
-⚠️ **La excepción de Cartagena:** es la ciudad que más rechaza de todas. Si interrapidísimo entrega
-mejor allá, **pagá los $2.022 y listo** — una devolución cuesta muchísimo más. Eso es decisión de
-negocio, no de tarifa.
+### 🔴 CORRECCIÓN 14-SEP: el flete NO es la variable que importa en Cartagena
 
-📌 **Y la pregunta que vale plata: ¿qué cobertura tiene coordinadora?** Es la más barata de las tres
-($15.440 promedio contra ~$20.800 de las otras dos) pero solo se ha usado en **5 destinos**. Si cubre
-el país, es el ahorro más grande que tenés disponible hoy. **Metelo en la misma llamada de los días
-de pago.** Solo en Bogotá, elegirla en vez de interrapidísimo son **$991 por envío** — y hubo
-8 envíos a Bogotá que se fueron por la más cara teniendo la barata disponible.
+> ⚠️ **Esta sección se escribió mal una primera vez y el dueño la corrigió.** La versión anterior
+> decía "cambiá Cartagena a interrapidísimo porque una devolución cuesta ~$65.000 en fletes".
+> **Ese número era falso: la devolución está asegurada.**
+
+**Lo que cuesta de verdad una devolución, medido en las 49 devoluciones reales del histórico:**
+
+| | |
+|---|---|
+| **46 de 49 (94%)** pagaron **solo la prima del seguro** | promedio **$2.941** |
+| 3 de 49 (6%) pagaron flete completo | $20.895 · $21.035 · $28.959 |
+| **costo esperado en flete por devolución** | **$4.208** |
+
+**No son $40.970. Son $4.208.** El seguro antidevolución cubre ida y vuelta (ver 0-L). Se pagó
+**10 veces de más** en el cálculo anterior.
+
+#### Entonces la cuenta real de una devolución es otra
+
+| componente | monto | peso |
+|---|---|---|
+| flete (cubierto por el seguro) | $4.208 | **12%** |
+| **utilidad que no se hizo** | **$24.129 por unidad** | **88%** |
+
+👉 **El flete es el 12% del problema. La devolución duele por el MARGEN que no se hizo, no por el
+envío.** Y los $2.022 de diferencia entre transportadoras son el **8%** de lo que está en juego:
+**es ruido.**
+
+#### Y para Cartagena, el dato no alcanza para elegir
+
+| transportadora | devueltas / resueltas en Cartagena | |
+|---|---|---|
+| servientrega | **1/4 = 25%** | n=4 |
+| coordinadora | **1/2 = 50%** | n=2 |
+| interrapidisimo | **3/3 = 100%** | n=3 |
+
+**Ninguna llega a 5 guías. No se puede decidir, y el poco dato que hay apunta justo al contrario de
+lo que se había recomendado.** (El veto a servientrega de 0-AA viene de **Medellín** —3 de 13—,
+no de Cartagena.)
+
+✅ **La regla honesta para Cartagena y la costa:**
+
+1. **La transportadora no es la palanca.** Elegí por costo si querés: la diferencia es ruido.
+2. **La palanca es la confirmación antes de despachar.** Cartagena devuelve 4 de 7 = 57% **con
+   todas**. Ahí lo que salva $24.129 es una llamada, no una guía distinta.
+3. **Ninguna transportadora arregla una ciudad que devuelve más de la mitad.**
+
+### ✅ RESUELTO: la cobertura de coordinadora (pregunta abierta desde este documento)
+
+Este documento preguntaba: *"¿qué cobertura tiene coordinadora? solo se ha usado en 5 destinos.
+Si cubre el país, es el ahorro más grande que tenés disponible hoy."*
+
+**Medido el 14-sep sobre las 349 guías del histórico:**
+
+| transportadora | guías | **municipios distintos** | flete promedio |
+|---|---|---|---|
+| **interrapidisimo** | 244 | **124** | $20.283 |
+| servientrega | 61 | 10 | $19.676 |
+| **coordinadora** | 42 | **5** | $22.837 |
+
+**Dos respuestas, y las dos tumban la esperanza:**
+
+1. **Coordinadora no cubre el país** — al menos no en el histórico. 5 municipios contra 124.
+2. **Y NO es la más barata.** Este documento decía "$15.440 promedio contra ~$20.800". **Falso hoy:
+   su flete promedio real es $22.837, el MÁS ALTO de las tres.** El $15.440 salía de sus primeras
+   guías, que fueron casi todas a Bogotá — el destino más barato del país. **Era mezcla de destinos,
+   no precio bajo.**
+
+⚠️ **Matiz honesto:** "usada en 5 municipios" no es lo mismo que "solo cubre 5 municipios" — quién
+despacha lo decidía 99 Envíos. Pero para un municipio pequeño hoy, **la única con cobertura
+demostrada es interrapidísimo.**
+
+👉 **Coordinadora queda solo para Bogotá y área metropolitana**, y ahí sí conviene por costo en ese
+destino puntual, alternándola contra interrapidísimo para por fin poder compararlas (0-AR).
 
 ### Tres decisiones que conviene conocer
 
@@ -163,6 +232,48 @@ Totales de 2 conjuntos que ya están confirmados (estos sí los puedo dar direct
   Pereira $138.000 · Medellín $138.000 · Caucasia $139.000
   Santa Rosa de Cabal $139.000 · Hispania $145.000 · Cartagena $146.000
 ```
+
+### 🔬 MEDICIÓN 14-SEP: la banda de 2 unidades de Bogotá/sabana quedó corta
+
+Primera guía del despacho del 14-sep, medida contra el export de 99 Envíos:
+
+| | |
+|---|---|
+| guía | 240061278692 · **SOACHA** · 2 unidades · interrapidísimo |
+| cobrado al cliente | $128.000 |
+| menos promo 2× | −$110.000 |
+| **= envío que le cobró** | **$18.000** |
+| **costo real** (`valor_servicio`, seguro incluido) | **$20.994** |
+| **absorbió** | **−$2.994** |
+
+El guion dice **`$128.000 — Bogotá y sabana (zona de $73.000)`**. Con ese total el envío queda en
+$18.000 y el costo real fue $20.994. **El total correcto habría sido $131.000.**
+
+**Este es el caso 7 de la fuga que ya describía la sección 2-bis** (*"los 6 pedidos de 2 unidades
+cobraron 6 precios distintos y en 2 de ellos se absorbió flete"*). **La fuga sigue viva y sigue
+estando SOLO en la promo de 2 unidades.**
+
+#### ⛔ Por qué NO se cambia el precio todavía
+
+**Es UNA sola medición.** Subir la banda a $131.000 con n=1 sería el mismo error de leer de más un
+dato que ya costó cuatro correcciones esta semana. Y hay un antecedente en este mismo documento:
+la banda A se dejó en $73.000 aceptando *"absorber $1.574 esporádicos"* en vez de castigar al 24%
+del volumen.
+
+**La pregunta real es si $2.994 es esporádico o sistemático**, y eso se responde con la segunda
+medición:
+
+| | |
+|---|---|
+| 🔔 **segundo dato disponible HOY** | pedido **#3 del lote, Bogotá, 2 unidades, cobrado $128.000** |
+| si su `valor_servicio` sale ~$21.000 | **la banda es sistemáticamente corta → subir a $131.000** |
+| si sale ~$18.000 o menos | Soacha fue un caso puntual → se acepta absorber |
+
+⚠️ **Y no se le cambia el precio a los clientes de hoy: ya se les prometió.** Esto es para el
+tarifario de mañana.
+
+📌 **Dato de referencia del seguro en esta guía:** `valor_seguro_99` = **$3.137** sobre un
+`valor_servicio` de $20.994 = **14,9%** (el documento venía usando 13,6%).
 
 ```
 CUADRO DE CONFIRMACIÓN — SIEMPRE CON TODOS LOS DATOS LLENOS

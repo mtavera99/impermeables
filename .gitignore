@@ -4,6 +4,12 @@ d.json
 gasto.json
 sep.json
 
+# 🔴 DATOS DEL BOT — conversations.json y orders.json tienen TELEFONOS y DIRECCIONES
+# de clientes reales. Este repo es publico: nunca se suben.
+bot/data/
+bot/.env
+.env
+
 # Cache de Python
 __pycache__/
 *.pyc

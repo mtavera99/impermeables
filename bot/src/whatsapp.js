@@ -38,4 +38,13 @@ async function sendVideo(to, link, caption) {
   return sendPayload({ to, type: "video", video: { link, caption } });
 }
 
-module.exports = { sendText, sendImage, sendVideo };
+// Plantilla aprobada. Hace falta pasadas las 24 horas desde el ultimo mensaje
+// del cliente: ahi Meta ya no acepta texto libre, solo plantillas. Dentro de la
+// ventana gratis de 72h del anuncio Click-to-WhatsApp no se cobra. Ver 0-BC.
+async function sendTemplate(to, nombre, idioma = "es", componentes) {
+  const template = { name: nombre, language: { code: idioma } };
+  if (componentes) template.components = componentes;
+  return sendPayload({ to, type: "template", template });
+}
+
+module.exports = { sendText, sendImage, sendVideo, sendTemplate };

@@ -22,6 +22,22 @@ está en Domiciliarios.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BE** | ⛔ **LAS 24H Y LAS PLANTILLAS NO APLICAN: usa la APP, no la API.** Escribe a quien quiera, cuando quiera, gratis · **el pozo de re-contacto es TODO el histórico, no un mes** · **NO migrar a la API**: perdería la intervención en tiempo real que le mejora el cierre · ya usa etiqueta `cliente potencial` y mensajes rápidos `/` · el límite real es el **reporte por spam**, no la técnica · **errores #19 y #20** | **14-sep** |
+| **0-BD** | ⛔ **EL BOT DE `bot/` NO ESTÁ CORRIENDO.** Usa el **agente de IA de Meta** · el agente es **reactivo: no puede iniciar** → el seguimiento no se automatiza con él · 🔔 verificar si Meta ya le cobra el Business Agent (desde 1-ago-2026) · **regla: código en el repo ≠ código en producción** | **14-sep** |
+| **0-BC** | 💰 **Re-contactar a los que no compraron es la palanca más grande: $558.000–$1.090.000/mes con CPA $0** · Colombia es de las 3 más baratas del mundo en la API ($0,0144/mensaje) · ⚠️ apps de envío masivo no oficiales **bloquean el número** | **14-sep** |
+| **0-BB** | 🔑 **EL CPA NO SUBE POR FATIGA DE CREATIVOS.** Tres pruebas: el CPM no subió · el creativo de 14 días rinde igual que el de 65 ($992 vs $1.033) · frecuencia 1,19-1,45 · **es DILUCIÓN POR ESCALA: correlación gasto↔respuesta −0,71** · descomposición: $4.114→$8.186 es estructural, $8.186→$17.346 es Amor y Amistad · 🎯 **TEST Creativos rinde 2× (7,41 conv/mil) y está desfinanciado** · la promo de $130.000 plano regala $13.000 en municipio lejano | **14-sep** |
+| **0-BA** | Fin de semana 12-13 sep: **CPA $11.732/pedido, utilidad neta $211.675** · validado con las guías reales (17,6 estimados vs ~16) · vs 5-6 sep ($8.512) empeoró +38% · ⚠️ **el lunes 14 dio $20.440 = GRAVE** | **14-sep** |
+| **0-AZ** | 🎯 **99 Envíos tiene un señalador de teléfonos con historial de devolución, visible ANTES de despachar** · el Plus cubre también la prima ($0 si se devuelve) y su equilibrio es **50%** de probabilidad · **el seguro protege el 16% del problema; el 84% es la utilidad** · la jugada real en un marcado es **pago anticipado**, no mejor seguro (gana si >42% acepta) | **14-sep** |
+| **0-AY** | ⛔ **ANULA 0-AW.1: nunca le cobraron ningún flete de devolución** · los estados de mi CSV estaban **truncados** y borraron *"solicita la entrega en una fecha posterior"* · ✅ **REGLA: una devolución está liquidada cuando `valor_servicio == valor_seguro_99`** (8 de 8 idénticas) · **error #18, el peor** | **14-sep** |
+| **0-AX** | Auditoría del despacho: 30 guías / 39 unidades · ✅ **confirmado con n=2: la banda de 2 uds de Bogotá/sabana está corta $2.994 → subir a $131.000** · margen real **$23.244/unidad** (no $24.129) · **el seguro es 15,1%, no 13,6%** (~$112.500/mes sin contar) · Quibdó/Buenaventura/Sincelejo en banda equivocada | **14-sep** |
+| **0-AW** | ⛔ **error #17: una devolución cuesta $17.384, no $24.129** — la pauta es el 77%, el producto vuelve y se revende · 🔴 **el 53% de las devoluciones NO dice motivo**; de las que sí: *no estaba* 48%, error de transportadora 24%, dirección 16%, **no pagó solo 8%** | **14-sep** |
+| **0-AV** | 🔧 Regla nueva en el guion: **para oficina solo se nombra Interrapidísimo** (o Coordinadora en Bogotá), **nunca Servientrega** · 🔴 el tarifario mandaba **Cartagena por Servientrega** para ahorrar $2.022 en la ciudad que devuelve 57% · ✅ **coordinadora cubre 5 municipios, interrapidísimo 124** — y NO es la más barata ($22.837, la más cara) | **14-sep** |
+| **0-AU** | 🎯 **LA CAUSA REAL DEL ALZA: Amor y Amistad (sábado 19-sep) subió el CPM +57%** desde el 12-sep · 🆕 **el efecto del pago llega con 2-3 DÍAS DE RETRASO**, el día de pago es plano · **errores #15 y #16** · regla: mirar el calendario comercial antes de culpar a la cuenta | **14-sep** |
+| **0-AS/AT** | Lunes 14 fue día 🔴 GRAVE ($20.275/pedido) · ⛔ **la quincena NO lo explica**: el 14-ago dio $704 y el 29-ago $893, los dos normales · en un valle de demanda Meta gastaría MENOS y gastó 72% MÁS | **14-sep** |
+| **0-AR** | ⛔ **CORRIGE 0-AP: Valle del Cauca es RENTABLE** ($1.258 vs límite $2.402) y casi recomiendo apagarla · **subir presupuesto a las regiones no sirve: usan 2% del que ya tienen** · **error #14** | **14-sep** |
+| **0-AQ** | ⛔ **ANULA 0-AP: el colmena es otro producto, su equilibrio es $3.322/conv, no $900** · el video del colmena corría al **72% de su equilibrio: DABA PLATA** · **error #12, el más grave** · decisión: prender a **$16.000/día**, solo el video | **14-sep** |
+| **0-AÑ** | ⛔ **ANULA el diagnóstico de saldo de 0-AN** · las regiones están frenadas porque cuestan **$1.576/conv vs $880**, no por falta de plata · **$20.992 del hueco eran los "Publico ABIERTO" pausados, que compraban a $3.500/conv** · **errores #8 y #9** · 🔑 **VIDEO, Domiciliarios y TEST Creativos tienen la MISMA segmentación: $125.000/día sobre la misma audiencia** | **12-14 sep** |
+| **0-AN** | 🔓 **EL SALDO SE LEE: `spend_cap − amount_spent`** · 🔓 **`/activities` se lee con `ads_read`** = libro de caja completo · Meta corta bajo **~$16.000-20.000**, no bajo cero · transportadoras: bug de `ENTREGADO A REMITENTE` corregido, las tres son **indistinguibles** (20,0/19,6/17,0%) | **12-sep** |
 | **0-AI** | 🔴🔴🔴 **LA CAUSA RAÍZ DE TODO: la cuenta se queda sin saldo a medio día y el rebote compra basura.** El 9-sep estuvo **MUERTA de 14 a 17h** ($30 en una hora) y a las **18:00 Meta metió $49.334 de golpe** → esa hora arruinó el $/conv del día **de todos los conjuntos a la vez**. **ESO fue "Motorizados se muere", no la audiencia.** Costó **$55.000-$130.000 de utilidad en un día** · hoy 11-sep pasó igual (11-13h seco) · **Meta protege a los grandes y ahoga a los chicos** = las 3 regiones que se están midiendo · 🔑 **el 10-sep es el ÚNICO día limpio** · la solución no es recargar más sino **recargar ANTES: colchón de 2-3 días** | **11-sep** |
 | **0-AH** | 🔑 **LA API YA LEE SOLA** (el token funciona, el veredicto del lunes sale sin exports) · 🔴 **Motorizados nunca se estaba encogiendo: era UN día, y el 9-sep fue malo para toda la cuenta** (+21%) — el recorte funcionó pero por el motivo contrario · 🔴🔴 **el que se diluye es DOMICILIARIOS, el control: +70% de costo en 5 días con CPM BAJANDO** = elasticidad 0,63 en vivo, vale **+26 conv/día** · **el CPM de TEST Creativos oscila, no sube** · 🔴 **la cuenta gasta $202.095, no $154.000** (Meta sobre-entrega 31% → el peso marginal ya devuelve $0) · **dos conjuntos del colmena no estaban en la tabla** y corroboran 0-AG (78,6% de su equilibrio) · regiones preliminares: **Tolima y Santander entregan, Eje Cafetero flojo** · **el sesgo del gate ahora tiene dos signos → solo criterio absoluto** | **11-sep** |
 | **0-AG** | 💎 **El colmena vendió solo con la campaña apagada, y prepagado** (lead de la propia campaña, NO del upsell) · 🔄 **y estaba comparando promedio contra promedio: contra el peso MARGINAL del tradicional (+$0,16) el colmena rinde +$0,43 = 2,7× más** · **no pierde plata: corre al 85% de SU equilibrio** · **se vuelve a prender después del 14** con audiencia de clientes, $8-10.000/día y ventana de 14 días · **diversificar ES el plan de crecimiento** · el manual para la chaqueta reflectiva · la campaña cerró en **+$37.060, no en −$3.908** · **me equivoqué en #85 y por mi propio error de ventana censurada** · el colmena cierra **8,1%** (el tradicional 8,4%) · **no perdía plata: rendía menos** (1,43× vs 3,93× por peso de pauta) · el gatillo nuevo es **$845/conversación** · **3 ventas confirmadas** · **17 de 37 conversaciones estaban vacías**, y con base limpia **el colmena ATRAE mejor (45,9% vs 57,8% de vacías) y CIERRA peor (15,0% vs 19,9%)** · el CPA se descompone exacto: paga 2,6× por conversación real y cierra 1,33× peor = 3,4× · seguimiento a **17** | **10-sep** |
@@ -8477,3 +8493,1647 @@ rezago (la misma trampa de la ventana censurada, otra vez).
 
 🔑 **Lección nueva: partir una muestra chica en dos y comparar las mitades no es medir elasticidad.
 Antes de creer una comparación de subgrupos, mover el punto de corte y ver si la conclusión sobrevive.**
+
+
+---
+
+## 0-AR · ⛔ CORRIGE 0-AP: VALLE DEL CAUCA ES RENTABLE, Y SUBIR PRESUPUESTO NO SIRVE DE NADA (lun 14-sep, 01:30)
+
+### El error, otra vez el mismo
+
+En 0-AP declaré Valle del Cauca *"🔴 PROBADO peor"* comparándolo contra **el promedio de la cuenta
+($880)**. El promedio no es el umbral. El umbral está escrito en este archivo:
+
+> **"Límite real: $2.402 por conversación** (ahí la utilidad llega a cero, con cierre de 8,4%)."
+
+**Es exactamente el error #12 del colmena, cometido dos veces el mismo día:** confundir *"más caro que
+el promedio"* con *"pierde plata"*. Una región puede costar más que Bogotá y ser muy rentable.
+
+### Las 4 regiones contra el umbral CORRECTO ($2.402)
+
+| conjunto | gasto | conv | alcance | frec | $/conv | % del límite | veredicto |
+|---|---|---|---|---|---|---|---|
+| **Valle del Cauca** | $57.864 | **46** | 12.760 | 1,31 | **$1.258** | **52%** | 🟢 **RENTABLE Y PROBADO** |
+| Santander | $5.576 | 5 | 1.074 | 1,11 | $1.115 | 46% | 🟡 apunta bien, 5 conv |
+| Tolima Huila | $4.981 | 5 | 1.100 | 1,13 | $996 | 41% | 🟡 apunta bien, 5 conv |
+| Eje Cafetero | $5.026 | 2 | 982 | 1,12 | $2.513 | 105% | ⛔ 2 conv, sin dato |
+
+**Tres de las cuatro apuntan a rentables, y Valle del Cauca está PROBADA** (46 conversaciones, IC 95%
+$976–$1.769, **el intervalo completo debajo de $2.402**).
+
+Y las frecuencias de 1,11–1,31 dicen que **ninguna audiencia está agotada.**
+
+### 🔑 Pero la pregunta del dueño ("¿subo o bajo?") tiene una respuesta incómoda: NINGUNA DE LAS DOS
+
+**Subir el presupuesto no haría absolutamente nada**, porque no están topadas: están usando una
+fracción mínima de lo que ya tienen.
+
+Valle del Cauca día por día desde que nació:
+
+| fecha | gasto | conv | $/conv |
+|---|---|---|---|
+| 31-ago | $2.299 | 2 | $1.150 🟢 |
+| 02-sep | $11.251 | 13 | $865 🟢 |
+| 05-sep | $8.387 | 12 | **$699 🟢** |
+| 08-sep | $2.612 | 3 | $871 🟢 |
+| 09-sep | $4.004 | 2 | $2.002 🟢 |
+| 10-sep | $3.924 | 1 | $3.924 🔴 |
+| **11-sep** | **$581** | 0 | — |
+| **12-sep** | **$108** | 0 | — |
+| **13-sep** | **$117** | 0 | — |
+
+**Entregó bien 10 días seguidos y se murió el 11-sep.** Con un presupuesto de $5.000 está gastando
+$108–$581. **El techo no es el problema. Subirlo de $5.000 a $20.000 cambiaría exactamente nada.**
+
+Y las otras tres se murieron **el mismo día 11-sep**. 🔴 **Eso sigue sin explicación** (ya estaba
+anotado como pendiente en 0-AÑ, y hoy queda confirmado que tampoco es solapamiento de audiencia
+—no hay cruce geográfico— ni saldo —había plata— ni frecuencia —1,11-1,31—).
+
+### ✅ Qué hacer con las regiones
+
+| cuándo | qué |
+|---|---|
+| **hoy 14-sep** | **nada.** Ya se prendió el colmena hoy; meter otra variable antes del test del 15 lo arruina |
+| **16-17 sep**, con el test leído | **Valle del Cauca es la única que amerita acción**: está probada rentable y entregó 10 días. Lo que hay que resolver es **por qué dejó de entregar**, no cuánto presupuesto tiene |
+| Santander / Tolima | **2 y 5 conversaciones. No hay nada que decidir.** Ni subir ni bajar: no hay dato |
+| Eje Cafetero | 2 conversaciones. Igual: sin dato |
+
+**Paso práctico para Valle (después del 15):** cuando un conjunto que entregaba se queda pegado en 2%
+del presupuesto, lo que se suele hacer es **duplicarlo** para que arranque limpio, en vez de editarlo.
+⚠️ **No está probado que eso lo arregle** — es práctica común, no evidencia. Pero es reversible y barato.
+
+⛔ **Y NO bajarlas ni apagarlas.** Estaba a punto de recomendar apagar Valle del Cauca basado en el
+umbral equivocado, y es la región con mejor evidencia de la cuenta.
+
+### ⚠️ Error #14
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 14 | *"Valle del Cauca está PROBADO peor ($1.258/conv), apagarlo o rediseñarlo"* | **usé el promedio de la cuenta ($880) como umbral en vez del límite real ($2.402). Valle corre al 52% del límite: es RENTABLE, y con 46 conversaciones es la región mejor probada. Casi recomiendo apagar lo que funciona.** |
+
+🔑 **El mismo error que el #12, el mismo día, en otro producto.** Queda una regla dura:
+
+> **NUNCA usar el promedio de la cuenta como umbral de decisión.** El promedio dice *cómo va lo que ya
+> funciona*; el umbral dice *desde dónde se pierde plata*. Son números distintos y muy separados:
+> **promedio del tradicional ~$880 · límite del tradicional $2.402 · límite del colmena $3.322.**
+> Antes de declarar algo "malo", escribir cuál es su umbral y de dónde salió.
+
+
+---
+
+## 0-AS · LUNES 14-SEP: DÍA 🔴 GRAVE, Y EL GATILLO ESCRITO ANTES DEL TEST (14-sep, 13:30)
+
+### El día en un número: CPA implícito **$20.275/pedido** → 🔴 GRAVE
+
+El dueño reportó **4-5 ventas** desde que arrancó el lunes. **Eso no desmiente el problema: lo
+confirma.**
+
+| | |
+|---|---|
+| gasto tradicional (corte 13:00) | $120.919 |
+| conversaciones | 71 |
+| $/conv | **$1.703** |
+| ventas esperadas de esas 71 (cierre 8,4%) | **6,0** |
+| ventas ya vistas | 4,5 → faltan ~1,5 por cerrar |
+| **CPA implícito** | **$20.275/pedido** |
+| utilidad por pedido después de pauta | **$3.854** (lo normal: $14.808) |
+
+⚠️ **El CPA crudo ($120.919 ÷ 4,5 = $26.871) está CENSURADO** — las conversaciones de hoy todavía no
+han cerrado. El número bueno es el implícito por tasa de cierre: **$20.275**. Misma trampa de la
+ventana censurada, evitada esta vez.
+
+### Escalada de cuatro días (mismo tramo 00:00-12:59)
+
+| día | $/conv | CPA implícito | banda |
+|---|---|---|---|
+| 11-sep vie | $751 | $8.940 | 🟢 NORMAL |
+| 12-sep sáb | $910 | $10.833 | 🟡 VIGILAR |
+| 13-sep dom | $1.139 | $13.560 | 🟡 VIGILAR |
+| **14-sep lun** | **$1.703** | **$20.274** | 🔴 **GRAVE** |
+
+**Costo del día contra el lunes pasado: ~$120.525 de utilidad.**
+
+### 🟢 Nada está en pérdida todavía — y el colmena arrancó bien
+
+Con **cada umbral en su producto** (la lección de los errores #12 y #14):
+
+| | gasto | conv | $/conv | umbral | |
+|---|---|---|---|---|---|
+| TRADICIONAL (suma) | $120.919 | 71 | $1.703 | $2.402 | 71% 🟢 |
+| **COLMENA** (`Publico ABIERTO video`) | $7.456 | 3 | **$2.485** | **$3.322** | **75% 🟢** |
+
+El colmena arrancó **dentro de rango** el primer día. Y el $1.732 que muestra Ads Manager a nivel de
+cuenta **es engañoso: mezcla dos productos con umbrales distintos.** No usarlo para decidir.
+
+### 🔀 DOS causas candidatas, y el 15 las separa
+
+| # | causa | qué predice para mañana |
+|---|---|---|
+| 1 | **Quincena.** Hoy es el día antes del pago, el fondo del valle. La escalada de 4 días encaja | mañana **se arregla solo** |
+| 2 | **Sobre-entrega.** Va a cerrar en ~$211.000 con presupuesto de $170.000 = **124-139%**, el más alto de la ventana. Y 0-AH ya midió que **el peso marginal devuelve $0** pasando ~$202.000 | mañana **sigue igual de mal**, porque el nivel de gasto no cambia |
+
+Las dos empujan el $/conv hacia arriba y **se pueden estar sumando.** El test del 15 las distingue.
+
+### 🎯 GATILLO ESCRITO ANTES DE VER EL DATO (15-sep, corte 13:00, tramo 00:00-12:59)
+
+**Se lee el $/conv del TRADICIONAL solo, sin el colmena.**
+
+| $/conv mañana | significa | acción |
+|---|---|---|
+| **≤ $900** | ✅ era la quincena | **no tocar nada.** Planear el gasto alrededor de las quincenas |
+| **$900 – $1.200** | ⚠️ recuperación parcial | vigilar un día más, sin tocar |
+| **> $1.200** | ❌ **la quincena NO era la causa** | **CORTAR.** Sería CPA >$14.286 el día mismo del pago = condenatorio. Primer recorte: el gasto por encima del presupuesto |
+
+Queda escrito **antes** para no acomodar la interpretación después.
+
+### 💰 PROBLEMA DE CAJA PARA MAÑANA — no alcanza
+
+Recarga de **+$100.000 a las 13:23**. Saldo actual **$117.170**. Pero:
+
+| | |
+|---|---|
+| gastado hoy hasta 13:00 | $129.391 |
+| ritmo últimas 4h | $8.195/hora |
+| proyección de cierre del día | **~$211.341** |
+| **saldo a medianoche** | **~$35.220** |
+| lo que necesita mañana (quincena, día fuerte) | **~$210.000** |
+| **faltante** | **~$175.000** |
+
+🔴 **Hay que recargar ~$200.000 más esta noche.** Quedarse seco **mañana** es el peor escenario posible
+de los tres:
+
+1. Es **quincena** = el mejor día de demanda del mes
+2. Es el **día del test** = se pierde la medición que define la estrategia del mes
+3. El secarse dispara el **rebote de 0-AI**: Meta gasta de golpe comprando el inventario más frío
+
+**Total a tener disponible al arrancar el 15: ~$250.000.**
+
+
+---
+
+## 0-AT · ⛔ LA QUINCENA NO EXPLICA EL LUNES 14. LA CULPA ES DEL RITMO DE GASTO (14-sep, 14:00)
+
+El dueño preguntó: *"¿la razón por la que subió costos hoy fue por ser día antes de quincena?"*
+Fui a buscar la evidencia histórica en vez de repetir la hipótesis. **No la sostiene.**
+
+### Prueba 1: el día antes de la quincena ANTERIOR fue normal
+
+| fecha | posición en el ciclo | gasto (tradicional) | conv | $/conv |
+|---|---|---|---|---|
+| 28-ago vie | −2 del pago | $112.912 | 113 | $999 |
+| **29-ago sáb** | **día antes del pago** | $114.337 | 128 | **$893** 🟢 |
+| 30-ago dom | pago | $103.142 | 119 | $867 |
+| 31-ago lun | pago | $158.283 | 179 | $884 |
+| … | | | | |
+| 13-sep dom | −2 del pago | $119.457 | 116 | $1.030 |
+| **14-sep lun** | **día antes del pago** | $125.373 | 73 | **$1.717** 🔴 |
+
+**El 29-ago, mismo lugar del ciclo, dio $893 — dentro de la banda normal.** No hubo pico.
+Si "día antes de quincena" fuera la causa, se habría visto ahí también.
+
+### Prueba 2 (la que decide): en un valle de demanda Meta gastaría MENOS, y hoy gastó MÁS
+
+Horas 06:00–12:59, **solo tradicional** (el presupuesto del tradicional NO cambió: sigue en $154.000):
+
+| | gasto | conv | $/conv |
+|---|---|---|---|
+| lunes 7-sep | $57.298 | **79** | **$725** |
+| **lunes 14-sep** | **$98.550** | **54** | **$1.825** |
+
+**Gastó 72% MÁS y trajo 32% MENOS.**
+
+🔑 **Ese es el argumento lógico decisivo: si la gente no tiene plata, Meta no logra gastar — el gasto
+BAJARÍA.** Lo que pasó es lo contrario. Meta compró mucho, rápido, y trajo poco.
+
+### La curva de saturación por hora (224 horas de dato, 1-14 sep, solo tradicional)
+
+| gasto en esa hora | horas | conv | $/conv |
+|---|---|---|---|
+| menos de $5.000 | 85 | 404 | **$583** |
+| $5.000 – $10.000 | 73 | 661 | $770 |
+| $10.000 – $15.000 | 36 | 461 | $892 |
+| **más de $15.000** | 30 | 646 | **$1.024** |
+
+**Monótona: mientras más rápido gasta Meta en una hora, más cara sale cada conversación.**
+Hoy a las 07:00 gastó **$21.706** y trajo **4** conversaciones = **$5.427/conv**.
+
+### ⚠️ El límite honesto de esta conclusión
+
+**La curva de arriba NO prueba causalidad, y hay que decirlo.** Puede ir al revés: cuando las
+conversaciones escasean, Meta **igual gasta el presupuesto**, y eso produce a la vez gasto alto y
+$/conv alto. Sería el mismo dato con la causa invertida.
+
+Lo que **sí** es sólido y no tiene esa vuelta: **el presupuesto del tradicional no cambió, y aun así
+Meta gastó 72% más en la mañana que el lunes pasado.** Eso no lo explica el pacing de un presupuesto
+fijo. **Por qué se aceleró sigue sin explicación** (igual que el desplome de las regiones el 11-sep).
+
+### 🎯 Esto DEBILITA el test de mañana, y hay que ajustar la lectura
+
+Mañana es quincena. Si el $/conv mejora, **ya no prueba que la causa era la quincena**: la demanda
+extra del día de pago puede tapar un problema de ritmo de gasto. El test es **asimétrico**:
+
+| resultado del 15 | qué se puede concluir |
+|---|---|
+| $/conv **sigue malo** (>$1.200) | ✅ **concluyente: NO era la quincena.** Es el ritmo de gasto |
+| $/conv **mejora** (≤$900) | ⚠️ **NO concluyente.** Puede ser la quincena o puede ser la quincena tapando el problema del ritmo |
+
+**Para separarlo de verdad hace falta otra cosa:** comparar el $/conv a **igual gasto por hora** entre
+días, no a igual día. Con la tabla de 224 horas ya se puede: si el 15 las horas de $15.000+ siguen
+dando ~$1.024, el problema es el ritmo; si dan $600-700, era demanda.
+
+### ⚠️ Error #15
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 15 | *"hoy es el día antes de la quincena, el fondo del valle, y la escalada de 4 días encaja perfecto"* | **el 29-ago —mismo lugar del ciclo— dio $893, normal. Y hoy Meta gastó 72% MÁS que el lunes pasado con el mismo presupuesto: un valle de demanda hace lo contrario, gastar menos. Presenté una hipótesis que encajaba con el relato sin buscar el contraejemplo, que estaba a dos semanas de distancia en el mismo dato.** |
+
+🔑 **Regla nueva: antes de aceptar una explicación cíclica ("es la quincena", "es el fin de semana"),
+buscar el ciclo ANTERIOR en el mismo dato.** Si el patrón no se repitió, la explicación no sirve.
+Estaba a un `grep` de distancia y no lo hice.
+
+
+---
+
+## 0-AU · 🎯 LA CAUSA REAL: AMOR Y AMISTAD (19-SEP) LE SUBIÓ EL CPM 57% (14-sep, 15:00)
+
+El dueño preguntó: *"¿cómo nos fue el 15 pero de agosto?"* — y esa pregunta destapó todo.
+
+### Respuesta directa: la quincena del 15-ago NO hizo lo de hoy
+
+| fecha | posición | gasto | conv | $/conv |
+|---|---|---|---|---|
+| 13-ago | −2 | $53.022 | 86 | $617 |
+| **14-ago** | **día antes del pago** | $58.429 | 83 | **$704** 🟢 |
+| **15-ago** | **💰 día de pago** | $72.483 | 102 | **$711** 🟢 |
+| 16-ago | +1 | $48.607 | 78 | $623 |
+| **17-ago** | **+2** | $49.738 | 133 | **$374** ⭐ |
+| 18-ago | +3 | $52.939 | 132 | $401 |
+
+**Los tres días antes de pago que existen en el dato:**
+
+| fecha | $/conv | |
+|---|---|---|
+| 14-ago | **$704** | 🟢 normal |
+| 29-ago | **$893** | 🟢 normal |
+| **14-sep** | **$1.667** | 🔴 **ANÓMALO** |
+
+**Dos de tres normales. La hipótesis de la quincena queda muerta**, ahora con dos contraejemplos.
+
+### 🆕 HALLAZGO 1: el efecto del pago existe, pero llega con 2-3 DÍAS DE RETRASO
+
+| ciclo | −1 | 💰 pago | +1 | +2 | +3 | +4 |
+|---|---|---|---|---|---|---|
+| **15-ago** | $704 | $711 | $623 | **$374** ⭐ | $401 | $531 |
+| **30-ago** | $893 | $867 | $884 | $1.056 | **$673** ⭐ | $662 |
+
+**El día del pago NO mejora nada** ($704→$711 y $893→$867: planos). La mejora llega en **+2 o +3**.
+
+Tiene sentido: la gente cobra, pero no compra el mismo día.
+
+⚠️ **Consecuencia inmediata: mañana 15-sep probablemente NO va a mejorar.** Si el ciclo se repite, la
+mejora aparece el **17-18 de septiembre**. No hay que leer el 15 como fracaso.
+
+### 🎯 HALLAZGO 2 (el grande): el CPM saltó 57% y arrancó justo una semana antes de AMOR Y AMISTAD
+
+| CPM promedio (solo tradicional) | |
+|---|---|
+| agosto | $4.270 |
+| 1–11 sep | **$3.582** |
+| **12–14 sep** | **$5.621** |
+| **salto** | **+57%** |
+
+Día por día: estable en $3.400–$4.100 del 1 al 11-sep, y después **12-sep $4.374 · 13-sep $6.865 ·
+14-sep $5.624.**
+
+**El Día del Amor y la Amistad en Colombia se celebra el tercer sábado de septiembre. En 2026 cae el
+sábado 19 de septiembre** ([calendariodecolombia.com](https://www.calendariodecolombia.com/fecha/2026/dia-de-amor-y-amistad),
+[Cablenoticias](https://www.cablenoticias.com/noticias/amor-y-amistad-2026-en-colombia-la-fecha-y-su-origen),
+[90minutos](https://90minutos.co/colombia/cuando-es-amor-y-amistad-en-colombia-fecha-02-09-2026/)).
+*Contenido reformulado por restricciones de licencia.*
+
+**El CPM empezó a subir el 12-sep = exactamente una semana antes.** Es la avalancha de anunciantes
+comprando subasta para la fecha comercial más grande de Colombia después de navidad.
+
+### La descomposición exacta del daño (4-sep → 14-sep)
+
+| | 4-sep | 14-sep | cambio |
+|---|---|---|---|
+| **CPM** (lo que cuesta mostrarse) | $3.455 | $5.632 | **+63%** ← la subasta |
+| **conv/mil** (cuánta gente contesta) | 5,62 | 3,38 | **−40%** ← la demanda |
+| **$/conv** | $614 | $1.667 | **+171%** |
+
+$1,63 × (1 ÷ 0,60) = 2,72 ✓ **Las dos causas se multiplican, y pesan casi igual.**
+
+- El **+63% de CPM** es Amor y Amistad: competencia externa, **no es culpa de la cuenta**
+- El **−40% de conv/mil** es demanda: parte ciclo de pago, parte que la gente está mirando regalos
+
+### 🔑 Lo que esto cambia
+
+1. ⛔ **EL TEST DEL 15 ESTÁ MUERTO.** No por el colmena: por el salto de CPM. **Ya no se puede separar
+   quincena de nada**, porque hay un shock externo encima. Y como el efecto del pago llega en +2/+3,
+   el 15 no iba a mostrar nada de todas formas. **Se libera la restricción de "no tocar nada".**
+2. ✅ **NO recortar por pánico.** La causa es **externa y con fecha de vencimiento**: el CPM debería
+   normalizarse después del sábado 19-sep. Recortar ahora sería castigar la cuenta por algo que no hizo.
+3. ⚠️ **Pero el peso marginal está malo esta semana.** Con CPM a $5.600 y la curva de saturación ya
+   medida (a más de $170.000/día el peso rinde 12,4 conv/$10.000 contra 18,6 por debajo de $60.000),
+   **esta es la semana para NO estar sobre-entregando al 124-139% del presupuesto.**
+4. 💡 **Y hay una oportunidad que nadie miró: un impermeable ES un regalo para un motociclista.**
+   Amor y Amistad es el 19-sep. Si el CPM está caro porque todo el mundo vende regalos, **la respuesta
+   no es esconderse: es entrar con ángulo de regalo.** ⚠️ **No está probado** — es una idea con fecha,
+   y quedan 5 días. Habría que probarla en `TEST Creativos`, que es el conjunto que existe para eso.
+
+### ⚠️ Errores #15 (ampliado) y #16
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 15 | *"es el día antes de la quincena"* | **ahora con DOS contraejemplos: 14-ago $704 y 29-ago $893, los dos normales** |
+| 16 | *"mañana 15-sep el $/conv debería volver a $600-750; ese es el test"* | **falso. En los dos ciclos anteriores el día de pago fue PLANO ($704→$711, $893→$867). La mejora llega en +2/+3. Mi gatillo del 15 habría dado un falso negativo y me habría hecho recortar sin razón.** |
+
+🔑 **Dos reglas nuevas:**
+
+1. **Antes de fijar la fecha de un test cíclico, medir el REZAGO del ciclo en los datos viejos.**
+   Yo puse el test el día del pago; el efecto llega dos días después.
+2. **Antes de culpar a la cuenta, mirar el CALENDARIO COMERCIAL del país.** Un salto de CPM del 57%
+   casi nunca es la cuenta: es la subasta. **Fechas colombianas que hay que tener en el radar:**
+   Amor y Amistad (3er sábado de septiembre), Halloween, Black Friday, navidad, día de la madre,
+   día del padre.
+
+
+---
+
+## 0-AV · EL BOT PROMETIÓ UNA OFICINA QUE NO EXISTE, Y EL TARIFARIO MANDABA CARTAGENA POR LA PEOR OPCIÓN (14-sep, 15:30)
+
+### El caso que lo destapó
+
+Pedido #2 del despacho del 14-sep (Potosí, Nariño, $85.000). El bot escribió:
+
+> *"Podemos enviarlo a la oficina de **Servientrega** en Potosí"*
+> …y en el campo Dirección: *"**Oficina interrapidisimo**"*
+
+El dueño explicó el fondo: **Servientrega no presta el servicio de recoger en oficina** como sí lo
+prestan Interrapidísimo y Coordinadora. Él corrigió la dirección, pero **la clienta leyó "Servientrega".**
+
+**No es un error de un pedido: es un error del guion, y se va a repetir.**
+
+### 🔧 Arreglo 1: regla nueva en `GUION-PARA-PEGAR.md`
+
+Se agregó el bloque **"ENTREGA EN OFICINA — QUÉ TRANSPORTADORA PUEDO NOMBRAR"** dentro del guion
+pegable:
+
+| regla | |
+|---|---|
+| 1º | la única que se nombra es **Interrapidísimo** (124 municipios de cobertura medida) |
+| 2º | en Bogotá y alrededores también vale **coordinadora** |
+| 3º | ⛔ **nunca Servientrega para recoger en oficina** — no presta ese servicio |
+| 4º | si no se sabe qué oficina hay, **no decir "la oficina de la transportadora"**: el cliente no sabría a dónde ir |
+
+📌 **El fondo:** el nombre de la transportadora en el cuadro de confirmación **es una promesa**.
+El cliente camina hasta ahí. Equivocarse = devolución autoinfligida.
+
+### 🔴 Arreglo 2: el tarifario mandaba Cartagena por Servientrega
+
+`TARIFARIO-Y-GUION.md` decía, en tabla y con negrilla:
+
+> | **Cartagena** | **servientrega** ($20.771) | con interrapidísimo ($22.793) faltan $1.693 |
+
+**La cuenta está al revés:**
+
+| | |
+|---|---|
+| devoluciones de Cartagena (guías maduras) | **4 de 7 = 57%** |
+| ahorro de servientrega vs interrapidísimo | **$2.022** |
+| costo de UNA devolución | flete ida+vuelta ~$41.000 + utilidad no hecha $24.129 = **~$65.000** |
+
+**Se estaba arriesgando $65.000 con 57% de probabilidad para ahorrar $2.022.** Y encima
+**Servientrega está vetada desde 0-AA.** Corregido: Cartagena y la costa van por Interrapidísimo.
+
+🔑 **El patrón del error: el tarifario optimizaba UNA sola variable (el flete) en un problema de dos
+(flete + devolución).** Y la variable que ignoraba es 30 veces más grande.
+**Regla: ninguna decisión de transportadora se toma solo por flete.** El costo real es
+`flete + tasa_de_devolución × (flete + utilidad)`.
+
+### ✅ Arreglo 3: resuelta una pregunta abierta del tarifario — y también estaba al revés
+
+El documento preguntaba: *"¿qué cobertura tiene coordinadora? Es la más barata de las tres ($15.440
+promedio contra ~$20.800) pero solo se ha usado en 5 destinos. Si cubre el país, es el ahorro más
+grande que tenés hoy."*
+
+**Medido sobre las 349 guías:**
+
+| transportadora | guías | municipios distintos | flete promedio real |
+|---|---|---|---|
+| **interrapidisimo** | 244 | **124** | $20.283 |
+| servientrega | 61 | 10 | $19.676 |
+| **coordinadora** | 42 | **5** | **$22.837** |
+
+**Las dos premisas eran falsas:**
+
+1. **No cubre el país:** 5 municipios contra 124.
+2. **Y NO es la más barata: es la MÁS CARA** ($22.837). El "$15.440" salía de sus primeras guías,
+   que fueron casi todas a **Bogotá — el destino más barato del país.** **Era mezcla de destinos,
+   no precio bajo.**
+
+🔑 **Otra vez el mismo error de siempre, ahora en el tarifario: comparar promedios de grupos con
+mezcla distinta.** Es el hermano gemelo del error de las transportadoras (0-AN) y del error de las
+regiones (#14).
+
+⚠️ **Matiz honesto:** *"usada en 5 municipios"* no es *"solo cubre 5 municipios"* — el enrutamiento
+lo decidía 99 Envíos. Pero para un municipio pequeño **hoy**, la única con cobertura demostrada es
+Interrapidísimo.
+
+### Archivos tocados
+
+| archivo | cambio |
+|---|---|
+| `GUION-PARA-PEGAR.md` | bloque nuevo: qué transportadora se puede nombrar para oficina |
+| `TARIFARIO-Y-GUION.md` | Cartagena servientrega → interrapidísimo · cobertura de coordinadora resuelta · flete real corregido |
+| `analisis/despacho-14sep.csv` | los 30 pedidos, sin PII |
+| `analisis/asignar-transportadora-14sep.py` | la asignación, con la regla de la oficina primero |
+
+
+---
+
+## 0-AW · ⛔ ERROR #17: LA DEVOLUCIÓN CUESTA $4.208, NO $40.970 — Y NO SÉ POR QUÉ SE DEVUELVEN (14-sep, 16:00)
+
+### El dueño frenó el número, y los datos le dan la razón exacta
+
+Yo venía calculando cada devolución como **"flete de ida + flete de vuelta = $40.970"**.
+Él respondió: *"acuérdate que yo pago un seguro, yo solamente pago como 2000 3000 pesos cuando me
+devuelven un pedido"*.
+
+**Medido en las 49 devoluciones reales del histórico:**
+
+| | |
+|---|---|
+| **46 de 49 (94%)** pagaron **solo la prima del seguro** | promedio **$2.941** |
+| 3 de 49 (6%) pagaron flete completo | $20.895 · $21.035 · $28.959 |
+| **costo esperado en flete por devolución** | **$4.208** |
+
+**Me pasé 10 veces.** Y el dato estaba en el archivo desde 0-L: *"en una devolución solo se paga la
+prima ($1.742 / $3.111)"*. **Tercera vez hoy que el número correcto ya estaba escrito y no lo busqué.**
+
+### La consecuencia: el flete es el 12% del problema
+
+| componente de una devolución | monto | peso |
+|---|---|---|
+| flete (lo cubre el seguro) | $4.208 | **12%** |
+| **utilidad que no se hizo** | **$24.129 por unidad** | **88%** |
+
+**El lote de hoy, corregido:**
+
+| | yo dije | de verdad |
+|---|---|---|
+| flete quemado | $233.529 | **$23.985** |
+| utilidad no hecha | $178.796 | $178.796 ✓ |
+| **total** | **$412.325** | **$202.781** |
+
+🔑 **Y esto cambia toda la lógica de elegir transportadora: los $2.022 de diferencia de flete son el
+8% de lo que está en juego. Es ruido.** Ninguna decisión de transportadora se justifica por flete.
+
+### Y tumba mi propio cambio a `TARIFARIO-Y-GUION.md` (revertido)
+
+Yo había cambiado Cartagena de servientrega a interrapidísimo argumentando *"una devolución cuesta
+$65.000, pagá los $2.022"*. **Con el costo real ($4.208) el argumento se cae.** Y el poco dato que
+hay en Cartagena apunta **al contrario**:
+
+| en Cartagena | devueltas/resueltas | |
+|---|---|---|
+| servientrega | **1/4 = 25%** | n=4 |
+| coordinadora | 1/2 = 50% | n=2 |
+| **interrapidisimo** | **3/3 = 100%** | n=3 |
+
+Ninguna llega a 5 guías → **no se puede decidir.** Revertido en el tarifario.
+(El veto a servientrega de 0-AA viene de **Medellín** —3 de 13—, no de Cartagena.)
+
+### 🔴 Y aquí está el hueco de verdad: NO SABEMOS POR QUÉ SE DEVUELVEN
+
+El dueño preguntó *"¿cómo así llamar, a qué te refieres con llamar?"* — y tiene razón en preguntar,
+porque yo estaba recomendando "confirmación reforzada" **sin saber qué hay que confirmar.**
+
+Fui a mirar los motivos en los 86 estados que dicen algo:
+
+| motivo | guías | % |
+|---|---|---|
+| 🔴 **SIN DETALLE** (interrapidísimo: *"Devolución ratificada"*) | 36 | 41,9% |
+| esperando que la recojan en oficina | 15 | 17,4% |
+| **NO ESTABA / no contestó** | 12 | 14,0% |
+| 🔴 **SIN DETALLE** (servientrega) | 9 | 10,5% |
+| **ERROR DE LA TRANSPORTADORA** (mal enrutada) | 6 | 7,0% |
+| **DIRECCIÓN MALA** | 4 | 4,7% |
+| **NO PAGÓ** | 2 | 2,3% |
+| paquete averiado | 1 | 1,2% |
+
+**El 53% no dice el motivo.** De los 25 que sí:
+
+| motivo conocido | % |
+|---|---|
+| **NO ESTABA / no contestó** | **48%** |
+| error de la transportadora | 24% |
+| dirección mala | 16% |
+| **no pagó** | **8%** |
+
+### 👉 Lo que esto cambia en la recomendación
+
+**"Llamar" fue impreciso mío. Y peor: yo asumía que el problema era que el cliente no tiene la plata
+— y eso es apenas el 8% de los motivos conocidos.** El motivo más grande es que **no estaba cuando
+llegó el mensajero (48%)**, que se arregla distinto:
+
+| motivo | qué lo arregla |
+|---|---|
+| no estaba (48%) | acordar día, **o mandar a oficina** para que vaya cuando pueda |
+| error de transportadora (24%) | reclamar a la transportadora, no es del cliente |
+| dirección mala (16%) | verificar la dirección **antes** de generar la guía |
+| no pagó (8%) | confirmar que tendrá la plata ese día |
+
+⚠️ **Ojo con la conclusión fácil:** "mandar todo a oficina" cambia un riesgo por otro — hay
+**15 guías esperando que las recojan**, y esas también se pueden vencer. **No hay dato para decir
+cuál es mejor.**
+
+### 🔔 PENDIENTE NUEVO (y es el más importante de logística)
+
+**Pedirle a 99 Envíos los códigos de motivo de devolución.** Sin eso, el 53% de las devoluciones son
+una caja negra y cualquier plan de "confirmación" es adivinar. **Va en la misma comunicación donde ya
+están pendientes:** el denominador del 16%, el flete de Tadó ($36.667) y si el seguro se puede apagar.
+
+🔑 **Regla nueva: antes de recomendar una acción para bajar un número, saber qué lo causa.**
+Estaba recomendando confirmar la plata cuando la plata es el 8% del problema.
+
+### ⚠️ Error #17
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 17 | *"cada devolución cuesta el flete de ida + vuelta ≈ $40.970; el lote de hoy arriesga $412.325"* | **el seguro antidevolución cubre los fletes: 94% de las devoluciones pagaron solo la prima ($2.941). Costo real $4.208 = 10× menos. El lote arriesga $202.781, y el 88% de eso es margen no hecho, no flete. Estaba en 0-L desde siempre.** |
+
+
+### 0-AW.1 · 💰 LAS 3 DEVOLUCIONES CARAS SON TODAS DE COORDINADORA — $61.796 PARA RECLAMAR
+
+El dueño preguntó: *"¿cuáles tres pagaron flete completo si yo mando todo con seguro?"*
+Fui a buscarlas una por una. **Las tres son de Coordinadora.**
+
+| fecha | ciudad | estado | flete cobrado | prima que igual pagó |
+|---|---|---|---|---|
+| 07-sep | CARTAGENA DE INDIAS | No se entrega no cancela recaudo | **$28.959** | $3.930 |
+| 08-sep | SINCELEJO | Destinatario no cancela recaudo | **$21.035** | $2.867 |
+| 07-sep | SOLEDAD | Deterioro en validacion GP | **$20.895** | $2.849 |
+
+**Pagó la prima del seguro Y el flete completo en las tres.** El seguro se cobró en **349 de 349
+guías (100%)**, así que no es que estas fueran sin seguro.
+
+#### El control descarta que sea "porque son recientes"
+
+| edad | transportadora | n | solo prima | flete completo |
+|---|---|---|---|---|
+| **0-9 días** | **coordinadora** | 3 | **0** | **3** |
+| **0-9 días** | **interrapidisimo** | 2 | **2** | **0** |
+| 10-14 d | interrapidisimo | 9 | 9 | 0 |
+| 15-21 d | interrapidisimo | 7 | 7 | 0 |
+| 22+ d | todas | 24 | 24 | 0 |
+
+🔑 **Interrapidísimo tiene 2 devoluciones del MISMO DÍA (07-sep) y las dos pagaron solo prima
+($2.324 y $2.286).** Las de Coordinadora son del 07 y 08-sep. **Misma fecha, resultado opuesto.**
+No es el tiempo de liquidación.
+
+**Fisher exacto: 3 de 4 (Coordinadora) contra 0 de 45 (las otras dos) → p = 0,000217.** No es azar.
+
+#### Costo real de una devolución, por transportadora
+
+| transportadora | n | costo promedio |
+|---|---|---|
+| servientrega | 9 | $2.729 |
+| **interrapidisimo** | 36 | **$3.031** |
+| **coordinadora** | 4 | **$18.124** ← **6×** |
+
+#### 💰 Para reclamar a 99 Envíos: $61.796
+
+| guía | cobro de más vs una devolución normal ($3.031) |
+|---|---|
+| 07-sep Cartagena | $25.928 |
+| 08-sep Sincelejo | $18.004 |
+| 07-sep Soledad | $17.864 |
+| **TOTAL** | **$61.796** |
+
+#### ⚠️ La explicación alternativa que NO se puede descartar con n=4
+
+Los 3 estados de Coordinadora son de **tipo distinto** a los de Interrapidísimo:
+
+- Coordinadora: *"no cancela recaudo"* (×2) y *"deterioro"*
+- Interrapidísimo: *"Devolución ratificada"* (sin decir motivo)
+
+**Puede que el seguro no cubra "el cliente no pagó el recaudo" ni "deterioro", y que Interrapidísimo
+llame a todo "devolución ratificada" y por eso sí quede cubierto.** Si es así, **no es un problema de
+Coordinadora: es un hueco de cobertura del seguro que Coordinadora simplemente hace visible.**
+
+**Con 4 guías no se puede separar. Y las dos explicaciones importan mucho:**
+
+| si es… | entonces |
+|---|---|
+| **la transportadora** | Coordinadora cuesta ~$2.900 más por envío en costo esperado de devolución → no usarla |
+| **el tipo de evento** | hay un hueco en el seguro que aplica a **todas** las transportadoras, y está oculto porque Interrapidísimo no reporta motivos |
+
+#### 🔔 Pregunta exacta para 99 Envíos (con las guías en la mano)
+
+> *"En estas 3 guías (07-sep Cartagena, 08-sep Sincelejo, 07-sep Soledad, todas Coordinadora) me
+> cobraron el flete completo ADEMÁS de la prima del seguro. En las 45 devoluciones de Interrapidísimo
+> y Servientrega del mismo período solo me cobraron la prima. ¿El seguro antidevolución no cubre
+> 'no cancela recaudo' ni 'deterioro', o no cubre Coordinadora? Y ¿me pueden devolver los $61.796?"*
+
+#### ✅ Cambio de decisión para el despacho de hoy
+
+En 0-AV recomendé mandar el pedido #21 (Bogotá) por Coordinadora para arrancar el A/B.
+**Se aplaza hasta que 99 Envíos explique el cobro.**
+
+Razón: **hay ahora una señal financiera dura contra Coordinadora que no entendemos.** Pagar por
+aprender cuando existe una respuesta gratis (preguntar) es mal orden. **Los 30 pedidos van por
+Interrapidísimo.**
+
+⚠️ Y esto **reencuadra toda la pregunta de transportadoras**, que llevábamos tres días midiendo mal:
+**el diferenciador no era la TASA de devolución (indistinguible entre las tres) sino el COSTO de
+cada devolución.** Estábamos mirando la variable equivocada.
+
+
+---
+
+## 0-AX · AUDITORÍA DEL DESPACHO DEL 14-SEP CONTRA EL EXPORT (30 guías, 39 unidades)
+
+### ⛔ FALSA ALARMA MÍA EN EL PEDIDO #28 (NECHÍ) — ya estaba resuelto
+
+Alerté que había conflicto: la guía salió por **Coordinadora** ("Oficina principal Coordinadora")
+mientras el cuadro de confirmación de WhatsApp decía *"Oficina principal Inter Rapidísimo"*.
+
+**No era un conflicto.** El dueño ya le había avisado al cliente que tocaba recogerlo en la oficina de
+**Coordinadora porque la de Interrapidísimo no estaba disponible en Nechí.**
+
+🔑 **El error de método, y es importante para no repetirlo:** yo traté el **cuadro de confirmación
+como si fuera el estado final de lo que el cliente sabe.** No lo es — es **una foto de un momento** de
+una conversación que siguió después. **Los cuadros que me pasa por WhatsApp no son la conversación
+completa.**
+
+**Regla:** antes de declarar un conflicto entre la guía y lo que sabe el cliente, **preguntar si hubo
+conversación posterior.** El export y el cuadro pueden estar desactualizados los dos.
+
+📌 **Y esto sí es dato nuevo de cobertura:** **Interrapidísimo NO tiene oficina disponible en Nechí
+(Antioquia).** Eso matiza los "124 municipios" de 0-AV: cubre mucho, pero no todo, y **Coordinadora
+cubrió donde Interrapidísimo no llegaba.** Es un punto a favor de Coordinadora que no estaba medido.
+
+📌 Potosí (#2) quedó consistente: salió por interrapidísimo y la guía dice "Oficina Interrapidísimo".
+⚠️ Pero **ahí sí puede quedar un pendiente real**: la clienta leyó *"Servientrega"* en el mensaje del
+bot. **Confirmar si se le aclaró después.**
+
+### Se despacharon 3 por Coordinadora, no 1
+
+| # | ciudad | uds | recaudo | flete |
+|---|---|---|---|---|
+| **15** | **MANIZALES** | **3** | **$185.000** | $36.054 |
+| 21 | BOGOTÁ | 1 | $73.000 | $12.201 |
+| **28** | **NECHÍ** | 2 | $143.000 | **$45.562** |
+
+⚠️ En 0-AW.1 se había **aplazado** el A/B de Coordinadora hasta que 99 Envíos explique por qué sus
+devoluciones cuestan **$18.124 contra $3.031**. Se fueron tres, y **dos son de los pedidos más
+valiosos del lote.**
+
+**Y el flete de Coordinadora en Nechí es carísimo:** $45.562 por 2 unidades a un municipio de
+Antioquia, contra **$36.209 de Interrapidísimo a Concordia** (también Antioquia, también 2 unidades).
+**+$9.353 = 26% más caro** por un destino comparable.
+
+### ✅ CONFIRMADO CON n=2: la banda de 2 unidades de Bogotá/sabana está corta
+
+| # | ciudad | cobrado | envío implícito | costo real | resultado |
+|---|---|---|---|---|---|
+| 3 | BOGOTÁ | $128.000 | $18.000 | **$20.993,75** | **absorbe $2.994** |
+| 12 | SOACHA | $128.000 | $18.000 | **$20.993,75** | **absorbe $2.994** |
+
+**Los dos dieron el número EXACTAMENTE igual. No es ruido: es la tarifa.**
+
+👉 **Se cumple la condición que quedó escrita antes de ver el dato: subir la banda de
+`$128.000` a `$131.000`** en `GUION-PARA-PEGAR.md`.
+
+### Margen real del lote (recaudo − flete − costo $33.000/unidad)
+
+| | |
+|---|---|
+| margen bruto total (antes de pauta) | **$906.503** |
+| unidades | 39 |
+| **margen por unidad** | **$23.244** |
+
+📌 El archivo venía usando **$24.129/unidad**. El real de este lote es **$23.244 (−3,7%)**.
+
+**Los peores por unidad, y los dos son de Coordinadora:**
+
+| # | ciudad | uds | flete | margen/unidad |
+|---|---|---|---|---|
+| **28** | **NECHÍ** (coordinadora) | 2 | $45.562 | **$15.719** 🔴 |
+| **15** | **MANIZALES** (coordinadora) | 3 | $36.054 | **$16.649** 🔴 |
+| 29 | ARMENIA | 2 | $32.312 | $19.844 |
+
+**Los peores de 1 unidad** (donde el flete se come el margen):
+
+| # | ciudad | recaudo | flete | margen |
+|---|---|---|---|---|
+| 30 | QUIBDÓ | $81.000 | $25.616 | $22.384 |
+| 11 | SAN LUIS DE SINCÉ | $85.000 | $27.865 | $24.135 |
+| 4 | BUENAVENTURA | $81.000 | $23.267 | $24.733 |
+| 27 | SINCELEJO | $81.000 | $23.267 | $24.733 |
+
+⚠️ **Quibdó, Buenaventura y Sincelejo se cobraron a $81.000 y su flete pasa de $23.000.** Están en la
+banda equivocada: deberían estar en la de $85.000.
+
+### 🆕 Dos hallazgos sobre el seguro
+
+**1. El seguro ya no es 13,6%: es 15,1%.**
+
+| | |
+|---|---|
+| lo que usa el tarifario | 13,6% del `valor_servicio` |
+| **lo real hoy (29 guías)** | **15,1%** (rango 14,9%–15,1%, muy estable) |
+
+Sobre ~$25.000 de flete promedio son **~$375 más por guía**. A 300 envíos/mes = **~$112.500/mes**
+que el modelo no está contando.
+
+**2. ⛔ El "Seguro 99 Plus" de la guía #11 lo pidió el dueño — segunda falsa alarma mía.**
+
+| | |
+|---|---|
+| pedido #11 · SAN LUIS DE SINCÉ · $85.000 | |
+| tipo | **Seguro 99 Plus** — **elegido a propósito** |
+| prima | $5.876 = 21,1% del flete (las otras 29 con "Seguro 99": ~15%) |
+| costo extra vs la prima normal | **~$2.376** |
+
+Lo marqué como anomalía a investigar. **No era una anomalía: era una decisión.**
+
+#### 🔑 El patrón de mis dos errores seguidos (Nechí y el Plus)
+
+Las dos veces hice lo mismo: **vi algo distinto al resto y lo llamé error, sin preguntar si había sido
+a propósito.** El export muestra el RESULTADO, no la INTENCIÓN.
+
+**Regla:** cuando una guía se sale del patrón, la primera pregunta no es *"¿qué falló?"* sino
+**"¿esto fue una decisión?"**. Un dato raro en una operación que alguien maneja a mano es, la mayoría
+de las veces, alguien decidiendo — no un error.
+
+#### 🔔 Pero queda una pregunta que sí vale plata
+
+**¿Qué cubre el "Plus" que el "Seguro 99" normal no cubre?**
+
+Porque en 0-AW.1 encontramos que **3 devoluciones de Coordinadora pagaron el flete completo
+($20.895–$28.959) ADEMÁS de la prima**, mientras 45 de Interrapidísimo y Servientrega solo pagaron la
+prima. Si el "Plus" cubre justo esos casos —*"no cancela recaudo"*, *"deterioro"*— entonces:
+
+| | |
+|---|---|
+| costo del Plus | **+$2.376 por guía** |
+| lo que evitaría | **~$18.000–25.000** de flete en una devolución no cubierta |
+| se paga solo si | la probabilidad de caer en ese hueco supera **~10-13%** |
+
+👉 **Vale la pena preguntarle a 99 Envíos qué cubre cada uno**, y con eso decidir si el Plus debería
+ser el default en los destinos de riesgo (o en todos). **No es un gasto a recortar: puede ser la
+respuesta al hueco de los $61.796.**
+
+### Lo que salió bien ✅
+
+- **27 de 30 por Interrapidísimo**, como se recomendó
+- **Las 9 de "reclame en oficina Interrapidísimo" salieron todas por Interrapidísimo** — la restricción se respetó
+- **Seguro activo en las 30**
+- Potosí quedó consistente entre guía y transportadora
+
+
+---
+
+## 0-AY · ⛔ ANULA 0-AW.1 COMPLETO: NUNCA LE COBRARON NINGÚN FLETE DE DEVOLUCIÓN (14-sep, 18:00)
+
+> El dueño preguntó: *"¿me estás diciendo que los fletes de Coordinadora me los cobraron?"*
+> **Fui a mirar los estados completos del export nuevo. La respuesta es NO, y todo 0-AW.1 se cae.**
+
+### El error: los estados del CSV viejo estaban TRUNCADOS y perdieron el significado
+
+| lo que decía `transportadoras-12sep.csv` | el estado REAL, completo |
+|---|---|
+| `Destinatario no cancela recaudo` | **`Destinatario no cancela el recaudo, solicita la entrega en una fecha posterior`** |
+| `No se entrega no cancela recaudo` | **`Se visita, no se logra entrega`** |
+| `Deterioro en validacion GP` | `Deterioro en validación - GP` |
+
+🔴 **La truncada le quitó lo esencial: *"solicita la entrega en una fecha posterior"*.**
+El cliente **pidió recibirlo otro día.** No es una devolución: **es un envío EN CURSO.**
+
+Los tres casos son envíos activos, no devoluciones cerradas. **El flete que se ve ($20.895, $28.400,
+$28.959) es el flete NORMAL DE IDA de un envío que todavía está andando.**
+
+### 🔑 Cómo se ve una devolución LIQUIDADA de verdad
+
+| ciudad | estado | `valor_servicio` | `valor_seguro_99` | ¿iguales? |
+|---|---|---|---|---|
+| DAGUA | Devolución ratificada | $3.434 | $3.434 | **SÍ** |
+| IBAGUÉ | Devolución ratificada | $2.324 | $2.324 | **SÍ** |
+| TOCANCIPÁ | Devolución ratificada | $2.286 | $2.286 | **SÍ** |
+| APARTADÓ | Devolución ratificada | $3.162 | $3.162 | **SÍ** |
+| BOGOTÁ | Devolución ratificada | $1.754 | $1.754 | **SÍ** |
+| CHINCHINÁ | Devolucion Regional | $3.114 | $3.114 | **SÍ** |
+| TURBACO | Devolución ratificada | $3.482 | $3.482 | **SÍ** |
+| FLORIDABLANCA | Devolución ratificada | $4.334 | $4.334 | **SÍ** |
+
+**8 de 8 idénticos al peso.** Cuando una devolución se liquida, **99 Envíos reemplaza el
+`valor_servicio` por la prima del seguro.** Eso es el seguro funcionando exactamente como el dueño
+dijo que funciona.
+
+### ✅ REGLA NUEVA para no repetirlo (mejor que leer estados)
+
+> **Una devolución está LIQUIDADA cuando `valor_servicio == valor_seguro_99`.**
+> Si son distintos, el envío **NO está resuelto** y su flete **no se puede leer como costo de
+> devolución.** Es un criterio numérico, exacto, y no depende de cómo cada transportadora
+> escriba los estados.
+
+### Lo que queda anulado
+
+| afirmación de 0-AW.1 | estado |
+|---|---|
+| *"$61.796 para reclamarle a 99 Envíos"* | ⛔ **no hay nada que reclamar** |
+| *"una devolución de Coordinadora cuesta $18.124 vs $3.031"* | ⛔ **falso** |
+| *"3 de 4 devoluciones de Coordinadora pagaron flete completo, p=0,0002"* | ⛔ **no eran devoluciones** |
+| *"el diferenciador no es la TASA sino el COSTO de la devolución"* | ⛔ **falso: el costo es igual, lo cubre el seguro** |
+| *"aplazar el A/B de Coordinadora"* | ⛔ **el motivo desaparece** |
+
+### Y el dato honesto que queda sobre Coordinadora
+
+**Coordinadora no tiene NI UNA devolución liquidada.** Cero. Todas sus guías están en curso
+(`En reparto`, `En terminal de destino`, `Se visita no se logra entrega`, `No se localiza dirección`,
+`Cerrado por incidencia`, `Pedido cancelado`, `Deterioro en validación`).
+
+👉 **No sabemos cuánto cuesta una devolución de Coordinadora. No hay dato. Ni bueno ni malo.**
+
+⛔ **Y también se cae el cálculo que estaba a punto de escribir en el tarifario** (*"en Bogotá
+Coordinadora cuesta $4.064 de riesgo contra $755 de ahorro"*): estaba construido sobre el $18.124
+inventado. **Se descarta.**
+
+### ⚠️ Error #18 — y es el peor de todos
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 18 | *"3 devoluciones de Coordinadora pagaron el flete completo además del seguro; hay $61.796 para reclamar; una devolución suya cuesta 6× más"* | **ninguna era devolución. Eran envíos EN CURSO, y el flete visible era el de ida normal. El CSV que yo mismo armé tenía los estados truncados y la truncada borró *"solicita la entrega en una fecha posterior"*. Comparé devoluciones LIQUIDADAS de Interrapidísimo contra envíos SIN RESOLVER de Coordinadora.** |
+
+🔑 **Es la ventana censurada otra vez, con la máscara más difícil de ver hasta ahora: no comparé dos
+períodos distintos, comparé dos ESTADOS DE MADUREZ distintos del mismo tipo de registro.**
+Liquidado vs sin liquidar.
+
+🔑 **Y la causa raíz es mía y evitable: yo construí `transportadoras-12sep.csv` truncando los estados.**
+**Regla: no abreviar nunca un campo de texto que después se va a usar para clasificar.** La palabra que
+se cae puede ser la que cambia el significado — aquí *"solicita la entrega en una fecha posterior"*
+convirtió un envío sano en una devolución imaginaria.
+
+
+---
+
+## 0-AZ · CÓMO FUNCIONA EL SEGURO DE 99 ENVÍOS, Y EL SEÑALADOR DE TELÉFONOS QUE NADIE ESTABA USANDO (14-sep, 18:30)
+
+### Explicación del dueño (y queda confirmada en el dato)
+
+99 Envíos cobra **dos cosas** por envío: el **flete** y el **seguro**. Y hay dos niveles:
+
+| | qué cubre | qué paga el dueño si se devuelve |
+|---|---|---|
+| **Seguro 99** (normal, el default) | el **flete** de ida y vuelta | **solo la prima**, ~$2.000–4.300 |
+| **Seguro 99 Plus** (más caro) | el flete **y la prima** | **$0. Absolutamente nada** |
+
+**Prueba en el histórico:** hay **2 guías devueltas con `valor_servicio` = $0** (28-ago
+interrapidísimo *"Devolución ratificada"* y 20-ago servientrega *"ENTREGADO A REMITENTE"*), contra
+todas las demás que quedaron en la prima ($1.754–$4.334). **Esas dos iban con Plus.**
+
+### 🎯 Y el criterio con que el dueño elige el Plus — esto es lo importante
+
+> *"99 Envíos tiene una función que me muestra qué personas según su número de teléfono tienen
+> historial de haber devuelto un pedido. Cuando veo uno de esos, le mando seguro Plus."*
+
+**99 Envíos tiene un señalador de riesgo por número de teléfono, y se puede ver ANTES de despachar.**
+Eso no estaba escrito en ninguna parte de este archivo y **cambia el problema de las devoluciones.**
+
+### El punto de equilibrio del Plus: 50%
+
+Medido con la guía #11 (San Luis de Sincé, $85.000, 1 unidad) contra las otras guías de $85.000 del
+mismo lote:
+
+| | |
+|---|---|
+| con Plus | `valor_servicio` $27.865 (prima $5.876) |
+| con normal habría sido | `valor_servicio` $25.914 (prima $3.917) |
+| **costo extra del Plus** | **$1.951** |
+| si se entrega | pagó $1.951 de más y no sirvió |
+| si se devuelve | con normal paga $3.917 · con Plus paga $0 → **ahorra $3.917** |
+
+> **El Plus se paga solo si la probabilidad de devolución de ese teléfono supera el 50%.**
+> ($1.951 ÷ $3.917 = 49,8%)
+
+Contra una tasa general del 19%, ese teléfono tendría que devolver **2,6 veces más** que un cliente
+normal. **Es un volado razonable, pero es un volado.** No hay dato todavía de cuánto devuelven de
+verdad los teléfonos marcados.
+
+📌 **Y hay que anotar el sesgo de medición que esto crea:** las guías con Plus son justamente las de
+mayor riesgo. **Si en el futuro se compara "tasa de devolución con Plus vs sin Plus", el Plus va a
+salir peor — no porque cause devoluciones, sino porque se le asigna a los casos malos.** Es selección,
+no causalidad.
+
+### 🔑 LO GRANDE: el seguro protege el 16% del problema
+
+| en una devolución se pierde | monto | peso |
+|---|---|---|
+| la prima (lo que cubre el Plus) | $3.917 | **16%** |
+| **la utilidad que no se hizo** | **$24.129** | **84%** |
+
+**Comprar mejor seguro para un teléfono riesgoso protege la parte chica.** La grande sigue
+completamente expuesta:
+
+| si el teléfono marcado devuelve… | utilidad esperada contraentrega | lo que el Plus le ahorra |
+|---|---|---|
+| 30% | $16.890 | $1.175 |
+| 50% | $12.064 | $1.958 |
+| 70% | $7.239 | $2.742 |
+
+### ✅ La jugada correcta en un teléfono marcado: cambiar el PAGO, no el seguro
+
+| opción | resultado esperado (con 50% de riesgo) |
+|---|---|
+| contraentrega + seguro normal | $12.064 − $1.959 de prima ≈ **$10.105** |
+| contraentrega + Plus | $12.064 − $1.951 ≈ **$10.113** (empata) |
+| **pago anticipado** | **$24.129 × (tasa de aceptación)** |
+
+> **El pago anticipado le gana a las dos si más del **42%** de los clientes marcados acepta pagar
+> por adelantado.** ($10.105 ÷ $24.129)
+
+**Y si no acepta, no se pierde nada:** ese pedido tenía 50% de probabilidad de devolverse igual.
+
+### 🔔 Esto RESUELVE la pregunta que quedó abierta en 0-AW
+
+En 0-AW dije: *"no voy a recomendar un proceso de confirmación porque el 53% de las devoluciones no
+dice el motivo, y no sé qué confirmar."*
+
+**Ya no hace falta saber el POR QUÉ. 99 Envíos dice el QUIÉN.**
+
+El señalador de teléfonos es un predictor que ya está disponible y gratis. **No hay que entender la
+causa para actuar sobre el riesgo.**
+
+### Acciones concretas
+
+| # | qué | por qué |
+|---|---|---|
+| 1 | **En teléfono marcado: ofrecer pago anticipado antes de despachar** (con descuento si hace falta) | se paga solo con 42% de aceptación, y protege $24.129 en vez de $3.917 |
+| 2 | **Registrar cuántos pedidos vienen marcados y cuántos de esos se devuelven** | sin eso no se sabe si el umbral del 50% del Plus se cumple. Hoy no hay ni un dato |
+| 3 | Seguir usando Plus en los marcados **mientras no haya dato** | el costo del error es chico ($1.951) y va en la dirección correcta |
+| 4 | 🔔 Preguntar a 99 Envíos **cómo se llama y dónde está ese señalador**, y si se puede consultar por lote | con 30 pedidos/día, revisar uno por uno es trabajo. Si hay consulta masiva o API, cambia todo |
+
+📌 **De 30 pedidos del 14-sep, solo 1 llevó Plus.** O el señalador marca poco, o no se revisan todos.
+**Vale la pena saber cuál de las dos.**
+
+
+---
+
+## 0-BA · CIERRE DEL FIN DE SEMANA 12-13 SEP: CPA $11.732 · UTILIDAD NETA $211.675 (14-sep, 19:00)
+
+### ⚠️ Primero: el cálculo que descarté
+
+Mi primer intento cargó al lote de hoy **todo el gasto del lunes hasta las 16:00 ($180.791)** contra
+los 30 pedidos del lote. Daba **CPA $18.364 → 🔴 GRAVE.**
+
+**Está mal.** Las guías se crearon a las **16:05 del lunes**. El gasto del lunes todavía está
+produciendo conversaciones que van a cerrar mañana y **despachar el martes.** Le estaba cobrando al
+fin de semana un gasto cuyos pedidos no han llegado.
+
+🔑 **Ventana censurada otra vez, en versión nueva: alinear el gasto con el LOTE en vez de con el DÍA
+mete el gasto de hoy contra los pedidos de ayer.** Para leer un fin de semana cerrado, el gasto y las
+conversaciones tienen que ser **del mismo día** (son simultáneos), y los pedidos se estiman con la
+tasa de cierre.
+
+### ✅ El resultado limpio
+
+| día | gasto | conv | $/conv | CPA implícito | banda |
+|---|---|---|---|---|---|
+| sábado 12 | $87.262 | 94 | $928 | **$11.051** | 🟡 VIGILAR |
+| domingo 13 | $119.690 | 116 | $1.032 | **$12.283** | 🟡 VIGILAR |
+| **FIN DE SEMANA** | **$206.952** | **210** | **$985** | **$11.732** | **🟡 VIGILAR** |
+
+### Utilidad
+
+| | |
+|---|---|
+| conversaciones | 210 |
+| pedidos esperados (cierre 8,4%) | **17,6** |
+| unidades (1,3 por pedido) | 22,9 |
+| margen bruto (22,9 × $23.244) | **$533.031** |
+| menos pauta | −$206.952 |
+| **utilidad antes de devoluciones** | **$326.079** |
+| menos devoluciones (19% = 3,4 pedidos) | −$114.404 |
+| **UTILIDAD NETA DEL FIN DE SEMANA** | **$211.675** |
+| por pedido entregado | **$14.814** |
+
+### ✅ Validación cruzada con las guías reales (los dos métodos coinciden)
+
+| | |
+|---|---|
+| pedidos estimados por conversaciones | **17,6** |
+| guías del lote de hoy | 30 |
+| menos las 8 del viernes (ya contadas en 0-AL) | 22 |
+| menos las del lunes por la mañana (~74 conv × 8,4%) | **~16** |
+
+**17,6 estimados contra ~16 reales.** Cierran. **La tasa de cierre del 8,4% se sostiene** y el número
+del fin de semana es confiable.
+
+### Contra el fin de semana anterior: se deterioró
+
+| | gasto | conv | $/conv | CPA |
+|---|---|---|---|---|
+| 5-6 sep | $301.747 | **422** | $715 | **$8.512** 🟢 |
+| **12-13 sep** | $206.952 | **210** | $985 | **$11.732** 🟡 |
+
+**El CPA empeoró +38% y las conversaciones cayeron −50%.**
+
+Encaja con lo de 0-AU: el CPM saltó **+57% desde el 12-sep** por Amor y Amistad (19-sep). El fin de
+semana pasado compró conversaciones a $715; este a $985.
+
+### 📌 Y el lunes 14 fue mucho peor, y NO está en estos números
+
+| día | CPA implícito |
+|---|---|
+| sábado 12 | $11.051 🟡 |
+| domingo 13 | $12.283 🟡 |
+| **lunes 14** | **$20.440** 🔴 **GRAVE** |
+
+**El lunes va a caer en el lote del martes.** Cuando llegue ese export, la utilidad por pedido va a
+ser bastante peor: a CPA $20.440, el margen por pedido baja de $14.814 a **~$9.000**.
+
+### Resumen para decidir
+
+| | |
+|---|---|
+| ✅ El fin de semana **dio plata**: $211.675 netos | |
+| 🟡 Pero el CPA está en VIGILAR ($11.732) y el fin de semana anterior estaba en NORMAL ($8.512) | |
+| 🔴 El lunes está en GRAVE ($20.440) y esa cuenta llega mañana | |
+| 📌 La causa medida es externa: **CPM +57% por Amor y Amistad**, que debería aflojar después del sábado 19 | |
+
+
+---
+
+## 0-BB · ¿POR QUÉ SUBIÓ EL CPA? NO ES FATIGA DE CREATIVOS: ES DILUCIÓN POR ESCALA (14-sep, 20:00)
+
+El dueño preguntó cuatro cosas: si el alza del CPA es normal, si es fatiga de creativos, si conviene
+una promo de Amor y Amistad, y si vale la pena volver a escribirles a los que no compraron.
+**Las cuatro son medibles. Aquí está el dato.**
+
+### La historia completa del CPA por unidad, semana por semana
+
+| semana | gasto/semana | CPM | conv/mil | **CPA/unidad** |
+|---|---|---|---|---|
+| 06-jul | $36.521 | $8.642 | 12,07 | $6.558 |
+| 13-jul | $83.479 | $6.603 | 9,89 | $6.116 |
+| **20-jul** | $124.882 | $4.169 | 9,28 | **$4.114** ⭐ el mejor |
+| 27-jul | $267.982 | $3.717 | 7,35 | $4.630 |
+| 03-ago | $305.862 | $4.224 | 8,13 | $4.755 |
+| 10-ago | $385.813 | $3.818 | 6,09 | $5.745 |
+| 17-ago | $561.762 | $4.290 | 7,70 | $5.104 |
+| 24-ago | $738.409 | $4.464 | 5,39 | $7.581 |
+| 31-ago | $1.173.571 | $3.674 | 4,64 | $7.252 |
+| 07-sep | — | $3.905 | 5,08 | $8.186 |
+| **14-sep** | — | **$5.416** | — | **$17.346** |
+
+### ❌ NO es fatiga de creativos. Tres pruebas independientes
+
+**1. El CPM NO subió.** De finales de julio a principios de septiembre se movió entre **$3.674 y
+$4.464 sin tendencia**. La fatiga de creativo se manifiesta como **CPM que sube** (Meta cobra más por
+un anuncio gastado). **No pasó.** El $5.416 de esta semana es Amor y Amistad, no desgaste.
+
+**2. El creativo de 14 días rinde IGUAL que el de 65 días.** Los dos corren en Bogotá+Medellín con
+la misma segmentación (semana 8-14 sep):
+
+| conjunto | creativo | gasto | $/conv | conv/mil | frec |
+|---|---|---|---|---|---|
+| Domiciliarios VIDEO | **VIDEO, 14 días** | $438.439 | **$992** | **3,79** | 1,21 |
+| Domiciliarios | **estático, 65 días** | $359.635 | **$1.033** | **3,75** | 1,29 |
+| Motorizados | estático, 65 días | $78.634 | $1.035 | 4,08 | 1,19 |
+| **TEST Creativos** | prueba social, 45 días | $116.593 | **$904** | **7,41** | 1,45 |
+
+**El de 14 días y el de 65 días dan prácticamente lo mismo ($992 vs $1.033).** Si fuera fatiga, el
+nuevo tendría que ser mucho más barato. **No lo es.**
+
+**3. La frecuencia es de 1,19 a 1,45.** Para que un creativo se gaste, la gente tiene que verlo muchas
+veces. **Lo están viendo ~1,2 veces.** No hay desgaste posible con esa frecuencia.
+
+### ✅ Lo que SÍ está pasando: dilución de audiencia por escalar
+
+| | |
+|---|---|
+| **correlación gasto semanal ↔ conv/mil** | **−0,71** (negativa y fuerte) |
+| semanas de MENOS gasto | $140.651/sem → **8,73 conv/mil** |
+| semanas de MÁS gasto | $633.083/sem → **6,39 conv/mil** |
+| el gasto se multiplicó ×4,5 | la respuesta cayó **−27%** |
+
+**Y el alcance sigue creciendo, así que la audiencia NO está agotada:**
+
+| | alcance | frecuencia | conv/mil |
+|---|---|---|---|
+| julio | 56.268 | 1,60 | 8,88 |
+| agosto | 232.809 | 2,34 | 6,38 |
+| sep 1-14 | **309.739** | 1,88 | 4,45 |
+
+🔑 **La intuición del dueño era correcta** (*"lo mejor lo tiene uno al inicio"*) **pero el mecanismo no
+es el que él creía.** No es que el anuncio se gastó ni que el mercado se saturó: es que **la gente que
+mejor encaja se alcanzó primero.** Al pasar de $36.000 a $1.170.000 por semana (**×32**), Meta tiene
+que ir a buscar gente cada vez menos parecida al comprador ideal. **Eso es normal, es esperado, y es
+el precio de crecer.**
+
+### 📊 La descomposición del $17.346 de esta semana
+
+| tramo | de → a | causa |
+|---|---|---|
+| **$4.114 → $8.186** | julio a 7-sep | **dilución por escalar ×9. Estructural y normal.** |
+| **$8.186 → $17.346** | 7-sep a 14-sep | **Amor y Amistad (CPM +57%) + valle de quincena. Temporal, con fecha.** |
+
+👉 **La mitad del susto tiene fecha de vencimiento (sábado 19-sep). La otra mitad es el peaje de
+haber crecido 32 veces, y no se devuelve.**
+
+### 🎯 HALLAZGO: `TEST Creativos` rinde 2× mejor y está desfinanciado
+
+| | conv/mil | $/conv |
+|---|---|---|
+| **TEST Creativos** (*"Prueba social +50 clientes"*) | **7,41** | **$904** |
+| VIDEO | 3,79 | $992 |
+| Domiciliarios estático | 3,75 | $1.033 |
+
+**Casi el doble de respuesta por mil impresiones, y el $/conv más bajo.** Y solo tiene $25.000/día
+(usó 62% la semana pasada).
+
+⚠️ **Caveat honesto:** gasta 4× menos que VIDEO, y acabamos de demostrar que **a menos gasto, mejor
+respuesta**. Parte de esa ventaja es el mismo efecto de escala, no mérito del creativo. **Pero es la
+mejor señal disponible**, y el camino para saberlo es subirle presupuesto y ver si aguanta.
+
+👉 **La acción no es "refrescar creativos" (no hay fatiga). Es darle plata al que ya gana.**
+
+### 💝 La promo de Amor y Amistad: NO a $130.000 plano nacional
+
+Con los fletes **reales de 2 unidades medidos hoy**:
+
+| ciudad | flete real | hoy cobra | margen hoy | con promo $130.000 | |
+|---|---|---|---|---|---|
+| BOGOTÁ / SOACHA | $20.994 | $128.000 | $41.006 | **$43.006** | 🟢 **mejora** |
+| ARMENIA | $32.312 | $138.000 | $39.688 | $31.688 | 🟠 −$8.000 |
+| VILLAVIEJA | $32.685 | $143.000 | $44.315 | $31.315 | 🟠 −$13.000 |
+| ARAUQUITA | $35.034 | $143.000 | $41.966 | $28.966 | 🟠 −$13.000 |
+| CONCORDIA | $36.209 | $143.000 | $40.791 | $27.791 | 🟠 −$13.000 |
+| **NECHÍ** | **$45.562** | $143.000 | $31.438 | **$18.438** | 🔴 −$13.000 |
+
+**Un precio plano nacional le regala $13.000 en cada municipio lejano.** Es la fuga de flete, pero
+ahora a propósito.
+
+✅ **La versión que sí sirve, y es elegante:** **"$130.000 los dos con envío" SOLO en Bogotá y sabana.**
+Ahí el flete es $20.994, el margen **mejora** a $43.006 — y de paso **arregla la banda que está corta
+$2.994** (0-AX). Es promoción y corrección de precio en el mismo movimiento.
+
+📌 **Y lo que no cuesta nada: el ÁNGULO.** Un impermeable **es** un regalo para un motociclista.
+Cambiar el mensaje para Amor y Amistad no cuesta margen. Se prueba en `TEST Creativos`, que existe
+justo para eso **y es el que mejor responde.**
+
+### 💰 LA IDEA MÁS VALIOSA DE TODAS: volver a escribirle a los que no compraron
+
+El dueño lo hacía antes y dejó de hacerlo por volumen. **Es la palanca más grande que hay sobre la
+mesa, porque el CPA de esos contactos ya está pagado.**
+
+| | |
+|---|---|
+| conversaciones del 1 al 14 de sep | **2.590** |
+| que cerraron (8,4%) | ~218 |
+| **que NO compraron** | **~2.372** |
+| si se recupera el **1%** | 24 ventas = **~$558.000** de margen |
+| si se recupera el **2%** | 47 ventas = **~$1.090.000** de margen |
+| **CPA de esas ventas** | **$0. Ya está pagado.** |
+
+**Ni una decisión de transportadora, de creativo o de presupuesto compite con ese número.**
+
+#### ⚠️ Pero cuidado con la herramienta: hay riesgo de perder el número
+
+| opción | alcance real | riesgo |
+|---|---|---|
+| **Listas de difusión** (WhatsApp Business App, gratis) | máximo **256 contactos**, y **solo le llega a quien tenga su número guardado** | ninguno |
+| **WhatsApp Business Platform / Cloud API** (oficial) | escala real, con plantillas aprobadas y consentimiento | ninguno, pero se paga por mensaje |
+| **Apps de envío masivo no oficiales** | prometen miles | 🔴 **violan los términos y el número se bloquea** |
+
+🔴 **El riesgo del tercero es catastrófico para BikerPro: el 100% de las ventas entra por ese número.**
+No vale la pena por ninguna herramienta gratis.
+
+⚠️ **Y la trampa de las listas de difusión:** *solo llega a quien lo tenga guardado en su agenda.*
+La mayoría de los prospectos que escribieron una vez **no lo tienen guardado**, así que el alcance real
+sería una fracción.
+Fuentes: [useinvent](https://www.useinvent.com/es/blog/guia-completa-de-difusion-por-whatsapp) ·
+[goeva](https://www.goeva.ai/es/glosario/listas-de-difusion-whatsapp) ·
+[Infobip](https://www.infobip.com/es/blog/como-enviar-mensajes-masivos-por-whatsapp).
+*Contenido reformulado por restricciones de licencia.*
+
+👉 **Pendiente de investigar bien: cuánto costaría la API oficial para ~2.400 mensajes/mes en Colombia,
+y si el bot actual la puede usar.** A $558.000–$1.090.000 de margen recuperable, casi cualquier costo
+por mensaje se paga solo.
+
+### Respuesta corta a "¿debería preocuparme?"
+
+| | |
+|---|---|
+| ❌ **No** por fatiga de creativos | descartada con tres pruebas |
+| ❌ **No** por audiencia agotada | el alcance sigue creciendo y la frecuencia es 1,2 |
+| ✅ **Sí** tenga presente que escalar cuesta | de $4.114 a $8.186 es real y no se devuelve |
+| ⏳ **El pico de ahora es temporal** | Amor y Amistad pasa el 19-sep |
+| 💰 **Y hay $558k–$1.09M sin tocar** | en los contactos que ya pagó |
+
+
+---
+
+## 0-BC · COTIZACIÓN DE LA API DE WHATSAPP: COLOMBIA ES DE LAS MÁS BARATAS, Y EL RE-CONTACTO ES GRATIS (14-sep, 21:00)
+
+### 💥 EL HALLAZGO: la ventana gratis de 72 horas de los anuncios Click-to-WhatsApp
+
+**Cuando alguien llega por un anuncio Click-to-WhatsApp y el negocio le responde dentro de las
+primeras 24 horas, se abre una ventana de 72 HORAS en la que TODOS los mensajes salientes son
+gratis — incluidas las plantillas de marketing.**
+
+Fuentes: [360dialog](https://360dialog.com/blog/72-hour-click-to-whatsapp-ad-window/) ·
+[doubletick](https://learn.doubletick.io/click-to-whatsapp-ctwa/understanding-the-72-hour-free-messaging-window-for-ctwa-leads) ·
+[SleekFlow](https://sleekflow.helpjuice.com/whatsapp/understanding-click-to-whatsapp-ads-ctwa-and-the-72-hour-free-window) ·
+[wati](https://www.wati.io/en/blog/whatsapp-advertising-messages/). *Contenido reformulado por
+restricciones de licencia.*
+
+🔑 **TODO el tráfico de BikerPro entra por Click-to-WhatsApp.** Y la práctica que el dueño describió
+—*"les escribía mañana o pasado mañana y así hacía como tres contactos"*— **cae exactamente dentro de
+esa ventana de 72 horas.**
+
+> **Su práctica antigua de re-contactar 3 veces no cuesta nada. Cero. Ni por la API oficial.**
+
+### 💵 Tarifa de Meta por mensaje — Colombia está entre las 3 más baratas del mundo
+
+| categoría | USD por mensaje |
+|---|---|
+| **Marketing** (fuera de la ventana) | **$0,0144** |
+| Utilidad / Autenticación / Servicio | $0,0009 |
+
+**Para comparar:** Colombia $0,0144 · India $0,0136 · Turquía $0,0125 · México $0,0457 ·
+Brasil $0,0719 · Chile $0,1022 · Alemania $0,1570.
+Fuente: [tabla de tarifas por país](https://docs.gallabox.com/pricing-and-billing/whatsapp-pricing/rate-card).
+
+**Colombia cuesta 7× menos que Chile y 11× menos que Alemania.** Es una ventaja estructural del país.
+
+### La cuenta de re-contactar a los ~2.372 que no compraron
+
+| escenario | costo de los mensajes |
+|---|---|
+| **dentro de las 72h del clic** (su práctica de siempre) | **$0** |
+| fuera de la ventana, los 2.372 como marketing | 2.372 × $0,0144 = **~$34 USD ≈ $137.000 COP** |
+
+| contra el beneficio | |
+|---|---|
+| recuperar 1% = 24 ventas | **~$558.000** de margen |
+| recuperar 2% = 47 ventas | **~$1.090.000** de margen |
+
+> **Aun en el peor escenario (todos fuera de la ventana), el costo de los mensajes es $137.000
+> contra $558.000–$1.090.000 de margen. Y dentro de las 72 horas es GRATIS.**
+
+#### ⚠️ Corrección al punto de equilibrio (afirmé mal)
+
+Escribí que *"recuperar medio punto porcentual ya paga 3 veces la inversión"*. **Falso**, por un
+redondeo mío en la tabla.
+
+Peor escenario real: **3 mensajes a cada uno de los 2.372, todos pagados = $409.882.**
+
+| recupera | ventas | margen | resultado |
+|---|---|---|---|
+| 0,50% | 11,9 | $275.674 | **−$134.208** 🔴 pierde |
+| **0,74%** | 17,6 | $407.997 | **$0 — equilibrio** |
+| 1,00% | 23,7 | $551.348 | +$141.466 |
+| 2,00% | 47,4 | $1.102.695 | +$692.814 |
+| 3,00% | 71,2 | $1.654.043 | +$1.244.161 |
+
+**El punto de equilibrio es 0,74%, no 0,5%.**
+
+🔑 **Pero eso aplica solo si paga TODOS los mensajes. Dentro de la ventana de 72 horas el costo es $0
+y no hay punto de equilibrio que superar: cualquier venta recuperada es ganancia pura.**
+
+⚠️ **La tasa de cambio usada es ~$4.000 COP/USD y hay que verificarla.** No cambia la conclusión: el
+costo es despreciable en cualquier escenario.
+
+### ⚠️ Dónde SÍ está el costo real: el proveedor, no los mensajes
+
+Meta cobra por mensaje, pero para usar la API se necesita un **BSP** (proveedor), y esos **suelen
+cobrar una mensualidad de plataforma.** **Ese es el número que hay que cotizar, no el de Meta.**
+
+🔔 **Pendiente concreto:** pedir cotización a 2-3 BSP en Colombia preguntando específicamente:
+
+1. **Mensualidad de la plataforma** (el costo real)
+2. Si respetan la **ventana gratis de 72 horas** sin cobrar sobrecargo propio por mensaje
+3. Si permiten **cargar una lista y disparar plantillas por lote**
+4. Si el bot actual de WhatsApp **se puede migrar** o hay que rehacerlo
+5. Si dan **API para leer los pedidos** (mataría dos pájaros: el pendiente de 99 Envíos era justamente
+   no tener API de lectura)
+
+### ⛔ Y lo que NO se debe hacer
+
+| | |
+|---|---|
+| 🔴 apps de envío masivo no oficiales | **bloquean el número.** El 100% de las ventas de BikerPro entra por ahí. No vale por ninguna herramienta gratis |
+| ⚠️ listas de difusión de la app gratis | topan en **256 contactos** y **solo llegan a quien tenga el número guardado** — la mayoría de los prospectos no lo tienen |
+
+### ✅ Recomendación: empiece hoy sin esperar la API
+
+**La ventana de 72 horas ya está disponible y es gratis. No necesita API para aprovecharla — necesita
+disciplina de seguimiento.**
+
+| día | acción |
+|---|---|
+| día 0 | conversación que entra del anuncio |
+| **día 1** | primer re-contacto (dentro de 72h → gratis) |
+| **día 2** | segundo re-contacto (dentro de 72h → gratis) |
+| **día 3** | tercero y último (borde de las 72h) |
+| después | se deja quieto |
+
+**Eso es exactamente lo que él hacía antes.** El problema no era el costo: era el **volumen manual**.
+👉 **La API no habilita la práctica: la hace escalable.** La práctica ya es gratis hoy.
+
+📌 **Y hay un dato que hay que medir y no existe:** de las ~2.372 conversaciones que no compraron,
+**cuántas recibieron al menos un re-contacto.** Si la respuesta es "casi ninguna", ahí está la
+oportunidad más grande y más barata de toda la operación — más grande que cualquier ajuste de pauta,
+transportadora o precio que se haya discutido en todo el día.
+
+
+---
+
+## 0-BD · ⛔ EL BOT DE RENDER NO SE ESTÁ USANDO. LO QUE CORRE ES EL AGENTE DE META (14-sep, 22:00)
+
+> **El dueño lo aclaró: no usa el bot de `bot/` que corre en Render. Usa el AGENTE DE IA DE META
+> integrado en WhatsApp Business** (Meta Business Agent), al que le pega el guion de
+> `GUION-PARA-PEGAR.md`.
+>
+> 🔴 **Y yo acabo de implementar el seguimiento de 72h dentro del bot de Render. No le sirve de nada
+> hoy.** Queda en el repo por si algún día migra, pero **no está corriendo.**
+
+🔑 **Error de contexto mío, y grave porque me costó una implementación completa:** el repo tiene una
+carpeta `bot/` con un servidor funcional, un README de instalación y variables de entorno. **Asumí que
+eso era lo que estaba en producción porque el código existía.** El nombre del archivo que él sí usa lo
+decía desde el principio: *"Guion **para pegar en la IA de WhatsApp Business**"*.
+
+**Regla: la existencia de código en el repo NO prueba que esté corriendo. Antes de construir sobre una
+pieza, preguntar si está en producción.**
+
+### Qué puede y qué NO puede el agente de Meta
+
+Según lo publicado sobre Meta Business Agent, es **reactivo**: responde preguntas, recomienda
+productos del catálogo, califica leads, agenda y deriva a un humano.
+Fuentes: [Cliengo](https://guiawabusiness.cliengo.com/meta-business-agent) ·
+[SleekFlow](https://www.sleekflow.io/blog/meta-whatsapp-business-ai-vs-ai-agents) ·
+[wati](https://www.wati.io/en/blog/meta-business-agent/) ·
+[Agentik — *"qué no resuelve"*](https://agentik.lat/blog/ia-meta-whatsapp-limites/).
+*Contenido reformulado por restricciones de licencia.*
+
+| | |
+|---|---|
+| ✅ responder al que escribe | sí, es lo que hace |
+| ✅ calificar, recomendar, derivar | sí |
+| ❌ **iniciar conversación él solo a las 20 horas** | **no. No hay agendador.** |
+
+👉 **El seguimiento de 72 horas NO se puede automatizar con el agente de Meta.** El agente contesta;
+no sale a buscar. **Para que salga solo hace falta la API (el bot de Render) o una herramienta externa.**
+
+📌 **Y un dato de costo que hay que verificar:** hay reportes de que Meta **empezó a cobrar el uso del
+Business Agent desde el 1-ago-2026** (~USD $2 por millón de tokens, según
+[360dialog](https://360dialog.com/blog/meta-business-agent-complete-guide-whatsapp-api/)).
+🔔 **Revisar si a la cuenta le está llegando ese cobro y cuánto es.** Antes era gratis.
+
+### ✅ Lo que SÍ se puede hacer hoy, sin código y gratis
+
+**Manual, pero rápido.** Dos funciones que la app de WhatsApp Business ya tiene:
+
+| función | para qué |
+|---|---|
+| **Etiquetas** | marcar en qué paso va cada uno: `SEG-1`, `SEG-2`, `SEG-3` |
+| **Mensajes rápidos** (atajos `/`) | escribir el seguimiento en 2 segundos en vez de teclearlo |
+
+**El circuito diario:**
+
+1. Al cerrar el día, a cada conversación que no compró se le pone la etiqueta **`SEG-1`**
+2. Al día siguiente se filtra por `SEG-1`, se manda el mensaje rápido y se cambia a **`SEG-2`**
+3. Al otro día igual, `SEG-2` → **`SEG-3`**
+4. Después de `SEG-3` se quita la etiqueta y se deja quieto
+
+**Cuánto tiempo cuesta de verdad:**
+
+| | |
+|---|---|
+| conversaciones que no compran | ~170/día |
+| con mensaje rápido, por chat | 3-5 segundos |
+| **total al día** | **~9 a 14 minutos** |
+
+⚠️ **Y hay que hacerlo desde el computador** (WhatsApp Business Web / Meta Business Suite), no desde el
+celular. En el celular es 3-4 veces más lento.
+
+**Contra $558.000–$1.090.000 de margen recuperable al mes, 10-15 minutos diarios es la mejor tarifa
+horaria de toda la operación.**
+
+### ❓ Preguntas que hay que responder para diseñarlo bien
+
+1. **¿Trabaja los chats desde el celular o desde el computador?** (define si son 10 o 40 minutos)
+2. **¿Ya usa etiquetas?** ¿Cuáles tiene?
+3. **¿El agente de Meta atiende TODAS las conversaciones o usted interviene en muchas?**
+4. **¿Cuántas conversaciones ve al día en la app?** (para cuadrar con las ~185/día que reporta Meta)
+5. **¿La app le muestra de cuáles ya pasó de 24 horas?** (después de 24h, la app tampoco deja mandar
+   texto libre — es la misma regla de Meta, no una limitación del bot)
+
+### 🔴 Y la duda técnica que hay que confirmar antes de prometer nada
+
+**¿La app de WhatsApp Business permite escribirle a alguien pasadas las 24 horas de su último
+mensaje?** La regla de las 24h/plantillas es de la **plataforma**, no de la API. Si la app tampoco lo
+permite, entonces:
+
+- **el seguimiento del día 1 (~20h) sí se puede hacer a mano** ✅
+- **los de los días 2 y 3 no**, ni a mano ni automático, sin plantillas aprobadas
+
+👉 **Eso reduciría el plan a UN solo seguimiento manual** — que sigue siendo la mayor parte del valor,
+porque el primero es el que más recupera.
+
+**Hay que probarlo con un caso real antes de montar cualquier rutina.**
+
+
+---
+
+## 0-BE · ⛔ LAS 24 HORAS Y LAS PLANTILLAS NO APLICAN: ÉL USA LA APP, NO LA API (14-sep, 22:30)
+
+### El dato que lo cambia todo
+
+> Dueño: *"sí me deja escribir después de 24 horas del último mensaje, **y las veces que quieras**."*
+
+**Correcto, y yo le estaba aplicando el reglamento equivocado.**
+
+| | |
+|---|---|
+| la regla de las **24 horas** + plantillas aprobadas | es de la **API (WhatsApp Business Platform)** |
+| la ventana **gratis de 72 horas** | es un concepto de **facturación de la API** |
+| **la app de WhatsApp Business** | es un cliente normal: **le escribe a quien quiera, cuando quiera, gratis** |
+
+🔴 **Entonces todo lo de 0-BC y 0-BD sobre plantillas, ventanas y los 3 pasos dentro de 72 horas
+NO APLICA a su operación.** Aplicaría solo si migrara a la API.
+
+🔑 **Y la oportunidad es MÁS GRANDE de lo que calculé:** no está limitado a 72 horas.
+**Puede re-contactar gente de hace semanas.** El pozo no son los ~2.372 del mes: es **todo el
+histórico acumulado.**
+
+### Por qué él NO quiere migrar a la API (y tiene razón)
+
+> *"eso es una de las cosas que me gusta del agente de Meta: no es como el API que yo pierdo el acceso
+> al teléfono, sino que yo puedo estar pendiente en tiempo real de qué está respondiendo el bot e ir
+> interviniendo para tener un mejor cierre."*
+
+**Ese argumento es sólido y hay que respetarlo.** El agente de Meta le da:
+
+| | |
+|---|---|
+| responde el **99%** de las conversaciones solo | |
+| le pasa a él solo lo puntual | |
+| **y él ve todo en tiempo real y puede intervenir** | ← esto la API se lo quitaría |
+
+**Su tasa de cierre depende de esas intervenciones.** Migrar a la API para automatizar el seguimiento
+podría costarle más en cierre de lo que gane en re-contactos. **No se recomienda migrar.**
+
+### Cómo trabaja hoy (para no volver a suponer)
+
+| | |
+|---|---|
+| dispositivos | **celular** (pendiente todo el día) **y computador** (para lo masivo) |
+| etiquetas que ya usa | `nuevo pedido sin guía` · `pedido completado` · `pago pendiente` · **`cliente potencial`** · y más |
+| mensajes rápidos | **ya los usa** con `/` para tomar pedidos |
+| quién responde | el agente de Meta el 99%, él interviene en lo puntual |
+
+👉 **Ya tiene las dos piezas que hacen falta: la etiqueta `cliente potencial` y los mensajes rápidos.**
+No hay que instalar nada.
+
+### ✅ El circuito real, sin plantillas ni ventanas
+
+Como no hay límite de 24h ni de 72h, **el seguimiento no tiene que ser diario ni urgente.**
+Eso permite **agruparlo**, que es lo que de verdad quita la tedio:
+
+| | |
+|---|---|
+| **cuándo** | un bloque fijo al día (o incluso día de por medio), desde el **computador** |
+| **a quién** | filtrar por la etiqueta **`cliente potencial`** |
+| **qué mandar** | un mensaje rápido nuevo, por ejemplo `/seg1`, `/seg2`, `/seg3` |
+| **cómo no repetir** | etiquetas nuevas `SEG-1`, `SEG-2`, `SEG-3` que reemplacen a `cliente potencial` |
+
+**El costo real es de tiempo, no de plata:**
+
+| | |
+|---|---|
+| por chat, con mensaje rápido y desde el computador | **3 a 5 segundos** |
+| ~170 conversaciones/día que no compran | **9 a 14 minutos** |
+| contra el margen recuperable | **$558.000–$1.090.000/mes** |
+
+### ⚠️ El límite real ya no es técnico: es el riesgo de que lo reporten
+
+Como la app no bloquea nada, **el único freno verdadero es que la gente lo marque como spam.**
+Demasiados reportes bloquean el número, y por ahí entra el 100% de las ventas.
+
+**Por eso el diseño importa:**
+
+| regla | por qué |
+|---|---|
+| **máximo 3 mensajes** y después se deja quieto | insistir más genera reportes |
+| **el mensaje tiene que aportar algo**, no *"¿ya decidiste?"* | un recordatorio útil no se reporta; una insistencia vacía sí |
+| **respetar de inmediato** a quien diga que no | y etiquetarlo para nunca volver a escribirle |
+| **empezar por los más recientes** | el que preguntó ayer se acuerda; el de hace un mes no, y es más probable que reporte |
+
+### 🔔 El dato que falta para dimensionarlo
+
+**¿Cuántos chats tiene hoy con la etiqueta `cliente potencial`?**
+
+Ese número es el pozo real. Con él se calcula cuántos días de trabajo son y cuánto vale.
+Y si son miles acumulados, **la recomendación NO es escribirles a todos**: es empezar por los últimos
+7 días —los que se acuerdan— y medir la tasa de recuperación antes de ir más atrás.
+
+### ⚠️ Errores #19 y #20
+
+| # | lo que afirmé | lo que era |
+|---|---|---|
+| 19 | *"el seguimiento pasadas las 24h necesita plantillas aprobadas de Meta"* | **falso para él.** Esa regla es de la API. Desde la app escribe cuando quiera, las veces que quiera |
+| 20 | *"la oportunidad son los ~2.372 del mes, dentro de la ventana de 72 horas"* | **la ventana no existe en su caso.** El pozo es todo el histórico acumulado, no un mes |
+
+🔑 **Las dos salen del mismo error: apliqué el reglamento de la API a alguien que usa la app.**
+**Regla: antes de citar un límite de plataforma, confirmar CUÁL de las dos WhatsApp está usando.**
+Son productos distintos con reglas distintas.
+
+
+---
+
+# 🔴 SI ESTE CHAT SE BORRÓ, EMPEZAR AQUÍ — cierre del lunes 14-sep-2026
+
+## Estado de la operación
+
+| | |
+|---|---|
+| **CPA/unidad ahora** | **$10.359** (banda normal histórica: $5.300–$6.500) 🟠 |
+| **margen real/unidad** | **$23.244** medido en 39 unidades (el archivo usaba $24.129) |
+| **le queda por unidad** | **$12.885** — sigue ganando bien |
+| causa del alza | **Amor y Amistad (sábado 19-sep) subió el CPM +57%** · mitad temporal, mitad estructural por escalar ×32 |
+| saldo Meta | leerlo con **`spend_cap − amount_spent`** · alarma bajo **$40.000** · Meta corta bajo ~$16.000-20.000 |
+| presupuesto activo | $154.000/día tradicional + **$16.000/día colmena** (prendido el 14-sep ~01:00) |
+
+## ⏰ Lo primero que hay que hacer (por fecha)
+
+| cuándo | qué |
+|---|---|
+| **martes 15** | leer el lote del martes: **el lunes dio CPA $20.440 = 🔴 GRAVE** y cae ahí |
+| **miér 16 – jue 17** | el efecto del pago llega con **2-3 días de retraso** (0-AU). Aquí debería mejorar |
+| **dom 20 – lun 21** | **si el CPM sigue en $5.400+ después de Amor y Amistad, hay algo estructural** y toca meterse |
+| **hasta el 28-sep** | ventana del colmena (14 días desde el 14). Gatillo: **$3.322/conv** |
+
+## ✅ Acciones concretas pendientes, en orden de plata
+
+| # | acción | valor |
+|---|---|---|
+| 1 | **Arrancar el re-contacto manual** con etiqueta `cliente potencial` + mensajes rápidos `/seg1 /seg2 /seg3` desde el computador. Máximo 3, empezando por los últimos 7 días | **$558.000–$1.090.000/mes con CPA $0** |
+| 2 | **Subir la banda de 2 uds de Bogotá/sabana de $128.000 a $131.000** en `GUION-PARA-PEGAR.md` (confirmado con n=2, las dos dieron $20.993,75) | $2.994 por pedido |
+| 3 | **Corregir Quibdó, Buenaventura y Sincelejo**: están en banda de $81.000 con fletes de $23.000+ | |
+| 4 | **Darle presupuesto a `TEST Creativos`**: rinde **7,41 conv/mil vs 3,75** de los demás y solo tiene $25.000/día | |
+| 5 | **Actualizar el seguro de 13,6% a 15,1%** en el modelo del tarifario | ~$112.500/mes sin contar |
+| 6 | **Promo Amor y Amistad: $130.000 los dos con envío SOLO en Bogotá/sabana** (ahí el margen mejora). ⛔ nunca plano nacional | |
+| 7 | **Pago anticipado a los teléfonos que 99 Envíos marca** con historial de devolución | protege $24.129 en vez de $3.917 |
+
+## 🔔 Preguntas pendientes para 99 Envíos (todas en un correo)
+
+1. Los **códigos de motivo de devolución** — el 53% no dice por qué
+2. Qué cubre exactamente **Seguro 99 vs Seguro 99 Plus**
+3. Cómo se llama y dónde está el **señalador de teléfonos con historial**, y si se consulta por lote
+4. El **denominador del 16%** que muestra la plataforma
+5. El flete de **Tadó ($36.667)**
+6. Si hay **API o webhook de solo lectura** de pedidos
+
+## 📊 Datos que faltan y sin los que no se puede decidir
+
+| dato | para qué |
+|---|---|
+| **¿cuántos chats hay con etiqueta `cliente potencial`?** | dimensionar el re-contacto |
+| cuántos pedidos vienen de teléfonos marcados y cuántos se devuelven | validar el umbral del 50% del Plus |
+| ventas del colmena contadas aparte | la tasa de cierre del 8,1% viene de solo 3 ventas |
+| devoluciones de septiembre | **no medibles hasta el 22-sep** (rezago de 10 días) |
+
+## ⚠️ Las 20 correcciones de esta bitácora — el patrón
+
+**De los errores #8 al #20, casi todos son la misma familia:**
+
+| trampa | ejemplos |
+|---|---|
+| **comparar cosas de distinta madurez** | ventanas censuradas (#9, #17, **#18**) · devoluciones liquidadas vs en curso |
+| **usar el promedio como umbral** | colmena vs cuenta (**#12**) · Valle del Cauca (#14) |
+| **promediar un grupo y sentenciar a cada miembro** | las 4 regiones (#14) · las transportadoras |
+| **aceptar una explicación sin buscar el contraejemplo** | la quincena (#15, #16) |
+| **leer de más un dato chico** | elasticidad del colmena (#13) · VIDEO en un día (#10) |
+| **llamar error a lo que fue una decisión** | Nechí y el Seguro Plus |
+| **aplicar el reglamento equivocado** | API vs app (#19, #20) |
+
+🔑 **Y lo más valioso de esta bitácora: el dueño destapó la mayoría.** Cuando dice *"no me cuadra"* o
+*"por qué contó eso"*, **casi siempre tiene razón. Recalcular antes de defender el número.**
+
+## Reglas duras que salieron hoy
+
+1. **Nunca usar el promedio de la cuenta como umbral.** Cada SKU tiene el suyo: tradicional **$2.402**/conv, colmena **$3.322**/conv
+2. **Una devolución está liquidada cuando `valor_servicio == valor_seguro_99`**
+3. **No abreviar un campo de texto que después se usa para clasificar**
+4. **Antes de aceptar una explicación cíclica, buscar el ciclo anterior en el mismo dato**
+5. **Antes de culpar a la cuenta, mirar el calendario comercial del país**
+6. **Antes de citar un límite de plataforma, confirmar si usa la APP o la API**
+7. **Código en el repo ≠ código en producción. Preguntar.**
+8. **Cuando algo se sale del patrón, primero preguntar si fue una decisión**
+9. **El costo de una transportadora es `flete + tasa_devolución × (flete + utilidad)`**, nunca solo el flete
+10. **Antes de recomendar una acción para bajar un número, saber qué lo causa**

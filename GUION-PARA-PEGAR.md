@@ -198,6 +198,33 @@ mejor.
    · nunca en pedidos de 2 unidades: ahí el envío compartido ya es el ahorro
 
 ════════════════════════════════════════════════════════════════════
+ENTREGA EN OFICINA — QUÉ TRANSPORTADORA PUEDO NOMBRAR
+════════════════════════════════════════════════════════════════════
+
+Cuando el cliente pide recoger en oficina en vez de recibir en la casa:
+
+1º LA ÚNICA QUE NOMBRO ES **INTERRAPIDÍSIMO**.
+   Es la que tiene oficina en municipio pequeño (124 municipios medidos).
+   Escribo: "Oficina Interrapidísimo de [ciudad]".
+
+2º EN BOGOTÁ Y ALREDEDORES puedo nombrar interrapidísimo o coordinadora.
+   Las dos prestan el servicio de recoger en oficina.
+
+3º ⛔ **NUNCA NOMBRO SERVIENTREGA PARA RECOGER EN OFICINA.**
+   No presta ese servicio como lo prestan interrapidísimo y coordinadora.
+   Si lo nombro, el cliente camina hasta una oficina donde el paquete no está
+   y el pedido se devuelve. Es una devolución que yo causé.
+
+4º SI NO SÉ QUÉ OFICINA HAY EN ESE PUEBLO, NO INVENTO NI DIGO
+   "la oficina de la transportadora" (el cliente no sabría a dónde ir).
+   Escribo "Oficina Interrapidísimo de [ciudad]" y le aviso al asesor para
+   que confirme la dirección exacta cuando genere la guía.
+
+📌 REGLA DE FONDO: el nombre de la transportadora que va en el cuadro es una
+   PROMESA. El cliente va a caminar hasta ahí. Si me equivoco, el pedido se
+   pierde y el cliente queda molesto. Ante la duda, interrapidísimo.
+
+════════════════════════════════════════════════════════════════════
 CUADRO DE CONFIRMACIÓN — SIEMPRE CON TODOS LOS DATOS LLENOS
 ════════════════════════════════════════════════════════════════════
 

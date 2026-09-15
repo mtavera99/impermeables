@@ -4,6 +4,7 @@ const { generateReply } = require("./agent");
 const { sendText, sendImage, sendVideo } = require("./whatsapp");
 const { MEDIA } = require("./media");
 const store = require("./store");
+const seguimiento = require("./seguimiento");
 
 const app = express();
 app.use(express.json());
@@ -72,6 +73,14 @@ async function handleWebhook(body) {
         const text = msg.text?.body?.trim();
         if (!text) continue;
 
+        // Si pide que no le escriban mas, se respeta para siempre y se saca
+        // del seguimiento. Esto va ANTES de la pausa: aunque un humano tenga el
+        // chat, la peticion se registra igual.
+        if (/\b(no me escrib|no escrib|dejen? de escrib|no molest|ya no me interesa|elimin[ae]me|no quiero)\b/i.test(text)) {
+          store.marcarNoMolestar(from);
+          console.log(`(${from}) pidio no ser contactado. Marcado como noMolestar.`);
+        }
+
         if (store.isPaused(from)) {
           console.log(`(${from}) en modo humano; el bot no responde.`);
           continue;
@@ -92,6 +101,9 @@ async function handleWebhook(body) {
           else await sendImage(from, item.url, item.caption);
         }
 
+        // Cerro pedido: no se le manda ningun seguimiento mas.
+        if (order) store.marcarComprado(from);
+
         if (order && OWNER) {
           await sendText(
             OWNER,
@@ -111,8 +123,30 @@ async function handleWebhook(body) {
   }
 }
 
+// Diagnostico del seguimiento de 72h: cuantos estan esperando cada paso.
+// No manda nada, solo cuenta. Visitar /seguimiento para ver el estado.
+app.get("/seguimiento", (_req, res) => {
+  res.json({
+    activo: process.env.SEGUIMIENTO_ACTIVO === "1",
+    plantilla_2: process.env.SEGUIMIENTO_PLANTILLA_2 || "(sin configurar)",
+    plantilla_3: process.env.SEGUIMIENTO_PLANTILLA_3 || "(sin configurar)",
+    estado: seguimiento.diagnostico()
+  });
+});
+
+// Dispara una pasada de seguimiento AHORA, sin esperar los 30 min.
+// Sirve para probar. Respeta todas las reglas (no manda a quien no toca).
+app.get("/seguimiento/correr", async (_req, res) => {
+  try {
+    res.json(await seguimiento.correrSeguimientos());
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`BikerPro bot escuchando en puerto ${PORT} 🏍️`);
-  subscribeWaba(); // auto-suscribe la WABA al arrancar
+  subscribeWaba();      // auto-suscribe la WABA al arrancar
+  seguimiento.arrancar(); // reloj del seguimiento de 72h (solo si esta activo)
 });

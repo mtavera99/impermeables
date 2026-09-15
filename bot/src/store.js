@@ -32,8 +32,58 @@ function pushMsg(phone, role, content) {
   const c = all[phone] || { messages: [], paused: false };
   c.messages.push({ role, content, at: Date.now() });
   if (c.messages.length > MAX_MSGS) c.messages = c.messages.slice(-MAX_MSGS);
+  // Marca de tiempo del ULTIMO mensaje DEL CLIENTE. De aqui salen las dos ventanas:
+  //   - 24h: mientras este abierta se puede escribir texto libre
+  //   - 72h: la ventana gratis que abre el anuncio Click-to-WhatsApp
+  if (role === "user") {
+    c.ultimoDelCliente = Date.now();
+    // si el cliente vuelve a escribir, el contador de seguimientos se reinicia:
+    // ya no es un lead frio, esta conversando otra vez
+    c.seguimientos = 0;
+  }
   all[phone] = c;
   writeJSON(CONV_FILE, all);
+}
+
+// ---------------------------------------------------------------------------
+// SEGUIMIENTO DE LOS QUE NO COMPRARON (ventana gratis de 72h · seccion 0-BC)
+// ---------------------------------------------------------------------------
+
+/** Marca que este cliente ya hizo pedido: no se le vuelve a escribir. */
+function marcarComprado(phone) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone] || { messages: [], paused: false };
+  c.compro = true;
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+}
+
+/** Registra que se le mandó un seguimiento (para no repetir ni pasarse de 3). */
+function registrarSeguimiento(phone) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone] || { messages: [], paused: false };
+  c.seguimientos = (c.seguimientos || 0) + 1;
+  c.ultimoSeguimiento = Date.now();
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+}
+
+/** Marca que el cliente pidió que no le escriban más. Se respeta para siempre. */
+function marcarNoMolestar(phone) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone] || { messages: [], paused: false };
+  c.noMolestar = true;
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+}
+
+/** Devuelve todas las conversaciones, para que el seguimiento las revise. */
+function todasLasConversaciones() {
+  ensure();
+  return readJSON(CONV_FILE, {});
 }
 function isPaused(phone) {
   return !!getConv(phone).paused;
@@ -55,4 +105,7 @@ function saveOrder(order) {
   return record;
 }
 
-module.exports = { getConv, pushMsg, isPaused, setPaused, saveOrder };
+module.exports = {
+  getConv, pushMsg, isPaused, setPaused, saveOrder,
+  marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones
+};
