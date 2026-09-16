@@ -4,10 +4,9 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-15 01:30 Bogotá** — 🆕 **sección 0-BF: la descomposición del alza.
-Amor y Amistad explica el 41%, no el 100%. El otro 59% es caída de conv/mil concentrada en los dos
-conjuntos que tienen $100.000 de los $154.000. Corrige 0-AU y 0-AO (errores #21, #22, #23) y proyecta
-el Q4.** *(ojo: verificar siempre la fecha en
+Última actualización: **2026-09-16 01:15 Bogotá** — 🆕 **sección 0-BG: el gate se disparó ($1.603),
+la quincena queda descartada, el colmena se dio vuelta (231% de su equilibrio) y se recortó a $10.000.
+Y el error #24: casi corto `Domiciliarios`, que fue el conjunto que MÁS utilidad dejó.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
 > 🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA: andá directo al bloque "TRASPASO A LA SESIÓN NUEVA" de la
@@ -23,6 +22,7 @@ el Q4.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BG** | 🎯 **EL GATE SE DISPARÓ: $1.603 > $1.134 → la quincena queda DESCARTADA** · el martes cerró en **$1.501/conv y $60.975 de utilidad** (×3,6 vs el lunes, pero un tercio de lo normal) · 🔴 **44% del gasto se fue a las 3 horas MÁS CARAS ($2.763/conv) y la cuenta quedó racionada de 18h a 21:21, cuando costaban $453-$1.142** · ⚠️ pero en días CON plata la noche no es más barata → **no hacer dayparting con 2 días** · 🔴 **el colmena se dio vuelta: $7.661/conv = 231% de su equilibrio** → recortado a $10.000 · 🟢 **TEST Creativos $614/conv y conv/mil 11,37 pero usa solo el 39%** → ⛔ **anula la acción 1-B: su límite es la subasta, no el presupuesto** · ⚠️ **error #24: casi corto `Domiciliarios`, que dejó $25.990 — el que más utilidad dio** · **5 reglas nuevas (18-22)** | **16-sep** |
 | **0-BF** | 🎯 **LA DESCOMPOSICIÓN: `$/conv = CPM ÷ conv-por-mil`. Amor y Amistad explica el 41%, la caída de audiencia el 59%** · ⛔ **corrige 0-AU** (el domingo 13 tuvo el CPM MÁS ALTO y salió bien: $1.032) · ⛔ **corrige 0-AO**: la degradación **NO fue uniforme** — Motorizados y el colmena tuvieron su MEJOR conv/mil mientras los dos grandes se derrumbaron · 🔑 **Motorizados pagó el peor CPM ($7.771) y trajo las conversaciones más baratas ($885)** · el lunes ganó **$16.700 vs $189.737 de promedio** (9%) · ✅ el CPM sube en TODOS los conjuntos a la vez = firma de la subasta · 📅 **proyección Q4: con conv/mil 2,76 el Cyber Monday PIERDE $57.652; con 4,45 GANA $60.380** · 🌧️ **nunca se midió si la lluvia mueve las ventas** (#98) · 🔴 **`balance` ≠ saldo** · 🔴 **leer a las 13:00 subestima el gasto 5,8%** · **errores #21, #22 y #23** | **15-sep** |
 | **0-BE** | ⛔ **LAS 24H Y LAS PLANTILLAS NO APLICAN: usa la APP, no la API.** Escribe a quien quiera, cuando quiera, gratis · **el pozo de re-contacto es TODO el histórico, no un mes** · **NO migrar a la API**: perdería la intervención en tiempo real que le mejora el cierre · ya usa etiqueta `cliente potencial` y mensajes rápidos `/` · el límite real es el **reporte por spam**, no la técnica · **errores #19 y #20** | **14-sep** |
 | **0-BD** | ⛔ **EL BOT DE `bot/` NO ESTÁ CORRIENDO.** Usa el **agente de IA de Meta** · el agente es **reactivo: no puede iniciar** → el seguimiento no se automatiza con él · 🔔 verificar si Meta ya le cobra el Business Agent (desde 1-ago-2026) · **regla: código en el repo ≠ código en producción** | **14-sep** |
@@ -10452,7 +10452,195 @@ porque se lo dijeran. **Van 3 de 3 secciones donde la pregunta escéptica del du
 
 ---
 
-# 🔴 SI ESTE CHAT SE BORRÓ, EMPEZAR AQUÍ — martes 15-sep-2026, 01:30 Bogotá
+## 0-BG · EL GATE SE DISPARÓ, EL COLMENA SE DIO VUELTA, Y CASI CORTO EL CONJUNTO QUE MÁS PLATA DA (mié 16-sep, 01:15 Bogotá)
+
+### 🎯 EL GATE DEL MARTES 15 — el resultado
+
+```
+tramo 00:00–12:59 · TRADICIONAL solo
+$54.512 / 34 conv = $1.603/conv
+umbral de corte (corregido por el sesgo −5,8% de 0-BF): $1.134
+```
+
+## ⛔ **$1.603 > $1.134 → LA QUINCENA NO ERA LA CAUSA. Queda descartada.**
+
+Quedó escrito antes de ver el dato (0-AS) y se respetó. **Pero la acción que el gatillo prescribía
+—"cortar el gasto por encima del presupuesto"— se escribió cuando creíamos que la sobre-entrega era
+el problema, y el error #23 retiró esa hipótesis. El gatillo acertó en el diagnóstico y quedó
+desactualizado en el remedio.**
+
+📌 **Regla: un gatillo escrito de antemano protege el DIAGNÓSTICO, no la ACCIÓN. Si entre que se
+escribió y que se disparó cambió lo que sabemos, la acción se vuelve a pensar; la lectura no.**
+
+### El martes 15, cerrado
+
+| | lunes 14 | **martes 15** | |
+|---|---|---|---|
+| **$/conv tradicional** | $1.862 | **$1.501** | 🟢 −19% |
+| conversaciones | 120 | 122 | = |
+| gasto total | $240.985 | $206.158 | −14% |
+| sobre-entrega | 142% | **121%** | 🟢 |
+| CPM | $5.143 | $4.950 | −4% |
+| conv/mil | 2,76 | **3,30** | 🟢 +20% |
+| CPA implícito | $22.167 | **$17.874** | 🟢 |
+| **utilidad estimada** | $16.700 | **$60.975** | 🟢 **×3,6** |
+
+**Se recuperó a un tercio de lo normal** ($189.737/día de promedio de los 7 días previos). La mejora
+es real pero parcial — consistente con 0-BF: el 41% del alza se va con el calendario, el 59% no.
+
+---
+
+### 🔴 LA CURVA HORARIA: 44% del gasto en las 3 horas más caras, y racionado en las más baratas
+
+| hora | gasto | conv | **$/conv** | saldo |
+|---|---|---|---|---|
+| 15h | $21.586 | 10 | $2.159 | $106.029 |
+| **16h** | **$39.514** | 13 | **$3.040** | $66.515 |
+| **17h** | **$30.072** | 10 | **$3.007** | $34.162 |
+| 18h | $17.133 | 15 | $1.142 | $19.310 🔴 |
+| 19h | $10.025 | 11 | $911 | $9.285 🔴 |
+| **20h** | **$2.411** | 5 | **$482** | $6.874 🔴 |
+| **21h** | **$3.626** | 8 | **$453** | $3.248 🔴 |
+| 22h | $3.644 | 7 | $521 | *(recarga 21:21)* |
+| 23h | $1.757 | 3 | $586 | |
+
+| | |
+|---|---|
+| **15h–17h** | **$91.172 = 44% del día** a **$2.763/conv** |
+| **18h–23h** | $38.596 = 19% del día a **$788/conv** · **39% de las conversaciones** |
+
+**Estuvo en zona de racionamiento (<$20.000) desde las 18:00 hasta la recarga de las 21:21** — las
+cuatro horas de mejor respuesta del mes.
+
+🔑 **Y esto conecta con algo que ya estaba en el repo sin cruzar:** `SEGUIMIENTO-COLMENA-10SEP.md` dice
+que el motociclista tiene el celular en la mano **entre 6 y 9 pm**. **Se sabía para WhatsApp y no se
+estaba usando para la pauta.**
+
+### ⚠️ PERO — el contraejemplo que obliga a frenar la conclusión
+
+Fui a probar si la noche es barata **siempre** o **solo cuando Meta raciona**:
+
+| bloque | días con plata (8, 10, 11-sep) | promedio 8 días |
+|---|---|---|
+| mañana 06-11h | $862 | $1.146 |
+| tarde 15-17h | $939 | **$1.635** |
+| **noche 18-23h** | **$886** | $941 |
+
+**En los días con plata la noche NO es más barata que la mañana ($886 vs $862). El patrón extremo
+solo aparece el 14 y el 15.**
+
+👉 **Lo verificado:** el 44% del gasto se fue a las 3 horas más caras y la cuenta estuvo racionada en
+las más baratas. **Lo NO verificado:** que con más plata la noche hubiera seguido a $788.
+⛔ **No convertir esto en dayparting con 2 días de dato.** Falta un tercer día limpio.
+
+---
+
+### 🔴 EL COLMENA SE DIO VUELTA — y se recortó
+
+| | 14-sep | **15-sep** |
+|---|---|---|
+| gasto | $17.495 | **$22.984** (144% de su presupuesto) |
+| conversaciones | 8 | **3** |
+| **$/conv** | $2.187 🟢 | **$7.661** 🔴 |
+| **% de SU equilibrio** ($3.322) | 66% | **231%** |
+| CPM | $10.780 | 2,2× la cuenta |
+
+**Acumulado de los dos días: $40.479 / 11 conv = $3.680/conv = 111% de su equilibrio. Ya perdía plata.**
+
+✅ **EJECUTADO por el dueño el 16-sep 01:07: `Publico ABIERTO video` $16.000 → $10.000.**
+No se pausó a propósito: la ventana de 14 días vence el 28-sep y pausar+reactivar lo mete en
+aprendizaje de nuevo. A $10.000 sigue midiendo sin sangrar.
+
+⚠️ n=3 conversaciones es poco (error #13). **Pero el gasto no es poco:** $22.984 reales.
+**Cuando el dato chico es el GASTO y no el resultado, sí se puede actuar.**
+
+---
+
+### 🟢 TEST CREATIVOS: el mejor número del mes — y corrige mi propia recomendación
+
+| conjunto | presup | gastado | **uso** | **$/conv** | **conv/mil** |
+|---|---|---|---|---|---|
+| **TEST Creativos** | $25.000 | $9.823 | **39%** | **$614** 🟢 | **11,37** 🟢 |
+| Motorizados | $9.000 | $7.122 | 79% | $1.187 | 5,83 |
+| Domiciliarios VIDEO | $55.000 | $80.056 | 146% | $1.483 | 3,11 |
+| Domiciliarios | $45.000 | **$84.488** | **188%** | $1.837 | 2,72 |
+| Colmena | $16.000 | $22.984 | 144% | $7.661 🔴 | 1,41 |
+| 4 regiones | $20.000 | $1.685 | **8%** | — | 0 |
+
+⛔ **La acción 1-B de 0-BF ("darle presupuesto a TEST Creativos") ESTÁ MAL. Usó el 39% del que ya
+tiene.** Su límite es la **subasta**, no el presupuesto — que es lo que #77 decía desde el principio.
+**La palanca es audiencia/segmentación. Darle plata no hace nada.**
+
+🔑 **Y el dato mata la idea de "rebalancear":** no hay a dónde mover la plata. TEST usa el 39%, las
+regiones el 8%. **Bajar un conjunto grande no reasigna: solo hace que la cuenta gaste menos.**
+
+---
+
+### ⚠️ ERROR #24 — casi le hago cortar el conjunto que más plata le dio
+
+Recomendé bajar `Domiciliarios` de $45.000 a $30.000 llamándolo "el peor de los grandes". La cuenta
+que debí hacer antes:
+
+| Domiciliarios, martes 15 | |
+|---|---|
+| $/conv | $1.837 |
+| su equilibrio | $2.402 |
+| **% del equilibrio** | **76%** 🟢 |
+| **utilidad que dejó** | **~$25.990** |
+
+**Fue el conjunto que MÁS utilidad produjo en toda la cuenta.** Lo llamé "el peor" porque compra más
+caro que TEST Creativos — **o sea que usé el mejor conjunto como umbral del resto. Es el error #12 y
+la regla dura #1, otra vez, y las escribí yo hace tres horas.**
+
+**Y "más caro" no es "en pérdida".** Bajarlo habría reducido la utilidad, no aumentado.
+
+📌 **Decisión correcta: NO se toca.** Dos razones:
+1. **Es el control**, y el miércoles-jueves son los días del efecto del pago (0-AU: 2-3 días de
+   retraso). Tocarlo hoy destruye la lectura otra vez
+2. **No sabemos si sus pesos MARGINALES son los malos.** El promedio es rentable; 0-AH midió que
+   pasando ~$202.000/día el marginal devuelve $0. **Eso se mide con días cerrados, no con una
+   corazonada a la 1am**
+
+🔑 **El dueño lo destapó preguntando *"¿lo hago ya o más tarde?"* en vez de ejecutar.
+Van 4 de 4 secciones donde su pregunta encuentra un error mío.**
+
+---
+
+### 💵 Caja: el hábito de recargar de noche es el que causa el racionamiento
+
+| hora Bogotá | evento |
+|---|---|
+| 15-sep 00:58 | recarga $100.000 |
+| 15-sep 06:16 | Meta cobra $242.831 (el gasto del 14) |
+| 15-sep 21:21 | recarga $100.000 ← **3 horas después de entrar en zona de freno** |
+| 16-sep 01:01 | recarga $100.000 |
+| 16-sep 01:07 | colmena $16.000 → $10.000 |
+
+**Saldo al arrancar el miércoles: $194.619. Presupuesto activo: $164.000.**
+
+⚠️ **Proyección con ese saldo: vuelve a entrar en zona de freno a las 18:00** — la misma hora.
+Para que la noche corra sin racionamiento hacen falta **~$50.000 más**.
+
+⛔ **REGLA: recargar EN LA MAÑANA, no de noche.** Llevaba 3 noches recargando entre las 21h y la 1am.
+Es la recomendación de 0-AI (colchón de 2-3 días) que nunca se ejecutó, y el martes costó estar
+racionado en las 4 horas de mejor respuesta del mes.
+
+### Reglas nuevas
+
+18. **Un gatillo escrito de antemano protege el diagnóstico, no la acción.** Si cambió lo que sabemos,
+    la acción se re-piensa; la lectura no se toca
+19. **Antes de llamar "el peor" a un conjunto, medirlo contra SU equilibrio y calcular la utilidad que
+    dejó** — no compararlo con el mejor conjunto de la cuenta
+20. **"Rebalancear" solo existe si hay un conjunto que pueda absorber la plata.** Si los buenos usan
+    el 39% y el 8%, bajar a los grandes no reasigna: reduce
+21. **Cuando el dato chico es el GASTO (no el resultado), sí se puede actuar.** $22.984 por 3
+    conversaciones no necesita n=30 para saber que sangra
+22. **Recargar de noche produce racionamiento de noche.** El saldo se pone en la mañana
+
+
+---
+
+# 🔴 SI ESTE CHAT SE BORRÓ, EMPEZAR AQUÍ — miércoles 16-sep-2026, 01:15 Bogotá
 
 > ⚠️ **PRIMERO: verificar la fecha con `TZ=America/Bogota date`.** El sandbox corre en UTC y marca el
 > día siguiente. Un diagnóstico entero se puede armar sobre el día equivocado.
@@ -10461,15 +10649,17 @@ porque se lo dijeran. **Van 3 de 3 secciones donde la pregunta escéptica del du
 
 | | |
 |---|---|
-| **$/conv tradicional (lunes 14 cerrado)** | **$1.862** 🔴 — el doble de cualquier día anterior. Equilibrio $2.402 (78%) |
-| **$/conv colmena** | **$2.192** 🟢 — 66% de su equilibrio ($3.322). **Lo más sano de la cuenta** |
-| **CPA implícito** | **$22.167**/pedido (banda normal: $5.300–$6.500 por unidad) 🟠 |
-| **utilidad del lunes** | **$16.700** contra **$189.737** de promedio de los 7 días previos = **9%** |
+| **$/conv tradicional (martes 15 cerrado)** | **$1.501** 🟠 — mejoró 19% vs el lunes ($1.862). Equilibrio $2.402 (63%) |
+| **el gate SE DISPARÓ** | tramo 00:00-12:59 dio **$1.603** contra umbral $1.134 → **la quincena NO era la causa** → 0-BG |
+| **$/conv colmena** | 🔴 **$7.661 el 15-sep = 231% de su equilibrio.** Acumulado 2 días: $3.680 = 111%. **Recortado a $10.000 el 16-sep 01:07** |
+| **CPA implícito** | **$17.874**/pedido el martes (banda normal: $5.300–$6.500 por unidad) 🟠 |
+| **utilidad** | martes **$60.975** · lunes $16.700 · promedio 7 días previos **$189.737** = va en el **32%** |
 | **margen real/unidad** | **$23.244** medido en 39 unidades |
 | **causa del alza** | 🆕 **41% Amor y Amistad (CPM ×1,42) + 59% caída de conv/mil (4,45 → 2,76)** → **0-BF**. ⛔ **NO es "todo Amor y Amistad" como decía 0-AU** |
 | saldo Meta | **`spend_cap − amount_spent`** (⛔ `balance` NO es el saldo) · alarma bajo **$40.000** · Meta corta bajo ~$16.000-20.000 |
-| **saldo al arrancar el 15** | **$204.005** (recarga de $100.000 a las 00:58 confirmada) |
-| presupuesto activo | $154.000/día tradicional + $16.000/día colmena · 🔴 **pero el lunes gastó $240.985 = 142%** |
+| **saldo al arrancar el 16** | **$194.619** · presupuesto activo **$164.000** · ⚠️ **proyección: vuelve a zona de freno a las 18:00. Faltan ~$50.000** |
+| sobre-entrega | lunes 142% · **martes 121%** (bajando) |
+| ⛔ **NO TOCAR** | `Domiciliarios`, `VIDEO`, `TEST Creativos`, `Motorizados`. Miér-jue son los días del efecto del pago y Domiciliarios es el control |
 
 ## 🔑 El diagnóstico en una frase
 
@@ -10502,10 +10692,10 @@ saturada**, mientras los dos que compran barato tienen $34.000 entre los dos:
 | # | acción | valor |
 |---|---|---|
 | 1 | **Arrancar el re-contacto manual** con etiqueta `cliente potencial` + mensajes rápidos `/seg1 /seg2 /seg3` desde el computador. Máximo 3, empezando por los últimos 7 días. 🆕 **Hoy vale el doble en términos relativos: cuando la conversación pagada cuesta $1.861, una venta a CPA $0 pesa más** | **$558.000–$1.090.000/mes con CPA $0** |
-| **1-B** | 🆕🔴 **REBALANCEAR EL PRESUPUESTO — el hallazgo de 0-BF.** `Motorizados` ($9.000, $885/conv) y `TEST Creativos` ($25.000, $1.360/conv) compran 1,5-2,3× más barato que `Domiciliarios` ($45.000, $2.063) y `Domiciliarios VIDEO` ($55.000, $2.012). ⛔ **NO antes del miércoles 16** (destruye el gate y editar reinicia el aprendizaje). ⚠️ Y recordar 0-AR: **subir presupuesto no sirve si el conjunto no lo usa** — hay que verificar utilización antes | **es lo que decide si el Q4 se gana o se pierde** |
+| ~~1-B~~ | ⛔ **ANULADA POR 0-BG: TEST Creativos usa el 39% de su presupuesto. Su límite es la subasta, no la plata, y no hay conjunto que pueda absorber lo que se le quite a los grandes.** *(texto original abajo)* 🔴 **REBALANCEAR EL PRESUPUESTO — el hallazgo de 0-BF.** `Motorizados` ($9.000, $885/conv) y `TEST Creativos` ($25.000, $1.360/conv) compran 1,5-2,3× más barato que `Domiciliarios` ($45.000, $2.063) y `Domiciliarios VIDEO` ($55.000, $2.012). ⛔ **NO antes del miércoles 16** (destruye el gate y editar reinicia el aprendizaje). ⚠️ Y recordar 0-AR: **subir presupuesto no sirve si el conjunto no lo usa** — hay que verificar utilización antes | **es lo que decide si el Q4 se gana o se pierde** |
 | 2 | **Subir la banda de 2 uds de Bogotá/sabana de $128.000 a $131.000** en `GUION-PARA-PEGAR.md` (confirmado con n=2, las dos dieron $20.993,75) | $2.994 por pedido |
 | 3 | **Corregir Quibdó, Buenaventura y Sincelejo**: están en banda de $81.000 con fletes de $23.000+ | |
-| 4 | **Darle presupuesto a `TEST Creativos`** *(absorbida en 1-B)*: rinde **7,41 conv/mil vs 3,75** de los demás y solo tiene $25.000/día | |
+| ~~4~~ | ⛔ **ANULADA POR 0-BG (usa el 39%).** ~~Darle presupuesto a `TEST Creativos`~~: rinde **7,41 conv/mil vs 3,75** de los demás y solo tiene $25.000/día | |
 | 5 | **Actualizar el seguro de 13,6% a 15,1%** en el modelo del tarifario | ~$112.500/mes sin contar |
 | 6 | **Promo Amor y Amistad: $130.000 los dos con envío SOLO en Bogotá/sabana** (ahí el margen mejora). ⛔ nunca plano nacional | |
 | 7 | **Pago anticipado a los teléfonos que 99 Envíos marca** con historial de devolución | protege $24.129 en vez de $3.917 |
@@ -10529,14 +10719,14 @@ saturada**, mientras los dos que compran barato tienen $34.000 entre los dos:
 | ventas del colmena contadas aparte | la tasa de cierre del 8,1% viene de solo 3 ventas |
 | devoluciones de septiembre | **no medibles hasta el 22-sep** (rezago de 10 días) |
 
-## ⚠️ Las 23 correcciones de esta bitácora — el patrón
+## ⚠️ Las 24 correcciones de esta bitácora — el patrón
 
-**De los errores #8 al #23, casi todos son la misma familia:**
+**De los errores #8 al #24, casi todos son la misma familia:**
 
 | trampa | ejemplos |
 |---|---|
 | **comparar cosas de distinta madurez** | ventanas censuradas (#9, #17, **#18**) · devoluciones liquidadas vs en curso |
-| **usar el promedio como umbral** | colmena vs cuenta (**#12**) · Valle del Cauca (#14) |
+| **usar el promedio como umbral** | colmena vs cuenta (**#12**) · Valle del Cauca (#14) · 🆕 **`Domiciliarios` medido contra TEST Creativos en vez de contra SU equilibrio (#24)** |
 | **promediar un grupo y sentenciar a cada miembro** | las 4 regiones (#14) · las transportadoras · 🆕 **"degradación uniforme" (#22)** |
 | **aceptar una explicación sin buscar el contraejemplo** | la quincena (#15, #16) · 🆕 **Amor y Amistad (#21): el contraejemplo era el domingo 13** |
 | **leer de más un dato chico** | elasticidad del colmena (#13) · VIDEO en un día (#10) |
@@ -10547,8 +10737,9 @@ saturada**, mientras los dos que compran barato tienen $34.000 entre los dos:
 🔑 **Y lo más valioso de esta bitácora: el dueño destapó la mayoría.** Cuando dice *"no me cuadra"* o
 *"por qué contó eso"*, **casi siempre tiene razón. Recalcular antes de defender el número.**
 
-📌 **Van 3 de 3 en las últimas secciones.** *"¿por qué contó eso?"* → #18 · *"sí me deja escribir
-después de 24 horas"* → #19 y #20 · *"¿qué tiene que ver Amor y Amistad?"* → **#21, #22 y #23.**
+📌 **Van 4 de 4 en las últimas secciones.** *"¿por qué contó eso?"* → #18 · *"sí me deja escribir
+después de 24 horas"* → #19 y #20 · *"¿qué tiene que ver Amor y Amistad?"* → #21, #22 y #23 ·
+*"¿lo bajo ya o más tarde?"* → **#24, y era el conjunto que más utilidad daba.**
 **La pregunta escéptica del dueño es el mejor detector de errores que tiene el proyecto.**
 
 ## Reglas duras que salieron hoy
