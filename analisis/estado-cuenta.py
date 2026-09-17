@@ -156,7 +156,7 @@ def construir():
     L.append("# 📊 Estado de la cuenta — BikerPro")
     L.append("")
     L.append(f"> **Última lectura: {hoy_dt.strftime('%Y-%m-%d %H:%M')} Bogotá.** "
-             f"Se actualiza solo 4 veces al día (07:00 · 13:00 · 17:00 · 23:00).")
+             f"Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.")
     L.append("> Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.")
     L.append("")
     L.append("---")
@@ -335,6 +335,28 @@ def construir():
     return "\n".join(L) + "\n"
 
 
+def resumen_una_linea():
+    """Linea corta para el mensaje del commit: asi la lista de commits del repo
+    se lee como una bitacora horaria sin tener que abrir el archivo."""
+    try:
+        hoy_dt = ahora_bogota()
+        hoy = hoy_dt.strftime("%Y-%m-%d")
+        cta = lector.get(ACT, {"fields": "spend_cap,amount_spent"})
+        saldo = float(cta.get("spend_cap") or 0) - float(cta.get("amount_spent") or 0)
+        g = c = 0
+        for f in por_conjunto(hoy):
+            if f.get("adset_name") in COLMENA:
+                continue
+            g += float(f.get("spend") or 0)
+            c += conv(f)
+        pc = f"${g/c:,.0f}/conv" if c else "sin conv"
+        alerta = " 🔴RECARGAR" if saldo < 60000 else ""
+        return (f"Estado {hoy_dt.strftime('%d-%b %H:%M')} · {pc} · "
+                f"gasto ${g:,.0f} · saldo ${saldo:,.0f}{alerta}")
+    except Exception:
+        return f"Estado {ahora_bogota().strftime('%d-%b %H:%M')} Bogota"
+
+
 def main():
     try:
         texto = construir()
@@ -350,6 +372,12 @@ def main():
                  f"```\n{traceback.format_exc()[-1500:]}\n```\n")
     with open(SALIDA, "w", encoding="utf-8") as f:
         f.write(texto)
+    # el workflow usa esta linea como mensaje del commit
+    try:
+        with open("/tmp/estado-resumen.txt", "w", encoding="utf-8") as f:
+            f.write(resumen_una_linea())
+    except OSError:
+        pass
     print(f"escrito {SALIDA} ({len(texto)} bytes)")
 
 
