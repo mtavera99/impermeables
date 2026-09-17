@@ -48,6 +48,12 @@ def ahora_bogota():
     return dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=5)
 
 
+def esc(nombre):
+    """Los nombres de conjunto traen '|' (ej: 'Domiciliarios | Santander') y eso
+    rompe las columnas de una tabla markdown. Hay que escaparlo."""
+    return (nombre or "").replace("|", "\\|")
+
+
 def conv(fila):
     return sum(
         int(float(a.get("value", 0)))
@@ -264,7 +270,7 @@ def construir():
         c = conv(f)
         i = int(f.get("impressions") or 0)
         p = presu_map.get(n, 0)
-        L.append(f"| {n} | ${p:,.0f} | ${g:,.0f} | {f'{g/p*100:.0f}%' if p else '—'} | {c} | "
+        L.append(f"| {esc(n)} | ${p:,.0f} | ${g:,.0f} | {f'{g/p*100:.0f}%' if p else '—'} | {c} | "
                  f"{f'${g/c:,.0f}' if c else '—'} | {c/i*1000 if i else 0:.2f} |")
     L.append("")
 
@@ -299,6 +305,66 @@ def construir():
         L.append(f"| CPA implícito (cierre {CIERRE*100:.1f}%) | **${gt/ct/CIERRE:,.0f}**/pedido |")
         L.append(f"| utilidad estimada de lo que va del día | **${utilidad(gt, ct):,.0f}** |")
         L.append("")
+    L.append("---")
+    L.append("")
+
+    # ---------- CADA CONJUNTO POR SEPARADO, dia por dia ----------
+    # El promedio de la cuenta esconde conjuntos que se rompen y conjuntos que mejoran
+    # al mismo tiempo. Esto los separa. Y como los conjuntos NO comparten toda la
+    # segmentacion (Expancion son 8 departamentos, los tres grandes son Bogota+Medellin),
+    # cada linea se lee sola: no hay que preocuparse por "contaminacion" entre ellos.
+    dias_hist = [(hoy_dt - dt.timedelta(days=k)).strftime("%Y-%m-%d") for k in range(5, -1, -1)]
+    hist = {}
+    for d in dias_hist:
+        for f in por_conjunto(d):
+            n = f.get("adset_name", "")
+            g = float(f.get("spend") or 0)
+            c = conv(f)
+            i = int(f.get("impressions") or 0)
+            hist.setdefault(n, {})[d] = (g, c, g / c if c else 0, c / i * 1000 if i else 0)
+
+    # solo los conjuntos con gasto en los ultimos 3 dias: los pausados sin dato
+    # solo agregan ruido a la tabla
+    recientes = set(dias_hist[-3:])
+    hist = {n: v for n, v in hist.items()
+            if any(v.get(d, (0,))[0] > 100 for d in recientes)}
+    orden = sorted(hist, key=lambda n: -hist[n].get(dias_hist[-1], (0,))[0])
+    L.append("## 🔍 Cada conjunto por separado — la tendencia real")
+    L.append("")
+    L.append("*(El promedio de la cuenta puede tapar un conjunto que se rompe y otro que mejora "
+             "al mismo tiempo. Acá va cada uno solo.)*")
+    L.append("")
+    L.append("### $/conv por día")
+    L.append("")
+    L.append("| conjunto | " + " | ".join(d[5:] for d in dias_hist) + " | |")
+    L.append("|---" * (len(dias_hist) + 2) + "|")
+    for n in orden:
+        vals = [hist[n].get(d) for d in dias_hist]
+        celdas = [f"${v[2]:,.0f}" if v and v[2] else "—" for v in vals]
+        # flecha: compara el ultimo dia con dato contra el anterior con dato
+        con = [v[2] for v in vals if v and v[2]]
+        flecha = ""
+        if len(con) >= 2:
+            flecha = "🟢" if con[-1] < con[-2] * 0.95 else ("🔴" if con[-1] > con[-2] * 1.15 else "🟡")
+        L.append(f"| {esc(n)} | " + " | ".join(celdas) + f" | {flecha} |")
+    L.append("")
+    L.append("### conv/mil por día *(la calidad de la audiencia de cada uno)*")
+    L.append("")
+    L.append("| conjunto | " + " | ".join(d[5:] for d in dias_hist) + " | |")
+    L.append("|---" * (len(dias_hist) + 2) + "|")
+    for n in orden:
+        vals = [hist[n].get(d) for d in dias_hist]
+        celdas = [f"{v[3]:.2f}" if v and v[3] else "—" for v in vals]
+        con = [v[3] for v in vals if v and v[3]]
+        flecha = ""
+        if len(con) >= 2:
+            flecha = "🟢" if con[-1] > con[-2] * 1.05 else ("🔴" if con[-1] < con[-2] * 0.85 else "🟡")
+        L.append(f"| {esc(n)} | " + " | ".join(celdas) + f" | {flecha} |")
+    L.append("")
+    L.append("🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta "
+             "contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). "
+             "Eso es canibalización, y se arregla diferenciando la segmentación.")
+    L.append("")
     L.append("---")
     L.append("")
 
