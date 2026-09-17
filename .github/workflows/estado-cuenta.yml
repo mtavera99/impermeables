@@ -1,0 +1,50 @@
+name: Estado de la cuenta
+
+# Lee Meta Ads (SOLO LECTURA) y actualiza ESTADO-CUENTA.md en la raiz del repo,
+# para poder ver los numeros desde el celular sin entrar a Kiro ni a Ads Manager.
+#
+# El token vive en Settings > Secrets and variables > Actions > META_ADS_TOKEN.
+# NUNCA en un archivo del repo.
+
+on:
+  schedule:
+    # Bogota = UTC-5. Cuatro cortes al dia:
+    - cron: "0 12 * * *"   # 07:00 Bogota — arranque, ver el saldo antes de que gaste
+    - cron: "0 18 * * *"   # 13:00 Bogota — el corte del gate
+    - cron: "0 22 * * *"   # 17:00 Bogota — 🔑 antes del bloque de 18-23h, decidir recarga
+    - cron: "0 4  * * *"   # 23:00 Bogota — cierre del dia
+  workflow_dispatch:        # boton manual, sirve desde la app de GitHub en el celular
+
+permissions:
+  contents: write
+
+concurrency:
+  group: estado-cuenta
+  cancel-in-progress: false
+
+jobs:
+  leer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Leer Meta y escribir ESTADO-CUENTA.md
+        env:
+          META_ADS_TOKEN: ${{ secrets.META_ADS_TOKEN }}
+        run: python3 analisis/estado-cuenta.py
+
+      - name: Commitear si cambio
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ESTADO-CUENTA.md
+          if git diff --staged --quiet; then
+            echo "sin cambios"
+          else
+            git commit -m "Estado de la cuenta — $(TZ=America/Bogota date '+%d-%b %H:%M') Bogota"
+            git push
+          fi
