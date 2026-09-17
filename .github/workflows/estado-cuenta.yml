@@ -8,11 +8,13 @@ name: Estado de la cuenta
 
 on:
   schedule:
-    # Bogota = UTC-5. Cuatro cortes al dia:
-    - cron: "0 12 * * *"   # 07:00 Bogota — arranque, ver el saldo antes de que gaste
-    - cron: "0 18 * * *"   # 13:00 Bogota — el corte del gate
-    - cron: "0 22 * * *"   # 17:00 Bogota — 🔑 antes del bloque de 18-23h, decidir recarga
-    - cron: "0 4  * * *"   # 23:00 Bogota — cierre del dia
+    # CADA HORA, en punto. Bogota = UTC-5 (offset entero, asi que la hora en punto
+    # de UTC es tambien la hora en punto de Bogota).
+    #
+    # ⚠️ El cron de GitHub NO es exacto: bajo carga se puede retrasar 5-15 minutos
+    # y en picos se puede saltar una corrida. Para un dato urgente, usar el boton
+    # manual (workflow_dispatch) que corre en el momento.
+    - cron: "0 * * * *"
   workflow_dispatch:        # boton manual, sirve desde la app de GitHub en el celular
 
 permissions:
@@ -37,7 +39,7 @@ jobs:
           META_ADS_TOKEN: ${{ secrets.META_ADS_TOKEN }}
         run: python3 analisis/estado-cuenta.py
 
-      - name: Commitear si cambio
+      - name: Commitear (el historial de commits queda como bitacora horaria)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -45,6 +47,12 @@ jobs:
           if git diff --staged --quiet; then
             echo "sin cambios"
           else
-            git commit -m "Estado de la cuenta — $(TZ=America/Bogota date '+%d-%b %H:%M') Bogota"
-            git push
+            # El resumen de una linea lo escribe estado-cuenta.py. Asi la lista de
+            # commits del repo se puede leer como un log horario sin abrir el archivo.
+            MSG="$(cat /tmp/estado-resumen.txt 2>/dev/null || echo "Estado de la cuenta")"
+            git commit -m "$MSG"
+            # varias corridas pueden pisarse: reintentar con rebase
+            for i in 1 2 3; do
+              git push && break || { git pull --rebase --autostash -q origin main; sleep 3; }
+            done
           fi
