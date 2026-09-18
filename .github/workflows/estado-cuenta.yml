@@ -5,23 +5,39 @@ name: Estado de la cuenta
 #
 # El token vive en Settings > Secrets and variables > Actions > META_ADS_TOKEN.
 # NUNCA en un archivo del repo.
+#
+# ══════════════════════════════════════════════════════════════════════════════
+# 🔑 POR QUE ESTE DISEÑO RARO (un bucle adentro en vez de cron horario)
+# ══════════════════════════════════════════════════════════════════════════════
+# El cron horario de GitHub NO FUNCIONA en la practica. Medido en este repo:
+#
+#   con "0 * * * *"  -> disparo 1 de 3 veces, y esa una con 46 min de retraso
+#   con "23 * * * *" -> disparo 0 de 3 veces (21:23, 22:23 y 23:23 del 17-sep)
+#
+# GitHub no garantiza los workflows programados: cuando hay cola los retrasa o
+# los SALTA, y no hay reintento. A mayor frecuencia, peor.
+#
+# LA SOLUCION: no pedirle al cron que dispare cada hora. Se le pide que dispare
+# CADA 3 HORAS (frecuencia baja = mucho mas confiable) y cada corrida hace el
+# trabajo 4 veces, esperando una hora entre cada una. Asi la lectura sale cada
+# hora aunque el scheduler falle, porque una sola corrida cubre 3 horas.
+#
+#   corrida de las 00:23 -> lee a las 00:23, 01:23, 02:23 y 03:23
+#   corrida de las 03:23 -> lee a las 03:23, 04:23, 05:23 y 06:23
+#   ...
+#
+# Si el cron se salta una corrida, se pierde una ventana de 3 horas en vez de
+# perderse todo. Y el boton manual sigue disponible para el dato urgente.
+# ══════════════════════════════════════════════════════════════════════════════
 
 on:
   schedule:
-    # CADA HORA, al minuto 23.
-    #
-    # 🔑 POR QUE EL MINUTO 23 Y NO EL 0: el minuto en punto es el mas congestionado
-    # de GitHub — millones de workflows programados a "0 * * * *" compiten a la vez,
-    # y GitHub retrasa o SALTA corridas cuando hay cola. Paso real: con "0 * * * *"
-    # las corridas de las 19:00 y 20:00 del 17-sep nunca dispararon. Un minuto
-    # impar y poco usado mejora bastante la probabilidad de que corra.
-    #
-    # Bogota = UTC-5 (offset entero), asi que el minuto 23 de UTC es tambien el
-    # minuto 23 de Bogota.
-    - cron: "23 * * * *"
+    # Cada 3 horas al minuto 23. Bogota = UTC-5 (offset entero), asi que el
+    # minuto 23 de UTC es el minuto 23 de Bogota.
+    - cron: "23 */3 * * *"
 
   # Si se cambia el script o el workflow, regenerar el archivo de una en vez de
-  # esperar la hora: si no, el ESTADO-CUENTA.md queda con el texto viejo.
+  # esperar: si no, el ESTADO-CUENTA.md queda con datos viejos.
   push:
     branches: [main]
     paths:
@@ -36,11 +52,15 @@ permissions:
 
 concurrency:
   group: estado-cuenta
-  cancel-in-progress: false
+  # Si entra una corrida nueva, la vieja se cancela. Evita que dos bucles
+  # escriban el mismo archivo al mismo tiempo.
+  cancel-in-progress: true
 
 jobs:
   leer:
     runs-on: ubuntu-latest
+    # 4 lecturas separadas por 1 hora = ~3h de trabajo. El tope de GitHub es 6h.
+    timeout-minutes: 230
     steps:
       - uses: actions/checkout@v4
 
@@ -48,25 +68,37 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Leer Meta y escribir ESTADO-CUENTA.md
+      - name: Leer Meta cada hora y commitear (4 lecturas por corrida)
         env:
           META_ADS_TOKEN: ${{ secrets.META_ADS_TOKEN }}
-        run: python3 analisis/estado-cuenta.py
-
-      - name: Commitear (el historial de commits queda como bitacora horaria)
+          # En push y en el boton manual con una sola lectura alcanza: el bucle
+          # largo es solo para las corridas programadas.
+          VUELTAS: ${{ github.event_name == 'schedule' && '4' || '1' }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ESTADO-CUENTA.md
-          if git diff --staged --quiet; then
-            echo "sin cambios"
-          else
-            # El resumen de una linea lo escribe estado-cuenta.py. Asi la lista de
-            # commits del repo se puede leer como un log horario sin abrir el archivo.
-            MSG="$(cat /tmp/estado-resumen.txt 2>/dev/null || echo "Estado de la cuenta")"
-            git commit -m "$MSG"
-            # varias corridas pueden pisarse: reintentar con rebase
-            for i in 1 2 3; do
-              git push && break || { git pull --rebase --autostash -q origin main; sleep 3; }
-            done
-          fi
+
+          for i in $(seq 1 "$VUELTAS"); do
+            echo "───── lectura $i de $VUELTAS ─────"
+            python3 analisis/estado-cuenta.py || echo "fallo la lectura $i, sigo"
+
+            git add ESTADO-CUENTA.md
+            if git diff --staged --quiet; then
+              echo "sin cambios, no commiteo"
+            else
+              MSG="$(cat /tmp/estado-resumen.txt 2>/dev/null || echo 'Estado de la cuenta')"
+              git commit -m "$MSG"
+              # el repo puede haber avanzado mientras dormiamos: rebase y reintento
+              for t in 1 2 3; do
+                git push && break || {
+                  git pull --rebase --autostash -q origin main || true
+                  sleep 5
+                }
+              done
+            fi
+
+            if [ "$i" -lt "$VUELTAS" ]; then
+              echo "esperando 1 hora hasta la proxima lectura..."
+              sleep 3600
+            fi
+          done
