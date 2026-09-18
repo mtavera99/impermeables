@@ -8,13 +8,27 @@ name: Estado de la cuenta
 
 on:
   schedule:
-    # CADA HORA, en punto. Bogota = UTC-5 (offset entero, asi que la hora en punto
-    # de UTC es tambien la hora en punto de Bogota).
+    # CADA HORA, al minuto 23.
     #
-    # ⚠️ El cron de GitHub NO es exacto: bajo carga se puede retrasar 5-15 minutos
-    # y en picos se puede saltar una corrida. Para un dato urgente, usar el boton
-    # manual (workflow_dispatch) que corre en el momento.
-    - cron: "0 * * * *"
+    # 🔑 POR QUE EL MINUTO 23 Y NO EL 0: el minuto en punto es el mas congestionado
+    # de GitHub — millones de workflows programados a "0 * * * *" compiten a la vez,
+    # y GitHub retrasa o SALTA corridas cuando hay cola. Paso real: con "0 * * * *"
+    # las corridas de las 19:00 y 20:00 del 17-sep nunca dispararon. Un minuto
+    # impar y poco usado mejora bastante la probabilidad de que corra.
+    #
+    # Bogota = UTC-5 (offset entero), asi que el minuto 23 de UTC es tambien el
+    # minuto 23 de Bogota.
+    - cron: "23 * * * *"
+
+  # Si se cambia el script o el workflow, regenerar el archivo de una en vez de
+  # esperar la hora: si no, el ESTADO-CUENTA.md queda con el texto viejo.
+  push:
+    branches: [main]
+    paths:
+      - "analisis/estado-cuenta.py"
+      - "analisis/meta-api-lectura.py"
+      - ".github/workflows/estado-cuenta.yml"
+
   workflow_dispatch:        # boton manual, sirve desde la app de GitHub en el celular
 
 permissions:
