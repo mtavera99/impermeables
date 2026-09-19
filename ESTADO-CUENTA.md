@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-09-19 16:49 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-09-19 17:49 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,14 +9,14 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$88,910** |
-| gastado hoy (hasta las 16h) | $75,143 |
+| **saldo ahora** | **$83,375** |
+| gastado hoy (hasta las 17h) | $81,438 |
 | presupuesto activo | $159,000/día |
-| cierre proyectado del día | $126,755 |
-| saldo proyectado a medianoche | $37,298 |
+| cierre proyectado del día | $120,442 |
+| saldo proyectado a medianoche | $44,372 |
 | objetivo (cubrir un día de 143% + colchón) | $247,370 |
 
-### 🟠 Recargar $83,317 para cubrir un día malo
+### 🟠 Recargar $82,557 para cubrir un día malo
 
 Hoy aguanta, pero no cubre un día de sobre-entrega alta.
 
@@ -24,31 +24,31 @@ Hoy aguanta, pero no cubre un día de sobre-entrega alta.
 
 ---
 
-## 📈 Hoy contra los días anteriores — mismo tramo 00:00–16:59
+## 📈 Hoy contra los días anteriores — mismo tramo 00:00–17:59
 
 *(Comparar medio día contra un día completo es el error #10. Acá va el mismo tramo.)*
 
 | día | gasto | conv | $/conv | CPM | conv/mil |
 |---|---|---|---|---|---|
-| 2026-09-15 | $121,720 | 63 | **$1,932** | $5,663 | 2.93 |
-| 2026-09-16 | $109,354 | 93 | **$1,176** | $3,646 | 3.10 |
-| 2026-09-17 | $82,291 | 61 | **$1,349** | $3,686 | 2.73 |
-| 2026-09-18 | $70,015 | 66 | **$1,061** | $5,122 | 4.83 |
-| 2026-09-19 **HOY** | $68,056 | 57 | **$1,194** | $4,604 | 3.86 |
+| 2026-09-15 | $149,764 | 73 | **$2,052** | $5,311 | 2.59 |
+| 2026-09-16 | $120,312 | 98 | **$1,228** | $3,575 | 2.91 |
+| 2026-09-17 | $99,234 | 73 | **$1,359** | $3,661 | 2.69 |
+| 2026-09-18 | $77,310 | 73 | **$1,059** | $5,114 | 4.83 |
+| 2026-09-19 **HOY** | $73,747 | 64 | **$1,152** | $4,651 | 4.04 |
 
-🟠 Hoy va 13% más caro que ayer a la misma hora ($1,194 vs $1,061).
+🟠 Hoy va 9% más caro que ayer a la misma hora ($1,152 vs $1,059).
 
 ### La descomposición — dónde está el problema
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$ 1,194  =  $ 4,604  ÷  3.86
+$ 1,152  =  $ 4,651  ÷  4.04
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $4,604 | ~$3.615 | 🔴 alto |
-| **conv/mil** (la calidad de la audiencia) | 3.86 | 5,33 | 🟠 |
+| **CPM** (el precio de la subasta) | $4,651 | ~$3.615 | 🔴 alto |
+| **conv/mil** (la calidad de la audiencia) | 4.04 | 5,33 | 🟠 |
 
 🔑 **El CPM está alto: hay algo en la subasta** (fecha comercial del país). Antes de culpar a la cuenta, mirar el calendario.
 
@@ -58,12 +58,12 @@ $ 1,194  =  $ 4,604  ÷  3.86
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
-| Domiciliarios VIDEO | $55,000 | $30,582 | 56% | 26 | $1,176 | 3.46 |
-| TEST Creativos | $25,000 | $15,155 | 61% | 13 | $1,166 | 6.45 |
-| Domiciliarios - Expancion | $15,000 | $8,710 | 58% | 8 | $1,089 | 3.40 |
-| Domiciliarios | $45,000 | $8,196 | 18% | 5 | $1,639 | 2.70 |
-| Publico ABIERTO video | $10,000 | $7,087 | 71% | 3 | $2,362 | 3.90 |
-| Motorizados | $9,000 | $5,413 | 60% | 5 | $1,083 | 4.78 |
+| Domiciliarios VIDEO | $55,000 | $33,388 | 61% | 32 | $1,043 | 3.94 |
+| TEST Creativos | $25,000 | $16,635 | 67% | 14 | $1,188 | 6.51 |
+| Domiciliarios - Expancion | $15,000 | $9,685 | 65% | 8 | $1,211 | 3.08 |
+| Domiciliarios | $45,000 | $8,196 | 18% | 5 | $1,639 | 2.69 |
+| Publico ABIERTO video | $10,000 | $7,691 | 77% | 3 | $2,564 | 3.58 |
+| Motorizados | $9,000 | $5,843 | 65% | 5 | $1,169 | 4.46 |
 
 ### Cada producto contra SU propio equilibrio
 
@@ -71,13 +71,13 @@ $ 1,194  =  $ 4,604  ÷  3.86
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
-| **TRADICIONAL** | $68,056 | 57 | **$1,194** | $2,402 | **50%** 🟢 |
-| **COLMENA** | $7,087 | 3 | **$2,362** | $3,322 | **71%** 🟢 |
+| **TRADICIONAL** | $73,747 | 64 | **$1,152** | $2,402 | **48%** 🟢 |
+| **COLMENA** | $7,691 | 3 | **$2,564** | $3,322 | **77%** 🟠 |
 
 | | |
 |---|---|
-| CPA implícito (cierre 8.4%) | **$14,214**/pedido |
-| utilidad estimada de lo que va del día | **$46,014** |
+| CPA implícito (cierre 8.4%) | **$13,718**/pedido |
+| utilidad estimada de lo que va del día | **$54,331** |
 
 ---
 
@@ -89,12 +89,12 @@ $ 1,194  =  $ 4,604  ÷  3.86
 
 | conjunto | 09-14 | 09-15 | 09-16 | 09-17 | 09-18 | 09-19 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios VIDEO | $2,026 | $1,498 | $1,208 | $963 | $1,060 | $1,176 | 🟡 |
-| TEST Creativos | $1,372 | $618 | $869 | $1,090 | $759 | $1,166 | 🔴 |
-| Domiciliarios - Expancion | — | — | — | $1,418 | $866 | $1,089 | 🔴 |
+| Domiciliarios VIDEO | $2,026 | $1,498 | $1,208 | $963 | $1,060 | $1,043 | 🟡 |
+| TEST Creativos | $1,372 | $618 | $869 | $1,090 | $759 | $1,188 | 🔴 |
+| Domiciliarios - Expancion | — | — | — | $1,418 | $866 | $1,211 | 🔴 |
 | Domiciliarios | $2,087 | $1,856 | $1,060 | $1,323 | $1,185 | $1,639 | 🔴 |
-| Publico ABIERTO video | $2,225 | $7,737 | $2,334 | $1,552 | $2,224 | $2,367 | 🟡 |
-| Motorizados | $914 | $1,194 | $1,342 | $1,438 | $1,842 | $1,083 | 🟢 |
+| Publico ABIERTO video | $2,225 | $7,737 | $2,334 | $1,552 | $2,224 | $2,564 | 🔴 |
+| Motorizados | $914 | $1,194 | $1,342 | $1,438 | $1,843 | $1,169 | 🟢 |
 | Domiciliarios \| Valle del cauca | — | — | $884 | — | — | — |  |
 | Domiciliarios \| Eje Cafetero | — | — | — | — | — | — |  |
 
@@ -102,12 +102,12 @@ $ 1,194  =  $ 4,604  ÷  3.86
 
 | conjunto | 09-14 | 09-15 | 09-16 | 09-17 | 09-18 | 09-19 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios VIDEO | 2.23 | 3.06 | 2.79 | 3.68 | 4.23 | 3.46 | 🔴 |
-| TEST Creativos | 5.09 | 11.18 | 7.23 | 5.61 | 11.66 | 6.45 | 🔴 |
-| Domiciliarios - Expancion | — | — | — | 2.48 | 5.30 | 3.40 | 🔴 |
-| Domiciliarios | 2.67 | 2.68 | 3.01 | 2.71 | 3.91 | 2.70 | 🔴 |
-| Publico ABIERTO video | 7.29 | 1.39 | 4.47 | 6.53 | 4.62 | 3.89 | 🔴 |
-| Motorizados | 8.57 | 5.75 | 2.83 | 2.54 | 3.00 | 4.78 | 🟢 |
+| Domiciliarios VIDEO | 2.23 | 3.06 | 2.79 | 3.68 | 4.23 | 3.94 | 🟡 |
+| TEST Creativos | 5.09 | 11.18 | 7.23 | 5.61 | 11.65 | 6.51 | 🔴 |
+| Domiciliarios - Expancion | — | — | — | 2.48 | 5.30 | 3.08 | 🔴 |
+| Domiciliarios | 2.67 | 2.68 | 3.01 | 2.71 | 3.91 | 2.69 | 🔴 |
+| Publico ABIERTO video | 7.29 | 1.39 | 4.47 | 6.53 | 4.62 | 3.58 | 🔴 |
+| Motorizados | 8.57 | 5.75 | 2.83 | 2.54 | 3.00 | 4.46 | 🟢 |
 | Domiciliarios \| Valle del cauca | — | — | 3.69 | — | — | — |  |
 | Domiciliarios \| Eje Cafetero | — | — | — | — | — | — |  |
 
@@ -124,7 +124,7 @@ $ 1,194  =  $ 4,604  ÷  3.86
 | 2026-09-15 | $185,055 | 122 | $1,517 | $4,920 | 3.24 | $59,094 |
 | 2026-09-16 | $153,504 | 137 | $1,120 | $3,403 | 3.04 | $120,664 |
 | 2026-09-17 | $133,609 | 118 | $1,132 | $3,690 | 3.26 | $102,535 |
-| 2026-09-18 | $113,692 | 110 | $1,034 | $5,016 | 4.85 | $106,442 |
+| 2026-09-18 | $113,708 | 110 | $1,034 | $5,015 | 4.85 | $106,426 |
 
 ---
 
