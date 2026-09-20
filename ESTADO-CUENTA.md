@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-09-20 06:34 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-09-20 07:35 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,14 +9,14 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$117,322** |
-| gastado hoy (hasta las 6h) | $17,426 |
+| **saldo ahora** | **$111,377** |
+| gastado hoy (hasta las 7h) | $23,515 |
 | presupuesto activo | $159,000/día |
-| cierre proyectado del día | $134,507 |
-| saldo proyectado a medianoche | $241 |
+| cierre proyectado del día | $128,218 |
+| saldo proyectado a medianoche | $6,674 |
 | objetivo (cubrir un día de 143% + colchón) | $247,370 |
 
-### 🔴 RECARGAR $112,622 — entra en zona de freno a las 20:00
+### 🔴 RECARGAR $112,478 — entra en zona de freno a las 21:00
 
 Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin saldo ahí es la fuga más cara que tiene la operación.
 
@@ -24,33 +24,33 @@ Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin s
 
 ---
 
-## 📈 Hoy contra los días anteriores — mismo tramo 00:00–6:59
+## 📈 Hoy contra los días anteriores — mismo tramo 00:00–7:59
 
 *(Comparar medio día contra un día completo es el error #10. Acá va el mismo tramo.)*
 
 | día | gasto | conv | $/conv | CPM | conv/mil |
 |---|---|---|---|---|---|
-| 2026-09-16 | $27,225 | 16 | **$1,702** | $4,513 | 2.65 |
-| 2026-09-17 | $15,346 | 15 | **$1,023** | $3,683 | 3.60 |
-| 2026-09-18 | $9,466 | 7 | **$1,352** | $5,523 | 4.08 |
-| 2026-09-19 | $6,385 | 5 | **$1,277** | $5,495 | 4.30 |
-| 2026-09-20 **HOY** | $16,494 | 11 | **$1,499** | $4,026 | 2.68 |
+| 2026-09-16 | $35,132 | 26 | **$1,351** | $4,288 | 3.17 |
+| 2026-09-17 | $23,213 | 20 | **$1,161** | $3,545 | 3.05 |
+| 2026-09-18 | $26,280 | 22 | **$1,195** | $4,610 | 3.86 |
+| 2026-09-19 | $13,577 | 10 | **$1,358** | $5,012 | 3.69 |
+| 2026-09-20 **HOY** | $22,137 | 23 | **$962** | $4,341 | 4.51 |
 
-🟠 Hoy va 17% más caro que ayer a la misma hora ($1,499 vs $1,277).
+🟢 **Hoy va mejor que ayer a la misma hora** ($962 vs $1,358).
 
 ### La descomposición — dónde está el problema
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$ 1,499  =  $ 4,026  ÷  2.68
+$   962  =  $ 4,341  ÷  4.51
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $4,026 | ~$3.615 | 🟢 normal |
-| **conv/mil** (la calidad de la audiencia) | 2.68 | 5,33 | 🔴 bajo |
+| **CPM** (el precio de la subasta) | $4,341 | ~$3.615 | 🔴 alto |
+| **conv/mil** (la calidad de la audiencia) | 4.51 | 5,33 | 🟢 |
 
-🔑 **El CPM está normal y el conv/mil bajo: todo el problema es AUDIENCIA, no precio.** Esperar no lo arregla — hace falta público nuevo (el lookalike de compradores es la jugada pendiente).
+🔑 **El CPM está alto: hay algo en la subasta** (fecha comercial del país). Antes de culpar a la cuenta, mirar el calendario.
 
 ---
 
@@ -58,12 +58,12 @@ $ 1,499  =  $ 4,026  ÷  2.68
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
-| Domiciliarios VIDEO | $55,000 | $6,459 | 12% | 4 | $1,615 | 2.47 |
-| Domiciliarios | $45,000 | $4,731 | 11% | 2 | $2,366 | 1.40 |
-| TEST Creativos | $25,000 | $2,815 | 11% | 3 | $938 | 6.59 |
-| Domiciliarios - Expancion | $15,000 | $1,612 | 11% | 1 | $1,612 | 2.43 |
-| Publico ABIERTO video | $10,000 | $932 | 9% | 1 | $932 | 12.66 |
-| Motorizados | $9,000 | $877 | 10% | 1 | $877 | 5.43 |
+| Domiciliarios VIDEO | $55,000 | $8,463 | 15% | 8 | $1,058 | 3.90 |
+| Domiciliarios | $45,000 | $6,231 | 14% | 2 | $3,116 | 1.18 |
+| TEST Creativos | $25,000 | $4,155 | 17% | 9 | $462 | 15.90 |
+| Domiciliarios - Expancion | $15,000 | $2,084 | 14% | 1 | $2,084 | 1.81 |
+| Publico ABIERTO video | $10,000 | $1,378 | 14% | 1 | $1,378 | 8.40 |
+| Motorizados | $9,000 | $1,171 | 13% | 3 | $390 | 13.22 |
 
 ### Cada producto contra SU propio equilibrio
 
@@ -71,13 +71,13 @@ $ 1,499  =  $ 4,026  ÷  2.68
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
-| **TRADICIONAL** | $16,494 | 11 | **$1,499** | $2,402 | **62%** 🟢 |
-| **COLMENA** | $932 | 1 | **$932** | $3,322 | **28%** 🟢 |
+| **TRADICIONAL** | $22,104 | 23 | **$961** | $2,402 | **40%** 🟢 |
+| **COLMENA** | $1,378 | 1 | **$1,378** | $3,322 | **41%** 🟢 |
 
 | | |
 |---|---|
-| CPA implícito (cierre 8.4%) | **$17,851**/pedido |
-| utilidad estimada de lo que va del día | **$5,519** |
+| CPA implícito (cierre 8.4%) | **$11,441**/pedido |
+| utilidad estimada de lo que va del día | **$23,924** |
 
 ---
 
@@ -89,23 +89,23 @@ $ 1,499  =  $ 4,026  ÷  2.68
 
 | conjunto | 09-15 | 09-16 | 09-17 | 09-18 | 09-19 | 09-20 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios VIDEO | $1,498 | $1,208 | $963 | $1,062 | $899 | $1,615 | 🔴 |
-| Domiciliarios | $1,856 | $1,060 | $1,323 | $1,185 | $1,639 | $2,366 | 🔴 |
-| TEST Creativos | $618 | $869 | $1,090 | $759 | $985 | $938 | 🟡 |
-| Domiciliarios - Expancion | — | — | $1,418 | $866 | $829 | $1,612 | 🔴 |
-| Publico ABIERTO video | $7,737 | $2,334 | $1,552 | $2,224 | $2,533 | $932 | 🟢 |
-| Motorizados | $1,194 | $1,342 | $1,438 | $1,848 | $911 | $877 | 🟡 |
+| Domiciliarios VIDEO | $1,498 | $1,208 | $963 | $1,062 | $899 | $1,058 | 🔴 |
+| Domiciliarios | $1,856 | $1,060 | $1,323 | $1,185 | $1,639 | $3,116 | 🔴 |
+| TEST Creativos | $618 | $869 | $1,090 | $760 | $986 | $462 | 🟢 |
+| Domiciliarios - Expancion | — | — | $1,418 | $866 | $832 | $2,084 | 🔴 |
+| Publico ABIERTO video | $7,737 | $2,334 | $1,552 | $2,224 | $2,533 | $1,378 | 🟢 |
+| Motorizados | $1,194 | $1,342 | $1,438 | $1,848 | $913 | $401 | 🟢 |
 
 ### conv/mil por día *(la calidad de la audiencia de cada uno)*
 
 | conjunto | 09-15 | 09-16 | 09-17 | 09-18 | 09-19 | 09-20 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios VIDEO | 3.06 | 2.79 | 3.68 | 4.22 | 4.28 | 2.47 | 🔴 |
-| Domiciliarios | 2.68 | 3.01 | 2.71 | 3.91 | 2.66 | 1.40 | 🔴 |
-| TEST Creativos | 11.18 | 7.23 | 5.61 | 11.65 | 7.82 | 6.59 | 🔴 |
-| Domiciliarios - Expancion | — | — | 2.48 | 5.30 | 4.62 | 2.43 | 🔴 |
-| Publico ABIERTO video | 1.39 | 4.47 | 6.53 | 4.62 | 3.76 | 12.66 | 🟢 |
-| Motorizados | 5.75 | 2.83 | 2.54 | 2.99 | 5.03 | 5.43 | 🟢 |
+| Domiciliarios VIDEO | 3.06 | 2.79 | 3.68 | 4.22 | 4.27 | 3.90 | 🟡 |
+| Domiciliarios | 2.68 | 3.01 | 2.71 | 3.91 | 2.66 | 1.18 | 🔴 |
+| TEST Creativos | 11.18 | 7.23 | 5.61 | 11.64 | 7.81 | 15.90 | 🟢 |
+| Domiciliarios - Expancion | — | — | 2.48 | 5.30 | 4.62 | 1.81 | 🔴 |
+| Publico ABIERTO video | 1.39 | 4.47 | 6.53 | 4.62 | 3.76 | 8.40 | 🟢 |
+| Motorizados | 5.75 | 2.83 | 2.54 | 2.99 | 5.01 | 12.93 | 🟢 |
 
 🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). Eso es canibalización, y se arregla diferenciando la segmentación.
 
@@ -119,8 +119,8 @@ $ 1,499  =  $ 4,026  ÷  2.68
 | 2026-09-15 | $185,055 | 122 | $1,517 | $4,920 | 3.24 | $59,094 |
 | 2026-09-16 | $153,504 | 137 | $1,120 | $3,403 | 3.04 | $120,664 |
 | 2026-09-17 | $133,609 | 118 | $1,132 | $3,690 | 3.26 | $102,535 |
-| 2026-09-18 | $113,816 | 110 | $1,035 | $5,018 | 4.85 | $106,318 |
-| 2026-09-19 | $118,998 | 127 | $937 | $4,406 | 4.70 | $135,157 |
+| 2026-09-18 | $113,822 | 110 | $1,035 | $5,018 | 4.85 | $106,312 |
+| 2026-09-19 | $119,072 | 127 | $938 | $4,400 | 4.69 | $135,083 |
 
 ---
 
