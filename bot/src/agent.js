@@ -3,10 +3,53 @@
 const { buildSystemPrompt } = require("./prompt");
 const store = require("./store");
 
-const GEMINI_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
+// ============================================================================
+// PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
+//
+// Por qué así: los precios de los modelos se movieron MUCHO en 2026 (Gemini
+// Flash pasó de US$0.10 a US$0.75 por millón de tokens de entrada). Amarrar el
+// bot a un proveedor obliga a tocar código cada vez que cambia el mercado.
+// Acá se cambia con una variable de entorno.
+//
+//   AI_PROVIDER=gemini          -> Gemini (Google AI Studio)
+//   AI_PROVIDER=openai-compat   -> DeepSeek, Groq, OpenAI, Together, etc.
+//
+// Referencia de costo medido para BikerPro (4.020 conversaciones/mes,
+// ver /analisis/comparar-opciones-bot-21sep.py):
+//   DeepSeek V4-Flash ........ US$0.14 / US$0.28 por millón  <- el más barato útil
+//   GPT-5.6 Luna ............. US$0.20 / US$1.20
+//   Gemini 3.1 Flash-Lite .... US$0.25 / US$1.50
+//   Gemini 3.8 Flash ......... US$0.75 / US$3.75  <- innecesario para un guion
+// ============================================================================
+const PROVIDER = (process.env.AI_PROVIDER || "gemini").toLowerCase();
 
-// Llama a la API de Gemini con el prompt de sistema + historial
+// Gemini
+const GEMINI_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-lite";
+
+// Compatible con OpenAI (DeepSeek, Groq, OpenAI, Together...)
+const AI_KEY = process.env.AI_API_KEY;
+const AI_BASE = (process.env.AI_BASE_URL || "https://api.deepseek.com").replace(/\/$/, "");
+const AI_MODEL = process.env.AI_MODEL || "deepseek-chat";
+
+// ¿Hay alguna credencial usable?
+const TIENE_IA = PROVIDER === "gemini" ? !!GEMINI_KEY : !!AI_KEY;
+
+// Cuántos mensajes del historial se mandan. El prompt de sistema ya ocupa
+// ~4.300 tokens y viaja en CADA llamada; el historial se suma encima. Mandar
+// la conversación completa hace que una charla larga cueste el triple que una
+// corta sin mejorar la venta. 8 mensajes = 4 turnos, suficiente para no perder
+// el hilo (ciudad, talla, color quedan además en el resumen del pedido).
+const MAX_HISTORIAL = Number(process.env.MAX_HISTORIAL || 8);
+
+function recortarHistorial(messages) {
+  if (messages.length <= MAX_HISTORIAL) return messages;
+  return messages.slice(-MAX_HISTORIAL);
+}
+
+const REINTENTABLES = new Set([429, 500, 502, 503, 504]);
+
+// ---- Gemini ----
 async function callGemini(systemPrompt, messages, retries = 2) {
   const contents = messages.map((m) => ({
     role: m.role === "assistant" ? "model" : "user",
@@ -26,8 +69,7 @@ async function callGemini(systemPrompt, messages, retries = 2) {
 
   if (!res.ok) {
     const err = await res.text();
-    // Reintenta ante límite de tasa (429) o saturación temporal (500/503)
-    if ((res.status === 429 || res.status === 500 || res.status === 503) && retries > 0) {
+    if (REINTENTABLES.has(res.status) && retries > 0) {
       console.log(`Gemini ${res.status}, reintentando en 2.5s (quedan ${retries})...`);
       await new Promise((r) => setTimeout(r, 2500));
       return callGemini(systemPrompt, messages, retries - 1);
@@ -36,12 +78,58 @@ async function callGemini(systemPrompt, messages, retries = 2) {
   }
   const data = await res.json();
   const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "";
-  // Si la respuesta viene vacía (a veces pasa), reintenta
   if (!text.trim() && retries > 0) {
     await new Promise((r) => setTimeout(r, 1500));
     return callGemini(systemPrompt, messages, retries - 1);
   }
   return text.trim();
+}
+
+// ---- Compatible con OpenAI: DeepSeek, Groq, OpenAI... ----
+async function callOpenAICompat(systemPrompt, messages, retries = 2) {
+  const res = await fetch(`${AI_BASE}/v1/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${AI_KEY}`
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages.map((m) => ({
+          role: m.role === "assistant" ? "assistant" : "user",
+          content: m.content
+        }))
+      ],
+      temperature: 0.6,
+      max_tokens: 800
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    if (REINTENTABLES.has(res.status) && retries > 0) {
+      console.log(`${AI_MODEL} ${res.status}, reintentando en 2.5s (quedan ${retries})...`);
+      await new Promise((r) => setTimeout(r, 2500));
+      return callOpenAICompat(systemPrompt, messages, retries - 1);
+    }
+    throw new Error(`${AI_MODEL} ${res.status}: ${err}`);
+  }
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content || "";
+  if (!text.trim() && retries > 0) {
+    await new Promise((r) => setTimeout(r, 1500));
+    return callOpenAICompat(systemPrompt, messages, retries - 1);
+  }
+  return text.trim();
+}
+
+// Punto único de entrada: enruta según el proveedor configurado
+async function callIA(systemPrompt, messages) {
+  const hist = recortarHistorial(messages);
+  if (PROVIDER === "gemini") return callGemini(systemPrompt, hist);
+  return callOpenAICompat(systemPrompt, hist);
 }
 
 // Extrae el bloque ##ORDER## {...} y lo separa del mensaje visible
@@ -105,13 +193,13 @@ async function generateReply(phone, userText) {
   const conv = store.getConv(phone);
 
   let reply;
-  if (!GEMINI_KEY) {
+  if (!TIENE_IA) {
     reply =
       "¡Hola! 🏍️ Gracias por escribir a BikerPro. (Bot en modo prueba: falta configurar la API de IA). " +
       "El conjunto impermeable de 4 piezas cuesta $59.900 con pago contraentrega 📦";
   } else {
     try {
-      reply = await callGemini(buildSystemPrompt(), conv.messages);
+      reply = await callIA(buildSystemPrompt(), conv.messages);
     } catch (e) {
       console.error("Error IA:", e.message);
       // Respaldo que NO reinicia la conversación (evita el saludo genérico a mitad de charla)
