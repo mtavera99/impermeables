@@ -32,15 +32,22 @@ const BANDAS = {
     ciudades: ["BOGOTA", "SOACHA", "ZIPAQUIRA", "CHIA", "CAJICA", "MOSQUERA", "MADRID", "FUNZA", "FACATATIVA", "SIBATE", "LA CALERA"],
   },
   B: {
+    // ⚠️ 19-SEP: sube de $77.000 a $78.000. El envío real de septiembre
+    // (flete+seguro) es $21.038 y el total viejo dejaba el margen en $22.962,
+    // o sea $282 bajo la meta de $23.244. Medido sobre 5 guías del export.
     nombre: "Boyacá, Casanare y Meta cercano",
     flete: 16843,
-    total: 77000,
+    total: 78000,
     ciudades: ["TUNJA", "PAIPA", "AGUAZUL", "TOCANCIPA", "VILLAVICENCIO", "DUITAMA", "SOGAMOSO", "YOPAL", "ACACIAS", "CUCUNUBA", "UBATE", "CHOCONTA", "VILLA DE LEYVA"],
   },
   C: {
+    // ⚠️ 19-SEP: sube de $81.000 a $82.000. El envío real de septiembre
+    // (flete+seguro) es $25.055 y el total viejo dejaba el margen en $22.945,
+    // o sea $299 bajo la meta. Es la banda con 27 guías en el export: el
+    // hueco chico multiplicado por volumen alto.
     nombre: "Capitales grandes",
     flete: 20771,
-    total: 81000,
+    total: 82000,
     ciudades: ["MEDELLIN", "CALI", "BARRANQUILLA", "SOLEDAD", "CARTAGENA", "CARTAGENA DE INDIAS", "PEREIRA", "DOSQUEBRADAS", "MANIZALES", "BARRANCABERMEJA", "YARUMAL", "ARMENIA", "IBAGUE", "NEIVA", "ITAGUI", "ENVIGADO", "SABANETA", "PALMIRA", "JAMUNDI", "YUMBO", "COPACABANA", "BUENAVENTURA", "PUERTO BERRIO", "OCANA"],
   },
   D: {
@@ -204,7 +211,21 @@ const FLETE_2_OBSERVADO = {
 // país, y el flete de 2 unidades va de $17.658 a $32.458. Eso sobrecobraba
 // $10.342 en Bogotá (riesgo de perder la venta) y absorbía $3.774 en los
 // destinos caros. La promo tiene que seguir las bandas, igual que 1 unidad.
-const PROMO_2_TOTAL = { A: 128000, B: 136000, C: 138000, D: 139000, E: 143000 };
+// ⚠️ CORRECCIÓN DEL 19-SEP: las 5 bandas estaban por debajo del margen.
+// Medido sobre las 226 guías del export del 18-sep, el envío REAL de 2 unidades
+// subió entre 26% y 54% desde agosto (Bogotá $17.658 → $23.947). Con los totales
+// viejos el margen quedaba entre $15.893 y $19.026/ud contra una meta de $23.244:
+// se dejaban de cobrar $12.314 por cada pedido de 2 unidades = $1.091.682/mes.
+//
+// Los nuevos totales salen de: 2×costo_producto + envío_real_2uds + 2×$23.244,
+// redondeado hacia ARRIBA al millar. Verificado en
+// /analisis/verificar-guion-definitivo-19sep.py (las 5 quedan sobre la meta).
+//
+// El cliente sigue ahorrando llevando dos: entre $9.000 (banda A) y $14.000
+// (banda D) contra comprar dos sueltos, así que el argumento de venta se mantiene.
+//
+// 🔔 GATILLO: si el envío de 2 uds de la banda E pasa de $47.000, revisar otra vez.
+const PROMO_2_TOTAL = { A: 137000, B: 146000, C: 152000, D: 152000, E: 158000 };
 
 // Recargo de flete por unidad adicional en el mismo pedido.
 // Observado en 6 pedidos de 2 unidades: el flete NO se duplica, sube entre
