@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-09-21 18:45 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-09-21 18:47 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,16 +9,14 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$24,561** |
+| **saldo ahora** | **$124,561** |
 | gastado hoy (hasta las 18h) | $128,797 |
 | presupuesto activo | $149,000/día |
 | cierre proyectado del día | $157,466 |
-| saldo proyectado a medianoche | $-4,108 |
+| saldo proyectado a medianoche | $95,892 |
 | objetivo (cubrir un día de 143% + colchón) | $233,070 |
 
-### 🔴 RECARGAR $79,712 — entra en zona de freno a las 19:00
-
-Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin saldo ahí es la fuga más cara que tiene la operación.
+### 🟢 Saldo suficiente. No hace falta recargar.
 
 ⛔ **Recargar en la MAÑANA, no de noche.** Recargar después de quedarse seco dispara el rebote de 0-AI: Meta suelta el gasto de golpe sobre el inventario más frío.
 
