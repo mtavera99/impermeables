@@ -79,6 +79,105 @@ const pueblo = cotizar("Un Pueblo Que No Existe", 1);
 ok(pueblo.total === 85000,
   `ciudad desconocida → ${fmt(pueblo.total)} (banda E, no un número bajo)`);
 
+// ============================================================================
+// 5. LOS NOMBRES REALES DEL EXPORT DEL AGENTE DE META (21-sep)
+//
+// El 47,6% de los pedidos del export traía una ciudad que cotizar() NO
+// reconocía y caía al default (banda E, $85.000). Estos son los nombres tal
+// como los escribieron clientes reales. Cada uno es plata:
+// una localidad de Bogotá cotizada como pueblo cobra $12.000 de más.
+// ============================================================================
+console.log("\n### 5. Nombres reales del export — localidades, barrios y departamentos\n");
+
+const casosExport = [
+  // Localidades de Bogotá → banda A ($73.000), NO banda E ($85.000)
+  ["Bogotá (Suba)", 73000, "localidad entre paréntesis"],
+  ["Bogotá - Fontibón", 73000, "localidad con guion"],
+  ["Bogotá - Usaquén - Codito", 73000, "localidad + barrio"],
+  ["Bosa", 73000, "localidad sola, sin decir Bogotá"],
+  ["Bogotá (Candelaria la Nueva)", 73000, "barrio que suena a otra ciudad"],
+  // Ciudad + departamento
+  ["Cartagena Bolívar", 82000, "ciudad + departamento"],
+  ["Ipiales Nariño", 83000, "ciudad + departamento de riesgo, pero tarifada"],
+  ["Neiva Huila", 82000, "ciudad + departamento"],
+  ["Yopal Casanare", 78000, "ciudad + departamento"],
+  ["Rionegro Antioquia", 83000, "ciudad + departamento"],
+  ["Villavicencio - meta", 78000, "departamento en minúscula"],
+  // Ciudad dentro de una cadena más larga
+  ["Madrid (Barrio San José)", 73000, "municipio + barrio"],
+  ["San Cristobal - Medellin", 82000, "corregimiento + ciudad"],
+  ["Barranquilla - Villa San Pedro etapa 3", 82000, "ciudad + urbanización"],
+  ["Buenaventura / Barrio Cascajal", 82000, "ciudad + barrio con barra"],
+];
+for (const [ciudad, esperado, nota] of casosExport) {
+  const q = cotizar(ciudad, 1);
+  ok(q.total === esperado,
+    `"${ciudad}" → ${q.total ? fmt(q.total) : "sin precio"} (esperado ${fmt(esperado)}) · ${nota}`);
+}
+
+// ============================================================================
+// 6. EL BUG DE MOSQUERA — el que se negaba a cotizar la sabana de Bogotá
+//
+// MOSQUERA estaba en BANDAS.A (Cundinamarca, sabana) y a la vez en
+// ZONA_DIFICIL_ACCESO (Nariño, fluvial). Difícil acceso se evalúa primero, así
+// que "Mosquera" devolvía banda F con escalar=true: el bot NO cotizaba un
+// municipio del área metropolitana de Bogotá, que es el 27% del volumen.
+// ============================================================================
+console.log("\n### 6. El bug de Mosquera (nombre en la sabana y en el Pacífico)\n");
+
+const mq = departamentosPosibles("Mosquera");
+ok(Array.isArray(mq) && mq.length === 2,
+  `"Mosquera" solo → pregunta el departamento (${mq ? mq.join("/") : "NO PREGUNTA"})`);
+
+const mqCun = cotizar("Mosquera, Cundinamarca", 1);
+ok(mqCun.total === 73000,
+  `"Mosquera, Cundinamarca" → ${mqCun.total ? fmt(mqCun.total) : "sin precio"} (esperado $73.000, sabana)`);
+
+const mqNar = cotizar("Mosquera, Nariño", 1);
+ok(mqNar.total === null && mqNar.escalar === true,
+  `"Mosquera, Nariño" → sin precio y escala (fluvial, no se adivina)`);
+
+// Y la ambigüedad que ya existía tiene que seguir funcionando igual
+const rioCal = cotizar("Riosucio, Caldas", 1);
+ok(rioCal.total === 85000,
+  `"Riosucio, Caldas" → ${rioCal.total ? fmt(rioCal.total) : "sin precio"} (esperado $85.000)`);
+
+const rioCho = cotizar("Riosucio, Chocó", 1);
+ok(rioCho.total === null,
+  `"Riosucio, Chocó" → sin precio (fluvial, se escala)`);
+
+console.log("\n### 7. Lo que NO se debe reconocer (no inventar tarifas)\n");
+
+// El Carmelo (Candelaria) es del Valle. "La Candelaria" es una localidad de
+// Bogotá: si el match de localidades fuera laxo, cotizaría $73.000 y perdería
+// $12.000 de envío. Debe caer al default, no a Bogotá.
+const carmelo = cotizar("El Carmelo (Candelaria)", 1);
+ok(carmelo.total === 85000,
+  `"El Carmelo (Candelaria)" → ${fmt(carmelo.total)} (banda E, NO Bogotá)`);
+
+// Municipios reales del export que todavía no están tarifados: deben caer al
+// default, nunca a un número inventado más bajo.
+for (const c of ["Apartadó, Antioquia", "La Ceja, Antioquia", "Floridablanca, Santander", "Pitalito, Huila"]) {
+  const q = cotizar(c, 1);
+  ok(q.total === 85000, `"${c}" → ${fmt(q.total)} (sin tarifa propia: default, no inventar)`);
+}
+
+// Difícil acceso escrito con departamento debe seguir escalando
+const istmina = cotizar("Istmina - Chocó", 1);
+ok(istmina.total === null && istmina.escalar === true,
+  `"Istmina - Chocó" → sin precio y escala (fluvial)`);
+
+console.log("\n### 8. La tabla que se le inyecta a la IA no se contradice\n");
+
+const { tablaFletesTexto } = require("./src/fletes");
+const tabla = tablaFletesTexto();
+ok(!/SIN precio:[^\n]*\bMOSQUERA\b/.test(tabla),
+  "MOSQUERA no aparece como difícil acceso (sería contradicción con banda A)");
+ok(/137\.000/.test(tabla) && /158\.000/.test(tabla),
+  "la tabla incluye los totales firmes de 2 unidades ($137.000 a $158.000)");
+ok(/MOSQUERA \(Cundinamarca/.test(tabla),
+  "MOSQUERA aparece en la lista de nombres ambiguos");
+
 console.log("\n" + "=".repeat(66));
 if (fallas === 0) {
   console.log("🟢 TODO PASA. El tarifario está listo para desplegar.");

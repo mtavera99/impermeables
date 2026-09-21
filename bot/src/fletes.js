@@ -147,7 +147,96 @@ const CIUDADES_AMBIGUAS = {
   "SANTA BARBARA": ["Antioquia", "Nariño", "Santander"],
   "SAN CARLOS": ["Antioquia", "Córdoba"],
   ARGELIA: ["Cauca", "Antioquia", "Valle"],
+  // 🔴 AGREGADO 21-SEP — BUG QUE COSTABA VENTAS EN BANDA A.
+  // MOSQUERA estaba en BANDAS.A (Mosquera, Cundinamarca, sabana de Bogotá,
+  // $73.000) y AL MISMO TIEMPO en ZONA_DIFICIL_ACCESO (Mosquera, Nariño,
+  // fluvial). Como difícil acceso se evalúa ANTES que la banda, "Mosquera"
+  // devolvía banda F con `escalar: true`: el bot se NEGABA a cotizar un
+  // municipio del área metropolitana de Bogotá y lo mandaba al dueño.
+  // Banda A es el 27% del volumen. Ahora pregunta el departamento, que es
+  // la conducta correcta y la misma que ya tenía Riosucio.
+  MOSQUERA: ["Cundinamarca", "Nariño"],
 };
+
+// ============================================================================
+// RESOLUCIÓN DE NOMBRES DE CIUDAD (agregado 21-sep tras el export del agente)
+//
+// EL PROBLEMA MEDIDO: en el export del Meta Business Agent, el 47,6% de los
+// pedidos traía una ciudad que `cotizar()` NO reconocía → caía al default
+// (banda E, $85.000). 124 variantes de nombre distintas.
+//
+// Y el caso más caro son las LOCALIDADES DE BOGOTÁ: "Bogotá (Suba)",
+// "Bogotá - Fontibón", "Bosa", "Bogotá - Usaquén - Codito" cotizaban $85.000
+// cuando Bogotá es banda A = $73.000. Son **$12.000 de sobreprecio** en el
+// 27% del volumen y en el cliente más sensible al precio que tenemos.
+//
+// 🔑 LO QUE ESTO HACE Y LO QUE NO HACE:
+//   ✅ Reconoce ciudades que YA ESTÁN en la tabla, escritas de otra forma:
+//      con departamento ("Cartagena Bolívar"), con barrio ("Madrid (Barrio
+//      San José)"), con localidad ("Bogotá - Fontibón"), con separadores
+//      ("San Cristóbal - Medellín", "Buenaventura / Barrio Cascajal").
+//   ⛔ NO le inventa banda a una ciudad que no esté tarifada. Eso sería
+//      repetir el error 0-N (la tabla vieja era inventada). Las ciudades
+//      genuinamente nuevas siguen cayendo al default y quedan listadas en
+//      CIUDADES_SIN_TARIFA para que el dueño las mida.
+// ============================================================================
+
+const DEPARTAMENTOS = [
+  "AMAZONAS", "ANTIOQUIA", "ARAUCA", "ATLANTICO", "BOLIVAR", "BOYACA",
+  "CALDAS", "CAQUETA", "CASANARE", "CAUCA", "CESAR", "CHOCO", "CORDOBA",
+  "CUNDINAMARCA", "GUAINIA", "GUAVIARE", "HUILA", "LA GUAJIRA", "GUAJIRA",
+  "MAGDALENA", "META", "NARINO", "NORTE DE SANTANDER", "PUTUMAYO", "QUINDIO",
+  "RISARALDA", "SANTANDER", "SUCRE", "TOLIMA", "VALLE DEL CAUCA", "VALLE",
+  "VAUPES", "VICHADA",
+];
+
+// Las 20 localidades de Bogotá. Si el cliente nombra una, ES Bogotá → banda A.
+// ⚠️ Solo se usan como coincidencia EXACTA del nombre completo, o cuando la
+// cadena dice "BOGOTA". Si no, "El Carmelo (Candelaria)" —que es Valle—
+// caería en La Candelaria de Bogotá y cotizaría mal.
+const LOCALIDADES_BOGOTA = [
+  "USAQUEN", "CHAPINERO", "SANTA FE", "SAN CRISTOBAL", "USME", "TUNJUELITO",
+  "BOSA", "KENNEDY", "FONTIBON", "ENGATIVA", "SUBA", "BARRIOS UNIDOS",
+  "TEUSAQUILLO", "LOS MARTIRES", "ANTONIO NARINO", "PUENTE ARANDA",
+  "LA CANDELARIA", "RAFAEL URIBE URIBE", "CIUDAD BOLIVAR", "SUMAPAZ",
+];
+
+// Municipios que aparecieron en el export y NO están tarifados. Hoy cotizan
+// al default (banda E, $85.000). Varios son áreas metropolitanas que
+// probablemente son más baratas, pero NO se les asigna banda sin medir.
+// 🔔 PENDIENTE: pedir a 99 Envíos el flete real de estos destinos.
+const CIUDADES_SIN_TARIFA = [
+  "FLORIDABLANCA", "GIRON", "PIEDECUESTA", // área metro de Bucaramanga (banda D)
+  "TULUA", "CARTAGO", "GINEBRA", "FLORIDA", "CANDELARIA", // Valle
+  "PITALITO", "TERUEL", "VILLAVIEJA", "PALERMO", "SALADOBLANCO", // Huila
+  "APARTADO", "LA CEJA", "FRONTINO", "EL BAGRE", "EL PENOL", "CONCORDIA",
+  "COPACABANA", "SAN PEDRO DE LOS MILAGROS", "CALDAS", "CAMPAMENTO",
+  "TOLEDO", "SAN PEDRO DE URABA", "EL CARMEN DE VIBORAL", // Antioquia
+  "COROZAL", "SAMPUES", "MAJAGUAL", "SAN JUAN DE BETULIA", "SAN BENITO ABAD",
+  "SAN LUIS", // Sucre
+  "MONTELIBANO", "CANALETE", "COTORRA", "PLANETA RICA", // Córdoba
+  "GALAPA", "SABANAGRANDE", "PUERTO COLOMBIA", "BARANOA", "PALMAR DE VARELA", // Atlántico
+  "ARJONA", "TURBANA", "CALAMAR", "CARMEN DE BOLIVAR", "TALAIGUA NUEVO",
+  "SAN ESTANISLAO DE KOSTKA", // Bolívar
+  "EL COPEY", "SAN ALBERTO", "SANDIEGO", "CHIRIGUANA", // Cesar
+  "CIENAGA", "ALGARROBO", "PLATO", // Magdalena
+  "NEMOCON", "MEDINA", "GUTIERREZ", "SESQUILE", "SAN FRANCISCO", "ARCABUCO", // Cundi/Boyacá
+  "SALAMINA", "PACORA", // Caldas
+  "MONTENEGRO", // Quindío
+  "CHITA", "IZA", // Boyacá
+  "TAME", "ARAUQUITA", // Arauca
+  "TRINIDAD", "MONTERREY", // Casanare
+  "GRANADA", "BARRANCA DE UPIA", "PACHAQUIARO", // Meta
+  "CHACHAGUI", "LEIVA", "CUMBAL", // Nariño
+  "ROSAS", "PUERTO TEJADA", "PAEZ", "BELALCAZAR", // Cauca
+  "EL CARMEN", "CHITAGA", // Norte de Santander
+  "ALBANIA", // Santander
+  "LA HORMIGA", "VALLE DEL GUAMUEZ", "COLON", // Putumayo
+  "SAN JOSE DEL GUAVIARE", "EL RETORNO", // Guaviare
+  "SAN VICENTE DEL CAGUAN", // Caquetá
+  "BARRANCAS", // La Guajira
+  "SAN JOSE DE LA MONTANA",
+];
 
 // Si la ciudad no está en ninguna lista, se asume la banda MÁS CARA.
 // Antes el default era $18.000 y se quedaba corto en todos los pueblos, que son
@@ -243,6 +332,8 @@ function fmt(n) {
 }
 
 // Quita tildes y normaliza para que "Bogotá D.C.", "bogota" y "BOGOTÁ" caigan igual.
+// Los separadores (coma, guion, barra, paréntesis) quedan como espacios, así
+// "Madrid (Barrio San José)" → "MADRID BARRIO SAN JOSE".
 function normalizar(ciudad) {
   return String(ciudad || "")
     .normalize("NFD")
@@ -254,13 +345,114 @@ function normalizar(ciudad) {
     .trim();
 }
 
+// Departamentos donde un nombre repetido puede ser un destino fluvial, aéreo o
+// insular. Si el cliente nombra uno de estos con una ciudad ambigua, NO se
+// cotiza: se escala. Es la lección de El Charco (−$28.663 en una sola guía).
+const DEPTOS_RIESGO = new Set([
+  "CHOCO", "NARINO", "CAUCA", "AMAZONAS", "GUAINIA", "VAUPES", "VICHADA", "GUAVIARE",
+]);
+
+// ¿`nombre` aparece en `n` como palabra/secuencia completa?
+// Evita que "PLATO" haga match dentro de "PLATOS" o "LA PLATA".
+function contiene(n, nombre) {
+  return new RegExp(`(^| )${nombre}( |$)`).test(n);
+}
+
+// Departamento mencionado en la cadena (el más largo, para que
+// "NORTE DE SANTANDER" gane sobre "SANTANDER").
+function deptoEnCadena(n) {
+  let mejor = null;
+  for (const d of DEPARTAMENTOS) {
+    if (contiene(n, d) && (!mejor || d.length > mejor.length)) mejor = d;
+  }
+  return mejor;
+}
+
+// Variantes de la cadena a probar, de la más específica a la más general:
+// tal cual, y sin el departamento.
+function candidatosDe(n) {
+  const out = [n];
+  const d = deptoEnCadena(n);
+  if (d) {
+    const sinDepto = n.replace(new RegExp(`(^| )${d}( |$)`), " ").replace(/\s+/g, " ").trim();
+    if (sinDepto && !out.includes(sinDepto)) out.push(sinDepto);
+  }
+  return out;
+}
+
+// Busca el nombre MÁS LARGO de `lista` contenido en `n`.
+// El más largo gana para que "CARTAGENA DE INDIAS" no se resuelva como
+// "CARTAGENA", y para que "SAN CRISTOBAL - MEDELLIN" encuentre MEDELLIN.
+function mejorCoincidencia(n, lista) {
+  let mejor = null;
+  for (const nombre of lista) {
+    if (contiene(n, nombre) && (!mejor || nombre.length > mejor.length)) mejor = nombre;
+  }
+  return mejor;
+}
+
+/**
+ * Ciudad ambigua CON departamento indicado → se resuelve sin preguntar.
+ *
+ * Regla, y es deliberadamente asimétrica:
+ *   - departamento de riesgo (Chocó, Nariño, Cauca, Amazonía…) → NO se cotiza,
+ *     se escala. Ahí es donde el flete real es 2-3× el default.
+ *   - cualquier otro departamento → si el nombre pelado ya está tarifado, se
+ *     usa esa banda.
+ * Errar hacia escalar cuesta un mensaje. Errar hacia cotizar barato costó
+ * $28.663 en una guía.
+ *
+ * @returns {{banda?:string, escalar?:boolean}|null}
+ */
+function resolverAmbigua(n) {
+  const depto = deptoEnCadena(n);
+  if (!depto) return null;
+  const sinDepto = candidatosDe(n)[1];
+  if (!sinDepto || !CIUDADES_AMBIGUAS[sinDepto]) return null;
+  if (DEPTOS_RIESGO.has(depto)) return { escalar: true };
+  for (const [clave, banda] of Object.entries(BANDAS)) {
+    if (banda.ciudades.includes(sinDepto)) return { banda: clave };
+  }
+  return null;
+}
+
 // Devuelve la banda de una ciudad, o null si no la reconoce.
 function bandaDe(ciudad) {
-  const c = normalizar(ciudad);
-  if (!c) return null;
-  for (const [clave, banda] of Object.entries(BANDAS)) {
-    if (banda.ciudades.includes(c)) return clave;
+  const n = normalizar(ciudad);
+  if (!n) return null;
+
+  // 0. Ciudad ambigua con departamento ya indicado
+  const res = resolverAmbigua(n);
+  if (res) return res.banda || null;
+
+  // 1. Coincidencia exacta (con y sin departamento)
+  for (const c of candidatosDe(n)) {
+    for (const [clave, banda] of Object.entries(BANDAS)) {
+      if (banda.ciudades.includes(c)) return clave;
+    }
   }
+
+  // 2. La ciudad nombrada dentro de una cadena más larga:
+  //    "SAN CRISTOBAL MEDELLIN", "BARRANQUILLA VILLA SAN PEDRO ETAPA",
+  //    "BUENAVENTURA BARRIO CASCAJAL", "BOGOTA USAQUEN CODITO".
+  //    ⚠️ Difícil acceso se revisa ANTES en cotizar(), así que si acá hay una
+  //    coincidencia de banda es porque no es un destino fluvial.
+  let mejorClave = null, mejorNombre = null;
+  for (const [clave, banda] of Object.entries(BANDAS)) {
+    const m = mejorCoincidencia(n, banda.ciudades);
+    if (m && (!mejorNombre || m.length > mejorNombre.length)) {
+      mejorNombre = m;
+      mejorClave = clave;
+    }
+  }
+  if (mejorClave) return mejorClave;
+
+  // 3. Localidad de Bogotá → Bogotá, banda A.
+  //    Solo si la cadena dice BOGOTA, o si ES exactamente el nombre de la
+  //    localidad. Si no, "EL CARMELO CANDELARIA" (Valle) caería en Bogotá.
+  if (contiene(n, "BOGOTA")) return "A";
+  if (LOCALIDADES_BOGOTA.includes(n)) return "A";
+
   return null;
 }
 
@@ -269,20 +461,40 @@ function bandaDe(ciudad) {
  * @returns {{total:number|null, nota?:string, sinPromo2?:boolean}|null}
  */
 function zonaDificilDe(ciudad) {
-  const c = normalizar(ciudad);
-  if (!c) return null;
-  return ZONA_DIFICIL_ACCESO[c] || null;
+  const n = normalizar(ciudad);
+  if (!n) return null;
+
+  // Ambigua ya resuelta: si cayó en una banda NO es difícil acceso.
+  // Este es el atajo que arregla "Mosquera, Cundinamarca" ($73.000) contra
+  // "Mosquera, Nariño" (fluvial, se escala).
+  const res = resolverAmbigua(n);
+  if (res) return res.escalar ? { total: null } : null;
+
+  // Si la cadena nombra Bogotá o una capital tarifada, no es difícil acceso.
+  // Protege casos como "Bogotá - San Cristóbal".
+  if (contiene(n, "BOGOTA")) return null;
+
+  for (const c of candidatosDe(n)) {
+    if (ZONA_DIFICIL_ACCESO[c]) return ZONA_DIFICIL_ACCESO[c];
+  }
+  const m = mejorCoincidencia(n, Object.keys(ZONA_DIFICIL_ACCESO));
+  return m ? ZONA_DIFICIL_ACCESO[m] : null;
 }
 
 /**
  * ¿El nombre de la ciudad existe en varios departamentos? (#97)
  * Si devuelve algo, HAY QUE PREGUNTAR el departamento antes de cotizar.
+ * Si el cliente YA dijo el departamento, no se pregunta: se resuelve.
  * @returns {string[]|null} departamentos posibles
  */
 function departamentosPosibles(ciudad) {
-  const c = normalizar(ciudad);
-  if (!c) return null;
-  return CIUDADES_AMBIGUAS[c] || null;
+  const n = normalizar(ciudad);
+  if (!n) return null;
+  if (resolverAmbigua(n)) return null; // ya lo dijo, no se pregunta de nuevo
+  for (const c of candidatosDe(n)) {
+    if (CIUDADES_AMBIGUAS[c]) return CIUDADES_AMBIGUAS[c];
+  }
+  return null;
 }
 
 /**
@@ -393,12 +605,22 @@ function tablaFletesTexto() {
     })
     .join("\n");
 
+  // Totales firmes de 2 unidades por banda. Desde el 19-sep están corregidos y
+  // por encima del margen meta, así que la IA SÍ puede cotizarlos sin escalar.
+  const promo2 = Object.entries(BANDAS)
+    .map(([clave, b]) => `- ${b.nombre}: TOTAL ${fmt(PROMO_2_TOTAL[clave])} los dos`)
+    .join("\n");
+
   const conDato = Object.entries(ZONA_DIFICIL_ACCESO)
     .filter(([, v]) => v.total !== null)
     .map(([c, v]) => `${c} ${fmt(v.total)}`)
     .join(" · ");
+  // ⚠️ Se excluyen los nombres que además son ambiguos (MOSQUERA está en la
+  // sabana de Bogotá Y en el Pacífico de Nariño). Si apareciera en las dos
+  // listas, el prompt se contradiría y la IA elegiría al azar. Van abajo, en
+  // la lista de "preguntá el departamento", que es la conducta correcta.
   const sinDato = Object.entries(ZONA_DIFICIL_ACCESO)
-    .filter(([, v]) => v.total === null)
+    .filter(([c, v]) => v.total === null && !CIUDADES_AMBIGUAS[c])
     .map(([c]) => c)
     .join(", ");
   const ambiguas = Object.entries(CIUDADES_AMBIGUAS)
@@ -406,6 +628,13 @@ function tablaFletesTexto() {
     .join(" · ");
 
   return `${bandas}
+
+## 2 CONJUNTOS — TOTALES FIRMES POR BANDA (corregidos el 19-sep)
+Estos totales YA incluyen el envío de las 2 unidades. Son firmes: se cotizan
+igual que los de 1 unidad, sin escalar a un asesor.
+${promo2}
+⛔ EXCEPCIÓN: en los destinos de difícil acceso de abajo NO se ofrece la promo
+de 2 (en Tadó el envío se DUPLICA en vez de compartirse). Ahí se cotiza a mano.
 
 🔴 DIFÍCIL ACCESO — ESTOS NO SE COTIZAN CON LA TABLA DE ARRIBA
 Se llega por río, avión o barco y el envío cuesta 2-3× lo de un pueblo normal.
