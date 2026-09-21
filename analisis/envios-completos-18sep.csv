@@ -1,0 +1,227 @@
+fecha,guia,transportadora,producto,ciudad,recaudo,estado,flete,seguro
+2026-09-18,240061604892,interrapidisimo,impermeable,QUIBDO,148000,Transito Urbano,39723.85,7085
+2026-09-18,240061604890,interrapidisimo,impermeable,BOGOTA,134000,Transito Urbano,22150.2,3914
+2026-09-18,240061604886,interrapidisimo,impermeable,SOACHA,73000,Transito Urbano,13611.51,2412
+2026-09-18,240061604881,interrapidisimo,impermeable,YOPAL,77000,Transito Urbano,17664.3,3143
+2026-09-18,240061604875,interrapidisimo,impermeable,PAEZ,85000,Transito Urbano,26781.81,4788
+2026-09-18,240061604876,interrapidisimo,impermeable,PIEDECUESTA,85000,Transito Urbano,24352.57,4348
+2026-09-18,240061604877,interrapidisimo,impermeable,BOGOTA,134000,Transito Urbano,22150.2,3914
+2026-09-18,240061604878,interrapidisimo,impermeable,SAMPUES,85000,Transito Urbano,24352.57,4348
+2026-09-18,240061604880,interrapidisimo,impermeable,BOGOTA,73000,Transito Urbano,13611.51,2412
+2026-09-18,240061604870,interrapidisimo,impermeable,ISTMINA,85000,Transito Urbano,26781.81,4788
+2026-09-18,240061604871,interrapidisimo,impermeable,COROZAL,81000,Transito Urbano,24044.74,4295
+2026-09-18,240061604873,interrapidisimo,impermeable,CERETE,85000,Transito Urbano,24352.57,4348
+2026-09-18,240061604872,interrapidisimo,impermeable,TOLEDO,148000,Transito Urbano,39723.85,7085
+2026-09-18,240061604874,interrapidisimo,impermeable,SAN SEBASTIAN DE MARIQUITA,85000,Transito Urbano,24352.57,4348
+2026-09-18,240061604869,interrapidisimo,impermeable,YARUMAL,148000,Transito Urbano,36586.45,6517
+2026-09-17,240061532266,interrapidisimo,impermeable,TUNJA,185000,Transito Urbano,34040.27,5339
+2026-09-17,240061532263,interrapidisimo,impermeable,PUERTO GAITAN,85000,Transito Urbano,26131.42,4135
+2026-09-17,240061532259,interrapidisimo,impermeable,SANTA ROSA DE OSOS,85000,Transito Urbano,26131.42,4135
+2026-09-17,240061532260,interrapidisimo,impermeable,PUENTE NACIONAL,85000,Transito Urbano,23761.94,3755
+2026-09-17,240061532261,interrapidisimo,impermeable,PENOL,85000,Transito Urbano,26131.42,4135
+2026-09-16,240061450914,interrapidisimo,impermeable,MONTERIA,81000,Admitida,23461.09,3709
+2026-09-16,240061450918,interrapidisimo,impermeable,TURBO,85000,Admitida,26131.42,4135
+2026-09-16,240061450912,interrapidisimo,impermeable,PUERTO COLOMBIA,81000,Telemercadeo,23461.09,3709
+2026-09-16,240061450903,interrapidisimo,impermeable,QUIBDO,140000,Admitida,38161,6028
+2026-09-16,240061450904,interrapidisimo,impermeable,ZIPAQUIRA,73000,Entregada,13283.83,2083
+2026-09-16,240061450905,interrapidisimo,impermeable,YOPAL,136000,Reclame en oficina,26013.72,4083
+2026-09-16,240061450906,interrapidisimo,impermeable,MEDELLIN,81000,Admitida,23461.09,3709
+2026-09-16,240061450907,interrapidisimo,impermeable,CHIGORODO,85000,Admitida,26131.42,4135
+2026-09-16,240061450909,interrapidisimo,impermeable,BUENAVENTURA,81000,Admitida,23461.09,3709
+2026-09-16,240061450898,interrapidisimo,impermeable,SAN VICENTE DEL CAGUAN,143000,Admitida,35326.43,5572
+2026-09-16,240061450899,interrapidisimo,impermeable,ZAMBRANO,135000,Admitida,38970.67,6161
+2026-09-16,64532766661,coordinadora,impermeable,SAN ANDRES,185000,En terminal de origen,78922.02,12533
+2026-09-15,240061368050,interrapidisimo,impermeable,YUMBO,85000,Entregada,23761.94,3755
+2026-09-15,240061368051,interrapidisimo,impermeable,MADRID,73000,Devolucion ratificada,2083.00,2083
+2026-09-15,240061368052,interrapidisimo,impermeable,BOGOTA,73000,Entregada,13283.83,2083
+2026-09-15,240061368045,interrapidisimo,impermeable,BOGOTA,73000,Entregada,13283.83,2083
+2026-09-15,240061368048,interrapidisimo,impermeable,BUENAVENTURA,138000,Entregada,32581.37,5135
+2026-09-15,240061368047,interrapidisimo,impermeable,MONTERIA,81000,Reclame en oficina,23461.09,3709
+2026-09-15,240061368049,interrapidisimo,impermeable,TOCANCIPA,77000,Entregada,17237.02,2714
+2026-09-15,240061368043,interrapidisimo,impermeable,PLATO,85000,Entregada,26131.42,4135
+2026-09-15,240061368042,interrapidisimo,impermeable,COTORRA,143000,Reclame en oficina,38386.14,6062
+2026-09-15,240061368044,interrapidisimo,impermeable,SABANAGRANDE,85000,Entregada,23761.94,3755
+2026-09-14,240061280103,interrapidisimo,impermeable,SAN LUIS DE SINCE,85000,Entregada,27865.46,5876
+2026-09-14,240061279729,interrapidisimo,impermeable,QUIBDO,81000,Reclame en oficina,25616.43,3874
+2026-09-14,240061278719,interrapidisimo,impermeable,PEREIRA,85000,Entregada,23564.73,3557
+2026-09-14,240061278702,interrapidisimo,impermeable,MADRID,73000,Devolucion ratificada,1973.00,1973
+2026-09-14,240061278704,interrapidisimo,impermeable,TURBANA,85000,Reclame en oficina,25914.3,3917
+2026-09-14,240061278692,interrapidisimo,impermeable,SOACHA,128000,Entregada,20993.75,3137
+2026-09-14,240061278697,interrapidisimo,impermeable,VILLAVICENCIO,77000,Entregada,17094.59,2571
+2026-09-14,240061278687,interrapidisimo,impermeable,GUARNE,85000,Reclame en oficina,23564.73,3557
+2026-09-14,240061278688,interrapidisimo,impermeable,PLANETA RICA,85000,Entregada,25914.3,3917
+2026-09-14,240061278690,interrapidisimo,impermeable,PUERTO GAITAN,85000,Reclame en oficina,25914.3,3917
+2026-09-14,240061278686,interrapidisimo,impermeable,SAN JOSE DEL GUAVIARE,85000,Entregada,25914.3,3917
+2026-09-14,240061278689,interrapidisimo,impermeable,VILLAVIEJA,143000,Intento de entrega,32685.04,4919
+2026-09-14,240061278694,interrapidisimo,impermeable,CONCORDIA,143000,Reclame en oficina,36208.88,5458
+2026-09-14,240061278679,interrapidisimo,impermeable,SINCELEJO,81000,Admitida,23266.86,3514
+2026-09-14,240061278674,interrapidisimo,impermeable,BUENAVENTURA,81000,Entregada,23266.86,3514
+2026-09-14,240061278682,interrapidisimo,impermeable,CHITAGA,85000,Reclame en oficina,25914.3,3917
+2026-09-14,240061278672,interrapidisimo,impermeable,BOGOTA,128000,Intento de entrega,20993.75,3137
+2026-09-14,240061278673,interrapidisimo,impermeable,ISTMINA,85000,Intento de entrega,25914.3,3917
+2026-09-14,240061278675,interrapidisimo,impermeable,SAN JOSE DE CUCUTA,83000,Entregada,23416.3,3536
+2026-09-14,240061278677,interrapidisimo,impermeable,ARMENIA,138000,Entregada,32312.45,4865
+2026-09-14,240061278666,interrapidisimo,impermeable,FLORIDA,85000,Intento de entrega,23564.73,3557
+2026-09-14,240061278667,interrapidisimo,impermeable,ARAUQUITA,143000,Intento de entrega,35033.6,5278
+2026-09-14,240061278670,interrapidisimo,impermeable,MONTELIBANO,85000,Admitida,25914.3,3917
+2026-09-14,240061278671,interrapidisimo,impermeable,EL BAGRE,85000,Entregada,25914.3,3917
+2026-09-14,240061278664,interrapidisimo,impermeable,CANDELARIA,85000,Entregada,25914.3,3917
+2026-09-14,240061278656,interrapidisimo,impermeable,POTOSI,85000,Reclame en oficina,25914.3,3917
+2026-09-14,240061278657,interrapidisimo,impermeable,EL BAGRE,85000,Reclame en oficina,25914.3,3917
+2026-09-14,64532764637,coordinadora,impermeable,MANIZALES,185000,Entregada,36054.18,5409
+2026-09-14,64532764635,coordinadora,impermeable,BOGOTA,73000,Entregada,12201.18,1824
+2026-09-14,64532764636,coordinadora,impermeable,NECHI,143000,En terminal de destino,45562.32,6891
+2026-09-11,240061093893,interrapidisimo,impermeable,MUTATA,85000,Entregada,25481.04,3482
+2026-09-11,240061093894,interrapidisimo,impermeable,SAN ROQUE,135000,Entregada,33863.18,4615
+2026-09-11,240061093882,interrapidisimo,impermeable,SAN ALBERTO,143000,Reclamo en oficina informado WhatsApp - Recordatorio 24h,34449.95,4692
+2026-09-11,240061093092,interrapidisimo,impermeable,QUIBDO,85000,Entregada,25481.04,3482
+2026-09-11,240061093094,interrapidisimo,impermeable,SAN MARTIN,85000,Entregada,25481.04,3482
+2026-09-11,240061093095,interrapidisimo,impermeable,SAN ANDRES DE TUMACO,85000,Reclamo en oficina informado WhatsApp - Recordatorio 24h,25481.04,3482
+2026-09-11,240061093085,interrapidisimo,impermeable,GINEBRA,85000,Reclamo en oficina informado WhatsApp - Recordatorio 24h,25481.04,3482
+2026-09-11,240061093086,interrapidisimo,impermeable,SAN BENITO ABAD,85000,Entregada,25481.04,3482
+2026-09-11,240061093087,interrapidisimo,impermeable,PUERTO TEJADA,81000,Entregada,22878.42,3124
+2026-09-11,240061093088,interrapidisimo,impermeable,MEDINA,85000,Entregada,25481.04,3482
+2026-09-11,64532762537,coordinadora,impermeable,BARRANQUILLA,81000,Entregada,20895.39,2849
+2026-09-11,64532762538,coordinadora,impermeable,VILLAVICENCIO,136000,Entregada,28260.69,3839
+2026-09-11,64532762535,coordinadora,impermeable,MONTERIA,138000,Entregada,28400.16,3857
+2026-09-11,64532762534,coordinadora,impermeable,BOGOTA,73000,Devuelto,1622.00,1622
+2026-09-11,64532762532,coordinadora,impermeable,CARTAGENA DE INDIAS,81000,Entregada,20895.39,2849
+2026-09-10,240061027066,interrapidisimo,impermeable,EL BAGRE,143000,Entregada,35605.31,4852
+2026-09-10,240061025746,interrapidisimo,Conjunto tradicional 4 piezas,CHACHAGUI,85000,Entregada,23171.31,3162
+2026-09-10,240061025744,interrapidisimo,Conjunto tradicional 4 piezas,SAN DIEGO,143000,Entregada,35123.24,4785
+2026-09-10,64532761837,coordinadora,impermeable,BARRANQUILLA,81000,Entregada,20895.39,2849
+2026-09-10,64532761757,coordinadora,Conjunto tradicional 4 piezas,NEIVA,80000,Entregada,20825.65,2840
+2026-09-10,64532761758,coordinadora,Conjunto tradicional 4 piezas,CIENAGA,85000,Entregada,21175.33,2886
+2026-09-10,64532761756,coordinadora,Conjunto tradicional 4 piezas,LA CEJA,85000,Entregada,21175.33,2886
+2026-09-10,64532761754,coordinadora,Conjunto tradicional 4 piezas,SINCELEJO,81000,Entregada,20895.39,2849
+2026-09-10,64532761753,coordinadora,Conjunto tradicional 4 piezas,SANTA MARTA,138000,Entregada,28400.16,3857
+2026-09-10,64532761755,coordinadora,Conjunto tradicional 4 piezas,NEIVA,138000,Entregada,28400.16,3857
+2026-09-10,64532761752,coordinadora,Conjunto tradicional 4 piezas,CARTAGENA DE INDIAS,81000,Entregada,20895.39,2849
+2026-09-10,64532761751,coordinadora,Conjunto tradicional 4 piezas,BELLO,81000,Entregada,20895.39,2849
+2026-09-09,240060949377,interrapidisimo,Conjunto tradicional 4 piezas,BOGOTA,73000,Entregada,12956.14,1754
+2026-09-09,240060949376,interrapidisimo,Conjunto tradicional 4 piezas,BOGOTA,128000,Entregada,20647.14,2789
+2026-09-09,240060949379,interrapidisimo,Conjunto tradicional 4 piezas,BOGOTA,128000,Entregada,20647.14,2789
+2026-09-09,240060949373,interrapidisimo,Conjunto tradicional 4 piezas,SAHAGUN,85000,Entregada,25481.04,3482
+2026-09-09,240060949372,interrapidisimo,Conjunto tradicional 4 piezas,BOGOTA,73000,Entregada,12956.14,1754
+2026-09-09,240060949375,interrapidisimo,Conjunto tradicional 4 piezas,BELLO,81000,Admitida,22878.42,3124
+2026-09-08,240060860795,interrapidisimo,Conjunto tradicional 4 piezas,BOGOTA,73000,Devolucion ratificada,1754.00,1754
+2026-09-08,240060860785,interrapidisimo,Conjunto tradicional 4 piezas,SOACHA,73000,Entregada,12956.14,1754
+2026-09-08,240060860787,interrapidisimo,Conjunto tradicional 4 piezas,BARRANCABERMEJA,138000,Entregada,34083.34,4644
+2026-09-08,240060860788,interrapidisimo,Conjunto tradicional 4 piezas,BARRANQUILLA,81000,Entregada,22878.42,3124
+2026-09-08,240060860773,interrapidisimo,Conjunto tradicional 4 piezas,FRONTINO,85000,Entregada,25481.04,3482
+2026-09-08,240060860774,interrapidisimo,Conjunto tradicional 4 piezas,EL COPEY,85000,Devolucion ratificada,3482.00,3482
+2026-09-08,240060860770,interrapidisimo,Conjunto tradicional 4 piezas,DAGUA,80000,Devolucion ratificada,3434.00,3434
+2026-09-08,240060860775,interrapidisimo,Conjunto tradicional 4 piezas,GUTIERREZ,85000,Reclamo en oficina informado WhatsApp - Recordatorio 48h,17397.5,2363
+2026-09-08,240060860772,interrapidisimo,Conjunto tradicional 4 piezas,SANTIAGO DE TOLU,85000,Devolucion ratificada,3482.00,3482
+2026-09-08,64532759612,coordinadora,impermeable,SOLEDAD,81000,Entregada,20895.39,2849
+2026-09-08,64532759600,coordinadora,Conjunto tradicional 4 piezas,CARTAGENA DE INDIAS,81000,Entregada,20895.39,2849
+2026-09-08,64532759599,coordinadora,Conjunto tradicional 4 piezas,CARTAGENA DE INDIAS,81000,No se entrega el destinatario no cancela el valor a recaudar RCE,20895.39,2849
+2026-09-08,64532759598,coordinadora,Conjunto tradicional 4 piezas,ARMENIA,81000,Entregada,20895.39,2849
+2026-09-08,64532759596,coordinadora,Conjunto tradicional 4 piezas,MEDELLIN,81000,Devuelto,2849.00,2849
+2026-09-08,64532759597,coordinadora,Conjunto tradicional 4 piezas,SINCELEJO,83000,Entregada,21034.86,2867
+2026-09-07,240060776980,interrapidisimo,impermeable,GUACHUCAL,85511,Entregada,25519.93,3487
+2026-09-07,240060773268,interrapidisimo,impermeable colmena,SAN FRANCISCO,149900,Entregada,22156.03,2985
+2026-09-07,240060772823,interrapidisimo,impermeables,GRANADA,573291,Entregada,94005.84,12701
+2026-09-07,240060768030,interrapidisimo,impermeable,MOCOA,143000,Entregada,34449.95,4692
+2026-09-07,240060767166,interrapidisimo,impermeable,BOGOTA,73000,Entregada,12956.14,1754
+2026-09-07,240060767167,interrapidisimo,impermeable,IBAGUE,81000,Devolucion ratificada,2324.00,2324
+2026-09-07,240060767169,interrapidisimo,impermeable,GRANADA,85000,Entregada,17397.5,2363
+2026-09-07,240060767157,interrapidisimo,impermeable,BOGOTA,128000,Entregada,20647.14,2789
+2026-09-07,240060767158,interrapidisimo,impermeable,BOGOTA,73000,Entregada,12956.14,1754
+2026-09-07,240060767160,interrapidisimo,impermeable,TADO,143000,Devolucion ratificada,9846.00,9846
+2026-09-07,240060767163,interrapidisimo,impermeable,BOGOTA,128000,Entregada,20647.14,2789
+2026-09-07,240060767165,interrapidisimo,impermeable,GALAPA,85000,Entregada,23171.31,3162
+2026-09-07,240060767151,interrapidisimo,impermeable,TERUEL,85000,Entregada,25481.04,3482
+2026-09-07,240060767152,interrapidisimo,impermeable,BOGOTA,73000,Entregada,12956.14,1754
+2026-09-07,240060767154,interrapidisimo,impermeable,BOGOTA,73000,Entregada,12956.14,1754
+2026-09-07,240060767153,interrapidisimo,impermeable,VILLA DE LEYVA,77000,Entregada,22584.54,3085
+2026-09-07,240060767155,interrapidisimo,impermeable,MONTELIBANO,85000,Entregada,25481.04,3482
+2026-09-07,240060767156,interrapidisimo,impermeable,TOCANCIPA,77000,Devolucion ratificada,2286.00,2286
+2026-09-07,240060767143,interrapidisimo,impermeable,EL CARMEN DE BOLIVAR,85000,Entregada,25481.04,3482
+2026-09-07,240060767146,interrapidisimo,impermeable,PIVIJAY,85000,Entregada,25481.04,3482
+2026-09-07,240060767148,interrapidisimo,impermeable,BARANOA,85000,Entregada,23171.31,3162
+2026-09-07,240060767150,interrapidisimo,impermeable,PALERMO,85000,Entregada,23171.31,3162
+2026-09-07,240060767142,interrapidisimo,impermeable,PLATO,85000,Entregada,25481.04,3482
+2026-09-07,240060767141,interrapidisimo,impermeable,EL RETORNO,85000,Devolucion ratificada,3482.00,3482
+2026-09-07,64532758226,coordinadora,impermeable,CARTAGENA DE INDIAS,146000,Devuelto,3930.00,3930
+2026-09-07,64532758224,coordinadora,impermeable,PUERTO GAITAN,149900,Se visita no se logra entrega,25708.76,3477
+2026-09-07,64532758221,coordinadora,impermeable,BARRANQUILLA,81000,No se localiza direccion del destinatario,20895.39,2849
+2026-09-07,64532758222,coordinadora,impermeable,CALDAS,213000,Entregada,33639.33,4541
+2026-09-07,64532758223,coordinadora,impermeable,MEDELLIN,81000,Devuelto,2849.00,2849
+2026-09-07,64532758220,coordinadora,impermeable,SAN JOSE DE CUCUTA,83000,Entregada,21034.86,2867
+2026-09-07,64532758218,coordinadora,impermeable,SOLEDAD,81000,Entregada,20895.39,2849
+2026-09-07,64532758219,coordinadora,impermeable,BELLO,83000,No se localiza direccion del destinatario,21034.86,2867
+2026-09-07,64532758217,coordinadora,impermeable,RIONEGRO,139000,No se localiza direccion del destinatario,28469.9,3866
+2026-09-07,64532758215,coordinadora,impermeable,TADO,85000,Entregada,32509.81,4455
+2026-09-07,64532758213,coordinadora,impermeable,CARTAGENA DE INDIAS,81000,Entregada,20895.39,2849
+2026-09-07,64532758214,coordinadora,impermeable,SABANETA,81000,Entregada,20895.39,2849
+2026-09-07,64532758212,coordinadora,impermeable,PEREIRA,81000,Se visita no se logra entrega,20895.39,2849
+2026-09-07,64532758211,coordinadora,impermeable,MONTERIA,83000,Devuelto,2867.00,2867
+2026-09-07,64532758210,coordinadora,impermeable,MEDELLIN,81000,Entregada,20895.39,2849
+2026-09-04,240060592755,interrapidisimo,impermeable,APARTADO,85000,Devolucion ratificada,3162.00,3162
+2026-09-04,240060592756,interrapidisimo,impermeable,BOGOTA,73000,Intento de entrega,12956.14,1754
+2026-09-04,240060592749,interrapidisimo,impermeable,PITALITO,85000,Entregada,23171.31,3162
+2026-09-04,240060592750,interrapidisimo,impermeable,FLORIDABLANCA,139000,Devolucion ratificada,4334.00,4334
+2026-09-04,240060592751,interrapidisimo,impermeable,BARRANCABERMEJA,81000,Entregada,25188.15,3444
+2026-09-04,240060592752,interrapidisimo,impermeable,BUENAVENTURA,81000,Entregada,22878.42,3124
+2026-09-04,240060592753,interrapidisimo,impermeable,BELLO,83000,Reclamo en oficina informado WhatsApp - Recordatorio 48h,23024.87,3143
+2026-09-04,240060592748,interrapidisimo,impermeable,LA PLATA,143000,Entregada,34449.95,4692
+2026-09-04,240060592747,interrapidisimo,impermeable,PALMAR DE VARELA,85000,Devolucion ratificada,3162.00,3162
+2026-09-04,240060592746,interrapidisimo,impermeable,LA CEJA,85000,Devolucion Regional,3162.00,3162
+2026-09-04,64532756431,coordinadora,impermeable,EL CHARCO,59900,En terminal de destino,55563.42,7662
+2026-09-03,240060512272,interrapidisimo,impermeable,SOACHA,128000,Entregada,20647.14,2789
+2026-09-03,240060511608,interrapidisimo,impermeable,VALLEDUPAR,83000,Entregada,23024.87,3143
+2026-09-03,240060511605,interrapidisimo,impermeable,BOGOTA,73000,Entregada,12956.14,1754
+2026-09-03,240060511602,interrapidisimo,impermeable,MADRID,128000,Entregada,20647.14,2789
+2026-09-03,240060511604,interrapidisimo,impermeable,BUENAVENTURA,138000,Creado,31773.62,4324
+2026-09-03,240060511599,interrapidisimo,impermeable,BARRANQUILLA,81000,Devolucion ratificada,3124.00,3124
+2026-09-03,240060511600,interrapidisimo,impermeable,TURBANA,85000,Entregada,25481.04,3482
+2026-09-03,240060511594,interrapidisimo,impermeable,CANALETE,85000,Devolucion ratificada,3482.00,3482
+2026-09-03,240060511595,interrapidisimo,impermeable,MEDELLIN,81000,Entregada,22878.42,3124
+2026-09-03,240060511597,interrapidisimo,impermeable,QUIBDO,83000,Reclamo en oficina informado WhatsApp - Recordatorio 48h,25334.59,3463
+2026-09-03,240060511598,interrapidisimo,impermeable,CHOCONTA,136000,Entregada,25372.29,3439
+2026-09-03,240060511596,interrapidisimo,impermeable,RIONEGRO,83000,Entregada,23024.87,3143
+2026-09-03,240060511587,interrapidisimo,impermeable,MEDELLIN,81000,Entregada,22878.42,3124
+2026-09-03,240060511588,interrapidisimo,impermeable,LEIVA,143000,Entregada,38588.33,5265
+2026-09-03,240060511589,interrapidisimo,impermeable,BOGOTA,73000,Entregada,12956.14,1754
+2026-09-03,240060511590,interrapidisimo,impermeable,TURBACO,85000,Devolucion ratificada,3482.00,3482
+2026-09-03,240060511593,interrapidisimo,impermeable,BOGOTA,128000,Entregada,20647.14,2789
+2026-09-03,240060511585,interrapidisimo,impermeable,YOPAL,77000,Entregada,16810.73,2286
+2026-09-03,240060511586,interrapidisimo,impermeable,CERRITO,143000,Entregada,35605.31,4852
+2026-09-03,240060511584,interrapidisimo,impermeable,EL CARMEN,85000,Entregada,25481.04,3482
+2026-09-03,240060511578,interrapidisimo,impermeable,COROZAL,85000,Entregada,23171.31,3162
+2026-09-03,240060511581,interrapidisimo,impermeable,EL BAGRE,85000,Entregada,25481.04,3482
+2026-09-03,240060511582,interrapidisimo,impermeable,SAN JACINTO DEL CAUCA,85000,Entregada,25481.04,3482
+2026-09-03,64532755512,coordinadora,impermeable,BUENAVENTURA,138000,Entregada,38475.7,5252
+2026-09-02,240060435826,interrapidisimo,impermeable,SUAITA,140000,Entregada,35385.14,4823
+2026-09-02,240060433963,interrapidisimo,impermeable,SAN JOSE DE LA MONTANA,85000,Entregada,25481.04,3482
+2026-09-02,240060433577,interrapidisimo,impermeable,PITALITO,85000,Entregada,23171.31,3162
+2026-09-02,240060433571,interrapidisimo,impermeable,BUCARAMANGA,83000,Entregada,23024.87,3143
+2026-09-02,240060433562,interrapidisimo,impermeable,SOACHA,73000,Entregada,12956.14,1754
+2026-09-02,240060433557,interrapidisimo,impermeable,INZA,85000,Entregada,25481.04,3482
+2026-09-02,240060433559,interrapidisimo,impermeable,CHINCHINA,80000,Devolucion Regional,3114.00,3114
+2026-09-02,240060433553,interrapidisimo,impermeable,SESQUILE,85000,Entregada,17397.5,2363
+2026-09-02,240060421874,interrapidisimo,impermeable,ZIPAQUIRA,73000,Entregada,12956.14,1754
+2026-09-02,240060421618,interrapidisimo,impermeable,PUERTO GAITAN,143000,Entregada,34449.95,4692
+2026-09-02,240060421615,interrapidisimo,impermeable,BUENAVENTURA,81000,Entregada,22878.42,3124
+2026-09-02,240060421612,interrapidisimo,impermeable,MONTERIA,83000,Entregada,23024.87,3143
+2026-09-02,240060421613,interrapidisimo,impermeable,APARTADO,79900,Entregada,22798.33,3113
+2026-09-02,240060421601,interrapidisimo,impermeable,SALAMINA,85000,Entregada,25481.04,3482
+2026-09-02,240060421602,interrapidisimo,impermeable,CHIA,128000,Entregada,20647.14,2789
+2026-09-02,240060421606,interrapidisimo,impermeable,ROSAS,85000,Reclamo en oficina informado WhatsApp - Recordatorio 48h,23171.31,3162
+2026-09-02,240060421608,interrapidisimo,impermeable,MONTERIA,80000,Entregada,22804.7,3114
+2026-09-02,240060421589,interrapidisimo,impermeable,BOGOTA,73000,Devolucion ratificada,1754.00,1754
+2026-09-02,240060421593,interrapidisimo,impermeable,CARTAGENA DE INDIAS,81000,Devolucion ratificada,3124.00,3124
+2026-09-02,240060421594,interrapidisimo,impermeable,ALBANIA,85000,Entregada,25481.04,3482
+2026-09-02,240060421596,interrapidisimo,impermeable,BOGOTA,128000,Entregada,20647.14,2789
+2026-09-02,240060421595,interrapidisimo,impermeable,TULUA,85000,Entregada,23171.31,3162
+2026-09-02,240060421597,interrapidisimo,impermeable,APARTADO,85000,Entregada,23171.31,3162
+2026-09-02,240060421600,interrapidisimo,impermeable,MANIZALES,81000,Entregada,22878.42,3124
+2026-09-02,240060421586,interrapidisimo,impermeable,ISTMINA,85000,Entregada,25481.04,3482
+2026-09-02,240060421585,interrapidisimo,impermeable,MONTERIA,83000,Entregada,23024.87,3143
+2026-09-02,240060421588,interrapidisimo,impermeable,CHIA,73000,Entregada,12956.14,1754
+2026-09-02,240060421587,interrapidisimo,impermeable,BOGOTA,73000,Entregada,12956.14,1754
+2026-09-02,240060421577,interrapidisimo,impermeable,MONTERREY,143000,Entregada,34449.95,4692
+2026-09-02,240060421578,interrapidisimo,impermeable,PACORA,85000,Entregada,25481.04,3482
+2026-09-02,240060421581,interrapidisimo,impermeable,COVENAS,83000,Entregada,23024.87,3143
+2026-09-02,240060421582,interrapidisimo,impermeable,CHIPAQUE,80000,Entregada,17030.89,2315
