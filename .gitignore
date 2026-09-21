@@ -10,6 +10,12 @@ bot/data/
 bot/.env
 .env
 
+# 🔴 DATOS PRIVADOS — exports del Meta Business Agent, chats reales de clientes.
+# Nombres, telefonos y direcciones. Este repo es PUBLICO: nunca se suben.
+# Solo pueden salir de aca resumenes agregados y anonimizados.
+datos-privados/
+*.zip
+
 # Cache de Python
 __pycache__/
 *.pyc
