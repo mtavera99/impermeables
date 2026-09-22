@@ -120,7 +120,7 @@ app.get("/setup-waba", async (req, res) => {
   if (pnid) {
     try {
       const r = await fetch(
-        `https://graph.facebook.com/v21.0/${pnid}?fields=display_phone_number,verified_name,quality_rating,platform_type`,
+        `https://graph.facebook.com/v21.0/${pnid}?fields=display_phone_number,verified_name,quality_rating,platform_type,code_verification_status,status,name_status`,
         { headers: { Authorization: `Bearer ${WA_TOKEN}` } }
       );
       out.numero = { http: r.status, ...(await r.json()) };
@@ -142,11 +142,88 @@ app.get("/setup-waba", async (req, res) => {
 
   const numeroOk = out.numero && out.numero.http === 200;
   const subOk = out.suscripcion && out.suscripcion.success === true;
-  out.diagnostico = numeroOk && subOk
-    ? `🟢 LISTO. Número conectado: ${out.numero.display_phone_number} (${out.numero.verified_name}). Los mensajes ya llegan al webhook.`
-    : "🔴 Algo falló. Mirá 'numero' y 'suscripcion' arriba: si dan error 190 el token está vencido o mal copiado; si dan 100 el Phone Number ID o el WABA ID no corresponden a este token.";
+
+  // 🔴 CORRECCIÓN 21-SEP: esto antes decía 🟢 con solo ver http 200 y success.
+  // Pasó con el +57 322 7545695: token bien, cuenta bien, webhook suscrito...
+  // y el número NO tenía WhatsApp. Agregar un número a la WABA y REGISTRARLO en
+  // la Cloud API son dos pasos distintos, y el diagnóstico no miraba el segundo.
+  // `platform_type` lo delata: CLOUD_API = registrado · NOT_APPLICABLE = no.
+  const registrado = numeroOk && out.numero.platform_type === "CLOUD_API";
+
+  if (!numeroOk || !subOk) {
+    out.diagnostico =
+      "🔴 Falló la conexión. Error 190 = token vencido o mal copiado. " +
+      "Error 100 = el Phone Number ID o el WABA ID no corresponden a este token.";
+  } else if (!registrado) {
+    out.diagnostico =
+      `🟡 CASI. El token y la cuenta están bien, y el número ${out.numero.display_phone_number} ` +
+      `existe en la WABA — pero platform_type es "${out.numero.platform_type}", no "CLOUD_API". ` +
+      "Eso significa que el número NO está registrado en la Cloud API: no tiene WhatsApp activo, " +
+      "no recibe ni envía. Falta registrarlo con un PIN de 6 dígitos: llamá a " +
+      "/registrar-numero?token=...&pin=XXXXXX";
+    if (out.numero.code_verification_status && out.numero.code_verification_status !== "VERIFIED") {
+      out.diagnostico +=
+        ` ⚠️ Y además code_verification_status es "${out.numero.code_verification_status}": ` +
+        "primero hay que verificar la propiedad del número con el código que manda Meta por SMS o llamada.";
+    }
+  } else {
+    out.diagnostico =
+      `🟢 LISTO. Número conectado y registrado en Cloud API: ` +
+      `${out.numero.display_phone_number} (${out.numero.verified_name}). ` +
+      `Calidad: ${out.numero.quality_rating}. Los mensajes ya llegan al webhook.`;
+  }
 
   res.json(out);
+});
+
+// ============================================================================
+// GET /registrar-numero?token=...&pin=XXXXXX
+//
+// Registra el número en la Cloud API. ES UN PASO APARTE de agregarlo a la WABA,
+// y es el que hace que el número tenga WhatsApp de verdad y pueda enviar/recibir.
+//
+// El PIN son 6 dígitos y es la verificación en dos pasos del número. Hay que
+// guardarlo: se pide de nuevo si el número se re-registra en otra plataforma.
+//
+// 🔒 Protegido con WHATSAPP_VERIFY_TOKEN: registra un número, es una escritura.
+// ============================================================================
+app.get("/registrar-numero", async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const pin = (req.query.pin || "").toString().trim();
+  if (!/^\d{6}$/.test(pin)) {
+    return res.status(400).json({
+      error: "El PIN debe ser exactamente 6 dígitos. Ejemplo: /registrar-numero?token=...&pin=123456",
+      consejo: "Elegí uno que puedas recordar y guardalo en el gestor de contraseñas: Meta lo pide de nuevo si hay que re-registrar el número.",
+    });
+  }
+
+  const pnid = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!WA_TOKEN || !pnid) {
+    return res.status(400).json({ error: "Faltan WHATSAPP_TOKEN o WHATSAPP_PHONE_NUMBER_ID en Render." });
+  }
+
+  try {
+    const r = await fetch(`https://graph.facebook.com/v21.0/${pnid}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${WA_TOKEN}` },
+      body: JSON.stringify({ messaging_product: "whatsapp", pin }),
+    });
+    const body = await r.json().catch(() => ({}));
+    const ok = r.status === 200 && body.success === true;
+    res.json({
+      http: r.status,
+      respuesta: body,
+      diagnostico: ok
+        ? "🟢 Número registrado en Cloud API. Esperá ~1 minuto y probá /setup-waba: platform_type debe pasar a CLOUD_API. Después escribile por WhatsApp."
+        : "🔴 No se registró. Errores típicos: 133005 = el PIN no coincide con uno anterior · " +
+          "133010 = el número no está verificado todavía (falta el código por SMS o llamada) · " +
+          "133006 = hay que verificar la propiedad del número primero · " +
+          "100 = el token no tiene permiso sobre este número.",
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Verificación del webhook (Meta)
