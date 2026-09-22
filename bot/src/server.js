@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const { generateReply } = require("./agent");
-const { sendText, sendImage, sendVideo } = require("./whatsapp");
+const { sendText, sendImage, sendVideo, sendCatalog, catalogoActivo } = require("./whatsapp");
 const { MEDIA } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
@@ -490,6 +490,32 @@ async function handleWebhook(body) {
 
         // Enviar fotos/videos si el bot los solicitó
         for (const key of media || []) {
+          // 📚 CATÁLOGO: si está configurado, es mejor que una foto suelta
+          // porque trae descripción y precio. Si NO está configurado, se cae
+          // al cuadro de colores para no dejar al cliente sin nada.
+          if (key === "catalogo") {
+            if (catalogoActivo()) {
+              const envio = await sendCatalog(
+                from,
+                "Acá podés ver todo nuestro catálogo con fotos y detalles 🏍️",
+                process.env.CATALOG_THUMBNAIL || undefined,
+                "Pago contraentrega en toda Colombia"
+              );
+              if (!envio.ok) {
+                anotarEvento({ tipo: "envio-rechazado", para: from, http: envio.status, error: "catálogo: " + JSON.stringify(envio.body?.error || envio.body).slice(0, 200), code: envio.body?.error?.code });
+                console.error("🔴 Catálogo no enviado:", JSON.stringify(envio.body));
+                // Respaldo: mandar la foto de colores para no dejarlo sin nada
+                const alt = MEDIA.colores;
+                if (alt?.url) await sendImage(from, alt.url, alt.caption);
+              }
+            } else {
+              console.log("Catálogo pedido pero CATALOG_ID no está configurado; mando la foto de colores.");
+              const alt = MEDIA.colores;
+              if (alt?.url) await sendImage(from, alt.url, alt.caption);
+            }
+            continue;
+          }
+
           const item = MEDIA[key];
           if (!item || !item.url) {
             console.log(`Media '${key}' sin URL configurada (agrega MEDIA_${key.toUpperCase()} en Render)`);

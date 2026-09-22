@@ -179,6 +179,11 @@ function detectMediaIntent(text) {
   } else if (pideColorGenerico || (quiereVer && pideColorSinFoto)) {
     keys.push("colores");                         // cuadro con todos los colores
   }
+  // 📚 Catálogo: el cliente lo pide por nombre. Va primero porque trae foto,
+  // descripción y precio, y es mejor que una imagen suelta.
+  if (has(["catalogo", "catálogo", "catalogos", "catálogos", "que mas tienen",
+           "qué más tienen", "otros productos", "mas productos", "más productos",
+           "variedad", "lista de productos"])) keys.push("catalogo");
   if (has(["puesto", "puesta", "modelo", "se ve", "persona"])) keys.push("modelo");
   if (t.includes("video")) keys.push("video");
   // Foto del producto: solo si NO pidió un color específico
