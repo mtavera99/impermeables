@@ -55,3 +55,9 @@ store.guardarPerfil("CO.9999999999999999", {
 store.pushMsg("CO.9999999999999999", "user", "hola vi el anuncio, cuanto vale?");
 
 require("./src/server.js");
+
+// Un cliente con guía enviada y ventana cerrada, para ver el caso de oficina.
+store.registrarGuiaEnviada({ guia: "240055550000", telefono: "573005550000", nombre: "Luis Ramirez" });
+const _c = store.todasLasConversaciones();
+_c["573005550000"] = { messages: [{ role: "user", content: "gracias", at: 1 }], ultimoDelCliente: Date.now() - 4 * 86400000 };
+require("fs").writeFileSync((process.env.DATA_DIR || ".") + "/conversations.json", JSON.stringify(_c, null, 2));
