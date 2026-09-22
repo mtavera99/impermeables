@@ -363,6 +363,21 @@ async function handleWebhook(body) {
 
       const messages = value.messages || [];
       for (const m of messages) {
+        // 🔴 21-SEP: llegaron dos mensajes SIN `from`. Sin remitente el bot no
+        // tiene a dónde responder, y quedaban como "el bot no contestó" sin
+        // explicación. Guardamos el payload crudo para poder diagnosticarlo.
+        // Sospecha principal: son los envíos de prueba del panel de Meta
+        // ("Revisa los webhooks de prueba"), que usan un payload de ejemplo.
+        if (!m.from) {
+          anotarEvento({
+            tipo: "entrante-sin-remitente",
+            clase: m.type,
+            texto: m.text?.body?.slice(0, 80),
+            crudo: JSON.stringify({ value }).slice(0, 700),
+          });
+          console.error("🔴 Mensaje entrante SIN 'from'. No hay a dónde responder. Payload:", JSON.stringify(value).slice(0, 500));
+          continue;
+        }
         anotarEvento({ tipo: "entrante", de: m.from, clase: m.type, texto: m.text?.body?.slice(0, 80) });
       }
       for (const msg of messages) {
@@ -393,6 +408,16 @@ async function handleWebhook(body) {
           if (envio && envio.ok) {
             console.log(`→ Respondido a ${from} (id ${envio.messageId})`);
           } else {
+            // Un rechazo en el POST /messages NUNCA genera evento `statuses`,
+            // porque Meta no creó el mensaje. Si no lo anotamos acá, el fallo
+            // solo existe en el log de Render y desde fuera es invisible.
+            anotarEvento({
+              tipo: "envio-rechazado",
+              para: from,
+              http: envio?.status,
+              error: envio?.body?.error?.message || JSON.stringify(envio?.body).slice(0, 200),
+              code: envio?.body?.error?.code,
+            });
             console.error(
               `🔴 MENSAJE NO ENTREGADO a ${from}. Meta respondió ${envio?.status}: ` +
                 JSON.stringify(envio?.body)
