@@ -269,6 +269,33 @@ Si el cliente manda el número con **57** al inicio (ej. `573138615813`), **guá
 57**: `3138615813`. Son 10 dígitos que empiezan por 3.
 Esto pasó **8 veces en 4 días** y llega mal a la transportadora.
 
+### 🔴🔴 SIN CELULAR NO HAY DESPACHO — y ya no siempre lo hay (22-sep)
+
+La regla de arriba daba por hecho que el teléfono **siempre llega**. De hecho existe
+*porque* se copiaba del número del chat, que viene con el `57` adelante.
+
+**Eso se rompió.** WhatsApp dejó que los clientes usen un **nombre de usuario** y le
+**oculten el teléfono al negocio**. Cuando eso pasa no hay número de chat de dónde
+copiarlo: Meta manda un identificador (`CO.1098944123092301`) del que **no se puede
+sacar el teléfono**.
+
+| | |
+|---|---|
+| ✅ El cliente **escribió** su celular | se usa ese, sin el 57 |
+| ✅ No lo escribió, pero **el chat es un teléfono** | se usa el del chat (lo hace el código, siempre bien formateado) |
+| 🔴 No lo escribió y **usa nombre de usuario** | **NO SE PUEDE DESPACHAR** |
+
+**Entonces el celular es OBLIGATORIO y se pide antes de cerrar:**
+> *"Para generar tu guía necesito un celular de contacto 📱 ¿A qué número te ubican?"*
+
+⛔ **Nunca inventarlo, nunca dejarlo vacío, y nunca poner ahí el identificador del chat.**
+
+🔒 **Y hay un candado en el código, no solo esta regla.** Si el pedido llega sin celular
+queda marcado `sinTelefono` y el aviso al dueño arranca con
+**"🔴🔴 OJO: ESTE PEDIDO NO TIENE CELULAR — NO LO DESPACHES"**. Se blindó en código
+porque hoy quedó demostrado que una instrucción al modelo no alcanza: el bloque
+`##ORDER##` se emitía dos veces aunque el prompt dijera que no.
+
 ---
 
 ## 10. 🆕 BAJAR DEVOLUCIONES — vale $154.000/mes por punto
