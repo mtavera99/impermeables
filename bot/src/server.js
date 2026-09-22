@@ -1,13 +1,15 @@
 require("dotenv").config();
 const express = require("express");
 const { generateReply } = require("./agent");
-const { sendText, sendImage, sendVideo, sendCatalog, catalogoActivo, sendPdf, esBsuid } = require("./whatsapp");
+const { sendText, sendImage, sendVideo, sendCatalog, catalogoActivo, sendPdf, sendTemplate, esBsuid } = require("./whatsapp");
 const { MEDIA } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
 const panel = require("./panel");
 const panelGuias = require("./panel-guias");
 const guias = require("./guias");
+const panelNovedades = require("./panel-novedades");
+const novedades = require("./novedades");
 const audio = require("./audio");
 const resumen = require("./resumen");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -264,7 +266,171 @@ function limpiarPlanesViejos() {
   for (const [id, p] of PLANES_GUIAS) {
     if (ahora - p.creado > PLAN_TTL_MS) PLANES_GUIAS.delete(id);
   }
+  for (const [id, p] of PLANES_NOVEDADES) {
+    if (ahora - p.creado > PLAN_TTL_MS) PLANES_NOVEDADES.delete(id);
+  }
 }
+
+// Mismo mecanismo que las guías: el plan vive entre "revisar" y "enviar" para
+// no obligar a pegar el texto dos veces, y se muere en 30 minutos.
+const PLANES_NOVEDADES = new Map(); // id -> { filas, creado }
+
+// El nombre de la plantilla aprobada para novedades. Mientras no exista, los
+// clientes con la ventana cerrada quedan bloqueados en vez de intentar y fallar.
+const PLANTILLA_NOVEDAD = process.env.PLANTILLA_NOVEDAD || "";
+
+// 🔴 EL IDIOMA DE LA PLANTILLA NO ES "es", ES "es_CO".
+// La primera plantilla se subió en "Spanish (COL)", que en la API es es_CO. Si
+// se manda "es", Meta rechaza el envío AUNQUE la plantilla esté aprobada, y el
+// error (132001) no dice que el problema sea el idioma. `sendTemplate` tiene
+// "es" por defecto, así que acá se pasa explícito y queda configurable por si
+// alguna plantilla se sube en otro idioma.
+const PLANTILLA_IDIOMA = process.env.PLANTILLA_IDIOMA || "es_CO";
+
+// ============================================================================
+// 📮 NOVEDADES DE ENTREGA
+//
+// POR QUÉ EXISTE: el dueño veía las novedades en 99 Envíos y le escribía a cada
+// cliente A MANO. Es el trabajo manual que más plata sostiene: el archivo madre
+// deja dicho que el rechazo bajo (5,0%) NO es suerte, es esa gestión diaria.
+// La devolución está en 19% y cuesta $2.464.218/mes; bajar 3 puntos son
+// $389.962/mes.
+//
+// Se pega el texto de la plataforma en vez de subir un archivo porque todavía
+// no sabemos si 99 Envíos exporta CSV. El mismo parser lee las dos cosas.
+//
+// 🔒 REVISAR ANTES DE ENVIAR, igual que las guías: un mensaje a un cliente real
+// no se puede deshacer.
+// ============================================================================
+app.get("/novedades", (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) {
+    return res.status(403).send("<h3>Falta el token.</h3><p>Usá /novedades?token=TU_PANEL_TOKEN</p>");
+  }
+  try {
+    res
+      .set("Content-Type", "text/html; charset=utf-8")
+      .send(panelNovedades.render({ hayPlantilla: Boolean(PLANTILLA_NOVEDAD) }));
+  } catch (e) {
+    res.status(500).send("Error armando la pantalla: " + esc(e.message));
+  }
+});
+
+app.post("/novedades/revisar", (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+
+  const texto = String(req.body?.texto || "");
+  if (!texto.trim()) return res.status(400).json({ ok: false, error: "No llegó nada para revisar." });
+
+  try {
+    limpiarPlanesViejos();
+    const plan = novedades.revisar(texto, { tienePlantilla: Boolean(PLANTILLA_NOVEDAD) });
+    const id = Math.random().toString(36).slice(2, 10);
+    PLANES_NOVEDADES.set(id, { filas: plan.filas, creado: Date.now() });
+
+    anotarEvento({
+      tipo: "novedades-revisadas",
+      cuantas: plan.filas.length,
+      listas: plan.listas,
+      bloqueadas: plan.bloqueadas,
+    });
+
+    res.json({
+      ok: true,
+      id,
+      listas: plan.listas,
+      bloqueadas: plan.bloqueadas,
+      // Se manda solo lo que la pantalla necesita mostrar, no el pedido entero.
+      filas: plan.filas.map((f) => ({
+        guia: f.guia,
+        motivo: f.motivo,
+        tipo: f.tipo,
+        tipoNombre: f.tipoNombre,
+        nombre: f.nombre,
+        destino: f.destino,
+        ventanaAbierta: Boolean(f.ventanaAbierta),
+        texto: f.texto || "",
+        enviar: Boolean(f.enviar),
+        motivoNoEnvio: f.motivoNoEnvio || "",
+      })),
+    });
+  } catch (e) {
+    console.error("🔴 /novedades/revisar:", e.message);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+app.post("/novedades/enviar", async (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+
+  const plan = PLANES_NOVEDADES.get(String(req.body?.id || ""));
+  if (!plan) {
+    return res.status(400).json({
+      ok: false,
+      error: "El plan venció o el bot se reinició. Pegá las novedades otra vez y volvé a revisar.",
+    });
+  }
+
+  const indices = Array.isArray(req.body?.indices) ? req.body.indices : [];
+  const resultados = [];
+
+  for (const i of indices) {
+    const f = plan.filas[i];
+    // No se manda nada que la revisión haya marcado como no enviable, aunque
+    // llegue en la lista: la pantalla puede estar vieja.
+    if (!f || !f.enviar || !f.destino || !f.texto) {
+      resultados.push({ guia: f ? f.guia : "?", ok: false, error: "quedó marcada como no enviable" });
+      continue;
+    }
+
+    // ⚠️ CON LA VENTANA CERRADA NO SE PUEDE MANDAR TEXTO LIBRE.
+    // Meta lo rechaza (131047), o peor: lo acepta y nunca lo entrega — ya pasó
+    // el 21-sep con un mensaje al dueño. Ahí va la plantilla, cuyo único
+    // trabajo es que el cliente responda: en cuanto responde se abre la ventana
+    // de 24h y el bot le habla normal, con el mensaje específico de su novedad.
+    const envio = f.porPlantilla
+      ? await sendTemplate(f.destino, PLANTILLA_NOVEDAD, PLANTILLA_IDIOMA)
+      : await sendText(f.destino, f.texto);
+
+    if (envio && envio.ok) {
+      // Queda en el historial del chat para que el bot no repita la información
+      // cuando el cliente responda. Si fue por plantilla se anota lo que de
+      // verdad se le mandó, no el mensaje largo que todavía no vio.
+      store.pushMsg(
+        f.destino,
+        "assistant",
+        f.porPlantilla
+          ? `(plantilla ${PLANTILLA_NOVEDAD}) Te avisamos que tu pedido tuvo una novedad en la entrega.`
+          : f.texto
+      );
+      anotarEvento({
+        tipo: "novedad-avisada",
+        para: f.destino,
+        guia: f.guia,
+        novedad: f.tipo,
+        porPlantilla: Boolean(f.porPlantilla),
+      });
+      console.log(`📮 Novedad ${f.tipo} avisada a ${f.nombre || f.destino} (guía ${f.guia})`);
+      resultados.push({ guia: f.guia, nombre: f.nombre, ok: true });
+    } else {
+      const motivo = motivoDeEnvio(envio);
+      anotarEvento({ tipo: "novedad-fallida", para: f.destino, guia: f.guia, error: motivo.slice(0, 180) });
+      console.error(`🔴 Novedad de la guía ${f.guia} NO se avisó a ${f.destino}: ${motivo}`);
+      resultados.push({ guia: f.guia, nombre: f.nombre, ok: false, error: motivo });
+    }
+  }
+
+  // El plan se consume: un segundo clic no puede reenviar lo mismo.
+  PLANES_NOVEDADES.delete(String(req.body.id));
+
+  const enviados = resultados.filter((r) => r.ok).length;
+  res.json({
+    ok: true,
+    intentados: resultados.length,
+    enviados,
+    fallaron: resultados.length - enviados,
+    resultados,
+  });
+});
 
 /** Traduce el error de Meta a algo que el dueño pueda accionar. */
 function motivoDeEnvio(envio) {
