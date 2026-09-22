@@ -26,7 +26,9 @@ fs.writeFileSync(path.join(DATA, "orders.json"), "[]");
 
 process.env.DATA_DIR = DATA;
 process.env.WHATSAPP_VERIFY_TOKEN = "prueba_token";
+process.env.PANEL_TOKEN = "prueba_token";
 process.env.BOT_WHATSAPP = "573227545695";
+process.env.OWNER_WHATSAPP = "573138615813"; // para probar el aviso al dueño
 process.env.PORT = "3998";
 delete process.env.WHATSAPP_TOKEN;
 
@@ -202,8 +204,58 @@ const check = (cond, msg) => { console.log(`${cond ? "✅" : "🔴"} ${msg}`); i
   check(prueba.para === BSUID || JSON.stringify(prueba).includes(BSUID),
     "🔑 /enviar-prueba ya NO le quita las letras al identificador");
 
+  console.log("\n── 10. Si el bot NO puede identificar a alguien, AVISA ──");
+  // Un payload con un formato de identidad que no existe todavía: ni `from`, ni
+  // `from_user_id`, ni `user_id`. Es lo que pasaría si Meta cambia otra vez.
+  const PAYLOAD_DESCONOCIDO = {
+    object: "whatsapp_business_account",
+    entry: [{
+      id: "2213159576112051",
+      changes: [{
+        field: "messages",
+        value: {
+          messaging_product: "whatsapp",
+          metadata: { display_phone_number: "573227545695", phone_number_id: "111122223333444" },
+          contacts: [{ profile: { name: "Formato Nuevo", username: "formatonuevo" } }], // sin user_id
+          messages: [{
+            algun_id_futuro: "XX.000",
+            id: "wamid.FUTURO==",
+            timestamp: String(Math.floor(Date.now() / 1000)),
+            text: { body: "Hola, quiero el impermeable" },
+            type: "text",
+          }],
+        },
+      }],
+    }],
+  };
+
+  await fetch(`${BASE}/webhook`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(PAYLOAD_DESCONOCIDO),
+  });
+  await new Promise((r) => setTimeout(r, 1500));
+
+  const ev2 = await (await fetch(`${BASE}/eventos?token=${TK}`)).json();
+  const noAtribuidos = ev2.eventos.filter((e) => e.tipo === "entrante-sin-remitente");
+  const avisos = ev2.eventos.filter((e) => e.tipo === "aviso-sin-atribuir");
+
+  check(noAtribuidos.length === 1, `un formato desconocido queda registrado (${noAtribuidos.length})`);
+  check(avisos.length === 1, `🔑 y se AVISA al dueño (avisos: ${avisos.length})`);
+  check(avisos[0]?.perfil === "Formato Nuevo @formatonuevo",
+    `el aviso dice de quién era: "${avisos[0]?.perfil}"`);
+
+  // Un segundo caso seguido NO debe generar un segundo aviso (tope de 30 min).
+  await fetch(`${BASE}/webhook`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(PAYLOAD_DESCONOCIDO),
+  });
+  await new Promise((r) => setTimeout(r, 1500));
+  const ev3 = await (await fetch(`${BASE}/eventos?token=${TK}`)).json();
+  check(ev3.eventos.filter((e) => e.tipo === "aviso-sin-atribuir").length === 1,
+    "🔑 un segundo caso NO manda otro aviso: se acumula (no lo inunda de mensajes)");
+  check(ev3.eventos.filter((e) => e.tipo === "entrante-sin-remitente").length === 2,
+    "pero los dos casos quedan contados");
+
   fs.rmSync(DATA, { recursive: true, force: true });
-  const total = 38;
+  const total = 43;
   console.log(fallas ? `\n🔴 ${fallas} de ${total} falla(s).` : `\n🟢 ${total}/${total} correctos.`);
   process.exit(fallas ? 1 : 0);
 })().catch((e) => { console.error("🔴", e); process.exit(1); });

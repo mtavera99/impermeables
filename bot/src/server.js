@@ -1154,6 +1154,62 @@ app.get("/eventos", (req, res) => {
 // no cambia: el identificador que devuelve esta función se usa igual como clave
 // de la conversación y como destino de la respuesta.
 // ============================================================================
+// ============================================================================
+// 🔔 AVISO CUANDO EL BOT NO PUEDE IDENTIFICAR A QUIEN ESCRIBE
+//
+// POR QUÉ EXISTE, con el número exacto: el 22-sep WhatsApp empezó a mandar
+// clientes sin teléfono (función "nombre de usuario") y el bot no supo a dónde
+// responderles. Escribió el fallo en el log de Render y siguió. Resultado:
+//
+//   17 clientes que venían de anuncios (~$17.850 de pauta) quedaron sin
+//   respuesta durante ~3 horas, y el problema se descubrió DE CASUALIDAD
+//   porque el dueño vio "un mensaje raro" en el panel.
+//
+// El arreglo de fondo ya está: hoy se leen los dos formatos de identidad. Pero
+// si Meta introduce un formato NUEVO, vuelve a pasar — y sin esto, otra vez nos
+// enteraríamos tarde. No se puede prevenir un formato que todavía no existe;
+// sí se puede hacer que el fallo GRITE en vez de susurrar.
+//
+// Se limita a un aviso cada 30 minutos con el acumulado, para que un problema
+// masivo no se convierta en 200 mensajes al dueño.
+// ============================================================================
+const SIN_ATRIBUIR = { cuantos: 0, ultimoAviso: 0 };
+const ESPERA_ENTRE_AVISOS_MS = 30 * 60 * 1000;
+
+async function avisarSinAtribuir(value, msg) {
+  SIN_ATRIBUIR.cuantos++;
+  if (!OWNER) return;
+
+  const ahora = Date.now();
+  if (ahora - SIN_ATRIBUIR.ultimoAviso < ESPERA_ENTRE_AVISOS_MS) return;
+  SIN_ATRIBUIR.ultimoAviso = ahora;
+
+  // El perfil suele venir aunque el identificador no se pueda leer: sirve para
+  // saber de quién estamos hablando sin entrar a los logs.
+  const perfil = (value?.contacts || [])[0]?.profile || {};
+  const quien = [perfil.name, perfil.username ? "@" + perfil.username : null].filter(Boolean).join(" ");
+  const texto = msg?.text?.body ? `"${String(msg.text.body).slice(0, 70)}"` : `un ${msg?.type || "mensaje"}`;
+
+  const aviso =
+    `🔴 UN CLIENTE ESCRIBIÓ Y EL BOT NO SUPO QUIÉN ES\n\n` +
+    `Mandó: ${texto}\n` +
+    (quien ? `Perfil: ${quien}\n` : "") +
+    `\nWhatsApp no mandó su número ni un identificador que el bot reconozca, así que NO se le pudo responder.\n\n` +
+    (SIN_ATRIBUIR.cuantos > 1 ? `⚠️ Van ${SIN_ATRIBUIR.cuantos} casos desde el último reinicio.\n\n` : "") +
+    `QUÉ HACER: en Render → Logs buscá  user_id  y copiá el identificador. ` +
+    `Con eso se le puede escribir desde /recuperar-cliente.\n\n` +
+    `⏰ Hay 24 horas desde su mensaje para contestarle sin plantilla.`;
+
+  const r = await sendText(OWNER, aviso);
+  anotarEvento({
+    tipo: "aviso-sin-atribuir",
+    acumulado: SIN_ATRIBUIR.cuantos,
+    avisado: Boolean(r && r.ok),
+    perfil: quien || undefined,
+  });
+  console.log(`🔔 Avisado al dueño: ${SIN_ATRIBUIR.cuantos} mensaje(s) sin atribuir (envío ok: ${r && r.ok})`);
+}
+
 function quienEscribe(msg, value) {
   const contacto = (value?.contacts || [])[0] || {};
   const telefono = msg?.from || contacto.wa_id || null;
@@ -1207,6 +1263,12 @@ async function handleWebhook(body) {
             crudo: JSON.stringify({ value }).slice(0, 700),
           });
           console.error("🔴 Mensaje entrante sin remitente NI username. Payload:", JSON.stringify(value).slice(0, 500));
+          // 🔔 Y AHORA SE AVISA. Esto es lo que faltó el 22-sep: el bot ya
+          // escribía el fallo en el log, pero nadie mira los logs, así que 17
+          // clientes pagados se quedaron sin respuesta durante ~3 horas y el
+          // problema se descubrió de casualidad, por "un mensaje raro" en el
+          // panel. Un fallo que no avisa se mide en horas de ventas perdidas.
+          avisarSinAtribuir(value, m).catch((e) => console.error("aviso:", e.message));
           continue;
         }
         anotarEvento({
