@@ -1375,7 +1375,7 @@ async function handleWebhook(body) {
         }
 
         console.log(`Cliente ${from}: ${text}`);
-        const { reply, order, handoff, media } = await generateReply(from, text);
+        const { reply, order, handoff, media, pedidoRescatado } = await generateReply(from, text);
         if (reply) {
           // 🔴 Registrar el RESULTADO del envío, no solo el intento. Si Meta
           // rechaza el mensaje, esto es lo único que lo delata en los logs.
@@ -1441,6 +1441,15 @@ async function handleWebhook(body) {
         if (order) store.marcarComprado(from);
 
         if (order && OWNER) {
+          // 🟠 Si el pedido hubo que RECONSTRUIRLO porque el bloque llegó
+          // cortado, el aviso lo dice primero: puede faltarle un campo y el
+          // dueño tiene que revisarlo antes de despachar. Antes este pedido
+          // simplemente no existía.
+          const avisoRescate = pedidoRescatado
+            ? `🟠 ESTE PEDIDO SE RECONSTRUYÓ\n` +
+              `La respuesta de la IA llegó cortada y el pedido se armó con los datos que se pudieron leer.\n` +
+              `⚠️ REVISÁ que no falte ningún dato antes de despachar.\n\n`
+            : "";
           // 🔴 Si el pedido no tiene celular, el aviso lo dice PRIMERO y fuerte.
           // Un pedido sin teléfono no se puede despachar: la transportadora lo
           // exige para la guía. Si esto va al final o en letra chica, el dueño
@@ -1452,7 +1461,8 @@ async function handleWebhook(body) {
             : "";
           await sendText(
             OWNER,
-            alerta +
+            avisoRescate +
+              alerta +
               `🟢 NUEVO PEDIDO BikerPro\n` +
               `Nombre: ${order.nombre}\nCel: ${order.celular || "🔴 FALTA"}\n` +
               `Ciudad: ${order.ciudad}\nDir: ${order.direccion}\n` +

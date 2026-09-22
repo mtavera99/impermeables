@@ -63,7 +63,12 @@ async function callGemini(systemPrompt, messages, retries = 2) {
     body: JSON.stringify({
       system_instruction: { parts: [{ text: systemPrompt }] },
       contents,
-      generationConfig: { temperature: 0.6, maxOutputTokens: 800 }
+      // ⚠️ 1600 y no 800. El tope viejo cortaba respuestas por la mitad, y lo
+      // que va AL FINAL es el bloque ##ORDER## con el pedido: se perdían ventas
+      // enteras sin que nadie se enterara (ver el bloque de extractOrder).
+      // Solo se paga lo que se usa, así que un tope más alto no cuesta nada
+      // salvo en las respuestas que de verdad lo necesitan.
+      generationConfig: { temperature: 0.6, maxOutputTokens: 1600 }
     })
   });
 
@@ -103,7 +108,9 @@ async function callOpenAICompat(systemPrompt, messages, retries = 2) {
         }))
       ],
       temperature: 0.6,
-      max_tokens: 800
+      // Mismo motivo que en Gemini: con 800 se cortaba el bloque ##ORDER## del
+      // final y el pedido se perdía en silencio.
+      max_tokens: 1600
     })
   });
 
@@ -133,17 +140,100 @@ async function callIA(systemPrompt, messages) {
 }
 
 // Extrae el bloque ##ORDER## {...} y lo separa del mensaje visible
+/**
+ * Rescata los campos de un bloque ##ORDER## que llegó CORTADO o mal formado.
+ *
+ * Se lee campo por campo con expresiones regulares en vez de JSON.parse,
+ * porque un JSON al que le falta la llave final no se puede parsear pero sí se
+ * puede leer. Mejor un pedido con un campo faltante —que el dueño completa en
+ * el panel— que ningún pedido.
+ */
+function rescatarPedido(fragmento) {
+  const txt = (n) => {
+    const m = fragmento.match(new RegExp('"' + n + '"\\s*:\\s*"([^"]*)"'));
+    return m ? m[1] : undefined;
+  };
+  const num = (n) => {
+    const m = fragmento.match(new RegExp('"' + n + '"\\s*:\\s*(\\d+)'));
+    return m ? Number(m[1]) : undefined;
+  };
+  const o = {
+    nombre: txt("nombre"),
+    celular: txt("celular"),
+    ciudad: txt("ciudad"),
+    direccion: txt("direccion"),
+    color: txt("color"),
+    talla: txt("talla"),
+    pago: txt("pago"),
+    total: num("total"),
+  };
+  // Sin nombre NI ciudad no hay nada que rescatar: sería basura disfrazada de
+  // pedido, y un pedido falso en el panel es peor que ninguno.
+  if (!o.nombre && !o.ciudad) return null;
+  return o;
+}
+
+// ============================================================================
+// 🔴 UN PEDIDO NO PUEDE PERDERSE EN SILENCIO (22-sep)
+//
+// EL DUEÑO REPORTÓ que no entraban ventas: 93 conversaciones y el último pedido
+// guardado de las 9:38 am. La IA funcionaba y el bot contestaba bien.
+//
+// Acá estaba el agujero: si el bloque ##ORDER## llegaba CORTADO —y se corta,
+// porque la respuesta tiene un tope de tokens y el JSON va al final— pasaba
+// esto, en este orden:
+//
+//   1. la expresión que busca {...} NO encontraba nada (falta la llave final)
+//   2. order quedaba en null
+//   3. la última línea borraba el bloque cortado para que el cliente no lo vea
+//   4. y listo: el cliente recibía una respuesta perfecta, creía que su pedido
+//      quedó hecho, y EL PEDIDO NO EXISTÍA EN NINGUNA PARTE
+//
+// Sin un log, sin un aviso, sin nada. Desde afuera era idéntico a "hoy no
+// compró nadie".
+//
+// Ahora: si el bloque estaba y no se pudo leer, se rescata campo por campo, se
+// grita en el log y se le avisa al dueño por WhatsApp.
+// ============================================================================
 function extractOrder(text) {
-  const m = text.match(/##ORDER##\s*(\{[\s\S]*?\})/);
   let order = null;
   let clean = text;
+  let rescatado = false;
+
+  const m = text.match(/##ORDER##\s*(\{[\s\S]*?\})/);
   if (m) {
-    try { order = JSON.parse(m[1]); } catch { order = null; }
+    try {
+      order = JSON.parse(m[1]);
+    } catch {
+      order = null;
+    }
     clean = text.replace(/##ORDER##\s*\{[\s\S]*?\}/, "").trim();
   }
+
+  if (!order && text.includes("##ORDER##")) {
+    const fragmento = text.slice(text.indexOf("##ORDER##"));
+    order = rescatarPedido(fragmento);
+    rescatado = Boolean(order);
+    if (rescatado) {
+      console.error(
+        "🟠 PEDIDO RESCATADO DE UN BLOQUE CORTADO. La IA emitió ##ORDER## pero el " +
+          "JSON no se pudo leer (casi siempre porque la respuesta llegó al tope de " +
+          "tokens). Se recuperaron los campos legibles: " +
+          JSON.stringify(order) +
+          " — REVISAR que no falte nada antes de despachar."
+      );
+    } else {
+      console.error(
+        "🔴 PEDIDO PERDIDO. La IA emitió ##ORDER## y no se pudo leer NI rescatar " +
+          "ningún campo. El cliente cree que su pedido quedó hecho. Bloque recibido: " +
+          fragmento.slice(0, 300)
+      );
+    }
+  }
+
   // Elimina cualquier resto de ##ORDER## aunque esté truncado/malformado (para que no llegue al cliente)
   clean = clean.replace(/##ORDER##[\s\S]*$/, "").trim();
-  return { order, clean };
+  return { order, clean, rescatado };
 }
 
 // Extrae marcadores [[MEDIA:clave]] y los separa del mensaje visible
@@ -238,6 +328,9 @@ async function generateReply(phone, userText) {
   const orderRes = extractOrder(reply);
   reply = orderRes.clean;
   const order = orderRes.order;
+  // true = el bloque venía cortado y se reconstruyó campo por campo. Puede
+  // faltarle algo, así que el aviso al dueño tiene que decirlo.
+  const pedidoRescatado = orderRes.rescatado;
 
   const mediaRes = extractMedia(reply);
   reply = mediaRes.clean;
@@ -249,7 +342,7 @@ async function generateReply(phone, userText) {
   if (handoff) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
-  return { reply, order: savedOrder, handoff, media };
+  return { reply, order: savedOrder, handoff, media, pedidoRescatado };
 }
 
 // Identificador de cliente con username (no es un teléfono).
@@ -295,4 +388,6 @@ function revisarTelefono(order, chatId) {
   return { ...order, celular: "", sinTelefono: true, despachable: false };
 }
 
-module.exports = { generateReply, revisarTelefono, celularValido };
+// extractOrder y rescatarPedido se exportan para poder probarlos sin llamar a
+// la IA: son el camino por donde se perdían pedidos enteros en silencio.
+module.exports = { generateReply, revisarTelefono, celularValido, extractOrder, rescatarPedido };
