@@ -57,6 +57,14 @@ const RUIDO = new Set([
 
 const digitos = (s) => String(s == null ? "" : s).replace(/\D/g, "");
 
+// 🔴 Clientes con username de WhatsApp: su identificador no es un teléfono sino
+// un BSUID ("CO.1098944123092301"). Hay que detectarlo porque quitarle los
+// símbolos da "1098944123092301", que parece un teléfono y NO lo es. Si eso
+// entrara al emparejamiento podría coincidir por casualidad con los números de
+// una etiqueta y mandarle la guía de otra persona.
+const RE_BSUID = /^[A-Za-z]{2}\.[A-Za-z0-9]{1,128}$/;
+const esBsuid = (s) => RE_BSUID.test(String(s == null ? "" : s).trim());
+
 /** Colombia: se comparan los últimos 10 dígitos, así "573138615813",
  *  "+57 313 861 5813" y "3138615813" son el mismo número. */
 function tel10(s) {
@@ -244,7 +252,9 @@ function puntuar(campos, pedido) {
 
   // --- Teléfonos (50 cada uno) ---
   const telPedido = tel10(pedido.celular);
-  const telChat = tel10(pedido.telefono_chat);
+  // Si el chat es un BSUID no hay teléfono que comparar: se ignora en vez de
+  // convertirlo en dígitos, que sería un número falso.
+  const telChat = esBsuid(pedido.telefono_chat) ? "" : tel10(pedido.telefono_chat);
   const enEtiqueta = (t) => t && campos.telefonos.includes(t);
 
   if (enEtiqueta(telPedido)) {
@@ -443,7 +453,10 @@ async function procesarPDF(buffer, pedidos, opciones = {}) {
  *  El teléfono impreso en la etiqueta puede ser de otra persona (el que
  *  recibe), y ahí el mensaje no llegaría o llegaría a un desconocido. */
 function destinoDe(pedido) {
-  return tel10(pedido.telefono_chat) ? digitos(pedido.telefono_chat) : digitos(pedido.celular);
+  const chat = String(pedido.telefono_chat == null ? "" : pedido.telefono_chat).trim();
+  // Cliente con username: se le responde por su BSUID, tal cual.
+  if (esBsuid(chat)) return chat;
+  return tel10(chat) ? digitos(chat) : digitos(pedido.celular);
 }
 
 // ============================================================================

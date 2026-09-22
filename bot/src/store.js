@@ -114,6 +114,22 @@ function registrarSeguimiento(phone) {
   writeJSON(CONV_FILE, all);
 }
 
+/**
+ * Guarda el nombre y el username del cliente.
+ *
+ * 🔑 Importa sobre todo para los clientes con username (sin teléfono): su clave
+ * de conversación es un BSUID como "CO.1098944123092301". Sin el nombre, el
+ * panel le muestra eso al dueño y no hay forma de saber con quién habla.
+ */
+function guardarPerfil(phone, perfil) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone] || { messages: [], paused: false };
+  c.perfil = { ...(c.perfil || {}), ...perfil };
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+}
+
 /** Marca que el cliente pidió que no le escriban más. Se respeta para siempre. */
 function marcarNoMolestar(phone) {
   ensure();
@@ -304,6 +320,7 @@ function anotarGuiaEnPedido(fechaPedido, guia) {
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones,
+  guardarPerfil,
   reemplazarPedidos,
   todosLosPedidos,
   guiaYaEnviada, registrarGuiaEnviada, todasLasGuiasEnviadas, anotarGuiaEnPedido,

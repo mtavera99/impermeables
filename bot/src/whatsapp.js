@@ -3,6 +3,53 @@ const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
 const GRAPH = "https://graph.facebook.com/v21.0";
 
+// ============================================================================
+// 🔴 CLIENTES SIN NÚMERO DE TELÉFONO (BSUID) — 22-sep
+//
+// QUÉ PASÓ: un cliente escribió desde un anuncio y el bot NO le contestó nunca.
+// Medido en /eventos a las 17:11 del 22-sep:
+//
+//   17:11:24  entrante-sin-remitente  "¡Hola! Quiero más información."
+//   17:11:26  envio-rechazado  400  "The parameter to is required."  code 100
+//
+// El payload de Meta no traía `from` ni `wa_id`. Traía esto:
+//   "contacts":[{"profile":{"name":"...","username":"..."},"user_id":"CO.1098…"}]
+//   "messages":[{"from_user_id":"CO.1098…", ...}]
+//
+// ES LA FUNCIÓN "NOMBRE DE USUARIO" DE WHATSAPP. Cuando un cliente adopta un
+// username, Meta le OCULTA el teléfono al negocio y lo identifica con un
+// Business-Scoped User ID (BSUID): código de país + punto + alfanuméricos.
+// Es estable para nosotros y distinto para cada negocio.
+//
+// ⚠️ EL COMENTARIO QUE HABÍA ACÁ SE EQUIVOCABA. Decía que probablemente eran
+// "los envíos de prueba del panel de Meta". No lo eran: el payload trae nombre
+// de perfil real, username real, y el texto es el mensaje prellenado DEL
+// ANUNCIO ("¡Hola! Quiero más información."). Una prueba de Meta no trae eso.
+// Era un cliente real que pagamos y que se quedó sin respuesta.
+//
+// CÓMO SE LE RESPONDE: el POST /messages acepta `recipient` con el BSUID en
+// lugar de `to`. Si por alguna razón Meta rechazara ese campo, se reintenta con
+// `to`: preferimos dos intentos a dejar a un cliente sin respuesta.
+// ============================================================================
+
+// Formato del BSUID: dos letras de país, punto, hasta 128 alfanuméricos.
+const RE_BSUID = /^[A-Za-z]{2}\.[A-Za-z0-9]{1,128}$/;
+
+/** ¿Este identificador es un BSUID (cliente con username) y no un teléfono? */
+function esBsuid(id) {
+  return RE_BSUID.test(String(id == null ? "" : id).trim());
+}
+
+/**
+ * Arma la parte del payload que dice A QUIÉN se le manda.
+ * Teléfono → `to`. Cliente con username → `recipient`.
+ */
+function destinatario(id) {
+  const s = String(id == null ? "" : id).trim();
+  if (esBsuid(s)) return { recipient: s };
+  return { to: s.replace(/\D/g, ""), recipient_type: "individual" };
+}
+
 // 🔴 ARREGLADO 21-SEP: antes esta función se COMÍA los errores. Escribía el
 // fallo en consola y devolvía undefined, así que si Meta rechazaba la respuesta
 // del bot, quien llamaba no se enteraba: ni reintento, ni aviso, ni registro.
@@ -10,21 +57,51 @@ const GRAPH = "https://graph.facebook.com/v21.0";
 // igual que uno que funciona. Ahora devuelve el resultado.
 //
 // @returns {{ok:boolean, status:number, body:object, messageId?:string}}
+/** Un POST a /messages. Separado para poder reintentar con otro destinatario. */
+async function postMensaje(cuerpo) {
+  const res = await fetch(`${GRAPH}/${PHONE_ID}/messages`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ messaging_product: "whatsapp", ...cuerpo })
+  });
+  const body = await res.json().catch(() => ({}));
+  return { res, body };
+}
+
 async function sendPayload(payload) {
   if (!TOKEN || !PHONE_ID) {
     console.log(`[SIN CREDENCIALES] Payload:`, JSON.stringify(payload));
     return { ok: false, status: 0, body: { error: "faltan WHATSAPP_TOKEN o WHATSAPP_PHONE_NUMBER_ID" } };
   }
+
+  // El destino se saca de `to` y se traduce: teléfono → `to`, BSUID → `recipient`.
+  const { to: destino, ...resto } = payload;
+  const bsuid = esBsuid(destino);
+
   try {
-    const res = await fetch(`${GRAPH}/${PHONE_ID}/messages`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${TOKEN}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ messaging_product: "whatsapp", recipient_type: "individual", ...payload })
-    });
-    const body = await res.json().catch(() => ({}));
+    let { res, body } = await postMensaje({ ...destinatario(destino), ...resto });
+
+    // 🛟 RED PARA EL CLIENTE CON USERNAME: si Meta rechaza `recipient` por un
+    // error de parámetro, se reintenta poniendo el BSUID en `to`. Las fuentes
+    // no coinciden en cuál de los dos campos espera la API, y esto no se puede
+    // probar sin un cliente real con username. Dos intentos cuestan una llamada
+    // de más; equivocarse cuesta un cliente sin respuesta, que es lo que ya
+    // pasó hoy. El log dice cuál funcionó, así queda medido.
+    if (!res.ok && bsuid && body?.error?.code === 100) {
+      console.warn(
+        `↻ Meta rechazó 'recipient' para el BSUID (${body?.error?.message}). Reintento con 'to'.`
+      );
+      const segundo = await postMensaje({ to: destino, ...resto });
+      if (segundo.res.ok) {
+        console.log("✅ El BSUID funciona en el campo 'to', no en 'recipient'. Anotarlo.");
+      }
+      res = segundo.res;
+      body = segundo.body;
+    }
+
     if (!res.ok) {
       console.error("Error enviando WhatsApp:", res.status, JSON.stringify(body));
       return { ok: false, status: res.status, body };
@@ -212,4 +289,5 @@ module.exports = {
   sendText, sendImage, sendVideo, sendTemplate,
   sendCatalog, sendProduct, sendProductList, catalogoActivo, CATALOG_ID,
   uploadMedia, sendDocumentById, sendPdf,
+  esBsuid, destinatario,
 };
