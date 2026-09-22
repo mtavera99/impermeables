@@ -21,6 +21,7 @@
 // ============================================================================
 
 const store = require("./store");
+const resumen = require("./resumen");
 
 const esc = (s) =>
   String(s == null ? "" : s)
@@ -77,13 +78,35 @@ function render() {
   const conPedido = lista.filter((x) => x.c.compro).length;
   const enHumano = lista.filter((x) => x.c.paused).length;
 
+  // ---- Números del día, en hora de Bogotá, comparados contra ayer ----
+  const hoy = resumen.delDia(resumen.hoyBogota());
+  const ayer = resumen.delDia(resumen.ayerBogota());
+
+  const delta = (a, b) => {
+    if (!b) return "";
+    const d = ((a - b) / b) * 100;
+    if (!isFinite(d) || Math.abs(d) < 1) return `<i class="d">= ayer</i>`;
+    return d > 0
+      ? `<i class="d up">▲ ${d.toFixed(0)}%</i>`
+      : `<i class="d dn">▼ ${Math.abs(d).toFixed(0)}%</i>`;
+  };
+
   const tarjetas = `
     <div class="kpis">
-      <div class="kpi"><b>${lista.length}</b><span>conversaciones</span></div>
-      <div class="kpi"><b>${totalMsgsCliente}</b><span>mensajes del cliente</span></div>
-      <div class="kpi ok"><b>${pedidos.length}</b><span>pedidos</span></div>
-      <div class="kpi ${enHumano ? "warn" : ""}"><b>${enHumano}</b><span>esperando humano</span></div>
-      <div class="kpi"><b>${conPedido ? ((conPedido / lista.length) * 100).toFixed(1) + "%" : "—"}</b><span>cierre</span></div>
+      <div class="kpi big ok"><b>${hoy.pedidos}</b><span>pedidos hoy</span>${delta(hoy.pedidos, ayer.pedidos)}</div>
+      <div class="kpi big ok"><b>${resumen.fmtCOP(hoy.ingresos)}</b><span>recaudo hoy</span>${delta(hoy.ingresos, ayer.ingresos)}</div>
+      <div class="kpi"><b>${hoy.unidades}</b><span>unidades</span></div>
+      <div class="kpi"><b>${resumen.fmtCOP(hoy.ticketPromedio)}</b><span>ticket promedio</span></div>
+      <div class="kpi"><b>${hoy.conversaciones}</b><span>conversaciones hoy</span>${delta(hoy.conversaciones, ayer.conversaciones)}</div>
+      <div class="kpi"><b>${hoy.cierre.toFixed(1)}%${hoy.cierreTopado ? "*" : ""}</b><span>cierre</span></div>
+      <div class="kpi"><b>${hoy.share2uds.toFixed(0)}%</b><span>share 2 uds</span></div>
+      <div class="kpi ${hoy.esperandoHumano ? "warn" : ""}"><b>${hoy.esperandoHumano}</b><span>esperando humano</span></div>
+    </div>
+    ${hoy.cierreTopado ? `<p class="nota">* Hay más pedidos que conversaciones de hoy: alguien escribió ayer y confirmó hoy. El cierre se topa en 100%.</p>` : ""}
+    ${hoy.topCiudades.length ? `<p class="nota">📍 ${hoy.topCiudades.map(([c, n]) => `${esc(c)} <b>${n}</b>`).join(" · ")}</p>` : ""}
+    <div class="acciones">
+      <a class="btn" href="/pedidos.csv?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">⬇️ Descargar pedidos (CSV)</a>
+      <a class="btn" href="/cierre?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}&enviar=1">📲 Mandarme el cierre por WhatsApp</a>
     </div>`;
 
   const filasPedidos = pedidos.length
@@ -190,6 +213,13 @@ function render() {
   .aviso{background:#3a2d0c;border:1px solid #6b5416;color:#ffd479;padding:11px 13px;border-radius:10px;font-size:13px;margin-bottom:14px}
   .aviso.ok{background:#12351f;border-color:#1d6b3d;color:#8ff0b5}
   code{background:#0b0d11;padding:1px 5px;border-radius:4px;font-size:12px}
+  .kpi.big b{font-size:26px}
+  .kpi .d{display:block;font-size:11px;font-style:normal;margin-top:3px;color:#8b93a4}
+  .kpi .d.up{color:#3ddc84}.kpi .d.dn{color:#ff6b6b}
+  .nota{color:#8b93a4;font-size:12px;margin:8px 0 0}
+  .acciones{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
+  .btn{background:#1b212b;border:1px solid #2d3542;color:#e7e9ee;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:13px}
+  .btn:hover{background:#232b36}
 </style></head>
 <body>
 <header>
@@ -199,7 +229,7 @@ function render() {
 <main>
   ${avisoDatos}
   ${tarjetas}
-  <h2>Pedidos</h2>
+  <h2>Pedidos (todos)</h2>
   <table>
     <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th></tr>
     ${filasPedidos}

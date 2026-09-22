@@ -7,6 +7,7 @@ const store = require("./store");
 const seguimiento = require("./seguimiento");
 const panel = require("./panel");
 const audio = require("./audio");
+const resumen = require("./resumen");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const app = express();
@@ -54,6 +55,74 @@ app.get("/panel", (req, res) => {
     res.set("Content-Type", "text/html; charset=utf-8").send(panel.render());
   } catch (e) {
     res.status(500).send("Error armando el panel: " + esc(e.message));
+  }
+});
+
+// ============================================================================
+// GET /cierre?token=...[&enviar=1][&dia=YYYY-MM-DD][&to=57...]
+//
+// El resumen de ventas del día. Con `enviar=1` lo manda por WhatsApp.
+//
+// 🔴 LÍMITE DE META, YA COMPROBADO: un mensaje que INICIA el negocio solo se
+// entrega si hay una ventana de 24h abierta (o con plantilla aprobada). Hoy se
+// probó: Meta aceptó un mensaje al dueño (ok:true con wamid) y NUNCA se entregó.
+//   → Si el dueño le escribió algo al bot ese día, la ventana está abierta y el
+//     cierre llega perfecto.
+//   → Si no, Meta lo acepta y lo descarta. Por eso la respuesta SIEMPRE incluye
+//     el texto completo: aunque el envío falle, el cierre se lee acá y el
+//     GitHub Action lo deja en su registro.
+// ============================================================================
+app.get("/cierre", async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const dia = (req.query.dia || "").match(/^\d{4}-\d{2}-\d{2}$/)
+    ? req.query.dia
+    : resumen.hoyBogota();
+
+  let datos, texto;
+  try {
+    datos = resumen.delDia(dia);
+    texto = resumen.textoCierre(dia);
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+
+  const out = { dia, resumen: { ...datos, detalle: undefined }, texto };
+
+  if (req.query.enviar === "1") {
+    const to = (req.query.to || OWNER || "").toString().replace(/\D/g, "");
+    if (!to) {
+      out.envio = { ok: false, motivo: "no hay número destino (falta OWNER_WHATSAPP o ?to=)" };
+    } else {
+      const r = await sendText(to, texto);
+      out.envio = {
+        ok: r.ok,
+        para: `+${to}`,
+        http: r.status,
+        detalle: r.ok
+          ? `entregado a Meta (id ${r.messageId})`
+          : JSON.stringify(r.body?.error || r.body).slice(0, 220),
+        nota: r.ok
+          ? "Meta lo aceptó. Si no te llega, es porque la ventana de 24h está cerrada: escribile algo al bot y volvé a pedir el cierre."
+          : "No se pudo enviar. El texto completo está igual en este mismo resultado.",
+      };
+      anotarEvento({ tipo: "cierre-enviado", para: to, ok: r.ok, pedidos: datos.pedidos });
+    }
+  }
+
+  res.json(out);
+});
+
+// Pedidos en CSV, para tener una copia propia fuera de Render
+app.get("/pedidos.csv", (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  try {
+    res
+      .set("Content-Type", "text/csv; charset=utf-8")
+      .set("Content-Disposition", `attachment; filename="pedidos-bikerpro-${resumen.hoyBogota()}.csv"`)
+      .send("\uFEFF" + resumen.pedidosCSV()); // BOM para que Excel lea los acentos
+  } catch (e) {
+    res.status(500).send("Error: " + esc(e.message));
   }
 });
 
