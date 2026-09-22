@@ -1,6 +1,20 @@
 // Catálogo de fotos/videos que el bot puede enviar.
 // URLs públicas (GitHub Pages). Se pueden sobreescribir con variables de entorno.
-const BASE = "https://mtavera99.github.io/impermeables/assets/productos";
+//
+// 🔴 ARREGLADO 21-SEP — TODAS LAS FOTOS DABAN 404.
+// El BASE apuntaba a `/assets/productos`, que es la carpeta del REPO. Pero
+// GitHub Pages publica desde `docs/`, así que la URL pública es `/img/`.
+// Ninguna de las 6 imágenes existía en esa ruta.
+//
+// Cómo se detectó: un cliente escribió "Tienes fotos" y Meta devolvió
+//   code 131053 · Media upload error
+//   "Downloading media from weblink failed with http code 404"
+// Se vio en /eventos, la bitácora del webhook. Antes de tenerla, esto fallaba
+// en silencio: el cliente pedía fotos y no pasaba nada.
+//
+// ⚠️ REGLA: si se agrega una foto nueva, tiene que estar en `docs/img/` —
+// no alcanza con subirla a `assets/`. Y hay que verificar la URL con curl.
+const BASE = "https://mtavera99.github.io/impermeables/img";
 
 const MEDIA = {
   // Foto de los colores. Se deja vacía por ahora: la cuadrícula subida muestra colores
@@ -20,7 +34,8 @@ const MEDIA = {
   // Fotos individuales por color de franja (recortadas de la cuadrícula).
   rojo: {
     type: "image",
-    url: process.env.MEDIA_ROJO || `${BASE}/rojo.jpg`,
+    // .png, no .jpg: en docs/img/ el archivo publicado es rojo.png
+    url: process.env.MEDIA_ROJO || `${BASE}/rojo.png`,
     caption: "🔴 Impermeable con franja ROJA (el conjunto es negro). ¿Te gusta este?"
   },
   verde: {
