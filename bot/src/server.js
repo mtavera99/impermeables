@@ -12,6 +12,8 @@ const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</
 
 const app = express();
 app.use(express.json());
+// Para los formularios del panel (responder a mano, pausar el bot)
+app.use(express.urlencoded({ extended: true }));
 
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || "bikerpro_verify_123";
 const OWNER = process.env.OWNER_WHATSAPP;
@@ -52,7 +54,14 @@ app.get("/panel", (req, res) => {
       .send("<h3>Falta el token.</h3><p>Usá /panel?token=TU_WHATSAPP_VERIFY_TOKEN</p>");
   }
   try {
-    res.set("Content-Type", "text/html; charset=utf-8").send(panel.render());
+    // Resultado de una respuesta manual, si viene de vuelta del redirect
+    let aviso = "";
+    if (req.query.r === "ok") {
+      aviso = `<div class="res ok">✅ Mensaje enviado como BikerPro. El bot quedó silenciado en ese chat: cuando termines, devolvéselo con el botón.</div>`;
+    } else if (req.query.r) {
+      aviso = `<div class="res mal">🔴 No se pudo enviar: ${esc(req.query.r)}</div>`;
+    }
+    res.set("Content-Type", "text/html; charset=utf-8").send(panel.render(aviso));
   } catch (e) {
     res.status(500).send("Error armando el panel: " + esc(e.message));
   }
@@ -124,6 +133,68 @@ app.get("/pedidos.csv", (req, res) => {
   } catch (e) {
     res.status(500).send("Error: " + esc(e.message));
   }
+});
+
+// ============================================================================
+// POST /responder  — contestarle a un cliente DESDE EL NÚMERO DEL BOT
+//
+// POR QUÉ EXISTE: el panel tenía un enlace `wa.me` para "responder por WhatsApp",
+// y estaba MAL. El número del bot vive en la Cloud API, no en la app del
+// celular del dueño, así que ese enlace abría SU WhatsApp personal y le habría
+// escrito al cliente desde otro número — el cliente vería un desconocido en vez
+// de BikerPro.
+//
+// Para hablar como el negocio, el mensaje tiene que salir por la Cloud API.
+// Este endpoint hace eso, y además PAUSA el bot en ese chat para que no le
+// conteste encima al humano.
+// ============================================================================
+app.post("/responder", async (req, res) => {
+  if (req.body?.token !== VERIFY_TOKEN && req.query.token !== VERIFY_TOKEN) {
+    return res.sendStatus(403);
+  }
+  const to = String(req.body?.to || "").replace(/\D/g, "");
+  const texto = String(req.body?.texto || "").trim();
+  if (!to || !texto) return res.status(400).send("Falta el número o el texto.");
+
+  const envio = await sendText(to, texto);
+
+  if (envio.ok) {
+    // Queda en el historial como mensaje del negocio, así el bot lo ve como
+    // contexto y no repite lo que ya dijo el humano.
+    store.pushMsg(to, "assistant", texto);
+    // Y el bot se calla en ese chat: dos voces contestando confunden al cliente.
+    store.setPaused(to, true);
+    anotarEvento({ tipo: "respuesta-humana", para: to, texto: texto.slice(0, 80) });
+    console.log(`👤 Respuesta manual a ${to}: "${texto.slice(0, 80)}"`);
+  } else {
+    anotarEvento({
+      tipo: "respuesta-humana-fallida",
+      para: to,
+      error: JSON.stringify(envio.body?.error || envio.body).slice(0, 180),
+    });
+  }
+
+  // Volver al panel con el resultado a la vista
+  const msg = envio.ok
+    ? "ok"
+    : encodeURIComponent(
+        (envio.body?.error?.code === 131047 || envio.body?.error?.code === 470)
+          ? "Pasaron más de 24h desde el último mensaje del cliente. Meta no permite texto libre; solo plantilla aprobada."
+          : envio.body?.error?.message || "No se pudo enviar."
+      );
+  res.redirect(`/panel?token=${encodeURIComponent(VERIFY_TOKEN)}&r=${msg}#c${to}`);
+});
+
+// POST /pausar — prender o apagar el bot en UN chat
+// Sirve para retomar: cuando el humano termina, devuelve el chat al bot.
+app.post("/pausar", (req, res) => {
+  if (req.body?.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  const tel = String(req.body?.tel || "").replace(/\D/g, "");
+  const valor = String(req.body?.valor) === "1";
+  if (!tel) return res.status(400).send("Falta el número.");
+  store.setPaused(tel, valor);
+  anotarEvento({ tipo: valor ? "bot-pausado" : "bot-reactivado", para: tel });
+  res.redirect(`/panel?token=${encodeURIComponent(VERIFY_TOKEN)}#c${tel}`);
 });
 
 // Salud
