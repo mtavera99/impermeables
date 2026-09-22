@@ -22,6 +22,7 @@ Y el error #24: casi corto `Domiciliarios`, que fue el conjunto que MÁS utilida
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BH** | 🔴 **CLIENTES SIN TELÉFONO: el bot no les contestaba y los mezclaba a TODOS en una conversación llamada `undefined`** · WhatsApp lanzó los nombres de usuario y Meta **oculta el teléfono** (BSUID `CO.1098…`, no se puede derivar) · el payload trae `from_user_id`, no `from` → el bot enviaba sin destino → **400, lead pagado en silencio: 1 de cada 4** · 🔴 **peor que no contestar: le respondía a un cliente nuevo con el historial de otro** (*"ya te he dado todos los detalles…"* en su PRIMER mensaje) · ⛔ **CORRIGE 0-BE: las 24h SÍ aplican ahora** que está en la Cloud API — **4 cosas ya necesitan la plantilla** · 🔒 **regla nueva: SIN CELULAR NO HAY DESPACHO**, blindada en código · **reglas 23-26** | **22-sep** |
 | **0-BG** | 🎯 **EL GATE SE DISPARÓ: $1.603 > $1.134 → la quincena queda DESCARTADA** · el martes cerró en **$1.501/conv y $60.975 de utilidad** (×3,6 vs el lunes, pero un tercio de lo normal) · 🔴 **44% del gasto se fue a las 3 horas MÁS CARAS ($2.763/conv) y la cuenta quedó racionada de 18h a 21:21, cuando costaban $453-$1.142** · ⚠️ pero en días CON plata la noche no es más barata → **no hacer dayparting con 2 días** · 🔴 **el colmena se dio vuelta: $7.661/conv = 231% de su equilibrio** → recortado a $10.000 · 🟢 **TEST Creativos $614/conv y conv/mil 11,37 pero usa solo el 39%** → ⛔ **anula la acción 1-B: su límite es la subasta, no el presupuesto** · ⚠️ **error #24: casi corto `Domiciliarios`, que dejó $25.990 — el que más utilidad dio** · **5 reglas nuevas (18-22)** | **16-sep** |
 | **0-BF** | 🎯 **LA DESCOMPOSICIÓN: `$/conv = CPM ÷ conv-por-mil`. Amor y Amistad explica el 41%, la caída de audiencia el 59%** · ⛔ **corrige 0-AU** (el domingo 13 tuvo el CPM MÁS ALTO y salió bien: $1.032) · ⛔ **corrige 0-AO**: la degradación **NO fue uniforme** — Motorizados y el colmena tuvieron su MEJOR conv/mil mientras los dos grandes se derrumbaron · 🔑 **Motorizados pagó el peor CPM ($7.771) y trajo las conversaciones más baratas ($885)** · el lunes ganó **$16.700 vs $189.737 de promedio** (9%) · ✅ el CPM sube en TODOS los conjuntos a la vez = firma de la subasta · 📅 **proyección Q4: con conv/mil 2,76 el Cyber Monday PIERDE $57.652; con 4,45 GANA $60.380** · 🌧️ **nunca se midió si la lluvia mueve las ventas** (#98) · 🔴 **`balance` ≠ saldo** · 🔴 **leer a las 13:00 subestima el gasto 5,8%** · **errores #21, #22 y #23** | **15-sep** |
 | **0-BE** | ⛔ **LAS 24H Y LAS PLANTILLAS NO APLICAN: usa la APP, no la API.** Escribe a quien quiera, cuando quiera, gratis · **el pozo de re-contacto es TODO el histórico, no un mes** · **NO migrar a la API**: perdería la intervención en tiempo real que le mejora el cierre · ya usa etiqueta `cliente potencial` y mensajes rápidos `/` · el límite real es el **reporte por spam**, no la técnica · **errores #19 y #20** | **14-sep** |
@@ -10769,3 +10770,81 @@ después de 24 horas"* → #19 y #20 · *"¿qué tiene que ver Amor y Amistad?"*
 16. **Un día abierto leído a mediodía subestima el gasto ~6%.** Bajar los umbrales ~6% o leer cerrado
 17. **La subasta de Meta no está segmentada por industria.** Cualquier fecha comercial grande del país
     sube el CPM de BikerPro, aunque el producto no tenga nada que ver con la fecha
+
+
+---
+
+## 0-BH · 🔴 CLIENTES SIN TELÉFONO: EL BOT NO LES CONTESTABA, Y LOS MEZCLABA A TODOS EN UNA SOLA CONVERSACIÓN (mar 22-sep, 12:30 Bogotá)
+
+> **Cómo se encontró:** el dueño vio "un mensaje raro" en el panel. Era una conversación
+> llamada literalmente **`undefined`**, con **12 mensajes**. Medido en producción vía
+> `/eventos` y `/panel`.
+
+### Qué pasaba
+
+```
+17:11:24  entrante-sin-remitente   "¡Hola! Quiero más información."
+17:11:26  envio-rechazado  400  "The parameter to is required."  code 100
+```
+
+Ese texto es **el mensaje prellenado del anuncio**: lead pagado que entró y no recibió
+nada. En la ventana de 10 minutos que había en memoria fue **1 de cada 4**.
+
+**La causa:** WhatsApp lanzó los **nombres de usuario**. Cuando un cliente adopta uno,
+Meta **le oculta el teléfono al negocio** y lo identifica con un **BSUID**
+(`CO.1098944123092301`): por negocio, estable, y **no se puede derivar el teléfono**.
+El payload no trae `from` ni `wa_id`, trae `from_user_id` y `contacts[].user_id`.
+El bot leía solo `msg.from` → `undefined` → enviaba sin destino → 400.
+
+### 🔴 Y el daño era peor que "no contesta"
+
+Todos esos clientes caían en la **misma** conversación (`undefined`), así que **el bot
+leía el historial de uno y le contestaba a otro**. Textual, del panel: al segundo cliente
+que escribió *"Hola, quiero más información"* le respondió
+*"Ya te he dado todos los detalles técnicos y el catálogo, para no dar más vueltas…"*.
+**A un cliente nuevo, en su primer mensaje.**
+
+### ⛔ CORRIGE 0-BE: LAS 24 HORAS **SÍ** APLICAN AHORA
+
+0-BE dice *"las 24h y las plantillas NO aplican: usa la app, no la API"*. **Eso ya es
+falso.** Era cierto cuando atendía desde WhatsApp Business; el bot **ya está en la Cloud
+API**, y ahí la ventana de 24h aplica. Pasado ese plazo Meta **acepta el mensaje y no lo
+entrega**, sin error visible.
+
+📌 **Ya son cuatro cosas que necesitan la plantilla aprobada:** guías, cierre diario,
+seguimiento de 72h y responder desde el panel a un chat viejo. **Pedirla.**
+
+### La regla nueva: SIN CELULAR NO HAY DESPACHO
+
+La regla que existía (*"quita el 57 del celular"*) daba por hecho que el teléfono
+**siempre llega** — de hecho existe *porque* se copiaba del número del chat. Con un
+cliente de username **no hay número de chat**, y contraentrega **necesita** un teléfono
+para la guía.
+
+| | |
+|---|---|
+| ✅ el cliente **escribió** su celular | se usa ese, sin el 57 |
+| ✅ no lo escribió pero **el chat es un teléfono** | se usa el del chat (lo hace el código) |
+| 🔴 no lo escribió y **usa nombre de usuario** | **NO SE PUEDE DESPACHAR** |
+
+🔒 **Blindado en código, no solo en el prompt** (`revisarTelefono` en `agent.js`): el
+pedido queda marcado `sinTelefono` y el aviso al dueño arranca con
+**"🔴🔴 OJO: ESTE PEDIDO NO TIENE CELULAR — NO LO DESPACHES"**.
+**Razón:** el mismo día se demostró que una instrucción al modelo no es un candado — el
+bloque `##ORDER##` se emitía dos veces aunque el prompt lo prohibiera.
+
+### Reglas nuevas (23-26)
+
+23. **Un identificador de cliente NO siempre es un teléfono.** Nunca hacer
+    `.replace(/\D/g,"")` sobre un destinatario: con un BSUID eso produce
+    `1098944123092301`, **un número inventado** que puede pertenecer a un tercero.
+24. **Sin celular no hay despacho.** Y el celular solo puede salir de que el cliente lo
+    escriba o del número del chat; de ningún otro lado.
+25. **Antes de descartar un evento raro como "prueba de Meta", mirar el payload.** El
+    comentario del 21-sep decía que eran los envíos de prueba del panel. No lo eran: traían
+    nombre de perfil, username y el texto del anuncio. **Un día de leads perdidos.**
+26. **Una regla de formato esconde un supuesto.** *"Quitale el 57"* asumía que el teléfono
+    siempre llega. Cuando el supuesto cae, la regla no avisa: sigue pareciendo correcta.
+
+*Arreglado en el PR #91. Limpieza de la basura que quedó:*
+`/limpiar-conversaciones-rotas?token=...` *(previsualiza; con `&aplicar=1` borra).*

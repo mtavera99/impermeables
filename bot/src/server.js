@@ -384,6 +384,63 @@ app.post("/guias/enviar", async (req, res) => {
   });
 });
 
+// ============================================================================
+// GET /limpiar-conversaciones-rotas?token=...[&aplicar=1]
+//
+// 🔴 LIMPIA LA BASURA QUE DEJÓ EL BUG DE LOS CLIENTES SIN TELÉFONO.
+//
+// Antes del arreglo, un cliente con username entraba sin `from`, y el bot
+// guardaba su conversación bajo la clave literal `undefined`. Medido en
+// producción el 22-sep: UNA conversación llamada "undefined" con 12 mensajes.
+//
+// Y el daño no era solo cosmético: TODOS esos clientes caían en la MISMA
+// conversación, así que el bot leía el historial de uno y le contestaba a otro.
+// Se ve en los mensajes reales: al segundo cliente que escribió "Hola, quiero
+// más información" le respondió "Ya te he dado todos los detalles técnicos y el
+// catálogo, para no dar más vueltas...". A un cliente nuevo. Su primer mensaje.
+//
+// Sin `aplicar=1` solo muestra qué haría.
+// ============================================================================
+app.get("/limpiar-conversaciones-rotas", (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const todas = store.todasLasConversaciones();
+  // Claves que no son ni un teléfono ni un BSUID: basura del bug.
+  const rotas = Object.keys(todas).filter(
+    (k) => k === "undefined" || k === "null" || k === "" || k === "false"
+  );
+
+  const detalle = rotas.map((k) => ({
+    clave: k,
+    mensajes: (todas[k]?.messages || []).length,
+    primero: todas[k]?.messages?.[0]?.content?.slice(0, 60),
+  }));
+
+  const out = {
+    conversacionesTotales: Object.keys(todas).length,
+    rotasEncontradas: rotas.length,
+    detalle,
+    porQue:
+      "Estas conversaciones son de clientes con nombre de usuario de WhatsApp que entraron " +
+      "antes del arreglo. Todos quedaron mezclados en la misma, así que el bot le contestaba " +
+      "a uno con el historial de otro. Ya no se puede saber quién era cada uno: el identificador " +
+      "se perdió. Borrarlas evita que el bot siga arrastrando ese historial.",
+  };
+
+  if (req.query.aplicar === "1") {
+    for (const k of rotas) store.borrarConversacion(k);
+    out.aplicado = true;
+    out.nota = `🟢 Borradas ${rotas.length} conversación(es) rota(s).`;
+    anotarEvento({ tipo: "conversaciones-rotas-borradas", cuantas: rotas.length });
+  } else {
+    out.nota = rotas.length
+      ? "PREVISUALIZACIÓN: no se borró nada. Para aplicarlo agregá &aplicar=1 a la URL."
+      : "🟢 No hay conversaciones rotas. Nada que limpiar.";
+  }
+
+  res.json(out);
+});
+
 // Pedidos en CSV, para tener una copia propia fuera de Render
 app.get("/pedidos.csv", (req, res) => {
   if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
@@ -1161,14 +1218,25 @@ async function handleWebhook(body) {
         if (order) store.marcarComprado(from);
 
         if (order && OWNER) {
+          // 🔴 Si el pedido no tiene celular, el aviso lo dice PRIMERO y fuerte.
+          // Un pedido sin teléfono no se puede despachar: la transportadora lo
+          // exige para la guía. Si esto va al final o en letra chica, el dueño
+          // lo despacha igual y el paquete se pierde o la guía se rechaza.
+          const alerta = order.sinTelefono
+            ? `🔴🔴 OJO: ESTE PEDIDO NO TIENE CELULAR\n` +
+              `El cliente usa nombre de usuario de WhatsApp, así que no tenemos su número.\n` +
+              `⛔ NO LO DESPACHES: pedile el celular por el chat primero.\n\n`
+            : "";
           await sendText(
             OWNER,
-            `🟢 NUEVO PEDIDO BikerPro\n` +
-              `Nombre: ${order.nombre}\nCel: ${order.celular}\n` +
+            alerta +
+              `🟢 NUEVO PEDIDO BikerPro\n` +
+              `Nombre: ${order.nombre}\nCel: ${order.celular || "🔴 FALTA"}\n` +
               `Ciudad: ${order.ciudad}\nDir: ${order.direccion}\n` +
               `Color: ${order.color} · Talla: ${order.talla}\n` +
               `Total al recibir: $${Number(order.total).toLocaleString("es-CO")}\n` +
-              `Chat: ${order.telefono_chat}`
+              `Chat: ${order.telefono_chat}` +
+              (order.celularDelChat ? `\n(el celular se tomó del número por el que escribe)` : "")
           );
         }
         if (handoff && OWNER) {
