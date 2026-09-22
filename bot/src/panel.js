@@ -133,6 +133,24 @@ function render() {
         .join("")
     : `<p class="vacio">Todavía no ha escrito nadie. Cuando entre el primer cliente aparece acá.</p>`;
 
+  // Estado de la persistencia. Antes esta advertencia era FIJA, y una vez
+  // montado el disco pasó a ser falsa — peor que no avisar, porque enseña a
+  // ignorar los avisos. Ahora refleja la realidad y sirve para verificar de un
+  // vistazo que el disco quedó bien configurado.
+  const persistente = Boolean(process.env.DATA_DIR);
+  const avisoDatos = persistente
+    ? `<div class="aviso ok">
+         💾 <b>Los pedidos se guardan en disco persistente</b> (<code>${esc(process.env.DATA_DIR)}</code>).
+         Sobreviven a los despliegues y reinicios. Además cada pedido queda en el log
+         de Render como <code>PEDIDO_JSON</code>, por si acaso.
+       </div>`
+    : `<div class="aviso">
+         ⚠️ <b>DATA_DIR no está configurado: estos datos se borran en el próximo despliegue.</b>
+         Montá un disco persistente en Render (Settings → Disks, mount <code>/var/data</code>)
+         y poné <code>DATA_DIR=/var/data</code>. Mientras tanto, anotá los pedidos aparte —
+         aunque cada uno también queda en el log como <code>PEDIDO_JSON</code>.
+       </div>`;
+
   return `<!doctype html>
 <html lang="es"><head>
 <meta charset="utf-8">
@@ -170,6 +188,8 @@ function render() {
   .hora{font-size:10px;color:#8b93a4;margin-top:3px}
   .wa{display:inline-block;margin-top:10px;font-size:13px;color:#3ddc84;text-decoration:none}
   .aviso{background:#3a2d0c;border:1px solid #6b5416;color:#ffd479;padding:11px 13px;border-radius:10px;font-size:13px;margin-bottom:14px}
+  .aviso.ok{background:#12351f;border-color:#1d6b3d;color:#8ff0b5}
+  code{background:#0b0d11;padding:1px 5px;border-radius:4px;font-size:12px}
 </style></head>
 <body>
 <header>
@@ -177,11 +197,7 @@ function render() {
   <div class="sub2">+57 322 7545695 · se refresca cada 30 segundos</div>
 </header>
 <main>
-  <div class="aviso">
-    ⚠️ <b>Estos datos se borran en cada despliegue del bot.</b> Se guardan en el disco de
-    Render, que es temporal. Si hay pedidos importantes, anotalos aparte hasta que
-    conectemos una base de datos.
-  </div>
+  ${avisoDatos}
   ${tarjetas}
   <h2>Pedidos</h2>
   <table>
