@@ -85,9 +85,68 @@ app.get("/probar", async (req, res) => {
 });
 
 // Suscripción manual de la WABA (visita esta URL una vez para forzarla)
-app.get("/setup-waba", async (_req, res) => {
-  await subscribeWaba();
-  res.send("Suscripción de WABA ejecutada. Revisa los logs de Render para ver el resultado.");
+// ============================================================================
+// GET /setup-waba?token=...  — suscribe la WABA y DIAGNOSTICA la conexión
+//
+// Antes solo escribía el resultado en el log de Render, así que para saber si
+// el token servía había que entrar a mirar los logs a mano. Ahora devuelve el
+// diagnóstico completo en la respuesta:
+//   · si el token es válido y tiene los permisos
+//   · QUÉ número quedó conectado (para no confundir el de prueba con el real)
+//   · el estado de calidad del número
+//
+// 🔒 Protegido con WHATSAPP_VERIFY_TOKEN porque hace una ESCRITURA (suscribe la
+//    app a la WABA). No debe quedar abierto.
+// 🔑 NUNCA devuelve el token, solo si funciona o no.
+// ============================================================================
+app.get("/setup-waba", async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const out = {
+    variables: {
+      WHATSAPP_TOKEN: WA_TOKEN ? `configurado (${WA_TOKEN.length} caracteres)` : "🔴 FALTA",
+      WHATSAPP_PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID || "🔴 FALTA",
+      WHATSAPP_WABA_ID: WABA_ID || "🔴 FALTA",
+    },
+  };
+
+  if (!WA_TOKEN) {
+    out.diagnostico = "Falta WHATSAPP_TOKEN en Render. Sin eso el bot no puede responder.";
+    return res.json(out);
+  }
+
+  // 1. ¿Qué número está conectado? Confirma que el Phone Number ID es el correcto.
+  const pnid = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (pnid) {
+    try {
+      const r = await fetch(
+        `https://graph.facebook.com/v21.0/${pnid}?fields=display_phone_number,verified_name,quality_rating,platform_type`,
+        { headers: { Authorization: `Bearer ${WA_TOKEN}` } }
+      );
+      out.numero = { http: r.status, ...(await r.json()) };
+    } catch (e) {
+      out.numero = { error: e.message };
+    }
+  }
+
+  // 2. Suscribir la app a la WABA para que Meta entregue los mensajes al webhook.
+  try {
+    const r = await fetch(`https://graph.facebook.com/v21.0/${WABA_ID}/subscribed_apps`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${WA_TOKEN}` },
+    });
+    out.suscripcion = { http: r.status, ...(await r.json().catch(() => ({}))) };
+  } catch (e) {
+    out.suscripcion = { error: e.message };
+  }
+
+  const numeroOk = out.numero && out.numero.http === 200;
+  const subOk = out.suscripcion && out.suscripcion.success === true;
+  out.diagnostico = numeroOk && subOk
+    ? `🟢 LISTO. Número conectado: ${out.numero.display_phone_number} (${out.numero.verified_name}). Los mensajes ya llegan al webhook.`
+    : "🔴 Algo falló. Mirá 'numero' y 'suscripcion' arriba: si dan error 190 el token está vencido o mal copiado; si dan 100 el Phone Number ID o el WABA ID no corresponden a este token.";
+
+  res.json(out);
 });
 
 // Verificación del webhook (Meta)
