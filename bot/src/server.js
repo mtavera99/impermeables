@@ -177,6 +177,69 @@ app.get("/setup-waba", async (req, res) => {
 });
 
 // ============================================================================
+// GET /catalogos?token=...
+//
+// POR QUÉ: en el export del agente viejo, 3.280 conversaciones (52%) mostraban
+// productos de un catálogo. Ese catálogo vive en el PORTAFOLIO COMERCIAL, no en
+// el número, así que sobrevivió al cambio de número y se puede reutilizar.
+//
+// Lo que hace falta para que el bot mande productos:
+//   1. el `catalog_id` del catálogo
+//   2. el `retailer_id` (SKU) de cada producto — ⚠️ NO es el product_id numérico
+//      que aparece en el export; la API pide el retailer_id que definiste vos
+//   3. que el catálogo esté CONECTADO a la WABA
+//
+// Esto averigua las tres cosas y avisa si al token le falta permiso.
+// ============================================================================
+app.get("/catalogos", async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (!WA_TOKEN) return res.status(400).json({ error: "Falta WHATSAPP_TOKEN." });
+
+  const g = async (path) => {
+    try {
+      const r = await fetch(`https://graph.facebook.com/v21.0/${path}`, {
+        headers: { Authorization: `Bearer ${WA_TOKEN}` },
+      });
+      return { http: r.status, ...(await r.json().catch(() => ({}))) };
+    } catch (e) {
+      return { error: e.message };
+    }
+  };
+
+  const out = {};
+
+  // ¿Hay un catálogo ya conectado a la WABA? Es lo que permite mandar productos.
+  out.catalogoConectadoALaWaba = await g(`${WABA_ID}/product_catalogs`);
+
+  // Catálogos del portafolio comercial (donde deberían estar los viejos)
+  const bizId = process.env.META_BUSINESS_ID || "1271452296042859";
+  out.catalogosDelNegocio = await g(`${bizId}/owned_product_catalogs?fields=id,name,product_count`);
+
+  // Si encontramos un catálogo, traemos sus productos CON el retailer_id
+  const cat =
+    out.catalogoConectadoALaWaba?.data?.[0]?.id ||
+    out.catalogosDelNegocio?.data?.[0]?.id ||
+    req.query.catalog_id;
+  if (cat) {
+    out.catalogoUsado = cat;
+    out.productos = await g(
+      `${cat}/products?fields=retailer_id,name,price,availability,image_url&limit=25`
+    );
+  }
+
+  const permisoFalta =
+    out.catalogosDelNegocio?.error?.code === 200 ||
+    out.catalogosDelNegocio?.error?.type === "OAuthException";
+  out.diagnostico = permisoFalta
+    ? "🟡 El token no tiene permiso para leer catálogos. Hay que agregarle 'catalog_management' (y darle el activo del catálogo al usuario de sistema 'BikerPro Bot')."
+    : out.productos?.data?.length
+    ? `🟢 Catálogo ${cat} con ${out.productos.data.length} productos legibles. Los 'retailer_id' de abajo son los que usa la API para mandar productos.`
+    : "🟡 No se encontró catálogo conectado. Hay que vincularlo a la WABA en el Administrador de WhatsApp.";
+
+  res.json(out);
+});
+
+// ============================================================================
 // GET /enviar-prueba?token=...&to=573138615813[&msg=...]
 //
 // POR QUÉ EXISTE: hasta acá lo único que teníamos era Meta diciendo que el
