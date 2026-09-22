@@ -184,6 +184,10 @@ function detectMediaIntent(text) {
   if (has(["catalogo", "catálogo", "catalogos", "catálogos", "que mas tienen",
            "qué más tienen", "otros productos", "mas productos", "más productos",
            "variedad", "lista de productos"])) keys.push("catalogo");
+  // Los otros productos del catálogo, por nombre
+  if (has(["colmena", "premium", "gama alta", "forro"])) keys.push("colmena");
+  if (has(["reflectiv", "doble faz", "que brille", "se vea de noche"])) keys.push("reflectiva");
+  if (has(["guante", "guantes"])) keys.push("guantes");
   if (has(["puesto", "puesta", "modelo", "se ve", "persona"])) keys.push("modelo");
   if (t.includes("video")) keys.push("video");
   // Foto del producto: solo si NO pidió un color específico
