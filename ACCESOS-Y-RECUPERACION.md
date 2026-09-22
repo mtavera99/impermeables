@@ -135,14 +135,21 @@ valor_comercial · estado_del_envio · fecha_actualizacion · aplica_contrapago 
 |---|---|
 | **App de Meta** | **`BikerPro Bot`** — `app_id 1338086151301765` · modo **Publicada** |
 | Portafolio comercial | `1271452296042859` (el mismo de Ads) |
-| **WhatsApp Business Account ID** | **`2213159576112051`** |
-| **Número de prueba** | `+1 555 160-4132` · Phone Number ID **`1257126177474870`** |
-| Calidad del número de prueba | GREEN · `platform_type: CLOUD_API` |
-| Destinatario autorizado | el celular del dueño (los números de prueba solo hablan con una lista) |
+| **WhatsApp Business Account ID** | **`1345319974418244`** ✅ verificado en vivo 22-sep |
+| **Número del bot** | **`+57 322 7545695`** ("Biker") · Phone Number ID **`1234151273126000`** |
+| Estado del número | **CONNECTED** · `code_verification_status: VERIFIED` · calidad **GREEN** · `CLOUD_API` |
+| Nombre para mostrar | ⚠️ `name_status: NON_EXISTS` — **"Biker" no está aprobado por Meta.** Pendiente de enviar |
 | **Servicio del bot** | **`https://bikerpro-bot.onrender.com`** (Render, plan Starter $7/mes) |
-| Webhook | `https://bikerpro-bot.onrender.com/webhook` · campo **`messages`** suscrito |
-| Verify token | `bikerpro_verify_2026` (está en `WHATSAPP_VERIFY_TOKEN` de Render) |
+| Webhook | `https://bikerpro-bot.onrender.com/webhook` · campo **`messages`** suscrito ✅ |
+| Verify token (solo para Meta) | vive en `WHATSAPP_VERIFY_TOKEN` de Render. **El valor no se escribe acá** |
+| **Contraseña del panel** | vive en `PANEL_TOKEN` de Render. **El valor no se escribe acá** |
 | Modelo de IA | Gemini `gemini-3.1-flash-lite` · clave **IMPERMEABLE BOT** |
+
+> ⛔ **Lo que este documento decía antes y era falso:** que el bot corría en el **número
+> de prueba `+1 555 160-4132`** (Phone Number ID `1257126177474870`, WABA
+> `2213159576112051`). Eso ya no es cierto: el bot está en un **número colombiano real** y
+> en otra WABA. Los valores de arriba salen de consultar `/setup-waba` en producción el
+> 22-sep, no de la memoria de una sesión.
 
 ⚠️ **La app "Kiro" (`28212160735114123`) NO es esta.** Esa es solo para leer Meta Ads
 y está en modo desarrollo. Son dos apps distintas y no hay que mezclarlas.
@@ -163,12 +170,29 @@ AI_PROVIDER=gemini                 (opcional: es el default)
 GEMINI_API_KEY=<secreto>
 GEMINI_MODEL=gemini-3.1-flash-lite (opcional: es el default)
 MAX_HISTORIAL=8                    (opcional: es el default)
-WHATSAPP_VERIFY_TOKEN=bikerpro_verify_2026
+WHATSAPP_VERIFY_TOKEN=<secreto>   (el que también está puesto en Meta)
+PANEL_TOKEN=<secreto>             🔐 la contraseña del panel — ver abajo
 WHATSAPP_TOKEN=<secreto>
-WHATSAPP_PHONE_NUMBER_ID=1257126177474870
-WHATSAPP_WABA_ID=2213159576112051
+WHATSAPP_PHONE_NUMBER_ID=1234151273126000
+WHATSAPP_WABA_ID=1345319974418244
 OWNER_WHATSAPP=573138615813
 ```
+
+### 🔴 `PANEL_TOKEN`: LA PUERTA DE LA CASA
+
+`PANEL_TOKEN` es lo único que protege `/panel` (las conversaciones, con nombre,
+dirección y teléfono de **todos** los clientes), `/pedidos.csv` (la base de clientes
+completa) y `/responder` (**escribirle a un cliente haciéndose pasar por BikerPro**).
+
+**Qué pasó el 22-sep:** ese secreto era el mismo `WHATSAPP_VERIFY_TOKEN`, y su valor
+estaba escrito en **5 archivos de este repo, que es público**. Cualquiera podía leerlo en
+GitHub y abrir el panel desde cualquier parte del mundo.
+
+⛔ **Borrarlo de los archivos NO alcanza: el valor viejo queda en el historial de Git,
+que es público para siempre.** Por eso hay que *cambiarlo*, no solo borrarlo.
+
+**Regla que queda:** el valor de `PANEL_TOKEN` vive **solo** en Render y en el gestor de
+contraseñas. Nunca en un archivo, un comando de ejemplo, ni un mensaje de chat.
 
 ### 🔴 EL TOKEN DE WHATSAPP: EL PERMANENTE, NO EL DE API SETUP
 
@@ -191,7 +215,7 @@ día para otro y no hubo ningún cambio, **es eso**. Es el fallo más probable.
 ### Cómo verificar que todo está conectado (sin revelar el token)
 
 ```
-https://bikerpro-bot.onrender.com/setup-waba?token=bikerpro_verify_2026
+https://bikerpro-bot.onrender.com/setup-waba?token=TU_PANEL_TOKEN
 ```
 
 Devuelve qué número está conectado, su calidad, y si la WABA está suscrita al
@@ -201,7 +225,7 @@ webhook. Traduce los errores de Meta: **190** = token vencido o mal copiado ·
 ### Cómo verificar que el GUION cotiza bien
 
 ```bash
-node bot/probar-guion.js https://bikerpro-bot.onrender.com bikerpro_verify_2026
+node bot/probar-guion.js https://bikerpro-bot.onrender.com TU_PANEL_TOKEN
 ```
 
 11 casos que ya costaron plata. **Correrlo dos veces**: la IA no es determinista,

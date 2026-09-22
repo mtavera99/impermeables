@@ -20,6 +20,13 @@
 //      pedidos. No confiar en el WhatsApp del dueño.
 // ============================================================================
 
+// La contraseña del panel. Se prefiere PANEL_TOKEN y se cae a
+// WHATSAPP_VERIFY_TOKEN solo por compatibilidad: ver la explicación larga en
+// server.js (el valor viejo quedó publicado en el repo, que es público).
+function panelToken() {
+  return process.env.PANEL_TOKEN || process.env.WHATSAPP_VERIFY_TOKEN || "";
+}
+
 const store = require("./store");
 const resumen = require("./resumen");
 const atencion = require("./atencion");
@@ -91,7 +98,7 @@ function numeroDelBot() {
 }
 
 function render(aviso) {
-  const tk = process.env.WHATSAPP_VERIFY_TOKEN || "";
+  const tk = panelToken();
   const numBot = numeroDelBot();
   const convs = store.todasLasConversaciones();
   const pedidos = store.todosLosPedidos();
@@ -177,10 +184,10 @@ function render(aviso) {
     ${hoy.cierreTopado ? `<p class="nota">* Hay más pedidos que conversaciones de hoy: alguien escribió ayer y confirmó hoy. El cierre se topa en 100%.</p>` : ""}
     ${hoy.topCiudades.length ? `<p class="nota">📍 ${hoy.topCiudades.map(([c, n]) => `${esc(c)} <b>${n}</b>`).join(" · ")}</p>` : ""}
     <div class="acciones">
-      <a class="btn destacado" href="/guias?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">📦 Enviar guías (subir el PDF)</a>
-      <a class="btn" href="/pedidos.csv?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">⬇️ Descargar pedidos (CSV)</a>
-      <a class="btn" href="/cierre?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}&enviar=1">📲 Mandarme el cierre por WhatsApp</a>
-      <a class="btn" href="/limpiar-duplicados?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">🧹 Revisar pedidos duplicados</a>
+      <a class="btn destacado" href="/guias?token=${esc(panelToken())}">📦 Enviar guías (subir el PDF)</a>
+      <a class="btn" href="/pedidos.csv?token=${esc(panelToken())}">⬇️ Descargar pedidos (CSV)</a>
+      <a class="btn" href="/cierre?token=${esc(panelToken())}&enviar=1">📲 Mandarme el cierre por WhatsApp</a>
+      <a class="btn" href="/limpiar-duplicados?token=${esc(panelToken())}">🧹 Revisar pedidos duplicados</a>
     </div>`;
 
   const filasPedidos = pedidos.length
