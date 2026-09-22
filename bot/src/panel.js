@@ -52,7 +52,8 @@ function hace(ms) {
   return `hace ${Math.floor(h / 24)} d`;
 }
 
-function render() {
+function render(aviso) {
+  const tk = process.env.WHATSAPP_VERIFY_TOKEN || "";
   const convs = store.todasLasConversaciones();
   const pedidos = store.todosLosPedidos();
 
@@ -143,14 +144,29 @@ function render() {
                  </div>`
             )
             .join("");
-          return `<details class="conv">
+          return `<details class="conv" id="c${esc(x.tel)}">
             <summary>
               <span class="tel">+${esc(x.tel)}</span>
               ${etiquetas}
               <span class="meta">${x.msgs.filter((m) => m.role === "user").length} msg · ${esc(hace(x.cuando))}</span>
             </summary>
             <div class="chat">${burbujas}</div>
-            <a class="wa" target="_blank" href="https://wa.me/${esc(x.tel)}">Abrir en WhatsApp para responder →</a>
+            <form class="resp" method="POST" action="/responder">
+              <input type="hidden" name="token" value="${esc(tk)}">
+              <input type="hidden" name="to" value="${esc(x.tel)}">
+              <textarea name="texto" rows="2" placeholder="Escribile como BikerPro… (sale del +57 322 7545695, no de tu WhatsApp)"></textarea>
+              <button type="submit">Enviar como BikerPro</button>
+            </form>
+            <form class="pausa" method="POST" action="/pausar">
+              <input type="hidden" name="token" value="${esc(tk)}">
+              <input type="hidden" name="tel" value="${esc(x.tel)}">
+              <input type="hidden" name="valor" value="${x.c.paused ? "0" : "1"}">
+              <button type="submit" class="${x.c.paused ? "verde" : ""}">${
+                x.c.paused
+                  ? "▶️ Devolverle el chat al bot"
+                  : "⏸️ Silenciar el bot en este chat"
+              }</button>
+            </form>
           </details>`;
         })
         .join("")
@@ -209,7 +225,15 @@ function render() {
   .msg.cli{align-self:flex-start;background:#222834}
   .msg.bot{align-self:flex-end;background:#124b33}
   .hora{font-size:10px;color:#8b93a4;margin-top:3px}
-  .wa{display:inline-block;margin-top:10px;font-size:13px;color:#3ddc84;text-decoration:none}
+  .resp{margin-top:10px;display:flex;gap:6px;align-items:flex-start}
+  .resp textarea{flex:1;background:#0f1319;border:1px solid #2d3542;color:#e7e9ee;border-radius:8px;padding:8px;font:13px/1.4 inherit;resize:vertical}
+  .resp button{background:#12693f;border:0;color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap}
+  .pausa{margin-top:6px}
+  .pausa button{background:#2a313d;border:1px solid #3a4250;color:#c8cfdd;padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer}
+  .pausa button.verde{background:#12351f;border-color:#1d6b3d;color:#8ff0b5}
+  .res{padding:10px 13px;border-radius:10px;margin-bottom:12px;font-size:13px}
+  .res.ok{background:#12351f;border:1px solid #1d6b3d;color:#8ff0b5}
+  .res.mal{background:#3a1414;border:1px solid #6b1616;color:#ffb3b3}
   .aviso{background:#3a2d0c;border:1px solid #6b5416;color:#ffd479;padding:11px 13px;border-radius:10px;font-size:13px;margin-bottom:14px}
   .aviso.ok{background:#12351f;border-color:#1d6b3d;color:#8ff0b5}
   code{background:#0b0d11;padding:1px 5px;border-radius:4px;font-size:12px}
@@ -227,6 +251,7 @@ function render() {
   <div class="sub2">+57 322 7545695 · se refresca cada 30 segundos</div>
 </header>
 <main>
+  ${aviso || ""}
   ${avisoDatos}
   ${tarjetas}
   <h2>Pedidos (todos)</h2>
