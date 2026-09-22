@@ -1,0 +1,46 @@
+name: Verificar a que numero apuntan los anuncios
+
+# ══════════════════════════════════════════════════════════════════════════════
+# El bot atiende el +57 322 7545695. El numero viejo (+57 313 8615813) ya NO
+# tiene quien atienda. Un conjunto que siga apuntando al viejo trae gente pagada
+# a un WhatsApp donde nadie responde: la pauta se gasta y la venta se pierde.
+#
+# Este workflow lo revisa contra la API y lo dice en una tabla. Se corre a mano
+# cada vez que se crean o duplican conjuntos.
+#
+# SOLO LECTURA: usa el token de rol Analista, que Meta rechaza para escrituras.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      cuenta:
+        description: "Cuenta publicitaria (act_...). Vacio = la de BikerPro."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Revisar el numero de destino de cada anuncio
+        env:
+          META_ADS_TOKEN: ${{ secrets.META_ADS_TOKEN }}
+          CUENTA: ${{ github.event.inputs.cuenta }}
+        run: |
+          if [ -z "$META_ADS_TOKEN" ]; then
+            echo "::error::Falta el secreto META_ADS_TOKEN."
+            exit 1
+          fi
+          python3 analisis/verificar-numeros-anuncios.py $CUENTA | tee salida.txt
+
+          # Si hay anuncios activos apuntando al numero viejo, dejarlo como
+          # advertencia visible en el resumen del run, no enterrado en el log.
+          if grep -q "QUEMANDO PLATA" salida.txt; then
+            echo "::warning::Hay anuncios ACTIVOS apuntando al numero viejo. Revisa el log."
+          fi
