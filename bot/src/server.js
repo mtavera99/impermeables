@@ -6,6 +6,7 @@ const { MEDIA } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
 const panel = require("./panel");
+const audio = require("./audio");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const app = express();
@@ -547,9 +548,49 @@ async function handleWebhook(body) {
         anotarEvento({ tipo: "entrante", de: m.from, clase: m.type, texto: m.text?.body?.slice(0, 80) });
       }
       for (const msg of messages) {
-        if (msg.type !== "text") continue; // por ahora solo texto
         const from = msg.from;
-        const text = msg.text?.body?.trim();
+        let text = msg.text?.body?.trim();
+
+        // 🎙️ NOTAS DE VOZ — medido en el export: 439 conversaciones (7%) las usan
+        // y 814 las mandó un cliente. Y preguntan justo lo que cierra: talla, 2
+        // unidades, material. Antes se ignoraban en silencio y el cliente quedaba
+        // esperando para siempre. Se transcriben y entran al MISMO flujo que un
+        // mensaje escrito, así respetan todas las reglas de precio del guion.
+        if ((msg.type === "audio" || msg.type === "voice") && from) {
+          const mediaId = msg.audio?.id || msg.voice?.id;
+          const t0 = Date.now();
+          const r = mediaId
+            ? await audio.transcribirNotaDeVoz(mediaId)
+            : { ok: false, error: "el mensaje de audio no trae id de medios" };
+
+          if (r.ok) {
+            text = r.texto;
+            anotarEvento({ tipo: "audio-transcrito", de: from, texto: text.slice(0, 120), ms: Date.now() - t0 });
+            console.log(`🎙️ Audio de ${from} transcrito en ${Date.now() - t0}ms: "${text.slice(0, 90)}"`);
+          } else {
+            anotarEvento({ tipo: "audio-fallido", de: from, error: String(r.error).slice(0, 160) });
+            console.error(`🔴 No se pudo transcribir el audio de ${from}: ${r.error}`);
+            // Nunca dejar al cliente sin respuesta: se le pide por escrito.
+            await sendText(
+              from,
+              "Te escuché a medias, se me cortó el audio 🙈 ¿Me lo escribís? Así te respondo bien y no te hago repetir."
+            );
+            continue;
+          }
+        }
+
+        // Imágenes y otros tipos: el bot no los procesa todavía, pero ya no se
+        // ignoran en silencio. Antes el cliente mandaba una foto y nadie contestaba.
+        if (!text && from && msg.type !== "text") {
+          anotarEvento({ tipo: "no-soportado", de: from, clase: msg.type });
+          console.log(`(${from}) mandó un ${msg.type}, que el bot todavía no procesa.`);
+          await sendText(
+            from,
+            "Recibí tu mensaje 🙌 Todavía no puedo abrir ese tipo de archivo. ¿Me contás por escrito qué necesitás?"
+          );
+          continue;
+        }
+
         if (!text) continue;
 
         // Si pide que no le escriban mas, se respeta para siempre y se saca
