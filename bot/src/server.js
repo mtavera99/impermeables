@@ -5,6 +5,8 @@ const { sendText, sendImage, sendVideo, sendCatalog, catalogoActivo } = require(
 const { MEDIA } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
+const panel = require("./panel");
+const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const app = express();
 app.use(express.json());
@@ -32,6 +34,27 @@ async function subscribeWaba() {
     console.error("subscribeWaba error:", e.message);
   }
 }
+
+// ============================================================================
+// GET /panel?token=...  — las conversaciones y los pedidos, en una página
+//
+// El dueño preguntó dónde ve los mensajes que van a entrar. No había dónde:
+// /eventos es JSON técnico y se borra en cada despliegue. Esto muestra las
+// conversaciones completas, los pedidos cerrados y quién está esperando a un
+// humano, con un enlace directo a WhatsApp para responder.
+// ============================================================================
+app.get("/panel", (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) {
+    return res
+      .status(403)
+      .send("<h3>Falta el token.</h3><p>Usá /panel?token=TU_WHATSAPP_VERIFY_TOKEN</p>");
+  }
+  try {
+    res.set("Content-Type", "text/html; charset=utf-8").send(panel.render());
+  } catch (e) {
+    res.status(500).send("Error armando el panel: " + esc(e.message));
+  }
+});
 
 // Salud
 app.get("/", (_req, res) => res.send("BikerPro bot activo 🏍️"));
