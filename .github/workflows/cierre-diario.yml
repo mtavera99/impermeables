@@ -1,0 +1,89 @@
+name: Cierre diario de ventas
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Manda el resumen de ventas del día al WhatsApp del dueño.
+#
+# POR QUÉ UN GITHUB ACTION Y NO UN TEMPORIZADOR DENTRO DEL BOT:
+# el servicio de Render se reinicia con cada despliegue, y un `setInterval` se
+# reinicia con él. Si el reinicio cae sobre la hora del cierre, ese día no sale.
+# Un Action corre aparte y no depende del estado del bot.
+#
+# 🔴 LÍMITE DE META, YA COMPROBADO: un mensaje que INICIA el negocio solo se
+# entrega si hay una ventana de 24h abierta con ese número (o con plantilla
+# aprobada). Si el dueño no le escribió nada al bot ese día, Meta lo acepta y lo
+# descarta — pasó hoy con un mensaje de prueba (ok:true con wamid, nunca llegó).
+#   → Por eso el resumen SIEMPRE se imprime en el log del Action. Aunque el
+#     WhatsApp no llegue, el cierre queda disponible acá.
+#   → Truco mientras no haya plantilla: escribirle cualquier cosa al bot en el
+#     día abre la ventana y el cierre llega.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  schedule:
+    # 17:05 Bogotá = 22:05 UTC. Bogotá es UTC−5 fijo (no hay horario de verano),
+    # así que la conversión no cambia en el año.
+    - cron: "5 22 * * *"
+  workflow_dispatch:      # botón manual, sirve desde la app de GitHub en el celular
+    inputs:
+      dia:
+        description: "Día a cerrar (YYYY-MM-DD). Vacío = hoy en Bogotá."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  cierre:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pedir el cierre al bot y mandarlo por WhatsApp
+        env:
+          BOT_URL: ${{ secrets.BOT_URL }}
+          BOT_TOKEN: ${{ secrets.BOT_VERIFY_TOKEN }}
+          DIA: ${{ github.event.inputs.dia }}
+        run: |
+          if [ -z "$BOT_URL" ] || [ -z "$BOT_TOKEN" ]; then
+            echo "::error::Faltan los secretos BOT_URL y/o BOT_VERIFY_TOKEN del repositorio."
+            exit 1
+          fi
+
+          URL="$BOT_URL/cierre?token=$BOT_TOKEN&enviar=1"
+          [ -n "$DIA" ] && URL="$URL&dia=$DIA"
+
+          echo "Pidiendo el cierre..."
+          # --max-time alto: Render puede tardar en despertar si estuvo inactivo
+          CODE=$(curl -s -o respuesta.json -w "%{http_code}" --max-time 90 "$URL" || echo "000")
+          echo "HTTP $CODE"
+
+          if [ "$CODE" != "200" ]; then
+            echo "::error::El bot respondió HTTP $CODE"
+            cat respuesta.json || true
+            exit 1
+          fi
+
+          echo "───────────── CIERRE DEL DÍA ─────────────"
+          python3 -c "
+          import json
+          d = json.load(open('respuesta.json'))
+          print(d.get('texto', '(sin texto)'))
+          print()
+          e = d.get('envio')
+          if e:
+              print('Envío a WhatsApp:', 'OK' if e.get('ok') else 'FALLÓ')
+              print(' ', e.get('detalle', ''))
+              print(' ', e.get('nota', ''))
+          else:
+              print('No se intentó enviar.')
+          "
+          echo "──────────────────────────────────────────"
+
+          # El Action no falla si el WhatsApp no se entregó: el resumen ya quedó
+          # arriba en el log, que es el objetivo mínimo.
+          python3 -c "
+          import json, sys
+          d = json.load(open('respuesta.json'))
+          e = d.get('envio') or {}
+          if not e.get('ok'):
+              print('::warning::El cierre no se pudo entregar por WhatsApp. Está en el log de arriba.')
+          "
