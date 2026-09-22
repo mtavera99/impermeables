@@ -53,8 +53,12 @@ Fuentes: [voltade](https://voltade.com/learn/whatsapp/template-message-best-prac
 4. Elegís **categoría**, **nombre** e **idioma**: **Español**
 5. Pegás el cuerpo, llenás **Agregar ejemplo**, y **Enviar**
 
-⚠️ **Idioma:** elegí **Español** (o *Español (Colombia)* si aparece). Tiene que ser **el
-mismo idioma** que después use el bot, o el envío falla aunque la plantilla esté aprobada.
+⚠️ **Idioma: `Spanish (COL)`** — es el que ya se usó en la primera plantilla. **Todas las
+demás tienen que ir en el mismo**, porque en el código el idioma es `es_CO` y si una
+plantilla está en otro idioma el envío falla aunque esté aprobada.
+
+🔗 **El enlace que funciona** (el que abrió el dueño):
+`business.facebook.com/latest/whatsapp_manager/message_templates?business_id=1271452296042859`
 
 ---
 
@@ -64,32 +68,57 @@ mismo idioma** que después use el bot, o el envío falla aunque la plantilla es
 
 Es la que te deja mandarle la guía a un cliente que escribió hace más de un día.
 
-| campo | valor |
+## ✅ ESTA YA SE ENVIÓ — así quedó de verdad (22-sep, 14:30)
+
+Lo de abajo **no es la propuesta: es lo que está en revisión en Meta.** Importa que quede
+exacto, porque el código tiene que coincidir con la plantilla o el envío falla.
+
+| campo | valor real |
 |---|---|
 | **Categoría** | **Utilidad** |
 | **Nombre** | `guia_de_envio` |
-| **Idioma** | Español |
-| **Encabezado** | **Documento** *(acá va el PDF de la guía)* |
+| **Idioma** | **Spanish (COL)** → en la API es **`es_CO`**, no `es` |
+| **Encabezado** | **Documento** (con un PDF de muestra subido) |
+| **Variables** | **NINGUNA** |
+| **Pie / Botones** | vacíos |
 
-**Cuerpo** — pegá esto tal cual:
+**Cuerpo, textual:**
 
 ```
-Hola {{1}}, tu pedido de BikerPro ya fue despachado. Guia {{2}} con {{3}}. Llega en 1 a 3 dias habiles y pagas al recibir. Adjuntamos la guia en PDF.
+Tu pedido de BikerPro ya fue despachado. Adjuntamos la guia de envio en PDF. Llega en 1 a 3 dias habiles y pagas al recibir.
 ```
 
-**Ejemplos** (para el botón *Agregar ejemplo*):
+### 🔑 Por qué quedó SIN variables
 
-| variable | ejemplo |
-|---|---|
-| `{{1}}` | `Juan Perez` |
-| `{{2}}` | `240012345678` |
-| `{{3}}` | `Interrapidisimo` |
+La primera versión llevaba `{{1}}` nombre, `{{2}}` guía y `{{3}}` transportadora. Se
+quitaron las tres, y fue una mejora, no una renuncia:
 
-> ✅ **Por qué esta pasa como Utilidad:** solo informa el estado de un pedido que ya existe.
+- **El número de guía y la transportadora ya van impresos dentro del PDF** que se adjunta.
+  Repetirlos en el texto no agrega información.
+- **Cada variable es un motivo más de rechazo.** Meta tiene una regla de proporción
+  (demasiadas variables para el largo del texto) que se disparó con 3 en una frase corta.
+- Sin variables **no hay que llenar las "Muestras de variables"**, que es el paso que más se
+  salta y otra causa común de rechazo.
+- Y para el código es más simple: se manda **solo el documento**, sin parámetros de cuerpo.
+
+**Lo único que pierde es el saludo por el nombre.** No importa: el cliente acaba de recibir
+su propio PDF, y en cuanto responda cualquier cosa se abre la ventana de 24 h y el bot le
+habla normal.
+
+### ⚠️ Dos trampas de la interfaz, para no repetirlas
+
+1. **El botón `Agregar variable` mete el `{{1}}` donde está el cursor.** Quedó al principio
+   del cuerpo (`{{1}}Hello`) y Meta lo rechaza: *las variables no pueden estar al principio
+   ni al final*. Si se usan variables, hay que escribir el texto completo primero.
+2. **Si elegís `Documento` en "Muestra de contenido multimedia", HAY QUE SUBIR un PDF de
+   muestra.** Sin eso el botón *Enviar para revisión* queda gris y el aviso de error no dice
+   cuál es el campo que falta. Ese PDF es solo para el revisor: no se le manda a nadie.
+
+> ✅ **Por qué pasa como Utilidad:** solo informa el estado de un pedido que ya existe.
 > No saluda de más, no agradece, no ofrece nada.
 >
 > ⛔ **No le agregues** *"gracias por tu compra"* ni *"cualquier cosa nos escribes"*. Eso es
-> justo lo que dispara la reclasificación a Marketing.
+> justo lo que dispara la reclasificación a Marketing (16× más caro).
 
 ---
 
@@ -102,16 +131,18 @@ sea** — dentro de las 72 horas del clic en el anuncio, Meta **no te la cobra**
 |---|---|
 | **Categoría** | **Marketing** |
 | **Nombre** | `seguimiento_impermeable` |
-| **Idioma** | Español |
-| **Encabezado** | *(ninguno)* |
+| **Idioma** | **Spanish (COL)** — el mismo que la primera |
+| **Encabezado** | **ninguno** (dejar *Muestra de contenido multimedia* en `Ninguna`) |
+| **Variables** | **ninguna**, por lo mismo que la primera |
 
 **Cuerpo:**
 
 ```
-Hola {{1}}, te escribimos de BikerPro por el conjunto impermeable de 4 piezas que consultaste. Sigue disponible en $59.900 con pago contraentrega. Si quieres, te confirmamos el envio a tu ciudad.
+Te escribimos de BikerPro por el conjunto impermeable de 4 piezas que consultaste. Sigue disponible en $59.900 con pago contraentrega. Si quieres, te confirmamos el envio a tu ciudad.
 ```
 
-**Ejemplo:** `{{1}}` → `Juan Perez`
+> ⚠️ **Esta plantilla tiene el precio adentro.** Si algún día cambia el precio del anuncio,
+> hay que **editarla y volver a mandarla a aprobación**. No se puede cambiar sobre la marcha.
 
 **Botones** → *Respuesta rápida* (agregá estos dos):
 
@@ -136,15 +167,27 @@ El reporte de la noche hoy no te llega si no le escribiste al bot en el día.
 |---|---|
 | **Categoría** | **Utilidad** |
 | **Nombre** | `cierre_del_dia` |
-| **Idioma** | Español |
+| **Idioma** | **Spanish (COL)** |
+| **Encabezado** | ninguno |
+| **Variables** | **1 sola** — acá sí hace falta, porque los números cambian cada día |
 
 **Cuerpo:**
 
 ```
-Cierre del dia {{1}}: {{2}} pedidos por un total de {{3}}. El detalle completo esta en el panel.
+Ya esta listo el cierre del dia en tu panel de BikerPro. Resumen: {{1}}
 ```
 
-**Ejemplos:** `{{1}}` → `22 de septiembre` · `{{2}}` → `7` · `{{3}}` → `$574.000`
+**Muestra de la variable:** `{{1}}` → `7 pedidos por $574.000`
+
+> 🔑 **Por qué una sola variable y al final del texto no rompe la regla:** la regla es que no
+> puede estar **al principio ni al final** — y acá el cuerpo **termina** en `{{1}}`. Así que
+> hay que dejarle algo después. Usá este cuerpo en su lugar:
+>
+> ```
+> Ya esta listo el cierre del dia en tu panel de BikerPro. Resumen: {{1}}. Entra al panel para ver el detalle.
+> ```
+>
+> Y si igual te la rechaza, mandala como **Marketing**: es **un mensaje al día**, ~$1,70 COP.
 
 > Si te la rechazan por ser un aviso interno, volvé a subirla como **Marketing**. Es **un
 > mensaje al día**: te costaría ~$1,70 COP diarios. No vale la pena pelearla.
