@@ -433,6 +433,82 @@ app.post("/guias/enviar", async (req, res) => {
 });
 
 // ============================================================================
+// GET /recuperar-cliente?token=...&id=CO.xxxx[&msg=...]
+//
+// 🎯 RECUPERAR LOS LEADS QUE SE PERDIERON POR EL BUG DE LOS CLIENTES SIN TELÉFONO
+//
+// Medido en producción: 7 clientes distintos escribieron entre las 09:59 y las
+// 12:11 del 22-sep y ninguno recibió una respuesta útil. Todos venían de un
+// anuncio, así que ya están pagados (~$1.050 cada conversación).
+//
+// 🔑 SE PUEDEN RECUPERAR, y esto es lo importante: su identificador NO se perdió.
+// Quedó escrito en los logs de Render, que sobreviven a los despliegues:
+//
+//     buscar en los logs de Render:  SIN 'from'
+//     y copiar el "user_id":"CO.…" de cada payload
+//
+// ⏰ TIENE RELOJ: la ventana de 24h de Meta se cuenta desde el último mensaje del
+// cliente. Los suyos son de las 09:59-12:11, así que se cierra a esa misma hora
+// del día siguiente. Pasado eso solo se les puede escribir con plantilla aprobada.
+//
+// A diferencia de /enviar-prueba, esto GUARDA el mensaje en el historial de la
+// conversación: así, cuando el cliente conteste, el bot sabe qué se le dijo y
+// sigue la charla en vez de arrancar de cero.
+// ============================================================================
+app.get("/recuperar-cliente", async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const id = idDestino(req.query.id || "");
+  if (!id) {
+    return res.status(400).json({
+      error: "Falta ?id= con el identificador del cliente.",
+      comoObtenerlo:
+        "En los logs de Render, buscá  SIN 'from'  y copiá el valor de \"user_id\" de cada payload.",
+      ejemplo: "/recuperar-cliente?token=...&id=CO.1098944123092301",
+    });
+  }
+
+  // El texto arranca la conversación de nuevo sin echarle la culpa al cliente ni
+  // dar explicaciones técnicas que no le importan.
+  const msg =
+    (req.query.msg || "").toString().trim() ||
+    "¡Hola! 🏍️ Te escribo de *BikerPro*. Vi que nos habías escrito y se nos cayó la " +
+      "conversación por un problema nuestro, mil disculpas 🙏\n\n" +
+      "El conjunto impermeable de 4 piezas es PVC siliconado calibre 8 con costura " +
+      "termosellada, y el pago es *contraentrega*: pagás cuando lo tenés en las manos.\n\n" +
+      "¿Para qué ciudad sería? Te cotizo el envío ya mismo 📦";
+
+  const envio = await sendText(id, msg);
+
+  if (envio.ok) {
+    // Queda en el historial para que el bot retome con contexto.
+    store.pushMsg(id, "assistant", msg);
+    anotarEvento({ tipo: "cliente-recuperado", para: id, messageId: envio.messageId });
+    console.log(`🎯 Mensaje de recuperación enviado a ${id} (id ${envio.messageId})`);
+  } else {
+    anotarEvento({
+      tipo: "recuperacion-fallida",
+      para: id,
+      error: JSON.stringify(envio.body?.error || envio.body).slice(0, 180),
+    });
+  }
+
+  const code = envio.body?.error?.code;
+  res.json({
+    para: id,
+    esClienteSinTelefono: esBsuid(id),
+    ok: envio.ok,
+    messageId: envio.messageId,
+    lectura: envio.ok
+      ? "🟢 Enviado. Cuando conteste, el bot retoma la conversación con contexto y ya aparece bien en el panel."
+      : code === 131047 || code === 470
+      ? "🔴 Se cerró la ventana de 24h: ya no se le puede escribir texto libre, solo plantilla aprobada. Este lead se perdió."
+      : "🔴 No se pudo enviar. El detalle crudo de Meta va abajo.",
+    metaDijo: envio.ok ? undefined : envio.body?.error || envio.body,
+  });
+});
+
+// ============================================================================
 // GET /limpiar-conversaciones-rotas?token=...[&aplicar=1]
 //
 // 🔴 LIMPIA LA BASURA QUE DEJÓ EL BUG DE LOS CLIENTES SIN TELÉFONO.
@@ -920,10 +996,13 @@ app.get("/producto", async (req, res) => {
 app.get("/enviar-prueba", async (req, res) => {
   if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
-  const to = (req.query.to || OWNER || "").toString().replace(/\D/g, "");
+  // Antes esto hacía .replace(/\D/g,"") y por lo tanto NO se le podía mandar
+  // nada a un cliente con username: su BSUID quedaba convertido en un número
+  // inventado. Justo los clientes que hay que recuperar.
+  const to = idDestino(req.query.to || OWNER || "");
   if (!to) {
     return res.status(400).json({
-      error: "Falta ?to= con el número destino (con código de país, sin + ni espacios).",
+      error: "Falta ?to= con el número destino (con código de país, sin + ni espacios) o el identificador del cliente.",
       ejemplo: "/enviar-prueba?token=...&to=573138615813",
     });
   }
