@@ -1,11 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const { generateReply } = require("./agent");
-const { sendText, sendImage, sendVideo, sendCatalog, catalogoActivo } = require("./whatsapp");
+const { sendText, sendImage, sendVideo, sendCatalog, catalogoActivo, sendPdf } = require("./whatsapp");
 const { MEDIA } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
 const panel = require("./panel");
+const panelGuias = require("./panel-guias");
+const guias = require("./guias");
 const audio = require("./audio");
 const resumen = require("./resumen");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -179,6 +181,197 @@ app.get("/limpiar-duplicados", (req, res) => {
   }
 
   res.json(resumen);
+});
+
+// ============================================================================
+// ENVIAR LAS GUÍAS DE LA TRANSPORTADORA  —  GET /guias · POST /guias/revisar
+//                                          POST /guias/enviar
+//
+// El dueño sube el PDF con todas las etiquetas y cada cliente recibe LA SUYA.
+//
+// 🔴 DOS PASOS, Y NO ES BUROCRACIA: la etiqueta lleva dirección y teléfono
+// impresos. Mandarle a un cliente la guía de otro le filtra datos personales a
+// un desconocido y no se puede deshacer. Primero se muestra el pareo, después
+// se envía solo lo aprobado.
+// ============================================================================
+
+// El pareo se guarda en memoria entre "revisar" y "enviar" para no obligar a
+// subir el PDF dos veces. Es a propósito efímero: son 30 minutos y un reinicio
+// de Render solo obliga a subirlo de nuevo, que es el lado seguro del error.
+const PLANES_GUIAS = new Map(); // id -> { filas, creado }
+const PLAN_TTL_MS = 30 * 60 * 1000;
+
+function limpiarPlanesViejos() {
+  const ahora = Date.now();
+  for (const [id, p] of PLANES_GUIAS) {
+    if (ahora - p.creado > PLAN_TTL_MS) PLANES_GUIAS.delete(id);
+  }
+}
+
+/** Traduce el error de Meta a algo que el dueño pueda accionar. */
+function motivoDeEnvio(envio) {
+  const code = envio.body?.error?.code;
+  if (code === 131047 || code === 470) {
+    return "pasaron más de 24h desde su último mensaje: Meta no permite mandarle nada que no sea una plantilla aprobada";
+  }
+  if (envio.etapa === "subida") {
+    return "no se pudo subir el PDF a WhatsApp: " + (envio.body?.error?.message || "revisá el WHATSAPP_TOKEN");
+  }
+  return envio.body?.error?.message || "no se pudo enviar";
+}
+
+app.get("/guias", (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) {
+    return res.status(403).send("<h3>Falta el token.</h3><p>Usá /guias?token=TU_WHATSAPP_VERIFY_TOKEN</p>");
+  }
+  try {
+    res.set("Content-Type", "text/html; charset=utf-8").send(panelGuias.render());
+  } catch (e) {
+    res.status(500).send("Error armando la pantalla: " + esc(e.message));
+  }
+});
+
+// El PDF llega como cuerpo crudo (no multipart): así no hace falta multer ni
+// busboy. Una dependencia menos que pueda romperse en el despliegue.
+app.post("/guias/revisar", express.raw({ type: "application/pdf", limit: "40mb" }), async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const buf = req.body;
+  if (!Buffer.isBuffer(buf) || !buf.length) {
+    return res.status(400).json({ ok: false, error: "No llegó ningún archivo. Elegí el PDF y volvé a intentar." });
+  }
+  if (buf.subarray(0, 5).toString("latin1") !== "%PDF-") {
+    return res.status(400).json({
+      ok: false,
+      error: "Ese archivo no es un PDF. Si la transportadora te lo dio como foto o ZIP, subí el PDF original.",
+    });
+  }
+
+  const pedidos = store.todosLosPedidos();
+  if (!pedidos.length) {
+    return res.status(400).json({
+      ok: false,
+      error: "No hay pedidos guardados contra los que comparar, así que no se puede saber de quién es cada guía.",
+    });
+  }
+
+  let filas;
+  try {
+    filas = await guias.procesarPDF(buf, pedidos, {
+      telefonoRemitente: OWNER,
+      yaEnviada: (g) => store.guiaYaEnviada(g),
+    });
+  } catch (e) {
+    console.error("🔴 Error procesando el PDF de guías:", e);
+    return res.status(500).json({ ok: false, error: "No se pudo leer el PDF: " + e.message });
+  }
+
+  limpiarPlanesViejos();
+  const id = require("crypto").randomUUID();
+  PLANES_GUIAS.set(id, { filas, creado: Date.now() });
+
+  anotarEvento({
+    tipo: "guias-revisadas",
+    hojas: filas.length,
+    listas: filas.filter((f) => f.enviar).length,
+  });
+
+  // ⚠️ Se devuelve TODO menos las hojas: los PDF se quedan en el servidor. No
+  // hay razón para que el navegador reciba las etiquetas de todos los clientes.
+  res.json({
+    ok: true,
+    id,
+    filas: filas.map((f) => ({
+      pagina: f.pagina,
+      guia: f.guia,
+      transportadora: f.transportadora?.nombre || null,
+      etiqueta: f.etiqueta,
+      pedido: f.pedido
+        ? { nombre: f.pedido.nombre, ciudad: f.pedido.ciudad, total: "$" + Number(f.pedido.total || 0).toLocaleString("es-CO") }
+        : null,
+      destino: f.pedido ? guias.destinoDe(f.pedido) : null,
+      certeza: f.certeza,
+      senales: f.senales,
+      motivo: f.motivo,
+      enviar: f.enviar,
+    })),
+  });
+});
+
+app.post("/guias/enviar", async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN && req.body?.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const plan = PLANES_GUIAS.get(String(req.body?.id || ""));
+  if (!plan) {
+    return res.status(400).json({
+      ok: false,
+      error: "El pareo ya se usó o expiró (dura 30 minutos). Subí el PDF otra vez.",
+    });
+  }
+  const pedidas = new Set((req.body?.paginas || []).map(Number));
+  if (!pedidas.size) return res.status(400).json({ ok: false, error: "No marcaste ninguna guía." });
+
+  const resultados = [];
+  for (const fila of plan.filas) {
+    if (!pedidas.has(fila.pagina)) continue;
+
+    const base = { guia: fila.guia, pagina: fila.pagina };
+
+    // El navegador no decide qué es enviable: se vuelve a verificar acá. Si el
+    // pareo decía que no, no se manda aunque llegue marcado.
+    if (!fila.enviar || !fila.pedido) {
+      resultados.push({ ...base, ok: false, error: fila.motivo || "no se pudo identificar al cliente" });
+      continue;
+    }
+
+    // Segunda verificación del candado: entre "revisar" y "enviar" pudo pasar
+    // otra corrida (dos pestañas abiertas, por ejemplo).
+    const previa = store.guiaYaEnviada(fila.guia);
+    if (previa) {
+      resultados.push({ ...base, nombre: fila.pedido.nombre, ok: false, error: "ya se le había enviado" });
+      continue;
+    }
+
+    const to = guias.destinoDe(fila.pedido);
+    const caption = guias.textoParaCliente(fila.pedido, fila.guia, fila.transportadora);
+    const envio = await sendPdf(to, fila.hoja, guias.nombreArchivo(fila.guia), caption);
+
+    if (envio.ok) {
+      store.registrarGuiaEnviada({
+        guia: fila.guia,
+        telefono: to,
+        nombre: fila.pedido.nombre,
+        certeza: fila.certeza,
+        transportadora: fila.transportadora?.clave || null,
+        messageId: envio.messageId,
+      });
+      // El número de guía queda pegado al pedido: así el CSV de despacho sale
+      // completo y se puede cruzar contra el export de la transportadora.
+      if (fila.pedido.fecha) store.anotarGuiaEnPedido(fila.pedido.fecha, fila.guia);
+      // Queda en el historial del chat para que el bot no repita la información.
+      store.pushMsg(to, "assistant", caption);
+      anotarEvento({ tipo: "guia-enviada", para: to, guia: fila.guia, certeza: fila.certeza });
+      console.log(`📦 Guía ${fila.guia} enviada a ${fila.pedido.nombre} (${to}), certeza ${fila.certeza}`);
+      resultados.push({ ...base, nombre: fila.pedido.nombre, telefono: to, ok: true });
+    } else {
+      const motivo = motivoDeEnvio(envio);
+      anotarEvento({ tipo: "guia-fallida", para: to, guia: fila.guia, error: motivo.slice(0, 180) });
+      console.error(`🔴 Guía ${fila.guia} NO se envió a ${to}: ${motivo}`);
+      resultados.push({ ...base, nombre: fila.pedido.nombre, telefono: to, ok: false, error: motivo });
+    }
+  }
+
+  // El plan se consume: un segundo clic no puede reenviar lo mismo.
+  PLANES_GUIAS.delete(String(req.body.id));
+
+  const enviadas = resultados.filter((r) => r.ok).length;
+  res.json({
+    ok: true,
+    intentadas: resultados.length,
+    enviadas,
+    fallaron: resultados.length - enviadas,
+    resultados,
+  });
 });
 
 // Pedidos en CSV, para tener una copia propia fuera de Render

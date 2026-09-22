@@ -35,6 +35,7 @@ if (!process.env.DATA_DIR) {
 }
 const CONV_FILE = path.join(DIR, "conversations.json");
 const ORDERS_FILE = path.join(DIR, "orders.json");
+const GUIAS_FILE = path.join(DIR, "guias-enviadas.json");
 
 const MAX_MSGS = 24; // historial máximo por cliente que enviamos a la IA
 
@@ -42,6 +43,7 @@ function ensure() {
   if (!fs.existsSync(DIR)) fs.mkdirSync(DIR, { recursive: true });
   if (!fs.existsSync(CONV_FILE)) fs.writeFileSync(CONV_FILE, "{}");
   if (!fs.existsSync(ORDERS_FILE)) fs.writeFileSync(ORDERS_FILE, "[]");
+  if (!fs.existsSync(GUIAS_FILE)) fs.writeFileSync(GUIAS_FILE, "{}");
 }
 function readJSON(file, fallback) {
   try { return JSON.parse(fs.readFileSync(file, "utf8")); } catch { return fallback; }
@@ -236,9 +238,73 @@ function saveOrder(order) {
   return record;
 }
 
+// ============================================================================
+// GUÍAS YA ENVIADAS — el candado para no mandarle dos veces la misma guía
+//
+// Se guarda en disco, no en memoria, y la razón importa: Render reinicia el
+// proceso por cualquier cosa (despliegue, inactividad del plan gratis, ajuste
+// de variables). Si esto viviera en memoria, el reinicio borraría el registro y
+// el dueño que sube el PDF otra vez le mandaría la guía repetida a todo el
+// mundo. Es exactamente el fallo que ya pasó dos veces hoy con otra forma.
+// ============================================================================
+
+/** ¿Esta guía ya se le envió? Devuelve el registro o null. */
+function guiaYaEnviada(guia) {
+  if (!guia) return null;
+  ensure();
+  const todas = readJSON(GUIAS_FILE, {});
+  return todas[String(guia)] || null;
+}
+
+/** Anota que una guía se envió, para que no se repita. */
+function registrarGuiaEnviada(datos) {
+  const guia = String(datos.guia || "").trim();
+  if (!guia) return null;
+  // 🛟 Igual que con los pedidos: al log ANTES de tocar el disco, así queda
+  // recuperable aunque la escritura falle.
+  console.log("GUIA_ENVIADA_JSON " + JSON.stringify(datos));
+  try {
+    ensure();
+    const todas = readJSON(GUIAS_FILE, {});
+    todas[guia] = { ...datos, fecha: Date.now() };
+    writeJSON(GUIAS_FILE, todas);
+    return todas[guia];
+  } catch (e) {
+    console.error(`🔴 No se pudo registrar la guía ${guia}: ${e.message}`);
+    return null;
+  }
+}
+
+/** Todas las guías enviadas, para el panel. */
+function todasLasGuiasEnviadas() {
+  ensure();
+  return readJSON(GUIAS_FILE, {});
+}
+
+/**
+ * Le pega el número de guía al pedido, para que el CSV de despacho salga
+ * completo y se pueda cruzar contra el export de la transportadora.
+ * Se identifica por `fecha` (el ISO del momento en que se guardó, único).
+ */
+function anotarGuiaEnPedido(fechaPedido, guia) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = orders.findIndex((o) => o.fecha === fechaPedido);
+    if (i === -1) return false;
+    orders[i] = { ...orders[i], guia: String(guia), guiaEnviadaEl: new Date().toISOString() };
+    writeJSON(ORDERS_FILE, orders);
+    return true;
+  } catch (e) {
+    console.error(`🔴 No se pudo anotar la guía en el pedido: ${e.message}`);
+    return false;
+  }
+}
+
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones,
   reemplazarPedidos,
-  todosLosPedidos
+  todosLosPedidos,
+  guiaYaEnviada, registrarGuiaEnviada, todasLasGuiasEnviadas, anotarGuiaEnPedido,
 };

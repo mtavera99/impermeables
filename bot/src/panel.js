@@ -53,8 +53,29 @@ function hace(ms) {
   return `hace ${Math.floor(h / 24)} d`;
 }
 
+// ============================================================================
+// El número del bot NO va escrito a mano.
+//
+// Estaba puesto a mano en dos lugares ("+57 322 7545695"). El día que el número
+// cambia —y ya pasó— hay que editar el código y volver a desplegar para algo
+// que es pura configuración. Peor: el panel seguiría diciendo el número viejo,
+// que es justo donde el dueño va a mirar para confirmar cuál está usando.
+//
+// Ahora sale de BOT_WHATSAPP (en Render). Si no está, se dice "el número del
+// bot" en vez de afirmar uno que puede estar equivocado.
+// ============================================================================
+function numeroDelBot() {
+  const n = String(process.env.BOT_WHATSAPP || "").replace(/\D/g, "");
+  if (!n) return null;
+  const sinPais = n.startsWith("57") && n.length > 10 ? n.slice(2) : n;
+  return sinPais.length === 10
+    ? `+57 ${sinPais.slice(0, 3)} ${sinPais.slice(3)}`
+    : `+${n}`;
+}
+
 function render(aviso) {
   const tk = process.env.WHATSAPP_VERIFY_TOKEN || "";
+  const numBot = numeroDelBot();
   const convs = store.todasLasConversaciones();
   const pedidos = store.todosLosPedidos();
 
@@ -138,8 +159,10 @@ function render(aviso) {
     ${hoy.cierreTopado ? `<p class="nota">* Hay más pedidos que conversaciones de hoy: alguien escribió ayer y confirmó hoy. El cierre se topa en 100%.</p>` : ""}
     ${hoy.topCiudades.length ? `<p class="nota">📍 ${hoy.topCiudades.map(([c, n]) => `${esc(c)} <b>${n}</b>`).join(" · ")}</p>` : ""}
     <div class="acciones">
+      <a class="btn destacado" href="/guias?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">📦 Enviar guías (subir el PDF)</a>
       <a class="btn" href="/pedidos.csv?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">⬇️ Descargar pedidos (CSV)</a>
       <a class="btn" href="/cierre?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}&enviar=1">📲 Mandarme el cierre por WhatsApp</a>
+      <a class="btn" href="/limpiar-duplicados?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">🧹 Revisar pedidos duplicados</a>
     </div>`;
 
   const filasPedidos = pedidos.length
@@ -195,7 +218,7 @@ function render(aviso) {
             <form class="resp" method="POST" action="/responder" data-tel="${esc(x.tel)}">
               <input type="hidden" name="token" value="${esc(tk)}">
               <input type="hidden" name="to" value="${esc(x.tel)}">
-              <textarea name="texto" rows="2" placeholder="Escribile como BikerPro… (sale del +57 322 7545695, no de tu WhatsApp)"></textarea>
+              <textarea name="texto" rows="2" placeholder="Escribile como BikerPro… (sale ${esc(numBot ? "del " + numBot : "del número del bot")}, no de tu WhatsApp)"></textarea>
               <button type="submit">Enviar como BikerPro</button>
             </form>
             <div class="envio"></div>
@@ -301,11 +324,13 @@ function render(aviso) {
   .acciones{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
   .btn{background:#1b212b;border:1px solid #2d3542;color:#e7e9ee;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:13px}
   .btn:hover{background:#232b36}
+  .btn.destacado{background:#1d4ed8;border-color:#2563eb;font-weight:700}
+  .btn.destacado:hover{background:#2563eb}
 </style></head>
 <body>
 <header>
   <h1>🏍️ BikerPro · panel del bot</h1>
-  <div class="sub2">+57 322 7545695 · se refresca cada 30 segundos</div>
+  <div class="sub2">${esc(numBot || "poné BOT_WHATSAPP en Render para ver acá el número del bot")} · se refresca cada 30 segundos</div>
 </header>
 <main>
   ${aviso || ""}
