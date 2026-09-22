@@ -103,18 +103,35 @@ Ya lo vivió con Solar.
 | Historial recortado a 4 turnos | ✅ |
 | Clave de Gemini | ✅ existe: **IMPERMEABLE BOT** (13 jul 2026) |
 | Cuenta de Render | ✅ creada, workspace "Bikerproco" |
-| Web Service en Render | 🟡 **a medias** — quedó con `Language: Python 3` y sin `Root Directory` |
-| App de WhatsApp en Meta | ⬜ |
-| Webhook | ⬜ |
+| Web Service en Render | ✅ **FUNCIONANDO** (ver aviso abajo) |
+| App de WhatsApp en Meta | ✅ |
+| Webhook | ✅ suscrito al campo `messages` |
 | Chatwoot | ⬜ |
 
-### Configuración correcta de Render
+> ## ⛔ ESTE DOCUMENTO QUEDÓ VIEJO — leer antes de actuar
+>
+> Fue escrito el 21-sep. **El 22-sep se avanzó mucho más y varias cosas de acá ya son
+> falsas.** Verificado en vivo el 22-sep a las 12:40 Bogotá:
+>
+> | lo que dice este doc | la verdad |
+> |---|---|
+> | Render "a medias", en Python y sin Root Directory | ✅ **anda**: HTTP 200 en 0,04 s |
+> | App de WhatsApp y webhook pendientes | ✅ los dos listos y suscritos |
+> | Verificación del negocio "en revisión" | ✅ **APROBADA** (`verified`) |
+> | Corre en el número de prueba `+1 555...` | ❌ corre en **`+57 322 7545695`**, calidad GREEN |
+> | WABA `2213159576112051` | ❌ la real es **`1345319974418244`** |
+>
+> **La fuente de verdad del despliegue es `ACCESOS-Y-RECUPERACION.md`**, y por encima de
+> todo `/setup-waba` contra el servicio real. Este archivo sirve como historia, no como
+> instrucción.
+
+### Configuración de Render — solo para recrearlo desde cero
 | campo | valor |
 |---|---|
 | Name | `bikerpro-bot` |
-| **Language** | **`Node`** ⬅️ estaba en Python |
+| **Language** | **`Node`** |
 | Branch | `main` |
-| **Root Directory** | **`bot`** ⬅️ faltaba |
+| **Root Directory** | **`bot`** |
 | Build Command | `npm install` |
 | Start Command | `npm start` |
 
@@ -124,9 +141,13 @@ AI_PROVIDER=gemini
 GEMINI_API_KEY=(la de IMPERMEABLE BOT)
 GEMINI_MODEL=gemini-3.1-flash-lite
 MAX_HISTORIAL=8
-WHATSAPP_VERIFY_TOKEN=bikerpro_verify_2026
+WHATSAPP_VERIFY_TOKEN=<secreto>
+PANEL_TOKEN=<secreto>          🔐 la contraseña del panel
 OWNER_WHATSAPP=573138615813
 ```
+
+🔴 **El valor que este documento tenía escrito acá era el secreto real del panel, y este
+repo es público.** Por eso ya no está. Ver `ACCESOS-Y-RECUPERACION.md`.
 
 ---
 

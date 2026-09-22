@@ -2,7 +2,7 @@
 /**
  * Prueba el GUION contra el bot desplegado, sin tocar WhatsApp.
  *
- *   node probar-guion.js https://bikerpro-bot.onrender.com bikerpro_verify_2026
+ *   node probar-guion.js https://bikerpro-bot.onrender.com TU_PANEL_TOKEN
  *
  * POR QUÉ EXISTE: `test-cotizacion.js` prueba que `cotizar()` devuelva el número
  * correcto. Esto prueba algo distinto y más difícil: **que la IA use ese número**.
@@ -22,7 +22,9 @@
  */
 
 const BASE = (process.argv[2] || "http://localhost:3000").replace(/\/$/, "");
-const TOKEN = process.argv[3] || process.env.WHATSAPP_VERIFY_TOKEN || "bikerpro_verify_2026";
+// Sin valor por defecto a propósito: el que había ("bikerpro_verify_2026") era
+// el secreto real y quedó publicado en el repo. Acá se pasa por argumento.
+const TOKEN = process.argv[3] || process.env.PANEL_TOKEN || process.env.WHATSAPP_VERIFY_TOKEN || "";
 
 // debe / noDebe aceptan string (se busca tal cual) o RegExp
 const CASOS = [

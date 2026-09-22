@@ -27,7 +27,55 @@ app.use(express.json());
 // Para los formularios del panel (responder a mano, pausar el bot)
 app.use(express.urlencoded({ extended: true }));
 
+// ============================================================================
+// 🔐 DOS SECRETOS DISTINTOS, Y POR QUÉ NO PUEDEN SER EL MISMO
+//
+//   WHATSAPP_VERIFY_TOKEN -> lo usa SOLO Meta, para verificar el webhook.
+//   PANEL_TOKEN           -> la CONTRASEÑA del panel y de todo lo que escribe.
+//
+// Antes era UN SOLO valor para las dos cosas, y eso tuvo una consecuencia real:
+// terminó escrito en 5 archivos del repo, que es PÚBLICO. Con ese valor,
+// cualquiera en internet podía abrir /panel (nombres, direcciones y teléfonos
+// de TODOS los clientes), bajarse /pedidos.csv, y sobre todo usar /responder
+// para escribirle a un cliente HACIÉNDOSE PASAR por BikerPro.
+//
+// Separarlos importa por algo concreto: la contraseña del panel hay que poder
+// cambiarla en cualquier momento, mientras que el token del webhook está
+// alineado con la configuración de Meta y si se desalinea DEJA DE ENTRAR el
+// 100% de los mensajes. Con un valor compartido, rotar lo barato obligaba a
+// tocar lo caro.
+//
+// ⚠️ Y cambiar el valor no alcanzaba por sí solo: el viejo ya quedó en el
+// historial de Git, que es público para siempre. Por eso el secreto nuevo
+// vive SOLO como variable de entorno en Render, y nunca en el repo.
+// ============================================================================
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || "bikerpro_verify_123";
+
+// Si PANEL_TOKEN todavía no está puesto, se cae a VERIFY_TOKEN a propósito: es
+// preferible avisar a gritos que dejar al dueño AFUERA de su propio panel en
+// media jornada, porque es la pantalla con la que despacha.
+const PANEL_TOKEN = process.env.PANEL_TOKEN || VERIFY_TOKEN;
+
+// Valores que ya se publicaron en el repo: dejaron de ser secretos el día que
+// se subieron. Si el panel está usando uno de estos, está abierto a internet.
+const SECRETOS_QUEMADOS = new Set(["bikerpro_verify_123", "bikerpro_verify_2026"]);
+
+if (SECRETOS_QUEMADOS.has(PANEL_TOKEN)) {
+  console.warn(
+    "\n🔴🔴 EL PANEL ESTÁ ABIERTO A INTERNET 🔴🔴\n" +
+      "   La contraseña del panel es un valor que YA ESTÁ PUBLICADO en el repo.\n" +
+      "   Cualquiera puede abrir /panel y ver los datos de todos los clientes,\n" +
+      "   y usar /responder para escribirles como si fuera BikerPro.\n" +
+      "   ARREGLO (2 minutos): en Render → Environment → agregar PANEL_TOKEN\n" +
+      "   con un valor nuevo y largo. No hay que tocar nada de Meta.\n"
+  );
+} else if (!process.env.PANEL_TOKEN) {
+  console.warn(
+    "⚠️  PANEL_TOKEN no está definido: el panel está usando WHATSAPP_VERIFY_TOKEN.\n" +
+      "   Conviene separarlos para poder cambiar la clave del panel sin tocar Meta."
+  );
+}
+
 const OWNER = process.env.OWNER_WHATSAPP;
 const WABA_ID = process.env.WHATSAPP_WABA_ID || "2213159576112051";
 const WA_TOKEN = process.env.WHATSAPP_TOKEN;
@@ -60,10 +108,10 @@ async function subscribeWaba() {
 // humano, con un enlace directo a WhatsApp para responder.
 // ============================================================================
 app.get("/panel", (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) {
+  if (req.query.token !== PANEL_TOKEN) {
     return res
       .status(403)
-      .send("<h3>Falta el token.</h3><p>Usá /panel?token=TU_WHATSAPP_VERIFY_TOKEN</p>");
+      .send("<h3>Falta el token.</h3><p>Usá /panel?token=TU_PANEL_TOKEN</p>");
   }
   try {
     // Resultado de una respuesta manual, si viene de vuelta del redirect
@@ -94,7 +142,7 @@ app.get("/panel", (req, res) => {
 //     GitHub Action lo deja en su registro.
 // ============================================================================
 app.get("/cierre", async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const dia = (req.query.dia || "").match(/^\d{4}-\d{2}-\d{2}$/)
     ? req.query.dia
@@ -142,7 +190,7 @@ app.get("/cierre", async (req, res) => {
 // Se queda con el PRIMER registro de cada cliente, que es el original.
 // ============================================================================
 app.get("/limpiar-duplicados", (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const todos = store.todosLosPedidos().slice().reverse(); // del más viejo al más nuevo
   const vistos = new Map();
@@ -231,8 +279,8 @@ function motivoDeEnvio(envio) {
 }
 
 app.get("/guias", (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) {
-    return res.status(403).send("<h3>Falta el token.</h3><p>Usá /guias?token=TU_WHATSAPP_VERIFY_TOKEN</p>");
+  if (req.query.token !== PANEL_TOKEN) {
+    return res.status(403).send("<h3>Falta el token.</h3><p>Usá /guias?token=TU_PANEL_TOKEN</p>");
   }
   try {
     res.set("Content-Type", "text/html; charset=utf-8").send(panelGuias.render());
@@ -244,7 +292,7 @@ app.get("/guias", (req, res) => {
 // El PDF llega como cuerpo crudo (no multipart): así no hace falta multer ni
 // busboy. Una dependencia menos que pueda romperse en el despliegue.
 app.post("/guias/revisar", express.raw({ type: "application/pdf", limit: "40mb" }), async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const buf = req.body;
   if (!Buffer.isBuffer(buf) || !buf.length) {
@@ -309,7 +357,7 @@ app.post("/guias/revisar", express.raw({ type: "application/pdf", limit: "40mb" 
 });
 
 app.post("/guias/enviar", async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN && req.body?.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN && req.body?.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const plan = PLANES_GUIAS.get(String(req.body?.id || ""));
   if (!plan) {
@@ -443,7 +491,7 @@ app.get("/limpiar-conversaciones-rotas", (req, res) => {
 
 // Pedidos en CSV, para tener una copia propia fuera de Render
 app.get("/pedidos.csv", (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   try {
     res
       .set("Content-Type", "text/csv; charset=utf-8")
@@ -489,7 +537,7 @@ function esDuplicado(to, texto) {
 }
 
 app.post("/responder", async (req, res) => {
-  if (req.body?.token !== VERIFY_TOKEN && req.query.token !== VERIFY_TOKEN) {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) {
     return res.sendStatus(403);
   }
   const to = idDestino(req.body?.to);
@@ -507,7 +555,7 @@ app.post("/responder", async (req, res) => {
     const aviso = "Ese mismo mensaje ya se envió hace unos segundos. No se envió de nuevo.";
     return comoJson
       ? res.json({ ok: true, duplicado: true, aviso })
-      : res.redirect(`/panel?token=${encodeURIComponent(VERIFY_TOKEN)}&r=${encodeURIComponent(aviso)}#c${to}`);
+      : res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${encodeURIComponent(aviso)}#c${to}`);
   }
 
   const envio = await sendText(to, texto);
@@ -546,20 +594,20 @@ app.post("/responder", async (req, res) => {
   }
 
   res.redirect(
-    `/panel?token=${encodeURIComponent(VERIFY_TOKEN)}&r=${envio.ok ? "ok" : encodeURIComponent(motivo)}#c${to}`
+    `/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${envio.ok ? "ok" : encodeURIComponent(motivo)}#c${to}`
   );
 });
 
 // POST /pausar — prender o apagar el bot en UN chat
 // Sirve para retomar: cuando el humano termina, devuelve el chat al bot.
 app.post("/pausar", (req, res) => {
-  if (req.body?.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.body?.token !== PANEL_TOKEN) return res.sendStatus(403);
   const tel = idDestino(req.body?.tel);
   const valor = String(req.body?.valor) === "1";
   if (!tel) return res.status(400).send("Falta el número.");
   store.setPaused(tel, valor);
   anotarEvento({ tipo: valor ? "bot-pausado" : "bot-reactivado", para: tel });
-  res.redirect(`/panel?token=${encodeURIComponent(VERIFY_TOKEN)}#c${tel}`);
+  res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}#c${tel}`);
 });
 
 // Salud
@@ -579,14 +627,14 @@ app.get("/health", (_req, res) => res.json({ ok: true }));
 //   2. Comparar proveedores de IA con los MISMOS casos antes de cambiar de motor
 //      (Gemini vs DeepSeek): cuál respeta las reglas de precio.
 //
-// 🔒 PROTEGIDO con WHATSAPP_VERIFY_TOKEN. Sin el token correcto responde 403.
+// 🔒 PROTEGIDO con PANEL_TOKEN. Sin el token correcto responde 403.
 //    Si quedara abierto, cualquiera podría quemar la cuota de IA a costa nuestra.
 //
 // ⚠️ Usa un teléfono ficticio ("prueba-*"), así no se mezcla con conversaciones
 //    de clientes reales ni dispara seguimientos. `&reset=1` arranca de cero.
 // ============================================================================
 app.get("/probar", async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const msg = (req.query.msg || "").toString().trim();
   if (!msg) return res.status(400).json({ error: "falta ?msg=" });
@@ -624,12 +672,12 @@ app.get("/probar", async (req, res) => {
 //   · QUÉ número quedó conectado (para no confundir el de prueba con el real)
 //   · el estado de calidad del número
 //
-// 🔒 Protegido con WHATSAPP_VERIFY_TOKEN porque hace una ESCRITURA (suscribe la
+// 🔒 Protegido con PANEL_TOKEN porque hace una ESCRITURA (suscribe la
 //    app a la WABA). No debe quedar abierto.
 // 🔑 NUNCA devuelve el token, solo si funciona o no.
 // ============================================================================
 app.get("/setup-waba", async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const out = {
     variables: {
@@ -721,7 +769,7 @@ app.get("/setup-waba", async (req, res) => {
 // Esto averigua las tres cosas y avisa si al token le falta permiso.
 // ============================================================================
 app.get("/catalogos", async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   if (!WA_TOKEN) return res.status(400).json({ error: "Falta WHATSAPP_TOKEN." });
 
   const g = async (path) => {
@@ -808,7 +856,7 @@ app.get("/catalogos", async (req, res) => {
 // nada del celular ni reescribir las fichas.
 // ============================================================================
 app.get("/producto", async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   if (!WA_TOKEN) return res.status(400).json({ error: "Falta WHATSAPP_TOKEN." });
 
   const ids = (req.query.ids || "")
@@ -867,10 +915,10 @@ app.get("/producto", async (req, res) => {
 //   · error 190            → token vencido o mal copiado.
 //   · error 133010         → el número no está registrado en Cloud API.
 //
-// 🔒 Protegido con WHATSAPP_VERIFY_TOKEN: manda mensajes reales.
+// 🔒 Protegido con PANEL_TOKEN: manda mensajes reales.
 // ============================================================================
 app.get("/enviar-prueba", async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const to = (req.query.to || OWNER || "").toString().replace(/\D/g, "");
   if (!to) {
@@ -919,10 +967,10 @@ app.get("/enviar-prueba", async (req, res) => {
 // El PIN son 6 dígitos y es la verificación en dos pasos del número. Hay que
 // guardarlo: se pide de nuevo si el número se re-registra en otra plataforma.
 //
-// 🔒 Protegido con WHATSAPP_VERIFY_TOKEN: registra un número, es una escritura.
+// 🔒 Protegido con PANEL_TOKEN: registra un número, es una escritura.
 // ============================================================================
 app.get("/registrar-numero", async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const pin = (req.query.pin || "").toString().trim();
   if (!/^\d{6}$/.test(pin)) {
@@ -997,7 +1045,7 @@ function anotarEvento(e) {
 }
 
 app.get("/eventos", (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   res.json({
     total: EVENTOS.length,
     nota: EVENTOS.length === 0

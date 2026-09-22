@@ -91,8 +91,11 @@ catálogo completo. Va el tradicional porque es el 98% de los envíos.
 ## Paso 6 — Verificar
 
 ```
-https://bikerpro-bot.onrender.com/catalogos?token=bikerpro_verify_2026
+https://bikerpro-bot.onrender.com/catalogos?token=TU_PANEL_TOKEN
 ```
+
+> 🔐 `TU_PANEL_TOKEN` es el valor de la variable `PANEL_TOKEN` de Render. **No se escribe
+> en este repo**: es público, y el secreto anterior se filtró justamente así.
 
 Tiene que listar los 3 productos con su `retailer_id`. Si los lista, el bot ya puede
 mandarlos.

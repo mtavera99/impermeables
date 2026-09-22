@@ -42,10 +42,27 @@ AI_MODEL=deepseek-chat
 
 ---
 
-## 1️⃣ Render — arreglar lo que quedó a medias
+## 1️⃣ Render — ✅ YA ESTÁ LISTO, NO HAY QUE TOCARLO
 
-El servicio quedó creado con **`Language: Python 3`** y **sin `Root Directory`**. Con eso
-no arranca nunca, porque el bot es Node y vive en `bot/`.
+> 🟢 **Verificado en vivo el 22-sep-2026, 12:40 Bogotá.** Este paso está **terminado**.
+>
+> | prueba hecha contra el servicio real | resultado |
+> |---|---|
+> | `GET /` | **HTTP 200 en 0,04 s** (despierto, no dormido) |
+> | verificación del webhook | ✅ devuelve el challenge |
+> | `/setup-waba` | 🟢 número **CONNECTED**, calidad **GREEN** |
+>
+> ⛔ **Lo que este documento decía y ya NO es cierto:** *"el servicio quedó creado con
+> `Language: Python 3` y sin `Root Directory`, con eso no arranca nunca"*. Eso se
+> arregló. El bot lleva días recibiendo mensajes reales de clientes que entran por
+> anuncios.
+>
+> 🔴 **Por qué importa dejarlo escrito:** una sesión que lea "quedó a medias" se pone a
+> "arreglar" un servicio que funciona y puede tumbar el canal por donde entra el 100% de
+> las ventas. **Si el bot responde, Render está bien. No se toca.**
+
+La tabla de abajo queda **solo para recrear el servicio desde cero** si algún día se
+borra — no para cambiar el que está andando.
 
 | campo | valor |
 |---|---|
@@ -68,9 +85,14 @@ AI_PROVIDER=gemini
 GEMINI_API_KEY=(la de IMPERMEABLE BOT)
 GEMINI_MODEL=gemini-3.1-flash-lite
 MAX_HISTORIAL=8
-WHATSAPP_VERIFY_TOKEN=bikerpro_verify_2026
+WHATSAPP_VERIFY_TOKEN=<secreto — el mismo que se pone en Meta>
+PANEL_TOKEN=<secreto — la contraseña del panel, larga>
 OWNER_WHATSAPP=573138615813
 ```
+
+> 🔐 **`PANEL_TOKEN` no es opcional.** Es lo único que protege `/panel`, `/pedidos.csv` y
+> `/responder`. El valor va **solo en Render**, nunca en un archivo de este repo: el repo
+> es público y el secreto anterior terminó publicado por escribirlo acá.
 
 Estas van **después**, cuando tengas la app de Meta:
 ```
@@ -88,7 +110,7 @@ WHATSAPP_WABA_ID=2213159576112051
 3. En **API Setup** copiar: `Phone Number ID` y el token temporal
 4. **Configurar el webhook:**
    - URL: `https://bikerpro-bot.onrender.com/webhook`
-   - Verify token: `bikerpro_verify_2026` (el mismo de la variable)
+   - Verify token: el valor de `WHATSAPP_VERIFY_TOKEN` de Render (no se escribe acá)
    - Suscribirse al campo **`messages`**
 5. Probar con el **número de prueba** que da Meta, no con el número real todavía
 
@@ -154,7 +176,7 @@ Servicio en vivo: `https://bikerpro-bot.onrender.com`
 
 **Cómo repetirlo** (después de cada cambio del guion, y obligatorio al cambiar de modelo):
 ```bash
-node bot/probar-guion.js https://bikerpro-bot.onrender.com bikerpro_verify_2026
+node bot/probar-guion.js https://bikerpro-bot.onrender.com TU_PANEL_TOKEN
 ```
 
 ⚠️ **Corré la batería DOS veces.** La IA no es determinista: un fallo aislado puede
