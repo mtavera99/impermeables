@@ -22,6 +22,7 @@
 
 const store = require("./store");
 const resumen = require("./resumen");
+const atencion = require("./atencion");
 
 const esc = (s) =>
   String(s == null ? "" : s)
@@ -71,6 +72,37 @@ function render(aviso) {
       };
     })
     .sort((a, b) => b.cuando - a.cuando);
+
+  // ---- Prioridad de atención: quién necesita que entres vos ----
+  const prior = new Map();
+  for (const x of lista) {
+    const e = atencion.evaluar(x.tel, x.c);
+    if (e.nivel) prior.set(x.tel, e);
+  }
+  // Los que requieren atención van primero, y entre ellos el más urgente arriba
+  lista.sort((a, b) => {
+    const pa = prior.get(a.tel), pb = prior.get(b.tel);
+    if (pa && pb) return pb.puntos - pa.puntos;
+    if (pa) return -1;
+    if (pb) return 1;
+    return b.cuando - a.cuando;
+  });
+  const urgentes = lista.filter((x) => prior.get(x.tel)?.nivel === "alta");
+  const medios = lista.filter((x) => prior.get(x.tel)?.nivel === "media");
+
+  const bloqueAtencion = (urgentes.length || medios.length)
+    ? `<div class="atencion">
+         <h3>${urgentes.length ? "🔴" : "🟡"} ${urgentes.length + medios.length} chat(s) necesitan que entres vos</h3>
+         ${[...urgentes, ...medios].slice(0, 12).map((x) => {
+           const e = prior.get(x.tel);
+           return `<a class="fila ${e.nivel}" href="#c${esc(x.tel)}">
+             <b>+${esc(x.tel)}</b>
+             <span class="por">${esc(e.motivos[0] || "")}</span>
+             <span class="cuando">${esc(hace(x.cuando))}</span>
+           </a>`;
+         }).join("")}
+       </div>`
+    : `<div class="atencion ok"><h3>🟢 Ningún chat necesita atención humana</h3></div>`;
 
   const totalMsgsCliente = lista.reduce(
     (s, x) => s + x.msgs.filter((m) => m.role === "user").length,
@@ -129,7 +161,15 @@ function render(aviso) {
     ? lista
         .slice(0, 60)
         .map((x) => {
+          const e = prior.get(x.tel);
+          const etiquetaAtencion = e
+            ? `<span class="tag ${e.nivel === "alta" ? "alta" : "media"}">${e.nivel === "alta" ? "🔴 atender" : "🟡 revisar"}</span>`
+            : "";
+          const porQue = e && e.motivos.length
+            ? `<div class="porque">${e.nivel === "alta" ? "🔴" : "🟡"} ${e.motivos.map(esc).join(" · ")}</div>`
+            : "";
           const etiquetas = [
+            etiquetaAtencion,
             x.c.compro ? `<span class="tag ok">compró</span>` : "",
             x.c.paused ? `<span class="tag warn">esperando humano</span>` : "",
             x.c.noMolestar ? `<span class="tag no">no molestar</span>` : "",
@@ -150,6 +190,7 @@ function render(aviso) {
               ${etiquetas}
               <span class="meta">${x.msgs.filter((m) => m.role === "user").length} msg · ${esc(hace(x.cuando))}</span>
             </summary>
+            ${porQue}
             <div class="chat">${burbujas}</div>
             <form class="resp" method="POST" action="/responder">
               <input type="hidden" name="token" value="${esc(tk)}">
@@ -233,6 +274,18 @@ function render(aviso) {
   .pausa button.verde{background:#12351f;border-color:#1d6b3d;color:#8ff0b5}
   .res{padding:10px 13px;border-radius:10px;margin-bottom:12px;font-size:13px}
   .res.ok{background:#12351f;border:1px solid #1d6b3d;color:#8ff0b5}
+  .atencion{background:#161a21;border:1px solid #242a35;border-radius:10px;padding:12px;margin:14px 0}
+  .atencion h3{margin:0 0 8px;font-size:14px}
+  .atencion.ok h3{margin:0;color:#8ff0b5}
+  .fila{display:flex;gap:8px;align-items:center;padding:7px 9px;border-radius:8px;margin-bottom:5px;text-decoration:none;color:#e7e9ee;background:#1b212b;border-left:3px solid #6b5416}
+  .fila.alta{border-left-color:#ff6b6b;background:#241417}
+  .fila.media{border-left-color:#ffb020;background:#241f14}
+  .fila:hover{background:#232b36}
+  .fila .por{font-size:12px;color:#c8cfdd;flex:1}
+  .fila .cuando{font-size:11px;color:#8b93a4}
+  .tag.alta{background:#3a1414;color:#ff9b9b}
+  .tag.media{background:#3a2d0c;color:#ffd479}
+  .porque{margin-top:8px;font-size:12px;color:#ffd479;background:#241f14;padding:7px 9px;border-radius:8px}
   .res.mal{background:#3a1414;border:1px solid #6b1616;color:#ffb3b3}
   .aviso{background:#3a2d0c;border:1px solid #6b5416;color:#ffd479;padding:11px 13px;border-radius:10px;font-size:13px;margin-bottom:14px}
   .aviso.ok{background:#12351f;border-color:#1d6b3d;color:#8ff0b5}
@@ -253,6 +306,7 @@ function render(aviso) {
 <main>
   ${aviso || ""}
   ${avisoDatos}
+  ${bloqueAtencion}
   ${tarjetas}
   <h2>Pedidos (todos)</h2>
   <table>
