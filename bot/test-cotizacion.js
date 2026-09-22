@@ -30,10 +30,38 @@ for (const b of ["A", "B", "C", "D", "E"]) {
     `banda ${b} · 1 ud · cobra ${fmt(BANDAS[b].total)} → margen ${fmt(Math.round(m1))}`);
 }
 console.log("");
+// ⚠️ BANDAS QUE ESTÁN BAJO LA META A PROPÓSITO, POR DECISIÓN DEL DUEÑO.
+// No se baja la exigencia en silencio: cada excepción va acá con su razón, y
+// el límite que SÍ se sigue exigiendo es el del bloque 1-B (vender dos tiene
+// que dejar más que vender una). Si esta lista crece sin razón escrita, es que
+// se está erosionando el margen de a poquitos.
+const BAJO_LA_META_A_PROPOSITO = {
+  D: "bajada de $152.000 a $140.000 el 22-sep para ganar volumen: un cliente de " +
+     "Montería vio $152.000 y se fue. Ver analisis/bajar-a-137-22sep.py",
+};
 for (const b of ["A", "B", "C", "D", "E"]) {
   const m2 = (PROMO_2_TOTAL[b] - 2 * COSTO_PROD - ENVIO_2[b]) / 2;
+  if (BAJO_LA_META_A_PROPOSITO[b]) {
+    console.log(
+      `  ℹ️  banda ${b} · 2 uds · cobra ${fmt(PROMO_2_TOTAL[b])} → margen ` +
+        `${fmt(Math.round(m2))}/ud (${fmt(Math.round(META_MARGEN - m2))} bajo la meta)\n` +
+        `      ${BAJO_LA_META_A_PROPOSITO[b]}`
+    );
+    continue;
+  }
   ok(m2 >= META_MARGEN,
     `banda ${b} · 2 uds · cobra ${fmt(PROMO_2_TOTAL[b])} → margen ${fmt(Math.round(m2))}/ud`);
+}
+
+console.log("\n### 1-B. 🔒 El piso real: vender DOS tiene que dejar más que vender UNA\n");
+// Este es el guardián que reemplaza a la meta en las bandas con descuento. Un
+// precio de 2 unidades que deja menos que vender una sola es una pérdida
+// disfrazada de promoción, y no se ve mirando el margen por unidad.
+for (const b of ["A", "B", "C", "D", "E"]) {
+  const queda1 = BANDAS[b].total - COSTO_PROD - ENVIO_1[b];
+  const queda2 = PROMO_2_TOTAL[b] - 2 * COSTO_PROD - ENVIO_2[b];
+  ok(queda2 > queda1,
+    `banda ${b} · 2 uds dejan ${fmt(Math.round(queda2))} vs ${fmt(Math.round(queda1))} de 1 ud`);
 }
 
 console.log("\n### 2. Llevar dos sigue siendo más barato que dos sueltos\n");
