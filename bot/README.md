@@ -125,6 +125,33 @@ cd bot && node test-guias.js     # 8 casos: teléfono distinto, empates, guía a
 > 24h **no le llega** un mensaje libre: para esos hace falta una **plantilla aprobada**
 > (y ya son tres cosas que la necesitan: guías, cierre diario y seguimiento de 72h).
 
+---
+
+## 🕵️ Clientes SIN número de teléfono (username de WhatsApp)
+
+WhatsApp dejó que los clientes usen un **nombre de usuario** y le **oculten el teléfono**
+al negocio. Cuando eso pasa, Meta no manda el número: manda un identificador
+(`CO.1098944123092301`), distinto para cada negocio, del que **no se puede sacar el
+teléfono**.
+
+El bot les responde igual, sin que tengas que hacer nada. En el panel aparecen con su
+**nombre y @username**, y con el aviso **🕵️ sin teléfono**.
+
+### ⚠️ Lo que tenés que saber para despachar
+
+**Contraentrega necesita un teléfono** — la transportadora lo pide para la guía. Con
+estos clientes el teléfono **no viene en el chat**: el bot se lo pide dentro de la
+conversación (va en el pedido, campo `celular`), y **ese** es el que hay que usar para la
+guía.
+
+🔴 **Si ves un pedido de un cliente marcado "sin teléfono" y el campo celular está vacío,
+no lo despaches sin pedírselo antes.** La guía se rechaza o se pierde el paquete.
+
+Y ojo: el número que te dé para la entrega **puede no ser suyo** (el del que recibe). El
+bot le manda la guía por WhatsApp, que es donde sí lo podés alcanzar.
+
+---
+
 ## ⚙️ Cómo cambiar lo que dice el bot
 - Todo el "cerebro" (precios, reglas, tono, objeciones) está en **`src/prompt.js`**.
 - Los fletes por ciudad están en **`src/fletes.js`**.

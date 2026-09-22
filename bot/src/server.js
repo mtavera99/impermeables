@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const { generateReply } = require("./agent");
-const { sendText, sendImage, sendVideo, sendCatalog, catalogoActivo, sendPdf } = require("./whatsapp");
+const { sendText, sendImage, sendVideo, sendCatalog, catalogoActivo, sendPdf, esBsuid } = require("./whatsapp");
 const { MEDIA } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
@@ -11,6 +11,16 @@ const guias = require("./guias");
 const audio = require("./audio");
 const resumen = require("./resumen");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// 🔴 Normalizar un destinatario SIN romper a los clientes con username.
+// Los formularios del panel hacían `.replace(/\D/g,"")` para limpiar el
+// teléfono. Con un BSUID ("CO.1098944123092301") eso deja "1098944123092301":
+// un número inventado. El dueño le daría enviar y el mensaje se iría al vacío,
+// o peor, a un tercero. Un BSUID se deja tal cual.
+const idDestino = (v) => {
+  const s = String(v == null ? "" : v).trim();
+  return esBsuid(s) ? s : s.replace(/\D/g, "");
+};
 
 const app = express();
 app.use(express.json());
@@ -425,7 +435,7 @@ app.post("/responder", async (req, res) => {
   if (req.body?.token !== VERIFY_TOKEN && req.query.token !== VERIFY_TOKEN) {
     return res.sendStatus(403);
   }
-  const to = String(req.body?.to || "").replace(/\D/g, "");
+  const to = idDestino(req.body?.to);
   const texto = String(req.body?.texto || "").trim();
   const comoJson = req.query.json === "1" || req.body?.json === "1";
   if (!to || !texto) {
@@ -487,7 +497,7 @@ app.post("/responder", async (req, res) => {
 // Sirve para retomar: cuando el humano termina, devuelve el chat al bot.
 app.post("/pausar", (req, res) => {
   if (req.body?.token !== VERIFY_TOKEN) return res.sendStatus(403);
-  const tel = String(req.body?.tel || "").replace(/\D/g, "");
+  const tel = idDestino(req.body?.tel);
   const valor = String(req.body?.valor) === "1";
   if (!tel) return res.status(400).send("Falta el número.");
   store.setPaused(tel, valor);
@@ -940,6 +950,35 @@ app.get("/eventos", (req, res) => {
   });
 });
 
+// ============================================================================
+// QUIÉN ESCRIBIÓ  —  y por qué no alcanza con leer `from`
+//
+// 🔴 El 22-sep a las 17:11 un cliente que venía de un anuncio NO recibió
+// respuesta. El payload no traía `from` ni `wa_id`: traía `from_user_id` y
+// `contacts[].user_id` con un BSUID, porque ese cliente usa la función
+// "nombre de usuario" de WhatsApp y Meta le oculta el teléfono al negocio.
+//
+// El código leía solo `msg.from` → undefined → intentaba enviar sin destino →
+// Meta respondía 400 "The parameter to is required." Resultado: silencio. El
+// lead estaba pagado.
+//
+// Se lee en este orden: el teléfono si está, y si no el BSUID. El resto del bot
+// no cambia: el identificador que devuelve esta función se usa igual como clave
+// de la conversación y como destino de la respuesta.
+// ============================================================================
+function quienEscribe(msg, value) {
+  const contacto = (value?.contacts || [])[0] || {};
+  const telefono = msg?.from || contacto.wa_id || null;
+  const bsuid = msg?.from_user_id || contacto.user_id || null;
+  const id = telefono || bsuid || null;
+  return {
+    id,
+    esBsuid: Boolean(!telefono && bsuid),
+    nombre: contacto.profile?.name || null,
+    username: contacto.profile?.username || null,
+  };
+}
+
 async function handleWebhook(body) {
   const entries = body?.entry || [];
   for (const entry of entries) {
@@ -968,25 +1007,36 @@ async function handleWebhook(body) {
 
       const messages = value.messages || [];
       for (const m of messages) {
-        // 🔴 21-SEP: llegaron dos mensajes SIN `from`. Sin remitente el bot no
-        // tiene a dónde responder, y quedaban como "el bot no contestó" sin
-        // explicación. Guardamos el payload crudo para poder diagnosticarlo.
-        // Sospecha principal: son los envíos de prueba del panel de Meta
-        // ("Revisa los webhooks de prueba"), que usan un payload de ejemplo.
-        if (!m.from) {
+        const quien = quienEscribe(m, value);
+        // Sin NINGÚN identificador no hay a dónde responder. Ahora sí es raro:
+        // antes esto se disparaba con los clientes que tienen username, que sí
+        // se pueden contestar (ver quienEscribe).
+        if (!quien.id) {
           anotarEvento({
             tipo: "entrante-sin-remitente",
             clase: m.type,
             texto: m.text?.body?.slice(0, 80),
             crudo: JSON.stringify({ value }).slice(0, 700),
           });
-          console.error("🔴 Mensaje entrante SIN 'from'. No hay a dónde responder. Payload:", JSON.stringify(value).slice(0, 500));
+          console.error("🔴 Mensaje entrante sin remitente NI username. Payload:", JSON.stringify(value).slice(0, 500));
           continue;
         }
-        anotarEvento({ tipo: "entrante", de: m.from, clase: m.type, texto: m.text?.body?.slice(0, 80) });
+        anotarEvento({
+          tipo: "entrante",
+          de: quien.id,
+          ...(quien.esBsuid ? { sinTelefono: true, perfil: quien.nombre, username: quien.username } : {}),
+          clase: m.type,
+          texto: m.text?.body?.slice(0, 80),
+        });
       }
       for (const msg of messages) {
-        const from = msg.from;
+        const quien = quienEscribe(msg, value);
+        const from = quien.id;
+        // El nombre y el username son lo único humano que tenemos de un cliente
+        // sin teléfono: sin esto el panel muestra "CO.1098944123092301".
+        if (from && (quien.nombre || quien.username)) {
+          store.guardarPerfil(from, { nombre: quien.nombre, username: quien.username, sinTelefono: quien.esBsuid });
+        }
         let text = msg.text?.body?.trim();
 
         // 🎙️ NOTAS DE VOZ — medido en el export: 439 conversaciones (7%) las usan

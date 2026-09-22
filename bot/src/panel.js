@@ -64,6 +64,23 @@ function hace(ms) {
 // Ahora sale de BOT_WHATSAPP (en Render). Si no está, se dice "el número del
 // bot" en vez de afirmar uno que puede estar equivocado.
 // ============================================================================
+// 🔴 Cómo se muestra un cliente SIN TELÉFONO (función username de WhatsApp).
+// Su clave de conversación es un BSUID como "CO.1098944123092301". Mostrar
+// "+CO.1098944123092301" no le sirve de nada al dueño: no sabe con quién habla
+// ni puede llamarlo. Se muestra el nombre del perfil y el @username, y se avisa
+// que no hay teléfono — porque para despachar contraentrega hace falta y se lo
+// va a tener que pedir en el chat.
+const RE_BSUID = /^[A-Za-z]{2}\.[A-Za-z0-9]{1,128}$/;
+
+function comoSeLlama(tel, conv) {
+  if (!RE_BSUID.test(String(tel))) return { texto: "+" + tel, sinTelefono: false };
+  const p = conv?.perfil || {};
+  const nombre = p.nombre || null;
+  const user = p.username ? "@" + String(p.username).replace(/^@/, "") : null;
+  const etiqueta = [nombre, user].filter(Boolean).join(" · ") || "cliente sin teléfono";
+  return { texto: etiqueta, sinTelefono: true };
+}
+
 function numeroDelBot() {
   const n = String(process.env.BOT_WHATSAPP || "").replace(/\D/g, "");
   if (!n) return null;
@@ -116,8 +133,9 @@ function render(aviso) {
          <h3>${urgentes.length ? "🔴" : "🟡"} ${urgentes.length + medios.length} chat(s) necesitan que entres vos</h3>
          ${[...urgentes, ...medios].slice(0, 12).map((x) => {
            const e = prior.get(x.tel);
+           const q = comoSeLlama(x.tel, x.c);
            return `<a class="fila ${e.nivel}" href="#c${esc(x.tel)}">
-             <b>+${esc(x.tel)}</b>
+             <b>${esc(q.texto)}${q.sinTelefono ? " 🕵️" : ""}</b>
              <span class="por">${esc(e.motivos[0] || "")}</span>
              <span class="cuando">${esc(hace(x.cuando))}</span>
            </a>`;
@@ -209,7 +227,11 @@ function render(aviso) {
             .join("");
           return `<details class="conv" id="c${esc(x.tel)}">
             <summary>
-              <span class="tel">+${esc(x.tel)}</span>
+              <span class="tel">${esc(comoSeLlama(x.tel, x.c).texto)}${
+                comoSeLlama(x.tel, x.c).sinTelefono
+                  ? ` <b style="color:#ffc857">🕵️ sin teléfono</b>`
+                  : ""
+              }</span>
               ${etiquetas}
               <span class="meta">${x.msgs.filter((m) => m.role === "user").length} msg · ${esc(hace(x.cuando))}</span>
             </summary>
