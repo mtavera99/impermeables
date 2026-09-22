@@ -73,6 +73,12 @@ function render(opciones = {}) {
   .vacio{color:#8b93a4;text-align:center;padding:20px}
   .msg{background:#0f1319;border-left:2px solid #2b5480;padding:7px 10px;border-radius:8px;
        font-size:13px;color:#c8cfdd;margin-top:6px;white-space:pre-wrap}
+  /* Campos para completar los datos de la oficina. 16px: menos que eso hace
+     que iOS agrande la página al tocarlos. */
+  .pide{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+  .pide input{background:#0f1319;border:1px solid #39424f;border-radius:10px;padding:10px;
+              color:#e7e9ee;font-size:16px;min-height:44px;width:100%}
+  .pide input:focus{outline:none;border-color:#3b82f6}
 
   @media (max-width:640px){
     main{padding:13px}
@@ -99,16 +105,14 @@ function render(opciones = {}) {
 <main>
   <div id="res" class="res"></div>
 
-  ${
-    hayPlantilla
-      ? ""
-      : `<div class="aviso">
-           ⚠️ <b>Todavía no hay plantilla aprobada para novedades.</b> A los clientes que
-           escribieron hace <b>más de 24 horas</b> WhatsApp no deja mandarles texto libre, así que
-           esos van a aparecer <b>bloqueados</b>. Subí la plantilla <code>novedad_entrega</code> y
-           poné <code>PLANTILLA_NOVEDAD=novedad_entrega</code> en Render para desbloquearlos.
-         </div>`
-  }
+  <div class="aviso">
+    ℹ️ <b>Cada novedad usa su propia plantilla</b>, así el cliente lee lo que le pasó sin tener
+    que preguntar:<br>
+    <code>novedad_direccion</code> · <code>novedad_ausente</code> · <code>novedad_oficina</code><br>
+    A quien escribió en las últimas 24 h se le manda un mensaje normal, más completo.
+    <b>La de oficina te va a pedir en qué oficina está y hasta cuándo tiene</b> — esos datos salen
+    de la novedad, el bot no los puede inventar.
+  </div>
 
   <div class="caja">
     <div class="como">
@@ -153,17 +157,29 @@ function mostrar(clase, texto) {
   res.style.display = "block";
 }
 
-document.getElementById("btnRevisar").addEventListener("click", function () {
+// Junta lo que el dueño escribió en los campos de oficina/plazo, por guía.
+function datosCompletados() {
+  var datos = {};
+  document.querySelectorAll("input.dato").forEach(function (i) {
+    var g = i.getAttribute("data-guia");
+    if (!datos[g]) datos[g] = {};
+    datos[g][i.getAttribute("data-campo")] = i.value.trim();
+  });
+  return datos;
+}
+
+function revisar(btn) {
   var txt = document.getElementById("pegado").value.trim();
   if (!txt) { mostrar("mal", "Pegá primero las novedades."); return; }
-  var btn = this;
   btn.disabled = true;
   mostrar("info", "Buscando a quién corresponde cada guía...");
 
   fetch("/novedades/revisar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token: TOKEN, texto: txt })
+    // Se vuelve a mandar lo que ya se completó: así al revisar de nuevo no se
+    // pierde lo que el dueño escribió en los campos de la oficina.
+    body: JSON.stringify({ token: TOKEN, texto: txt, datos: datosCompletados() })
   })
     .then(function (r) {
       if (r.status === 403) throw new Error("la clave del panel no coincide. Abrí el panel de nuevo.");
@@ -189,9 +205,29 @@ document.getElementById("btnRevisar").addEventListener("click", function () {
               ? '<span class="tag abierta">abierta</span>'
               : '<span class="tag cerrada">cerrada +24h</span>')
           : "";
-        var cuerpo = f.enviar
-          ? '<div class="msg">' + f.texto + "</div>"
-          : '<span class="motivo">' + (f.motivoNoEnvio || "") + "</span>";
+        // 🔴 La novedad de oficina necesita DÓNDE está y HASTA CUÁNDO tiene.
+        // Esos datos salen de la novedad y los completa el dueño: el bot no los
+        // puede inventar (el 14-sep prometió una oficina de Servientrega que no
+        // presta ese servicio, y la clienta lo leyó).
+        var cuerpo;
+        if (f.pidoDatos) {
+          cuerpo =
+            '<span class="motivo">' + (f.motivoNoEnvio || "") + "</span>" +
+            '<div class="pide">' +
+              '<input class="dato" data-guia="' + f.guia + '" data-campo="oficina" ' +
+                'placeholder="¿En qué oficina? ej: Interrapidisimo, Monteria">' +
+              '<input class="dato" data-guia="' + f.guia + '" data-campo="plazo" ' +
+                'placeholder="¿Hasta cuándo? ej: el 27 de septiembre">' +
+            "</div>";
+        } else if (f.enviar) {
+          cuerpo =
+            '<div class="msg">' + f.texto + "</div>" +
+            (f.porPlantilla
+              ? '<span class="sub">se manda por la plantilla <b>' + f.plantilla + "</b></span>"
+              : '<span class="sub">ventana abierta: se manda como mensaje normal</span>');
+        } else {
+          cuerpo = '<span class="motivo">' + (f.motivoNoEnvio || "") + "</span>";
+        }
         tr.innerHTML =
           '<td data-label="Enviar">' + chk + "</td>" +
           '<td data-label="Guía"><code>' + f.guia + "</code></td>" +
@@ -203,16 +239,22 @@ document.getElementById("btnRevisar").addEventListener("click", function () {
         tb.appendChild(tr);
       });
       document.getElementById("zona").style.display = "block";
+      var faltanDatos = d.filas.filter(function (f) { return f.pidoDatos; }).length;
       mostrar(
         d.bloqueadas ? "info" : "ok",
         "Se leyeron " + d.filas.length + " novedad(es): " + d.listas + " lista(s) para avisar" +
           (d.bloqueadas ? " y " + d.bloqueadas + " que NO se pueden enviar (mirá el motivo)." : ".") +
+          (faltanDatos
+            ? " ⚠️ " + faltanDatos + " de oficina necesitan que completes los dos campos y le des Revisar otra vez."
+            : "") +
           " Todavía no se envió nada."
       );
     })
     .catch(function (e) { mostrar("mal", "🔴 No salió: " + e.message + " No se envió nada."); })
     .finally(function () { btn.disabled = false; });
-});
+}
+
+document.getElementById("btnRevisar").addEventListener("click", function () { revisar(this); });
 
 document.getElementById("btnEnviar").addEventListener("click", function () {
   if (!PLAN) return;

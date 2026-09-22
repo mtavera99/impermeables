@@ -143,36 +143,68 @@ chequear(
   JSON.stringify(porGuia("240077777777"))
 );
 
-console.log("\n── 6. 🔑 La ventana de 24h decide si se puede escribir ──");
+console.log("\n── 6. 🔑 La ventana de 24h decide CÓMO se le escribe ──");
 
 const pedro = porGuia("240012345678");
 const ana = porGuia("240098765432");
 
 chequear("Pedro escribió hace 2h → ventana abierta", pedro.ventanaAbierta === true);
-chequear("a Pedro SÍ se le puede escribir", pedro.enviar === true);
-chequear("y el mensaje lo saluda por su primer nombre", pedro.texto.includes("Hola Pedro"), pedro.texto.slice(0, 60));
+chequear("a Pedro se le manda mensaje normal, no plantilla", pedro.enviar === true && !pedro.porPlantilla);
+chequear("y lo saluda por su primer nombre", pedro.texto.includes("Hola Pedro"), pedro.texto.slice(0, 60));
 chequear("el mensaje le pide un punto de referencia", /punto de referencia/i.test(pedro.texto));
 
 chequear("Ana escribió hace 3 días → ventana cerrada", ana.ventanaAbierta === false);
+chequear("a Ana igual se le puede avisar, por plantilla", ana.enviar === true && ana.porPlantilla === true);
 chequear(
-  "a Ana NO se le manda texto libre: quedaría bloqueado",
-  ana.enviar === false,
-  "intentaría enviar y Meta lo rechazaría, o peor: lo aceptaría y no lo entregaría"
+  "y usa la plantilla de SU tipo de novedad, no una genérica",
+  ana.plantilla === "novedad_ausente",
+  `usó: ${ana.plantilla}`
 );
 chequear(
-  "y el motivo explica que falta la plantilla",
-  /plantilla/i.test(ana.motivoNoEnvio),
-  ana.motivoNoEnvio
+  "el panel muestra el texto real que va a recibir",
+  /no encontramos a nadie/i.test(ana.texto),
+  ana.texto
 );
 
-console.log("\n── 7. Con la plantilla aprobada, Ana se desbloquea ──");
+console.log("\n── 7. 🔴 La de OFICINA no se manda sin los datos reales ──");
+// El 14-sep el bot prometió "la oficina de Servientrega en Potosí" y
+// Servientrega no presta recogida en oficina. Esos datos salen de la novedad.
 
-const plan2 = novedades.revisar("240098765432 Destinatario ausente", { tienePlantilla: true });
-chequear("ya se puede avisar", plan2.filas[0].enviar === true);
+store.registrarGuiaEnviada({ guia: "240055550000", telefono: "573005550000", nombre: "Luis Ramirez" });
+const convO = store.todasLasConversaciones();
+convO["573005550000"] = { messages: [{ role: "user", content: "ok", at: 1 }], ultimoDelCliente: Date.now() - 5 * 86400 * 1000 };
+fs.writeFileSync(DIR + "/conversations.json", JSON.stringify(convO, null, 2));
+
+const sinDatos = novedades.revisar("240055550000 Reclame en oficina").filas[0];
+chequear("sin completar, queda bloqueada", sinDatos.enviar === false);
+chequear("y pide los dos datos", Array.isArray(sinDatos.pidoDatos) && sinDatos.pidoDatos.length === 2);
 chequear(
-  "y queda marcado que va por plantilla, no por texto libre",
-  plan2.filas[0].porPlantilla === true,
-  "mandaría texto libre con la ventana cerrada"
+  "el motivo dice que el bot no los puede inventar",
+  /no los puede inventar/i.test(sinDatos.motivoNoEnvio),
+  sinDatos.motivoNoEnvio
+);
+
+const conDatos = novedades.revisar("240055550000 Reclame en oficina", {
+  datos: { "240055550000": { oficina: "Interrapidisimo, Monteria", plazo: "el 27 de septiembre" } },
+}).filas[0];
+chequear("con los datos completos ya se puede enviar", conDatos.enviar === true);
+chequear("usa la plantilla de oficina", conDatos.plantilla === "novedad_oficina");
+chequear(
+  "los datos van como parámetros de la plantilla, en orden",
+  conDatos.parametros[0] === "Interrapidisimo, Monteria" && conDatos.parametros[1] === "el 27 de septiembre",
+  JSON.stringify(conDatos.parametros)
+);
+chequear(
+  "y el panel muestra el mensaje ya armado",
+  conDatos.texto.includes("Interrapidisimo, Monteria") && conDatos.texto.includes("el 27 de septiembre"),
+  conDatos.texto
+);
+chequear(
+  "completar solo la mitad tampoco alcanza",
+  novedades.revisar("240055550000 Reclame en oficina", {
+    datos: { "240055550000": { oficina: "Interrapidisimo" } },
+  }).filas[0].enviar === false,
+  "mandaría la plantilla con un parámetro vacío"
 );
 
 console.log("\n── 8. El nombre se usa con cabeza ──");
@@ -186,8 +218,21 @@ chequear(
 
 console.log("\n── 9. La pantalla se arma y su JavaScript compila ──");
 process.env.PANEL_TOKEN = "clave_de_prueba";
-const pantalla = require("./src/panel-novedades").render({ hayPlantilla: false });
-chequear("avisa que falta la plantilla", pantalla.includes("Todavía no hay plantilla aprobada"));
+const pantalla = require("./src/panel-novedades").render({});
+chequear(
+  "la pantalla nombra las 3 plantillas, una por tipo de novedad",
+  pantalla.includes("novedad_direccion") &&
+    pantalla.includes("novedad_ausente") &&
+    pantalla.includes("novedad_oficina")
+);
+chequear(
+  "y avisa que la de oficina va a pedir los datos",
+  /en qué oficina está y hasta cuándo/i.test(pantalla)
+);
+chequear(
+  "los campos para completar la oficina existen en el JS",
+  pantalla.includes('data-campo="oficina"') && pantalla.includes('data-campo="plazo"')
+);
 chequear("tiene el cuadro para pegar", pantalla.includes("<textarea"));
 chequear("el botón de revisar aclara que no envía", /Revisar \(no env/.test(pantalla));
 const script = pantalla.match(/<script>([\s\S]*?)<\/script>/);

@@ -323,9 +323,11 @@ app.post("/novedades/revisar", (req, res) => {
 
   try {
     limpiarPlanesViejos();
-    const plan = novedades.revisar(texto, { tienePlantilla: Boolean(PLANTILLA_NOVEDAD) });
+    // `datos` trae lo que el dueño completó para las novedades de oficina
+    // (dónde está y hasta cuándo). Va indexado por número de guía.
+    const plan = novedades.revisar(texto, { datos: req.body?.datos || {} });
     const id = Math.random().toString(36).slice(2, 10);
-    PLANES_NOVEDADES.set(id, { filas: plan.filas, creado: Date.now() });
+    PLANES_NOVEDADES.set(id, { filas: plan.filas, creado: Date.now(), texto });
 
     anotarEvento({
       tipo: "novedades-revisadas",
@@ -351,6 +353,10 @@ app.post("/novedades/revisar", (req, res) => {
         texto: f.texto || "",
         enviar: Boolean(f.enviar),
         motivoNoEnvio: f.motivoNoEnvio || "",
+        porPlantilla: Boolean(f.porPlantilla),
+        plantilla: f.plantilla || "",
+        // Cuando viene, la pantalla muestra los campos para completarlos.
+        pidoDatos: f.pidoDatos || null,
       })),
     });
   } catch (e) {
@@ -387,21 +393,23 @@ app.post("/novedades/enviar", async (req, res) => {
     // el 21-sep con un mensaje al dueño. Ahí va la plantilla, cuyo único
     // trabajo es que el cliente responda: en cuanto responde se abre la ventana
     // de 24h y el bot le habla normal, con el mensaje específico de su novedad.
+    // Cada tipo de novedad tiene SU plantilla, para que el cliente reciba lo
+    // que necesita saber y no un "tu pedido tuvo una novedad, responde".
+    // Los parámetros (la oficina y el plazo) los completó el dueño: no se
+    // inventan.
+    const componentes = (f.parametros || []).length
+      ? [{ type: "body", parameters: f.parametros.map((t) => ({ type: "text", text: String(t) })) }]
+      : undefined;
+
     const envio = f.porPlantilla
-      ? await sendTemplate(f.destino, PLANTILLA_NOVEDAD, PLANTILLA_IDIOMA)
+      ? await sendTemplate(f.destino, f.plantilla, PLANTILLA_IDIOMA, componentes)
       : await sendText(f.destino, f.texto);
 
     if (envio && envio.ok) {
       // Queda en el historial del chat para que el bot no repita la información
       // cuando el cliente responda. Si fue por plantilla se anota lo que de
       // verdad se le mandó, no el mensaje largo que todavía no vio.
-      store.pushMsg(
-        f.destino,
-        "assistant",
-        f.porPlantilla
-          ? `(plantilla ${PLANTILLA_NOVEDAD}) Te avisamos que tu pedido tuvo una novedad en la entrega.`
-          : f.texto
-      );
+      store.pushMsg(f.destino, "assistant", f.texto);
       anotarEvento({
         tipo: "novedad-avisada",
         para: f.destino,

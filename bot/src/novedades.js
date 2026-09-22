@@ -43,6 +43,42 @@ function esCelular(n) {
 // desconocida y se escala al dueño. Preferimos no escribir antes que escribir
 // una cosa equivocada.
 // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// 🔑 UNA PLANTILLA POR TIPO DE NOVEDAD, Y POR QUÉ
+//
+// La primera versión usaba UNA plantilla genérica ("tu pedido tuvo una novedad,
+// responde"). El dueño la vio y señaló el problema real: el cliente recibe algo
+// vago y TIENE QUE PREGUNTAR qué pasó. Eso pierde gente justo cuando el paquete
+// está a días de devolverse.
+//
+// Con una plantilla por caso, al cliente le llega exactamente lo que necesita
+// saber sin preguntar nada: "está en la oficina de X, tienes hasta el Y".
+//
+// Los nombres son los que el dueño ya subió a Meta el 22-sep, en Spanish (COL).
+// Quedan como variables de entorno por si alguna se renombra o se rechaza.
+// ----------------------------------------------------------------------------
+const PLANTILLAS = {
+  direccion: process.env.PLANTILLA_NOVEDAD_DIRECCION || "novedad_direccion",
+  ausente: process.env.PLANTILLA_NOVEDAD_AUSENTE || "novedad_ausente",
+  oficina: process.env.PLANTILLA_NOVEDAD_OFICINA || "novedad_oficina",
+};
+
+// El texto EXACTO de cada plantilla aprobada, solo para mostrarle al dueño en el
+// panel qué va a recibir el cliente antes de enviar. No se manda desde acá: lo
+// arma Meta con la plantilla y los parámetros. Si se edita la plantilla en Meta,
+// hay que actualizar esto o el panel mostraría algo que no es.
+const TEXTO_PLANTILLA = {
+  direccion:
+    "Salimos a entregarte tu pedido de BikerPro y no logramos dar con la direccion. " +
+    "Responde este mensaje con la direccion completa y un punto de referencia, y lo intentamos de nuevo.",
+  ausente:
+    "Pasamos a entregarte tu pedido de BikerPro y no encontramos a nadie. " +
+    "Responde este mensaje y coordinamos un dia y una hora para volver a intentarlo.",
+  oficina:
+    "Tu pedido de BikerPro esta en la oficina de {{1}} para que lo reclames. " +
+    "Tienes hasta {{2}} para recogerlo, despues se devuelve. Responde por aqui si necesitas ayuda.",
+};
+
 const TIPOS = [
   {
     clave: "direccion",
@@ -160,8 +196,6 @@ const VENTANA_24H = 24 * 60 * 60 * 1000;
  */
 function revisar(texto, opciones = {}) {
   const ahora = opciones.ahora || Date.now();
-  const tienePlantilla = Boolean(opciones.tienePlantilla);
-
   const pedidos = store.todosLosPedidos();
   const guiasEnviadas = store.todasLasGuiasEnviadas();
 
@@ -208,25 +242,66 @@ function revisar(texto, opciones = {}) {
       };
     }
 
-    if (!ventanaAbierta && !tienePlantilla) {
+    // ------------------------------------------------------------------------
+    // VENTANA ABIERTA: texto libre, que es más completo y más humano.
+    // ------------------------------------------------------------------------
+    if (ventanaAbierta) {
+      return { ...base, ventanaAbierta, texto: tipo.mensaje(primerNombre(nombre)), enviar: true };
+    }
+
+    // ------------------------------------------------------------------------
+    // VENTANA CERRADA: solo pasa una plantilla aprobada, y cada tipo tiene la
+    // suya para que el cliente no reciba un mensaje vago.
+    // ------------------------------------------------------------------------
+    const plantilla = PLANTILLAS[tipo.clave];
+    if (!plantilla) {
       return {
         ...base,
         ventanaAbierta,
-        texto: tipo.mensaje(primerNombre(nombre)),
         enviar: false,
         motivoNoEnvio:
-          "Hace más de 24h que no escribe: WhatsApp no deja mandarle texto libre. " +
-          "Falta la plantilla aprobada (novedad_entrega)",
+          "Hace más de 24h que no escribe y este tipo de novedad no tiene plantilla configurada",
+      };
+    }
+
+    // 🔴 La de oficina necesita DÓNDE y HASTA CUÁNDO, y eso NO se puede
+    // inventar: es exactamente el error del 14-sep con Servientrega en Potosí.
+    // Sale de la novedad, y lo completa el dueño en el panel.
+    if (tipo.clave === "oficina") {
+      const datos = (opciones.datos && opciones.datos[n.guia]) || {};
+      const oficina = String(datos.oficina || "").trim();
+      const plazo = String(datos.plazo || "").trim();
+      if (!oficina || !plazo) {
+        return {
+          ...base,
+          ventanaAbierta,
+          plantilla,
+          pidoDatos: ["oficina", "plazo"],
+          enviar: false,
+          motivoNoEnvio:
+            "Falta completar en qué oficina está y hasta cuándo tiene para reclamarlo. " +
+            "Esos datos salen de la novedad: el bot no los puede inventar.",
+        };
+      }
+      return {
+        ...base,
+        ventanaAbierta,
+        plantilla,
+        parametros: [oficina, plazo],
+        texto: TEXTO_PLANTILLA.oficina.replace("{{1}}", oficina).replace("{{2}}", plazo),
+        enviar: true,
+        porPlantilla: true,
       };
     }
 
     return {
       ...base,
       ventanaAbierta,
-      texto: tipo.mensaje(primerNombre(nombre)),
+      plantilla,
+      parametros: [],
+      texto: TEXTO_PLANTILLA[tipo.clave] || tipo.mensaje(primerNombre(nombre)),
       enviar: true,
-      // Con la ventana cerrada hay que ir por plantilla, no por texto libre.
-      porPlantilla: !ventanaAbierta,
+      porPlantilla: true,
     };
   });
 
@@ -243,4 +318,4 @@ function primerNombre(nombre) {
   return p && p.length > 1 ? p : "";
 }
 
-module.exports = { parsear, clasificar, revisar, primerNombre, TIPOS, VENTANA_24H };
+module.exports = { parsear, clasificar, revisar, primerNombre, TIPOS, VENTANA_24H, PLANTILLAS, TEXTO_PLANTILLA };
