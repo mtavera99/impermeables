@@ -37,6 +37,53 @@ async function subscribeWaba() {
 app.get("/", (_req, res) => res.send("BikerPro bot activo 🏍️"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
+// ============================================================================
+// PROBAR EL BOT SIN WHATSAPP  —  GET /probar?token=...&msg=...
+//
+// POR QUÉ EXISTE: el webhook manda la respuesta por WhatsApp y NO la escribe en
+// el log. Sin esto, la única forma de saber si la IA cotiza bien es mandarle un
+// mensaje real desde un celular, y eso no se puede repetir 20 veces ni automatizar.
+//
+// PARA QUÉ SIRVE:
+//   1. Verificar en cada despliegue que el guion cotiza con el tarifario vigente
+//      (los casos que ya costaron plata: Bogotá Suba, Mosquera, Tadó, 2 unidades).
+//   2. Comparar proveedores de IA con los MISMOS casos antes de cambiar de motor
+//      (Gemini vs DeepSeek): cuál respeta las reglas de precio.
+//
+// 🔒 PROTEGIDO con WHATSAPP_VERIFY_TOKEN. Sin el token correcto responde 403.
+//    Si quedara abierto, cualquiera podría quemar la cuota de IA a costa nuestra.
+//
+// ⚠️ Usa un teléfono ficticio ("prueba-*"), así no se mezcla con conversaciones
+//    de clientes reales ni dispara seguimientos. `&reset=1` arranca de cero.
+// ============================================================================
+app.get("/probar", async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const msg = (req.query.msg || "").toString().trim();
+  if (!msg) return res.status(400).json({ error: "falta ?msg=" });
+
+  const phone = `prueba-${(req.query.id || "default").toString().slice(0, 20)}`;
+
+  try {
+    if (req.query.reset === "1") store.borrarConversacion(phone);
+    const t0 = Date.now();
+    const { reply, order, handoff, media } = await generateReply(phone, msg);
+    res.json({
+      pregunta: msg,
+      respuesta: reply,
+      pedido: order || null,
+      pasarAHumano: handoff,
+      medios: media || [],
+      ms: Date.now() - t0,
+      modelo: process.env.AI_PROVIDER === "openai-compat"
+        ? (process.env.AI_MODEL || "deepseek-chat")
+        : (process.env.GEMINI_MODEL || "gemini-3.1-flash-lite"),
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Suscripción manual de la WABA (visita esta URL una vez para forzarla)
 app.get("/setup-waba", async (_req, res) => {
   await subscribeWaba();
