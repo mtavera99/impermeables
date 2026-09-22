@@ -306,12 +306,65 @@ app.post("/webhook", (req, res) => {
   handleWebhook(req.body).catch((e) => console.error("handleWebhook:", e.message));
 });
 
+// ============================================================================
+// BITÁCORA DE EVENTOS DEL WEBHOOK (últimos 60, en memoria)
+//
+// POR QUÉ: el 21-sep Meta aceptó un mensaje (200 + wamid) y NUNCA lo entregó.
+// El motivo del fallo viene en eventos `statuses`, que este webhook estaba
+// IGNORANDO: solo miraba `value.messages`. O sea que Meta nos explicaba el
+// problema y nosotros tirábamos la explicación a la basura.
+//
+// También sirve para la pregunta opuesta: si un mensaje entrante NO aparece
+// acá, Meta no está llegando al webhook y el problema es de configuración, no
+// del bot. Sin esto, "el bot no contesta" es indistinguible de "Meta no avisa".
+// ============================================================================
+const EVENTOS = [];
+function anotarEvento(e) {
+  EVENTOS.push({ cuando: new Date().toISOString(), ...e });
+  if (EVENTOS.length > 60) EVENTOS.shift();
+}
+
+app.get("/eventos", (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  res.json({
+    total: EVENTOS.length,
+    nota: EVENTOS.length === 0
+      ? "🔴 VACÍO: Meta no ha llamado al webhook desde el último reinicio. Si ya escribiste al número, el problema es la suscripción del campo 'messages' en la cuenta correcta (la de 'biker'), no el bot."
+      : "Del más viejo al más nuevo. 'status: failed' trae el motivo en 'errores'.",
+    eventos: EVENTOS,
+  });
+});
+
 async function handleWebhook(body) {
   const entries = body?.entry || [];
   for (const entry of entries) {
     for (const change of entry.changes || []) {
       const value = change.value || {};
+
+      // 🔴 ESTADOS DE ENTREGA — acá viene el motivo cuando un mensaje no llega.
+      for (const st of value.statuses || []) {
+        const errores = (st.errors || []).map((e) => ({
+          code: e.code,
+          title: e.title,
+          details: e.error_data?.details || e.details,
+        }));
+        anotarEvento({
+          tipo: "estado",
+          para: st.recipient_id,
+          status: st.status, // sent · delivered · read · failed
+          errores,
+        });
+        if (st.status === "failed") {
+          console.error(`🔴 ENVÍO FALLIDO a ${st.recipient_id}: ${JSON.stringify(errores)}`);
+        } else {
+          console.log(`· estado ${st.status} para ${st.recipient_id}`);
+        }
+      }
+
       const messages = value.messages || [];
+      for (const m of messages) {
+        anotarEvento({ tipo: "entrante", de: m.from, clase: m.type, texto: m.text?.body?.slice(0, 80) });
+      }
       for (const msg of messages) {
         if (msg.type !== "text") continue; // por ahora solo texto
         const from = msg.from;
