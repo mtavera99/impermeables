@@ -122,6 +122,65 @@ app.get("/cierre", async (req, res) => {
   res.json(out);
 });
 
+// ============================================================================
+// GET /limpiar-duplicados?token=...[&aplicar=1]
+//
+// Los pedidos duplicados que YA quedaron guardados antes del candado. Sin
+// `aplicar=1` solo muestra qué haría (para poder revisarlo antes de borrar).
+// Se queda con el PRIMER registro de cada cliente, que es el original.
+// ============================================================================
+app.get("/limpiar-duplicados", (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const todos = store.todosLosPedidos().slice().reverse(); // del más viejo al más nuevo
+  const vistos = new Map();
+  const conservar = [];
+  const descartar = [];
+
+  for (const o of todos) {
+    const tel = String(o.celular || o.telefono_chat || "").replace(/\D/g, "");
+    const clave = `${tel}|${o.total}|${o.talla || ""}`;
+    if (vistos.has(clave)) {
+      descartar.push(o);
+    } else {
+      vistos.set(clave, true);
+      conservar.push(o);
+    }
+  }
+
+  const resumen = {
+    registros: todos.length,
+    clientesReales: conservar.length,
+    duplicados: descartar.length,
+    recaudoReal: conservar.reduce((s, o) => s + Number(o.total || 0), 0),
+    recaudoConDuplicados: todos.reduce((s, o) => s + Number(o.total || 0), 0),
+    aDespachar: conservar.map((o) => ({
+      nombre: o.nombre,
+      celular: o.celular || o.telefono_chat,
+      ciudad: o.ciudad,
+      talla: o.talla,
+      color: o.color,
+      total: o.total,
+      pago: o.pago,
+    })),
+    duplicadosDetalle: descartar.map((o) => ({ nombre: o.nombre, celular: o.celular, fecha: o.fecha, total: o.total })),
+  };
+
+  if (req.query.aplicar === "1") {
+    const ok = store.reemplazarPedidos(conservar);
+    resumen.aplicado = ok;
+    resumen.nota = ok
+      ? `🟢 Listo: quedaron ${conservar.length} pedidos y se eliminaron ${descartar.length} duplicados.`
+      : "🔴 No se pudo escribir el archivo. Nada se borró.";
+  } else {
+    resumen.nota =
+      "Esto es solo una PREVISUALIZACIÓN, no se borró nada. " +
+      "Para aplicarlo agregá &aplicar=1 a la URL.";
+  }
+
+  res.json(resumen);
+});
+
 // Pedidos en CSV, para tener una copia propia fuera de Render
 app.get("/pedidos.csv", (req, res) => {
   if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);

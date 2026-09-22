@@ -128,6 +128,28 @@ function todasLasConversaciones() {
   return readJSON(CONV_FILE, {});
 }
 
+/**
+ * Reescribe la lista completa de pedidos. La usa /limpiar-duplicados para sacar
+ * los que quedaron guardados antes de que existiera el candado.
+ * ⚠️ Deja copia de respaldo del archivo anterior antes de tocar nada: borrar
+ * pedidos sin red es exactamente el tipo de operación que no se puede deshacer.
+ */
+function reemplazarPedidos(lista) {
+  try {
+    ensure();
+    const previo = readJSON(ORDERS_FILE, []);
+    const respaldo = ORDERS_FILE.replace(/\.json$/, `-respaldo-${Date.now()}.json`);
+    writeJSON(respaldo, previo);
+    console.log(`💾 Respaldo de pedidos en ${respaldo} (${previo.length} registros)`);
+    // Se guarda del más viejo al más nuevo, como estaba
+    writeJSON(ORDERS_FILE, lista);
+    return true;
+  } catch (e) {
+    console.error("🔴 No se pudo reescribir los pedidos:", e.message);
+    return false;
+  }
+}
+
 /** Devuelve todos los pedidos guardados, del más nuevo al más viejo. */
 function todosLosPedidos() {
   ensure();
@@ -145,6 +167,34 @@ function setPaused(phone, val) {
   all[phone] = c;
   writeJSON(CONV_FILE, all);
 }
+// 🔴 ANTIDUPLICADOS DE PEDIDOS (22-sep). El bot emitió el bloque ##ORDER## dos
+// veces para el mismo cliente, con 18 a 30 segundos de diferencia. Medido con
+// datos reales: 7 registros para 4 clientes. Si el dueño despacha por el
+// archivo, manda 3 paquetes de mas: ~$99.000 de producto mas 3 fletes tirados.
+//
+// El prompt ya le pide a la IA no repetir el cuadro de confirmación, pero eso
+// es una instrucción y esto es un candado. La instrucción falló; el candado no
+// depende de que el modelo se porte bien.
+const VENTANA_PEDIDO_DUPLICADO_MS = 6 * 60 * 60 * 1000; // 6 horas
+
+function esPedidoDuplicado(orders, nuevo) {
+  const tel = String(nuevo.celular || nuevo.telefono_chat || "").replace(/\D/g, "");
+  if (!tel) return null;
+  const ahora = Date.now();
+  for (let i = orders.length - 1; i >= 0; i--) {
+    const o = orders[i];
+    const telO = String(o.celular || o.telefono_chat || "").replace(/\D/g, "");
+    if (telO !== tel) continue;
+    const cuando = new Date(o.fecha).getTime();
+    if (ahora - cuando > VENTANA_PEDIDO_DUPLICADO_MS) break;
+    // Mismo cliente, mismo total y misma talla dentro de la ventana = repetido
+    if (Number(o.total) === Number(nuevo.total) && String(o.talla || "") === String(nuevo.talla || "")) {
+      return o;
+    }
+  }
+  return null;
+}
+
 function saveOrder(order) {
   const record = { ...order, fecha: new Date().toISOString() };
 
@@ -162,6 +212,17 @@ function saveOrder(order) {
   try {
     ensure();
     const orders = readJSON(ORDERS_FILE, []);
+
+    const repetido = esPedidoDuplicado(orders, record);
+    if (repetido) {
+      console.warn(
+        `⏭️  PEDIDO DUPLICADO NO GUARDADO: ${record.nombre || "?"} (${record.celular || record.telefono_chat}) ` +
+          `por $${record.total}. Ya existe uno igual de ${repetido.fecha}. ` +
+          "El bot emitió el bloque dos veces."
+      );
+      return { ...repetido, duplicadoIgnorado: true };
+    }
+
     orders.push(record);
     writeJSON(ORDERS_FILE, orders);
   } catch (e) {
@@ -178,5 +239,6 @@ function saveOrder(order) {
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones,
+  reemplazarPedidos,
   todosLosPedidos
 };
