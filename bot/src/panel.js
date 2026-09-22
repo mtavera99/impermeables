@@ -390,8 +390,53 @@ document.querySelectorAll("form.resp").forEach(function (f) {
     btn.disabled = true;                       // candado contra el doble clic
     estado.className = "envio wait";
     estado.textContent = "Enviando…";
-    fetch("/responder?json=1", { method: "POST", body: new FormData(f) })
-      .then(function (r) { return r.json(); })
+    // ========================================================================
+    // 🔴 POR QUÉ ACÁ NO SE USA FormData (bug encontrado el 22-sep, iPhone)
+    //
+    // Esto era "body: new FormData(f)" y el botón NO FUNCIONABA NUNCA. Dos
+    // fallas encimadas, las dos medidas contra el servicio real:
+    //
+    //  1. El servidor solo parsea JSON y urlencoded (express.urlencoded). Un
+    //     cuerpo multipart/form-data le llega VACÍO, así que req.body.token
+    //     queda undefined y responde 403.
+    //       multipart  -> HTTP 403 Forbidden
+    //       urlencoded -> HTTP 200  ✅
+    //
+    //  2. En el Safari del iPhone el fetch con FormData ni siquiera salía:
+    //     tiraba "The string did not match the expected pattern", que este
+    //     panel mostraba como "Error de red" — y eso manda a buscar el
+    //     problema en la conexión o en Meta, cuando estaba acá.
+    //
+    // Se arma a mano en vez de "new URLSearchParams(new FormData(f))" para no
+    // tocar FormData en absoluto, que es justamente lo que rompe en Safari.
+    //
+    // ⚠️ OJO al editar: este bloque vive DENTRO de un template literal de
+    // JavaScript. Acá NO se pueden usar comillas invertidas, ni el signo de
+    // dólar seguido de llave: las dos cosas cortan el texto y dejan el panel
+    // con SyntaxError. Ya rompió dos veces, incluso en un comentario.
+    // ========================================================================
+    var datos = new URLSearchParams();
+    Array.prototype.forEach.call(f.elements, function (el) {
+      if (el.name) datos.append(el.name, el.value);
+    });
+
+    fetch("/responder?json=1", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+      body: datos.toString()
+    })
+      .then(function (r) {
+        // Un 403 devuelve "Forbidden" en texto plano, no JSON: sin esto
+        // r.json() explota y el fallo sale disfrazado de "Error de red".
+        if (r.status === 403) {
+          throw new Error(
+            "la clave del panel no coincide. Volvé a abrir el panel con el token " +
+              "correcto (el valor de PANEL_TOKEN en Render)."
+          );
+        }
+        if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
+        return r.json();
+      })
       .then(function (d) {
         if (d.duplicado) {
           estado.className = "envio wait";
@@ -420,7 +465,7 @@ document.querySelectorAll("form.resp").forEach(function (f) {
       })
       .catch(function (e) {
         estado.className = "envio mal";
-        estado.textContent = "🔴 Error de red: " + e.message + ". Revisá /eventos antes de reintentar.";
+        estado.textContent = "🔴 No salió: " + e.message + " El mensaje NO se envió, se puede reintentar.";
       })
       .finally(function () { btn.disabled = false; });
   });
