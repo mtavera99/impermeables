@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-09-21 20:10 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-09-21 21:11 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,12 +9,12 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$97,670** |
-| gastado hoy (hasta las 20h) | $155,182 |
-| presupuesto activo | $149,000/día |
-| cierre proyectado del día | $171,196 |
-| saldo proyectado a medianoche | $81,656 |
-| objetivo (cubrir un día de 143% + colchón) | $233,070 |
+| **saldo ahora** | **$89,349** |
+| gastado hoy (hasta las 20h) | $163,958 |
+| presupuesto activo | $0/día |
+| cierre proyectado del día | $179,972 |
+| saldo proyectado a medianoche | $73,334 |
+| objetivo (cubrir un día de 143% + colchón) | $20,000 |
 
 ### 🟢 Saldo suficiente. No hace falta recargar.
 
@@ -32,21 +32,21 @@
 | 2026-09-18 | $102,096 | 93 | **$1,098** | $4,997 | 4.55 |
 | 2026-09-19 | $94,921 | 95 | **$999** | $4,674 | 4.68 |
 | 2026-09-20 | $114,748 | 97 | **$1,183** | $4,915 | 4.16 |
-| 2026-09-21 **HOY** | $146,730 | 129 | **$1,137** | $4,012 | 3.53 |
+| 2026-09-21 **HOY** | $155,451 | 141 | **$1,102** | $3,950 | 3.58 |
 
-🟢 **Hoy va mejor que ayer a la misma hora** ($1,137 vs $1,183).
+🟢 **Hoy va mejor que ayer a la misma hora** ($1,102 vs $1,183).
 
 ### La descomposición — dónde está el problema
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$ 1,137  =  $ 4,012  ÷  3.53
+$ 1,102  =  $ 3,950  ÷  3.58
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $4,012 | ~$3.615 | 🟢 normal |
-| **conv/mil** (la calidad de la audiencia) | 3.53 | 5,33 | 🟠 |
+| **CPM** (el precio de la subasta) | $3,950 | ~$3.615 | 🟢 normal |
+| **conv/mil** (la calidad de la audiencia) | 3.58 | 5,33 | 🟠 |
 
 
 ---
@@ -55,12 +55,12 @@ $ 1,137  =  $ 4,012  ÷  3.53
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
-| Domiciliarios VIDEO | $55,000 | $75,073 | 136% | 52 | $1,444 | 2.47 |
-| Domiciliarios | $45,000 | $41,499 | 92% | 47 | $883 | 4.86 |
-| TEST Creativos | $25,000 | $14,135 | 57% | 15 | $942 | 7.40 |
-| Domiciliarios - Expancion | $15,000 | $9,676 | 65% | 8 | $1,210 | 3.38 |
-| Publico ABIERTO video | $0 | $8,452 | — | 2 | $4,226 | 2.99 |
-| Motorizados | $9,000 | $6,347 | 71% | 7 | $907 | 4.72 |
+| Domiciliarios VIDEO | $0 | $77,349 | — | 52 | $1,487 | 2.38 |
+| Domiciliarios | $0 | $46,070 | — | 53 | $869 | 4.72 |
+| TEST Creativos | $0 | $15,105 | — | 20 | $755 | 9.38 |
+| Domiciliarios - Expancion | $0 | $9,921 | — | 9 | $1,102 | 3.68 |
+| Publico ABIERTO video | $0 | $8,507 | — | 2 | $4,254 | 2.96 |
+| Motorizados | $0 | $7,006 | — | 7 | $1,001 | 4.15 |
 
 ### Cada producto contra SU propio equilibrio
 
@@ -68,13 +68,13 @@ $ 1,137  =  $ 4,012  ÷  3.53
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
-| **TRADICIONAL** | $146,730 | 129 | **$1,137** | $2,402 | **47%** 🟢 |
-| **COLMENA** | $8,452 | 2 | **$4,226** | $3,322 | **127%** 🔴 PIERDE |
+| **TRADICIONAL** | $155,451 | 141 | **$1,102** | $2,402 | **46%** 🟢 |
+| **COLMENA** | $8,507 | 2 | **$4,254** | $3,322 | **128%** 🔴 PIERDE |
 
 | | |
 |---|---|
-| CPA implícito (cierre 8.4%) | **$13,541**/pedido |
-| utilidad estimada de lo que va del día | **$111,428** |
+| CPA implícito (cierre 8.4%) | **$13,125**/pedido |
+| utilidad estimada de lo que va del día | **$126,721** |
 
 ---
 
@@ -86,23 +86,23 @@ $ 1,137  =  $ 4,012  ÷  3.53
 
 | conjunto | 09-16 | 09-17 | 09-18 | 09-19 | 09-20 | 09-21 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios VIDEO | $1,208 | $963 | $1,062 | $899 | $1,148 | $1,444 | 🔴 |
-| Domiciliarios | $1,060 | $1,323 | $1,185 | $1,639 | $1,738 | $883 | 🟢 |
-| TEST Creativos | $869 | $1,090 | $760 | $987 | $730 | $942 | 🔴 |
-| Domiciliarios - Expancion | — | $1,418 | $866 | $841 | $1,223 | $1,210 | 🟡 |
-| Publico ABIERTO video | $2,334 | $1,552 | $2,224 | $2,550 | $1,111 | $4,226 | 🔴 |
-| Motorizados | $1,342 | $1,438 | $1,848 | $924 | $633 | $907 | 🔴 |
+| Domiciliarios VIDEO | $1,208 | $963 | $1,062 | $899 | $1,148 | $1,487 | 🔴 |
+| Domiciliarios | $1,060 | $1,323 | $1,185 | $1,639 | $1,738 | $869 | 🟢 |
+| TEST Creativos | $869 | $1,090 | $760 | $987 | $730 | $755 | 🟡 |
+| Domiciliarios - Expancion | — | $1,418 | $866 | $841 | $1,223 | $1,102 | 🟢 |
+| Publico ABIERTO video | $2,334 | $1,552 | $2,224 | $2,550 | $1,111 | $4,254 | 🔴 |
+| Motorizados | $1,342 | $1,438 | $1,848 | $924 | $633 | $1,001 | 🔴 |
 
 ### conv/mil por día *(la calidad de la audiencia de cada uno)*
 
 | conjunto | 09-16 | 09-17 | 09-18 | 09-19 | 09-20 | 09-21 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios VIDEO | 2.79 | 3.68 | 4.22 | 4.23 | 3.76 | 2.47 | 🔴 |
-| Domiciliarios | 3.01 | 2.71 | 3.91 | 2.66 | 2.74 | 4.86 | 🟢 |
-| TEST Creativos | 7.23 | 5.61 | 11.64 | 7.77 | 11.20 | 7.40 | 🔴 |
-| Domiciliarios - Expancion | — | 2.48 | 5.30 | 4.58 | 3.59 | 3.38 | 🟡 |
-| Publico ABIERTO video | 4.47 | 6.53 | 4.62 | 3.76 | 8.70 | 2.99 | 🔴 |
-| Motorizados | 2.83 | 2.54 | 2.99 | 4.93 | 9.47 | 4.72 | 🔴 |
+| Domiciliarios VIDEO | 2.79 | 3.68 | 4.22 | 4.23 | 3.76 | 2.38 | 🔴 |
+| Domiciliarios | 3.01 | 2.71 | 3.91 | 2.66 | 2.74 | 4.72 | 🟢 |
+| TEST Creativos | 7.23 | 5.61 | 11.64 | 7.77 | 11.20 | 9.38 | 🔴 |
+| Domiciliarios - Expancion | — | 2.48 | 5.30 | 4.58 | 3.59 | 3.68 | 🟡 |
+| Publico ABIERTO video | 4.47 | 6.53 | 4.62 | 3.76 | 8.70 | 2.96 | 🔴 |
+| Motorizados | 2.83 | 2.54 | 2.99 | 4.93 | 9.47 | 4.15 | 🔴 |
 
 🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). Eso es canibalización, y se arregla diferenciando la segmentación.
 
