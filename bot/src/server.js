@@ -148,13 +148,48 @@ app.get("/pedidos.csv", (req, res) => {
 // Este endpoint hace eso, y además PAUSA el bot en ese chat para que no le
 // conteste encima al humano.
 // ============================================================================
+// 🔴 ANTIDUPLICADOS (22-sep). El dueño mandó su Nequi y el panel no le confirmó
+// nada, así que le dio enviar 2-3 veces. Resultado medido en /eventos: dos
+// mensajes idénticos al MISMO SEGUNDO, los dos entregados y leídos. El cliente
+// recibió los datos de pago dos veces.
+// Esto es un candado del lado del servidor: aunque el navegador mande el
+// formulario dos veces, el cliente recibe UNO.
+const ENVIOS_RECIENTES = new Map(); // "tel|texto" -> timestamp
+const VENTANA_DUPLICADO_MS = 90 * 1000;
+
+function esDuplicado(to, texto) {
+  const clave = `${to}|${texto}`;
+  const ahora = Date.now();
+  // Limpieza de entradas viejas para que el mapa no crezca sin control
+  for (const [k, t] of ENVIOS_RECIENTES) {
+    if (ahora - t > VENTANA_DUPLICADO_MS) ENVIOS_RECIENTES.delete(k);
+  }
+  if (ENVIOS_RECIENTES.has(clave)) return true;
+  ENVIOS_RECIENTES.set(clave, ahora);
+  return false;
+}
+
 app.post("/responder", async (req, res) => {
   if (req.body?.token !== VERIFY_TOKEN && req.query.token !== VERIFY_TOKEN) {
     return res.sendStatus(403);
   }
   const to = String(req.body?.to || "").replace(/\D/g, "");
   const texto = String(req.body?.texto || "").trim();
-  if (!to || !texto) return res.status(400).send("Falta el número o el texto.");
+  const comoJson = req.query.json === "1" || req.body?.json === "1";
+  if (!to || !texto) {
+    return comoJson
+      ? res.status(400).json({ ok: false, error: "Falta el número o el texto." })
+      : res.status(400).send("Falta el número o el texto.");
+  }
+
+  if (esDuplicado(to, texto)) {
+    console.log(`⏭️  Duplicado bloqueado a ${to}: "${texto.slice(0, 60)}"`);
+    anotarEvento({ tipo: "duplicado-bloqueado", para: to, texto: texto.slice(0, 60) });
+    const aviso = "Ese mismo mensaje ya se envió hace unos segundos. No se envió de nuevo.";
+    return comoJson
+      ? res.json({ ok: true, duplicado: true, aviso })
+      : res.redirect(`/panel?token=${encodeURIComponent(VERIFY_TOKEN)}&r=${encodeURIComponent(aviso)}#c${to}`);
+  }
 
   const envio = await sendText(to, texto);
 
@@ -174,15 +209,26 @@ app.post("/responder", async (req, res) => {
     });
   }
 
-  // Volver al panel con el resultado a la vista
-  const msg = envio.ok
-    ? "ok"
-    : encodeURIComponent(
-        (envio.body?.error?.code === 131047 || envio.body?.error?.code === 470)
-          ? "Pasaron más de 24h desde el último mensaje del cliente. Meta no permite texto libre; solo plantilla aprobada."
-          : envio.body?.error?.message || "No se pudo enviar."
-      );
-  res.redirect(`/panel?token=${encodeURIComponent(VERIFY_TOKEN)}&r=${msg}#c${to}`);
+  const motivo = envio.ok
+    ? ""
+    : (envio.body?.error?.code === 131047 || envio.body?.error?.code === 470)
+    ? "Pasaron más de 24h desde el último mensaje del cliente. Meta no permite texto libre; solo plantilla aprobada."
+    : envio.body?.error?.message || "No se pudo enviar.";
+
+  // Si el panel lo pidió por fetch, responder JSON: así NO se recarga la página
+  // y la conversación abierta no se cierra.
+  if (comoJson) {
+    return res.json({
+      ok: envio.ok,
+      error: motivo || undefined,
+      messageId: envio.messageId,
+      hora: new Date().toLocaleTimeString("es-CO", { timeZone: "America/Bogota", hour: "2-digit", minute: "2-digit" }),
+    });
+  }
+
+  res.redirect(
+    `/panel?token=${encodeURIComponent(VERIFY_TOKEN)}&r=${envio.ok ? "ok" : encodeURIComponent(motivo)}#c${to}`
+  );
 });
 
 // POST /pausar — prender o apagar el bot en UN chat
