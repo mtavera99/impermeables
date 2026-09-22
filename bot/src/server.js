@@ -177,6 +177,68 @@ app.get("/setup-waba", async (req, res) => {
 });
 
 // ============================================================================
+// GET /enviar-prueba?token=...&to=573138615813[&msg=...]
+//
+// POR QUÉ EXISTE: hasta acá lo único que teníamos era Meta diciendo que el
+// número estaba "CONNECTED". Eso es Meta hablando de sí misma, no evidencia de
+// que un mensaje viaje. Esto intenta un envío REAL y devuelve la respuesta
+// cruda de Meta, sin interpretarla.
+//
+// 🔑 CÓMO LEER EL RESULTADO:
+//   · ok:true + messageId  → el camino de SALIDA funciona de punta a punta.
+//   · error 131030         → el destinatario no está en la lista de permitidos
+//                            (pasa con números de prueba, no con producción).
+//   · error 131047 / 470   → fuera de la ventana de 24h: solo se puede mandar
+//                            plantilla. ⚠️ ESTO ES BUENA NOTICIA: significa que
+//                            el token y el número SÍ sirven, y que lo único que
+//                            falta es que el cliente escriba primero.
+//   · error 190            → token vencido o mal copiado.
+//   · error 133010         → el número no está registrado en Cloud API.
+//
+// 🔒 Protegido con WHATSAPP_VERIFY_TOKEN: manda mensajes reales.
+// ============================================================================
+app.get("/enviar-prueba", async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+
+  const to = (req.query.to || OWNER || "").toString().replace(/\D/g, "");
+  if (!to) {
+    return res.status(400).json({
+      error: "Falta ?to= con el número destino (con código de país, sin + ni espacios).",
+      ejemplo: "/enviar-prueba?token=...&to=573138615813",
+    });
+  }
+
+  const msg =
+    (req.query.msg || "").toString().trim() ||
+    "Prueba del bot de BikerPro 🏍️ Si recibiste esto, el envío por Cloud API funciona.";
+
+  const r = await sendText(to, msg);
+
+  let lectura;
+  if (r.ok) {
+    lectura = `🟢 ENVIADO de verdad. Meta aceptó el mensaje (id ${r.messageId}). El camino de SALIDA funciona. Revisá el WhatsApp de +${to}.`;
+  } else {
+    const code = r.body?.error?.code;
+    const sub = r.body?.error?.error_subcode;
+    if (code === 131047 || code === 470) {
+      lectura =
+        "🟡 Fuera de la ventana de 24h: Meta solo acepta plantillas hasta que el cliente escriba primero. " +
+        "PERO esto CONFIRMA que el token y el número funcionan. Lo único que falta es un mensaje entrante.";
+    } else if (code === 131030) {
+      lectura = "🟡 El destinatario no está en la lista de permitidos. Pasa con números de prueba, no con producción.";
+    } else if (code === 190) {
+      lectura = "🔴 Token vencido o mal copiado. Hay que regenerarlo.";
+    } else if (code === 133010) {
+      lectura = "🔴 El número no está registrado en Cloud API. Usá /registrar-numero con el PIN.";
+    } else {
+      lectura = `🔴 Meta rechazó el envío (código ${code}${sub ? `, subcódigo ${sub}` : ""}). El detalle está en 'respuesta'.`;
+    }
+  }
+
+  res.json({ destino: `+${to}`, http: r.status, ok: r.ok, respuesta: r.body, lectura });
+});
+
+// ============================================================================
 // GET /registrar-numero?token=...&pin=XXXXXX
 //
 // Registra el número en la Cloud API. ES UN PASO APARTE de agregarlo a la WABA,
@@ -271,7 +333,19 @@ async function handleWebhook(body) {
 
         console.log(`Cliente ${from}: ${text}`);
         const { reply, order, handoff, media } = await generateReply(from, text);
-        if (reply) await sendText(from, reply);
+        if (reply) {
+          // 🔴 Registrar el RESULTADO del envío, no solo el intento. Si Meta
+          // rechaza el mensaje, esto es lo único que lo delata en los logs.
+          const envio = await sendText(from, reply);
+          if (envio && envio.ok) {
+            console.log(`→ Respondido a ${from} (id ${envio.messageId})`);
+          } else {
+            console.error(
+              `🔴 MENSAJE NO ENTREGADO a ${from}. Meta respondió ${envio?.status}: ` +
+                JSON.stringify(envio?.body)
+            );
+          }
+        }
 
         // Enviar fotos/videos si el bot los solicitó
         for (const key of media || []) {
