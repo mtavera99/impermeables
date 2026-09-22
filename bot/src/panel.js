@@ -138,8 +138,10 @@ function render(aviso) {
     ${hoy.cierreTopado ? `<p class="nota">* Hay más pedidos que conversaciones de hoy: alguien escribió ayer y confirmó hoy. El cierre se topa en 100%.</p>` : ""}
     ${hoy.topCiudades.length ? `<p class="nota">📍 ${hoy.topCiudades.map(([c, n]) => `${esc(c)} <b>${n}</b>`).join(" · ")}</p>` : ""}
     <div class="acciones">
+      <a class="btn destacado" href="/guias?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">📦 Enviar guías (subir el PDF)</a>
       <a class="btn" href="/pedidos.csv?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">⬇️ Descargar pedidos (CSV)</a>
       <a class="btn" href="/cierre?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}&enviar=1">📲 Mandarme el cierre por WhatsApp</a>
+      <a class="btn" href="/limpiar-duplicados?token=${esc(process.env.WHATSAPP_VERIFY_TOKEN || "")}">🧹 Revisar pedidos duplicados</a>
     </div>`;
 
   const filasPedidos = pedidos.length
@@ -301,6 +303,8 @@ function render(aviso) {
   .acciones{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
   .btn{background:#1b212b;border:1px solid #2d3542;color:#e7e9ee;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:13px}
   .btn:hover{background:#232b36}
+  .btn.destacado{background:#1d4ed8;border-color:#2563eb;font-weight:700}
+  .btn.destacado:hover{background:#2563eb}
 </style></head>
 <body>
 <header>

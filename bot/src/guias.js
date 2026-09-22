@@ -394,6 +394,7 @@ async function procesarPDF(buffer, pedidos, opciones = {}) {
     const fila = {
       pagina: i + 1,
       guia: campos.guia,
+      transportadora: transportadoraDe(campos.plano),
       etiqueta: {
         nombre: campos.nombre,
         direccion: campos.direccion,
@@ -445,9 +446,93 @@ function destinoDe(pedido) {
   return tel10(pedido.telefono_chat) ? digitos(pedido.telefono_chat) : digitos(pedido.celular);
 }
 
+// ============================================================================
+// TRANSPORTADORA Y RASTREO
+//
+// ⚠️ Las tres URLs están COMPROBADAS (HTTP 200) el 22-sep-2026. Importa porque
+// esto va en un mensaje a un cliente real: un link roto justo cuando está
+// esperando su pedido genera una llamada al dueño, no una queja silenciosa.
+//
+// Interrapidísimo NO tiene página propia de rastreo: el formulario "Sigue tu
+// envío" está en su home (probé /sigue-tu-envio, /rastreo, /seguimiento y otras
+// seis rutas: todas 404). Por eso se manda el home y se le dice al cliente
+// dónde pegar el número, en vez de inventar una ruta que devuelva 404.
+// ============================================================================
+const TRANSPORTADORAS = {
+  interrapidisimo: {
+    nombre: "Interrapidísimo",
+    patron: /INTER\s*RAPIDISIMO/,
+    rastreo: "https://www.interrapidisimo.com/",
+    comoRastrear: 'pegá el número en "Sigue tu envío"',
+  },
+  servientrega: {
+    nombre: "Servientrega",
+    patron: /SERVIENTREGA/,
+    rastreo: "https://www.servientrega.com/wps/portal/rastreo-envio",
+    comoRastrear: null,
+  },
+  coordinadora: {
+    nombre: "Coordinadora",
+    patron: /COORDINADORA/,
+    rastreo: "https://coordinadora.com/rastreo/rastreo-de-guia/",
+    comoRastrear: null,
+  },
+};
+
+/** Qué transportadora es, leído de la etiqueta. */
+function transportadoraDe(plano) {
+  for (const [clave, t] of Object.entries(TRANSPORTADORAS)) {
+    if (t.patron.test(plano || "")) return { clave, ...t };
+  }
+  return null;
+}
+
+const fmtCOP = (n) => "$" + Number(n || 0).toLocaleString("es-CO");
+
+/**
+ * El mensaje que acompaña al PDF de la guía.
+ *
+ * Va en el caption del documento y no en un mensaje aparte: así el cliente
+ * recibe UNA notificación con todo, en vez de dos mensajes sueltos donde el
+ * segundo puede llegar primero.
+ */
+function textoParaCliente(pedido, guia, transportadora) {
+  const lineas = ["🏍️ *BikerPro* — tu pedido ya va en camino", ""];
+
+  if (guia) lineas.push(`📦 Guía: *${guia}*`);
+  if (transportadora) {
+    lineas.push(`🚚 ${transportadora.nombre}`);
+    lineas.push(
+      `🔎 Rastrealo acá: ${transportadora.rastreo}` +
+        (transportadora.comoRastrear ? ` (${transportadora.comoRastrear})` : "")
+    );
+  }
+  lineas.push("");
+
+  // El recaudo es lo que más consultan al recibir, y decirlo acá evita la
+  // discusión con el mensajero en la puerta.
+  if (String(pedido.pago || "").toLowerCase().startsWith("contra")) {
+    lineas.push(`💰 Pagás *${fmtCOP(pedido.total)}* en efectivo al recibir.`);
+  } else {
+    lineas.push(`✅ Tu pedido de ${fmtCOP(pedido.total)} ya está pago. No tenés que pagar nada al recibir.`);
+  }
+
+  const destino = [pedido.direccion, pedido.ciudad].filter(Boolean).join(", ");
+  if (destino) lineas.push(`📍 Va a: ${destino}`);
+
+  lineas.push("", "Cualquier cosa me escribís por acá. ¡Gracias por tu compra! 🙌");
+  return lineas.join("\n");
+}
+
+/** Nombre del archivo que ve el cliente en WhatsApp. */
+function nombreArchivo(guia) {
+  return `guia-${guia || "envio"}-bikerpro.pdf`;
+}
+
 module.exports = {
-  PESOS, MINIMO, MARGEN,
+  PESOS, MINIMO, MARGEN, TRANSPORTADORAS,
   normalizar, tel10, numerosDireccion, palabrasNombre,
   lineasPorPagina, partirHojas, extraerCampos,
   puntuar, emparejar, procesarPDF, destinoDe,
+  transportadoraDe, textoParaCliente, nombreArchivo,
 };

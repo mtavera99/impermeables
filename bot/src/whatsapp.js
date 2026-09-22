@@ -124,6 +124,77 @@ async function sendImage(to, link, caption) {
   return sendPayload({ to, type: "image", image: { link, caption } });
 }
 
+// ============================================================================
+// DOCUMENTOS (agregado 22-sep para mandarle a cada cliente su GUÍA en PDF)
+//
+// Por qué se SUBE el archivo en vez de mandar un link: las otras funciones de
+// acá usan `link` porque las fotos del producto viven en GitHub Pages, que es
+// una URL pública y estable. Las guías no: se generan en el momento, son
+// distintas para cada cliente y traen dirección y teléfono impresos.
+//
+// 🔴 Publicarlas en una URL sería exponer los datos personales de los clientes
+// en internet. Y el disco de Render es efímero, así que el link se rompería.
+//
+// Por eso se sube a Meta y se manda por `id`: el archivo queda en su servidor,
+// solo accesible con el token, y no hay URL pública que filtre nada.
+// ============================================================================
+
+/**
+ * Sube un archivo a Meta y devuelve su media_id (sirve 30 días).
+ * @param {Buffer} buffer contenido del archivo
+ * @param {string} mime tipo, ej. "application/pdf"
+ * @param {string} nombre nombre del archivo
+ */
+async function uploadMedia(buffer, mime, nombre) {
+  if (!TOKEN || !PHONE_ID) {
+    return { ok: false, status: 0, body: { error: "faltan WHATSAPP_TOKEN o WHATSAPP_PHONE_NUMBER_ID" } };
+  }
+  try {
+    const form = new FormData();
+    form.append("messaging_product", "whatsapp");
+    form.append("type", mime);
+    form.append("file", new Blob([buffer], { type: mime }), nombre);
+
+    const res = await fetch(`${GRAPH}/${PHONE_ID}/media`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${TOKEN}` }, // el boundary lo pone fetch
+      body: form,
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok || !body?.id) {
+      console.error("Error subiendo archivo a Meta:", res.status, JSON.stringify(body));
+      return { ok: false, status: res.status, body };
+    }
+    return { ok: true, status: res.status, body, mediaId: body.id };
+  } catch (e) {
+    console.error("Excepción subiendo archivo:", e.message);
+    return { ok: false, status: 0, body: { error: e.message } };
+  }
+}
+
+/** Manda un documento ya subido, por su media_id. */
+async function sendDocumentById(to, mediaId, filename, caption) {
+  return sendPayload({
+    to,
+    type: "document",
+    document: { id: mediaId, filename, ...(caption ? { caption } : {}) },
+  });
+}
+
+/**
+ * Sube un PDF y lo manda, en un paso.
+ * @returns {{ok:boolean, status:number, body:object, messageId?:string, mediaId?:string, etapa?:string}}
+ */
+async function sendPdf(to, buffer, filename, caption) {
+  const subida = await uploadMedia(buffer, "application/pdf", filename);
+  // Si falla la subida hay que distinguirlo del fallo de envío: son problemas
+  // distintos (token/tamaño vs ventana de 24h) y llevan a arreglos distintos.
+  if (!subida.ok) return { ...subida, etapa: "subida" };
+
+  const envio = await sendDocumentById(to, subida.mediaId, filename, caption);
+  return { ...envio, mediaId: subida.mediaId, etapa: envio.ok ? "enviado" : "envio" };
+}
+
 async function sendVideo(to, link, caption) {
   return sendPayload({ to, type: "video", video: { link, caption } });
 }
@@ -140,4 +211,5 @@ async function sendTemplate(to, nombre, idioma = "es", componentes) {
 module.exports = {
   sendText, sendImage, sendVideo, sendTemplate,
   sendCatalog, sendProduct, sendProductList, catalogoActivo, CATALOG_ID,
+  uploadMedia, sendDocumentById, sendPdf,
 };

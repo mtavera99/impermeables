@@ -76,6 +76,55 @@ npm run chat              # conversa con el bot por consola
 - Se guardan en `bot/data/orders.json` y se te **avisan por WhatsApp** al instante.
 - Las conversaciones quedan en `bot/data/conversations.json`.
 
+---
+
+## 📦 Mandarle a cada cliente su guía (pantalla "Enviar guías")
+
+Después de despachar, en vez de mandar las guías una por una:
+
+1. Generás las guías en 99 Envíos y descargás **el PDF con todas**.
+2. Entrás a `/guias?token=TU_WHATSAPP_VERIFY_TOKEN` (o al botón **📦 Enviar guías** del panel).
+3. Subís el PDF y le das **Revisar**. Se parte en una hoja por guía y se muestra a quién
+   le corresponde cada una, con un puntaje de certeza. **Todavía no se envía nada.**
+4. Destildás lo que no quieras y le das **Enviar**. Cada cliente recibe **su hoja en PDF**
+   con el número de guía, la transportadora y el enlace para rastrear.
+
+### Cómo sabe de quién es cada guía
+
+No solo por el teléfono, porque **el cliente a veces da en la guía un número distinto al de
+su WhatsApp** (el del marido, el del vecino que recibe). Se usan varias señales:
+
+| señal | puntos |
+|---|---|
+| celular del pedido | 50 |
+| número de WhatsApp | 50 |
+| nombre (repartido entre sus palabras) | hasta 45 |
+| números de la dirección | hasta 40 |
+| ciudad | 10 |
+
+Y **dos candados**: mínimo **50** puntos, y el mejor candidato tiene que superarle al
+segundo por **20**. Si hay empate entre dos personas distintas, **no se envía** y se
+reporta — mandarle a un cliente la dirección y el teléfono de otro es filtrarle datos
+personales a un desconocido.
+
+La guía se manda **siempre al WhatsApp con el que habló el bot**, nunca al teléfono
+impreso en la etiqueta.
+
+### Lo que no se puede repetir
+Una guía ya enviada queda anotada en `bot/data/guias-enviadas.json` y **no se reenvía**
+aunque el PDF se suba otra vez. También se bloquea la misma guía repetida dentro del
+mismo PDF.
+
+### Probarlo sin credenciales
+```bash
+cd bot && node test-guias.js     # 8 casos: teléfono distinto, empates, guía ajena, repetidas
+```
+
+> ⚠️ **La ventana de 24 horas de Meta aplica.** Si despachás el mismo día, la mayoría de
+> los clientes la tiene abierta y la guía llega sin problema. Al que escribió hace más de
+> 24h **no le llega** un mensaje libre: para esos hace falta una **plantilla aprobada**
+> (y ya son tres cosas que la necesitan: guías, cierre diario y seguimiento de 72h).
+
 ## ⚙️ Cómo cambiar lo que dice el bot
 - Todo el "cerebro" (precios, reglas, tono, objeciones) está en **`src/prompt.js`**.
 - Los fletes por ciudad están en **`src/fletes.js`**.
