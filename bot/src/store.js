@@ -45,6 +45,19 @@ function pushMsg(phone, role, content) {
   writeJSON(CONV_FILE, all);
 }
 
+/**
+ * Borra una conversación. La usa el endpoint /probar para arrancar un caso de
+ * prueba desde cero sin arrastrar el historial de la prueba anterior.
+ * ⚠️ Solo se invoca con teléfonos ficticios ("prueba-*"): no se usa para
+ * borrar clientes reales.
+ */
+function borrarConversacion(phone) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  delete all[phone];
+  writeJSON(CONV_FILE, all);
+}
+
 // ---------------------------------------------------------------------------
 // SEGUIMIENTO DE LOS QUE NO COMPRARON (ventana gratis de 72h · seccion 0-BC)
 // ---------------------------------------------------------------------------
@@ -106,6 +119,6 @@ function saveOrder(order) {
 }
 
 module.exports = {
-  getConv, pushMsg, isPaused, setPaused, saveOrder,
+  getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones
 };
