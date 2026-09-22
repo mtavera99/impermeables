@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-09-22 01:28 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-09-22 01:55 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,42 +9,45 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$85,464** |
-| gastado hoy (hasta las 0h) | $0 |
+| **saldo ahora** | **$185,137** |
+| gastado hoy (hasta las 1h) | $285 |
 | presupuesto activo | $155,000/día |
-| cierre proyectado del día | $146,468 |
-| saldo proyectado a medianoche | $-61,004 |
+| cierre proyectado del día | $144,711 |
+| saldo proyectado a medianoche | $40,711 |
 | objetivo (cubrir un día de 143% + colchón) | $241,650 |
 
-### 🔴 RECARGAR $156,186 — entra en zona de freno a las 10:00
+### 🟠 Recargar $56,228 para cubrir un día malo
 
-Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin saldo ahí es la fuga más cara que tiene la operación.
+Hoy aguanta, pero no cubre un día de sobre-entrega alta.
 
 ⛔ **Recargar en la MAÑANA, no de noche.** Recargar después de quedarse seco dispara el rebote de 0-AI: Meta suelta el gasto de golpe sobre el inventario más frío.
 
 ---
 
-## 📈 Hoy contra los días anteriores — mismo tramo 00:00–0:59
+## 📈 Hoy contra los días anteriores — mismo tramo 00:00–1:59
 
 *(Comparar medio día contra un día completo es el error #10. Acá va el mismo tramo.)*
 
 | día | gasto | conv | $/conv | CPM | conv/mil |
 |---|---|---|---|---|---|
-| 2026-09-20 | $5,370 | 2 | **$2,685** | $4,150 | 1.55 |
+| 2026-09-20 | $8,864 | 6 | **$1,477** | $4,098 | 2.77 |
+| 2026-09-22 **HOY** | $285 | 1 | **$285** | $4,750 | 16.67 |
+
+🟢 **Hoy va mejor que ayer a la misma hora** ($285 vs $1,477).
 
 ### La descomposición — dónde está el problema
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$ 2,685  =  $ 4,150  ÷  1.55
+$   285  =  $ 4,750  ÷  16.67
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $4,150 | ~$3.615 | 🟢 normal |
-| **conv/mil** (la calidad de la audiencia) | 1.55 | 5,33 | 🔴 bajo |
+| **CPM** (el precio de la subasta) | $4,750 | ~$3.615 | 🔴 alto |
+| **conv/mil** (la calidad de la audiencia) | 16.67 | 5,33 | 🟢 |
 
-🔑 **El CPM está normal y el conv/mil bajo: todo el problema es AUDIENCIA, no precio.** Esperar no lo arregla — hace falta público nuevo (el lookalike de compradores es la jugada pendiente).
+🔑 **El CPM está alto: hay algo en la subasta** (fecha comercial del país). Antes de culpar a la cuenta, mirar el calendario.
 
 ---
 
@@ -52,6 +55,10 @@ $ 2,685  =  $ 4,150  ÷  1.55
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
+| Domiciliarios VIDEO - API | $20,000 | $263 | 1% | 0 | — | 0.00 |
+| Domiciliarios - API | $35,000 | $21 | 0% | 0 | — | 0.00 |
+| Motorizados - API | $20,000 | $1 | 0% | 0 | — | 0.00 |
+| TEST Creativos | $0 | $0 | — | 1 | $0 | 0.00 |
 
 ### Cada producto contra SU propio equilibrio
 
@@ -59,6 +66,12 @@ $ 2,685  =  $ 4,150  ÷  1.55
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
+| **TRADICIONAL** | $285 | 1 | **$285** | $2,402 | **12%** 🟢 |
+
+| | |
+|---|---|
+| CPA implícito (cierre 8.4%) | **$3,393**/pedido |
+| utilidad estimada de lo que va del día | **$1,716** |
 
 ---
 
@@ -70,6 +83,7 @@ $ 2,685  =  $ 4,150  ÷  1.55
 
 | conjunto | 09-17 | 09-18 | 09-19 | 09-20 | 09-21 | 09-22 | |
 |---|---|---|---|---|---|---|---|
+| Domiciliarios VIDEO - API | — | — | — | — | — | — |  |
 | Motorizados | $1,438 | $1,848 | $924 | $633 | $1,051 | — | 🔴 |
 | Domiciliarios | $1,323 | $1,185 | $1,639 | $1,738 | $865 | — | 🟢 |
 | TEST Creativos | $1,090 | $760 | $987 | $730 | $705 | — | 🟡 |
@@ -81,7 +95,8 @@ $ 2,685  =  $ 4,150  ÷  1.55
 
 | conjunto | 09-17 | 09-18 | 09-19 | 09-20 | 09-21 | 09-22 | |
 |---|---|---|---|---|---|---|---|
-| Motorizados | 2.54 | 2.99 | 4.93 | 9.47 | 4.01 | — | 🔴 |
+| Domiciliarios VIDEO - API | — | — | — | — | — | — |  |
+| Motorizados | 2.54 | 2.99 | 4.93 | 9.47 | 4.00 | — | 🔴 |
 | Domiciliarios | 2.71 | 3.91 | 2.66 | 2.74 | 4.71 | — | 🟢 |
 | TEST Creativos | 5.61 | 11.64 | 7.77 | 11.20 | 10.05 | — | 🟡 |
 | Domiciliarios VIDEO | 3.68 | 4.22 | 4.23 | 3.76 | 2.33 | — | 🔴 |
@@ -101,7 +116,7 @@ $ 2,685  =  $ 4,150  ÷  1.55
 | 2026-09-18 | $113,822 | 110 | $1,035 | $5,017 | 4.85 | $106,312 |
 | 2026-09-19 | $119,438 | 127 | $940 | $4,371 | 4.65 | $134,717 |
 | 2026-09-20 | $120,934 | 110 | $1,099 | $4,936 | 4.49 | $99,200 |
-| 2026-09-21 | $159,263 | 146 | $1,091 | $3,937 | 3.61 | $132,916 |
+| 2026-09-21 | $159,282 | 146 | $1,091 | $3,937 | 3.61 | $132,897 |
 
 ---
 
