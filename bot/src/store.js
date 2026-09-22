@@ -3,7 +3,36 @@
 const fs = require("fs");
 const path = require("path");
 
-const DIR = path.join(__dirname, "..", "data");
+// ============================================================================
+// 🔴 DÓNDE SE GUARDAN LOS DATOS — LO MÁS IMPORTANTE DE ESTE ARCHIVO
+//
+// Por defecto esto escribe en `bot/data`, que en Render vive en el disco del
+// contenedor y es EFÍMERO: cada despliegue lo borra. Con eso se perdían las
+// conversaciones Y LOS PEDIDOS.
+//
+// ✅ LA SOLUCIÓN: un DISCO PERSISTENTE de Render montado en /var/data, y
+//    DATA_DIR=/var/data en las variables de entorno. El disco sobrevive a los
+//    despliegues, los reinicios y los cambios de código.
+//
+// Cómo se configura (una sola vez):
+//   Render → el servicio → Settings → Disks → Add Disk
+//     Name: datos · Mount Path: /var/data · Size: 1 GB
+//   Y en Environment: DATA_DIR=/var/data
+//
+// ⚠️ Si DATA_DIR no está puesto, el bot arranca igual pero AVISA en el log que
+//    los datos son temporales. No falla en silencio.
+// ============================================================================
+const DIR = process.env.DATA_DIR || path.join(__dirname, "..", "data");
+
+if (!process.env.DATA_DIR) {
+  console.warn(
+    "⚠️  DATA_DIR no está configurado: los pedidos se guardan en disco EFÍMERO y " +
+      "se borran en el próximo despliegue. Montá un disco persistente en Render y " +
+      "poné DATA_DIR=/var/data."
+  );
+} else {
+  console.log(`💾 Datos en disco persistente: ${DIR}`);
+}
 const CONV_FILE = path.join(DIR, "conversations.json");
 const ORDERS_FILE = path.join(DIR, "orders.json");
 
@@ -117,11 +146,32 @@ function setPaused(phone, val) {
   writeJSON(CONV_FILE, all);
 }
 function saveOrder(order) {
-  ensure();
-  const orders = readJSON(ORDERS_FILE, []);
   const record = { ...order, fecha: new Date().toISOString() };
-  orders.push(record);
-  writeJSON(ORDERS_FILE, orders);
+
+  // 🛟 RED DE SEGURIDAD — ESTO VA PRIMERO, ANTES DE TOCAR EL DISCO.
+  // El pedido se escribe COMPLETO en el log antes de cualquier operación que
+  // pueda fallar. Los logs de Render sobreviven a los despliegues, así que si
+  // el disco falla o no está montado, el pedido se recupera buscando
+  // "PEDIDO_JSON" en los logs. Un pedido perdido es una venta perdida.
+  //
+  // ⚠️ El orden importa y ya me equivoqué una vez: tenía `ensure()` arriba, y
+  // si ensure() lanzaba excepción el log NUNCA se escribía — justo en el caso
+  // en que más se necesita. La red de seguridad va antes del riesgo.
+  console.log("PEDIDO_JSON " + JSON.stringify(record));
+
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    orders.push(record);
+    writeJSON(ORDERS_FILE, orders);
+  } catch (e) {
+    // Si no se pudo escribir, que quede clarísimo en el log. El pedido ya está
+    // arriba en formato recuperable, así que no se pierde.
+    console.error(
+      `🔴 NO SE PUDO GUARDAR EL PEDIDO EN DISCO (${e.message}). ` +
+        "Está en el log de arriba como PEDIDO_JSON — recuperalo de ahí."
+    );
+  }
   return record;
 }
 
