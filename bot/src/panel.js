@@ -192,12 +192,13 @@ function render(aviso) {
             </summary>
             ${porQue}
             <div class="chat">${burbujas}</div>
-            <form class="resp" method="POST" action="/responder">
+            <form class="resp" method="POST" action="/responder" data-tel="${esc(x.tel)}">
               <input type="hidden" name="token" value="${esc(tk)}">
               <input type="hidden" name="to" value="${esc(x.tel)}">
               <textarea name="texto" rows="2" placeholder="Escribile como BikerPro… (sale del +57 322 7545695, no de tu WhatsApp)"></textarea>
               <button type="submit">Enviar como BikerPro</button>
             </form>
+            <div class="envio"></div>
             <form class="pausa" method="POST" action="/pausar">
               <input type="hidden" name="token" value="${esc(tk)}">
               <input type="hidden" name="tel" value="${esc(x.tel)}">
@@ -269,6 +270,9 @@ function render(aviso) {
   .resp{margin-top:10px;display:flex;gap:6px;align-items:flex-start}
   .resp textarea{flex:1;background:#0f1319;border:1px solid #2d3542;color:#e7e9ee;border-radius:8px;padding:8px;font:13px/1.4 inherit;resize:vertical}
   .resp button{background:#12693f;border:0;color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap}
+  .envio{margin-top:6px;font-size:12px;min-height:16px}
+  .envio.ok{color:#3ddc84}.envio.mal{color:#ff6b6b}.envio.wait{color:#ffd479}
+  .resp button:disabled{opacity:.5;cursor:default}
   .pausa{margin-top:6px}
   .pausa button{background:#2a313d;border:1px solid #3a4250;color:#c8cfdd;padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer}
   .pausa button.verde{background:#12351f;border-color:#1d6b3d;color:#8ff0b5}
@@ -316,7 +320,103 @@ function render(aviso) {
   <h2>Conversaciones</h2>
   ${bloquesConv}
 </main>
-<script>setTimeout(function(){location.reload()},30000)</script>
+<script>
+// ── ENVIAR SIN RECARGAR ──────────────────────────────────────────────────────
+// Antes el formulario hacía POST normal y el navegador recargaba la página.
+// Eso cerraba la conversación abierta y no dejaba ver si el mensaje salió, así
+// que el dueño le daba enviar 2-3 veces y el cliente recibía duplicados.
+document.querySelectorAll("form.resp").forEach(function (f) {
+  var estado = f.parentElement.querySelector(".envio");
+  var btn = f.querySelector("button");
+  var ta = f.querySelector("textarea");
+  f.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var texto = ta.value.trim();
+    if (!texto) return;
+    btn.disabled = true;                       // candado contra el doble clic
+    estado.className = "envio wait";
+    estado.textContent = "Enviando…";
+    fetch("/responder?json=1", { method: "POST", body: new FormData(f) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.duplicado) {
+          estado.className = "envio wait";
+          estado.textContent = "⏭️ " + d.aviso;
+          ta.value = "";
+          return;
+        }
+        if (d.ok) {
+          estado.className = "envio ok";
+          estado.textContent = "✅ Enviado como BikerPro a las " + (d.hora || "");
+          // Pintar la burbuja de una, sin esperar a recargar
+          var chat = f.parentElement.querySelector(".chat");
+          if (chat) {
+            var b = document.createElement("div");
+            b.className = "msg bot";
+            b.innerHTML = '<div class="txt"></div><div class="hora">' + (d.hora || "") + " · vos</div>";
+            b.querySelector(".txt").textContent = texto;
+            chat.appendChild(b);
+            chat.scrollTop = chat.scrollHeight;
+          }
+          ta.value = "";
+        } else {
+          estado.className = "envio mal";
+          estado.textContent = "🔴 " + (d.error || "No se pudo enviar.");
+        }
+      })
+      .catch(function (e) {
+        estado.className = "envio mal";
+        estado.textContent = "🔴 Error de red: " + e.message + ". Revisá /eventos antes de reintentar.";
+      })
+      .finally(function () { btn.disabled = false; });
+  });
+});
+
+// ── REFRESCO QUE NO INTERRUMPE ───────────────────────────────────────────────
+// El refresco fijo cada 30s cerraba la conversación abierta: parecía que la
+// ventana "se cerraba sola". Ahora espera a que no estés ocupado, y recuerda
+// cuál conversación tenías abierta.
+(function () {
+  var CLAVE = "bikerpro_chat_abierto";
+
+  // Al cargar, volver a abrir la conversación que estaba abierta
+  try {
+    var abierto = localStorage.getItem(CLAVE);
+    if (abierto) {
+      var d = document.getElementById(abierto);
+      if (d) { d.open = true; d.scrollIntoView({ block: "center" }); }
+    }
+  } catch (e) {}
+
+  document.querySelectorAll("details.conv").forEach(function (d) {
+    d.addEventListener("toggle", function () {
+      try {
+        if (d.open) localStorage.setItem(CLAVE, d.id);
+        else if (localStorage.getItem(CLAVE) === d.id) localStorage.removeItem(CLAVE);
+      } catch (e) {}
+    });
+  });
+
+  function ocupado() {
+    var a = document.activeElement;
+    // Escribiendo en un cuadro de texto
+    if (a && (a.tagName === "TEXTAREA" || a.tagName === "INPUT")) return true;
+    // Hay texto sin enviar en algún cuadro
+    var hayTexto = false;
+    document.querySelectorAll("form.resp textarea").forEach(function (t) {
+      if (t.value.trim()) hayTexto = true;
+    });
+    if (hayTexto) return true;
+    // Hay un mensaje enviándose
+    if (document.querySelector(".envio.wait")) return true;
+    return false;
+  }
+
+  setInterval(function () {
+    if (!ocupado()) location.reload();
+  }, 45000);
+})();
+</script>
 </body></html>`;
 }
 
