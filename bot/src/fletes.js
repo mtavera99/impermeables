@@ -314,7 +314,51 @@ const FLETE_2_OBSERVADO = {
 // (banda D) contra comprar dos sueltos, así que el argumento de venta se mantiene.
 //
 // 🔔 GATILLO: si el envío de 2 uds de la banda E pasa de $47.000, revisar otra vez.
-const PROMO_2_TOTAL = { A: 137000, B: 146000, C: 152000, D: 152000, E: 158000 };
+// ⚠️ BANDA D BAJÓ DE $152.000 A $140.000 POR DECISIÓN DEL DUEÑO (22-sep).
+// No es un cálculo: es una decisión de negocio, tomada con los números a la
+// vista, y queda escrita para que nadie la "corrija" pensando que es un error.
+//
+// EL CASO QUE LA ORIGINA: un cliente de Montería (banda D) vio $152.000 y se
+// fue del chat. El dueño le escribió a mano ofreciéndole $137.000.
+//
+// LA CUENTA, con el envío real de 2 uds en banda D ($37.832):
+//   a $152.000 → $24.084/ud antes de pauta  (+$840 sobre la meta)
+//   a $140.000 → $18.084/ud antes de pauta  (−$5.160 bajo la meta)
+//   a $137.000 → $16.584/ud antes de pauta  (−$6.660 bajo la meta)
+//
+// POR QUÉ ES DEFENDIBLE: la alternativa real casi nunca es "paga $152.000".
+// Es "se lleva UNA sola a $83.000", que deja $23.713 en total. Vender DOS a
+// $140.000 deja $36.168: son $12.455 MÁS que vender una. El dueño prefiere
+// volumen a margen por unidad en esta banda, y con estos números cierra.
+//
+// ⚠️ LO QUE ESTO CUESTA, para que esté dicho: son $12.000 menos por pedido de
+// 2 unidades en banda D, incluido el cliente que hubiera pagado $152.000 sin
+// chistar. Ver /analisis/bajar-a-137-22sep.py.
+//
+// 🔔 GATILLO: si el envío de 2 uds de banda D pasa de $44.000, a $140.000 el
+// margen cae bajo $15.000/ud y hay que volver a mirarlo.
+const PROMO_2_TOTAL = { A: 137000, B: 146000, C: 152000, D: 140000, E: 158000 };
+
+// ============================================================================
+// 💬 PRECIO DE RESCATE — el descuento que NO se regala
+//
+// Existe por una distinción que cuesta plata confundir: bajar la LISTA se lo
+// regala a todos, incluidos los que pagaban sin chistar. Medido: 89 pedidos de
+// 2 unidades al mes, así que cada $1.000 de rebaja general son $89.000/mes.
+//
+// El precio de rescate se usa SOLO cuando el cliente ya puso la objeción de
+// precio o se está yendo. Ahí el descuento no regala nada, porque la
+// alternativa es perder la venta o vender una sola unidad.
+//
+// ⛔ LA REGLA QUE LO SOSTIENE, y está en el prompt: el bot NO lo ofrece de
+// entrada. Si lo ofreciera de entrada se convierte en la lista nueva y
+// volvemos al regalo.
+//
+// 🔒 PISO ABSOLUTO: por debajo de $127.545 en banda D, vender DOS deja menos
+// que vender UNA a $83.000. Ese límite no se cruza, y hay una prueba que lo
+// verifica en test-desglose-honesto.js.
+// ============================================================================
+const PROMO_2_RESCATE = { D: 137000 };
 
 // ============================================================================
 // 🔴 EL ENVÍO QUE SE LE MUESTRA AL CLIENTE (agregado 22-sep por una venta perdida)
@@ -353,6 +397,19 @@ const ENVIO_REAL_2 = { A: 23947, B: 32597, C: 38784, D: 37832, E: 45214 };
 // exactamente lo que el cliente de Montería vio en la plataforma.
 function alMillarAbajo(n) {
   return Math.floor(n / 1000) * 1000;
+}
+
+/**
+ * El precio de rescate de una banda, o null si esa banda no tiene.
+ * Solo aplica a pedidos de 2 unidades.
+ */
+function rescateDe(claveBanda, uds) {
+  if (uds !== 2) return null;
+  const r = PROMO_2_RESCATE[claveBanda];
+  if (!r) return null;
+  // Nunca por encima de la lista: sería un "descuento" más caro.
+  if (r >= PROMO_2_TOTAL[claveBanda]) return null;
+  return r;
 }
 
 /**
@@ -683,6 +740,9 @@ function cotizar(ciudad, unidades = 1) {
     producto: d.producto,
     fleteReal: flete,
     total,
+    // Precio de rescate: SOLO para usar si el cliente ya dijo que está caro.
+    // null si esta banda no tiene uno definido.
+    rescate: rescateDe(claveBanda, uds),
     unidades: uds,
     reconocida,
     promo: uds === 2,
@@ -749,12 +809,45 @@ function tablaFletesTexto() {
     .map(([c, d]) => `${c} (${d.join(" / ")})`)
     .join(" · ");
 
+  // Los precios de rescate, con la regla de uso PEGADA a cada uno. Van juntos
+  // a propósito: cuando el número y su condición aparecen separados en el
+  // prompt, la IA usa el número e ignora la condición (ya pasó con Tadó).
+  const rescates = Object.entries(BANDAS)
+    .filter(([clave]) => PROMO_2_RESCATE[clave])
+    .map(([clave, b]) => {
+      const r = PROMO_2_RESCATE[clave];
+      const d = desgloseDe(clave, 2, r);
+      return (
+        `- ${b.nombre}: podés bajar de ${fmt(PROMO_2_TOTAL[clave])} a ${fmt(r)} ` +
+        `(los 2 conjuntos ${fmt(d.producto)} + envío ${fmt(d.envio)}), ` +
+        `PERO SOLO si ya dijo que está caro.`
+      );
+    })
+    .join("\n");
+
+  const bloqueRescate = rescates
+    ? `
+
+## 💬 PRECIO DE RESCATE — SOLO SI EL CLIENTE YA DIJO QUE ESTÁ CARO
+${rescates}
+
+⛔ REGLAS, y son estrictas:
+- NUNCA ofrezcas este precio de entrada. Primero cotizás el total normal.
+- Solo lo usás si el cliente YA puso la objeción: "está caro", "muy costoso",
+  "lo voy a pensar", "por ahora no", o si dijo que se va.
+- Es para no perder la venta, no para vender más barato. Si lo ofrecés sin que
+  te lo pida, le estás regalando plata a alguien que ya iba a comprar.
+- Se ofrece UNA vez y no se negocia más abajo. No hay un tercer precio.
+- Presentalo como un esfuerzo puntual, no como el precio de siempre:
+  *"Te lo puedo dejar en $137.000 los dos para que lo aproveches hoy 🙌"*`
+    : "";
+
   return `${bandas}
 
 ## 2 CONJUNTOS — TOTALES FIRMES POR BANDA (corregidos el 19-sep)
 Estos totales YA incluyen el envío de las 2 unidades. Son firmes: se cotizan
 igual que los de 1 unidad, sin escalar a un asesor.
-${promo2}
+${promo2}${bloqueRescate}
 ⛔ EXCEPCIÓN: en los destinos de difícil acceso de abajo NO se ofrece la promo
 de 2 (en Tadó el envío se DUPLICA en vez de compartirse). Ahí se cotiza a mano.
 
@@ -794,7 +887,9 @@ module.exports = {
   CIUDADES_AMBIGUAS,
   ENVIO_REAL_1,
   ENVIO_REAL_2,
+  PROMO_2_RESCATE,
   desgloseDe,
+  rescateDe,
   FLETE_2_OBSERVADO,
   PRECIO_PRODUCTO,
   PROMO_2_TOTAL,

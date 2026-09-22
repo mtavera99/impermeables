@@ -44,8 +44,8 @@ console.log("\n── 1. El caso que se perdió: Montería, 2 unidades ──");
 const mont = f.cotizar("Monteria", 2);
 chequear("Montería sigue siendo banda D", mont.banda === "D");
 chequear(
-  "el total no cambió (el arreglo no toca el precio)",
-  mont.total === 152000,
+  "el total es $140.000 (bajado por decisión del dueño el 22-sep)",
+  mont.total === 140000,
   `quedó en ${pesos(mont.total)}`
 );
 chequear(
@@ -94,11 +94,24 @@ for (const banda of ["A", "B", "C", "D", "E"]) {
   }
 }
 
-console.log("\n── 4. El margen quedó intacto (esto NO era un descuento) ──");
+console.log("\n── 4. El margen de cada banda, contra su límite ──");
+
+// Banda D está DEBAJO de la meta a propósito: el dueño la bajó a $140.000 el
+// 22-sep para ganar volumen, con los números a la vista. Esta prueba no exige
+// la meta ahí, pero sí exige el límite que de verdad importa (ver bloque 7):
+// que vender DOS siga dejando más que vender UNA.
+const BAJO_LA_META_A_PROPOSITO = { D: "bajada a $140.000 por decisión del dueño (22-sep)" };
 
 for (const banda of ["A", "B", "C", "D", "E"]) {
   const q = f.cotizar(CIUDAD[banda], 2);
   const margen = (q.total - 2 * COSTO_PROD - f.ENVIO_REAL_2[banda]) / 2;
+  if (BAJO_LA_META_A_PROPOSITO[banda]) {
+    console.log(
+      `ℹ️  banda ${banda}: margen ${pesos(Math.round(margen))}/ud, ` +
+        `${pesos(Math.round(META - margen))} bajo la meta — ${BAJO_LA_META_A_PROPOSITO[banda]}`
+    );
+    continue;
+  }
   chequear(
     `banda ${banda}, 2 uds: margen ${pesos(Math.round(margen))}/ud (meta ${pesos(META)})`,
     margen >= META - 1,
@@ -146,6 +159,73 @@ for (const l of lineas) {
   if (n[0] + n[1] > 0) cuadran++;
 }
 chequear("las 5 líneas tienen los dos números", cuadran === 5);
+
+// ===========================================================================
+console.log("\n── 7. 🔒 EL PISO: vender DOS nunca puede dejar menos que vender UNA ──");
+// ===========================================================================
+//
+// Este es el límite de verdad, y reemplaza a la meta como guardián en las
+// bandas con descuento. Si un precio de 2 unidades deja menos plata que vender
+// una sola, el descuento dejó de ser una herramienta de venta y se volvió una
+// pérdida — y eso no se nota mirando solo el margen por unidad.
+
+for (const banda of ["A", "B", "C", "D", "E"]) {
+  const uno = f.cotizar(CIUDAD[banda], 1);
+  const dos = f.cotizar(CIUDAD[banda], 2);
+  const quedaUno = uno.total - COSTO_PROD - f.ENVIO_REAL_1[banda];
+  const quedaDos = dos.total - 2 * COSTO_PROD - f.ENVIO_REAL_2[banda];
+  chequear(
+    `banda ${banda}: 2 uds dejan ${pesos(quedaDos)} vs ${pesos(quedaUno)} de 1 ud`,
+    quedaDos > quedaUno,
+    `vender dos deja ${pesos(quedaUno - quedaDos)} MENOS que vender una: el precio está mal`
+  );
+
+  // Y lo mismo con el precio de rescate, que es el más bajo que se puede decir.
+  if (dos.rescate) {
+    const quedaRescate = dos.rescate - 2 * COSTO_PROD - f.ENVIO_REAL_2[banda];
+    chequear(
+      `banda ${banda}: al rescate (${pesos(dos.rescate)}) quedan ${pesos(quedaRescate)}, sigue sobre el piso`,
+      quedaRescate > quedaUno,
+      `el rescate deja ${pesos(quedaUno - quedaRescate)} menos que vender una sola unidad`
+    );
+  }
+}
+
+// ===========================================================================
+console.log("\n── 8. El precio de rescate y su regla ──");
+// ===========================================================================
+
+chequear("Montería (banda D) tiene precio de rescate", mont.rescate === 137000, `es ${mont.rescate}`);
+chequear("el rescate es MENOR que la lista", mont.rescate < mont.total);
+chequear(
+  "una banda sin rescate definido devuelve null",
+  f.cotizar(CIUDAD.A, 2).rescate === null,
+  "apareció un rescate donde no se decidió ninguno"
+);
+chequear(
+  "el rescate NO aplica a pedidos de 1 unidad",
+  f.cotizar(CIUDAD.D, 1).rescate == null,
+  "se ofrecería descuento en 1 unidad, que no se decidió"
+);
+
+const d137 = f.desgloseDe("D", 2, 137000);
+chequear(
+  `al rescate el desglose sigue cerrando: ${pesos(d137.producto)} + ${pesos(d137.envio)} = ${pesos(137000)}`,
+  d137.producto + d137.envio === 137000
+);
+chequear(
+  "al rescate el envío mostrado sigue sin inflarse",
+  d137.envio <= f.ENVIO_REAL_2.D,
+  `muestra ${pesos(d137.envio)} contra un real de ${pesos(f.ENVIO_REAL_2.D)}`
+);
+
+// 🔑 Lo más importante: que la IA reciba el número CON su condición. Si el
+// prompt trae el precio suelto, la IA lo usa de entrada y se vuelve la lista.
+const t = f.tablaFletesTexto();
+chequear("el prompt trae el bloque del precio de rescate", t.includes("PRECIO DE RESCATE"));
+chequear("y dice que es SOLO si ya dijo que está caro", t.includes("SOLO si ya dijo que está caro"));
+chequear("y prohíbe ofrecerlo de entrada", t.includes("NUNCA ofrezcas este precio de entrada"));
+chequear("y aclara que no se negocia un tercer precio", t.includes("No hay un tercer precio"));
 
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);
