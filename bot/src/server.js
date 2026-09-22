@@ -1,7 +1,10 @@
 require("dotenv").config();
 const express = require("express");
 const { generateReply } = require("./agent");
-const { sendText, sendImage, sendVideo, sendCatalog, catalogoActivo, sendPdf, sendTemplate, esBsuid } = require("./whatsapp");
+const {
+  sendText, sendImage, sendVideo, sendCatalog, catalogoActivo,
+  sendPdf, sendPdfPorPlantilla, sendTemplate, esBsuid,
+} = require("./whatsapp");
 const { MEDIA } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
@@ -287,6 +290,11 @@ const PLANTILLA_NOVEDAD = process.env.PLANTILLA_NOVEDAD || "";
 // alguna plantilla se sube en otro idioma.
 const PLANTILLA_IDIOMA = process.env.PLANTILLA_IDIOMA || "es_CO";
 
+// La plantilla con la que viaja el PDF de la guía cuando la ventana del cliente
+// ya se cerró. Es la que el dueño subió el 22-sep, sin variables: el número de
+// guía y la transportadora ya van impresos dentro del PDF.
+const PLANTILLA_GUIA = process.env.PLANTILLA_GUIA || "guia_de_envio";
+
 // ============================================================================
 // 📮 NOVEDADES DE ENTREGA
 //
@@ -566,7 +574,32 @@ app.post("/guias/enviar", async (req, res) => {
 
     const to = guias.destinoDe(fila.pedido);
     const caption = guias.textoParaCliente(fila.pedido, fila.guia, fila.transportadora);
-    const envio = await sendPdf(to, fila.hoja, guias.nombreArchivo(fila.guia), caption);
+
+    // ========================================================================
+    // 🔴 LA GUÍA SE DESPACHA AL DÍA SIGUIENTE, ASÍ QUE LA VENTANA YA ESTÁ
+    //    CERRADA PARA MUCHOS CLIENTES.
+    //
+    // Un documento como mensaje libre solo pasa dentro de las 24h desde el
+    // último mensaje del cliente. Pasado eso Meta lo rechaza (131047) y el
+    // cliente se queda sin su guía — y el dueño creyendo que la mandó.
+    //
+    // Con la ventana cerrada el PDF viaja DENTRO de la plantilla aprobada
+    // (guia_de_envio), que lleva el documento en el encabezado. El cliente
+    // recibe el archivo igual, sin haber escrito antes.
+    // ========================================================================
+    const conv = store.getConv(to);
+    const ultimo = (conv && conv.ultimoDelCliente) || 0;
+    const ventanaAbierta = ultimo > 0 && Date.now() - ultimo < 24 * 60 * 60 * 1000;
+
+    const envio = ventanaAbierta
+      ? await sendPdf(to, fila.hoja, guias.nombreArchivo(fila.guia), caption)
+      : await sendPdfPorPlantilla(
+          to,
+          fila.hoja,
+          guias.nombreArchivo(fila.guia),
+          PLANTILLA_GUIA,
+          PLANTILLA_IDIOMA
+        );
 
     if (envio.ok) {
       store.registrarGuiaEnviada({
@@ -576,6 +609,9 @@ app.post("/guias/enviar", async (req, res) => {
         certeza: fila.certeza,
         transportadora: fila.transportadora?.clave || null,
         messageId: envio.messageId,
+        // Queda anotado el camino: si mañana una guía no llegó, saber si salió
+        // por plantilla o como mensaje libre es la primera pista.
+        porPlantilla: Boolean(envio.porPlantilla),
       });
       // El número de guía queda pegado al pedido: así el CSV de despacho sale
       // completo y se puede cruzar contra el export de la transportadora.
@@ -583,7 +619,10 @@ app.post("/guias/enviar", async (req, res) => {
       // Queda en el historial del chat para que el bot no repita la información.
       store.pushMsg(to, "assistant", caption);
       anotarEvento({ tipo: "guia-enviada", para: to, guia: fila.guia, certeza: fila.certeza });
-      console.log(`📦 Guía ${fila.guia} enviada a ${fila.pedido.nombre} (${to}), certeza ${fila.certeza}`);
+      console.log(
+        `📦 Guía ${fila.guia} enviada a ${fila.pedido.nombre} (${to}), certeza ${fila.certeza}` +
+          (envio.porPlantilla ? ` [por plantilla ${PLANTILLA_GUIA}, su ventana estaba cerrada]` : " [mensaje libre]")
+      );
       resultados.push({ ...base, nombre: fila.pedido.nombre, telefono: to, ok: true });
     } else {
       const motivo = motivoDeEnvio(envio);
