@@ -265,6 +265,61 @@ app.get("/catalogos", async (req, res) => {
 });
 
 // ============================================================================
+// GET /producto?token=...&ids=123,456
+//
+// Lee productos del catálogo POR ID, directo del grafo de Meta.
+//
+// POR QUÉ: el catálogo viejo (con las buenas tomas y descripciones) no aparece
+// en `product_catalogs` de ninguna WABA — se creó en la app del celular y no
+// quedó expuesto como catálogo de Commerce Manager. Pero los enlaces que
+// comparte la app, `wa.me/p/{PRODUCT_ID}/{TELEFONO}`, SÍ traen el ID del
+// producto. Y un producto es un objeto direccionable del grafo.
+//
+// Así se recuperan foto, descripción y precio sin que el dueño tenga que bajar
+// nada del celular ni reescribir las fichas.
+// ============================================================================
+app.get("/producto", async (req, res) => {
+  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  if (!WA_TOKEN) return res.status(400).json({ error: "Falta WHATSAPP_TOKEN." });
+
+  const ids = (req.query.ids || "")
+    .toString()
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!ids.length) {
+    return res.status(400).json({
+      error: "Falta ?ids=",
+      ejemplo: "/producto?token=...&ids=27892272213763991,27607874028892677",
+      nota: "Los IDs salen de los enlaces wa.me/p/{ID}/{telefono} que comparte la app de WhatsApp Business.",
+    });
+  }
+
+  const campos = "id,retailer_id,name,description,price,currency,image_url,additional_image_urls,availability,url,category,brand";
+  const resultados = [];
+  for (const id of ids.slice(0, 20)) {
+    try {
+      const r = await fetch(`https://graph.facebook.com/v21.0/${id}?fields=${campos}`, {
+        headers: { Authorization: `Bearer ${WA_TOKEN}` },
+      });
+      resultados.push({ idPedido: id, http: r.status, ...(await r.json().catch(() => ({}))) });
+    } catch (e) {
+      resultados.push({ idPedido: id, error: e.message });
+    }
+  }
+
+  const leidos = resultados.filter((r) => r.http === 200).length;
+  res.json({
+    pedidos: ids.length,
+    leidos,
+    diagnostico: leidos
+      ? `🟢 ${leidos} de ${ids.length} productos leídos. Con image_url y description se reconstruye el catálogo sin trabajo manual.`
+      : "🔴 Ninguno se pudo leer. Si el error es 100/33, el token no tiene acceso a ese catálogo: hay que asignarle el activo del catálogo viejo al usuario de sistema.",
+    productos: resultados,
+  });
+});
+
+// ============================================================================
 // GET /enviar-prueba?token=...&to=573138615813[&msg=...]
 //
 // POR QUÉ EXISTE: hasta acá lo único que teníamos era Meta diciendo que el
