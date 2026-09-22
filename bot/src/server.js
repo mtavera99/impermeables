@@ -211,6 +211,31 @@ app.get("/catalogos", async (req, res) => {
   // ¿Hay un catálogo ya conectado a la WABA? Es lo que permite mandar productos.
   out.catalogoConectadoALaWaba = await g(`${WABA_ID}/product_catalogs`);
 
+  // ---- BUSCAR CATÁLOGOS EN *TODAS* LAS WABAs DEL NEGOCIO ----
+  // Por qué: el catálogo bueno (con las fotos y descripciones que ya funcionaban)
+  // estaba en el NÚMERO ANTERIOR. Los catálogos de la app de WhatsApp Business
+  // quedan atados a su WABA, así que hay que recorrer las otras WABAs para
+  // encontrarlo. Si aparece, se pueden leer sus productos con image_url y
+  // description y migrarlos al catálogo nuevo sin rehacerlos a mano.
+  if (req.query.buscar_viejo === "1") {
+    const bizId2 = process.env.META_BUSINESS_ID || "1271452296042859";
+    const wabas = await g(`${bizId2}/owned_whatsapp_business_accounts?fields=id,name&limit=25`);
+    out.todasLasWabas = wabas;
+    out.catalogosPorWaba = [];
+    for (const w of wabas?.data || []) {
+      const cats = await g(`${w.id}/product_catalogs?fields=id,name,product_count`);
+      const entrada = { waba: w.name, wabaId: w.id, catalogos: cats?.data || [], error: cats?.error?.message };
+      // Si esa WABA tiene un catálogo distinto al nuevo, leer sus productos
+      for (const c of entrada.catalogos) {
+        if (c.id === "1444910067541151") continue; // el nuevo, ya lo conocemos
+        c.productos = await g(
+          `${c.id}/products?fields=retailer_id,name,description,price,image_url,availability&limit=30`
+        );
+      }
+      out.catalogosPorWaba.push(entrada);
+    }
+  }
+
   // Catálogos del portafolio comercial (donde deberían estar los viejos)
   const bizId = process.env.META_BUSINESS_ID || "1271452296042859";
   out.catalogosDelNegocio = await g(`${bizId}/owned_product_catalogs?fields=id,name,product_count`);
