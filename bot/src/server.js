@@ -456,7 +456,10 @@ app.post("/guias/enviar", async (req, res) => {
 // sigue la charla en vez de arrancar de cero.
 // ============================================================================
 app.get("/recuperar-cliente", async (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  // 🔴 PANEL_TOKEN, no VERIFY_TOKEN. Esta ruta ESCRIBE: manda mensajes de
+  // WhatsApp como BikerPro. Quedó con VERIFY_TOKEN por un cruce de ramas y eso
+  // la dejó abierta a internet con un valor que está publicado en el repo.
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const id = idDestino(req.query.id || "");
   if (!id) {
@@ -526,7 +529,8 @@ app.get("/recuperar-cliente", async (req, res) => {
 // Sin `aplicar=1` solo muestra qué haría.
 // ============================================================================
 app.get("/limpiar-conversaciones-rotas", (req, res) => {
-  if (req.query.token !== VERIFY_TOKEN) return res.sendStatus(403);
+  // 🔴 PANEL_TOKEN, no VERIFY_TOKEN: con `aplicar=1` esta ruta BORRA datos.
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
   const todas = store.todasLasConversaciones();
   // Claves que no son ni un teléfono ni un BSUID: basura del bug.
@@ -1376,7 +1380,9 @@ async function handleWebhook(body) {
 
 // Diagnostico del seguimiento de 72h: cuantos estan esperando cada paso.
 // No manda nada, solo cuenta. Visitar /seguimiento para ver el estado.
-app.get("/seguimiento", (_req, res) => {
+app.get("/seguimiento", (req, res) => {
+  // Filtraba los nombres de las plantillas y el estado interno sin pedir nada.
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   res.json({
     activo: process.env.SEGUIMIENTO_ACTIVO === "1",
     plantilla_2: process.env.SEGUIMIENTO_PLANTILLA_2 || "(sin configurar)",
@@ -1387,7 +1393,15 @@ app.get("/seguimiento", (_req, res) => {
 
 // Dispara una pasada de seguimiento AHORA, sin esperar los 30 min.
 // Sirve para probar. Respeta todas las reglas (no manda a quien no toca).
-app.get("/seguimiento/correr", async (_req, res) => {
+app.get("/seguimiento/correr", async (req, res) => {
+  // 🔴🔴 ESTA ERA LA PEOR: no pedía NADA y manda mensajes de WhatsApp a los
+  // clientes (`sendText` y `sendTemplate` dentro de correrSeguimientos).
+  // Cualquiera en internet podía dispararla, todas las veces que quisiera, y
+  // hacer que BikerPro les escriba a sus propios clientes.
+  //
+  // Hoy estaba inerte solo porque SEGUIMIENTO_ACTIVO no está en "1". Esa no es
+  // una protección: es una casualidad que se cae el día que se active.
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   try {
     res.json(await seguimiento.correrSeguimientos());
   } catch (e) {
