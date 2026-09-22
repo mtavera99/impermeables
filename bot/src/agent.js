@@ -217,6 +217,21 @@ async function generateReply(phone, userText) {
     }
   }
 
+  // ==========================================================================
+  // 🔴 CANDADO: SIN CELULAR NO HAY DESPACHO
+  //
+  // El guion ya pedía el celular y ya tenía la regla de quitarle el "57". Pero
+  // las dos daban por hecho que el teléfono SIEMPRE llega — y la de quitar el
+  // 57 existe precisamente porque se copiaba del número del chat.
+  //
+  // Eso se rompió: los clientes con username de WhatsApp NO tienen número de
+  // chat. Si la IA no pidió el celular, no hay de dónde sacarlo, y un pedido sin
+  // teléfono NO SE PUEDE DESPACHAR: la transportadora lo exige para la guía.
+  //
+  // Y esto va acá, en código, no solo en el prompt. Hoy ya aprendimos que una
+  // instrucción al modelo no es un candado: el bloque ##ORDER## se emitía dos
+  // veces aunque el prompt dijera que no. Lo que no puede fallar, se blinda.
+  // ==========================================================================
   const handoff = reply.includes("##HANDOFF##");
   reply = reply.replace(/##HANDOFF##/g, "").trim();
 
@@ -230,11 +245,54 @@ async function generateReply(phone, userText) {
   const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
 
   let savedOrder = null;
-  if (order) savedOrder = store.saveOrder({ ...order, telefono_chat: phone });
+  if (order) savedOrder = store.saveOrder({ ...revisarTelefono(order, phone), telefono_chat: phone });
   if (handoff) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
   return { reply, order: savedOrder, handoff, media };
 }
 
-module.exports = { generateReply };
+// Identificador de cliente con username (no es un teléfono).
+const RE_BSUID_AG = /^[A-Za-z]{2}\.[A-Za-z0-9]{1,128}$/;
+
+/**
+ * Devuelve el celular en el formato que espera la transportadora (10 dígitos
+ * que empiezan en 3) o null si no sirve.
+ *
+ * Acepta que venga con el 57 adelante y lo quita, que era la regla que ya
+ * existía en el guion: pasó 8 veces en 4 días y llegaba mal a la transportadora.
+ */
+function celularValido(c) {
+  const d = String(c == null ? "" : c).replace(/\D/g, "");
+  const s = d.length > 10 ? d.slice(-10) : d;
+  return /^3\d{9}$/.test(s) ? s : null;
+}
+
+/**
+ * Se asegura de que el pedido tenga un celular usable, y si no lo tiene, lo
+ * marca como NO DESPACHABLE en vez de dejarlo pasar en silencio.
+ *
+ * @param {object} order el pedido que armó la IA
+ * @param {string} chatId teléfono del chat, o BSUID si el cliente usa username
+ */
+function revisarTelefono(order, chatId) {
+  const propio = celularValido(order.celular);
+  if (propio) return { ...order, celular: propio };
+
+  // No dio celular. Si el chat ES un teléfono, ese sirve: es el número por el
+  // que está escribiendo. (Antes esto lo hacía la IA copiándolo, de ahí la
+  // regla del "57"; ahora lo hace el código y siempre bien formateado.)
+  if (!RE_BSUID_AG.test(String(chatId))) {
+    const delChat = celularValido(chatId);
+    if (delChat) return { ...order, celular: delChat, celularDelChat: true };
+  }
+
+  // No hay teléfono en ninguna parte: cliente con username que no lo dio.
+  console.error(
+    `🔴 PEDIDO SIN TELÉFONO de ${chatId}: ${order.nombre || "?"} en ${order.ciudad || "?"}. ` +
+      "NO SE PUEDE DESPACHAR hasta que dé un celular."
+  );
+  return { ...order, celular: "", sinTelefono: true, despachable: false };
+}
+
+module.exports = { generateReply, revisarTelefono, celularValido };

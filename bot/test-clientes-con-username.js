@@ -146,8 +146,49 @@ const check = (cond, msg) => { console.log(`${cond ? "✅" : "🔴"} ${msg}`); i
   check(html.includes("sin teléfono"), "y avisa que no tiene teléfono (hace falta para despachar)");
   check(html.includes(BSUID), "pero el BSUID sigue en el formulario para poder responderle");
 
+  console.log("\n── 7. SIN CELULAR NO HAY DESPACHO (el candado) ──");
+  const { revisarTelefono, celularValido } = require("./src/agent");
+
+  check(celularValido("573138615813") === "3138615813", 'quita el 57: "573138615813" → "3138615813"');
+  check(celularValido("3138615813") === "3138615813", "un celular ya limpio queda igual");
+  check(celularValido("2138615813") === null, "un fijo (no empieza en 3) se rechaza");
+  check(celularValido("") === null, "vacío se rechaza");
+  check(celularValido("CO.9999999999999999") === null, "🔑 un BSUID NO pasa como celular");
+
+  // El cliente escribió su celular: se usa ese.
+  const a = revisarTelefono({ nombre: "A", celular: "310 555 4433" }, TELEFONO);
+  check(a.celular === "3105554433" && !a.sinTelefono, `celular del cliente, limpio: ${a.celular}`);
+
+  // No lo escribió, pero escribe desde un teléfono: se toma del chat.
+  const b = revisarTelefono({ nombre: "B", celular: "" }, TELEFONO);
+  check(b.celular === "3001112233" && b.celularDelChat === true,
+    `sin celular pero con chat telefónico → se toma del chat (${b.celular})`);
+
+  // No lo escribió y usa username: NO DESPACHABLE.
+  const c = revisarTelefono({ nombre: "C", celular: "" }, BSUID);
+  check(c.sinTelefono === true && c.despachable === false && c.celular === "",
+    "🔑 sin celular y con username → marcado sinTelefono y NO despachable");
+  check(c.celular !== BSUID.replace(/\D/g, ""),
+    `🔑 y NO se le inventó el número "${BSUID.replace(/\D/g, "")}" a partir del BSUID`);
+
+  console.log("\n── 8. Se pueden limpiar las conversaciones rotas ──");
+  // Simula la basura que dejó el bug en producción: la clave literal "undefined"
+  const convs2 = JSON.parse(fs.readFileSync(path.join(DATA, "conversations.json"), "utf8"));
+  convs2["undefined"] = { messages: [{ role: "user", content: "¡Hola! Quiero más información.", at: Date.now() }], paused: false };
+  fs.writeFileSync(path.join(DATA, "conversations.json"), JSON.stringify(convs2, null, 2));
+
+  const prev = await (await fetch(`${BASE}/limpiar-conversaciones-rotas?token=${TK}`)).json();
+  check(prev.rotasEncontradas === 1, `la encuentra (${prev.rotasEncontradas})`);
+  check(!prev.aplicado, "y NO borra nada sin &aplicar=1");
+
+  const apl = await (await fetch(`${BASE}/limpiar-conversaciones-rotas?token=${TK}&aplicar=1`)).json();
+  check(apl.aplicado === true, "con &aplicar=1 la borra");
+  const convs3 = JSON.parse(fs.readFileSync(path.join(DATA, "conversations.json"), "utf8"));
+  check(!convs3["undefined"], "ya no está");
+  check(Boolean(convs3[BSUID]), "🔑 y la del cliente REAL con username NO se borró");
+
   fs.rmSync(DATA, { recursive: true, force: true });
-  const total = 19;
+  const total = 33;
   console.log(fallas ? `\n🔴 ${fallas} de ${total} falla(s).` : `\n🟢 ${total}/${total} correctos.`);
   process.exit(fallas ? 1 : 0);
 })().catch((e) => { console.error("🔴", e); process.exit(1); });
