@@ -98,6 +98,13 @@ function todasLasConversaciones() {
   ensure();
   return readJSON(CONV_FILE, {});
 }
+
+/** Devuelve todos los pedidos guardados, del más nuevo al más viejo. */
+function todosLosPedidos() {
+  ensure();
+  const orders = readJSON(ORDERS_FILE, []);
+  return [...orders].reverse();
+}
 function isPaused(phone) {
   return !!getConv(phone).paused;
 }
@@ -120,5 +127,6 @@ function saveOrder(order) {
 
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
-  marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones
+  marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones,
+  todosLosPedidos
 };
