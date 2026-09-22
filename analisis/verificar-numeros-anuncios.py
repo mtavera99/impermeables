@@ -202,10 +202,24 @@ def main():
 
     if sin_dato:
         print()
-        print("❓ En estos el número no viene en la respuesta de la API.")
-        print("   No significa que estén mal: puede ser que el destino se defina")
-        print("   en la publicación de la página y no en el creativo.")
-        print("   Hay que confirmarlos a mano en Ads Manager:")
+        print("🔴 LIMITACIÓN CONFIRMADA (22-sep): LA API NO EXPONE EL NÚMERO.")
+        print("   Se probó con todos los campos candidatos y con un volcado del JSON")
+        print("   crudo. En los anuncios CTWA de esta cuenta:")
+        print("     · promoted_object trae SOLO page_id, sin teléfono")
+        print("     · el link de la CTA es genérico: https://api.whatsapp.com/send")
+        print("     · destination_type dice WHATSAPP, pero no cuál número")
+        print("   El número se elige por conjunto en Ads Manager, pero no vuelve")
+        print("   por la API con un token de solo lectura.")
+        print()
+        print("   ✅ CÓMO VERIFICARLO DE VERDAD, EN ORDEN DE FACILIDAD:")
+        print("   1. POR TRÁFICO (automático y sin margen de duda): cuando la pauta")
+        print("      gaste, mirar /panel del bot. Si entran conversaciones, el")
+        print("      anuncio apunta al número del bot. Si hay gasto y CERO")
+        print("      conversaciones, apunta al viejo. Esto no se puede confundir.")
+        print("   2. A MANO: Ads Manager → el conjunto → Editar → sección WhatsApp.")
+        print("      El número se lee en el encabezado de esa sección.")
+        print()
+        print("   Conjuntos a confirmar:")
         for f in sin_dato:
             print(f"     · {f['conjunto']} → {f['anuncio']}")
 
