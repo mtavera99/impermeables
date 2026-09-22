@@ -194,13 +194,16 @@ function render(aviso) {
     ? pedidos
         .slice(0, 40)
         .map(
+          // data-label alimenta el ::before del CSS móvil: en el celular cada
+          // fila se vuelve una tarjeta y cada dato muestra su etiqueta al lado.
+          // Así no hay que duplicar los títulos en el HTML.
           (p) => `<tr>
-            <td class="nowrap">${esc(HORA(new Date(p.fecha).getTime()))}</td>
-            <td><b>${esc(p.nombre)}</b><div class="sub">${esc(p.celular || p.telefono_chat)}</div></td>
-            <td>${esc(p.ciudad)}<div class="sub">${esc(p.direccion)}</div></td>
-            <td>${esc(p.talla)} / ${esc(p.color)}</td>
-            <td class="nowrap"><b>${esc(fmtCOP(p.total))}</b><div class="sub">${esc(p.pago)}</div></td>
-            <td class="nowrap">${
+            <td class="nowrap" data-label="Fecha">${esc(HORA(new Date(p.fecha).getTime()))}</td>
+            <td data-label="Cliente"><b>${esc(p.nombre)}</b><div class="sub">${esc(p.celular || p.telefono_chat)}</div></td>
+            <td data-label="Dirección">${esc(p.ciudad)}<div class="sub">${esc(p.direccion)}</div></td>
+            <td data-label="Talla / color">${esc(p.talla)} / ${esc(p.color)}</td>
+            <td class="nowrap" data-label="Total"><b>${esc(fmtCOP(p.total))}</b><div class="sub">${esc(p.pago)}</div></td>
+            <td class="nowrap" data-label="Anuncio">${
               p.anuncio_id
                 ? `<span title="${esc(p.anuncio_origen || "")}">…${esc(String(p.anuncio_id).slice(-6))}</span>`
                 : `<span class="sub">—</span>`
@@ -233,20 +236,20 @@ function render(aviso) {
     .sort((a, b) => b[1].pedidos - a[1].pedidos)
     .map(
       ([id, a]) => `<tr>
-          <td class="nowrap">${id === "(sin dato)" ? '<span class="sub">(sin dato)</span>' : esc(id)}</td>
-          <td>${esc(a.origen || "")}</td>
-          <td class="nowrap"><b>${a.pedidos}</b></td>
-          <td class="nowrap"><b>${esc(fmtCOP(a.total))}</b></td>
+          <td class="nowrap" data-label="Anuncio">${id === "(sin dato)" ? '<span class="sub">(sin dato)</span>' : esc(id)}</td>
+          <td data-label="De dónde">${esc(a.origen || "")}</td>
+          <td class="nowrap" data-label="Pedidos"><b>${a.pedidos}</b></td>
+          <td class="nowrap" data-label="Vendido"><b>${esc(fmtCOP(a.total))}</b></td>
         </tr>`
     )
     .join("");
   const bloqueAnuncios = pedidos.length
     ? `<h2>🎯 Pedidos por anuncio</h2>
        <p class="sub">Cruzá el <b>id</b> con el gasto de ese anuncio en Meta Ads y tenés el costo real por venta.</p>
-       <table>
+       <div class="tabla"><table>
          <tr><th>Anuncio</th><th>De dónde</th><th>Pedidos</th><th>Vendido</th></tr>
          ${filasAnuncios}
-       </table>`
+       </table></div>`
     : "";
 
   const bloquesConv = lista.length
@@ -368,43 +371,124 @@ function render(aviso) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BikerPro · panel del bot</title>
 <style>
+  /* ==========================================================================
+     DISEÑO MÓVIL PRIMERO (rehecho el 22-sep)
+     El dueño usa este panel DESDE EL IPHONE y se veía mal. La causa era simple
+     y grave: no había UNA SOLA media query. Lo que se arregló y por qué:
+
+       · Las tablas de 6 columnas no caben en 390px: se salían o se aplastaban.
+         En móvil cada fila se convierte en una TARJETA, con la etiqueta de cada
+         dato al lado (sale de data-label, no de texto duplicado en el HTML).
+       · Los cuadros de texto tenían 13px. iOS hace ZOOM automático en cualquier
+         input de menos de 16px, y al escribirle a un cliente la página se
+         agrandaba sola. Ahora los campos son de 16px: el zoom no se dispara.
+       · Los botones medían ~30px de alto. La guía de Apple pide 44px para que
+         el dedo acierte. Todos los botones tienen min-height 44px en móvil.
+       · Faltaba el área segura del iPhone: el último botón quedaba debajo de la
+         barra de gestos. Ahora hay padding con env(safe-area-inset-bottom).
+       · touch-action:manipulation quita el retardo de ~300ms del doble toque,
+         que es lo que hacía sentir el panel "pesado".
+     ========================================================================== */
+  :root{
+    color-scheme:dark;
+    --bg:#0f1115; --card:#161a21; --card2:#1b212b; --linea:#242a35;
+    --txt:#e7e9ee; --gris:#8b93a4; --verde:#3ddc84; --amarillo:#ffb020;
+    --rojo:#ff6b6b; --azul:#2563eb;
+  }
   *{box-sizing:border-box}
-  body{margin:0;font:15px/1.45 -apple-system,system-ui,sans-serif;background:#0f1115;color:#e7e9ee}
-  header{padding:14px 16px;background:#161a21;border-bottom:1px solid #242a35;position:sticky;top:0;z-index:5}
-  h1{margin:0;font-size:17px}
-  .sub2{color:#8b93a4;font-size:12px;margin-top:3px}
-  main{padding:16px;max-width:900px;margin:0 auto}
-  h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:#8b93a4;margin:24px 0 10px}
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
-  .kpi{background:#161a21;border:1px solid #242a35;border-radius:10px;padding:12px;text-align:center}
-  .kpi b{display:block;font-size:22px}
-  .kpi span{font-size:11px;color:#8b93a4}
-  .kpi.ok b{color:#3ddc84}.kpi.warn b{color:#ffb020}
-  table{width:100%;border-collapse:collapse;background:#161a21;border:1px solid #242a35;border-radius:10px;overflow:hidden}
-  th,td{padding:9px 10px;text-align:left;border-bottom:1px solid #242a35;vertical-align:top;font-size:13px}
-  th{background:#1b212b;font-size:11px;text-transform:uppercase;color:#8b93a4}
-  .sub{color:#8b93a4;font-size:11px}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{
+    margin:0;font:16px/1.5 -apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",sans-serif;
+    background:var(--bg);color:var(--txt);
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:calc(24px + env(safe-area-inset-bottom));
+    overflow-x:hidden;
+  }
+  header{
+    padding:12px max(16px,env(safe-area-inset-left));
+    background:rgba(22,26,33,.92);backdrop-filter:saturate(180%) blur(12px);
+    border-bottom:1px solid var(--linea);position:sticky;top:0;z-index:20;
+  }
+  h1{margin:0;font-size:17px;letter-spacing:-.01em}
+  .sub2{color:var(--gris);font-size:12px;margin-top:2px}
+  main{padding:16px;max-width:920px;margin:0 auto}
+  /* scroll-margin-top deja el título visible cuando se salta a una sección:
+     sin esto la cabecera fija (sticky) le tapa la primera línea. */
+  h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);margin:26px 0 10px;scroll-margin-top:76px}
+  .conv{scroll-margin-top:76px}
+
+  /* --- Tarjetas de números --- */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .kpi{background:var(--card);border:1px solid var(--linea);border-radius:14px;padding:14px;text-align:center}
+  .kpi b{display:block;font-size:24px;letter-spacing:-.02em}
+  .kpi span{font-size:11px;color:var(--gris)}
+  .kpi.ok b{color:var(--verde)}.kpi.warn b{color:var(--amarillo)}
+
+  /* --- Tablas --- */
+  .tabla{background:var(--card);border:1px solid var(--linea);border-radius:14px;overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--linea);vertical-align:top;font-size:13px}
+  tr:last-child td{border-bottom:0}
+  th{background:var(--card2);font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--gris)}
+  .sub{color:var(--gris);font-size:12px;margin-top:2px}
   .nowrap{white-space:nowrap}
-  .vacio{color:#8b93a4;text-align:center;padding:22px}
-  .conv{background:#161a21;border:1px solid #242a35;border-radius:10px;margin-bottom:8px;padding:10px 12px}
-  .conv summary{cursor:pointer;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .tel{font-weight:600}
-  .meta{color:#8b93a4;font-size:12px;margin-left:auto}
-  .tag{font-size:10px;padding:2px 7px;border-radius:99px;background:#2a313d;color:#c8cfdd}
-  .tag.ok{background:#12351f;color:#3ddc84}.tag.warn{background:#3a2d0c;color:#ffb020}.tag.no{background:#3a1414;color:#ff6b6b}
-  .chat{margin-top:10px;display:flex;flex-direction:column;gap:6px}
-  .msg{max-width:82%;padding:7px 10px;border-radius:12px;font-size:13px}
-  .msg.cli{align-self:flex-start;background:#222834}
-  .msg.bot{align-self:flex-end;background:#124b33}
-  .hora{font-size:10px;color:#8b93a4;margin-top:3px}
-  .resp{margin-top:10px;display:flex;gap:6px;align-items:flex-start}
-  .resp textarea{flex:1;background:#0f1319;border:1px solid #2d3542;color:#e7e9ee;border-radius:8px;padding:8px;font:13px/1.4 inherit;resize:vertical}
-  .resp button{background:#12693f;border:0;color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap}
-  .envio{margin-top:6px;font-size:12px;min-height:16px}
-  .envio.ok{color:#3ddc84}.envio.mal{color:#ff6b6b}.envio.wait{color:#ffd479}
+  .vacio{color:var(--gris);text-align:center;padding:26px}
+
+  /* --- Conversaciones --- */
+  .conv{background:var(--card);border:1px solid var(--linea);border-radius:14px;margin-bottom:10px;padding:12px 14px}
+  .conv[open]{border-color:#2f3947;background:#171c24}
+  .conv summary{
+    cursor:pointer;display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+    list-style:none;min-height:32px;
+  }
+  .conv summary::-webkit-details-marker{display:none}
+  .conv summary::after{
+    content:"›";margin-left:auto;color:var(--gris);font-size:22px;line-height:1;
+    transition:transform .18s ease;
+  }
+  .conv[open] summary::after{transform:rotate(90deg)}
+  .tel{font-weight:650;letter-spacing:-.01em}
+  .meta{color:var(--gris);font-size:12px}
+  .tag{font-size:10px;padding:3px 8px;border-radius:99px;background:#2a313d;color:#c8cfdd;white-space:nowrap}
+  .tag.ok{background:#12351f;color:var(--verde)}.tag.warn{background:#3a2d0c;color:var(--amarillo)}.tag.no{background:#3a1414;color:var(--rojo)}
+
+  /* --- Burbujas del chat --- */
+  .chat{
+    margin-top:12px;display:flex;flex-direction:column;gap:7px;
+    max-height:58vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding-right:2px;overscroll-behavior:contain;
+  }
+  .msg{max-width:84%;padding:8px 11px;border-radius:14px;font-size:14px;word-break:break-word}
+  .msg.cli{align-self:flex-start;background:#222834;border-bottom-left-radius:5px}
+  .msg.bot{align-self:flex-end;background:#12563a;border-bottom-right-radius:5px}
+  .hora{font-size:10px;color:var(--gris);margin-top:3px;opacity:.85}
+
+  /* --- Responder --- */
+  .resp{margin-top:12px;display:flex;gap:8px;align-items:flex-start}
+  .resp textarea{
+    flex:1;background:#0f1319;border:1px solid #2d3542;color:var(--txt);
+    border-radius:12px;padding:11px;
+    /* 16px NO es decorativo: menos que eso hace que iOS agrande la página */
+    font:16px/1.45 inherit;resize:vertical;min-height:46px;
+    transition:border-color .15s ease;
+  }
+  .resp textarea:focus{outline:none;border-color:#3b82f6}
+  .resp button{
+    background:#12693f;border:0;color:#fff;padding:0 16px;min-height:46px;
+    border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;
+    white-space:nowrap;touch-action:manipulation;transition:background .15s ease,transform .1s ease;
+  }
+  .resp button:active{transform:scale(.97)}
+  .resp button:hover{background:#158a51}
+  .envio{margin-top:8px;font-size:13px;min-height:18px}
+  .envio.ok{color:var(--verde)}.envio.mal{color:var(--rojo)}.envio.wait{color:#ffd479}
   .resp button:disabled{opacity:.5;cursor:default}
-  .pausa{margin-top:6px}
-  .pausa button{background:#2a313d;border:1px solid #3a4250;color:#c8cfdd;padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer}
+  .pausa{margin-top:8px}
+  .pausa button{
+    background:#2a313d;border:1px solid #3a4250;color:#c8cfdd;padding:9px 14px;
+    border-radius:10px;font-size:13px;cursor:pointer;touch-action:manipulation;min-height:38px;
+  }
+  .pausa button:active{transform:scale(.97)}
   .pausa button.verde{background:#12351f;border-color:#1d6b3d;color:#8ff0b5}
   .res{padding:10px 13px;border-radius:10px;margin-bottom:12px;font-size:13px}
   .res.ok{background:#12351f;border:1px solid #1d6b3d;color:#8ff0b5}
@@ -429,16 +513,98 @@ function render(aviso) {
   .kpi .d{display:block;font-size:11px;font-style:normal;margin-top:3px;color:#8b93a4}
   .kpi .d.up{color:#3ddc84}.kpi .d.dn{color:#ff6b6b}
   .nota{color:#8b93a4;font-size:12px;margin:8px 0 0}
-  .acciones{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
-  .btn{background:#1b212b;border:1px solid #2d3542;color:#e7e9ee;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:13px}
+  .acciones{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}
+  .btn{
+    background:var(--card2);border:1px solid #2d3542;color:var(--txt);
+    padding:0 14px;min-height:44px;display:inline-flex;align-items:center;gap:6px;
+    border-radius:12px;text-decoration:none;font-size:14px;font-weight:500;
+    touch-action:manipulation;transition:background .15s ease,transform .1s ease;
+  }
   .btn:hover{background:#232b36}
-  .btn.destacado{background:#1d4ed8;border-color:#2563eb;font-weight:700}
-  .btn.destacado:hover{background:#2563eb}
+  .btn:active{transform:scale(.98)}
+  .btn.destacado{background:#1d4ed8;border-color:var(--azul);font-weight:700}
+  .btn.destacado:hover{background:var(--azul)}
+
+  /* ==========================================================================
+     MÓVIL — hasta 640px. Es la pantalla real de uso.
+     ========================================================================== */
+  @media (max-width:640px){
+    main{padding:12px}
+    h1{font-size:16px}
+    h2{margin:22px 0 8px}
+
+    /* Dos columnas fijas: el auto-fit metía tres KPIs apretados y se cortaban */
+    .kpis{grid-template-columns:1fr 1fr;gap:8px}
+    .kpi{padding:12px 10px}
+    .kpi b{font-size:21px}
+    .kpi.big b{font-size:23px}
+
+    /* --- LA TABLA SE VUELVE TARJETAS ---
+       Una tabla de 6 columnas en 390px es ilegible. Cada fila pasa a ser una
+       tarjeta y cada celda muestra su etiqueta, que viene de data-label. */
+    .tabla{background:transparent;border:0;border-radius:0;overflow:visible}
+    .tabla table,.tabla tbody,.tabla tr,.tabla td{display:block;width:100%}
+    .tabla tr:first-child{display:none}          /* la fila de encabezados */
+    .tabla tr{
+      background:var(--card);border:1px solid var(--linea);border-radius:14px;
+      padding:10px 12px;margin-bottom:10px;
+    }
+    /* La etiqueta a la izquierda y el valor a la derecha, y si el valor es
+       largo se va solo al renglón siguiente en vez de partirse en pedazos.
+       El margin-right:auto de la etiqueta es lo que empuja el valor a la
+       derecha sin necesitar un div extra alrededor del valor. */
+    .tabla td{
+      border:0;padding:6px 0;display:flex;flex-wrap:wrap;
+      justify-content:flex-end;align-items:baseline;gap:2px 12px;
+      font-size:14px;text-align:right;
+    }
+    .tabla td::before{
+      content:attr(data-label);color:var(--gris);font-size:11px;
+      text-transform:uppercase;letter-spacing:.04em;
+      margin-right:auto;text-align:left;flex:0 0 auto;max-width:42%;
+    }
+    /* El dato secundario (teléfono, dirección, forma de pago) baja a su propio
+       renglón. Antes quedaba pegado al lado del principal: "Bogota Cra 7 #80". */
+    .tabla td .sub{flex:0 0 100%;text-align:right;margin-top:0}
+    .tabla td:empty{display:none}
+    /* La celda vacía de "todavía no hay pedidos" no debe verse como tarjeta */
+    .tabla td.vacio{display:block;text-align:center;padding:20px}
+    .tabla td.vacio::before{content:none}
+
+    .conv{padding:12px;border-radius:14px}
+    .meta{width:100%;order:3}
+    .msg{max-width:90%;font-size:14px}
+    .chat{max-height:62vh}
+
+    /* El botón de enviar abajo y a lo ancho: al lado quedaba de 60px y el
+       cuadro de texto sin espacio para leer lo que se estaba escribiendo. */
+    .resp{flex-direction:column;gap:8px}
+    .resp textarea{width:100%;min-height:76px}
+    .resp button{width:100%;min-height:48px;font-size:16px}
+
+    .acciones{flex-direction:column}
+    .btn{width:100%;justify-content:center}
+
+    .fila{padding:10px;min-height:44px}
+    .aviso,.res{font-size:13px;padding:11px 12px;border-radius:12px}
+  }
+
+  /* Pantallas muy angostas (iPhone SE y similares) */
+  @media (max-width:360px){
+    .kpis{grid-template-columns:1fr}
+    .tabla td{flex-direction:column;gap:2px}
+    .tabla td::before{flex:none}
+  }
+
+  /* Respeta a quien pidió menos animación en el sistema */
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;scroll-behavior:auto!important}
+  }
 </style></head>
 <body>
 <header>
   <h1>🏍️ BikerPro · panel del bot</h1>
-  <div class="sub2">${esc(numBot || "poné BOT_WHATSAPP en Render para ver acá el número del bot")} · se refresca cada 30 segundos</div>
+  <div class="sub2">${esc(numBot || "poné BOT_WHATSAPP en Render para ver acá el número del bot")} · se refresca cada 45 s (nunca mientras escribís)</div>
 </header>
 <main>
   ${aviso || ""}
@@ -446,10 +612,10 @@ function render(aviso) {
   ${bloqueAtencion}
   ${tarjetas}
   <h2>Pedidos (todos)</h2>
-  <table>
+  <div class="tabla"><table>
     <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Anuncio</th></tr>
     ${filasPedidos}
-  </table>
+  </table></div>
   ${bloqueAnuncios}
   <h2>Conversaciones</h2>
   ${bloquesConv}
