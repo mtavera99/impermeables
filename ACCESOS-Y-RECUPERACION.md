@@ -127,7 +127,108 @@ valor_comercial · estado_del_envio · fecha_actualizacion · aplica_contrapago 
 
 ---
 
-## 3️⃣ 🔴 PENDIENTE DE SEGURIDAD: EL REPO ES PÚBLICO Y TIENE DATOS DE CLIENTES
+## 3️⃣ WHATSAPP CLOUD API — el bot de ventas
+
+### Qué existe hoy (montado el 21-sep-2026)
+
+| Dato | Valor |
+|---|---|
+| **App de Meta** | **`BikerPro Bot`** — `app_id 1338086151301765` · modo **Publicada** |
+| Portafolio comercial | `1271452296042859` (el mismo de Ads) |
+| **WhatsApp Business Account ID** | **`2213159576112051`** |
+| **Número de prueba** | `+1 555 160-4132` · Phone Number ID **`1257126177474870`** |
+| Calidad del número de prueba | GREEN · `platform_type: CLOUD_API` |
+| Destinatario autorizado | el celular del dueño (los números de prueba solo hablan con una lista) |
+| **Servicio del bot** | **`https://bikerpro-bot.onrender.com`** (Render, plan Starter $7/mes) |
+| Webhook | `https://bikerpro-bot.onrender.com/webhook` · campo **`messages`** suscrito |
+| Verify token | `bikerpro_verify_2026` (está en `WHATSAPP_VERIFY_TOKEN` de Render) |
+| Modelo de IA | Gemini `gemini-3.1-flash-lite` · clave **IMPERMEABLE BOT** |
+
+⚠️ **La app "Kiro" (`28212160735114123`) NO es esta.** Esa es solo para leer Meta Ads
+y está en modo desarrollo. Son dos apps distintas y no hay que mezclarlas.
+
+### Configuración de Render (si hay que recrear el servicio)
+
+| campo | valor |
+|---|---|
+| Name | `bikerpro-bot` |
+| **Language** | **`Node`** ⬅️ el error clásico es dejarlo en Python |
+| **Root Directory** | **`bot`** ⬅️ el otro error clásico, dejarlo vacío |
+| Branch | `main` · Build `npm install` · Start `npm start` |
+| Instance | **Starter $7/mes — NO Free** (el Free se duerme y pierde el primer mensaje) |
+
+Variables de entorno (los valores secretos van en el gestor de contraseñas):
+```
+AI_PROVIDER=gemini                 (opcional: es el default)
+GEMINI_API_KEY=<secreto>
+GEMINI_MODEL=gemini-3.1-flash-lite (opcional: es el default)
+MAX_HISTORIAL=8                    (opcional: es el default)
+WHATSAPP_VERIFY_TOKEN=bikerpro_verify_2026
+WHATSAPP_TOKEN=<secreto>
+WHATSAPP_PHONE_NUMBER_ID=1257126177474870
+WHATSAPP_WABA_ID=2213159576112051
+OWNER_WHATSAPP=573138615813
+```
+
+### 🔴 EL TOKEN DE WHATSAPP: EL PERMANENTE, NO EL DE API SETUP
+
+El token que muestra **API Setup dura 24 HORAS**. Si el bot deja de contestar de un
+día para otro y no hubo ningún cambio, **es eso**. Es el fallo más probable.
+
+**El permanente se hace con un usuario de sistema:**
+
+1. `business.facebook.com` → **Configuración del negocio** → **Usuarios de sistema**
+2. **Agregar** → nombre `BikerPro Bot` → rol **Administrador**
+   ⛔ **NO usar `Kiro Lectura`.** Ese es de solo lectura a propósito (rol Analista) y
+   es el candado técnico que impide que un error toque el presupuesto de Ads.
+   Mezclarlos rompe esa garantía.
+3. **Agregar activos** → Apps → `BikerPro Bot` → **Control total**
+   y Cuentas de WhatsApp → la de BikerPro → **Control total**
+4. **Generar nuevo token** → app `BikerPro Bot` → caducidad **Nunca** →
+   permisos **`whatsapp_business_messaging`** + **`whatsapp_business_management`**
+5. Pegarlo en Render como `WHATSAPP_TOKEN` y guardarlo en el gestor de contraseñas
+
+### Cómo verificar que todo está conectado (sin revelar el token)
+
+```
+https://bikerpro-bot.onrender.com/setup-waba?token=bikerpro_verify_2026
+```
+
+Devuelve qué número está conectado, su calidad, y si la WABA está suscrita al
+webhook. Traduce los errores de Meta: **190** = token vencido o mal copiado ·
+**100** = el Phone Number ID o el WABA ID no son de ese token.
+
+### Cómo verificar que el GUION cotiza bien
+
+```bash
+node bot/probar-guion.js https://bikerpro-bot.onrender.com bikerpro_verify_2026
+```
+
+11 casos que ya costaron plata. **Correrlo dos veces**: la IA no es determinista,
+un fallo aislado puede ser variación, el mismo caso fallando dos veces es un problema.
+
+🔑 **Y esta es la lección más importante del 21-sep:** las 54 pruebas unitarias del
+tarifario estaban en verde y el guion **igual falló 2 de 11**, porque **la IA no llama
+a `cotizar()`: lee la tabla del prompt**. Un tarifario correcto en el código no
+garantiza un precio correcto al cliente. Hay que probar contra producción.
+
+### ⬜ Lo que falta
+
+| paso | estado |
+|---|---|
+| Token permanente | ⬜ el actual vence en 24h |
+| **Número real** (Paso 2: Configuración de producción) | ⬜ |
+| **Desconectar Hermes** (Baileys) del número real | ⬜ **bloquea lo anterior** |
+| Verificar coexistence | ⬜ permite Cloud API sin sacar el número del app |
+| Chatwoot | ⬜ |
+
+🔴 **Hermes usa Baileys, que no es oficial.** Dos sistemas en el mismo número se
+pelean, y el riesgo de fondo es el bloqueo permanente del número por donde entra el
+**100% de las ventas**. Hay que apagarlo antes de conectar el número real.
+
+---
+
+## 4️⃣ 🔴 PENDIENTE DE SEGURIDAD: EL REPO ES PÚBLICO Y TIENE DATOS DE CLIENTES
 
 | Archivo | Qué tiene |
 |---|---|
@@ -152,12 +253,15 @@ Meta, sin pasar por git.**
 
 ---
 
-## 4️⃣ Qué leer en una sesión nueva, en orden
+## 5️⃣ Qué leer en una sesión nueva, en orden
 
 1. **`.kiro/steering/proyecto-bikerpro.md`** — el archivo madre. Empezar por el bloque **⚡ ARRANQUE** y
    por el índice; las secciones más nuevas son las de letras más altas (0-AK, 0-AJ, 0-AI, 0-AH…)
 2. **Este archivo**, para reconectar los accesos
 3. **`git log --oneline -20`** — los mensajes de commit cuentan la historia con números
+4. **`BOT-DESPLIEGUE.md`** — el estado del bot, la config de Render y los pasos de Meta
+5. **`EXPORT-AGENTE-META-21SEP.md`** — los hallazgos del export de 6.317 conversaciones:
+   la atribución por `ad_id`, la fuga de precios del agente viejo y qué pregunta el cliente
 
 📌 **Y la cultura del proyecto, que importa tanto como los datos:** acá se anotan **los errores
 propios** con nombre y apellido. Si un análisis se cae, se marca la sección vieja con un aviso arriba
