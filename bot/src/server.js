@@ -1504,6 +1504,25 @@ app.get("/seguimiento/correr", async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`BikerPro bot escuchando en puerto ${PORT} 🏍️`);
+
+  // 💾 Contar este arranque en el propio disco. Es la evidencia de que los
+  // datos sobreviven: si el contador va en 5, aguantaron 5 arranques. El panel
+  // lo muestra en vez de suponer que el disco está bien solo porque existe la
+  // variable DATA_DIR (que fue exactamente el aviso falso que teníamos).
+  const marca = store.registrarArranque();
+  const disco = store.estadoDelDisco();
+  if (disco.discoAparte === true) {
+    console.log(
+      `💾 Disco persistente COMPROBADO en ${disco.dir} · arranque #${marca?.arranques || "?"}` +
+        (disco.desde ? ` · datos desde ${disco.desde}` : "")
+    );
+  } else if (disco.configurado && disco.discoAparte === false) {
+    console.warn(
+      `🔴 DATA_DIR=${disco.dir} NO es un disco montado: es una carpeta del contenedor y se ` +
+        "borra en el próximo despliegue. Revisá el Mount Path en Render → Settings → Disks."
+    );
+  }
+
   subscribeWaba();      // auto-suscribe la WABA al arrancar
   seguimiento.arrancar(); // reloj del seguimiento de 72h (solo si esta activo)
 });

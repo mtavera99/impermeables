@@ -31,11 +31,16 @@ if (!process.env.DATA_DIR) {
       "poné DATA_DIR=/var/data."
   );
 } else {
-  console.log(`💾 Datos en disco persistente: ${DIR}`);
+  // Neutral a propósito: acá todavía no se sabe si hay un disco montado, solo
+  // que la variable está puesta. La comprobación de verdad la hace
+  // estadoDelDisco() al arrancar. Antes esta línea decía "disco persistente" y
+  // era la misma mentira que el aviso del panel.
+  console.log(`💾 Datos en: ${DIR} (sin comprobar todavía si es un disco montado)`);
 }
 const CONV_FILE = path.join(DIR, "conversations.json");
 const ORDERS_FILE = path.join(DIR, "orders.json");
 const GUIAS_FILE = path.join(DIR, "guias-enviadas.json");
+const MARCADOR_FILE = path.join(DIR, "marcador-disco.json");
 
 const MAX_MSGS = 24; // historial máximo por cliente que enviamos a la IA
 
@@ -438,8 +443,80 @@ function anotarGuiaEnPedido(fechaPedido, guia) {
   }
 }
 
+// ============================================================================
+// 💾 ¿LOS DATOS SE GUARDAN DE VERDAD? — COMPROBARLO, NO SUPONERLO
+//
+// El panel decía "los pedidos se guardan en disco persistente" con solo mirar
+// si la variable DATA_DIR existía. Eso es una suposición disfrazada de dato:
+// la variable dice DÓNDE guardar, no si hay un disco ahí. Si DATA_DIR apunta a
+// una carpeta del contenedor (por tener mal la ruta del disco, o por no haber
+// creado el disco), el aviso salía IGUAL de verde y los datos se borraban.
+//
+// Un aviso que dice "todo bien" sin haberlo verificado es peor que no tenerlo:
+// enseña a confiar. Acá se comprueba con dos evidencias independientes:
+//
+//  1. ¿Es OTRO sistema de archivos? Un disco montado tiene un número de
+//     dispositivo distinto al del código. Si DATA_DIR cae en el mismo
+//     dispositivo que /src, NO es un disco montado: es una carpeta y punto.
+//
+//  2. ¿Sobrevivió a reinicios? Se cuenta cada arranque en un archivo del propio
+//     disco. Si el contador va en 5, esos datos aguantaron 5 arranques — y eso
+//     es prueba directa, no inferencia.
+// ============================================================================
+
+/** Suma uno al contador de arranques. Se llama una vez al iniciar el bot. */
+function registrarArranque() {
+  try {
+    ensure();
+    const m = readJSON(MARCADOR_FILE, null) || { desde: new Date().toISOString(), arranques: 0 };
+    m.arranques = (m.arranques || 0) + 1;
+    m.ultimoArranque = new Date().toISOString();
+    writeJSON(MARCADOR_FILE, m);
+    return m;
+  } catch (e) {
+    console.error(`⚠️  No se pudo registrar el arranque: ${e.message}`);
+    return null;
+  }
+}
+
+/**
+ * Estado real del almacenamiento, para que el panel diga la verdad.
+ * Nunca lanza: si algo falla, lo reporta como desconocido en vez de mentir.
+ */
+function estadoDelDisco() {
+  const out = {
+    dir: DIR,
+    configurado: Boolean(process.env.DATA_DIR),
+    discoAparte: null, // null = no se pudo determinar
+    desde: null,
+    arranques: 0,
+  };
+
+  try {
+    ensure();
+    // Comparar el dispositivo de DATA_DIR con el del código. Distinto =
+    // sistema de archivos montado aparte = disco de verdad.
+    const dev = fs.statSync(DIR).dev;
+    const devCodigo = fs.statSync(__dirname).dev;
+    out.discoAparte = dev !== devCodigo;
+  } catch (e) {
+    console.error(`⚠️  No se pudo comprobar el disco: ${e.message}`);
+  }
+
+  try {
+    const m = readJSON(MARCADOR_FILE, null);
+    if (m) {
+      out.desde = m.desde || null;
+      out.arranques = m.arranques || 0;
+    }
+  } catch {}
+
+  return out;
+}
+
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
+  registrarArranque, estadoDelDisco,
   marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones,
   guardarPerfil, guardarAtribucion, atribucionDe,
   reemplazarPedidos,
