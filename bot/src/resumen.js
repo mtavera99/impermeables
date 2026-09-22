@@ -147,7 +147,11 @@ function textoCierre(dia = hoyBogota()) {
 /** Pedidos en CSV, para abrir en Excel o guardar como respaldo propio. */
 function pedidosCSV() {
   const pedidos = store.todosLosPedidos();
-  const cab = ["fecha", "dia_bogota", "nombre", "celular", "ciudad", "direccion", "talla", "color", "pago", "unidades", "total"];
+  // Las dos últimas columnas son la atribución: de qué anuncio salió la venta.
+  // Con esto el CSV se puede cruzar contra el gasto por anuncio de Meta Ads y
+  // sacar el CPA REAL por anuncio — no el costo por conversación, que es lo
+  // único que se podía ver hasta ahora.
+  const cab = ["fecha", "dia_bogota", "nombre", "celular", "ciudad", "direccion", "talla", "color", "pago", "unidades", "total", "anuncio_id", "anuncio_origen"];
   const filas = pedidos.map((p) => {
     const q = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
     return [
@@ -162,6 +166,8 @@ function pedidosCSV() {
       p.pago,
       unidadesDe(p),
       p.total,
+      p.anuncio_id || "",
+      p.anuncio_origen || "",
     ].map(q).join(",");
   });
   return [cab.join(","), ...filas].join("\n");

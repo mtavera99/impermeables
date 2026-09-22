@@ -1287,6 +1287,36 @@ async function handleWebhook(body) {
         if (from && (quien.nombre || quien.username)) {
           store.guardarPerfil(from, { nombre: quien.nombre, username: quien.username, sinTelefono: quien.esBsuid });
         }
+
+        // ====================================================================
+        // 🎯 DE QUÉ ANUNCIO VINO (atribución de Meta Ads, gratis en el webhook)
+        //
+        // Meta manda esto en `msg.referral` y hasta hoy se descartaba. Medido
+        // en los logs del 22-sep: los 17 clientes perdidos traían el anuncio,
+        // y un solo anuncio explicaba 7 de ellos.
+        //
+        // Llega SOLO en el primer mensaje después del clic, así que se guarda
+        // en la conversación apenas aparece. El pedido lo recoge de ahí varios
+        // mensajes después (ver store.saveOrder).
+        // ====================================================================
+        const ref = msg.referral;
+        if (from && ref && ref.source_id) {
+          store.guardarAtribucion(from, {
+            source_id: String(ref.source_id),
+            source_url: ref.source_url || null,
+            source_type: ref.source_type || null,
+            // El identificador del clic. Meta lo pide para medir conversiones
+            // de vuelta; si algún día se hace, sin esto no se puede.
+            ctwa_clid: ref.ctwa_clid || null,
+          });
+          anotarEvento({
+            tipo: "anuncio-detectado",
+            de: from,
+            anuncio: String(ref.source_id),
+            origen: ref.source_url || null,
+          });
+          console.log(`🎯 ${from} viene del anuncio ${ref.source_id} (${ref.source_url || "sin url"})`);
+        }
         let text = msg.text?.body?.trim();
 
         // 🎙️ NOTAS DE VOZ — medido en el export: 439 conversaciones (7%) las usan

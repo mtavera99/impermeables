@@ -200,10 +200,54 @@ function render(aviso) {
             <td>${esc(p.ciudad)}<div class="sub">${esc(p.direccion)}</div></td>
             <td>${esc(p.talla)} / ${esc(p.color)}</td>
             <td class="nowrap"><b>${esc(fmtCOP(p.total))}</b><div class="sub">${esc(p.pago)}</div></td>
+            <td class="nowrap">${
+              p.anuncio_id
+                ? `<span title="${esc(p.anuncio_origen || "")}">…${esc(String(p.anuncio_id).slice(-6))}</span>`
+                : `<span class="sub">—</span>`
+            }</td>
           </tr>`
         )
         .join("")
-    : `<tr><td colspan="5" class="vacio">Todavía no hay pedidos.</td></tr>`;
+    : `<tr><td colspan="6" class="vacio">Todavía no hay pedidos.</td></tr>`;
+
+  // ==========================================================================
+  // 🎯 VENTAS POR ANUNCIO — la tabla que decide dónde va el presupuesto
+  //
+  // Hasta hoy Meta solo mostraba el costo por CONVERSACIÓN. Esto muestra qué
+  // anuncio deja PEDIDOS. Son cosas distintas: un anuncio puede traer charlas
+  // baratas y no vender, y ese es justo el que se venía premiando con más
+  // presupuesto.
+  //
+  // Los pedidos viejos (de antes de este cambio) no tienen anuncio y salen
+  // agrupados como "sin dato": no se inventa una atribución que no se midió.
+  // ==========================================================================
+  const porAnuncio = new Map();
+  pedidos.forEach((p) => {
+    const k = p.anuncio_id || "(sin dato)";
+    const a = porAnuncio.get(k) || { pedidos: 0, total: 0, origen: p.anuncio_origen || "" };
+    a.pedidos += 1;
+    a.total += Number(p.total) || 0;
+    porAnuncio.set(k, a);
+  });
+  const filasAnuncios = [...porAnuncio.entries()]
+    .sort((a, b) => b[1].pedidos - a[1].pedidos)
+    .map(
+      ([id, a]) => `<tr>
+          <td class="nowrap">${id === "(sin dato)" ? '<span class="sub">(sin dato)</span>' : esc(id)}</td>
+          <td>${esc(a.origen || "")}</td>
+          <td class="nowrap"><b>${a.pedidos}</b></td>
+          <td class="nowrap"><b>${esc(fmtCOP(a.total))}</b></td>
+        </tr>`
+    )
+    .join("");
+  const bloqueAnuncios = pedidos.length
+    ? `<h2>🎯 Pedidos por anuncio</h2>
+       <p class="sub">Cruzá el <b>id</b> con el gasto de ese anuncio en Meta Ads y tenés el costo real por venta.</p>
+       <table>
+         <tr><th>Anuncio</th><th>De dónde</th><th>Pedidos</th><th>Vendido</th></tr>
+         ${filasAnuncios}
+       </table>`
+    : "";
 
   const bloquesConv = lista.length
     ? lista
@@ -368,9 +412,10 @@ function render(aviso) {
   ${tarjetas}
   <h2>Pedidos (todos)</h2>
   <table>
-    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th></tr>
+    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Anuncio</th></tr>
     ${filasPedidos}
   </table>
+  ${bloqueAnuncios}
   <h2>Conversaciones</h2>
   ${bloquesConv}
 </main>
