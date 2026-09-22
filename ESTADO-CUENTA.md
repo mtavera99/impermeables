@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-09-22 00:08 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-09-22 01:08 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,14 +9,16 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$85,720** |
+| **saldo ahora** | **$85,527** |
 | gastado hoy (hasta las 0h) | $0 |
-| presupuesto activo | $40,000/día |
-| cierre proyectado del día | $146,330 |
-| saldo proyectado a medianoche | $-60,610 |
-| objetivo (cubrir un día de 143% + colchón) | $77,200 |
+| presupuesto activo | $135,000/día |
+| cierre proyectado del día | $146,434 |
+| saldo proyectado a medianoche | $-60,907 |
+| objetivo (cubrir un día de 143% + colchón) | $213,050 |
 
-### 🟢 Saldo suficiente. No hace falta recargar.
+### 🔴 RECARGAR $127,523 — entra en zona de freno a las 10:00
+
+Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin saldo ahí es la fuga más cara que tiene la operación.
 
 ⛔ **Recargar en la MAÑANA, no de noche.** Recargar después de quedarse seco dispara el rebote de 0-AI: Meta suelta el gasto de golpe sobre el inventario más frío.
 
@@ -68,23 +70,23 @@ $ 2,685  =  $ 4,150  ÷  1.55
 
 | conjunto | 09-17 | 09-18 | 09-19 | 09-20 | 09-21 | 09-22 | |
 |---|---|---|---|---|---|---|---|
-| Motorizados | $1,438 | $1,848 | $924 | $633 | $1,050 | — | 🔴 |
-| Domiciliarios | $1,323 | $1,185 | $1,639 | $1,738 | $864 | — | 🟢 |
-| TEST Creativos | $1,090 | $760 | $987 | $730 | $702 | — | 🟡 |
-| Domiciliarios VIDEO | $963 | $1,062 | $899 | $1,148 | $1,512 | — | 🔴 |
+| Motorizados | $1,438 | $1,848 | $924 | $633 | $1,051 | — | 🔴 |
+| Domiciliarios | $1,323 | $1,185 | $1,639 | $1,738 | $865 | — | 🟢 |
+| TEST Creativos | $1,090 | $760 | $987 | $730 | $703 | — | 🟡 |
+| Domiciliarios VIDEO | $963 | $1,062 | $899 | $1,148 | $1,514 | — | 🔴 |
 | Publico ABIERTO video | $1,552 | $2,224 | $2,550 | $1,111 | $4,278 | — | 🔴 |
-| Domiciliarios - Expancion | $1,418 | $866 | $841 | $1,223 | $1,006 | — | 🟢 |
+| Domiciliarios - Expancion | $1,418 | $866 | $841 | $1,223 | $1,010 | — | 🟢 |
 
 ### conv/mil por día *(la calidad de la audiencia de cada uno)*
 
 | conjunto | 09-17 | 09-18 | 09-19 | 09-20 | 09-21 | 09-22 | |
 |---|---|---|---|---|---|---|---|
 | Motorizados | 2.54 | 2.99 | 4.93 | 9.47 | 4.01 | — | 🔴 |
-| Domiciliarios | 2.71 | 3.91 | 2.66 | 2.74 | 4.72 | — | 🟢 |
-| TEST Creativos | 5.61 | 11.64 | 7.77 | 11.20 | 10.08 | — | 🟡 |
+| Domiciliarios | 2.71 | 3.91 | 2.66 | 2.74 | 4.71 | — | 🟢 |
+| TEST Creativos | 5.61 | 11.64 | 7.77 | 11.20 | 10.06 | — | 🟡 |
 | Domiciliarios VIDEO | 3.68 | 4.22 | 4.23 | 3.76 | 2.33 | — | 🔴 |
 | Publico ABIERTO video | 6.53 | 4.62 | 3.76 | 8.70 | 2.93 | — | 🔴 |
-| Domiciliarios - Expancion | 2.48 | 5.30 | 4.58 | 3.59 | 4.02 | — | 🟢 |
+| Domiciliarios - Expancion | 2.48 | 5.30 | 4.58 | 3.59 | 4.01 | — | 🟢 |
 
 🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). Eso es canibalización, y se arregla diferenciando la segmentación.
 
@@ -99,7 +101,7 @@ $ 2,685  =  $ 4,150  ÷  1.55
 | 2026-09-18 | $113,822 | 110 | $1,035 | $5,017 | 4.85 | $106,312 |
 | 2026-09-19 | $119,438 | 127 | $940 | $4,371 | 4.65 | $134,717 |
 | 2026-09-20 | $120,934 | 110 | $1,099 | $4,936 | 4.49 | $99,200 |
-| 2026-09-21 | $158,988 | 146 | $1,089 | $3,937 | 3.61 | $133,191 |
+| 2026-09-21 | $159,196 | 146 | $1,090 | $3,936 | 3.61 | $132,983 |
 
 ---
 
