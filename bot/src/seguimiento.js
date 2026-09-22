@@ -35,9 +35,19 @@ const ACTIVO = process.env.SEGUIMIENTO_ACTIVO === "1";
 
 // Nombres de las plantillas aprobadas en Meta. Si estan vacias, ese
 // seguimiento se salta en silencio en vez de fallar.
-const PLANTILLA_2 = process.env.SEGUIMIENTO_PLANTILLA_2 || "";
-const PLANTILLA_3 = process.env.SEGUIMIENTO_PLANTILLA_3 || "";
-const IDIOMA = process.env.SEGUIMIENTO_IDIOMA || "es";
+// Nombres de las plantillas aprobadas en Meta. El dueño subio
+// `seguimiento_impermeable` el 22-sep y sirve para los dos pasos: es el mismo
+// mensaje, mandado un dia despues. Si algun dia quiere textos distintos, se
+// cambian por variable de entorno sin tocar codigo.
+const PLANTILLA_2 = process.env.SEGUIMIENTO_PLANTILLA_2 || "seguimiento_impermeable";
+const PLANTILLA_3 = process.env.SEGUIMIENTO_PLANTILLA_3 || "seguimiento_impermeable";
+
+// 🔴 es_CO, NO es. Las plantillas se subieron en "Spanish (COL)", que en la API
+// es es_CO. Con "es" Meta RECHAZA el envio aunque la plantilla este aprobada, y
+// el error no menciona el idioma: se buscaria el problema en cualquier otra
+// parte. Este default ya estaba en "es" y habria hecho fallar los pasos 2 y 3
+// en silencio el dia que se prendieran.
+const IDIOMA = process.env.SEGUIMIENTO_IDIOMA || "es_CO";
 
 // Los tres momentos. Se dejan con margen para no rozar los limites:
 //   20h  -> comodo dentro de las 24h de servicio

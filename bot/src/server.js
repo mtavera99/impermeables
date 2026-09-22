@@ -168,16 +168,44 @@ app.get("/cierre", async (req, res) => {
     if (!to) {
       out.envio = { ok: false, motivo: "no hay número destino (falta OWNER_WHATSAPP o ?to=)" };
     } else {
-      const r = await sendText(to, texto);
+      // ======================================================================
+      // 🔴 EL CIERRE ES UN MENSAJE QUE INICIA EL NEGOCIO, Y ESO TIENE REGLA.
+      //
+      // Si el dueño no le escribió al bot en las últimas 24h, su propia ventana
+      // está cerrada y el texto libre NO le llega. Ya se comprobó el 21-sep:
+      // Meta lo aceptó (ok:true, con id) y nunca lo entregó — el peor caso,
+      // porque desde afuera parece que salió bien.
+      //
+      // Con la ventana cerrada va por la plantilla `cierre_del_dia`, que lleva
+      // el resumen en su única variable. El detalle completo queda en el panel.
+      // ======================================================================
+      const convDueno = store.getConv(to);
+      const ultimoDueno = (convDueno && convDueno.ultimoDelCliente) || 0;
+      const ventanaAbierta = ultimoDueno > 0 && Date.now() - ultimoDueno < 24 * 60 * 60 * 1000;
+
+      const resumenCorto =
+        `${datos.pedidos} pedido${datos.pedidos === 1 ? "" : "s"}` +
+        `, ${datos.unidades} unidad${datos.unidades === 1 ? "" : "es"}` +
+        `, ${resumen.fmtCOP(datos.ingresos)}`;
+
+      const r = ventanaAbierta
+        ? await sendText(to, texto)
+        : await sendTemplate(to, PLANTILLA_CIERRE, PLANTILLA_IDIOMA, [
+            { type: "body", parameters: [{ type: "text", text: resumenCorto }] },
+          ]);
+
       out.envio = {
         ok: r.ok,
         para: `+${to}`,
         http: r.status,
+        porPlantilla: !ventanaAbierta,
         detalle: r.ok
           ? `entregado a Meta (id ${r.messageId})`
           : JSON.stringify(r.body?.error || r.body).slice(0, 220),
         nota: r.ok
-          ? "Meta lo aceptó. Si no te llega, es porque la ventana de 24h está cerrada: escribile algo al bot y volvé a pedir el cierre."
+          ? ventanaAbierta
+            ? "Meta lo aceptó y tu ventana estaba abierta, así que te llega completo."
+            : `Tu ventana estaba cerrada, así que salió por la plantilla ${PLANTILLA_CIERRE} con el resumen "${resumenCorto}". El detalle completo está en el panel.`
           : "No se pudo enviar. El texto completo está igual en este mismo resultado.",
       };
       anotarEvento({ tipo: "cierre-enviado", para: to, ok: r.ok, pedidos: datos.pedidos });
@@ -294,6 +322,9 @@ const PLANTILLA_IDIOMA = process.env.PLANTILLA_IDIOMA || "es_CO";
 // ya se cerró. Es la que el dueño subió el 22-sep, sin variables: el número de
 // guía y la transportadora ya van impresos dentro del PDF.
 const PLANTILLA_GUIA = process.env.PLANTILLA_GUIA || "guia_de_envio";
+
+// El cierre diario al dueño. Lleva una variable: el resumen corto del día.
+const PLANTILLA_CIERRE = process.env.PLANTILLA_CIERRE || "cierre_del_dia";
 
 // ============================================================================
 // 📮 NOVEDADES DE ENTREGA
@@ -1531,6 +1562,51 @@ async function handleWebhook(body) {
           console.log(`🎯 ${from} viene del anuncio ${ref.source_id} (${ref.source_url || "sin url"})`);
         }
         let text = msg.text?.body?.trim();
+
+        // ====================================================================
+        // 🔑 LAS RESPUESTAS A LOS BOTONES DE UNA PLANTILLA SON MENSAJES, PERO
+        //    NO SON DE TIPO "text".
+        //
+        // La plantilla de seguimiento tiene dos botones ("Si, me interesa" /
+        // "No, gracias"), y esos botones son el mecanismo completo: cuando el
+        // cliente toca uno, para WhatsApp ESO CUENTA COMO QUE ESCRIBIÓ, y se
+        // reabre la ventana de 24h para hablarle libre.
+        //
+        // 🔴 Sin esto, el cliente tocaba el botón y el bot le contestaba
+        // "Recibí tu mensaje 🙌 Todavía no puedo abrir ese tipo de archivo" —
+        // porque caía en la rama de los tipos no soportados. O sea: justo al
+        // que levantó la mano se le respondía con una confusión, y la plantilla
+        // que pagamos por aprobar no servía para nada.
+        //
+        // Meta manda esto de dos formas según el tipo de botón, así que se
+        // miran las dos.
+        // ====================================================================
+        if (!text && (msg.type === "button" || msg.type === "interactive")) {
+          const titulo =
+            msg.button?.text ||
+            msg.interactive?.button_reply?.title ||
+            msg.interactive?.list_reply?.title ||
+            "";
+          const payload = msg.button?.payload || msg.interactive?.button_reply?.id || "";
+          text = String(titulo || payload).trim();
+
+          anotarEvento({ tipo: "boton-tocado", de: from, texto: text.slice(0, 60) });
+          console.log(`👉 ${from} tocó el botón "${text}"`);
+
+          // Un "no" por botón es una respuesta explícita y se respeta sin
+          // molestarlo más. No pasa por la IA: sería absurdo intentar venderle
+          // a alguien que acaba de decir que no.
+          if (/^no[, ]|no,? gracias|no me interesa|ya no|no quiero/i.test(text)) {
+            store.marcarNoMolestar(from);
+            store.registrarSeguimiento(from); // no se le vuelve a escribir
+            await sendText(
+              from,
+              "Listo, no te escribo más 🙌 Si algún día lo necesitás, acá estamos. ¡Buen camino! 🏍️"
+            );
+            console.log(`(${from}) dijo NO por botón. Marcado como noMolestar.`);
+            continue;
+          }
+        }
 
         // 🎙️ NOTAS DE VOZ — medido en el export: 439 conversaciones (7%) las usan
         // y 814 las mandó un cliente. Y preguntan justo lo que cierra: talla, 2
