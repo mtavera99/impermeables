@@ -78,7 +78,9 @@ def main():
     data = meta.get(
         f"{CUENTA}/adsets",
         {
-            "fields": "id,name,status,effective_status,daily_budget,destination_type,campaign{name}",
+            # promoted_object es donde vive el numero en los conjuntos de WhatsApp
+            "fields": ("id,name,status,effective_status,daily_budget,destination_type,"
+                       "campaign{name},promoted_object,object_store_url"),
             "limit": 200,
         },
     )
@@ -86,6 +88,11 @@ def main():
         conjuntos[a["id"]] = a
 
     # 2. Anuncios con su creativo completo
+    #
+    # ⚠️ 22-sep: la primera version pedia solo object_story_spec y asset_feed_spec
+    # y el numero NO aparecia en ninguno de los 38 anuncios. El destino de
+    # WhatsApp en los anuncios CTWA vive en otros campos segun como se creo el
+    # anuncio, asi que ahora se piden TODOS los que pueden contenerlo.
     ads = []
     data = meta.get(
         f"{CUENTA}/ads",
@@ -93,12 +100,30 @@ def main():
             "fields": (
                 "id,name,status,effective_status,adset_id,"
                 "creative{id,name,object_story_spec,asset_feed_spec,"
-                "effective_object_story_id,link_destination_display_url}"
+                "effective_object_story_id,link_destination_display_url,"
+                "object_type,object_id,url_tags,template_url,link_url,"
+                "destination_set_id,platform_customizations,"
+                "contextual_multi_ads,degrees_of_freedom_spec}"
             ),
             "limit": 300,
         },
     )
     ads = data.get("data", [])
+
+    # Modo diagnostico: volcar el JSON crudo de un anuncio activo para ver DONDE
+    # esta el numero, en vez de seguir adivinando campos.
+    if "--dump" in sys.argv:
+        for ad in ads:
+            cj = conjuntos.get(ad.get("adset_id"), {})
+            if ad.get("effective_status") == "ACTIVE":
+                print("=" * 78)
+                print("JSON CRUDO DE UN ANUNCIO ACTIVO (para encontrar el numero)")
+                print("=" * 78)
+                print("--- ANUNCIO ---")
+                print(json.dumps(ad, indent=2, ensure_ascii=False)[:4000])
+                print("--- CONJUNTO ---")
+                print(json.dumps(cj, indent=2, ensure_ascii=False)[:2000])
+                return
 
     filas = []
     for ad in ads:

@@ -18,6 +18,10 @@ on:
         description: "Cuenta publicitaria (act_...). Vacio = la de BikerPro."
         required: false
         default: ""
+      dump:
+        description: "Poner 1 para volcar el JSON crudo de un anuncio activo (diagnostico)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -37,7 +41,9 @@ jobs:
             echo "::error::Falta el secreto META_ADS_TOKEN."
             exit 1
           fi
-          python3 analisis/verificar-numeros-anuncios.py $CUENTA | tee salida.txt
+          EXTRA=""
+          [ "${{ github.event.inputs.dump }}" = "1" ] && EXTRA="--dump"
+          python3 analisis/verificar-numeros-anuncios.py $CUENTA $EXTRA | tee salida.txt
 
           # Si hay anuncios activos apuntando al numero viejo, dejarlo como
           # advertencia visible en el resumen del run, no enterrado en el log.
