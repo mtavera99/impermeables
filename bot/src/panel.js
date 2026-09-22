@@ -53,8 +53,29 @@ function hace(ms) {
   return `hace ${Math.floor(h / 24)} d`;
 }
 
+// ============================================================================
+// El número del bot NO va escrito a mano.
+//
+// Estaba puesto a mano en dos lugares ("+57 322 7545695"). El día que el número
+// cambia —y ya pasó— hay que editar el código y volver a desplegar para algo
+// que es pura configuración. Peor: el panel seguiría diciendo el número viejo,
+// que es justo donde el dueño va a mirar para confirmar cuál está usando.
+//
+// Ahora sale de BOT_WHATSAPP (en Render). Si no está, se dice "el número del
+// bot" en vez de afirmar uno que puede estar equivocado.
+// ============================================================================
+function numeroDelBot() {
+  const n = String(process.env.BOT_WHATSAPP || "").replace(/\D/g, "");
+  if (!n) return null;
+  const sinPais = n.startsWith("57") && n.length > 10 ? n.slice(2) : n;
+  return sinPais.length === 10
+    ? `+57 ${sinPais.slice(0, 3)} ${sinPais.slice(3)}`
+    : `+${n}`;
+}
+
 function render(aviso) {
   const tk = process.env.WHATSAPP_VERIFY_TOKEN || "";
+  const numBot = numeroDelBot();
   const convs = store.todasLasConversaciones();
   const pedidos = store.todosLosPedidos();
 
@@ -197,7 +218,7 @@ function render(aviso) {
             <form class="resp" method="POST" action="/responder" data-tel="${esc(x.tel)}">
               <input type="hidden" name="token" value="${esc(tk)}">
               <input type="hidden" name="to" value="${esc(x.tel)}">
-              <textarea name="texto" rows="2" placeholder="Escribile como BikerPro… (sale del +57 322 7545695, no de tu WhatsApp)"></textarea>
+              <textarea name="texto" rows="2" placeholder="Escribile como BikerPro… (sale ${esc(numBot ? "del " + numBot : "del número del bot")}, no de tu WhatsApp)"></textarea>
               <button type="submit">Enviar como BikerPro</button>
             </form>
             <div class="envio"></div>
@@ -309,7 +330,7 @@ function render(aviso) {
 <body>
 <header>
   <h1>🏍️ BikerPro · panel del bot</h1>
-  <div class="sub2">+57 322 7545695 · se refresca cada 30 segundos</div>
+  <div class="sub2">${esc(numBot || "poné BOT_WHATSAPP en Render para ver acá el número del bot")} · se refresca cada 30 segundos</div>
 </header>
 <main>
   ${aviso || ""}
