@@ -124,6 +124,58 @@ fuga viva más grande que queda.
 
 ---
 
+## 🟢 ESTADO: EL BOT ESTÁ ARRIBA Y EL GUION PASA 11/11
+
+Servicio en vivo: `https://bikerpro-bot.onrender.com`
+
+| prueba | resultado |
+|---|---|
+| `GET /` | ✅ `BikerPro bot activo 🏍️` |
+| `GET /health` | ✅ `{"ok":true}` |
+| webhook con el token correcto | ✅ devuelve el challenge |
+| webhook con token equivocado | ✅ `Forbidden` |
+| **guion contra el bot real** | ✅ **11/11 en tres pasadas seguidas** |
+
+### Los 11 casos del guion, verificados en producción
+
+| caso | verifica |
+|---|---|
+| primer mensaje | se adelanta a talla y color (28,1% de las dudas) |
+| `Bogotá (Suba)` | $73.000, no $85.000 |
+| `Bosa` sin decir Bogotá | $73.000 |
+| `Cali` | $82.000 |
+| 2 uds a Bogotá | **$137.000 en firme**, sin escalar |
+| `Mosquera` | pregunta el departamento |
+| `Riosucio` | pregunta el departamento |
+| `Tadó` | $93.000 |
+| `Guapi` | no da número, escala |
+| envío sin ciudad | no da número ni rango |
+| 12 unidades | no cotiza, escala |
+
+**Cómo repetirlo** (después de cada cambio del guion, y obligatorio al cambiar de modelo):
+```bash
+node bot/probar-guion.js https://bikerpro-bot.onrender.com bikerpro_verify_2026
+```
+
+⚠️ **Corré la batería DOS veces.** La IA no es determinista: un fallo aislado puede
+ser variación, pero el mismo caso fallando dos veces es un problema del guion.
+
+### 🔑 Lo que aprendimos probando en producción
+
+Las 54 pruebas unitarias estaban en verde y el guion **igual falló 2 de 11**.
+La causa: **la IA no llama a `cotizar()` — lee la tabla del prompt.**
+
+- `MOSQUERA` estaba como 6º ejemplo de banda A, así que la IA lo cotizaba a
+  $73.000 en vez de preguntar el departamento. El código estaba bien; el texto no.
+- Tadó y El Charco iban comprimidos en una línea y la IA no los aplicaba: a
+  "¿cuánto a Tadó?" respondía con el pitch del producto, sin precio.
+
+**Moraleja: un tarifario correcto en el código no garantiza un precio correcto al
+cliente.** Por eso existe `probar-guion.js` y por eso hay que correrlo en producción,
+no solo en local.
+
+---
+
 ## ✅ Lo que ya quedó listo y probado
 
 | | |
