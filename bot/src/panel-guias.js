@@ -27,7 +27,19 @@ const esc = (s) =>
 const fmtCOP = (n) => "$" + Number(n || 0).toLocaleString("es-CO");
 
 function render() {
-  const tk = process.env.WHATSAPP_VERIFY_TOKEN || "";
+  // 🔴 ESTE ARCHIVO SE QUEDÓ ATRÁS EN LA MIGRACIÓN A PANEL_TOKEN (22-sep).
+  //
+  // Decía `process.env.WHATSAPP_VERIFY_TOKEN`, el secreto VIEJO. El servidor ya
+  // validaba PANEL_TOKEN, así que esta pantalla mandaba una clave que el
+  // servidor rechazaba: TODA la función de enviar guías quedó muerta con un
+  // 403, y el error que se veía era "Unexpected token 'F', Forbidden is not
+  // valid JSON" — que no dice nada de una clave.
+  //
+  // Estuvo roto ~4 horas y lo encontró el dueño al intentar despachar. El
+  // guardián de rutas no lo agarra porque las rutas SÍ estaban protegidas: lo
+  // que estaba mal era el token que el navegador enviaba. Por eso ahora hay una
+  // prueba que compara las dos cosas (test-token-del-panel.js).
+  const tk = process.env.PANEL_TOKEN || process.env.WHATSAPP_VERIFY_TOKEN || "";
   const enviadas = store.todasLasGuiasEnviadas();
   const historial = Object.entries(enviadas)
     .sort((a, b) => (b[1].fecha || 0) - (a[1].fecha || 0))
@@ -241,7 +253,16 @@ btnRevisar.addEventListener("click", function () {
     headers: { "Content-Type": "application/pdf" },
     body: f
   })
-    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      // Un 403 devuelve el texto "Forbidden", no JSON. Sin esto, r.json()
+      // explota con "Unexpected token 'F'" y el dueño ve un error que no tiene
+      // nada que ver con el problema real, que es la clave del panel.
+      if (r.status === 403) {
+        throw new Error("la clave del panel no coincide. Volvé a abrir el panel y entrá de nuevo a Guías.");
+      }
+      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
+      return r.json();
+    })
     .then(function (d) {
       if (!d.ok) { mostrar("mal", "🔴 " + (d.error || "No se pudo leer el PDF.")); return; }
       plan = d;
@@ -319,7 +340,13 @@ btnEnviar.addEventListener("click", function () {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id: plan.id, paginas: paginas })
   })
-    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      if (r.status === 403) {
+        throw new Error("la clave del panel no coincide. Volvé a abrir el panel y entrá de nuevo a Guías.");
+      }
+      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
+      return r.json();
+    })
     .then(function (d) {
       if (!d.ok) { mostrar("mal", "🔴 " + (d.error || "No se pudo enviar.")); return; }
       var tb = document.querySelector("#tablaReporte tbody");
