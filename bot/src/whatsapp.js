@@ -276,6 +276,40 @@ async function sendVideo(to, link, caption) {
   return sendPayload({ to, type: "video", video: { link, caption } });
 }
 
+/**
+ * Manda un PDF DENTRO de una plantilla aprobada.
+ *
+ * POR QUE EXISTE: `sendPdf` manda el documento como mensaje libre, y eso solo
+ * funciona dentro de las 24h desde el ultimo mensaje del cliente. Una guia se
+ * despacha al dia siguiente, asi que en la practica MUCHOS clientes tienen la
+ * ventana cerrada y no podian recibirla: Meta rechaza el envio (131047).
+ *
+ * La plantilla tiene el PDF en el encabezado, asi que el cliente recibe el
+ * archivo Y el texto aprobado, sin necesidad de haber escrito antes.
+ *
+ * @param {string} to
+ * @param {Buffer} buffer el PDF
+ * @param {string} filename
+ * @param {string} plantilla nombre de la plantilla aprobada
+ * @param {string} idioma codigo de idioma. OJO: es "es_CO", no "es".
+ */
+async function sendPdfPorPlantilla(to, buffer, filename, plantilla, idioma = "es_CO") {
+  const subida = await uploadMedia(buffer, "application/pdf", filename);
+  // Separar "no se pudo subir" de "no se pudo enviar" importa: son problemas
+  // distintos (token o tamaño vs plantilla o ventana) y llevan a arreglos
+  // distintos.
+  if (!subida.ok) return { ...subida, etapa: "subida" };
+
+  const componentes = [
+    {
+      type: "header",
+      parameters: [{ type: "document", document: { id: subida.mediaId, filename } }],
+    },
+  ];
+  const envio = await sendTemplate(to, plantilla, idioma, componentes);
+  return { ...envio, mediaId: subida.mediaId, etapa: envio.ok ? "enviado" : "envio", porPlantilla: true };
+}
+
 // Plantilla aprobada. Hace falta pasadas las 24 horas desde el ultimo mensaje
 // del cliente: ahi Meta ya no acepta texto libre, solo plantillas. Dentro de la
 // ventana gratis de 72h del anuncio Click-to-WhatsApp no se cobra. Ver 0-BC.
@@ -286,7 +320,7 @@ async function sendTemplate(to, nombre, idioma = "es", componentes) {
 }
 
 module.exports = {
-  sendText, sendImage, sendVideo, sendTemplate,
+  sendText, sendImage, sendVideo, sendTemplate, sendPdfPorPlantilla,
   sendCatalog, sendProduct, sendProductList, catalogoActivo, CATALOG_ID,
   uploadMedia, sendDocumentById, sendPdf,
   esBsuid, destinatario,
