@@ -44,7 +44,11 @@ _spec = importlib.util.spec_from_file_location("meta_api_lectura", _ruta)
 meta = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(meta)
 
-CUENTA = sys.argv[1] if len(sys.argv) > 1 else "act_4330882710457791"
+# ⚠️ Los argumentos que empiezan con "--" son banderas, NO la cuenta. La primera
+# version hacia sys.argv[1] a secas, y cuando el workflow pasaba la cuenta vacia
+# seguida de --dump, terminaba pidiendole a Meta un objeto llamado "--dump".
+_args = [a for a in sys.argv[1:] if not a.startswith("--")]
+CUENTA = _args[0] if _args else "act_4330882710457791"
 
 # Los dos números que nos importan. El nuevo es el que tiene el bot.
 NUEVO = "3227545695"
