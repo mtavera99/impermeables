@@ -37,10 +37,10 @@ function render() {
     ? historial
         .map(
           ([g, d]) => `<tr>
-            <td><code>${esc(g)}</code></td>
-            <td>${esc(d.nombre || "")}</td>
-            <td>+${esc(d.telefono || "")}</td>
-            <td>${esc(new Date(d.fecha).toLocaleString("es-CO", { timeZone: "America/Bogota" }))}</td>
+            <td data-label="Guía"><code>${esc(g)}</code></td>
+            <td data-label="Cliente">${esc(d.nombre || "")}</td>
+            <td data-label="WhatsApp">+${esc(d.telefono || "")}</td>
+            <td data-label="Cuándo">${esc(new Date(d.fecha).toLocaleString("es-CO", { timeZone: "America/Bogota" }))}</td>
           </tr>`
         )
         .join("")
@@ -91,6 +91,51 @@ function render() {
   .aviso{background:#241c10;border:1px solid #6b5220;color:#f5d9a0;padding:12px 14px;border-radius:8px;font-size:13px;margin:0 0 16px}
   .cargando{color:#8b93a4;font-size:13px}
   .reglas{color:#8b93a4;font-size:12px;margin:10px 0 0}
+
+  /* ==========================================================================
+     MÓVIL (agregado 22-sep). Esta pantalla tampoco tenía media queries, y acá
+     el problema era peor que en el panel: la tabla de pareo tiene SIETE
+     columnas y en 390px no se podía leer nada. Es la pantalla con la que se
+     despacha, así que tiene que funcionar en el teléfono.
+     ========================================================================== */
+  html{-webkit-text-size-adjust:100%}
+  body{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+  .btn{touch-action:manipulation;min-height:44px;align-items:center}
+  /* 16px o más: menos que eso hace que iOS agrande la página al tocar el campo */
+  input[type=file]{font-size:16px}
+
+  @media (max-width:640px){
+    header{padding:14px 16px}
+    h1{font-size:17px}
+    main{padding:14px}
+    h2{font-size:15px;margin:22px 0 8px}
+    .caja{padding:13px;border-radius:14px}
+
+    /* Cada fila pasa a ser una tarjeta */
+    table{background:transparent;border-radius:0}
+    table,tbody,tr,td{display:block;width:100%}
+    thead{display:none}
+    tbody tr{
+      background:#151a22;border:1px solid #222a35;border-radius:14px;
+      padding:10px 12px;margin-bottom:10px;
+    }
+    tbody td{
+      border:0;padding:6px 0;display:flex;flex-wrap:wrap;gap:2px 12px;
+      justify-content:flex-end;align-items:baseline;text-align:right;font-size:14px;
+    }
+    tbody td::before{
+      content:attr(data-label);color:#8b93a4;font-size:11px;text-transform:uppercase;
+      letter-spacing:.04em;margin-right:auto;text-align:left;flex:0 0 auto;max-width:42%;
+    }
+    tbody td .sub{flex:0 0 100%;text-align:right}
+    tbody td.vacio{display:block;text-align:center}
+    tbody td.vacio::before{content:none}
+    /* La casilla de "enviar" grande y arriba: es la que se toca */
+    tbody td[data-label="Enviar"] input[type=checkbox]{width:22px;height:22px}
+
+    .acciones{flex-direction:column;align-items:stretch}
+    .btn{width:100%;justify-content:center;text-align:center;min-height:48px;font-size:15px}
+  }
 </style></head>
 <body>
 <header>
@@ -230,15 +275,18 @@ function pintarPareo(d) {
       ? '<span class="cert ' + claseCert(f.certeza) + '">' + f.certeza + "</span>"
       : "—";
 
+    // data-label alimenta el ::before del CSS móvil: en el celular esta tabla
+    // de 7 columnas se vuelve una tarjeta por hoja, con la etiqueta de cada
+    // dato al lado. En 390px la tabla era ilegible.
     tr.innerHTML =
-      "<td>" + chk + "</td>" +
-      "<td>" + f.pagina + "</td>" +
-      "<td><code>" + (f.guia || "?") + "</code>" +
+      '<td data-label="Enviar">' + chk + "</td>" +
+      '<td data-label="Pág">' + f.pagina + "</td>" +
+      '<td data-label="Guía"><code>' + (f.guia || "?") + "</code>" +
         (f.transportadora ? '<span class="sub">' + f.transportadora + "</span>" : "") + "</td>" +
-      "<td>" + etiqueta + "</td>" +
-      "<td>" + destino + "</td>" +
-      "<td>" + cert + "</td>" +
-      '<td><span class="sub">' + (f.senales || []).join(", ") + "</span></td>";
+      '<td data-label="Dice la etiqueta">' + etiqueta + "</td>" +
+      '<td data-label="Le corresponde a">' + destino + "</td>" +
+      '<td data-label="Certeza">' + cert + "</td>" +
+      '<td data-label="Por qué"><span class="sub">' + (f.senales || []).join(", ") + "</span></td>";
     tb.appendChild(tr);
   });
 
@@ -280,9 +328,9 @@ btnEnviar.addEventListener("click", function () {
         var tr = document.createElement("tr");
         if (!r.ok) tr.className = "no";
         tr.innerHTML =
-          "<td><code>" + (r.guia || "?") + "</code></td>" +
-          "<td>" + (r.nombre || "") + '<span class="sub">+' + (r.telefono || "") + "</span></td>" +
-          "<td>" + (r.ok ? "✅ enviada" : '<span class="motivo">🔴 ' + (r.error || "falló") + "</span>") + "</td>";
+          '<td data-label="Guía"><code>' + (r.guia || "?") + "</code></td>" +
+          '<td data-label="Cliente">' + (r.nombre || "") + '<span class="sub">+' + (r.telefono || "") + "</span></td>" +
+          '<td data-label="Estado">' + (r.ok ? "✅ enviada" : '<span class="motivo">🔴 ' + (r.error || "falló") + "</span>") + "</td>";
         tb.appendChild(tr);
       });
       document.getElementById("zonaReporte").style.display = "block";
