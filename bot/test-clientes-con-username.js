@@ -187,8 +187,23 @@ const check = (cond, msg) => { console.log(`${cond ? "✅" : "🔴"} ${msg}`); i
   check(!convs3["undefined"], "ya no está");
   check(Boolean(convs3[BSUID]), "🔑 y la del cliente REAL con username NO se borró");
 
+  console.log("\n── 9. Se puede ALCANZAR a un cliente sin teléfono (recuperar el lead) ──");
+  // Sin credenciales el envío falla, pero lo que se prueba es que el destinatario
+  // llegue INTACTO: antes el BSUID se convertía en un número inventado.
+  const rec = await (await fetch(`${BASE}/recuperar-cliente?token=${TK}&id=${encodeURIComponent(BSUID)}`)).json();
+  check(rec.para === BSUID, `🔑 el identificador llega intacto: ${rec.para}`);
+  check(rec.esClienteSinTelefono === true, "y se reconoce como cliente sin teléfono");
+  check(rec.ok === false, "sin credenciales no se envía (esperado en la prueba)");
+
+  const sinId = await (await fetch(`${BASE}/recuperar-cliente?token=${TK}`)).json();
+  check(/user_id/.test(JSON.stringify(sinId)), "sin ?id= explica dónde sacarlo (logs de Render)");
+
+  const prueba = await (await fetch(`${BASE}/enviar-prueba?token=${TK}&to=${encodeURIComponent(BSUID)}`)).json();
+  check(prueba.para === BSUID || JSON.stringify(prueba).includes(BSUID),
+    "🔑 /enviar-prueba ya NO le quita las letras al identificador");
+
   fs.rmSync(DATA, { recursive: true, force: true });
-  const total = 33;
+  const total = 38;
   console.log(fallas ? `\n🔴 ${fallas} de ${total} falla(s).` : `\n🟢 ${total}/${total} correctos.`);
   process.exit(fallas ? 1 : 0);
 })().catch((e) => { console.error("🔴", e); process.exit(1); });
