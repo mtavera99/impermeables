@@ -178,6 +178,26 @@ ok(/137\.000/.test(tabla) && /158\.000/.test(tabla),
 ok(/MOSQUERA \(Cundinamarca/.test(tabla),
   "MOSQUERA aparece en la lista de nombres ambiguos");
 
+// 🔴 REGRESIÓN MEDIDA EL 21-SEP contra el bot desplegado (probar-guion.js):
+// MOSQUERA era el 6º ejemplo de banda A, y la IA cotizó "Mosquera" a $73.000
+// leyéndolo de ahí en vez de preguntar el departamento. `cotizar()` lo
+// resolvía bien, pero la IA no llama a cotizar(): lee esta tabla.
+const lineaBandaA = tabla.split("\n")[0];
+ok(!/MOSQUERA/.test(lineaBandaA),
+  "ningún nombre ambiguo aparece como ejemplo de banda A (si aparece, la IA lo cotiza)");
+for (const ambigua of Object.keys(require("./src/fletes").CIUDADES_AMBIGUAS)) {
+  const enEjemplos = new RegExp(`\\(([^)]*\\b${ambigua}\\b[^)]*)\\):`).test(tabla);
+  ok(!enEjemplos, `"${ambigua}" no se ofrece como ejemplo de ninguna banda`);
+}
+
+// Los destinos con precio medido deben ir en su propia línea con el total.
+// Comprimidos en una sola ("TADO $93.000 · EL CHARCO $115.500") la IA no los
+// aplicaba: a "¿cuánto a Tadó?" respondía con el pitch del producto, sin precio.
+ok(/·\s*TADO:\s*el TOTAL es \$93\.000/.test(tabla),
+  "TADÓ va en su propia línea con el total explícito");
+ok(/·\s*EL CHARCO:\s*el TOTAL es \$115\.500/.test(tabla),
+  "EL CHARCO va en su propia línea con el total explícito");
+
 console.log("\n" + "=".repeat(66));
 if (fallas === 0) {
   console.log("🟢 TODO PASA. El tarifario está listo para desplegar.");

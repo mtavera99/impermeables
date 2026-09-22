@@ -600,7 +600,16 @@ function cotizar(ciudad, unidades = 1) {
 function tablaFletesTexto() {
   const bandas = Object.entries(BANDAS)
     .map(([clave, b]) => {
-      const ejemplos = b.ciudades.slice(0, 6).join(", ");
+      // 🔴 SE EXCLUYEN LOS NOMBRES AMBIGUOS DE LOS EJEMPLOS.
+      // Medido el 21-sep con probar-guion.js contra el bot desplegado:
+      // MOSQUERA era el 6º ejemplo de banda A y la IA cotizó "Mosquera" a
+      // $73.000 leyéndolo de acá, en vez de preguntar el departamento.
+      // 🔑 LA LECCIÓN: la IA NO llama a cotizar(). Lee ESTA tabla. Que el
+      // código resuelva bien no sirve si el prompt dice otra cosa.
+      const ejemplos = b.ciudades
+        .filter((c) => !CIUDADES_AMBIGUAS[c])
+        .slice(0, 6)
+        .join(", ");
       return `- ${b.nombre} (${ejemplos}...): TOTAL ${fmt(b.total)} al recibir (producto ${fmt(PRECIO_PRODUCTO)} + envío ${fmt(b.flete)})`;
     })
     .join("\n");
@@ -611,10 +620,14 @@ function tablaFletesTexto() {
     .map(([clave, b]) => `- ${b.nombre}: TOTAL ${fmt(PROMO_2_TOTAL[clave])} los dos`)
     .join("\n");
 
+  // Una línea POR destino, no todos comprimidos en una sola.
+  // Medido el 21-sep: cuando iban juntos ("TADO $93.000 · EL CHARCO $115.500")
+  // la IA no los aplicaba y a "¿cuánto a Tadó?" respondía con el pitch genérico
+  // del producto, sin el precio. Separados y con la orden al lado, sí los usa.
   const conDato = Object.entries(ZONA_DIFICIL_ACCESO)
     .filter(([, v]) => v.total !== null)
-    .map(([c, v]) => `${c} ${fmt(v.total)}`)
-    .join(" · ");
+    .map(([c, v]) => `  · ${c}: el TOTAL es ${fmt(v.total)} al recibir. Ese número y no otro.${v.sinPromo2 ? " NO ofrezcas promo de 2 acá." : ""}`)
+    .join("\n");
   // ⚠️ Se excluyen los nombres que además son ambiguos (MOSQUERA está en la
   // sabana de Bogotá Y en el Pacífico de Nariño). Si apareciera en las dos
   // listas, el prompt se contradiría y la IA elegiría al azar. Van abajo, en
@@ -636,17 +649,34 @@ ${promo2}
 ⛔ EXCEPCIÓN: en los destinos de difícil acceso de abajo NO se ofrece la promo
 de 2 (en Tadó el envío se DUPLICA en vez de compartirse). Ahí se cotiza a mano.
 
-🔴 DIFÍCIL ACCESO — ESTOS NO SE COTIZAN CON LA TABLA DE ARRIBA
-Se llega por río, avión o barco y el envío cuesta 2-3× lo de un pueblo normal.
-- CON precio confirmado, usá ESTE número: ${conDato}
-- SIN precio: ${sinDato}
-  → NO des ningún número. Decí: "Dejame confirmarte el envío a tu ciudad y te
-    escribo en un momento 📦" y avisá al dueño. Cobrar $85.000 acá es vender a
-    pérdida: en El Charco el envío real fue $55.563.
+⚠️⚠️ ANTES DE COTIZAR CON LA TABLA DE ARRIBA, REVISÁ ESTAS DOS LISTAS.
+MANDAN SOBRE LA TABLA. Si la ciudad está acá, la tabla de arriba NO aplica.
 
-⚠️ NOMBRES QUE EXISTEN EN VARIOS DEPARTAMENTOS — PREGUNTÁ ANTES DE COTIZAR
-${ambiguas}
-→ Ejemplo: "¿Riosucio de Caldas o de Chocó? Es que el envío cambia bastante 🙂"`;
+🔴 LISTA 1 — NOMBRES QUE EXISTEN EN VARIOS DEPARTAMENTOS: PREGUNTÁ, NO COTICES
+Si el cliente nombra una de estas, **NO le des ningún precio todavía**, ni
+aunque el nombre te suene a una ciudad conocida. Preguntá el departamento:
+${ambiguas
+  .split(" · ")
+  .map((a) => `  · ${a}`)
+  .join("\n")}
+→ Así: "¿Riosucio de Caldas o de Chocó? Es que el envío cambia bastante 🙂"
+🔑 POR QUÉ: hay un Mosquera en la sabana de Bogotá ($73.000) y otro en el
+Pacífico de Nariño, al que se llega por río y cuesta 3× más. Si asumís el
+barato y era el caro, la venta sale a pérdida.
+
+🔴 LISTA 2 — DIFÍCIL ACCESO: TAMPOCO SE COTIZAN CON LA TABLA DE ARRIBA
+Se llega por río, avión o barco y el envío cuesta 2-3× lo de un pueblo normal.
+
+CON PRECIO YA CONFIRMADO — usá EXACTAMENTE este total, no el de la tabla:
+${conDato}
+
+SIN PRECIO CONFIRMADO — ${sinDato}
+  → ⛔ NO des NINGÚN número, ni el de pueblos. Respondé exactamente:
+    "Dejame confirmarte el envío a tu ciudad y te escribo en un momento 📦"
+    y avisá al dueño.
+  🔑 POR QUÉ: en El Charco se cobró $59.900 contra un envío real de $55.563.
+    Una sola guía se comió $28.663, el margen de 1,3 pedidos buenos. Y cobrar
+    los $85.000 de pueblos tampoco alcanzaba. Donde no hay dato, se escala.`;
 }
 
 module.exports = {
