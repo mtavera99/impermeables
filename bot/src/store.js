@@ -45,11 +45,70 @@ function ensure() {
   if (!fs.existsSync(ORDERS_FILE)) fs.writeFileSync(ORDERS_FILE, "[]");
   if (!fs.existsSync(GUIAS_FILE)) fs.writeFileSync(GUIAS_FILE, "{}");
 }
+// ============================================================================
+// 🔴 POR QUÉ LA LECTURA Y LA ESCRITURA SON MÁS LARGAS DE LO QUE PARECE
+//
+// Estas dos funciones eran una línea cada una, y entre las dos había un camino
+// que borraba los pedidos SIN UNA SOLA LÍNEA DE LOG. Los dos bugs son
+// independientes del disco de Render: pasan igual con el disco montado.
+//
+//   1. writeFileSync NO es atómico. Render manda SIGTERM en cada despliegue y
+//      el proceso puede morir A MITAD de escribir. El archivo queda TRUNCADO.
+//   2. Un JSON truncado no parsea, y readJSON devolvía el fallback EN SILENCIO
+//      (un [] vacío). El bot seguía como si no hubiera pedidos, y el siguiente
+//      writeJSON PISABA el archivo con esa lista vacía.
+//
+// O sea: los datos se perdían dos veces, y la segunda era la definitiva.
+// Se arregla de los dos lados: rename atómico al escribir, y al leer nunca
+// tirar a la basura un archivo que existe pero no se entiende.
+// ============================================================================
+
 function readJSON(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, "utf8")); } catch { return fallback; }
+  let crudo;
+  try {
+    crudo = fs.readFileSync(file, "utf8");
+  } catch {
+    // No existe todavía: es lo normal la primera vez. No hay nada que avisar.
+    return fallback;
+  }
+  try {
+    return JSON.parse(crudo);
+  } catch (e) {
+    // El archivo EXISTE pero está corrupto (truncado a mitad de escritura, casi
+    // siempre). Antes esto devolvía el fallback calladito. Ahora se guarda una
+    // copia intacta ANTES de que el próximo writeJSON la pise, y se grita.
+    const roto = `${file}.roto-${Date.now()}`;
+    try {
+      fs.copyFileSync(file, roto);
+    } catch (e2) {
+      console.error(`🔴 Tampoco se pudo respaldar el archivo corrupto: ${e2.message}`);
+    }
+    console.error(
+      `🔴 ${path.basename(file)} ESTÁ CORRUPTO y no se pudo leer (${e.message}).\n` +
+        `   Copia sin tocar en: ${roto}\n` +
+        "   Los pedidos también están en el log como PEDIDO_JSON: se recuperan de ahí.\n" +
+        "   ⚠️ El bot sigue atendiendo, pero arranca con la lista vacía."
+    );
+    return fallback;
+  }
 }
+
 function writeJSON(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+  // Escritura ATÓMICA: se escribe completo en un temporal y después se cambia
+  // el nombre. rename() dentro del mismo sistema de archivos es atómico, así
+  // que el archivo final NUNCA existe a medias. Si el proceso muere a mitad, lo
+  // que queda incompleto es el .tmp, y el bueno sigue intacto.
+  const tmp = `${file}.tmp`;
+  const texto = JSON.stringify(data, null, 2);
+  try {
+    fs.writeFileSync(tmp, texto);
+    fs.renameSync(tmp, file);
+  } catch (e) {
+    // Si falla el rename, limpiar el temporal para no dejar basura acumulándose
+    // en el disco (que es de 1 GB y pago).
+    try { fs.unlinkSync(tmp); } catch {}
+    throw e;
+  }
 }
 
 function getConv(phone) {
@@ -128,6 +187,51 @@ function guardarPerfil(phone, perfil) {
   c.perfil = { ...(c.perfil || {}), ...perfil };
   all[phone] = c;
   writeJSON(CONV_FILE, all);
+}
+
+// ============================================================================
+// 🎯 DE QUÉ ANUNCIO VINO EL CLIENTE (atribución de Meta Ads)
+//
+// Meta ya manda esto GRATIS en el webhook, en `messages[].referral`, y hasta hoy
+// se tiraba a la basura. Con esto se pasa de "este anuncio trae conversaciones
+// baratas" a "este anuncio trae VENTAS", que es la única pregunta que decide
+// dónde poner el presupuesto.
+//
+// 🔑 EL DETALLE QUE HACE FALTA ENTENDER: el referral llega SOLO en el primer
+// mensaje después del clic en el anuncio. Los siguientes mensajes del mismo
+// cliente NO lo traen. Y el pedido se cierra varios mensajes después. Por eso
+// hay que guardarlo en la CONVERSACIÓN cuando llega, y copiarlo al pedido
+// cuando se cierra: si se leyera del mensaje que trae el pedido, siempre
+// vendría vacío.
+//
+// Se guarda el PRIMERO (el anuncio que trajo al cliente, que es lo que se
+// paga) y aparte el ÚLTIMO si después entra por otro anuncio distinto. Los dos
+// sirven para cosas distintas y no se pisan.
+// ============================================================================
+function guardarAtribucion(phone, anuncio) {
+  if (!phone || !anuncio || !anuncio.source_id) return;
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone] || { messages: [], paused: false };
+  const registro = { ...anuncio, visto: Date.now() };
+
+  if (!c.anuncio) {
+    c.anuncio = registro; // primer toque: el que trajo al cliente
+  } else if (c.anuncio.source_id !== anuncio.source_id) {
+    // Volvió por otro anuncio. No se pisa el primero: el cliente se paga una
+    // vez, pero saber que volvió a hacer clic también dice algo.
+    c.anuncioUltimo = registro;
+  }
+
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+}
+
+/** El anuncio que trajo a este cliente, o null. Lo usa saveOrder. */
+function atribucionDe(phone) {
+  if (!phone) return null;
+  const c = getConv(phone);
+  return c.anuncio || null;
 }
 
 /** Marca que el cliente pidió que no le escriban más. Se respeta para siempre. */
@@ -215,6 +319,23 @@ function esPedidoDuplicado(orders, nuevo) {
 
 function saveOrder(order) {
   const record = { ...order, fecha: new Date().toISOString() };
+
+  // 🎯 Pegarle el anuncio que trajo al cliente. Va ACÁ, en el store, y no en
+  // quien llama, para que ningún camino nuevo se olvide de hacerlo.
+  //
+  // ⚠️ Envuelto en try/catch y ANTES del log de abajo por una razón concreta:
+  // esto lee del disco, y si el disco falla no puede tumbar el guardado del
+  // pedido. La atribución es información valiosa; el pedido es la venta.
+  try {
+    const anuncio = atribucionDe(record.telefono_chat);
+    if (anuncio) {
+      record.anuncio_id = anuncio.source_id;
+      record.anuncio_origen = anuncio.source_url || null;
+      record.anuncio_tipo = anuncio.source_type || null;
+    }
+  } catch (e) {
+    console.error(`⚠️  No se pudo leer la atribución del anuncio: ${e.message}`);
+  }
 
   // 🛟 RED DE SEGURIDAD — ESTO VA PRIMERO, ANTES DE TOCAR EL DISCO.
   // El pedido se escribe COMPLETO en el log antes de cualquier operación que
@@ -320,7 +441,7 @@ function anotarGuiaEnPedido(fechaPedido, guia) {
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones,
-  guardarPerfil,
+  guardarPerfil, guardarAtribucion, atribucionDe,
   reemplazarPedidos,
   todosLosPedidos,
   guiaYaEnviada, registrarGuiaEnviada, todasLasGuiasEnviadas, anotarGuiaEnPedido,
