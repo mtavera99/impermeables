@@ -316,6 +316,91 @@ const FLETE_2_OBSERVADO = {
 // 🔔 GATILLO: si el envío de 2 uds de la banda E pasa de $47.000, revisar otra vez.
 const PROMO_2_TOTAL = { A: 137000, B: 146000, C: 152000, D: 152000, E: 158000 };
 
+// ============================================================================
+// 🔴 EL ENVÍO QUE SE LE MUESTRA AL CLIENTE (agregado 22-sep por una venta perdida)
+//
+// LO QUE PASÓ: a un cliente de Montería (banda D) el bot le desglosó
+// "2 conjuntos $110.000 + envío $42.000 = $152.000". El cliente entró a la
+// plataforma de 99 Envíos, vio que ese envío cuesta ~$37.000, y se fue.
+//
+// 🔑 EL ENVÍO ES EL ÚNICO NÚMERO QUE EL CLIENTE PUEDE VERIFICAR POR FUERA.
+// El precio de "dos conjuntos" no lo puede comparar con nada; el flete sí.
+// Entonces inflar el flete es justo el peor lugar donde poner el margen.
+//
+// Y no era solo Montería: el desglose NO CERRABA EN NINGUNA BANDA, porque el
+// `flete` cargado y el `total` salen de fuentes distintas. Medido:
+//   1 ud:  producto + flete quedaba entre $144 y $1.329 POR DEBAJO del total
+//          (y en banda E daba $381 POR ENCIMA, o sea la suma contradecía el total)
+//   2 uds: el residual inflaba el envío entre $2.786 y $4.168 en TODAS las bandas
+//
+// LA REGLA QUE QUEDA, y está blindada con pruebas:
+//   1. producto + envío tiene que dar EXACTAMENTE el total. Siempre.
+//   2. el envío que se muestra NUNCA puede ser mayor que el envío real medido.
+//   3. el margen va en la línea del producto, que es la que no se puede auditar.
+//
+// El total NO cambia y el margen NO cambia: es solo dónde se para el dinero.
+// Ver /analisis/monteria-2uds-22sep.py.
+// ============================================================================
+
+// Envío REAL (flete + seguro) medido sobre las 226 guías del export del 18-sep.
+// Es la referencia contra la que se compara lo que se muestra. No se cobra esto:
+// se usa para no pasarse.
+const ENVIO_REAL_1 = { A: 14906, B: 21038, C: 25055, D: 26287, E: 28697 };
+const ENVIO_REAL_2 = { A: 23947, B: 32597, C: 38784, D: 37832, E: 45214 };
+
+// Se redondea HACIA ABAJO al millar: así el número que se dice queda siempre
+// por debajo del real, nunca por encima. Con banda D da $37.000, que es
+// exactamente lo que el cliente de Montería vio en la plataforma.
+function alMillarAbajo(n) {
+  return Math.floor(n / 1000) * 1000;
+}
+
+/**
+ * Cómo se le presenta el precio al cliente: producto + envío = total, cerrado.
+ *
+ * @param {string} claveBanda  A..E
+ * @param {number} uds
+ * @param {number} total       el total firme que ya se decidió cobrar
+ * @param {number} [fleteCiudad] flete real medido de ESA ciudad, si existe
+ */
+function desgloseDe(claveBanda, uds, total, fleteCiudad) {
+  if (uds === 1) {
+    // El producto es el precio del anuncio y no se toca: el envío es el resto.
+    // Da entre $13.100 y $25.100 según la banda, siempre por debajo del real.
+    return { producto: PRECIO_PRODUCTO, envio: total - PRECIO_PRODUCTO };
+  }
+
+  if (uds === 2) {
+    // ⚠️ SE USA EL MAYOR ENTRE LA BANDA Y LA CIUDAD, y el orden importa.
+    //
+    // La primera versión de esto confiaba en el flete medido de la ciudad
+    // (FLETE_2_OBSERVADO) por parecer "más preciso". Salió mal y lo cazó la
+    // prueba: en Bogotá mostraba un envío de $17.000, y como el total es
+    // $137.000, el producto quedaba en $120.000 — MÁS que comprar dos sueltos
+    // ($119.800). El bot le habría ofrecido una "promo" más cara que el precio
+    // normal, que es peor que el problema que vinimos a arreglar.
+    //
+    // 🔑 LA CAUSA: FLETE_2_OBSERVADO es de AGOSTO y quedó viejo. El envío de 2
+    // unidades subió entre 26% y 54% en septiembre (Bogotá $17.658 → $23.947,
+    // ver la corrección del 19-sep). Los totales de PROMO_2_TOTAL se calcularon
+    // con los números de septiembre, así que el desglose tiene que usar los
+    // mismos o no cierra con la realidad.
+    //
+    // Se toma el mayor para cubrir el caso de una ciudad que sí esté por encima
+    // de su banda: ahí el total también sube y el desglose lo tiene que seguir.
+    const base = Math.max(ENVIO_REAL_2[claveBanda] ?? ENVIO_REAL_2.E, fleteCiudad ?? 0);
+    let envio = alMillarAbajo(base);
+    // Salvavidas: si el total no alcanzara a cubrir ese envío, se muestra el
+    // resto y no un producto negativo. No debería pasar, y hay prueba.
+    if (envio >= total) envio = total - PROMO_2_UNIDADES;
+    return { producto: total - envio, envio };
+  }
+
+  // 3+ unidades: el par va a precio de promo y el resto a precio lleno.
+  const producto = PROMO_2_UNIDADES + (uds - 2) * PRECIO_PRODUCTO;
+  return { producto, envio: total - producto };
+}
+
 // Recargo de flete por unidad adicional en el mismo pedido.
 // Observado en 6 pedidos de 2 unidades: el flete NO se duplica, sube entre
 // $6.838 y $15.089 (mediana ~$7.100).
@@ -548,10 +633,15 @@ function cotizar(ciudad, unidades = 1) {
   const banda = BANDAS[clave || BANDA_POR_DEFECTO];
 
   if (uds === 1) {
+    const d = desgloseDe(clave || BANDA_POR_DEFECTO, 1, banda.total);
     return {
       banda: clave || BANDA_POR_DEFECTO,
       nombreBanda: banda.nombre,
-      flete: banda.flete,
+      // `flete` es lo que se le MUESTRA al cliente y cierra la cuenta con el
+      // total. El costo real de la banda sigue disponible en `fleteReal`.
+      flete: d.envio,
+      producto: d.producto,
+      fleteReal: ENVIO_REAL_1[clave || BANDA_POR_DEFECTO] ?? banda.flete,
       total: banda.total,
       unidades: 1,
       reconocida,
@@ -581,10 +671,17 @@ function cotizar(ciudad, unidades = 1) {
     total = Math.ceil((producto + flete) / 1000) * 1000;
   }
 
+  const d = desgloseDe(claveBanda, uds, total, fleteObservado);
+
   return {
     banda: clave || BANDA_POR_DEFECTO,
     nombreBanda: banda.nombre,
-    flete,
+    // Lo que se le dice al cliente: producto + flete = total, exacto, y el
+    // flete nunca por encima del real. Antes acá iba el flete estimado, que
+    // no cerraba con el total y hacía que el residual inflara el envío.
+    flete: d.envio,
+    producto: d.producto,
+    fleteReal: flete,
     total,
     unidades: uds,
     reconocida,
@@ -610,14 +707,26 @@ function tablaFletesTexto() {
         .filter((c) => !CIUDADES_AMBIGUAS[c])
         .slice(0, 6)
         .join(", ");
-      return `- ${b.nombre} (${ejemplos}...): TOTAL ${fmt(b.total)} al recibir (producto ${fmt(PRECIO_PRODUCTO)} + envío ${fmt(b.flete)})`;
+      // ⚠️ El desglose sale de desgloseDe(), NO de b.flete. Con b.flete la
+      // cuenta no cerraba (ver el bloque del 22-sep) y la IA le dictaba al
+      // cliente un producto + envío que no sumaba el total.
+      const d = desgloseDe(clave, 1, b.total);
+      return `- ${b.nombre} (${ejemplos}...): TOTAL ${fmt(b.total)} al recibir (producto ${fmt(d.producto)} + envío ${fmt(d.envio)})`;
     })
     .join("\n");
 
   // Totales firmes de 2 unidades por banda. Desde el 19-sep están corregidos y
   // por encima del margen meta, así que la IA SÍ puede cotizarlos sin escalar.
   const promo2 = Object.entries(BANDAS)
-    .map(([clave, b]) => `- ${b.nombre}: TOTAL ${fmt(PROMO_2_TOTAL[clave])} los dos`)
+    .map(([clave, b]) => {
+      const d = desgloseDe(clave, 2, PROMO_2_TOTAL[clave]);
+      const ahorro = 2 * PRECIO_PRODUCTO - d.producto;
+      return (
+        `- ${b.nombre}: TOTAL ${fmt(PROMO_2_TOTAL[clave])} los dos ` +
+        `(los 2 conjuntos ${fmt(d.producto)} + envío ${fmt(d.envio)}) ` +
+        `→ se ahorra ${fmt(ahorro)} en el producto`
+      );
+    })
     .join("\n");
 
   // Una línea POR destino, no todos comprimidos en una sola.
@@ -683,6 +792,9 @@ module.exports = {
   BANDAS,
   BANDA_POR_DEFECTO,
   CIUDADES_AMBIGUAS,
+  ENVIO_REAL_1,
+  ENVIO_REAL_2,
+  desgloseDe,
   FLETE_2_OBSERVADO,
   PRECIO_PRODUCTO,
   PROMO_2_TOTAL,
