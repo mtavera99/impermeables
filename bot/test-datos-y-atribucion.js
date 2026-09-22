@@ -236,5 +236,100 @@ chequear("el JavaScript del panel compila", compila === true, `error: ${compila}
 
 // ===========================================================================
 fs.rmSync(DIR, { recursive: true, force: true });
-console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
+
+
+// ===========================================================================
+// B3. EL AVISO DEL PANEL TIENE QUE DECIR LA VERDAD, NO SUPONERLA
+//
+// Antes el aviso verde salía con solo existir la variable DATA_DIR. O sea que
+// si el disco no estaba montado, o el Mount Path no coincidía, el panel decía
+// "los pedidos se guardan en disco persistente" y se borraban igual.
+// Un aviso que dice "todo bien" sin comprobarlo enseña a ignorar los avisos.
+// ===========================================================================
+console.log("\n── B3. El aviso del panel dice la verdad ──");
+
+// Caso real del dueño: DATA_DIR puesto pero apuntando a una carpeta común
+// (esto es lo que pasa si el disco no existe o el Mount Path está mal).
+const DIR2 = path.join(__dirname, "data-prueba-carpeta");
+fs.rmSync(DIR2, { recursive: true, force: true });
+
+// Se recarga el módulo con el DATA_DIR nuevo: DIR se fija al importar.
+delete require.cache[require.resolve("./src/store")];
+delete require.cache[require.resolve("./src/panel")];
+delete require.cache[require.resolve("./src/resumen")];
+process.env.DATA_DIR = DIR2;
+const store2 = require("./src/store");
+const panel2 = require("./src/panel");
+
+const estado = store2.estadoDelDisco();
+chequear(
+  "detecta que NO es un disco montado, aunque la variable esté puesta",
+  estado.configurado === true && estado.discoAparte === false,
+  `configurado=${estado.configurado} discoAparte=${estado.discoAparte}`
+);
+
+const html2 = panel2.render();
+chequear(
+  "el panel AVISA en rojo en vez de decir que todo está bien",
+  html2.includes("NO hay un disco montado") && !html2.includes("Disco persistente comprobado"),
+  "sigue mostrando el aviso optimista sin haber comprobado nada"
+);
+chequear(
+  "el aviso dice dónde arreglarlo (Mount Path)",
+  html2.includes("Mount Path"),
+  "un aviso que no dice qué hacer obliga a leer el código en plena emergencia"
+);
+
+// ---------------------------------------------------------------------------
+// Ahora el caso BUENO: un directorio que SÍ está en otro sistema de archivos,
+// igual que el disco de Render. Acá se usa /tmp, que en este equipo es otro
+// dispositivo; en producción es /var/data sobre /dev/nvme2n1. La comprobación
+// es la misma: el número de dispositivo no coincide con el del código.
+// ---------------------------------------------------------------------------
+const DIR3 = "/tmp/prueba-disco-bikerpro";
+fs.rmSync(DIR3, { recursive: true, force: true });
+
+delete require.cache[require.resolve("./src/store")];
+delete require.cache[require.resolve("./src/panel")];
+delete require.cache[require.resolve("./src/resumen")];
+process.env.DATA_DIR = DIR3;
+const store3 = require("./src/store");
+const panel3 = require("./src/panel");
+
+const bueno = store3.estadoDelDisco();
+chequear("reconoce un disco montado de verdad", bueno.discoAparte === true, `discoAparte=${bueno.discoAparte}`);
+
+// El contador de arranques es la evidencia directa de que los datos aguantan.
+store3.registrarArranque();
+store3.registrarArranque();
+const tras3 = store3.estadoDelDisco();
+chequear("cuenta los arranques que sobrevivieron los datos", tras3.arranques === 2, `van ${tras3.arranques}`);
+chequear("guarda desde cuándo existen los datos", Boolean(tras3.desde));
+
+const html3 = panel3.render();
+chequear(
+  "con el disco comprobado, el panel lo dice como prueba y no como suposición",
+  html3.includes("Disco persistente comprobado") && html3.includes("2 arranques"),
+  "no está mostrando la evidencia que ya tiene"
+);
+
+fs.rmSync(DIR3, { recursive: true, force: true });
+
+// Sin DATA_DIR: el aviso naranja de siempre, que sigue siendo correcto.
+delete require.cache[require.resolve("./src/store")];
+delete require.cache[require.resolve("./src/panel")];
+delete require.cache[require.resolve("./src/resumen")];
+delete process.env.DATA_DIR;
+const panel4 = require("./src/panel");
+const html4 = panel4.render();
+chequear(
+  "sin DATA_DIR sigue avisando que los datos se borran",
+  html4.includes("DATA_DIR no está configurado"),
+  "se perdió el aviso para el caso sin configurar"
+);
+
+fs.rmSync(DIR2, { recursive: true, force: true });
+fs.rmSync(path.join(__dirname, "data"), { recursive: true, force: true });
+
+console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos (con el aviso del disco).\n`);
 process.exit(mal === 0 ? 0 : 1);

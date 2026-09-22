@@ -314,19 +314,53 @@ function render(aviso) {
   // montado el disco pasó a ser falsa — peor que no avisar, porque enseña a
   // ignorar los avisos. Ahora refleja la realidad y sirve para verificar de un
   // vistazo que el disco quedó bien configurado.
-  const persistente = Boolean(process.env.DATA_DIR);
-  const avisoDatos = persistente
-    ? `<div class="aviso ok">
-         💾 <b>Los pedidos se guardan en disco persistente</b> (<code>${esc(process.env.DATA_DIR)}</code>).
-         Sobreviven a los despliegues y reinicios. Además cada pedido queda en el log
-         de Render como <code>PEDIDO_JSON</code>, por si acaso.
-       </div>`
-    : `<div class="aviso">
+  // 🔴 Antes esto era `Boolean(process.env.DATA_DIR)`: daba el aviso VERDE con
+  // solo existir la variable, sin comprobar que hubiera un disco. Si la ruta
+  // del disco no coincidía con DATA_DIR, decía "todo bien" y los datos se
+  // borraban igual. Ahora se pregunta al sistema de archivos.
+  const disco = store.estadoDelDisco();
+  const aguanto = disco.arranques > 1;
+  const desdeTxto = disco.desde
+    ? new Date(disco.desde).toLocaleDateString("es-CO", { day: "numeric", month: "short" })
+    : null;
+
+  let avisoDatos;
+  if (!disco.configurado) {
+    avisoDatos = `<div class="aviso">
          ⚠️ <b>DATA_DIR no está configurado: estos datos se borran en el próximo despliegue.</b>
          Montá un disco persistente en Render (Settings → Disks, mount <code>/var/data</code>)
          y poné <code>DATA_DIR=/var/data</code>. Mientras tanto, anotá los pedidos aparte —
          aunque cada uno también queda en el log como <code>PEDIDO_JSON</code>.
        </div>`;
+  } else if (disco.discoAparte === false) {
+    // El caso peligroso que antes salía en verde.
+    avisoDatos = `<div class="aviso mal">
+         🔴 <b>DATA_DIR apunta a <code>${esc(disco.dir)}</code>, pero ahí NO hay un disco montado:
+         es una carpeta del contenedor y se borra en el próximo despliegue.</b>
+         En Render → Settings → Disks, revisá que el <i>Mount Path</i> del disco sea
+         exactamente <code>${esc(disco.dir)}</code>. Los pedidos igual quedan en el log
+         como <code>PEDIDO_JSON</code>.
+       </div>`;
+  } else if (disco.discoAparte === true) {
+    avisoDatos = `<div class="aviso ok">
+         💾 <b>Disco persistente comprobado</b> (<code>${esc(disco.dir)}</code>${
+      desdeTxto ? `, con datos desde el ${esc(desdeTxto)}` : ""
+    }).
+         ${
+           aguanto
+             ? `Ya sobrevivió <b>${disco.arranques} arranques</b> del bot: está probado, no supuesto.`
+             : "Primer arranque con el disco: el contador de arranques empieza ahora."
+         }
+         Cada pedido queda además en el log de Render como <code>PEDIDO_JSON</code>.
+       </div>`;
+  } else {
+    // No se pudo determinar. Se dice, en vez de elegir el mensaje optimista.
+    avisoDatos = `<div class="aviso">
+         ⚠️ <b>No se pudo comprobar si <code>${esc(disco.dir)}</code> es un disco persistente.</b>
+         La variable está puesta, pero la verificación falló, así que no se puede
+         afirmar que los datos sobrevivan a un despliegue. Revisá Settings → Disks.
+       </div>`;
+  }
 
   return `<!doctype html>
 <html lang="es"><head>
@@ -389,6 +423,7 @@ function render(aviso) {
   .res.mal{background:#3a1414;border:1px solid #6b1616;color:#ffb3b3}
   .aviso{background:#3a2d0c;border:1px solid #6b5416;color:#ffd479;padding:11px 13px;border-radius:10px;font-size:13px;margin-bottom:14px}
   .aviso.ok{background:#12351f;border-color:#1d6b3d;color:#8ff0b5}
+  .aviso.mal{background:#3d1418;border-color:#7d2630;color:#ff9aa4}
   code{background:#0b0d11;padding:1px 5px;border-radius:4px;font-size:12px}
   .kpi.big b{font-size:26px}
   .kpi .d{display:block;font-size:11px;font-style:normal;margin-top:3px;color:#8b93a4}
