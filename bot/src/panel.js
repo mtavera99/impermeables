@@ -30,6 +30,7 @@ function panelToken() {
 const store = require("./store");
 const resumen = require("./resumen");
 const atencion = require("./atencion");
+const embudo = require("./embudo");
 
 const esc = (s) =>
   String(s == null ? "" : s)
@@ -212,6 +213,53 @@ function render(aviso) {
         )
         .join("")
     : `<tr><td colspan="6" class="vacio">Todavía no hay pedidos.</td></tr>`;
+
+  // ==========================================================================
+  // 📉 EL EMBUDO — dónde se caen los clientes
+  //
+  // El dueño vio 97 conversaciones y 4 pedidos sin poder saber qué pasó en el
+  // medio. Un 4% de cierre puede venir de tres problemas distintos y cada uno
+  // se arregla en otro lado. Esto contesta cuál es.
+  // ==========================================================================
+  const emb = embudo.calcular(store.todasLasConversaciones(), pedidos);
+  const pct = (x) => Math.round(x * 100) + "%";
+  const filasEmbudo = emb.etapas
+    .map((e, i) => {
+      const ancho = emb.total > 0 ? Math.max(4, Math.round((e.n / emb.total) * 100)) : 0;
+      const esFuga = emb.fuga && emb.fuga.clave === e.clave;
+      return `<div class="paso${esFuga ? " fuga" : ""}">
+          <div class="barra" style="width:${ancho}%"></div>
+          <div class="etiq">
+            <b>${e.n}</b> ${esc(e.nombre)}
+            <span class="sub">${esc(e.que)}</span>
+          </div>
+          ${
+            i > 0
+              ? `<div class="baja">${e.perdidos > 0 ? `−${e.perdidos}` : "—"}<span class="sub">${
+                  e.perdidos > 0 ? pct(e.caida) : ""
+                }</span></div>`
+              : `<div class="baja"><span class="sub">total</span></div>`
+          }
+        </div>`;
+    })
+    .join("");
+
+  const bloqueEmbudo =
+    emb.total > 0
+      ? `<h2>📉 Dónde se caen los clientes</h2>
+         <div class="embudo">
+           ${filasEmbudo}
+           ${
+             emb.diagnostico
+               ? `<div class="porque"><b>La fuga más grande está en "${esc(emb.fuga.nombre)}"</b> —
+                   se perdieron ${emb.fuga.perdidos} ahí.<br>${esc(emb.diagnostico)}</div>`
+               : ""
+           }
+           <p class="nota">Cierre total: <b>${pct(emb.cierre)}</b> · Las etapas se deducen de lo
+             que se habló en cada chat, no de una marca del bot: sirve para ver la tendencia y dónde
+             mirar, no como contabilidad exacta.</p>
+         </div>`
+      : "";
 
   // ==========================================================================
   // 🎯 VENTAS POR ANUNCIO — la tabla que decide dónde va el presupuesto
@@ -513,6 +561,18 @@ function render(aviso) {
   .kpi .d{display:block;font-size:11px;font-style:normal;margin-top:3px;color:#8b93a4}
   .kpi .d.up{color:#3ddc84}.kpi .d.dn{color:#ff6b6b}
   .nota{color:#8b93a4;font-size:12px;margin:8px 0 0}
+  /* --- Embudo --- */
+  .embudo{background:var(--card);border:1px solid var(--linea);border-radius:14px;padding:14px}
+  .paso{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:6px;border-radius:10px;overflow:hidden;background:#12161d}
+  .paso .barra{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#1d4ed8,#2563eb);opacity:.28}
+  .paso.fuga .barra{background:linear-gradient(90deg,#7d2630,#c2410c);opacity:.34}
+  .paso .etiq{position:relative;flex:1;font-size:14px}
+  .paso .etiq b{font-size:19px;margin-right:6px}
+  .paso .etiq .sub{display:block;font-size:11px}
+  .paso .baja{position:relative;text-align:right;font-size:14px;color:var(--rojo);font-weight:600;white-space:nowrap}
+  .paso .baja .sub{display:block;font-weight:400}
+  .paso.fuga{outline:1px solid #7d2630}
+
   .acciones{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}
   .btn{
     background:var(--card2);border:1px solid #2d3542;color:var(--txt);
@@ -611,6 +671,7 @@ function render(aviso) {
   ${avisoDatos}
   ${bloqueAtencion}
   ${tarjetas}
+  ${bloqueEmbudo}
   <h2>Pedidos (todos)</h2>
   <div class="tabla"><table>
     <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Anuncio</th></tr>
