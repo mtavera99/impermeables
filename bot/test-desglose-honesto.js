@@ -161,6 +161,73 @@ for (const l of lineas) {
 chequear("las 5 líneas tienen los dos números", cuadran === 5);
 
 // ===========================================================================
+// ===========================================================================
+console.log("\n── 6-B. 🔴 EL GANCHO DE 2 UNIDADES (vale $44.007/día) ──");
+// ===========================================================================
+//
+// El 22-sep este gancho se debilitó y el share de pedidos de 2 unidades pasó de
+// 26,8% a 0% EN UN DÍA. La causa: se cambió "pagás UN solo envío, te ahorrás
+// $13.000" por "se ahorra $5.800 en el producto" — un número 2,2× más chico y
+// movido al lugar que el cliente no compara.
+//
+// El archivo madre ya tenía medido lo que vale: subió el share de 6,8% a 26,8%
+// (3,9×) y aporta +$44.007/día, el 72% del valor del guion. Es la línea más
+// valiosa de todo el prompt, así que se blinda.
+
+const tabla2 = f.tablaFletesTexto();
+
+chequear(
+  "el ahorro se dice contra COMPRAR DOS SUELTOS",
+  /Comprados por separado ser[íi]an/.test(tabla2),
+  "volvió a la versión débil: el cliente no tiene con qué comparar"
+);
+chequear(
+  "🔑 y la razón que se le da es el ENVÍO compartido",
+  /UN SOLO ENV[ÍI]O/.test(tabla2),
+  "sin el argumento del envío el ahorro parece un descuento cualquiera"
+);
+chequear(
+  "el desglose sigue disponible, pero como secundario",
+  /Si pide el desglose/.test(tabla2),
+  "se perdió el desglose honesto que se arregló el 22-sep"
+);
+chequear(
+  "⛔ ya NO usa el ahorro en el producto como titular",
+  !/→ se ahorra .* en el producto/.test(tabla2),
+  "ese es exactamente el texto que tiró el share a 0%"
+);
+
+// El número que se dice tiene que ser el REAL contra dos sueltos, en cada banda.
+for (const banda of ["A", "B", "C", "D", "E"]) {
+  const uno = f.cotizar(CIUDAD[banda], 1);
+  const dos = f.cotizar(CIUDAD[banda], 2);
+  const ahorro = 2 * uno.total - dos.total;
+  chequear(
+    `banda ${banda}: dice el ahorro real de ${pesos(ahorro)}`,
+    tabla2.includes(`SE AHORRA ${f.fmt(ahorro)}`),
+    `no encontré "SE AHORRA ${f.fmt(ahorro)}" en la tabla`
+  );
+}
+
+// Y el guion tiene que prohibir explícitamente volver al texto viejo.
+const guion = require("./src/prompt").buildSystemPrompt();
+chequear(
+  "el guion prohíbe decir el ahorro en el producto",
+  /NO decir "te ahorras/.test(guion),
+  "sin la prohibición explícita, el modelo puede volver al número chico"
+);
+chequear(
+  "el guion NO promete una promo de $110.000 que ya no existe",
+  !/2 conjuntos por \$110/.test(guion),
+  "se contradice con el desglose, que dice $103.000-115.000 según la banda"
+);
+chequear(
+  "el guion dice el share real de 2 unidades (26,8%)",
+  /26,8%/.test(guion),
+  "decía 8,3%, y eso le quita importancia al gancho más rentable que hay"
+);
+
+// ===========================================================================
 console.log("\n── 7. 🔒 EL PISO: vender DOS nunca puede dejar menos que vender UNA ──");
 // ===========================================================================
 //
