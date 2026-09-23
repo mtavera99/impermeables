@@ -358,7 +358,43 @@ const PROMO_2_TOTAL = { A: 137000, B: 146000, C: 152000, D: 140000, E: 158000 };
 // que vender UNA a $83.000. Ese límite no se cruza, y hay una prueba que lo
 // verifica en test-desglose-honesto.js.
 // ============================================================================
-const PROMO_2_RESCATE = { D: 137000 };
+// ============================================================================
+// 💬 PRECIO DE RESCATE DE 2 UNIDADES — TODAS LAS BANDAS (23-sep)
+//
+// ANTES: solo banda D, porque su lista bajó a $140.000 y quedó desalineada.
+//
+// POR QUÉ SE ABRIÓ A TODAS. El dueño lo planteó así: *"yo negociaba mucho el
+// precio... varios de esos pedidos los vendí en 135.000... como yo era flexible
+// creo que llegaba a vender un poquito más"*. Se midió sobre los 6.317 chats
+// (ver analisis/negociar-el-precio-23sep.js) y tenía razón, pero SOLO en combos:
+//
+//   de los 22 combos cerrados a mano, 18 (81,8%) fueron por debajo de la lista,
+//   con rebaja mediana de $9.000 — y el margen mediano siguió en $38.053.
+//   NINGUNO de los 113 pedidos quedó en pérdida.
+//
+// Y la razón económica es la que decide, porque no depende de la elasticidad:
+//
+//   🔑 LA SEGUNDA UNIDAD NO PAGA PAUTA. El costo de traer al cliente se paga una
+//      vez por PEDIDO, no por unidad. Con cierre al 5% son ~$20.000 por pedido.
+//
+//   margen DESPUÉS de pauta:   1 unidad ....... $3.303 a $5.094
+//                              2 unidades ..... $16.168 a $27.403
+//
+//   O sea que un combo con $10.000 de descuento deja entre 3,3 y 5,1 VECES más
+//   que una unidad a precio full. El descuento no sirve para salvar una venta de
+//   1 unidad (ahí no hay de dónde): sirve para convertir una de 1 en una de 2.
+//
+// ⚠️ BANDA D SE QUEDA EN $137.000 A PROPÓSITO. Su lista ($140.000) ya está baja
+// y su combo deja $16.168 después de pauta contra ~$27.000 de las demás. Ahí el
+// problema es el precio de LISTA, no la falta de descuento: hay que subirlo a
+// ~$145.000, no descontarlo más. Bajarla a $135.000 dejaría $11.168.
+//
+// ⚠️ Y ESTOS PISOS SE MUEVEN CON EL CIERRE. Si el cierre baja, la pauta por
+// pedido sube y el margen real se encoge: a 4,1% son $24.390 por pedido en vez
+// de $20.000. Descontar cuando el cierre está bajo es justo cuando menos se
+// puede. Si el cierre se queda por debajo del 4%, revisar esta tabla.
+// ============================================================================
+const PROMO_2_RESCATE = { A: 127000, B: 136000, C: 142000, D: 137000, E: 148000 };
 
 // ============================================================================
 // 🔴 EL ENVÍO QUE SE LE MUESTRA AL CLIENTE (agregado 22-sep por una venta perdida)

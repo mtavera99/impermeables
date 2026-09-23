@@ -118,9 +118,17 @@ chequear(
   "con el dato que lo justifica: solo 14 de 1.574 hablaron de precio",
   /solo 14 mencionaron el precio/i.test(guion)
 );
+// 23-sep: el tope dejó de ser uno solo. En 1 unidad sigue en $3.000, pero en 2
+// unidades pasó a usar el precio de rescate, porque la 2ª unidad no paga pauta y
+// ahí hay entre $16.168 y $27.403 de margen contra $3.303–$5.094 en una sola.
+// Detalle completo en test-negociar-precio.js.
 chequear(
-  "el tope del descuento sigue en $3.000",
-  /M[áa]ximo \$3\.000/.test(guion)
+  "el tope de 1 unidad sigue en $3.000",
+  /1 UNIDAD — m[áa]ximo \$3\.000/i.test(guion)
+);
+chequear(
+  "y en 2 unidades manda al precio de rescate, no al tope de $3.000",
+  /2 UNIDADES — us[áa] el precio de rescate/i.test(guion)
 );
 
 console.log("\n── 6. Los números medidos quedan escritos, no de memoria ──");

@@ -141,11 +141,41 @@ chequear(
   tabla.includes("los 2 conjuntos"),
   "la IA no tiene de dónde leer el desglose y lo va a improvisar"
 );
-chequear(
-  "la tabla NO menciona un envío de $42.000 en ninguna parte",
-  !tabla.includes("42.000"),
-  "quedó el número inflado en el prompt"
-);
+// 🔴 ESTA PRUEBA ESTABA MAL ESCRITA Y DABA UNA FALSA ALARMA (23-sep).
+// Antes decía `!tabla.includes("42.000")`, y eso engancha dentro de "$142.000"
+// —que es un TOTAL perfectamente válido—. Al abrir el precio de rescate a todas
+// las bandas empezó a fallar sin que nada estuviera roto.
+//
+// Buscar un número suelto por substring no sirve: lo que importa no es que el
+// texto "42.000" no aparezca, es que NINGÚN envío mostrado supere el real. Eso
+// es lo que perdió la venta de Montería, y así queda medido de verdad.
+{
+  const envios = [...tabla.matchAll(/envío \$([\d.]+)\)/g)].map((m) =>
+    Number(m[1].replace(/\./g, ""))
+  );
+  chequear(
+    `la tabla muestra ${envios.length} envíos de 2 unidades y ninguno está inflado`,
+    envios.length >= 5 && envios.every((e) => e < Math.max(...Object.values(f.ENVIO_REAL_2))),
+    `envíos mostrados: ${envios.map(pesos).join(", ")}`
+  );
+  // El chequeo fuerte, banda por banda: el envío que se le muestra al cliente
+  // nunca puede pasar el que cobra la transportadora, porque es el ÚNICO número
+  // que el cliente puede verificar por fuera.
+  for (const banda of ["A", "B", "C", "D", "E"]) {
+    const r = f.PROMO_2_RESCATE[banda];
+    if (!r) continue;
+    const d = f.desgloseDe(banda, 2, r);
+    chequear(
+      `banda ${banda}: al rescate muestra envío ${pesos(d.envio)} y el real es ${pesos(f.ENVIO_REAL_2[banda])}`,
+      d.envio <= f.ENVIO_REAL_2[banda],
+      "el cliente puede verificar esto en 99 Envíos y nos pilla inflando"
+    );
+    chequear(
+      `banda ${banda}: al rescate el desglose cierra (${pesos(d.producto)} + ${pesos(d.envio)} = ${pesos(r)})`,
+      d.producto + d.envio === r
+    );
+  }
+}
 chequear("la tabla trae el envío real de Montería ($37.000)", tabla.includes("37.000"));
 
 // La IA lee ESTA tabla, no llama a cotizar(). Si los números de la tabla no
@@ -264,11 +294,52 @@ console.log("\n── 8. El precio de rescate y su regla ──");
 
 chequear("Montería (banda D) tiene precio de rescate", mont.rescate === 137000, `es ${mont.rescate}`);
 chequear("el rescate es MENOR que la lista", mont.rescate < mont.total);
+
+// ───────────────────────────────────────────────────────────────────────────
+// 23-sep: el rescate de 2 unidades se abrió a TODAS las bandas.
+//
+// Antes esta prueba exigía que banda A devolviera null, porque el rescate solo
+// existía para arreglar la banda D. Se abrió después de medir los 6.317 chats:
+// de los 22 combos que el dueño cerró a mano, 18 fueron por debajo de la lista
+// con rebaja mediana de $9.000, y el margen mediano siguió en $38.053.
+//
+// La razón de fondo es que la 2ª unidad NO paga pauta: después de publicidad una
+// unidad deja $3.303–$5.094 y un combo deja $16.168–$27.403.
+// ───────────────────────────────────────────────────────────────────────────
 chequear(
-  "una banda sin rescate definido devuelve null",
-  f.cotizar(CIUDAD.A, 2).rescate === null,
-  "apareció un rescate donde no se decidió ninguno"
+  "las 5 bandas tienen precio de rescate de 2 unidades",
+  ["A", "B", "C", "D", "E"].every((b) => f.PROMO_2_RESCATE[b] > 0),
+  `faltan: ${["A", "B", "C", "D", "E"].filter((b) => !f.PROMO_2_RESCATE[b]).join(", ")}`
 );
+chequear(
+  "banda A ahora sí tiene rescate, y es menor que su lista",
+  f.cotizar(CIUDAD.A, 2).rescate === 127000 && 127000 < f.PROMO_2_TOTAL.A
+);
+
+// 🚨 EL CANDADO DE PLATA: ningún rescate puede dejar la venta por debajo del
+// piso real, que es costo + envío + la pauta que ya se gastó para traer al
+// cliente. Si alguien baja un número de esta tabla, esto falla y avisa.
+{
+  const COSTO_UD = 33000;
+  const PAUTA_POR_PEDIDO = 20000; // con cierre al 5% y ~$1.000/conversación
+  for (const banda of ["A", "B", "C", "D", "E"]) {
+    const r = f.PROMO_2_RESCATE[banda];
+    const queda = r - 2 * COSTO_UD - f.ENVIO_REAL_2[banda] - PAUTA_POR_PEDIDO;
+    chequear(
+      `banda ${banda}: al rescate quedan ${pesos(queda)} DESPUÉS de pauta`,
+      queda > 0,
+      "este rescate destruye plata: la venta saldría por debajo del piso real"
+    );
+    // Y tiene que seguir siendo mejor que vender una sola unidad a precio lleno,
+    // porque si no, el descuento del combo no tiene sentido económico.
+    const TOTAL_1 = { A: 73000, B: 78000, C: 82000, D: 83000, E: 85000 };
+    const unaFull = TOTAL_1[banda] - COSTO_UD - f.ENVIO_REAL_1[banda] - PAUTA_POR_PEDIDO;
+    chequear(
+      `banda ${banda}: el combo al rescate (${pesos(queda)}) sigue ganándole a 1 unidad full (${pesos(unaFull)})`,
+      queda > unaFull
+    );
+  }
+}
 chequear(
   "el rescate NO aplica a pedidos de 1 unidad",
   f.cotizar(CIUDAD.D, 1).rescate == null,
