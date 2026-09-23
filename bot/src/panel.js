@@ -274,11 +274,21 @@ function render(aviso) {
     .map((e, i) => {
       const ancho = emb.total > 0 ? Math.max(4, Math.round((e.n / emb.total) * 100)) : 0;
       const esFuga = emb.fuga && emb.fuga.clave === e.clave;
+      // Contra la referencia del agente viejo: 🟢 igual o mejor, 🟡 hasta 20%
+      // abajo, 🔴 peor que eso. Sin esto, un "−46%" no dice si está bien o mal.
+      let marca = "";
+      if (i > 0 && e.indice != null) {
+        const icono = e.indice >= 1 ? "🟢" : e.indice >= 0.8 ? "🟡" : "🔴";
+        marca = `<span class="ref">${icono} pasa ${pct(e.pasan)} · el agente viejo ${pct(
+          e.referencia
+        )}</span>`;
+      }
       return `<div class="paso${esFuga ? " fuga" : ""}">
           <div class="barra" style="width:${ancho}%"></div>
           <div class="etiq">
             <b>${e.n}</b> ${esc(e.nombre)}
             <span class="sub">${esc(e.que)}</span>
+            ${marca}
           </div>
           ${
             i > 0
@@ -297,14 +307,24 @@ function render(aviso) {
          <div class="embudo">
            ${filasEmbudo}
            ${
-             emb.diagnostico
-               ? `<div class="porque"><b>La fuga más grande está en "${esc(emb.fuga.nombre)}"</b> —
-                   se perdieron ${emb.fuga.perdidos} ahí.<br>${esc(emb.diagnostico)}</div>`
-               : ""
+             emb.fuga
+               ? `<div class="porque"><b>El escalón más flojo es "${esc(emb.fuga.nombre)}"</b> —
+                   pasa ${pct(emb.fuga.pasan)} donde el agente viejo pasaba ${pct(
+                   emb.fuga.referencia
+                 )}, y se perdieron ${emb.fuga.perdidos} ahí.<br>${esc(emb.diagnostico)}</div>`
+               : `<div class="porque">${esc(emb.diagnostico)}</div>`
            }
-           <p class="nota">Cierre total: <b>${pct(emb.cierre)}</b> · Las etapas se deducen de lo
-             que se habló en cada chat, no de una marca del bot: sirve para ver la tendencia y dónde
-             mirar, no como contabilidad exacta.</p>
+           <p class="nota">Cierre total: <b>${pct(emb.cierre)}</b> · Cada escalón se compara con lo
+             que lograba el <b>agente viejo de Meta</b> sobre 6.317 conversaciones, medido con este
+             mismo código. <b>No se señala el escalón que pierde más gente</b> —ese siempre es el
+             primero, porque es el más ancho— sino el que está peor <b>contra su referencia</b>.
+             ${
+               emb.comparable
+                 ? ""
+                 : "⚠️ Todavía hay pocas conversaciones para comparar: esta lectura es prematura."
+             }
+             Las etapas se deducen de lo que se habló en cada chat, no de una marca del bot: sirve
+             para ver la tendencia y dónde mirar, no como contabilidad exacta.</p>
          </div>`
       : "";
 
@@ -616,6 +636,7 @@ function render(aviso) {
   .paso .etiq{position:relative;flex:1;font-size:14px}
   .paso .etiq b{font-size:19px;margin-right:6px}
   .paso .etiq .sub{display:block;font-size:11px}
+  .paso .etiq .ref{display:block;font-size:11px;color:#9fb3c8;margin-top:3px}
   .paso .baja{position:relative;text-align:right;font-size:14px;color:var(--rojo);font-weight:600;white-space:nowrap}
   .paso .baja .sub{display:block;font-weight:400}
   .paso.fuga{outline:1px solid #7d2630}

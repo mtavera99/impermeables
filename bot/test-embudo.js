@@ -191,6 +191,104 @@ chequear(
   embudo.PISO_TOTAL <= 73000
 );
 
+// ══════════════════════════════════════════════════════════════════════════
+console.log("\n── 🔑 LA FUGA SE ELIGE CONTRA LA REFERENCIA, NO POR EL BULTO ──");
+//
+// El criterio viejo era "el escalón donde se pierden más clientes". Ese criterio
+// SIEMPRE señala el primer escalón, porque es el más ancho del embudo.
+//
+// Caso real, panel en vivo del 23-sep con 221 conversaciones:
+//   221 → 119 → 89 → 27 → 9
+// El panel marcaba "Siguieron la charla" (−102) y mandaba a revisar el anuncio y
+// el primer mensaje, que es justo lo único que ya sabíamos que estaba SANO.
+// El escalón roto era "Llegaron a los datos": 30,3% contra 49,1% del agente viejo.
+
+const RECETAS = {
+  entro: () => ({ messages: [u("hola")] }),
+  volvio: () => ({ messages: [u("hola"), b("¿Qué talla usás?"), u("M")] }),
+  cotizado: () => ({ messages: [u("Cali"), b("Te llega a $82.000 al recibir 📦")] }),
+  datos: () => ({ messages: [u("dale"), b("Perfecto, ¿cuál es tu dirección?")] }),
+  cerro: () => ({ messages: [u("sí confirmo"), b("Listo, se despacha 📦")], compro: true }),
+};
+
+function armar(cuentas) {
+  const convs = {};
+  let i = 0;
+  for (const [etapa, n] of Object.entries(cuentas)) {
+    for (let k = 0; k < n; k++) convs["57300" + String(i++).padStart(7, "0")] = RECETAS[etapa]();
+  }
+  return convs;
+}
+
+// Los números exactos del panel del 23-sep, desarmados en conteos por etapa.
+const r23 = embudo.calcular(
+  armar({ entro: 102, volvio: 30, cotizado: 62, datos: 18, cerro: 9 }),
+  []
+);
+const etapa23 = (clave) => r23.etapas.find((e) => e.clave === clave);
+
+chequear("reproduce los 221 que escribieron", etapa23("entro").n === 221);
+chequear("reproduce los 119 que siguieron", etapa23("volvio").n === 119);
+chequear("reproduce los 89 cotizados", etapa23("cotizado").n === 89);
+chequear("reproduce los 27 que llegaron a datos", etapa23("datos").n === 27);
+chequear("reproduce los 9 que cerraron", etapa23("cerro").n === 9);
+
+chequear(
+  "🔑 señala 'datos' como el escalón flojo, NO 'volvio'",
+  r23.fuga && r23.fuga.clave === "datos",
+  `señaló: ${r23.fuga ? r23.fuga.clave : "ninguno"}`
+);
+chequear(
+  "y 'volvio' pierde MÁS gente en bruto (por eso el criterio viejo erraba)",
+  etapa23("volvio").perdidos > etapa23("datos").perdidos,
+  `volvio −${etapa23("volvio").perdidos} vs datos −${etapa23("datos").perdidos}`
+);
+chequear(
+  "el diagnóstico de 'datos' aclara que NO es el precio",
+  /no es el precio/i.test(r23.diagnostico)
+);
+chequear("dice que hay datos para comparar", r23.comparable === true);
+
+console.log("\n── Cada escalón trae su referencia y su índice ──");
+for (const clave of ["volvio", "cotizado", "datos", "cerro"]) {
+  const e = etapa23(clave);
+  chequear(
+    `${clave}: referencia ${(e.referencia * 100).toFixed(1)}%, índice ${e.indice.toFixed(2)}`,
+    e.referencia === embudo.REFERENCIA[clave] && typeof e.indice === "number"
+  );
+}
+chequear(
+  "'datos' tiene el índice más bajo de los cuatro",
+  ["volvio", "cotizado", "cerro"].every((k) => etapa23("datos").indice < etapa23(k).indice)
+);
+
+console.log("\n── Si todo está a la altura, no se inventa un culpable ──");
+const sano = embudo.calcular(
+  armar({ entro: 20, volvio: 20, cotizado: 20, datos: 20, cerro: 40 }),
+  []
+);
+chequear("no marca ninguna fuga", sano.fuga === null);
+chequear(
+  "y dice que el problema es de volumen, no de conversación",
+  /más volumen o mejores anuncios/.test(sano.diagnostico)
+);
+
+console.log("\n── Con pocos datos avisa en vez de opinar ──");
+const chico = embudo.calcular(armar({ entro: 3, volvio: 2, cotizado: 1 }), []);
+chequear("dice que todavía no es comparable", chico.comparable === false);
+chequear("aun así no explota", typeof chico.cierre === "number");
+chequear("un embudo vacío no explota", embudo.calcular({}, []).total === 0);
+
+console.log("\n── La referencia es la medida sobre las 6.317 del export ──");
+chequear("volvio = 59,1%", embudo.REFERENCIA.volvio === 0.591);
+chequear("cotizado = 67,9%", embudo.REFERENCIA.cotizado === 0.679);
+chequear("datos = 49,1%", embudo.REFERENCIA.datos === 0.491);
+chequear("cerro = 23,0%", embudo.REFERENCIA.cerro === 0.23);
+chequear(
+  "las cuatro son proporciones, no porcentajes",
+  Object.values(embudo.REFERENCIA).every((v) => v > 0 && v < 1)
+);
+
 require("fs").rmSync("/tmp/prueba-embudo", { recursive: true, force: true });
 
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
