@@ -253,9 +253,20 @@ function render(aviso) {
       <td class="nowrap" data-label="Fecha">${esc(HORA(cuando))}${
       viejo && !opciones.despachado ? ' <span class="tag warn">+1 día</span>' : ""
     }</td>
-      <td data-label="Cliente"><b>${esc(p.nombre)}</b>${verChat}<div class="sub">${esc(
-      p.celular || p.telefono_chat
-    )}${sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""}</div></td>
+      <td data-label="Cliente"><b>${esc(p.nombre)}</b>${verChat}${
+      // ⚠️ Ya le habíamos vendido antes. Puede ser real o el bot tomando por
+      // pedido la respuesta de alguien que ya tiene su guía. No se despacha sin
+      // confirmar: eso ya pasó el 23-sep y ensució el conteo de ventas.
+      p.posible_duplicado ? ' <span class="tag no">⚠️ ¿REPETIDO?</span>' : ""
+    }<div class="sub">${esc(p.celular || p.telefono_chat)}${
+      sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""
+    }${
+      p.posible_duplicado
+        ? `<br><b style="color:#ff9aa4">⚠️ ya tenía un pedido de ${esc(
+            fmtCOP(p.pedido_previo_total)
+          )} — confirmá antes de despachar</b>`
+        : ""
+    }</div></td>
       <td data-label="Dirección">${esc(p.ciudad)}${
       // 🏢 Entrega en oficina: no va con mensajero a una casa. Verlo de un
       // vistazo evita mandar un domicilio a una recogida y al revés.

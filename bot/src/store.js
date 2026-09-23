@@ -302,24 +302,76 @@ function setPaused(phone, val) {
 // El prompt ya le pide a la IA no repetir el cuadro de confirmación, pero eso
 // es una instrucción y esto es un candado. La instrucción falló; el candado no
 // depende de que el modelo se porte bien.
-const VENTANA_PEDIDO_DUPLICADO_MS = 6 * 60 * 60 * 1000; // 6 horas
+// ============================================================================
+// 🔴 LOS DOS HUECOS QUE TENÍA ESTE CANDADO (23-sep)
+//
+// LO QUE PASÓ, en palabras del dueño: *"cayó supuestamente otra venta y es una
+// duplicada de una de las guías que envié, y contestó la persona y la tomó otra
+// vez como pedido"*. O sea: un cliente que YA había comprado y YA tenía su guía
+// contestó el mensaje, y el bot volvió a emitir el bloque ##ORDER##.
+//
+// El pedido falso entró al conteo. Y eso es peor que un pedido de más: el dueño
+// está decidiendo con esos números —CPA, cierre, cuánto recargar— y un pedido
+// inventado los corrompe todos.
+//
+// HUECO 1 — LA VENTANA ERA DE 6 HORAS.
+//   Se puso así porque el caso original era el bloque emitido dos veces con 18 a
+//   30 segundos de diferencia. Pero acá el pedido original era de ANTES (ya tenía
+//   guía enviada), así que el candado ni lo miró. La ventana pasa a 30 días.
+//
+// HUECO 2 — NO MIRABA SI EL PEDIDO YA SE HABÍA DESPACHADO.
+//   Si un pedido ya tiene guía, el cliente que escribe NO está comprando otra
+//   vez: está contestando la guía. Eso ahora se descarta siempre, sin importar
+//   cuánto tiempo pasó.
+//
+// ⚠️ Y EL CASO QUE NO SE PUEDE DESCARTAR A CIEGAS: un cliente de verdad puede
+// comprar otra vez. Si el pedido nuevo NO es idéntico al anterior, se GUARDA
+// —una venta real no se tira nunca— pero se marca `posible_duplicado` para que
+// el dueño la confirme antes de despachar, en vez de descubrirlo con el paquete
+// enviado.
+// ============================================================================
+const VENTANA_PEDIDO_DUPLICADO_MS = 30 * 24 * 60 * 60 * 1000; // 30 días
+
+/** Todos los pedidos anteriores de este mismo cliente, del más nuevo al más viejo. */
+function pedidosDelMismoCliente(orders, nuevo) {
+  const tel = String(nuevo.celular || nuevo.telefono_chat || "").replace(/\D/g, "");
+  const chat = String(nuevo.telefono_chat || "");
+  if (!tel && !chat) return [];
+  return orders
+    .filter((o) => {
+      const telO = String(o.celular || o.telefono_chat || "").replace(/\D/g, "");
+      // Se compara por teléfono Y por id de chat: los clientes con nombre de
+      // usuario de WhatsApp no tienen teléfono, y ahí el chat es lo único que hay.
+      return (tel && telO === tel) || (chat && String(o.telefono_chat || "") === chat);
+    })
+    .reverse();
+}
+
+const mismoPedido = (a, b) =>
+  Number(a.total) === Number(b.total) && String(a.talla || "") === String(b.talla || "");
 
 function esPedidoDuplicado(orders, nuevo) {
-  const tel = String(nuevo.celular || nuevo.telefono_chat || "").replace(/\D/g, "");
-  if (!tel) return null;
   const ahora = Date.now();
-  for (let i = orders.length - 1; i >= 0; i--) {
-    const o = orders[i];
-    const telO = String(o.celular || o.telefono_chat || "").replace(/\D/g, "");
-    if (telO !== tel) continue;
+  for (const o of pedidosDelMismoCliente(orders, nuevo)) {
+    if (!mismoPedido(o, nuevo)) continue;
+
+    // Ya se despachó: el cliente está contestando la guía, no comprando de nuevo.
+    if (o.guia) return o;
+
     const cuando = new Date(o.fecha).getTime();
-    if (ahora - cuando > VENTANA_PEDIDO_DUPLICADO_MS) break;
-    // Mismo cliente, mismo total y misma talla dentro de la ventana = repetido
-    if (Number(o.total) === Number(nuevo.total) && String(o.talla || "") === String(nuevo.talla || "")) {
-      return o;
-    }
+    if (Number.isFinite(cuando) && ahora - cuando <= VENTANA_PEDIDO_DUPLICADO_MS) return o;
   }
   return null;
+}
+
+/**
+ * El cliente ya compró antes, pero este pedido NO es idéntico. Puede ser una
+ * compra de verdad o el bot confundiéndose: se guarda y se marca.
+ */
+function pedidoSospechoso(orders, nuevo) {
+  const previos = pedidosDelMismoCliente(orders, nuevo);
+  if (previos.length === 0) return null;
+  return previos[0];
 }
 
 function saveOrder(order) {
@@ -361,10 +413,26 @@ function saveOrder(order) {
     if (repetido) {
       console.warn(
         `⏭️  PEDIDO DUPLICADO NO GUARDADO: ${record.nombre || "?"} (${record.celular || record.telefono_chat}) ` +
-          `por $${record.total}. Ya existe uno igual de ${repetido.fecha}. ` +
-          "El bot emitió el bloque dos veces."
+          `por $${record.total}. Ya existe uno igual de ${repetido.fecha}` +
+          (repetido.guia ? ` y YA SE DESPACHÓ (guía ${repetido.guia})` : "") +
+          ". El bot volvió a emitir el bloque."
       );
       return { ...repetido, duplicadoIgnorado: true };
+    }
+
+    // Compró antes, pero este pedido es distinto. Puede ser real: se guarda,
+    // marcado, para que el dueño lo confirme antes de despachar.
+    const previo = pedidoSospechoso(orders, record);
+    if (previo) {
+      record.posible_duplicado = true;
+      record.pedido_previo_fecha = previo.fecha;
+      record.pedido_previo_total = previo.total;
+      console.warn(
+        `⚠️  POSIBLE PEDIDO REPETIDO: ${record.nombre || "?"} (${record.celular || record.telefono_chat}) ` +
+          `ya tenía un pedido de $${previo.total} del ${previo.fecha}` +
+          (previo.guia ? ` (guía ${previo.guia})` : "") +
+          `. El nuevo es por $${record.total}. SE GUARDA, pero hay que confirmarlo.`
+      );
     }
 
     orders.push(record);
@@ -521,5 +589,10 @@ module.exports = {
   guardarPerfil, guardarAtribucion, atribucionDe,
   reemplazarPedidos,
   todosLosPedidos,
+  // Se exportan para poder probar el candado antiduplicados sin tocar el disco:
+  // es el que decide si una venta es real, y de eso dependen el CPA y el cierre.
+  esPedidoDuplicado,
+  pedidoSospechoso,
+  VENTANA_PEDIDO_DUPLICADO_MS,
   guiaYaEnviada, registrarGuiaEnviada, todasLasGuiasEnviadas, anotarGuiaEnPedido,
 };
