@@ -143,11 +143,52 @@ function calcular(conversaciones, pedidos) {
     etapas[i].pasan = antes > 0 ? ahora / antes : 0;
   }
 
-  // La fuga más grande se mide en CLIENTES PERDIDOS, no en porcentaje: perder
-  // el 80% de 5 personas importa menos que perder el 40% de 90.
-  let fuga = null;
+  // ==========================================================================
+  // 🔑 LA FUGA SE ELIGE CONTRA UNA REFERENCIA, NO POR EL NÚMERO MÁS GRANDE
+  //
+  // Esto decía: la fuga es el escalón donde se pierden MÁS clientes. Y ese
+  // criterio SIEMPRE señala el primer escalón, porque es el más ancho del
+  // embudo: es donde hay más gente para perder.
+  //
+  // Medido el 23-sep con el panel en vivo (221 conversaciones):
+  //   el panel marcaba "Siguieron la charla" (−102) y mandaba a revisar el
+  //   anuncio y el primer mensaje... que es justo lo único que ya sabíamos que
+  //   estaba SANO (el bot engancha 53,8% y el agente viejo enganchaba 59,1%).
+  //   El escalón roto de verdad era "Llegaron a los datos": 30,3% contra 49,1%.
+  //
+  // Un porcentaje de caída solo no sirve para nada si no se sabe cuánto es
+  // normal caerse ahí. Perder el 46% de los que entran es normal. Perder el 70%
+  // de los que ya tienen el precio NO lo es.
+  //
+  // Así que se compara cada escalón con lo que lograba el agente viejo, medido
+  // sobre las 6.317 conversaciones del export CON ESTE MISMO CÓDIGO (ver
+  // analisis/bot-vs-agente-mismo-embudo-23sep.js). Índice = cuánto pasa el bot
+  // dividido cuánto pasaba el viejo. Abajo de 1 es peor que la referencia.
+  // ==========================================================================
   for (let i = 1; i < etapas.length; i++) {
-    if (!fuga || etapas[i].perdidos > fuga.perdidos) fuga = etapas[i];
+    const ref = REFERENCIA[etapas[i].clave];
+    etapas[i].referencia = ref;
+    etapas[i].indice = ref > 0 ? etapas[i].pasan / ref : null;
+  }
+
+  // Un escalón solo se puede juzgar si tiene gente suficiente antes. Con 5
+  // personas el porcentaje salta 20 puntos por una sola, y marcaríamos como
+  // "roto" lo que es azar.
+  const MIN_PARA_JUZGAR = 15;
+  const juzgables = etapas
+    .slice(1)
+    .filter((e, idx) => etapas[idx].n >= MIN_PARA_JUZGAR && e.indice != null);
+
+  let fuga = null;
+  if (juzgables.length > 0) {
+    // El peor contra su referencia.
+    fuga = juzgables.reduce((a, b) => (a.indice <= b.indice ? a : b));
+    // Si TODOS los escalones están a la altura o mejor, no hay un culpable:
+    // el embudo está sano y el problema es de volumen, no de conversación.
+    if (fuga.indice >= 1) fuga = null;
+  } else {
+    // Todavía no hay datos para comparar: se cae al criterio viejo, avisando.
+    for (const e of etapas.slice(1)) if (!fuga || e.perdidos > fuga.perdidos) fuga = e;
   }
 
   return {
@@ -155,26 +196,62 @@ function calcular(conversaciones, pedidos) {
     cierre: entro > 0 ? cerro / entro : 0,
     etapas,
     fuga,
+    // ¿Hay suficiente para comparar, o es una lectura prematura?
+    comparable: juzgables.length > 0,
     // Qué hacer según dónde esté la fuga. Es la traducción de "un número" a
     // "dónde tengo que meter la mano", que es lo que el dueño necesita.
-    diagnostico: fuga ? DIAGNOSTICO[fuga.clave] : null,
+    diagnostico: fuga ? DIAGNOSTICO[fuga.clave] : DIAGNOSTICO.sano,
   };
 }
 
-const DIAGNOSTICO = {
-  volvio:
-    "La mayoría se va sin contestarle al bot. Eso NO es del bot: el anuncio está " +
-    "trayendo gente que no quiere el producto, o el primer mensaje no engancha. " +
-    "Mirá la tabla de pedidos por anuncio para ver cuál trae curiosos y cuál trae compradores.",
-  cotizado:
-    "Contestan pero no llegan a darte la ciudad. Se están yendo antes del precio: " +
-    "revisá qué está diciendo el bot en los primeros dos mensajes.",
-  datos:
-    "🔴 Acá duele: les diste el precio y se fueron. El problema es el PRECIO o la " +
-    "confianza. Es justo donde el precio de rescate puede salvar la venta.",
-  cerro:
-    "Llegan hasta los datos y no confirman. El precio ya lo aceptaron: lo que falla " +
-    "es el último empujón. Revisá una de esas conversaciones completa.",
+// ============================================================================
+// LA REFERENCIA: qué lograba el agente viejo de Meta en cada escalón.
+//
+// Medido sobre las 6.317 conversaciones del export del 21-sep, pasadas por
+// ESTE MISMO archivo para que las etapas signifiquen lo mismo. Si se mide con
+// otras reglas, los números no son comparables y la conclusión sale al revés
+// (ya pasó: con el detector viejo de cotización daba 98,8% y era mentira).
+//
+// Cada número es "de los que llegaron al escalón anterior, cuántos pasaron":
+// ============================================================================
+const REFERENCIA = {
+  volvio: 0.591, // 3.600 de 6.095 contestaron al agente
+  cotizado: 0.679, // 2.446 de 3.600 recibieron un total real
+  datos: 0.491, // 1.202 de 2.446 llegaron a dirección/confirmación
+  cerro: 0.230, // 277 de 1.202 confirmaron el pedido
 };
 
-module.exports = { calcular, etapaDe, dioTotal, montosDe, PISO_TOTAL, RE_TOTAL, RE_DATOS };
+const DIAGNOSTICO = {
+  volvio:
+    "Contestan menos que con el agente viejo (que lograba 59%). Acá el bot no tiene " +
+    "mucho margen: o el anuncio está trayendo gente que no quiere el producto, o el " +
+    "primer mensaje no engancha. Mirá la tabla de pedidos por anuncio para ver cuál " +
+    "trae curiosos y cuál trae compradores.",
+  cotizado:
+    "Contestan pero no llegan a darte la ciudad, y el agente viejo sacaba el precio al " +
+    "68% de ellos. El bot se está quedando corto en pedir la ciudad: es UNA pregunta y " +
+    "es la que desbloquea todo lo demás.",
+  datos:
+    "🔴 Les diste el precio y no avanzaron a dar sus datos. El agente viejo pasaba el 49% " +
+    "de este escalón.\n" +
+    "⚠️ Y NO es el precio: medido sobre 1.574 conversaciones perdidas del export, solo 14 " +
+    "mencionaron que estaba caro. Lo que pasa es que el bot cotiza y se queda esperando. " +
+    "Después del total hay que PEDIR EL PEDIDO, no preguntar '¿qué te parece?'.",
+  cerro:
+    "Llegan hasta los datos y no confirman. El precio ya lo aceptaron: lo que falla es el " +
+    "último empujón. Revisá una de esas conversaciones completa.",
+  sano:
+    "🟢 Ningún escalón está peor que lo que lograba el agente viejo. Si querés más pedidos, " +
+    "el camino no es la conversación: es más volumen o mejores anuncios.",
+};
+
+module.exports = {
+  calcular,
+  etapaDe,
+  dioTotal,
+  montosDe,
+  PISO_TOTAL,
+  REFERENCIA,
+  RE_TOTAL,
+  RE_DATOS,
+};
