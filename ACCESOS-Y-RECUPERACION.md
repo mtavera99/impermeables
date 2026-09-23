@@ -194,6 +194,36 @@ que es público para siempre.** Por eso hay que *cambiarlo*, no solo borrarlo.
 **Regla que queda:** el valor de `PANEL_TOKEN` vive **solo** en Render y en el gestor de
 contraseñas. Nunca en un archivo, un comando de ejemplo, ni un mensaje de chat.
 
+### 🔴 `PANEL_TOKEN` VIVE EN DOS LUGARES, Y LOS DOS HAY QUE ROTAR JUNTOS
+
+| dónde | para qué |
+|---|---|
+| **Render** → Environment → `PANEL_TOKEN` | el panel y todo lo que escribe |
+| **GitHub** → Settings → Secrets → Actions → **`BOT_VERIFY_TOKEN`** | el **cierre diario** automático |
+
+⚠️ **El secreto de GitHub se llama `BOT_VERIFY_TOKEN` por historia, pero tiene que
+contener el valor de `PANEL_TOKEN`.** El nombre quedó del secreto viejo y **no se puede
+renombrar desde acá** (ver la nota de abajo). Lo que importa es el valor.
+
+🔴 **Si se rota `PANEL_TOKEN` en Render y no se actualiza el secreto de GitHub, el cierre
+diario muere con HTTP 403 y no avisa por ningún lado** — solo queda en el log del Action,
+que nadie mira. Pasó el 22-sep: el cierre de ese día no salió.
+
+**Cómo comprobar que quedó bien, sin esperar a las 5 pm:**
+GitHub → pestaña **Actions** → **Cierre diario de ventas** → **Run workflow**. Si sale en
+verde, el secreto está bien. Si sale 403, los dos valores no coinciden.
+
+### ⚠️ POR QUÉ LOS WORKFLOWS NO LOS PUEDE ARREGLAR EL AGENTE
+
+GitHub **no permite que un bot mergee cambios dentro de `.github/workflows/`**. Es una
+protección de la plataforma, no un permiso que se pueda pedir: un PR del agente que toque
+un workflow **queda imposible de mergear** (pasó con el PR #115, que hubo que cerrar).
+
+**Consecuencia práctica:** cualquier arreglo en `.github/workflows/*.yml` lo tiene que
+aplicar el dueño a mano, editando el archivo en GitHub. Por eso, cuando algo de un
+workflow se rompe, **la primera pregunta es si se puede arreglar cambiando un secreto o una
+variable en vez del archivo** — casi siempre se puede, y es más rápido.
+
 ### 🔴 EL TOKEN DE WHATSAPP: EL PERMANENTE, NO EL DE API SETUP
 
 El token que muestra **API Setup dura 24 HORAS**. Si el bot deja de contestar de un
