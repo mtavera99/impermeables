@@ -777,14 +777,37 @@ function tablaFletesTexto() {
 
   // Totales firmes de 2 unidades por banda. Desde el 19-sep están corregidos y
   // por encima del margen meta, así que la IA SÍ puede cotizarlos sin escalar.
+  // ==========================================================================
+  // 🔴 EL GANCHO DE 2 UNIDADES: EL AHORRO VA CONTRA COMPRAR DOS SUELTOS
+  //
+  // ESTO SE ROMPIÓ EL 22-SEP Y COSTÓ CARO. Al arreglar el desglose cambié el
+  // texto del gancho por "se ahorra $5.800 en el producto". Dos errores juntos:
+  //
+  //   a) el número es 2,2× más chico que el que funcionaba ($13.000)
+  //   b) movió el ahorro del ENVÍO al PRODUCTO, y el del envío es el que el
+  //      cliente entiende de una: "pago un solo envío en vez de dos"
+  //
+  // Ese mismo día el share de pedidos de 2 unidades pasó de 26,8% (histórico) a
+  // 0%. El archivo madre ya tenía medido lo que vale ese gancho: subió el share
+  // de 6,8% a 26,8% (3,9×) y aporta +$44.007/día, el 72% del valor del guion.
+  //
+  // 🔑 LA REGLA: el ahorro se dice contra COMPRAR DOS SUELTOS, que es el número
+  // más grande de los tres posibles y además el único que el cliente puede
+  // comparar solo (sabe cuánto le costó uno). El desglose queda disponible por
+  // si lo pide, pero no es el titular.
+  // Ver /analisis/donde-esta-la-fuga-23sep.py
+  // ==========================================================================
   const promo2 = Object.entries(BANDAS)
     .map(([clave, b]) => {
-      const d = desgloseDe(clave, 2, PROMO_2_TOTAL[clave]);
-      const ahorro = 2 * PRECIO_PRODUCTO - d.producto;
+      const total2 = PROMO_2_TOTAL[clave];
+      const dosSueltos = 2 * b.total;
+      const ahorro = dosSueltos - total2;
+      const d = desgloseDe(clave, 2, total2);
       return (
-        `- ${b.nombre}: TOTAL ${fmt(PROMO_2_TOTAL[clave])} los dos ` +
-        `(los 2 conjuntos ${fmt(d.producto)} + envío ${fmt(d.envio)}) ` +
-        `→ se ahorra ${fmt(ahorro)} en el producto`
+        `- ${b.nombre}: TOTAL ${fmt(total2)} los dos. Comprados por separado serían ` +
+        `${fmt(dosSueltos)}, así que SE AHORRA ${fmt(ahorro)} porque van en el mismo ` +
+        `paquete y paga UN SOLO ENVÍO. Si pide el desglose: ${fmt(d.producto)} los dos ` +
+        `conjuntos + ${fmt(d.envio)} de envío.`
       );
     })
     .join("\n");

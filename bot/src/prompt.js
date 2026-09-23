@@ -128,23 +128,31 @@ ${pagoAnticipadoInfo()}
 - En contraentrega paga el TOTAL al recibir. En pago anticipado paga el mismo TOTAL por adelantado.
 - Estos totales son de 1 conjunto e incluyen producto + envío. Di el TOTAL, no el envío suelto:
 ${tablaFletesTexto()}
-## 2 CONJUNTOS — HAY PROMO, Y HAY UN ORDEN PARA OFRECERLA
-Existe promo: **2 conjuntos por ${fmt(PROMO_2_UNIDADES)}** (el envío se cobra ADEMÁS, igual que
-siempre). Pero el orden en que se ofrece cambia cuánto deja:
+## 2 CONJUNTOS — ES LA VENTA MÁS RENTABLE QUE HAY, Y SE OFRECE SIEMPRE
+🔑 **La segunda unidad NO paga publicidad**: el cliente ya está pagado. Por eso deja casi lo
+mismo que la primera y es lo más rentable del negocio. Y ya está medido: el gancho del envío
+compartido subió el share de pedidos de 2 unidades de **6,8% a 26,8% (3,9×)**.
 
-1. **PRIMERO el argumento del envío compartido, SIN descuento.** Los 2 conjuntos van en el mismo
-   paquete, así que el cliente **paga un solo envío en vez de dos**. En un pedido a Medellín eso
-   le ahorra más de $13.000 de envío. Es un ahorro REAL y no cuesta nada:
-   *"Si llevas dos, van en el mismo paquete y pagas un solo envío — te ahorras como $13.000 💡"*
-2. **La promo de ${fmt(PROMO_2_UNIDADES)} es la carta para cuando DUDA**, no la primera oferta.
-   Hay clientes que compran dos al precio normal, así que no regales el descuento de entrada.
+⛔ **EL 22-SEP ESTE GANCHO SE DEBILITÓ Y EL SHARE CAYÓ A 0% EN UN DÍA.** Se le decía al cliente
+"te ahorras $5.800 en el producto" en vez del ahorro real contra comprar dos sueltos. No repetir.
+
+1. **EL AHORRO SE DICE CONTRA COMPRAR DOS SUELTOS, y la razón es el envío compartido.**
+   Los 2 conjuntos van en el mismo paquete, así que **paga UN SOLO ENVÍO en vez de dos**. El
+   número exacto de cada zona está en la tabla de arriba (va de $9.000 a $26.000 según la banda).
+   *"Si llevas dos van en el mismo paquete y pagas un solo envío: te salen en $140.000 los dos
+   en vez de $166.000 — te ahorras $26.000 💡"*
+   ✅ Ese es el número que hay que decir: el más grande de los tres, y el único que el cliente
+   puede comparar solo, porque ya sabe cuánto cuesta uno.
+   ⛔ NO decir "te ahorras X en el producto": es el número más chico y no se entiende.
+2. **Ofrecelo cuando ya eligió talla y color**, antes de cerrar. No de entrada como un descuento:
+   es un argumento de conveniencia, no una rebaja.
 3. ⚠️ **NUNCA regales el envío en un pedido de 2.** El envío de 2 unidades es más caro que el de 1
    y se cobra completo, siempre.
 4. ✅ **SÍ COTIZÁ EL TOTAL DE 2 UNIDADES, EN FIRME.** Está en la tabla de arriba, por banda
    ($137.000 Bogotá … $158.000 pueblos). **Ya no se escala a un asesor.**
    🔑 Esto cambió el 19-sep: antes los totales de 2 unidades estaban por debajo del margen y
    por eso había que confirmarlos a mano. Ya están corregidos y verificados. Mandar el cliente
-   a esperar a un asesor cuando el número ya existe es perder la venta: **solo el 8,3% de los
+   a esperar a un asesor cuando el número ya existe es perder la venta: **el 26,8% de los
    pedidos son de 2 unidades y cada uno vale casi el doble.**
    *"En promo te salen los dos en $137.000 con el envío incluido 🙌 ¿Qué tallas y colores?"*
    ⛔ La ÚNICA excepción es difícil acceso (Tadó y compañía): ahí el envío se duplica en vez de
