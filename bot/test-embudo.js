@@ -138,6 +138,59 @@ try {
   compila = e.message;
 }
 chequear("el JavaScript del panel sigue compilando", compila === true, `error: ${compila}`);
+
+// ══════════════════════════════════════════════════════════════════════════
+console.log("\n── 🔴 EL PRECIO DEL PRODUCTO NO ES UNA COTIZACIÓN ──");
+//
+// El bug: la etapa "cotizado" se detectaba con /\$\s?\d{2,3}\.\d{3}/, y esa
+// expresión engancha el $59.900 del producto — que el bot dice en su PRIMER
+// mensaje, antes de saber la ciudad. Medido sobre el export de 6.317
+// conversaciones: inflaba el escalón de 1.895 a 3.394 cotizados (54,2% → 97,1%)
+// y escondía 1.600 personas que hablaron y nunca recibieron un total.
+
+chequear(
+  "decir el precio del producto NO es cotizar",
+  embudo.dioTotal("Son $59.900 el conjunto, más el envío") === false
+);
+chequear(
+  "el arranque completo del bot NO cuenta como cotización",
+  embudo.etapaDe({
+    messages: [u("¡Hola! Quiero más información."), b("Son $59.900 el conjunto, más el envío 📦 ¿Para qué ciudad sería?")],
+  }) === "entro"
+);
+chequear("un total con envío SÍ es cotizar", embudo.dioTotal("Te llega a $82.000") === true);
+chequear("el más barato que existe ($73.000) cuenta", embudo.dioTotal("Son $73.000 en total") === true);
+chequear("el de 2 unidades cuenta", embudo.dioTotal("Los dos te salen en $137.000") === true);
+chequear(
+  "el precio de rescate más bajo ($70.000) cuenta",
+  embudo.dioTotal("Te lo dejo en $70.000") === true
+);
+chequear(
+  "un descuento de $3.000 NO se confunde con un total",
+  embudo.dioTotal("Te ayudo con $3.000 si lo cerramos hoy") === false
+);
+chequear(
+  "si el bot dice producto Y total, cuenta como cotizado",
+  embudo.dioTotal("El conjunto son $59.900 y con envío a Cali queda en $82.000") === true
+);
+chequear("sin ningún monto no cotiza", embudo.dioTotal("¿Para qué ciudad sería?") === false);
+chequear("aguanta texto vacío", embudo.dioTotal("") === false);
+chequear("aguanta null", embudo.dioTotal(null) === false);
+chequear(
+  "lee los montos con coma igual que con punto",
+  embudo.montosDe("$82,000 y $59,900").join(",") === "82000,59900"
+);
+chequear("el piso está en $70.000", embudo.PISO_TOTAL === 70000);
+chequear(
+  "🚨 el piso queda por ENCIMA del precio del producto",
+  embudo.PISO_TOTAL > require("./src/fletes").PRECIO_PRODUCTO,
+  `piso ${embudo.PISO_TOTAL} vs producto ${require("./src/fletes").PRECIO_PRODUCTO} — si el producto sube de $70.000 hay que mover el corte`
+);
+chequear(
+  "🚨 y por DEBAJO del total más barato que existe",
+  embudo.PISO_TOTAL <= 73000
+);
+
 require("fs").rmSync("/tmp/prueba-embudo", { recursive: true, force: true });
 
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);

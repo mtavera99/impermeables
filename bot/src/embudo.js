@@ -21,10 +21,53 @@
 // Por eso cada uno está probado en test-embudo.js contra transcripciones reales.
 // ============================================================================
 
-// El bot SIEMPRE dice el total con este formato: "$83.000", "$140.000".
-// Si aparece en un mensaje del bot, es que ya cotizó — y solo puede cotizar
-// cuando el cliente dio la ciudad.
+// ============================================================================
+// 🔴 COTIZAR NO ES "DECIR UN PRECIO" — ESTA ETAPA ESTABA MIDIENDO MAL
+//
+// Esto decía:  const RE_TOTAL = /\$\s?\d{2,3}\.\d{3}/
+//
+// Y esa expresión también engancha el **$59.900 del producto**, que el bot dice
+// en su PRIMER mensaje, siempre, antes de saber la ciudad. O sea que casi toda
+// conversación con una sola respuesta del bot ya contaba como "cotizada".
+//
+// Medido sobre el export de 6.317 conversaciones reales (23-sep):
+//
+//   con la expresión vieja ..... 3.394 cotizados (97,1% de los que engancharon)
+//   con el corte correcto ...... 1.895 cotizados (54,2%)
+//
+// El paso venía inflado en 1.499 conversaciones, y escondía la segunda fuga más
+// grande que tiene el negocio: 1.600 personas que hablaron y NUNCA recibieron un
+// total. El panel mostraba ese escalón como si estuviera sano.
+//
+// EL CORTE: un total de verdad incluye el envío y depende de la ciudad. El más
+// barato que existe es $73.000 (banda A), y con el precio de rescate de $3.000
+// el piso baja a $70.000. El producto solo son $59.900. Así que:
+//
+//   monto >= $70.000  ->  es un total con envío   (ya cotizó)
+//   monto <  $70.000  ->  es el precio del producto, o un descuento
+//
+// ⚠️ Si algún día sube el precio del producto por encima de $70.000, este corte
+// hay que moverlo. Está probado en test-embudo.js contra los dos casos.
+// ============================================================================
+const PISO_TOTAL = 70000;
+
+// Se deja exportada por compatibilidad: detecta "hay un monto en pesos".
+// 🔴 NO la uses para saber si cotizó — para eso está dioTotal().
 const RE_TOTAL = /\$\s?\d{2,3}\.\d{3}/;
+
+/** Todos los montos en pesos que aparecen en un texto, como números. */
+function montosDe(texto) {
+  const out = [];
+  for (const m of String(texto == null ? "" : texto).matchAll(/\$\s?(\d{1,3}(?:[.,]\d{3})+)/g)) {
+    out.push(Number(m[1].replace(/[.,]/g, "")));
+  }
+  return out;
+}
+
+/** ¿Este texto contiene un TOTAL con envío (no solo el precio del producto)? */
+function dioTotal(texto) {
+  return montosDe(texto).some((n) => n >= PISO_TOTAL);
+}
 
 // El guion pide la dirección para armar el pedido, y antes de guardar muestra
 // un resumen para que el cliente lo confirme. Cualquiera de las dos cosas
@@ -54,7 +97,7 @@ function etapaDe(conv, tienePedido) {
   const textoBot = delBot.map((m) => String(m.content || "")).join(" \n ");
 
   if (RE_DATOS.test(textoBot)) return "datos";
-  if (RE_TOTAL.test(textoBot)) return "cotizado";
+  if (dioTotal(textoBot)) return "cotizado";
   // Volvió a escribir después de la primera respuesta del bot: hay interés.
   if (delCliente.length >= 2) return "volvio";
   if (delCliente.length >= 1) return "entro";
@@ -134,4 +177,4 @@ const DIAGNOSTICO = {
     "es el último empujón. Revisá una de esas conversaciones completa.",
 };
 
-module.exports = { calcular, etapaDe, RE_TOTAL, RE_DATOS };
+module.exports = { calcular, etapaDe, dioTotal, montosDe, PISO_TOTAL, RE_TOTAL, RE_DATOS };
