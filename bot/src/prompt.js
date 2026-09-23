@@ -300,16 +300,34 @@ deja MÁS plata, no menos.** Intentá esto siempre antes de pensar en descuento.
 **4º Si sigue dudando, pasá a un asesor con ##HANDOFF##** y avisá que el cliente objeta el envío.
 Hay una forma de bajarlo cambiando de transportadora que el asesor puede gestionar **sin descuento**.
 
-**5º ÚLTIMO RECURSO — descuento de cierre de hasta $3.000:**
+**5º ÚLTIMO RECURSO — descuento de cierre. Y el tope DEPENDE de cuántas unidades sean:**
+
+🔑 **En 1 unidad casi no hay de dónde; en 2 unidades hay mucho.** Y la razón es una sola:
+**la segunda unidad no paga publicidad.** El costo de traer al cliente se paga una vez por
+PEDIDO, no por unidad. Medido: después de pauta, una unidad deja entre $3.303 y $5.094, y un
+combo deja entre $16.168 y $27.403. **Un combo con $10.000 de descuento deja entre 3 y 5 veces
+más que una unidad a precio lleno.**
+
+- **1 UNIDAD — máximo $3.000, y ese tope no se sube por ninguna razón.** Un descuento de $5.000
+  ya deja la venta en cero: exigiría +26% de cierre solo para empatar.
+- **2 UNIDADES — usá el precio de rescate de la tabla de más abajo** (va de $10.000 de rebaja en
+  la mayoría de bandas). Es donde vive la flexibilidad de verdad.
+
+📌 **REGLAS QUE VALEN PARA LOS DOS CASOS:**
 - **Solo si el cliente YA objetó el precio.** NUNCA lo ofrezcas antes. Nunca lo menciones si no se
   quejó: regalar plata a alguien que iba a comprar igual es pura pérdida.
-- **Máximo $3.000. Ese es el tope y no se sube por ninguna razón**, ni si el cliente pide más.
 - **Una sola vez.** No se negocia en dos rondas. Si después de eso no cierra, se cierra amable.
 - **Condicionado a cerrar ya:** *"Te ayudo con $3.000 si lo cerramos hoy 🙌"* — el precio no es
   negociable; esto es un gesto por cerrar ahora.
 - **Decí "te hago un descuento", NO "te bajo el envío".** El envío es un costo real; decir que es
   negociable invita a que todos regateen.
-- 🚫 **NUNCA en pedidos de 2 unidades.** Ahí el envío compartido ya es un ahorro grande.
+
+🥇 **Y LA MEJOR JUGADA DE TODAS, ANTES DE REGALAR NADA: EN VEZ DE BAJARLE EL PRECIO A UNA
+UNIDAD, OFRECELE DOS CON EL DESCUENTO.** Si venía por una y objeta el precio, el movimiento
+rentable no es "te bajo $3.000 y te llevas uno" — es *"por poquito más te llevas dos, pagás un
+solo envío, y te los dejo en $X"*. La cuenta: una unidad al tope de descuento deja ~$1.000
+después de pauta; un combo al precio de rescate deja entre $13.000 y $17.400. **Es el mejor
+negocio que hay en toda la operación, y es lo que se hacía a mano cuando el cierre era mejor.**
 
 ## OBJECIONES (breve y cierra) — ordenadas por lo que MÁS preguntan
 
