@@ -104,6 +104,16 @@ function render(aviso) {
   const convs = store.todasLasConversaciones();
   const pedidos = store.todosLosPedidos();
 
+  // 📋 Pendientes de despachar vs ya despachados. Se calcula acá arriba porque
+  // la tarjeta de "pendientes" va en los KPIs, antes de las tablas.
+  // Un pedido está despachado cuando tiene la guía anotada, que es lo que pasa
+  // al mandársela al cliente. Los pendientes van del MÁS VIEJO al más nuevo: en
+  // una lista de trabajo lo urgente es lo que lleva más tiempo esperando.
+  const pendientes = pedidos.filter((p) => !p.guia).slice().reverse();
+  const despachados = pedidos.filter((p) => p.guia);
+  const totalPendiente = pendientes.reduce((s, p) => s + Number(p.total || 0), 0);
+  const sinCelularCuantos = pendientes.filter((p) => !String(p.celular || "").trim()).length;
+
   // Ordenar por el último mensaje del cliente: lo más reciente arriba
   const lista = Object.entries(convs)
     .filter(([tel]) => !tel.startsWith("prueba-"))
@@ -181,6 +191,12 @@ function render(aviso) {
       <div class="kpi"><b>${hoy.cierre.toFixed(1)}%${hoy.cierreTopado ? "*" : ""}</b><span>cierre</span></div>
       <div class="kpi"><b>${hoy.share2uds.toFixed(0)}%</b><span>share 2 uds</span></div>
       <div class="kpi ${hoy.esperandoHumano ? "warn" : ""}"><b>${hoy.esperandoHumano}</b><span>esperando humano</span></div>
+      <!-- Esta tarjeta NO es de hoy: es el trabajo acumulado. Un pedido de
+           anteayer sin despachar importa más que uno de hoy, y en un panel
+           donde todo lo demás dice "hoy" hay que decirlo explícito. -->
+      <div class="kpi ${pendientes.length ? "warn" : "ok"}"><b>${pendientes.length}</b><span>pendientes de despachar</span>
+        <span class="d">${pendientes.length ? esc(fmtCOP(totalPendiente)) + " por recaudar" : "todo despachado"}</span>
+      </div>
     </div>
     ${hoy.cierreTopado ? `<p class="nota">* Hay más pedidos que conversaciones de hoy: alguien escribió ayer y confirmó hoy. El cierre se topa en 100%.</p>` : ""}
     ${hoy.topCiudades.length ? `<p class="nota">📍 ${hoy.topCiudades.map(([c, n]) => `${esc(c)} <b>${n}</b>`).join(" · ")}</p>` : ""}
@@ -192,28 +208,58 @@ function render(aviso) {
       <a class="btn" href="/limpiar-duplicados?token=${esc(panelToken())}">🧹 Revisar pedidos duplicados</a>
     </div>`;
 
-  const filasPedidos = pedidos.length
-    ? pedidos
-        .slice(0, 40)
-        .map(
-          // data-label alimenta el ::before del CSS móvil: en el celular cada
-          // fila se vuelve una tarjeta y cada dato muestra su etiqueta al lado.
-          // Así no hay que duplicar los títulos en el HTML.
-          (p) => `<tr>
-            <td class="nowrap" data-label="Fecha">${esc(HORA(new Date(p.fecha).getTime()))}</td>
-            <td data-label="Cliente"><b>${esc(p.nombre)}</b><div class="sub">${esc(p.celular || p.telefono_chat)}</div></td>
-            <td data-label="Dirección">${esc(p.ciudad)}<div class="sub">${esc(p.direccion)}</div></td>
-            <td data-label="Talla / color">${esc(p.talla)} / ${esc(p.color)}</td>
-            <td class="nowrap" data-label="Total"><b>${esc(fmtCOP(p.total))}</b><div class="sub">${esc(p.pago)}</div></td>
-            <td class="nowrap" data-label="Anuncio">${
-              p.anuncio_id
-                ? `<span title="${esc(p.anuncio_origen || "")}">…${esc(String(p.anuncio_id).slice(-6))}</span>`
-                : `<span class="sub">—</span>`
-            }</td>
-          </tr>`
-        )
-        .join("")
-    : `<tr><td colspan="6" class="vacio">Todavía no hay pedidos.</td></tr>`;
+  // ==========================================================================
+  // 📋 PENDIENTES DE DESPACHAR vs YA DESPACHADOS
+  //
+  // POR QUÉ: los pedidos se acumulan para siempre (bien: son la contabilidad),
+  // y el panel los mostraba TODOS mezclados. Con 8 se maneja; con 30 al día, en
+  // una semana no hay forma de saber cuál ya se mandó. El dueño lo preguntó
+  // así: "cómo va a manejar ese orden para no enredarnos con las ventas".
+  //
+  // El dato ya existía y no se estaba usando: cuando se le manda la guía a un
+  // cliente, queda anotada en su pedido (`guia`). Con guía = despachado.
+  //
+  // Los pendientes van PRIMERO y del MÁS VIEJO al más nuevo, al revés que el
+  // resto del panel. Es a propósito: en una lista de trabajo lo urgente es lo
+  // que lleva más tiempo esperando, no lo que acaba de entrar.
+  // ==========================================================================
+  const UN_DIA = 24 * 60 * 60 * 1000;
+
+  const filaPedido = (p, opciones = {}) => {
+    const cuando = new Date(p.fecha).getTime();
+    const viejo = Date.now() - cuando > UN_DIA;
+    // Sin celular no se puede hacer la guía: la transportadora lo exige. Vale
+    // marcarlo acá para no descubrirlo con el PDF ya subido.
+    const sinCelular = !String(p.celular || "").trim();
+    return `<tr>
+      <td class="nowrap" data-label="Fecha">${esc(HORA(cuando))}${
+      viejo && !opciones.despachado ? ' <span class="tag warn">+1 día</span>' : ""
+    }</td>
+      <td data-label="Cliente"><b>${esc(p.nombre)}</b><div class="sub">${esc(
+      p.celular || p.telefono_chat
+    )}${sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""}</div></td>
+      <td data-label="Dirección">${esc(p.ciudad)}<div class="sub">${esc(p.direccion)}</div></td>
+      <td data-label="Talla / color">${esc(p.talla)} / ${esc(p.color)}</td>
+      <td class="nowrap" data-label="Total"><b>${esc(fmtCOP(p.total))}</b><div class="sub">${esc(p.pago)}</div></td>
+      <td class="nowrap" data-label="${opciones.despachado ? "Guía" : "Anuncio"}">${
+      opciones.despachado
+        ? `<code>${esc(p.guia)}</code>`
+        : p.anuncio_id
+        ? `<span title="${esc(p.anuncio_origen || "")}">…${esc(String(p.anuncio_id).slice(-6))}</span>`
+        : `<span class="sub">—</span>`
+    }</td>
+    </tr>`;
+  };
+
+  const filasPendientes = pendientes.length
+    ? pendientes.map((p) => filaPedido(p)).join("")
+    : `<tr><td colspan="6" class="vacio">🎉 No hay nada pendiente: todos los pedidos tienen su guía enviada.</td></tr>`;
+
+  const filasDespachados = despachados.length
+    ? despachados.slice(0, 60).map((p) => filaPedido(p, { despachado: true })).join("")
+    : `<tr><td colspan="6" class="vacio">Todavía no se ha despachado ningún pedido.</td></tr>`;
+
+
 
   // ==========================================================================
   // 📉 EL EMBUDO — dónde se caen los clientes
@@ -673,10 +719,27 @@ function render(aviso) {
   ${bloqueAtencion}
   ${tarjetas}
   ${bloqueEmbudo}
-  <h2>Pedidos (todos)</h2>
+  <h2>📋 Pendientes de despachar${pendientes.length ? ` · ${pendientes.length}` : ""}</h2>
+  ${
+    pendientes.length
+      ? `<p class="nota">Del más viejo al más nuevo: lo de arriba es lo que lleva más tiempo esperando.
+         Suman <b>${esc(fmtCOP(totalPendiente))}</b> por recaudar.${
+           sinCelularCuantos
+             ? ` <b style="color:#ff9aa4">${sinCelularCuantos} sin celular: a esos no les podés hacer la guía todavía.</b>`
+             : ""
+         }</p>`
+      : ""
+  }
   <div class="tabla"><table>
     <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Anuncio</th></tr>
-    ${filasPedidos}
+    ${filasPendientes}
+  </table></div>
+
+  <h2>✅ Ya despachados${despachados.length ? ` · ${despachados.length}` : ""}</h2>
+  <p class="nota">Estos ya tienen su guía enviada al cliente. Quedan acá para consultar: <b>no se borran nunca</b>.</p>
+  <div class="tabla"><table>
+    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Guía</th></tr>
+    ${filasDespachados}
   </table></div>
   ${bloqueAnuncios}
   <h2>Conversaciones</h2>
