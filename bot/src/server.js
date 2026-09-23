@@ -12,6 +12,7 @@ const panel = require("./panel");
 const panelGuias = require("./panel-guias");
 const guias = require("./guias");
 const panelNovedades = require("./panel-novedades");
+const panelChat = require("./panel-chat");
 const novedades = require("./novedades");
 const audio = require("./audio");
 const resumen = require("./resumen");
@@ -341,6 +342,36 @@ const PLANTILLA_CIERRE = process.env.PLANTILLA_CIERRE || "cierre_del_dia";
 // 🔒 REVISAR ANTES DE ENVIAR, igual que las guías: un mensaje a un cliente real
 // no se puede deshacer.
 // ============================================================================
+// ============================================================================
+// GET /chat?token=...&id=57300...   (o &q=nombre)
+//
+// 💬 El chat completo de UN cliente, para leerlo desde el celular.
+//
+// DE DÓNDE SALE (23-sep): el dueño estaba cargando guías, se topó con un pedido
+// que traía solo la ciudad y preguntó *"¿cómo puedo ver el chat de él, para
+// verificar si es oficina de Interrapidísimo o qué?"*.
+//
+// La única forma era pegar un comando de una línea en el Web Shell de Render, y
+// falló dos veces porque el shell mastica los emojis y los caracteres de caja.
+// El dato ya estaba guardado: solo faltaba una pantalla.
+// ============================================================================
+app.get("/chat", (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) {
+    return res.status(403).send("<h3>Falta el token.</h3><p>Usá /chat?token=TU_PANEL_TOKEN</p>");
+  }
+  try {
+    res.set("Content-Type", "text/html; charset=utf-8").send(
+      panelChat.render({
+        id: req.query.id ? String(req.query.id) : "",
+        q: req.query.q ? String(req.query.q) : "",
+        token: PANEL_TOKEN,
+      })
+    );
+  } catch (e) {
+    res.status(500).send("Error armando la pantalla: " + esc(e.message));
+  }
+});
+
 app.get("/novedades", (req, res) => {
   if (req.query.token !== PANEL_TOKEN) {
     return res.status(403).send("<h3>Falta el token.</h3><p>Usá /novedades?token=TU_PANEL_TOKEN</p>");
