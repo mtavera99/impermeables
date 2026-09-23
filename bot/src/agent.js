@@ -2,6 +2,7 @@
 // (detecta pedidos confirmados y solicitudes de pasar a un humano).
 const { buildSystemPrompt } = require("./prompt");
 const { respuestaDeArranque } = require("./primer-mensaje");
+const { revisarDireccionDePedido } = require("./direccion");
 const store = require("./store");
 
 // ============================================================================
@@ -358,7 +359,14 @@ async function generateReply(phone, userText) {
   const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
 
   let savedOrder = null;
-  if (order) savedOrder = store.saveOrder({ ...revisarTelefono(order, phone), telefono_chat: phone });
+  if (order) {
+    // Dos candados antes de guardar: el celular y la dirección. Los dos son
+    // requisitos de la transportadora, y los dos ya se rompieron en producción
+    // porque el guion los pedía y el modelo no siempre obedecía.
+    const conTelefono = revisarTelefono(order, phone);
+    const conDireccion = revisarDireccionDePedido({ ...conTelefono, telefono_chat: phone });
+    savedOrder = store.saveOrder(conDireccion);
+  }
   if (handoff) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
