@@ -13,6 +13,7 @@ const panelGuias = require("./panel-guias");
 const guias = require("./guias");
 const panelNovedades = require("./panel-novedades");
 const panelChat = require("./panel-chat");
+const { avisoParaElDueno: avisoDireccion } = require("./direccion");
 const novedades = require("./novedades");
 const audio = require("./audio");
 const resumen = require("./resumen");
@@ -365,6 +366,7 @@ app.get("/chat", (req, res) => {
         id: req.query.id ? String(req.query.id) : "",
         q: req.query.q ? String(req.query.q) : "",
         token: PANEL_TOKEN,
+        resultado: req.query.r ? String(req.query.r) : "",
       })
     );
   } catch (e) {
@@ -946,6 +948,16 @@ app.post("/responder", async (req, res) => {
       messageId: envio.messageId,
       hora: new Date().toLocaleTimeString("es-CO", { timeZone: "America/Bogota", hour: "2-digit", minute: "2-digit" }),
     });
+  }
+
+  // Si el mensaje se mandó desde la pantalla del chat, se vuelve ahí y no al
+  // panel: el dueño está mirando ESE cliente y perder el contexto es un paso
+  // más para nada.
+  if (req.body?.volver === "chat") {
+    return res.redirect(
+      `/chat?token=${encodeURIComponent(PANEL_TOKEN)}&id=${encodeURIComponent(to)}` +
+        `&r=${envio.ok ? "ok" : encodeURIComponent(motivo)}`
+    );
   }
 
   res.redirect(
@@ -1785,11 +1797,15 @@ async function handleWebhook(body) {
               alerta +
               `🟢 NUEVO PEDIDO BikerPro\n` +
               `Nombre: ${order.nombre}\nCel: ${order.celular || "🔴 FALTA"}\n` +
-              `Ciudad: ${order.ciudad}\nDir: ${order.direccion}\n` +
+              `Ciudad: ${order.ciudad}\nDir: ${order.direccion || "🔴 FALTA"}\n` +
               `Color: ${order.color} · Talla: ${order.talla}\n` +
               `Total al recibir: $${Number(order.total).toLocaleString("es-CO")}\n` +
               `Chat: ${order.telefono_chat}` +
-              (order.celularDelChat ? `\n(el celular se tomó del número por el que escribe)` : "")
+              (order.celularDelChat ? `\n(el celular se tomó del número por el que escribe)` : "") +
+              // 🏢 Si es entrega en oficina, o si la dirección no está clara, el
+              // aviso lo dice ACÁ. Enterarse con el PDF de las guías ya subido
+              // cuesta una llamada y un despacho trabado.
+              avisoDireccion(order)
           );
         }
         if (handoff && OWNER) {
