@@ -40,11 +40,28 @@ jobs:
       - name: Pedir el cierre al bot y mandarlo por WhatsApp
         env:
           BOT_URL: ${{ secrets.BOT_URL }}
-          BOT_TOKEN: ${{ secrets.BOT_VERIFY_TOKEN }}
+          # 🔴 ESTE ACTION SE ROMPIÓ EL 22-SEP Y ASÍ SE ARREGLA.
+          #
+          # Usaba BOT_VERIFY_TOKEN, que guardaba el secreto VIEJO. Ese día el bot
+          # migró a PANEL_TOKEN (para dejar de compartir clave con el webhook) y
+          # el endpoint /cierre empezó a validar la nueva. El Action siguió
+          # mandando la vieja y el cierre de ese día murió con HTTP 403.
+          #
+          # Es la TERCERA vez que la misma migración se olvidó de un lugar: la
+          # pantalla de guías, y acá. La lección quedó en el traspaso: al cambiar
+          # un secreto hay que buscar TODOS los lugares que lo mandan, no solo
+          # los que lo validan.
+          #
+          # ⚠️ HAY QUE CREAR EL SECRETO `BOT_PANEL_TOKEN` en el repo con el mismo
+          #    valor que PANEL_TOKEN tiene en Render:
+          #    GitHub → Settings → Secrets and variables → Actions → New secret
+          #    Y cada vez que se rote PANEL_TOKEN, hay que actualizarlo ACÁ TAMBIÉN.
+          BOT_TOKEN: ${{ secrets.BOT_PANEL_TOKEN }}
           DIA: ${{ github.event.inputs.dia }}
         run: |
           if [ -z "$BOT_URL" ] || [ -z "$BOT_TOKEN" ]; then
-            echo "::error::Faltan los secretos BOT_URL y/o BOT_VERIFY_TOKEN del repositorio."
+            echo "::error::Faltan los secretos BOT_URL y/o BOT_PANEL_TOKEN del repositorio."
+            echo "::error::BOT_PANEL_TOKEN tiene que tener el MISMO valor que PANEL_TOKEN en Render."
             exit 1
           fi
 
@@ -58,6 +75,12 @@ jobs:
 
           if [ "$CODE" != "200" ]; then
             echo "::error::El bot respondió HTTP $CODE"
+            # Un 403 tiene una sola causa y conviene decirla, no dejar que se
+            # busque en cualquier otra parte: es exactamente lo que pasó el
+            # 22-sep y costó un día de cierre.
+            if [ "$CODE" = "403" ]; then
+              echo "::error::403 = la clave no coincide. El secreto BOT_PANEL_TOKEN del repositorio tiene que ser IGUAL a PANEL_TOKEN en Render. Si rotaste PANEL_TOKEN, actualizá el secreto acá."
+            fi
             cat respuesta.json || true
             exit 1
           fi
