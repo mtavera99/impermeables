@@ -97,13 +97,140 @@ function fichaPedido(p) {
     </div>`;
 }
 
+// ============================================================================
+// ✍️ ESCRIBIRLE AL CLIENTE DESDE ACÁ
+//
+// DE DÓNDE SALE (23-sep): el dueño fue a despachar un pedido y el envío a esa
+// ciudad solo estaba disponible por Coordinadora, a $51.000. Sus palabras:
+//
+//   "quiero que así mismo como me dejas ahora ver los chats también me dejes
+//    mandar un mensaje, porque en este caso necesitamos preguntarle al usuario
+//    si va a pagar los 51.000 —que lo más probable es que no— o si cancelamos
+//    su pedido"
+//
+// Un pedido que no se puede despachar al precio cotizado no se puede dejar
+// quieto: o el cliente acepta el sobrecosto, o se cancela. Las dos salidas
+// requieren preguntarle, y no había forma de hacerlo desde acá.
+//
+// 🔴 LA VENTANA DE 24 HORAS MANDA. WhatsApp solo permite texto libre dentro de
+// las 24h del ÚLTIMO mensaje del cliente. Pasado eso, Meta rechaza el envío con
+// el error 131047 y solo se puede mandar una plantilla aprobada. Por eso la
+// pantalla calcula la ventana y AVISA ANTES de que el dueño escriba: descubrirlo
+// después de redactar un mensaje largo es perder el trabajo dos veces.
+// ============================================================================
+
+const VENTANA_MS = 24 * 60 * 60 * 1000;
+
+/** Estado de la ventana de 24h para poder escribir texto libre. */
+function ventanaDe(conv) {
+  const ultimo = conv && conv.ultimoDelCliente;
+  if (!ultimo) return { abierta: false, motivo: "no hay registro del último mensaje del cliente" };
+  const pasado = Date.now() - ultimo;
+  if (pasado >= VENTANA_MS) {
+    const dias = Math.floor(pasado / (24 * 60 * 60 * 1000));
+    return {
+      abierta: false,
+      motivo:
+        `el cliente escribió hace ${dias >= 1 ? `${dias} día${dias > 1 ? "s" : ""}` : "más de 24 h"}` +
+        ", así que Meta NO permite texto libre",
+    };
+  }
+  const horas = Math.floor((VENTANA_MS - pasado) / (60 * 60 * 1000));
+  const minutos = Math.floor(((VENTANA_MS - pasado) % (60 * 60 * 1000)) / 60000);
+  return {
+    abierta: true,
+    restante: horas >= 1 ? `${horas} h` : `${minutos} min`,
+  };
+}
+
+// Mensajes que se repiten y hay que escribir bien, no improvisar con el cliente
+// esperando. Rellenan el cuadro y se pueden editar antes de enviar.
+const RAPIDOS = [
+  {
+    etiqueta: "💸 El envío subió",
+    // El caso de hoy: el envío real no alcanza para el total cotizado.
+    texto:
+      "¡Hola! 🏍️ Te escribo por tu pedido. Cuando fuimos a despacharlo nos encontramos con que " +
+      "a tu ciudad la única transportadora disponible cobra $51.000 de envío, bastante más de lo " +
+      "que te cotizamos.\n\nNo queremos cobrarte algo que no acordamos, así que te pregunto " +
+      "directo: ¿querés que lo despachemos pagando ese envío, o preferís que te cancelemos el " +
+      "pedido sin ningún costo? Lo que decidas está bien 🙌",
+  },
+  {
+    etiqueta: "🏢 ¿Cuál oficina?",
+    texto:
+      "¡Hola! 🏍️ Para generar tu guía me falta un dato: ¿de qué transportadora es la oficina " +
+      "donde lo vas a recibir, y en qué dirección queda (calle y número)? Así la guía sale al " +
+      "punto exacto y no se pierde 📦",
+  },
+  {
+    etiqueta: "📍 Falta la dirección",
+    texto:
+      "¡Hola! 🏍️ Ya tengo tu pedido listo, solo me falta la dirección completa para despacharlo: " +
+      "calle, número y barrio. ¿Me la confirmás? 📦",
+  },
+  {
+    etiqueta: "❌ Cancelar",
+    texto:
+      "Listo, cancelamos tu pedido sin ningún costo 🙌 Si más adelante lo querés, escribinos y " +
+      "te lo armamos de nuevo. ¡Gracias por avisarnos!",
+  },
+];
+
+/** El cuadro para escribirle, con el estado de la ventana de 24h. */
+function cajonDeEnvio(p, conv, token) {
+  if (!p.telefono_chat) return "";
+  const v = ventanaDe(conv);
+
+  const botones = RAPIDOS.map(
+    (r, i) =>
+      `<button type="button" class="rapido" data-i="${i}">${esc(r.etiqueta)}</button>`
+  ).join("");
+
+  const aviso = v.abierta
+    ? `<div class="ventana ok">🟢 Podés escribirle libre. La ventana de 24 h cierra en <b>${esc(
+        v.restante
+      )}</b>.</div>`
+    : `<div class="ventana mal">🔴 <b>No se puede mandar texto libre:</b> ${esc(v.motivo)}.
+         <br>Si lo intentás, Meta lo rechaza. Para reabrir la conversación hay que mandarle una
+         <b>plantilla aprobada</b> (la de seguimiento trae botones, y cuando el cliente toca uno
+         se reabren las 24 h y ahí sí le podés escribir).</div>`;
+
+  return `<div class="enviar">
+      <h3>✍️ Escribirle a ${esc(p.nombre || "este cliente")}</h3>
+      ${aviso}
+      <div class="rapidos">${botones}</div>
+      <form method="post" action="/responder">
+        <input type="hidden" name="token" value="${esc(token || "")}">
+        <input type="hidden" name="to" value="${esc(p.telefono_chat)}">
+        <input type="hidden" name="volver" value="chat">
+        <textarea name="texto" rows="6" placeholder="Escribile acá..."
+          ${v.abierta ? "" : ""}></textarea>
+        <button type="submit" class="enviarbtn">Enviar por WhatsApp</button>
+      </form>
+      <p class="nota">Al enviar, <b>el bot se calla en este chat</b> para que no contesten dos
+        voces a la vez. Cuando termines, devolvéselo con el botón del panel.</p>
+      <script>
+        var RAPIDOS = ${JSON.stringify(RAPIDOS.map((r) => r.texto))};
+        document.querySelectorAll(".rapido").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var ta = b.closest(".enviar").querySelector("textarea");
+            ta.value = RAPIDOS[Number(b.dataset.i)];
+            ta.focus();
+          });
+        });
+      </script>
+    </div>`;
+}
+
 /**
  * @param {object} opciones
  * @param {string} [opciones.id]  telefono_chat exacto
  * @param {string} [opciones.q]   nombre o celular a buscar
  * @param {string} opciones.token para armar el enlace de vuelta al panel
+ * @param {string} [opciones.resultado] "ok" o el motivo del fallo del último envío
  */
-function render({ id, q, token } = {}) {
+function render({ id, q, token, resultado } = {}) {
   const encontrados = buscar({ id, q });
   const conversaciones = store.todasLasConversaciones();
 
@@ -134,7 +261,7 @@ function render({ id, q, token } = {}) {
                     pedido es viejo puede haberse rotado.`
                  : ""
              }</p>`;
-        return `${fichaPedido(p)}<div class="chat">${chat}</div>`;
+        return `${fichaPedido(p)}<div class="chat">${chat}</div>${cajonDeEnvio(p, conv, token)}`;
       })
       .join('<hr class="sep">');
   }
@@ -179,9 +306,33 @@ function render({ id, q, token } = {}) {
   .nota{color:var(--gris);font-size:13px}
   .lista{color:var(--gris);font-size:13px;padding-left:20px}
   .sep{border:0;border-top:1px solid var(--linea);margin:22px 0}
+  .res{padding:10px 12px;border-radius:10px;margin-bottom:14px;font-size:14px}
+  .res.ok{background:#12351f;color:#7ee2a8}
+  .res.mal{background:#3a1414;color:var(--rojo)}
+  .enviar{background:var(--card);border:1px solid var(--linea);border-radius:14px;
+    padding:14px;margin-top:16px}
+  .enviar h3{font-size:15px;margin:0 0 10px}
+  .ventana{font-size:13px;padding:9px 11px;border-radius:10px;margin-bottom:12px;line-height:1.4}
+  .ventana.ok{background:#12351f;color:#7ee2a8}
+  .ventana.mal{background:#3a1414;color:#ffc2c8}
+  .rapidos{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .rapido{background:#1c2530;border:1px solid var(--linea);color:#cfe3f5;border-radius:99px;
+    padding:6px 11px;font-size:12px;font-weight:600}
+  .enviar form{display:block}
+  textarea{width:100%;background:#0f141b;border:1px solid var(--linea);color:#e6edf3;
+    border-radius:10px;padding:10px 12px;font-size:15px;font-family:inherit;resize:vertical}
+  .enviarbtn{width:100%;margin-top:10px;background:#1f6feb;border:0;color:#fff;border-radius:10px;
+    padding:12px;font-size:15px;font-weight:700}
 </style></head><body>
   <h1>💬 Chat del cliente</h1>
-  <p class="nota">Para verificar una dirección, una oficina de la transportadora, o qué se le prometió.</p>
+  <p class="nota">Para verificar una dirección, una oficina de la transportadora, o qué se le prometió — y escribirle.</p>
+  ${
+    resultado
+      ? resultado === "ok"
+        ? '<div class="res ok">✅ Mensaje enviado. El bot quedó en pausa en este chat.</div>'
+        : `<div class="res mal">🔴 No se envió: ${esc(resultado)}</div>`
+      : ""
+  }
   <div class="barra">
     <a class="btn" href="/panel?token=${esc(token || "")}">← Volver al panel</a>
   </div>

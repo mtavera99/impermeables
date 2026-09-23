@@ -256,10 +256,19 @@ function render(aviso) {
       <td data-label="Cliente"><b>${esc(p.nombre)}</b>${verChat}<div class="sub">${esc(
       p.celular || p.telefono_chat
     )}${sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""}</div></td>
-      <td data-label="Dirección">${esc(p.ciudad)}<div class="sub">${
+      <td data-label="Dirección">${esc(p.ciudad)}${
+      // 🏢 Entrega en oficina: no va con mensajero a una casa. Verlo de un
+      // vistazo evita mandar un domicilio a una recogida y al revés.
+      p.entrega === "oficina" ? ' <span class="tag oficina">🏢 OFICINA</span>' : ""
+    }<div class="sub">${
       sinDireccion
         ? '<b style="color:#ff9aa4">🔴 falta dirección — abrí el chat</b>'
-        : esc(p.direccion)
+        : esc(p.direccion) +
+          (p.direccion_dudosa
+            ? '<br><b style="color:#ff9aa4">🔴 dirección sin confirmar' +
+              (p.direccion_falta ? ` — falta ${esc(p.direccion_falta)}` : "") +
+              "</b>"
+            : "")
     }</div></td>
       <td data-label="Talla / color">${esc(p.talla)} / ${esc(p.color)}</td>
       <td class="nowrap" data-label="Total"><b>${esc(fmtCOP(p.total))}</b><div class="sub">${esc(p.pago)}</div></td>
@@ -588,6 +597,7 @@ function render(aviso) {
   .meta{color:var(--gris);font-size:12px}
   .tag{font-size:10px;padding:3px 8px;border-radius:99px;background:#2a313d;color:#c8cfdd;white-space:nowrap}
   .tag.ok{background:#12351f;color:var(--verde)}.tag.warn{background:#3a2d0c;color:var(--amarillo)}.tag.no{background:#3a1414;color:var(--rojo)}
+  .tag.oficina{background:#132c40;color:#7fd1ff}
 
   /* --- Burbujas del chat --- */
   .chat{
