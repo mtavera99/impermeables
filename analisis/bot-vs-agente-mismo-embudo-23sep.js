@@ -26,69 +26,25 @@
  *   node analisis/bot-vs-agente-mismo-embudo-23sep.js
  */
 
-const fs = require("fs");
-const path = require("path");
 const embudo = require("../bot/src/embudo.js");
-
-const DIR = path.join(__dirname, "..", "datos-privados", "export", "conversations");
-if (!fs.existsSync(DIR)) {
-  console.error("🔴 Falta " + DIR);
-  process.exit(1);
-}
+const lib = require("./lib-export.js");
 
 const LINEA = "═".repeat(78);
 const pct = (a, b) => (b > 0 ? ((a / b) * 100).toFixed(1) + "%" : "—");
 
-function limpiar(s) {
-  return String(s == null ? "" : s).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase().replace(/\s+/g, " ").trim();
-}
-
-const RE_PRERRELLENADO = /^¡?hola!?,?\s*(quiero mas informacion|me interesa)\.?$/i;
-const RE_BLOQUE = /confirmemos tu pedido/i;
-const RE_CONFIRMA = /^(si\s*confirmo|si|confirmo|listo|dale|ok|correcto|asi es|todo bien|perfecto|de acuerdo)\b/;
-
-// Convierte un archivo del export al formato que espera embudo.js:
-// { messages: [{role:"user"|"assistant", content}] }
-function aConversacion(texto) {
-  const messages = [];
-  let ultimo = null;
-  let vistoBloque = false;
-  let confirmo = false;
-
-  for (const linea of texto.split("\n")) {
-    if (linea.startsWith("Context:")) continue;
-    if (linea.startsWith("You:")) {
-      const t = linea.slice(4).trim();
-      ultimo = { role: "user", content: t };
-      messages.push(ultimo);
-      if (vistoBloque && RE_CONFIRMA.test(limpiar(t))) confirmo = true;
-      continue;
-    }
-    const mb = linea.match(/^(?:Bot|Business):(.*)$/);
-    if (mb) {
-      ultimo = { role: "assistant", content: mb[1].trim() };
-      messages.push(ultimo);
-      if (RE_BLOQUE.test(ultimo.content)) vistoBloque = true;
-      continue;
-    }
-    if (ultimo && linea.trim()) {
-      ultimo.content += "\n" + linea.trim();
-      if (ultimo.role === "assistant" && RE_BLOQUE.test(ultimo.content)) vistoBloque = true;
-    }
-  }
-  return { messages, confirmo };
-}
-
 console.log("Pasando el export por bot/src/embudo.js...");
-const archivos = fs.readdirSync(DIR).filter((f) => f.endsWith(".txt"));
+
+// 🔴 El lector vive en lib-export.js y no se copia mas. La primera version de
+// este script traia su propio parser, y ese parser le pegaba el TEXTO DEL
+// ANUNCIO a los mensajes del negocio (el bloque Context: ocupa varias lineas).
+// Contaminaba 173 conversaciones con 52.409 caracteres de publicidad.
+const todas = lib.leerTodas();
 
 const cuenta = { vacia: 0, entro: 0, volvio: 0, cotizado: 0, datos: 0, cerro: 0 };
-for (const f of archivos) {
-  const conv = aConversacion(fs.readFileSync(path.join(DIR, f), "utf8"));
+for (const { turnos } of todas) {
   // "cerro" para el agente viejo = el cliente confirmo explicitamente. Es el
   // equivalente mas cercano a "hay un pedido guardado" que tiene el bot.
-  cuenta[embudo.etapaDe(conv, conv.confirmo)]++;
+  cuenta[embudo.etapaDe(lib.aConversacion(turnos), lib.confirmo(turnos))]++;
 }
 
 // Acumulado, igual que hace embudo.calcular()
