@@ -1802,6 +1802,14 @@ async function handleWebhook(body) {
               `Total al recibir: $${Number(order.total).toLocaleString("es-CO")}\n` +
               `Chat: ${order.telefono_chat}` +
               (order.celularDelChat ? `\n(el celular se tomó del número por el que escribe)` : "") +
+              // ⚠️ Ya le habíamos vendido a este cliente. Puede ser una compra
+              // real o el bot confundiéndose con un cliente que contestó su
+              // guía. Avisarlo ACÁ evita despachar un paquete inventado.
+              (order.posible_duplicado
+                ? `\n\n⚠️ OJO: este cliente YA tenía un pedido de $${Number(
+                    order.pedido_previo_total || 0
+                  ).toLocaleString("es-CO")}. Confirmá con él antes de despachar.`
+                : "") +
               // 🏢 Si es entrega en oficina, o si la dirección no está clara, el
               // aviso lo dice ACÁ. Enterarse con el PDF de las guías ya subido
               // cuesta una llamada y un despacho trabado.
