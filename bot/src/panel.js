@@ -202,6 +202,7 @@ function render(aviso) {
     ${hoy.topCiudades.length ? `<p class="nota">📍 ${hoy.topCiudades.map(([c, n]) => `${esc(c)} <b>${n}</b>`).join(" · ")}</p>` : ""}
     <div class="acciones">
       <a class="btn destacado" href="/guias?token=${esc(panelToken())}">📦 Enviar guías (subir el PDF)</a>
+      <a class="btn" href="/auditoria?token=${esc(panelToken())}">🔍 Auditar el día (¿se perdió una venta?)</a>
       <a class="btn" href="/novedades?token=${esc(panelToken())}">📮 Avisar novedades de entrega</a>
       <a class="btn" href="/pedidos.csv?token=${esc(panelToken())}">⬇️ Descargar pedidos (CSV)</a>
       <a class="btn" href="/cierre?token=${esc(panelToken())}&enviar=1">📲 Mandarme el cierre por WhatsApp</a>
