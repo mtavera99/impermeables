@@ -231,14 +231,36 @@ function render(aviso) {
     // Sin celular no se puede hacer la guía: la transportadora lo exige. Vale
     // marcarlo acá para no descubrirlo con el PDF ya subido.
     const sinCelular = !String(p.celular || "").trim();
+    // ========================================================================
+    // 🔴 SIN DIRECCIÓN TAMPOCO SE PUEDE DESPACHAR (23-sep)
+    //
+    // Lo encontró el dueño cargando guías: el pedido de un cliente traía solo
+    // la ciudad, sin dirección, y no había forma de saber si era una oficina de
+    // Interrapidísimo o si el bot simplemente nunca la pidió.
+    //
+    // Es el mismo agujero que el del celular, y se marca igual: descubrirlo con
+    // el PDF ya subido cuesta una llamada y un despacho trabado.
+    // ========================================================================
+    const sinDireccion = !String(p.direccion || "").trim();
+    // Enlace para leer el chat completo de ese cliente desde el celular, sin
+    // tener que entrar al shell de Render.
+    const verChat = p.telefono_chat
+      ? ` <a class="chatlink" href="/chat?token=${esc(panelToken())}&id=${encodeURIComponent(
+          p.telefono_chat
+        )}">ver chat</a>`
+      : "";
     return `<tr>
       <td class="nowrap" data-label="Fecha">${esc(HORA(cuando))}${
       viejo && !opciones.despachado ? ' <span class="tag warn">+1 día</span>' : ""
     }</td>
-      <td data-label="Cliente"><b>${esc(p.nombre)}</b><div class="sub">${esc(
+      <td data-label="Cliente"><b>${esc(p.nombre)}</b>${verChat}<div class="sub">${esc(
       p.celular || p.telefono_chat
     )}${sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""}</div></td>
-      <td data-label="Dirección">${esc(p.ciudad)}<div class="sub">${esc(p.direccion)}</div></td>
+      <td data-label="Dirección">${esc(p.ciudad)}<div class="sub">${
+      sinDireccion
+        ? '<b style="color:#ff9aa4">🔴 falta dirección — abrí el chat</b>'
+        : esc(p.direccion)
+    }</div></td>
       <td data-label="Talla / color">${esc(p.talla)} / ${esc(p.color)}</td>
       <td class="nowrap" data-label="Total"><b>${esc(fmtCOP(p.total))}</b><div class="sub">${esc(p.pago)}</div></td>
       <td class="nowrap" data-label="${opciones.despachado ? "Guía" : "Anuncio"}">${
@@ -637,6 +659,8 @@ function render(aviso) {
   .paso .etiq b{font-size:19px;margin-right:6px}
   .paso .etiq .sub{display:block;font-size:11px}
   .paso .etiq .ref{display:block;font-size:11px;color:#9fb3c8;margin-top:3px}
+  .chatlink{font-size:11px;font-weight:600;color:#7fd1ff;text-decoration:none;border:1px solid #2a4a5e;
+    border-radius:6px;padding:1px 6px;margin-left:6px;white-space:nowrap}
   .paso .baja{position:relative;text-align:right;font-size:14px;color:var(--rojo);font-weight:600;white-space:nowrap}
   .paso .baja .sub{display:block;font-weight:400}
   .paso.fuga{outline:1px solid #7d2630}
