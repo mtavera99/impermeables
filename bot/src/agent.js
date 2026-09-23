@@ -1,6 +1,7 @@
 // Cerebro del bot: arma el historial, llama a Gemini y procesa la respuesta
 // (detecta pedidos confirmados y solicitudes de pasar a un humano).
 const { buildSystemPrompt } = require("./prompt");
+const { respuestaDeArranque } = require("./primer-mensaje");
 const store = require("./store");
 
 // ============================================================================
@@ -290,6 +291,25 @@ function detectMediaIntent(text) {
 async function generateReply(phone, userText) {
   store.pushMsg(phone, "user", userText);
   const conv = store.getConv(phone);
+
+  // ==========================================================================
+  // 🥇 EL ARRANQUE NO SE IMPROVISA
+  //
+  // Si es el primer contacto y el cliente no pregunto nada (llego con el texto
+  // prerrellenado del anuncio o solo saludo), se le manda el arranque fijo: el
+  // que responde talla y color de una, que son el 28,1% de las dudas.
+  //
+  // Va ANTES de la llamada a la IA a proposito: sale instantaneo y gratis, y es
+  // el mensaje que mas se repite en toda la operacion. Ver primer-mensaje.js.
+  //
+  // Cualquier otro caso (pregunta concreta, anuncio del colmena, charla ya
+  // empezada) devuelve null y sigue el camino normal.
+  // ==========================================================================
+  const arranque = respuestaDeArranque(conv.messages, userText);
+  if (arranque) {
+    store.pushMsg(phone, "assistant", arranque);
+    return { reply: arranque, order: null, handoff: false, media: [], pedidoRescatado: false };
+  }
 
   let reply;
   if (!TIENE_IA) {
