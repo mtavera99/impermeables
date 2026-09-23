@@ -157,17 +157,22 @@ const RAPIDOS = [
       "pedido sin ningún costo? Lo que decidas está bien 🙌",
   },
   {
-    etiqueta: "🏢 ¿Cuál oficina?",
+    // ⛔ Esto ANTES preguntaba la dirección de la oficina. El dueño lo frenó:
+    // "no tienes que ponerle trabas al cliente... no le preguntes la dirección
+    // porque el cliente no la sabe. Las direcciones no las necesitamos cuando
+    // sea en una oficina de la transportadora."
+    // Ahora es UNA pregunta cerrada de dos opciones, sin nada que averiguar.
+    etiqueta: "🏠🏢 ¿Casa u oficina?",
     texto:
-      "¡Hola! 🏍️ Para generar tu guía me falta un dato: ¿de qué transportadora es la oficina " +
-      "donde lo vas a recibir, y en qué dirección queda (calle y número)? Así la guía sale al " +
-      "punto exacto y no se pierde 📦",
+      "¡Hola! 🏍️ Para generar tu guía me falta un solo dato: ¿te lo enviamos a tu casa, o " +
+      "preferís recogerlo en la oficina de Interrapidísimo de tu ciudad? 📦",
   },
   {
     etiqueta: "📍 Falta la dirección",
     texto:
-      "¡Hola! 🏍️ Ya tengo tu pedido listo, solo me falta la dirección completa para despacharlo: " +
-      "calle, número y barrio. ¿Me la confirmás? 📦",
+      "¡Hola! 🏍️ Ya tengo tu pedido listo, solo me falta la dirección para despacharlo: calle, " +
+      "número y barrio. O si preferís, lo dejamos en la oficina de Interrapidísimo de tu ciudad y " +
+      "lo recogés ahí — lo que te quede más fácil 📦",
   },
   {
     etiqueta: "❌ Cancelar",

@@ -16,8 +16,19 @@
 // 🔑 SON DOS FORMAS DE ENTREGA DISTINTAS Y HAY QUE SABER CUÁL ES:
 //
 //   A CASA ....... calle/carrera + número + barrio. Va con el mensajero.
-//   A OFICINA .... hay que saber DE QUÉ TRANSPORTADORA y CUÁL oficina. Sin las
-//                  dos cosas no existe un destino: "oficina" solo no es nada.
+//   A OFICINA .... alcanza con la ciudad. La oficina la ubica la transportadora,
+//                  y por defecto es Interrapidísimo.
+//
+// ⛔ Y NO SE LE PIDE LA DIRECCIÓN DE LA OFICINA. Mi primera versión de este
+// archivo la exigía, y el dueño la frenó: *"no tienes que ponerle trabas al
+// cliente... no le preguntes la dirección porque lo que vas a hacer es que el
+// cliente no sepa la dirección. Las direcciones no las necesitamos cuando sea en
+// una oficina de la transportadora."* Pedir un dato que el cliente no tiene es
+// inventar un obstáculo, y hoy mismo medimos que cada pregunta extra después del
+// total baja el cierre.
+//
+// Lo que el dueño pidió fue CLARIDAD PARA ELLOS —"para tenerlo muy claro
+// nosotros"— y eso se resuelve marcando el pedido, no interrogando al cliente.
 //
 // ⚠️ POR QUÉ ESTO VA EN CÓDIGO Y NO SOLO EN EL GUION. El guion ya decía "nunca
 // mandes el cuadro con campos en blanco" y el pedido se guardó igual sin
@@ -84,16 +95,21 @@ function revisar(direccion) {
   const cruda = String(direccion == null ? "" : direccion).trim();
   const t = limpiar(cruda);
 
+  // 🔑 LA ÚNICA PREGUNTA QUE VALE LA PENA HACER, y es fácil de contestar:
+  // ¿va a la casa o lo recoge en la oficina? Una sola, cerrada, sin datos que
+  // el cliente tenga que averiguar. Si dice oficina, ya está: no se pide más.
+  const PREGUNTA_SIMPLE =
+    "saber si lo enviamos a su casa (y ahí sí la dirección) o si lo recoge en la " +
+    "oficina de Interrapidísimo de su ciudad";
+
   if (!t) {
     return {
       estado: "vacia",
       entrega: null,
       transportadora: null,
       despachable: false,
-      motivo: "el pedido no tiene dirección",
-      queFalta:
-        "la dirección completa con calle, número y barrio — o, si lo va a recoger, " +
-        "de qué transportadora es la oficina y en qué dirección queda",
+      motivo: "el pedido no dice si va a una casa o a una oficina",
+      queFalta: PREGUNTA_SIMPLE,
     };
   }
 
@@ -104,42 +120,37 @@ function revisar(direccion) {
 
   if (esOficina) {
     // ────────────────────────────────────────────────────────────────────────
-    // Para despachar a una oficina hacen falta DOS cosas: la transportadora Y
-    // la DIRECCIÓN de esa oficina.
+    // 🔴 SI ES OFICINA, NO SE PIDE NINGUNA DIRECCIÓN. Y ESTO YA ME LO CORRIGIÓ
+    //    EL DUEÑO UNA VEZ.
     //
-    // 🔴 LA PRIMERA VERSIÓN DE ESTO ACEPTABA UN NOMBRE SUELTO ("oficina de
-    // Interrapidísimo del centro") y eso es EXACTAMENTE el caso que reportó el
-    // dueño: *"mucho cuidado porque no es claro que sea una oficina de
-    // Interrapidísimo"*. "Del centro" puede ser cualquiera de varias, y la guía
-    // se hace con una dirección, no con una descripción.
+    // Mi primera versión exigía la transportadora Y la dirección exacta de la
+    // oficina. Él lo frenó con la razón del negocio:
     //
-    // Así que se exige nomenclatura de verdad: vía + número. Si el cliente solo
-    // dice "la del centro", se marca y se le pregunta. Marcar de más cuesta
-    // abrir un chat; adivinar un destino cuesta un despacho.
+    //   "no tienes que ponerle trabas al cliente... no le preguntes la dirección
+    //    porque lo que vas a hacer es que el cliente no sepa la dirección. Las
+    //    direcciones no las necesitamos cuando sea en una oficina de la
+    //    transportadora."
+    //
+    // Y tiene toda la razón: la oficina la ubica la transportadora, no el
+    // cliente. Pedirle una calle y un número que probablemente no sabe es
+    // inventar un obstáculo en el peor momento. Encima contradice lo que medimos
+    // hoy mismo: cada pregunta extra después del total baja el cierre.
+    //
+    // 🔑 CON LA CIUDAD ALCANZA. Por defecto es Interrapidísimo, que es la que se
+    // usa; si el cliente nombra otra, se respeta la que dijo.
+    //
+    // Lo que el dueño SÍ pidió es claridad para ELLOS —"para tenerlo muy claro
+    // nosotros"— y eso se resuelve marcando el pedido, no interrogando al
+    // cliente.
     // ────────────────────────────────────────────────────────────────────────
-    const ubicable = RE_VIA.test(t) && RE_NUMERO.test(t);
-
-    if (transportadora && ubicable) {
-      return {
-        estado: "oficina",
-        entrega: "oficina",
-        transportadora,
-        despachable: true,
-        motivo: `entrega en oficina de ${transportadora}`,
-        queFalta: null,
-      };
-    }
-
-    const falta = [];
-    if (!transportadora) falta.push("de qué transportadora es la oficina");
-    if (!ubicable) falta.push("la dirección exacta de esa oficina (calle y número)");
     return {
-      estado: "oficina-incompleta",
+      estado: "oficina",
       entrega: "oficina",
-      transportadora,
-      despachable: false,
-      motivo: "dice oficina pero no se sabe " + falta.join(" ni "),
-      queFalta: falta.join(" y "),
+      transportadora: transportadora || "interrapidisimo",
+      transportadora_supuesta: !transportadora,
+      despachable: true,
+      motivo: `recoge en oficina de ${transportadora || "interrapidisimo"}`,
+      queFalta: null,
     };
   }
 
@@ -160,10 +171,9 @@ function revisar(direccion) {
     entrega: null,
     transportadora: null,
     despachable: false,
-    motivo: "la dirección no tiene calle ni número: la transportadora no la va a encontrar",
-    queFalta:
-      "la dirección completa con calle, número y barrio — o, si lo va a recoger en una " +
-      "oficina, de qué transportadora es y dónde queda",
+    motivo:
+      "no se sabe si va a una casa o a una oficina: no hay calle ni número, y tampoco dijo oficina",
+    queFalta: PREGUNTA_SIMPLE,
   };
 }
 
