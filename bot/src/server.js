@@ -1875,6 +1875,10 @@ async function handleWebhook(body) {
                     order.pedido_previo_total || 0
                   ).toLocaleString("es-CO")}. Confirmá con él antes de despachar.`
                 : "") +
+              // 🔴 No hubo un "sí" reconocible. Leer el chat antes de despachar.
+              (order.sin_confirmar
+                ? `\n\n🔴 OJO: el cliente NO dijo un "sí" claro. Leé el chat antes de despachar.`
+                : "") +
               // 🏢 Si es entrega en oficina, o si la dirección no está clara, el
               // aviso lo dice ACÁ. Enterarse con el PDF de las guías ya subido
               // cuesta una llamada y un despacho trabado.

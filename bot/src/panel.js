@@ -259,6 +259,10 @@ function render(aviso) {
       // pedido la respuesta de alguien que ya tiene su guía. No se despacha sin
       // confirmar: eso ya pasó el 23-sep y ensució el conteo de ventas.
       p.posible_duplicado ? ' <span class="tag no">⚠️ ¿REPETIDO?</span>' : ""
+    }${
+      // 🔴 El cliente no dijo un "sí" reconocible. Puede ser un "hágale" que no
+      // entendimos, o puede que no haya comprado. No se despacha sin leer el chat.
+      p.sin_confirmar ? ' <span class="tag no">🔴 SIN CONFIRMAR</span>' : ""
     }<div class="sub">${esc(p.celular || p.telefono_chat)}${
       sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""
     }${
@@ -266,6 +270,10 @@ function render(aviso) {
         ? `<br><b style="color:#ff9aa4">⚠️ ya tenía un pedido de ${esc(
             fmtCOP(p.pedido_previo_total)
           )} — confirmá antes de despachar</b>`
+        : ""
+    }${
+      p.sin_confirmar
+        ? '<br><b style="color:#ff9aa4">🔴 no dijo un "sí" claro — leé el chat antes de despachar</b>'
         : ""
     }</div></td>
       <td data-label="Dirección">${esc(p.ciudad)}${
