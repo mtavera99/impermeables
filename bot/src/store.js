@@ -277,11 +277,93 @@ function reemplazarPedidos(lista) {
   }
 }
 
-/** Devuelve todos los pedidos guardados, del más nuevo al más viejo. */
-function todosLosPedidos() {
+// ============================================================================
+// 🚫 ANULAR UN PEDIDO — SIN BORRARLO
+//
+// DE DÓNDE SALE (23-sep): el bot tomó como venta nueva a un cliente que ya tenía
+// su guía. El candado nuevo evita los próximos, pero el que ya estaba guardado
+// seguía apareciendo. El dueño: *"todavía me sigue saliendo duplicada la de uno
+// de los clientes... necesito que lo corrijas bien en general"*.
+//
+// Y también sirve para lo que pasa de verdad todos los días: un cliente que
+// cancela, o uno que no se puede despachar.
+//
+// 🔑 SE ANULA, NO SE BORRA. El panel promete que los pedidos "no se borran
+// nunca" y esa promesa vale: un pedido borrado es contabilidad que desaparece.
+// Un pedido anulado queda en el archivo con el motivo y la fecha, y deja de
+// contar en TODAS partes a la vez.
+//
+// Por eso el filtro va acá, en `todosLosPedidos()`, y no en cada pantalla: son
+// nueve lugares los que leen esta lista (panel, resumen, cierre del día, CSV,
+// novedades, embudo, auditoría, chat, limpiar-duplicados). Filtrar en cada uno
+// es garantizar que alguno se olvide y siga contando una venta que no existe.
+// ============================================================================
+
+/**
+ * Todos los pedidos guardados, del más nuevo al más viejo.
+ * Por defecto SIN los anulados: son los que cuentan como venta.
+ * @param {{incluirAnulados?: boolean}} [opciones]
+ */
+function todosLosPedidos(opciones) {
   ensure();
   const orders = readJSON(ORDERS_FILE, []);
-  return [...orders].reverse();
+  const todos = [...orders].reverse();
+  if (opciones && opciones.incluirAnulados) return todos;
+  return todos.filter((p) => !p.anulado);
+}
+
+/** Solo los anulados, para poder revisarlos y revertir si hizo falta. */
+function pedidosAnulados() {
+  return todosLosPedidos({ incluirAnulados: true }).filter((p) => p.anulado);
+}
+
+/**
+ * Marca un pedido como anulado. Se identifica por `fecha`, que es única.
+ * @param {string} fechaPedido  el ISO con el que se guardó
+ * @param {string} motivo       por qué se anula (queda en el registro)
+ * @returns {object|null} el pedido anulado, o null si no se encontró
+ */
+function anularPedido(fechaPedido, motivo) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, fechaPedido);
+    if (i === -1) return null;
+    if (orders[i].anulado) return orders[i]; // ya estaba, no se toca
+    orders[i] = {
+      ...orders[i],
+      anulado: true,
+      motivo_anulacion: String(motivo || "sin motivo"),
+      anulado_en: new Date().toISOString(),
+    };
+    writeJSON(ORDERS_FILE, orders);
+    console.warn(
+      `🚫 PEDIDO ANULADO: ${orders[i].nombre || "?"} (${orders[i].celular || orders[i].telefono_chat}) ` +
+        `por $${orders[i].total} — motivo: ${orders[i].motivo_anulacion}`
+    );
+    return orders[i];
+  } catch (e) {
+    console.error(`🔴 No se pudo anular el pedido: ${e.message}`);
+    return null;
+  }
+}
+
+/** Deshace una anulación, por si se anuló por error. */
+function reactivarPedido(fechaPedido) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, fechaPedido);
+    if (i === -1) return null;
+    const { anulado, motivo_anulacion, anulado_en, ...limpio } = orders[i];
+    orders[i] = limpio;
+    writeJSON(ORDERS_FILE, orders);
+    console.log(`↩️  Pedido reactivado: ${limpio.nombre || "?"} por $${limpio.total}`);
+    return orders[i];
+  } catch (e) {
+    console.error(`🔴 No se pudo reactivar el pedido: ${e.message}`);
+    return null;
+  }
 }
 function isPaused(phone) {
   return !!getConv(phone).paused;
@@ -374,8 +456,39 @@ function pedidoSospechoso(orders, nuevo) {
   return previos[0];
 }
 
+// ============================================================================
+// 🔴 LA FECHA NO ES UN IDENTIFICADOR ÚNICO (23-sep)
+//
+// Los pedidos se identificaban por `fecha` para pegarles la guía y para
+// anularlos, y el comentario decía "el ISO del momento en que se guardó, único".
+// NO ES ÚNICO: `toISOString()` tiene resolución de milisegundo, y dos pedidos
+// guardados en el mismo milisegundo salen con la misma fecha.
+//
+// Lo delató una prueba: dos pedidos distintos quedaron con
+// `2026-09-24T01:06:40.326Z` los dos. Y `findIndex` devuelve el primero que
+// coincide, así que:
+//
+//   · anular un pedido podía anular OTRO
+//   · una guía podía quedar pegada al pedido equivocado → paquete a otra persona
+//
+// En producción los pedidos entran separados por segundos, así que la colisión
+// es poco probable — pero "poco probable" sobre el despacho de un paquete no es
+// una garantía. Ahora cada pedido lleva `id` propio y las búsquedas lo usan,
+// cayendo a `fecha` solo para los pedidos viejos que ya están guardados sin id.
+// ============================================================================
+const { randomUUID } = require("crypto");
+
+/** Encuentra el índice de un pedido por id (o por fecha, si es uno viejo). */
+function indiceDePedido(orders, ref) {
+  const r = String(ref || "");
+  if (!r) return -1;
+  const porId = orders.findIndex((o) => o.id && String(o.id) === r);
+  if (porId !== -1) return porId;
+  return orders.findIndex((o) => o.fecha === r);
+}
+
 function saveOrder(order) {
-  const record = { ...order, fecha: new Date().toISOString() };
+  const record = { ...order, id: randomUUID(), fecha: new Date().toISOString() };
 
   // 🎯 Pegarle el anuncio que trajo al cliente. Va ACÁ, en el store, y no en
   // quien llama, para que ningún camino nuevo se olvide de hacerlo.
@@ -500,7 +613,7 @@ function anotarGuiaEnPedido(fechaPedido, guia) {
   try {
     ensure();
     const orders = readJSON(ORDERS_FILE, []);
-    const i = orders.findIndex((o) => o.fecha === fechaPedido);
+    const i = indiceDePedido(orders, fechaPedido);
     if (i === -1) return false;
     orders[i] = { ...orders[i], guia: String(guia), guiaEnviadaEl: new Date().toISOString() };
     writeJSON(ORDERS_FILE, orders);
@@ -589,6 +702,9 @@ module.exports = {
   guardarPerfil, guardarAtribucion, atribucionDe,
   reemplazarPedidos,
   todosLosPedidos,
+  pedidosAnulados,
+  anularPedido,
+  reactivarPedido,
   // Se exportan para poder probar el candado antiduplicados sin tocar el disco:
   // es el que decide si una venta es real, y de eso dependen el CPA y el cierre.
   esPedidoDuplicado,

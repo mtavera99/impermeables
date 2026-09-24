@@ -250,7 +250,7 @@ function render(aviso) {
           p.telefono_chat
         )}">ver chat</a>`
       : "";
-    return `<tr>
+    return `<tr${opciones.anulado ? ' class="anulado"' : ""}>
       <td class="nowrap" data-label="Fecha">${esc(HORA(cuando))}${
       viejo && !opciones.despachado ? ' <span class="tag warn">+1 día</span>' : ""
     }</td>
@@ -284,23 +284,62 @@ function render(aviso) {
     }</div></td>
       <td data-label="Talla / color">${esc(p.talla)} / ${esc(p.color)}</td>
       <td class="nowrap" data-label="Total"><b>${esc(fmtCOP(p.total))}</b><div class="sub">${esc(p.pago)}</div></td>
-      <td class="nowrap" data-label="${opciones.despachado ? "Guía" : "Anuncio"}">${
-      opciones.despachado
+      <td class="nowrap" data-label="${
+        opciones.anulado ? "Motivo" : opciones.despachado ? "Guía" : "Anuncio"
+      }">${
+      opciones.anulado
+        ? `<span class="sub">${esc(p.motivo_anulacion || "sin motivo")}</span>`
+        : opciones.despachado
         ? `<code>${esc(p.guia)}</code>`
         : p.anuncio_id
         ? `<span title="${esc(p.anuncio_origen || "")}">…${esc(String(p.anuncio_id).slice(-6))}</span>`
         : `<span class="sub">—</span>`
     }</td>
+      <td class="nowrap" data-label="">${
+        // 🚫 Anular: para el pedido que el bot tomó de más, o el que el cliente
+        // canceló. No borra nada — deja de contar como venta y queda el registro.
+        opciones.anulado
+          ? `<form method="post" action="/reactivar" class="acc">
+               <input type="hidden" name="token" value="${esc(panelToken())}">
+               <input type="hidden" name="fecha" value="${esc(p.id || p.fecha)}">
+               <button type="submit" class="mini">↩️ reactivar</button>
+             </form>`
+          : `<form method="post" action="/anular" class="acc"
+                 onsubmit="return confirm('¿Anular el pedido de ${esc(
+                   String(p.nombre || "").replace(/'/g, "")
+                 )}? Deja de contar como venta, pero queda en el registro.')">
+               <input type="hidden" name="token" value="${esc(panelToken())}">
+               <input type="hidden" name="fecha" value="${esc(p.id || p.fecha)}">
+               <input type="hidden" name="motivo" value="anulado desde el panel">
+               <button type="submit" class="mini">🚫 anular</button>
+             </form>`
+      }</td>
     </tr>`;
   };
 
   const filasPendientes = pendientes.length
     ? pendientes.map((p) => filaPedido(p)).join("")
-    : `<tr><td colspan="6" class="vacio">🎉 No hay nada pendiente: todos los pedidos tienen su guía enviada.</td></tr>`;
+    : `<tr><td colspan="7" class="vacio">🎉 No hay nada pendiente: todos los pedidos tienen su guía enviada.</td></tr>`;
 
   const filasDespachados = despachados.length
     ? despachados.slice(0, 60).map((p) => filaPedido(p, { despachado: true })).join("")
-    : `<tr><td colspan="6" class="vacio">Todavía no se ha despachado ningún pedido.</td></tr>`;
+    : `<tr><td colspan="7" class="vacio">Todavía no se ha despachado ningún pedido.</td></tr>`;
+
+  // 🚫 Los anulados: quedan a la vista para poder revisarlos y revertir si se
+  // anuló uno por error. No cuentan como venta en ninguna parte.
+  const anulados = store.pedidosAnulados();
+  const bloqueAnulados = anulados.length
+    ? `<h2>🚫 Anulados · ${anulados.length}</h2>
+       <p class="nota">No cuentan como venta ni aparecen para despachar, pero <b>quedan en el
+         registro</b>. Si anulaste uno por error, reactivalo acá.</p>
+       <div class="tabla"><table>
+         <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Motivo</th><th></th></tr>
+         ${anulados
+           .slice(0, 40)
+           .map((p) => filaPedido(p, { anulado: true }))
+           .join("")}
+       </table></div>`
+    : "";
 
 
 
@@ -683,6 +722,11 @@ function render(aviso) {
   .paso .etiq .ref{display:block;font-size:11px;color:#9fb3c8;margin-top:3px}
   .chatlink{font-size:11px;font-weight:600;color:#7fd1ff;text-decoration:none;border:1px solid #2a4a5e;
     border-radius:6px;padding:1px 6px;margin-left:6px;white-space:nowrap}
+  .acc{display:inline}
+  .mini{background:#2a1a1c;border:1px solid #5e2a2a;color:#ff9aa4;border-radius:7px;
+    padding:4px 8px;font-size:11px;font-weight:600}
+  tr.anulado{opacity:.55}
+  tr.anulado .mini{background:#1a2a1e;border-color:#2a5e3a;color:#7ee2a8}
   .paso .baja{position:relative;text-align:right;font-size:14px;color:var(--rojo);font-weight:600;white-space:nowrap}
   .paso .baja .sub{display:block;font-weight:400}
   .paso.fuga{outline:1px solid #7d2630}
@@ -798,14 +842,16 @@ function render(aviso) {
       : ""
   }
   <div class="tabla"><table>
-    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Anuncio</th></tr>
+    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Anuncio</th><th></th></tr>
     ${filasPendientes}
   </table></div>
+
+  ${bloqueAnulados}
 
   <h2>✅ Ya despachados${despachados.length ? ` · ${despachados.length}` : ""}</h2>
   <p class="nota">Estos ya tienen su guía enviada al cliente. Quedan acá para consultar: <b>no se borran nunca</b>.</p>
   <div class="tabla"><table>
-    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Guía</th></tr>
+    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Guía</th><th></th></tr>
     ${filasDespachados}
   </table></div>
   ${bloqueAnuncios}

@@ -706,7 +706,10 @@ app.post("/guias/enviar", async (req, res) => {
       });
       // El número de guía queda pegado al pedido: así el CSV de despacho sale
       // completo y se puede cruzar contra el export de la transportadora.
-      if (fila.pedido.fecha) store.anotarGuiaEnPedido(fila.pedido.fecha, fila.guia);
+      // 🔑 por id, no por fecha: dos pedidos del mismo milisegundo comparten fecha
+      // y la guia podia quedar pegada al pedido equivocado.
+      const refPedido = fila.pedido.id || fila.pedido.fecha;
+      if (refPedido) store.anotarGuiaEnPedido(refPedido, fila.guia);
       // Queda en el historial del chat para que el bot no repita la información.
       store.pushMsg(to, "assistant", caption);
       anotarEvento({ tipo: "guia-enviada", para: to, guia: fila.guia, certeza: fila.certeza });
@@ -990,6 +993,41 @@ app.post("/responder", async (req, res) => {
   res.redirect(
     `/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${envio.ok ? "ok" : encodeURIComponent(motivo)}#c${to}`
   );
+});
+
+// ============================================================================
+// POST /anular y POST /reactivar — quitar de las ventas un pedido que no existe
+//
+// DE DÓNDE SALE (23-sep): el bot tomó como venta nueva a un cliente que ya tenía
+// su guía. El candado nuevo evita los próximos, pero el que ya estaba guardado
+// seguía contando. El dueño: *"todavía me sigue saliendo duplicada la de uno de
+// los clientes... necesito que lo corrijas bien en general"*.
+//
+// 🔑 ANULA, NO BORRA. El pedido queda en el archivo con el motivo y la fecha, y
+// deja de contar en todas las pantallas a la vez porque el filtro está en
+// store.todosLosPedidos(). Un pedido borrado es contabilidad que desaparece.
+// ============================================================================
+app.post("/anular", (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const fecha = String(req.body?.fecha || "");
+  const motivo = String(req.body?.motivo || "anulado desde el panel");
+  const r = store.anularPedido(fecha, motivo);
+  const aviso = r
+    ? `🚫 Pedido de ${r.nombre || "?"} anulado. Ya no cuenta como venta.`
+    : "No se encontró ese pedido.";
+  anotarEvento({ tipo: r ? "pedido-anulado" : "pedido-anular-fallido", fecha, motivo });
+  res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${encodeURIComponent(aviso)}`);
+});
+
+app.post("/reactivar", (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const fecha = String(req.body?.fecha || "");
+  const r = store.reactivarPedido(fecha);
+  const aviso = r
+    ? `↩️ Pedido de ${r.nombre || "?"} reactivado. Vuelve a contar como venta.`
+    : "No se encontró ese pedido.";
+  anotarEvento({ tipo: r ? "pedido-reactivado" : "pedido-reactivar-fallido", fecha });
+  res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${encodeURIComponent(aviso)}`);
 });
 
 // POST /pausar — prender o apagar el bot en UN chat
