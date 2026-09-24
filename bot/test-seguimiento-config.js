@@ -232,6 +232,70 @@ function seguir() {
     return Object.keys(vacio).every((k) => typeof d[k] === "number");
   })());
 
+  console.log("\n── 11. 🔒 NO SE MANDA DOS VECES AL MISMO CLIENTE ──");
+  //
+  // DE DÓNDE SALE (24-sep): el seguimiento mandaba primero y registraba después.
+  // Durante ese segundo de red el cliente seguía apareciendo como "no le hemos
+  // escrito", así que otra corrida podía mandarle lo mismo otra vez.
+  //
+  // Y no era hipotético: el dueño abrió /seguimiento/correr a mano mientras el
+  // reloj automático corre cada 30 min, y en los logs de esa noche aparecieron
+  // DOS identificadores de instancia distintos. Con dos procesos sobre el mismo
+  // disco, los dos ven seguimientos:0 y los dos mandan.
+  //
+  // Un cliente que recibe el mismo mensaje de marketing dos veces es una queja y
+  // un golpe a la calificación del número, que es lo único que no se compra.
+
+  const st = require("./src/store");
+  st.pushMsg("573001112299", "user", "hola");
+
+  chequear(
+    "la primera corrida reserva el turno",
+    st.reclamarSeguimiento("573001112299", 0) === true
+  );
+  chequear(
+    "🔑 la segunda NO puede reservarlo: no se manda doble",
+    st.reclamarSeguimiento("573001112299", 0) === false,
+    "el cliente recibiría el mismo mensaje dos veces"
+  );
+  chequear(
+    "el contador quedó en 1, no en 2",
+    st.getConv("573001112299").seguimientos === 1
+  );
+  chequear(
+    "el paso siguiente sí se reserva, con el valor correcto",
+    st.reclamarSeguimiento("573001112299", 1) === true
+  );
+  chequear(
+    "una conversación que no existe no se puede reservar",
+    st.reclamarSeguimiento("573000000000", 0) === false
+  );
+
+  const src2 = fs.readFileSync(`${__dirname}/src/seguimiento.js`, "utf8");
+  const iReclama = src2.indexOf("reclamarSeguimiento(phone");
+  const iManda = src2.indexOf("await sendText(phone, TEXTO_1)");
+  chequear(
+    "🔑 el código reserva el turno ANTES de mandar",
+    iReclama > 0 && iManda > 0 && iReclama < iManda,
+    "si manda primero, vuelve la ventana para el mensaje duplicado"
+  );
+  chequear(
+    "ya no registra después de mandar",
+    !/await sendText\(phone, TEXTO_1\);\s*\n\s*store\.registrarSeguimiento/.test(src2)
+  );
+  chequear(
+    "⚠️ y la falta de plantilla se revisa ANTES de reservar (si no, se gasta un turno sin mandar)",
+    src2.indexOf("falta configurar SEGUIMIENTO_PLANTILLA_") < iReclama
+  );
+  chequear(
+    "un envío rechazado se registra fuerte en el log",
+    /NO SE ENTREG[ÓO]|PLANTILLA .* RECHAZADA/.test(src2)
+  );
+  chequear(
+    "y el mensaje de error explica qué mirar si la plantilla tiene variables",
+    /variables \{\{1\}\}/.test(src2)
+  );
+
   fs.rmSync(DIR, { recursive: true, force: true });
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   process.exit(mal === 0 ? 0 : 1);
