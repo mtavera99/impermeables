@@ -9,9 +9,17 @@ la quincena queda descartada, el colmena se dio vuelta (231% de su equilibrio) y
 Y el error #24: casi corto `Domiciliarios`, que fue el conjunto que MÁS utilidad dejó.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA: andá directo al bloque "TRASPASO A LA SESIÓN NUEVA" de la
-> sección 12.** Ahí está qué hacer primero (incluido el MCP de Meta Ads), el estado confirmado de la
-> cuenta, los tres checkpoints y lo que quedó abierto.
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR `TRASPASO-SESION-24SEP.md`.**
+> Es lo más reciente y está escrito para retomar: pendientes del dueño, los 23 PRs del 23-24 de
+> septiembre, los precios vigentes, los números ya medidos (para no volver a medirlos), las 25
+> baterías de prueba, las trampas conocidas y cómo trabajar con el dueño.
+> **El bot de WhatsApp ya reemplazó al agente de Meta y está en producción** —
+> `https://bikerpro-bot.onrender.com` — así que las secciones de este archivo que dicen que el bot
+> no está corriendo (0-BD) están vencidas.
+
+> 🚀 **Para el contexto de Meta Ads:** el bloque "TRASPASO A LA SESIÓN NUEVA" de la sección 12 tiene
+> qué hacer primero (incluido el MCP de Meta Ads), el estado confirmado de la cuenta, los tres
+> checkpoints y lo que quedó abierto.
 
 ---
 
