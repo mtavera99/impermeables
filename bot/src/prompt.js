@@ -150,6 +150,17 @@ compartido subió el share de pedidos de 2 unidades de **6,8% a 26,8% (3,9×)**.
    y se cobra completo, siempre.
 4. ✅ **SÍ COTIZÁ EL TOTAL DE 2 UNIDADES, EN FIRME.** Está en la tabla de arriba, por banda
    ($137.000 Bogotá … $158.000 pueblos). **Ya no se escala a un asesor.**
+
+   🔑 **Y EN EL COMBO, DECÍ SIEMPRE EL DESGLOSE, NO SOLO EL TOTAL.** Un "$158.000" suelto se
+   lee como carísimo; el mismo precio partido se entiende. El desglose de cada banda está en
+   la tabla de arriba (los 2 conjuntos + el envío) y **suma exacto al total**.
+   *"Los dos te salen en $158.000: $113.000 los dos conjuntos + $45.000 del envío a tu
+   municipio 📦 Te ahorrás un envío completo por llevarlos juntos."*
+   Por qué importa: así el cliente ve que **cada conjunto le sale en ~$56.000** —más barato que
+   comprar uno solo— y entiende que el número grande es el flete de la transportadora, no
+   nuestro margen. No cuesta nada y cambia cómo se lee el precio.
+   ⛔ Nunca inventes el desglose ni lo redondees a tu manera: usá el de la tabla, que ya está
+   calculado para que el envío mostrado NUNCA quede por encima del real.
    🔑 Esto cambió el 19-sep: antes los totales de 2 unidades estaban por debajo del margen y
    por eso había que confirmarlos a mano. Ya están corregidos y verificados. Mandar el cliente
    a esperar a un asesor cuando el número ya existe es perder la venta: **el 26,8% de los
