@@ -127,13 +127,42 @@ async function correrSeguimientos() {
 function diagnostico() {
   const todas = store.todasLasConversaciones();
   const ahora = Date.now();
+  // ==========================================================================
+  // 🔴 EL DIAGNÓSTICO NO PERMITÍA COMPROBAR SI SE MANDÓ ALGO (24-sep)
+  //
+  // El dueño prendió el sistema, abrió /seguimiento/correr y le dio
+  // `{"revisadas":353,"enviados":0}`. Conclusión natural: "no funcionó".
+  //
+  // Pero sí había funcionado: `arrancar()` hace la primera pasada 1 MINUTO
+  // después de arrancar, y poner la variable en Render reinicia el servicio. O
+  // sea que el reloj automático ya había mandado los 6 antes de que él abriera
+  // el enlace a mano. Cuando lo abrió, esos 6 ya tenían `seguimientos = 1` y el
+  // paso 2 no les toca hasta las 44h.
+  //
+  // El problema de fondo: los que ya recibieron 1 o 2 mensajes caían en
+  // `enEspera`, mezclados con los que no habían recibido nada. Así no había
+  // forma de comprobar que el sistema estuviera mandando — y el log de eventos
+  // no sirve porque vive en memoria y se borra en cada despliegue.
+  //
+  // Ahora se cuenta cuántos recibieron cada cantidad. Eso vive en disco (en la
+  // conversación), así que es la prueba permanente de que el sistema anda.
+  // ==========================================================================
   const r = {
     total: 0, compraron: 0, noMolestar: 0, enPausa: 0,
     ventanaCerrada: 0, yaCon3: 0, esperandoPaso1: 0, esperandoPaso2: 0,
-    esperandoPaso3: 0, enEspera: 0, sinSeguimientoYVencidos: 0
+    esperandoPaso3: 0, enEspera: 0, sinSeguimientoYVencidos: 0,
+    // 🔑 La prueba de que se mandó: cuántos llevan 1, 2 o 3 seguimientos.
+    recibieron1: 0, recibieron2: 0, recibieron3: 0, mensajesEnviados: 0,
   };
   for (const [, c] of Object.entries(todas)) {
     r.total++;
+    // 🔑 Se cuenta ACÁ ARRIBA, antes de cualquier `continue`, porque si no los
+    // que ya recibieron seguimientos y además compraron (o pidieron no molestar)
+    // desaparecerían del conteo — y son justo los que prueban que sirve.
+    const recibidos = Math.min(c.seguimientos || 0, 3);
+    if (recibidos >= 1) r[`recibieron${recibidos}`]++;
+    r.mensajesEnviados += recibidos;
+
     if (c.compro) { r.compraron++; continue; }
     if (c.noMolestar) { r.noMolestar++; continue; }
     if (c.paused) { r.enPausa++; continue; }

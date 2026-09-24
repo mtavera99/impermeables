@@ -171,6 +171,67 @@ function seguir() {
     chequear(`quedan fuera ${que}`, patron.test(src));
   }
 
+  console.log("\n── 10. 🔑 SE PUEDE COMPROBAR QUE MANDÓ (lo que faltaba) ──");
+  //
+  // DE DÓNDE SALE: el dueño prendió el sistema, abrió /seguimiento/correr y leyó
+  // `{"revisadas":353,"enviados":0}`. Conclusión natural: "no funcionó". Pero sí
+  // había funcionado — `arrancar()` hace la primera pasada 1 minuto después de
+  // arrancar, y poner la variable en Render reinicia el servicio, así que el
+  // reloj ya había mandado los 6 antes de que él abriera el enlace.
+  //
+  // El problema era que no había forma de comprobarlo: los que ya recibieron 1 o
+  // 2 mensajes caían en `enEspera`, mezclados con los que no recibieron nada. Y
+  // el log de eventos no sirve porque vive en memoria y se borra en cada deploy.
+
+  const store2 = require("./src/store");
+  const H2 = 60 * 60 * 1000;
+  const ahora2 = Date.now();
+  for (let i = 0; i < 6; i++) store2.pushMsg("57300111000" + i, "user", "hola");
+  for (let i = 0; i < 2; i++) store2.pushMsg("57300222000" + i, "user", "hola");
+  {
+    const archivo = `${DIR}/conversations.json`;
+    const convs = JSON.parse(fs.readFileSync(archivo, "utf8"));
+    let n = 0;
+    for (const k in convs) {
+      convs[k].ultimoDelCliente = ahora2 - 21 * H2;
+      convs[k].seguimientos = 1;
+      if (n >= 6) convs[k].compro = true; // recibieron seguimiento Y compraron
+      n++;
+    }
+    // Uno que no recibió nada y le toca ahora.
+    convs["573009999999"] = {
+      messages: [{ role: "user", content: "hola", at: ahora2 }],
+      ultimoDelCliente: ahora2 - 21 * H2,
+    };
+    fs.writeFileSync(archivo, JSON.stringify(convs));
+  }
+  const s2 = cargarCon({});
+  const d = s2.diagnostico();
+
+  chequear(
+    `cuenta los que ya recibieron 1 seguimiento (dio ${d.recibieron1})`,
+    d.recibieron1 === 8,
+    "sin esto no hay forma de saber si el sistema mandó algo"
+  );
+  chequear(`cuenta el total de mensajes enviados (dio ${d.mensajesEnviados})`, d.mensajesEnviados === 8);
+  chequear(
+    "🔑 los que recibieron seguimiento Y compraron SIGUEN contando",
+    d.compraron === 2 && d.recibieron1 === 8,
+    "son justo los que prueban que el seguimiento sirve: se contaban en cero"
+  );
+  chequear(
+    `el que no recibió nada aparece esperando el paso 1 (dio ${d.esperandoPaso1})`,
+    d.esperandoPaso1 === 1
+  );
+  chequear(
+    `los que ya tienen 1 quedan esperando las 44h, no en el paso 1 (dio ${d.enEspera})`,
+    d.enEspera === 6
+  );
+  chequear("los contadores arrancan en cero cuando no hay nada", (() => {
+    const vacio = { recibieron1: 0, recibieron2: 0, recibieron3: 0 };
+    return Object.keys(vacio).every((k) => typeof d[k] === "number");
+  })());
+
   fs.rmSync(DIR, { recursive: true, force: true });
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   process.exit(mal === 0 ? 0 : 1);
