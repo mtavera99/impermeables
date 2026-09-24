@@ -73,14 +73,22 @@ function bodegaInfo() {
   // seguiría mandando clientes a una bodega donde ya no estamos.
   const direccion = (process.env.BODEGA_DIRECCION ?? "Calle 62bis #67-12 Sur, barrio Madelena").trim();
   const ciudad = (process.env.BODEGA_CIUDAD ?? "Bogotá").trim();
-  // 🔴 EL HORARIO NO SE PONE POR DEFECTO, A PROPÓSITO.
-  // El perfil de Meta dice "Abierto las 24 horas todos los días" y el agente
-  // viejo lo repetía. Pero ese es el horario de ATENCIÓN por WhatsApp, no el de
-  // una bodega física: si un cliente se para en la puerta a las 3 de la mañana
-  // porque el bot se lo prometió, el problema es peor que no haber dicho nada.
-  // Hasta que el dueño confirme el horario real, el bot da la dirección y pide
-  // coordinar la hora.
-  const horario = process.env.BODEGA_HORARIO;
+  // ✅ HORARIO CONFIRMADO POR EL DUEÑO (24-sep): 24 horas, los 7 días.
+  //
+  // Yo me había negado a poner un default acá. El razonamiento era: el perfil de
+  // Meta dice "Abierto las 24 horas" pero ese es el horario de ATENCIÓN POR
+  // WHATSAPP, y prometerle a un cliente que puede ir a las 3 de la mañana a una
+  // bodega cerrada es peor que no decir nada. Pedí la confirmación y el dueño
+  // confirmó que el punto físico SÍ atiende 24/7. Con eso el default entra.
+  //
+  // Se deja igual la línea de "avisá antes de salir": no limita el horario, pero
+  // evita el viaje perdido si justo no hay nadie en la puerta, y nos deja tener
+  // el pedido listo cuando llegue.
+  //
+  // Si algún día deja de ser 24/7, hay dos formas de cambiarlo sin tocar código:
+  // poner el horario nuevo en BODEGA_HORARIO, o dejarla VACÍA para que el bot
+  // vuelva a coordinar la hora en vez de prometer una.
+  const horario = (process.env.BODEGA_HORARIO ?? "abierto 24 horas, todos los días").trim();
 
   const comun =
     `## 🏪 ¿TIENDA FÍSICA / PASAR A RECOGER?\n` +
@@ -98,7 +106,7 @@ function bodegaInfo() {
   }
 
   const lineaHorario = horario
-    ? `- Horario: ${horario}\n`
+    ? `- Horario: ${horario}. Pedile que **avise antes de salir** para tenerle el pedido listo.\n`
     : `⛔ **NO hay horario confirmado: no inventes uno** ni digas "24 horas". Coordiná: *"¿Qué ` +
       `día pensás pasar? Te confirmo la hora para que no viajés en vano 🙌"*\n`;
 

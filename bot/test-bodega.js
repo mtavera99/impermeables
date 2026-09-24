@@ -105,43 +105,61 @@ const otra = seccionBodega(
 chequear("la variable de entorno manda sobre el default", /Carrera 1 #2-3/.test(otra));
 chequear("y cambia la ciudad", /Medellín/.test(otra) && !/Bogotá/.test(otra));
 
-console.log("\n── 3. El horario NO se inventa ──");
+console.log("\n── 3. El horario: 24/7, confirmado por el dueño el 24-sep ──");
 
 chequear(
-  "sin horario confirmado, avisa que no hay horario",
-  /no hay horario confirmado/i.test(bodega)
+  "el bot da el horario sin necesidad de variable de entorno",
+  /24 horas, todos los días/.test(bodega)
 );
 chequear(
-  "prohíbe explícitamente decir '24 horas'",
-  /no inventes uno.*24 horas/is.test(bodega)
+  "va en su propia línea, no pegado a la dirección",
+  /\n- Horario: /.test(bodega)
 );
 chequear(
-  "en vez de prometer, pide coordinar el día y la hora",
-  /Te confirmo la hora/.test(bodega)
+  "pide que avise antes de salir (para no hacer el viaje en vano)",
+  /avise antes de salir/.test(bodega)
 );
 chequear(
-  "no aparece 'Abierto las 24 horas' (lo que dice el perfil de Meta)",
-  !/Abierto las 24 horas/.test(porDefecto)
-);
-chequear(
-  "no dice 'cuando quieras' ni 'a cualquier hora' en la sección de bodega",
-  !/cuando quieras|a cualquier hora/i.test(bodega)
+  "NO queda el aviso de horario sin confirmar",
+  !/no hay horario confirmado/i.test(bodega)
 );
 
-const conHorario = seccionBodega(
+const otroHorario = seccionBodega(
   guionCon({ BODEGA_HORARIO: "Lunes a viernes 8am a 5pm" })
 );
 chequear(
-  "cuando el dueño confirma el horario, el bot lo da",
-  /Lunes a viernes 8am a 5pm/.test(conHorario)
+  "si el horario cambia, la variable de entorno manda",
+  /Lunes a viernes 8am a 5pm/.test(otroHorario)
 );
 chequear(
-  "y desaparece el aviso de horario sin confirmar",
-  !/no hay horario confirmado/i.test(conHorario)
+  "y el 24 horas desaparece (no se quedan los dos)",
+  !/24 horas/.test(otroHorario)
+);
+
+// 🔴 ESTE ES EL CANDADO IMPORTANTE. Si algún día deja de ser 24/7 y todavía no
+// se sabe el horario nuevo, dejar BODEGA_HORARIO vacía tiene que hacer que el
+// bot COORDINE en vez de prometer. Un cliente parado a las 3am en una bodega
+// cerrada porque el bot se lo prometió es peor que no haber dicho nada.
+const sinHorario = seccionBodega(guionCon({ BODEGA_HORARIO: "" }));
+chequear(
+  "con la variable vacía, avisa que no hay horario confirmado",
+  /no hay horario confirmado/i.test(sinHorario)
 );
 chequear(
-  "el horario confirmado va en su propia línea, no pegado a la dirección",
-  /\n- Horario: Lunes a viernes/.test(conHorario)
+  "y prohíbe explícitamente decir '24 horas'",
+  /no inventes uno.*24 horas/is.test(sinHorario)
+);
+chequear(
+  "y pide coordinar el día y la hora",
+  /Te confirmo la hora/.test(sinHorario)
+);
+chequear(
+  "y NO se le escapa el horario por otro lado",
+  !/- Horario:/.test(sinHorario)
+);
+chequear(
+  "nunca dice 'cuando quieras' ni 'a cualquier hora'",
+  !/cuando quieras|a cualquier hora/i.test(porDefecto)
 );
 
 console.log("\n── 4. Recoger se ofrece como ventaja, con el precio correcto ──");
