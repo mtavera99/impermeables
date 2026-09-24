@@ -53,15 +53,61 @@ const IDIOMA = process.env.SEGUIMIENTO_IDIOMA || "es_CO";
 //   20h  -> comodo dentro de las 24h de servicio
 //   44h  -> segundo dia
 //   68h  -> tercero, antes de que se cierre la ventana de 72h
+// ============================================================================
+// ⏱️ LA CADENCIA: 2h · 20h · 44h  (antes era 20h · 44h · 68h)
+//
+// LO QUE PIDIÓ EL DUEÑO (24-sep): *"cuando yo lo hacía manual, al que no
+// respondía le escribía como a la hora, después al otro día, y después un último
+// acercamiento"*. Y tenía razón, por una razón que ni él sabía.
+//
+// 🔑 EL TOPE DE FRECUENCIA DE META SOLO APLICA A PLANTILLAS DE MARKETING.
+// Meta limita cuántas plantillas de marketing recibe una persona, contando las
+// de TODAS las marcas que le escriben — no solo las nuestras. Cuando se pasa, el
+// envío falla con el error 131049. Los mensajes de TEXTO LIBRE dentro de la
+// ventana de 24h NO cuentan para ese tope.
+//
+// Consecuencia directa: cuanto más temprano se toca, menos restricción hay.
+//
+//   paso 1 ...  2h  → texto libre. Sin tope, gratis, y el cliente está tibio.
+//   paso 2 ... 20h  → texto libre. Última oportunidad antes de que cierren las 24h.
+//   paso 3 ... 44h  → plantilla. UNA sola, no dos.
+//
+// Antes se mandaban DOS plantillas por persona (44h y 68h). Ahora una. Eso parte
+// a la mitad la exposición al tope de frecuencia y a la calificación del número
+// —que es lo único de esta operación que no se puede comprar de vuelta— y encima
+// AGREGA un toque donde más vale: a las 2 horas.
+//
+// ⚠️ HONESTIDAD SOBRE ESTA DECISIÓN: no está probada con nuestros datos. El
+// export del agente viejo NO trae la hora de cada mensaje, así que no sabemos
+// cuánto tardan en volver los que vuelven. La cadencia sale de la mecánica de
+// las políticas, no de una medición. Por eso se agregó la medición por paso
+// (store.estadisticasSeguimiento): en una semana se sabe cuál toque paga.
+// ============================================================================
 const PASOS = [
-  { n: 1, desde: 20 * H, hasta: 23 * H, tipo: "texto" },
-  { n: 2, desde: 44 * H, hasta: 47 * H, tipo: "plantilla", plantilla: PLANTILLA_2 },
-  { n: 3, desde: 68 * H, hasta: 71 * H, tipo: "plantilla", plantilla: PLANTILLA_3 }
+  { n: 1, desde: 2 * H, hasta: 5 * H, tipo: "texto", texto: () => TEXTO_1 },
+  { n: 2, desde: 20 * H, hasta: 23 * H, tipo: "texto", texto: () => TEXTO_2 },
+  { n: 3, desde: 44 * H, hasta: 47 * H, tipo: "plantilla", plantilla: PLANTILLA_2 }
 ];
 
 // El texto del seguimiento 1. Va sin presion y le devuelve el argumento que
 // mas cierra en el guion: contraentrega, no paga nada por adelantado.
+// ── Paso 1, a las 2 horas ──────────────────────────────────────────────────
+// Corto y sin presión. El cliente todavía se acuerda de la conversación, así que
+// no hay que recordarle nada: hay que quitarle la duda que lo frenó.
+//
+// 🔑 Medido en el embudo del 23-sep: de 54 personas que recibieron el total, solo
+// 10 llegaron al cuadro de confirmación. El freno está justo después del precio,
+// así que este mensaje va directo a eso y ofrece la salida más fácil.
 const TEXTO_1 =
+  "¿Te quedó alguna duda con el impermeable? 🏍️\n\n" +
+  "Te cuento lo que más preguntan: pagás *cuando lo recibís*, no antes. Si no te " +
+  "sirve la talla, se cambia.\n\n" +
+  "¿Te lo despacho?";
+
+// ── Paso 2, a las 20 horas ─────────────────────────────────────────────────
+// Último mensaje de texto libre antes de que se cierre la ventana de 24h. Acá sí
+// conviene recordar qué es, porque ya pasó un día.
+const TEXTO_2 =
   "Hola 👋 Te escribo por el impermeable que estabas mirando.\n\n" +
   "Sigue disponible y recuerda que es *contraentrega*: pagas cuando lo " +
   "tienes en la mano, no antes 🏍️\n\n" +
@@ -79,10 +125,42 @@ function elegible(phone, c, ahora) {
   const edad = ahora - c.ultimoDelCliente;
   if (edad > 72 * H) return null;                  // se cerro la ventana gratis
 
-  const paso = PASOS[hechos];                      // el siguiente que le toca
-  if (!paso) return null;
-  if (edad < paso.desde || edad > paso.hasta) return null;  // todavia no, o ya paso
-  return paso;
+  // ==========================================================================
+  // 🔴 SE BUSCA EL PASO QUE CORRESPONDE POR EDAD, NO EL SIGUIENTE DE LA LISTA
+  //
+  // Antes esto era `PASOS[hechos]`: el paso número N según cuántos se mandaron.
+  // Funcionaba cuando el primer paso iba de 20h a 23h, porque casi nadie se lo
+  // perdía. Con el paso 1 movido a 2-5h se rompe:
+  //
+  //   un cliente que escribió hace 21h y nunca recibió nada tiene hechos = 0,
+  //   así que le tocaría PASOS[0] — cuya ventana (2-5h) YA PASÓ. Resultado: no
+  //   entra nunca, ni al paso 1 ni a ninguno. Queda trabado para siempre.
+  //
+  // Y eso no era un caso raro: al cambiar la cadencia, los 313 clientes que ya
+  // estaban dentro de las 72h quedaban todos trabados de golpe.
+  //
+  // Ahora se recorre desde el primer paso no hecho y se devuelve el primero cuya
+  // ventana contenga la edad actual. El que se perdió el toque de 2h igual recibe
+  // el de 20h y el de 44h: dos en vez de tres, pero no cero.
+  // ==========================================================================
+  return pasoQueCorresponde(hechos, edad);
+}
+
+/**
+ * El paso que le toca a alguien con `hechos` seguimientos y `edad` de espera.
+ * null si ninguna ventana le calza ahora mismo.
+ *
+ * 🔑 Vive acá, en una sola función, porque `elegible()` y `diagnostico()` TIENEN
+ * que estar de acuerdo. Cuando la lógica estaba duplicada, el diagnóstico decía
+ * "esperandoPaso2: 0" mientras el envío sí lo tomaba: una pantalla que contradice
+ * lo que hace el bot es peor que no tenerla.
+ */
+function pasoQueCorresponde(hechos, edad) {
+  for (let i = hechos; i < PASOS.length; i++) {
+    const p = PASOS[i];
+    if (edad >= p.desde && edad <= p.hasta) return p;
+  }
+  return null;
 }
 
 /** Revisa todas las conversaciones y manda los seguimientos que corresponden. */
@@ -115,7 +193,7 @@ async function correrSeguimientos() {
     // 🔒 Se reserva el turno ANTES de mandar. Si otra corrida ya lo tomó —el
     // reloj automático y un clic manual pueden cruzarse— esta se retira en vez
     // de mandarle al cliente el mismo mensaje dos veces.
-    if (!store.reclamarSeguimiento(phone, c.seguimientos || 0)) {
+    if (!store.reclamarSeguimiento(phone, c.seguimientos || 0, paso.n)) {
       saltados++;
       console.log(
         `[seguimiento ${paso.n}] ${phone} SALTADO: otra corrida ya le escribió ` +
@@ -125,7 +203,7 @@ async function correrSeguimientos() {
     }
 
     if (paso.tipo === "texto") {
-      const r = await sendText(phone, TEXTO_1);
+      const r = await sendText(phone, paso.texto());
       if (r && r.ok === false) {
         console.error(
           `🔴 [seguimiento ${paso.n}] ${phone} NO SE ENTREGÓ: ${JSON.stringify(r.body?.error || r.body).slice(0, 180)}. ` +
@@ -205,8 +283,8 @@ function diagnostico() {
       if (hechos === 0) r.sinSeguimientoYVencidos++;
       continue;
     }
-    const paso = PASOS[hechos];
-    if (edad >= paso.desde && edad <= paso.hasta) r[`esperandoPaso${paso.n}`]++;
+    const paso = pasoQueCorresponde(hechos, edad);
+    if (paso) r[`esperandoPaso${paso.n}`]++;
     else r.enEspera++;
   }
   return r;
@@ -267,5 +345,6 @@ module.exports = {
   diagnostico,
   configuracionEfectiva,
   TEXTO_1,
+  TEXTO_2,
   PASOS,
 };

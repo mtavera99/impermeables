@@ -132,6 +132,15 @@ function pushMsg(phone, role, content) {
   //   - 72h: la ventana gratis que abre el anuncio Click-to-WhatsApp
   if (role === "user") {
     c.ultimoDelCliente = Date.now();
+    // 📊 ANTES de reiniciar el contador: si había un seguimiento esperando
+    // respuesta, ESTE mensaje es la respuesta. Se anota en el historial
+    // acumulativo (que no se borra) y se cierra la espera para no contarlo dos
+    // veces si el cliente manda varios mensajes seguidos.
+    if (c.segEsperaRta) {
+      c.segRespondio = c.segRespondio || {};
+      c.segRespondio[c.segEsperaRta] = (c.segRespondio[c.segEsperaRta] || 0) + 1;
+      delete c.segEsperaRta;
+    }
     // si el cliente vuelve a escribir, el contador de seguimientos se reinicia:
     // ya no es un lead frio, esta conversando otra vez
     c.seguimientos = 0;
@@ -214,7 +223,7 @@ function registrarSeguimiento(phone) {
  * @param {number} esperados cuántos seguimientos creíamos que tenía
  * @returns {boolean} true si quedó reservado para nosotros
  */
-function reclamarSeguimiento(phone, esperados) {
+function reclamarSeguimiento(phone, esperados, paso) {
   ensure();
   const all = readJSON(CONV_FILE, {});
   const c = all[phone];
@@ -222,9 +231,70 @@ function reclamarSeguimiento(phone, esperados) {
   if ((c.seguimientos || 0) !== esperados) return false; // otra corrida se adelantó
   c.seguimientos = esperados + 1;
   c.ultimoSeguimiento = Date.now();
+
+  // ==========================================================================
+  // 📊 EL REGISTRO PARA MEDIR — SEPARADO DEL CONTADOR, Y NO SE BORRA
+  //
+  // `seguimientos` NO sirve para medir: cuando el cliente contesta se reinicia a
+  // 0 (ver pushMsg), porque deja de ser un lead frío. Eso está bien para decidir
+  // a quién escribirle, pero para medir es al revés: borra justo a los que SÍ
+  // respondieron, o sea los éxitos. Medir con ese contador daría que el
+  // seguimiento no sirve nunca.
+  //
+  // Así que el historial va aparte y es acumulativo:
+  //   segPorPaso ....... cuántas veces se mandó cada paso
+  //   segPasoReciente .. el último paso que se le mandó (para atribuir la venta)
+  //   segEsperaRta ..... paso pendiente de saber si contestó (pushMsg lo resuelve)
+  // ==========================================================================
+  const n = Number(paso) || 0;
+  if (n >= 1) {
+    c.segPorPaso = c.segPorPaso || {};
+    c.segPorPaso[n] = (c.segPorPaso[n] || 0) + 1;
+    c.segPasoReciente = n;
+    c.segEsperaRta = n;
+  }
+
   all[phone] = c;
   writeJSON(CONV_FILE, all);
   return true;
+}
+
+/** Anota que este cliente compró después del paso N de seguimiento. */
+function marcarCompraDeSeguimiento(phone, paso) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone];
+  if (!c) return;
+  c.segCompro = c.segCompro || {};
+  c.segCompro[paso] = (c.segCompro[paso] || 0) + 1;
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+}
+
+/**
+ * Cuenta, sumando todas las conversaciones, qué pasó con cada paso.
+ * Es la respuesta a "¿sirve el seguimiento, y cuál de los toques sirve?".
+ */
+function estadisticasSeguimiento() {
+  ensure();
+  const todas = readJSON(CONV_FILE, {});
+  const r = {};
+  for (const n of [1, 2, 3]) r[n] = { enviados: 0, respondieron: 0, compraron: 0 };
+  for (const k in todas) {
+    const c = todas[k] || {};
+    const porPaso = c.segPorPaso || {};
+    for (const n of [1, 2, 3]) {
+      if (porPaso[n]) r[n].enviados += porPaso[n];
+      if (c.segRespondio && c.segRespondio[n]) r[n].respondieron += c.segRespondio[n];
+      if (c.segCompro && c.segCompro[n]) r[n].compraron += c.segCompro[n];
+    }
+  }
+  for (const n of [1, 2, 3]) {
+    const p = r[n];
+    p.tasaRespuesta = p.enviados ? Math.round((p.respondieron / p.enviados) * 1000) / 10 : 0;
+    p.tasaCompra = p.enviados ? Math.round((p.compraron / p.enviados) * 1000) / 10 : 0;
+  }
+  return r;
 }
 
 /**
@@ -556,6 +626,19 @@ function saveOrder(order) {
     console.error(`⚠️  No se pudo leer la atribución del anuncio: ${e.message}`);
   }
 
+  // 📊 ¿ESTA VENTA VINO DE UN SEGUIMIENTO? Si al cliente se le había mandado un
+  // toque, se anota cuál fue el último. Es lo único que permite contestar si el
+  // seguimiento paga o solo hace ruido.
+  try {
+    const conv = getConv(record.telefono_chat);
+    if (conv && conv.segPasoReciente) {
+      record.venta_tras_seguimiento = conv.segPasoReciente;
+      marcarCompraDeSeguimiento(record.telefono_chat, conv.segPasoReciente);
+    }
+  } catch (e) {
+    console.error(`⚠️  No se pudo atribuir la venta al seguimiento: ${e.message}`);
+  }
+
   // 🛟 RED DE SEGURIDAD — ESTO VA PRIMERO, ANTES DE TOCAR EL DISCO.
   // El pedido se escribe COMPLETO en el log antes de cualquier operación que
   // pueda fallar. Los logs de Render sobreviven a los despliegues, así que si
@@ -747,7 +830,8 @@ function estadoDelDisco() {
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   registrarArranque, estadoDelDisco,
-  marcarComprado, registrarSeguimiento, reclamarSeguimiento, marcarNoMolestar, todasLasConversaciones,
+  marcarComprado, registrarSeguimiento, reclamarSeguimiento,
+  estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
   guardarPerfil, guardarAtribucion, atribucionDe,
   reemplazarPedidos,
   todosLosPedidos,
