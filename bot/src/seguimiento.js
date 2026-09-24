@@ -170,4 +170,43 @@ function arrancar() {
   setInterval(tick, 30 * 60 * 1000);    // y luego cada 30 min
 }
 
-module.exports = { arrancar, correrSeguimientos, diagnostico, TEXTO_1 };
+// ============================================================================
+// 🔴 LA PANTALLA TIENE QUE DECIR LO QUE EL BOT VA A MANDAR DE VERDAD
+//
+// DE DÓNDE SALE (24-sep): el dueño abrió /seguimiento y leyó
+// `plantilla_2: "(sin configurar)"`. Pero eso NO era cierto: la ruta mostraba
+// `process.env.SEGUIMIENTO_PLANTILLA_2` directo, y este módulo tiene un valor
+// por defecto en el código (`seguimiento_impermeable`). O sea que la pantalla
+// decía "no hay plantilla" mientras el bot estaba listo para mandar una.
+//
+// Y esa diferencia hace tomar decisiones al revés: él podía prenderlo creyendo
+// que los pasos 2 y 3 no iban a hacer nada, y se habrían mandado plantillas a
+// clientes reales sin que lo supiera. O al contrario: no prenderlo pensando que
+// faltaba configurar algo que ya estaba.
+//
+// Se exporta la CONFIGURACIÓN EFECTIVA para que la pantalla muestre eso, y de
+// paso se dice de dónde sale cada valor (variable de entorno o default).
+// ============================================================================
+function configuracionEfectiva() {
+  return {
+    activo: ACTIVO,
+    idioma: IDIOMA,
+    plantilla_2: PLANTILLA_2 || "(ninguna: el paso 2 se salta)",
+    plantilla_3: PLANTILLA_3 || "(ninguna: el paso 3 se salta)",
+    // De dónde viene cada uno, para no volver a confundirse.
+    origen: {
+      plantilla_2: process.env.SEGUIMIENTO_PLANTILLA_2 ? "variable de entorno" : "default del código",
+      plantilla_3: process.env.SEGUIMIENTO_PLANTILLA_3 ? "variable de entorno" : "default del código",
+      idioma: process.env.SEGUIMIENTO_IDIOMA ? "variable de entorno" : "default del código (es_CO)",
+    },
+  };
+}
+
+module.exports = {
+  arrancar,
+  correrSeguimientos,
+  diagnostico,
+  configuracionEfectiva,
+  TEXTO_1,
+  PASOS,
+};

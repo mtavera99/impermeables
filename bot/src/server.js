@@ -1898,11 +1898,13 @@ async function handleWebhook(body) {
 app.get("/seguimiento", (req, res) => {
   // Filtraba los nombres de las plantillas y el estado interno sin pedir nada.
   if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  // 🔴 Se muestra la configuración EFECTIVA, no las variables de entorno. Antes
+  // esta pantalla decía `plantilla_2: "(sin configurar)"` mientras el módulo
+  // tenía un default en el código listo para mandar: una diferencia que hace
+  // tomar la decisión al revés. Ver el comentario en seguimiento.js.
   res.json({
-    activo: process.env.SEGUIMIENTO_ACTIVO === "1",
-    plantilla_2: process.env.SEGUIMIENTO_PLANTILLA_2 || "(sin configurar)",
-    plantilla_3: process.env.SEGUIMIENTO_PLANTILLA_3 || "(sin configurar)",
-    estado: seguimiento.diagnostico()
+    ...seguimiento.configuracionEfectiva(),
+    estado: seguimiento.diagnostico(),
   });
 });
 
