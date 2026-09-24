@@ -2,6 +2,7 @@ const {
   tablaFletesTexto,
   PRECIO_PRODUCTO,
   PROMO_2_UNIDADES,
+  PROMO_2_TOTAL,
   fmt,
 } = require("./fletes");
 
@@ -53,8 +54,32 @@ Pídele que envíe el comprobante de pago por este chat. Cuando lo mande, confir
 // pasar y escala a un asesor para que dé la dirección.
 // ============================================================================
 function bodegaInfo() {
-  const direccion = process.env.BODEGA_DIRECCION;
-  const ciudad = process.env.BODEGA_CIUDAD;
+  // ⚠️ POR QUÉ ESTA DIRECCIÓN SÍ VA EN EL CÓDIGO Y LOS NEQUI NO.
+  //
+  // Primero dije que no debía ir en el repo porque es público. El dueño me
+  // corrigió y tenía razón: esta dirección YA ES PÚBLICA. Está en el perfil de
+  // WhatsApp Business (aparece como "Address:" en el settings.txt del export),
+  // la ve cualquier cliente que abra el perfil, y el agente viejo la dio en
+  // 281 conversaciones. Ponerla acá no expone nada nuevo.
+  //
+  // Un número de Nequi es distinto: ese es una cuenta de plata y no está en
+  // ningún perfil público. Por eso sigue solo en variable de entorno.
+  //
+  // La variable se mantiene para poder cambiarla sin tocar código si se mudan.
+  //
+  // Ojo con el `??` en vez de `||`: si se mudan y todavía no saben la dirección
+  // nueva, poner BODEGA_DIRECCION="" (vacía) tiene que APAGAR la dirección, no
+  // caer de vuelta en la vieja. Con `||` la cadena vacía es falsy y el bot
+  // seguiría mandando clientes a una bodega donde ya no estamos.
+  const direccion = (process.env.BODEGA_DIRECCION ?? "Calle 62bis #67-12 Sur, barrio Madelena").trim();
+  const ciudad = (process.env.BODEGA_CIUDAD ?? "Bogotá").trim();
+  // 🔴 EL HORARIO NO SE PONE POR DEFECTO, A PROPÓSITO.
+  // El perfil de Meta dice "Abierto las 24 horas todos los días" y el agente
+  // viejo lo repetía. Pero ese es el horario de ATENCIÓN por WhatsApp, no el de
+  // una bodega física: si un cliente se para en la puerta a las 3 de la mañana
+  // porque el bot se lo prometió, el problema es peor que no haber dicho nada.
+  // Hasta que el dueño confirme el horario real, el bot da la dirección y pide
+  // coordinar la hora.
   const horario = process.env.BODEGA_HORARIO;
 
   const comun =
@@ -72,9 +97,15 @@ function bodegaInfo() {
     );
   }
 
+  const lineaHorario = horario
+    ? `- Horario: ${horario}\n`
+    : `⛔ **NO hay horario confirmado: no inventes uno** ni digas "24 horas". Coordiná: *"¿Qué ` +
+      `día pensás pasar? Te confirmo la hora para que no viajés en vano 🙌"*\n`;
+
   return (
     comun +
-    `- Dirección: ${direccion}${ciudad ? ` · ${ciudad}` : ""}${horario ? ` · ${horario}` : ""}\n` +
+    `- Dirección: ${direccion}${ciudad ? ` · ${ciudad}` : ""}\n` +
+    lineaHorario +
     `🔑 **Ofrecelo como ventaja: recogiendo NO paga envío**, es lo más barato que hay.\n` +
     `*"¡Claro! Si pasás a recogerlo no pagás envío: te sale en ${fmt(PRECIO_PRODUCTO)} 🙌 Estamos en ${direccion}."*\n` +
     `- Recogiendo, el total es solo el producto: ${fmt(PRECIO_PRODUCTO)} uno, ${fmt(PROMO_2_UNIDADES)} los dos.\n` +
@@ -204,14 +235,13 @@ compartido subió el share de pedidos de 2 unidades de **6,8% a 26,8% (3,9×)**.
 3. ⚠️ **NUNCA regales el envío en un pedido de 2.** El envío de 2 unidades es más caro que el de 1
    y se cobra completo, siempre.
 4. ✅ **SÍ COTIZÁ EL TOTAL DE 2 UNIDADES, EN FIRME.** Está en la tabla de arriba, por banda
-   ($137.000 Bogotá … $158.000 pueblos). **Ya no se escala a un asesor.**
+   (${fmt(PROMO_2_TOTAL.A)} Bogotá … ${fmt(PROMO_2_TOTAL.E)} pueblos). **Ya no se escala a un asesor.**
 
    🚨🚨 **NUNCA MULTIPLIQUES ${fmt(PRECIO_PRODUCTO)} × 2. ESTE ES EL ERROR MÁS CARO QUE HAY.**
    Los dos conjuntos valen **${fmt(PROMO_2_UNIDADES)} en promo**, no ${fmt(2 * PRECIO_PRODUCTO)}.
-   Ya pasó y costó una venta: a un cliente se le dijo *"los dos conjuntos ($119.800) más el envío
-   ($38.200) = $158.000"*. Eso son dos unidades a precio lleno **sin aplicar la promo**, y encima
-   con un envío inventado para que la suma cuadrara. El cliente hizo la cuenta, vio que no había
-   descuento, y se fue.
+   Ya pasó y costó una venta: se le dijo *"los dos ($119.800) + envío ($38.200) = $158.000"*. Eso
+   es precio lleno **sin la promo**, con un envío inflado para que la suma cuadrara. El cliente
+   hizo la cuenta, vio que no había descuento, y se fue.
 
    🔑 **EL COMBO SE DICE SIEMPRE ASÍ: ${fmt(PROMO_2_UNIDADES)} los dos conjuntos + el envío de su ciudad.**
    Los dos números salen de la tabla de arriba y **suman exacto al total**.
@@ -225,11 +255,8 @@ compartido subió el share de pedidos de 2 unidades de **6,8% a 26,8% (3,9×)**.
    ⛔ Nunca inventes el desglose ni lo redondees a tu manera: usá el de la tabla, que ya está
    calculado para que el envío mostrado NUNCA quede por encima del real. Si te lo inventás, el
    cliente lo verifica en la página de la transportadora y nos pilla.
-   🔑 Esto cambió el 19-sep: antes los totales de 2 unidades estaban por debajo del margen y
-   por eso había que confirmarlos a mano. Ya están corregidos y verificados. Mandar el cliente
-   a esperar a un asesor cuando el número ya existe es perder la venta: **el 26,8% de los
-   pedidos son de 2 unidades y cada uno vale casi el doble.**
-   *"En promo te salen los dos en $137.000 con el envío incluido 🙌 ¿Qué tallas y colores?"*
+   🔑 Mandar al cliente a esperar a un asesor cuando el número ya existe es perder la venta:
+   **el 26,8% de los pedidos son de 2 unidades y cada uno vale casi el doble.**
    ⛔ La ÚNICA excepción es difícil acceso (Tadó y compañía): ahí el envío se duplica en vez de
    compartirse, no se ofrece la promo, y si insiste se escala con ##HANDOFF##.
 5. 🤝 **AL POR MAYOR: SÍ MANEJAMOS, PERO NO LO COTIZÁS VOS.**
