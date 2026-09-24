@@ -43,9 +43,13 @@ console.log("\n── 1. El caso que se perdió: Montería, 2 unidades ──");
 
 const mont = f.cotizar("Monteria", 2);
 chequear("Montería sigue siendo banda D", mont.banda === "D");
+// 23-sep: banda D pasa de $140.000 a $147.000 porque el combo se cotiza como
+// $110.000 + envío en TODAS las bandas. D era la única desalineada: su margen
+// por unidad era $18.084 contra ~$23.500 de las demás, y ahora queda en $21.584
+// como el resto. Es la única banda que SUBE con este cambio.
 chequear(
-  "el total es $140.000 (bajado por decisión del dueño el 22-sep)",
-  mont.total === 140000,
+  "el total de banda D es $147.000 ($110.000 + $37.000 de envío)",
+  mont.total === 147000,
   `quedó en ${pesos(mont.total)}`
 );
 chequear(
@@ -100,7 +104,13 @@ console.log("\n── 4. El margen de cada banda, contra su límite ──");
 // 22-sep para ganar volumen, con los números a la vista. Esta prueba no exige
 // la meta ahí, pero sí exige el límite que de verdad importa (ver bloque 7):
 // que vender DOS siga dejando más que vender UNA.
-const BAJO_LA_META_A_PROPOSITO = { D: "bajada a $140.000 por decisión del dueño (22-sep)" };
+// 23-sep: las CINCO bandas quedan bajo la meta por unidad a propósito, porque el
+// combo se cotiza como $110.000 los dos + el envío real. Antes era imposible
+// mostrar los $110.000 sin inflar el flete. Cuesta ~$2.000/ud antes de pauta,
+// pero DESPUÉS de pauta el combo sigue dejando 4,5 a 7,2 veces más que una unidad
+// sola — y eso es lo que el bloque 7 sí exige. Banda D además MEJORA.
+const RAZON = "combo a $110.000 + envío por decisión del dueño (23-sep); el bloque 7 vigila el piso real";
+const BAJO_LA_META_A_PROPOSITO = { A: RAZON, B: RAZON, C: RAZON, D: RAZON, E: RAZON };
 
 for (const banda of ["A", "B", "C", "D", "E"]) {
   const q = f.cotizar(CIUDAD[banda], 2);
@@ -313,7 +323,7 @@ chequear(
 );
 chequear(
   "banda A ahora sí tiene rescate, y es menor que su lista",
-  f.cotizar(CIUDAD.A, 2).rescate === 127000 && 127000 < f.PROMO_2_TOTAL.A
+  f.cotizar(CIUDAD.A, 2).rescate === 123000 && 123000 < f.PROMO_2_TOTAL.A
 );
 
 // 🚨 EL CANDADO DE PLATA: ningún rescate puede dejar la venta por debajo del
@@ -360,6 +370,58 @@ chequear(
 // 🔑 Lo más importante: que la IA reciba el número CON su condición. Si el
 // prompt trae el precio suelto, la IA lo usa de entrada y se vuelve la lista.
 const t = f.tablaFletesTexto();
+// ───────────────────────────────────────────────────────────────────────────
+// 23-sep: el desglose del combo se dice SIEMPRE, no solo si lo piden.
+//
+// DE DÓNDE SALE: el dueño vio chats con "$158.000" y escribió *"súper carísimo"*.
+// Medido en el export, el precio NO es la objeción declarada (1,9% de los combos
+// perdidos lo mencionó) y banda E es solo el 12,4% de las ventas. Pero el número
+// suelto sí se lee mal, y partirlo no cuesta un peso de margen: el cliente ve que
+// cada conjunto le sale ~$56.000 y que el número grande es el flete.
+// ───────────────────────────────────────────────────────────────────────────
+// El texto vive en el GUION completo, no en la tabla de fletes: `t` es solo la
+// tabla, así que hay que mirar buildSystemPrompt().
+const guionCompleto = require("./src/prompt").buildSystemPrompt();
+chequear(
+  "el guion prohíbe multiplicar el precio de una unidad por dos",
+  /NUNCA MULTIPLIQUES .* × 2/.test(guionCompleto)
+);
+chequear(
+  "y manda decir el combo como $110.000 + envío",
+  /EL COMBO SE DICE SIEMPRE AS[ÍI]/.test(guionCompleto)
+);
+chequear(
+  "explicando que cada conjunto sale más barato así",
+  /cada conjunto le sale/.test(guionCompleto) && guionCompleto.includes("~$55.000")
+);
+chequear(
+  "🔑 y el desglose del guion usa los $110.000 de la promo en TODAS las bandas",
+  ["A", "B", "C", "D", "E"].every(
+    (b) => f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]).producto === f.PROMO_2_UNIDADES
+  ),
+  "si el producto no da 110.000, el bot no está aplicando la promo"
+);
+chequear(
+  "y prohíbe inventar o redondear el desglose",
+  /Nunca inventes el desglose ni lo redondees/.test(guionCompleto)
+);
+chequear(
+  "🚨 el desglose de CADA banda suma exacto al total",
+  ["A", "B", "C", "D", "E"].every((b) => {
+    const d = f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]);
+    return d.producto + d.envio === f.PROMO_2_TOTAL[b];
+  }),
+  "si no suma, el cliente hace la cuenta y nos pilla"
+);
+chequear(
+  "🚨 y el envío mostrado del combo nunca pasa el real, en ninguna banda",
+  ["A", "B", "C", "D", "E"].every((b) => {
+    const d = f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]);
+    return d.envio <= f.ENVIO_REAL_2[b];
+  }),
+  "el cliente puede verificar el flete en 99 Envíos"
+);
+
 chequear("el prompt trae el bloque del precio de rescate", t.includes("PRECIO DE RESCATE"));
 chequear("y dice que es SOLO si ya dijo que está caro", t.includes("SOLO si ya dijo que está caro"));
 chequear("y prohíbe ofrecerlo de entrada", t.includes("NUNCA ofrezcas este precio de entrada"));

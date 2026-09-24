@@ -290,9 +290,13 @@ chequear(
 
 console.log("\n── 7. Otro día no se mezcla ──");
 
-const ayer = auditoria.auditar("2026-09-22");
-chequear("un día sin actividad da cero conversaciones", ayer.cuenta.conversaciones === 0);
-chequear("y ninguna venta perdida", ayer.confirmadasSinPedido.length === 0);
+// 🔴 Acá había una prueba que dependía de la fecha: pedía el día "2026-09-22" y
+// más arriba esta misma batería envejece una conversación "a anteayer". Cuando el
+// reloj pasó la medianoche, anteayer CAYÓ en el 22-sep y la prueba falló sin que
+// nada estuviera roto. Se usa una fecha que no puede colisionar con nada.
+const vacio = auditoria.auditar("2019-03-15");
+chequear("un día sin actividad da cero conversaciones", vacio.cuenta.conversaciones === 0);
+chequear("y ninguna venta perdida", vacio.confirmadasSinPedido.length === 0);
 chequear("el render de un día vacío no explota", typeof auditoria.render({ token: "x", dia: "2026-01-01" }) === "string");
 
 console.log("\n── 8. La ruta está protegida ──");

@@ -35,9 +35,17 @@ console.log("");
 // el límite que SÍ se sigue exigiendo es el del bloque 1-B (vender dos tiene
 // que dejar más que vender una). Si esta lista crece sin razón escrita, es que
 // se está erosionando el margen de a poquitos.
+const RAZON_COMBO_23SEP =
+  "23-sep: el combo se cotiza como $110.000 los dos + el envío real redondeado al " +
+  "millar abajo, por decisión del dueño. Antes el bot cotizaba dos unidades a precio " +
+  "lleno ($119.800) e inventaba el envío para que cuadrara; con los totales viejos era " +
+  "IMPOSIBLE mostrar los $110.000 sin inflar el flete. Cuesta ~$2.000/ud de margen " +
+  "antes de pauta, pero DESPUÉS de pauta el combo sigue dejando 4,5 a 7,2 veces más " +
+  "que una unidad sola (el bloque 1-B lo verifica), y banda D MEJORA de $18.084 a " +
+  "$21.584/ud. Ver el comentario de PROMO_2_TOTAL en fletes.js.";
 const BAJO_LA_META_A_PROPOSITO = {
-  D: "bajada de $152.000 a $140.000 el 22-sep para ganar volumen: un cliente de " +
-     "Montería vio $152.000 y se fue. Ver analisis/bajar-a-137-22sep.py",
+  A: RAZON_COMBO_23SEP, B: RAZON_COMBO_23SEP, C: RAZON_COMBO_23SEP,
+  D: RAZON_COMBO_23SEP, E: RAZON_COMBO_23SEP,
 };
 for (const b of ["A", "B", "C", "D", "E"]) {
   const m2 = (PROMO_2_TOTAL[b] - 2 * COSTO_PROD - ENVIO_2[b]) / 2;
@@ -76,13 +84,13 @@ const c1 = cotizar("Cali", 1);
 ok(c1.total === 82000, `"Para Cali" → ${fmt(c1.total)} (esperado $82.000)`);
 
 const c2 = cotizar("Medellin", 2);
-ok(c2.total === 152000, `"2 para Medellín" → ${fmt(c2.total)} (esperado $152.000)`);
+ok(c2.total === 148000, `"2 para Medellín" → ${fmt(c2.total)} (esperado $148.000 = $110.000 + $38.000)`);
 
 const c3 = cotizar("Bogota", 1);
 ok(c3.total === 73000, `"Para Bogotá" → ${fmt(c3.total)} (esperado $73.000)`);
 
 const c4 = cotizar("Bogota", 2);
-ok(c4.total === 137000, `"2 para Bogotá" → ${fmt(c4.total)} (esperado $137.000)`);
+ok(c4.total === 133000, `"2 para Bogotá" → ${fmt(c4.total)} (esperado $133.000 = $110.000 + $23.000)`);
 
 const c5 = cotizar("Tunja", 1);
 ok(c5.total === 78000, `"Para Tunja" → ${fmt(c5.total)} (esperado $78.000)`);
@@ -201,8 +209,8 @@ const { tablaFletesTexto } = require("./src/fletes");
 const tabla = tablaFletesTexto();
 ok(!/SIN precio:[^\n]*\bMOSQUERA\b/.test(tabla),
   "MOSQUERA no aparece como difícil acceso (sería contradicción con banda A)");
-ok(/137\.000/.test(tabla) && /158\.000/.test(tabla),
-  "la tabla incluye los totales firmes de 2 unidades ($137.000 a $158.000)");
+ok(/133\.000/.test(tabla) && /155\.000/.test(tabla) && /110\.000/.test(tabla),
+  "la tabla incluye los totales firmes de 2 unidades ($133.000 a $155.000)");
 ok(/MOSQUERA \(Cundinamarca/.test(tabla),
   "MOSQUERA aparece en la lista de nombres ambiguos");
 
