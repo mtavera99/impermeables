@@ -366,25 +366,56 @@ const FLETE_2_OBSERVADO = {
 //   A       $137.000   $133.000   $110.000 + $23.000  (real $23.947)
 //   B       $146.000   $142.000   $110.000 + $32.000  (real $32.597)
 //   C       $152.000   $148.000   $110.000 + $38.000  (real $38.784)
-//   D       $140.000   $147.000   $110.000 + $37.000  (real $37.832)  ⬆️ SUBE
+//   D       $140.000   $140.000   $103.000 + $37.000  (real $37.832)  ← se queda
 //   E       $158.000   $155.000   $110.000 + $45.000  (real $45.214)
 //
-// ⚠️ BANDA D SUBE $7.000, Y ES A PROPÓSITO. El dueño la había bajado a $140.000
-// el 22-sep y eso dejó su combo en $36.168 de margen contra ~$47.000 de las
-// demás: era la única banda desalineada, y ya lo veníamos marcando. Con esta
-// estructura todas quedan en ~$43.000, incluida D.
+// ============================================================================
+// ⚠️⚠️ BANDA D SE QUEDA EN $140.000 POR DECISIÓN DEL DUEÑO (24-sep).
 //
-// EL EFECTO EN PLATA, ponderado por el volumen real de cada banda (A 32,7%,
-// B 7,1%, C 31,9%, D 15,9%, E 12,4% de las ventas cerradas del export):
-//   −$2.127 de margen por combo, y el cierre del combo solo tiene que subir
-//   4,9% para empatar. Es la barra más baja de todos los cambios de precio que
-//   hemos evaluado (una rebaja plana de $10.000 exigía +27%).
+// Yo la había subido a $147.000 para que las cinco bandas quedaran parejas en
+// ~$43.000 de margen por combo. El dueño lo revirtió con estas palabras:
+// *"dejarla en 140.000 para que se venda más"*. Es la SEGUNDA vez que decide
+// este número (ya la había bajado de $152.000 el 22-sep), así que no es un
+// descuido: es su criterio sostenido de preferir volumen en esta banda.
+//
+// QUÉ CUESTA, con el envío real de 2 uds en banda D ($37.832):
+//   a $147.000 → $43.168 de margen por combo
+//   a $140.000 → $36.168 de margen por combo   = −$7.000
+//   Banda D es el 15,9% de las ventas, así que son ~$1.113 menos por combo
+//   promedio del país.
+//
+// POR QUÉ NO ES UN PROBLEMA: la alternativa real casi nunca es "paga $147.000".
+// Es "se lleva UNA sola a $83.000", que deja $23.713. Vender DOS a $140.000
+// deja $36.168 — **$12.455 MÁS que vender una**. El piso que de verdad importa
+// (bloque 7 de test-desglose-honesto.js) se cumple con holgura.
+//
+// ⚠️ LO QUE SÍ SE ENCOGE, y hay que tenerlo claro: el espacio para negociar.
+// El rescate de banda D es $137.000, así que a $140.000 de lista quedan **solo
+// $3.000 de margen para regatear**, contra $10.000 en las otras cuatro bandas.
+// En banda D el descuento ya está metido en el precio de lista. Bajarlo más
+// dejaría el combo por debajo de lo que deja una unidad después de pauta.
+//
+// ⚠️ Y EL DESGLOSE DE BANDA D ES EL ÚNICO QUE NO DA $110.000. Da $103.000 los
+// dos + $37.000 de envío. Es correcto y es honesto (el envío mostrado sigue por
+// debajo del real, y la suma cierra exacta), pero el guion NO puede decir
+// "siempre $110.000": tiene que leer el desglose de la tabla. Ya está corregido
+// en prompt.js y hay una prueba que lo amarra.
+//
+// 🔔 GATILLO: si el envío de 2 uds de banda D pasa de $44.000, a $140.000 el
+// margen por combo cae bajo $30.000 y hay que volver a mirarlo.
+// ============================================================================
+//
+// EL EFECTO EN PLATA del cambio de estructura, ponderado por el volumen real de
+// cada banda (A 32,7%, B 7,1%, C 31,9%, D 15,9%, E 12,4% de las ventas cerradas
+// del export): −$2.127 de margen por combo, y el cierre del combo solo tiene que
+// subir 4,9% para empatar. Es la barra más baja de todos los cambios de precio
+// que hemos evaluado (una rebaja plana de $10.000 exigía +27%).
 //
 // Y EL GANCHO SE HACE MÁS GRANDE, que es lo que de verdad vende: el ahorro
-// contra comprar dos sueltos pasa de $9.000 a $13.000 en Bogotá, y de $12.000 a
-// $16.000 en capitales.
+// contra comprar dos sueltos pasa de $9.000 a $13.000 en Bogotá, de $12.000 a
+// $16.000 en capitales, y en banda D es el más grande del país: **$26.000**.
 // ============================================================================
-const PROMO_2_TOTAL = { A: 133000, B: 142000, C: 148000, D: 147000, E: 155000 };
+const PROMO_2_TOTAL = { A: 133000, B: 142000, C: 148000, D: 140000, E: 155000 };
 
 // ============================================================================
 // 💬 PRECIO DE RESCATE — el descuento que NO se regala
@@ -954,9 +985,8 @@ ${rescates}
 
   return `${bandas}
 
-## 2 CONJUNTOS — TOTALES FIRMES POR BANDA (corregidos el 19-sep)
-Estos totales YA incluyen el envío de las 2 unidades. Son firmes: se cotizan
-igual que los de 1 unidad, sin escalar a un asesor.
+## 2 CONJUNTOS — TOTALES FIRMES POR BANDA
+Estos totales YA incluyen el envío de las 2 unidades y son firmes.
 ${promo2}${bloqueRescate}
 ⛔ EXCEPCIÓN: en los destinos de difícil acceso de abajo NO se ofrece la promo
 de 2 (en Tadó el envío se DUPLICA en vez de compartirse). Ahí se cotiza a mano.

@@ -43,14 +43,23 @@ console.log("\n── 1. El caso que se perdió: Montería, 2 unidades ──");
 
 const mont = f.cotizar("Monteria", 2);
 chequear("Montería sigue siendo banda D", mont.banda === "D");
-// 23-sep: banda D pasa de $140.000 a $147.000 porque el combo se cotiza como
-// $110.000 + envío en TODAS las bandas. D era la única desalineada: su margen
-// por unidad era $18.084 contra ~$23.500 de las demás, y ahora queda en $21.584
-// como el resto. Es la única banda que SUBE con este cambio.
+// 24-sep: BANDA D SE QUEDA EN $140.000 POR DECISIÓN DEL DUEÑO.
+// El 23-sep yo la había subido a $147.000 para alinear el margen de las cinco
+// bandas en ~$43.000. El dueño lo revirtió: *"dejarla en 140.000 para que se
+// venda más"*. Es la segunda vez que decide este número (ya la había bajado de
+// $152.000 el 22-sep), así que es criterio sostenido, no un descuido.
+//
+// Lo que esta prueba protege NO es el número —ese es del dueño— sino que el
+// desglose siga cerrando exacto y honesto con el número que él eligió.
 chequear(
-  "el total de banda D es $147.000 ($110.000 + $37.000 de envío)",
-  mont.total === 147000,
+  "el total de banda D es $140.000, el que decidió el dueño",
+  mont.total === 140000,
   `quedó en ${pesos(mont.total)}`
+);
+chequear(
+  "y su desglose son $103.000 los dos + $37.000 de envío",
+  mont.producto === 103000 && mont.flete === 37000,
+  `dice ${pesos(mont.producto)} + ${pesos(mont.flete)}`
 );
 chequear(
   "el envío que se le muestra ya NO es $42.000",
@@ -387,20 +396,58 @@ chequear(
   /NUNCA MULTIPLIQUES .* × 2/.test(guionCompleto)
 );
 chequear(
-  "y manda decir el combo como $110.000 + envío",
-  /EL COMBO SE DICE SIEMPRE AS[ÍI]/.test(guionCompleto)
+  "y manda decir el combo partido en dos números (los dos + el envío)",
+  /EL COMBO SE DICE AS[ÍI]/.test(guionCompleto)
 );
 chequear(
   "explicando que cada conjunto sale más barato así",
-  /cada conjunto le sale/.test(guionCompleto) && guionCompleto.includes("~$55.000")
+  /cada conjunto le sale por debajo/.test(guionCompleto)
+);
+
+// ───────────────────────────────────────────────────────────────────────────
+// 🔴 24-sep: EL GUION YA NO PUEDE DECIR "SIEMPRE $110.000".
+//
+// El dueño dejó banda D en $140.000, así que ahí los dos conjuntos salen en
+// $103.000, no en $110.000. El desglose sigue siendo honesto (suma exacta y
+// envío por debajo del real), pero si el guion afirma un número plano, el
+// modelo lo va a usar en banda D y va a dictar una cuenta que no cuadra —
+// exactamente el error que costó la venta de San Juan de Urabá.
+//
+// Lo que se exige ahora: que el producto del combo nunca PASE el precio de
+// promo (nunca cobrarle más que la promo), que siempre quede por debajo de dos
+// sueltos, y que el guion avise de la banda distinta en vez de generalizar.
+// ───────────────────────────────────────────────────────────────────────────
+chequear(
+  "🔑 el combo nunca le cobra al cliente más que la promo de dos",
+  ["A", "B", "C", "D", "E"].every(
+    (b) => f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]).producto <= f.PROMO_2_UNIDADES
+  ),
+  "una banda quedó cobrando los dos conjuntos por encima de $110.000"
 );
 chequear(
-  "🔑 y el desglose del guion usa los $110.000 de la promo en TODAS las bandas",
+  "🔑 y siempre por debajo de comprar dos sueltos",
   ["A", "B", "C", "D", "E"].every(
-    (b) => f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]).producto === f.PROMO_2_UNIDADES
+    (b) => f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]).producto < 2 * f.PRECIO_PRODUCTO
   ),
-  "si el producto no da 110.000, el bot no está aplicando la promo"
+  "sin esto la 'promo' sale más cara que el precio normal"
 );
+{
+  const distintas = ["A", "B", "C", "D", "E"].filter(
+    (b) => f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]).producto !== f.PROMO_2_UNIDADES
+  );
+  chequear(
+    `🚨 si alguna banda no da $110.000 (hoy: ${distintas.join(", ") || "ninguna"}), el guion lo avisa`,
+    distintas.length === 0 || /Leelo de la tabla, no lo asumas/.test(guionCompleto),
+    "el guion generaliza un número que no aplica en todas las bandas"
+  );
+  chequear(
+    "y dice el número exacto de la banda distinta",
+    distintas.every((b) =>
+      guionCompleto.includes(f.fmt(f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]).producto))
+    ),
+    "el guion no trae el desglose de la banda que se sale del patrón"
+  );
+}
 chequear(
   "y prohíbe inventar o redondear el desglose",
   /Nunca inventes el desglose ni lo redondees/.test(guionCompleto)
