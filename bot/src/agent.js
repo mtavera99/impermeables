@@ -3,6 +3,7 @@
 const { buildSystemPrompt } = require("./prompt");
 const { respuestaDeArranque } = require("./primer-mensaje");
 const { revisarDireccionDePedido } = require("./direccion");
+const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
 
 // ============================================================================
@@ -360,12 +361,39 @@ async function generateReply(phone, userText) {
 
   let savedOrder = null;
   if (order) {
-    // Dos candados antes de guardar: el celular y la dirección. Los dos son
-    // requisitos de la transportadora, y los dos ya se rompieron en producción
-    // porque el guion los pedía y el modelo no siempre obedecía.
-    const conTelefono = revisarTelefono(order, phone);
-    const conDireccion = revisarDireccionDePedido({ ...conTelefono, telefono_chat: phone });
-    savedOrder = store.saveOrder(conDireccion);
+    // ========================================================================
+    // 🔴 CANDADO CERO: SIN "SÍ CONFIRMO" NO HAY VENTA.
+    //
+    // El 23-sep quedó guardado como pedido un cliente que había dicho "No
+    // confirmo". El modelo emitió el bloque junto con el cuadro, antes de que el
+    // cliente contestara. Un pedido así no es un número mal contado: si se
+    // despacha por el panel, sale un paquete para alguien que dijo que no.
+    //
+    // Va ANTES de los otros candados porque si no hay venta, lo demás no importa.
+    // ========================================================================
+    const conf = revisarConfirmacion(order, store.getConv(phone).messages, reply);
+    if (!conf.guardar) {
+      console.warn(
+        `⏭️  PEDIDO NO GUARDADO (${conf.estado}) de ${phone}: ${conf.motivo}. ` +
+          `Cliente: ${order.nombre || "?"} · ${order.ciudad || "?"} · $${order.total || "?"}`
+      );
+    } else {
+      // Dos candados más: el celular y la dirección. Los dos son requisitos de la
+      // transportadora, y los dos ya se rompieron en producción porque el guion
+      // los pedía y el modelo no siempre obedecía.
+      const conTelefono = revisarTelefono(order, phone);
+      const conDireccion = revisarDireccionDePedido({ ...conTelefono, telefono_chat: phone });
+      savedOrder = store.saveOrder({
+        ...conDireccion,
+        ...(conf.marcar ? { sin_confirmar: true, motivo_sin_confirmar: conf.motivo } : {}),
+      });
+      if (conf.marcar) {
+        console.warn(
+          `⚠️  PEDIDO SIN CONFIRMACIÓN CLARA de ${phone}: ${conf.motivo}. ` +
+            "SE GUARDA, pero hay que leer el chat antes de despachar."
+        );
+      }
+    }
   }
   if (handoff) store.setPaused(phone, true);
 
