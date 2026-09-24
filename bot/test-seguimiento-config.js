@@ -119,30 +119,106 @@ console.log("\n── 5. Apagado no manda NADA, aunque haya gente esperando ─�
 }
 
 function seguir() {
-  console.log("\n── 6. Los tres pasos son los acordados ──");
+  console.log("\n── 6. La cadencia nueva: 2h · 20h · 44h ──");
+  //
+  // Antes era 20h · 44h · 68h, con DOS plantillas de marketing. El dueño pidió
+  // tocar más temprano (como hacía a mano) y resultó ser también lo correcto por
+  // política: el tope de frecuencia de Meta solo aplica a plantillas de
+  // marketing, no al texto libre de las primeras 24h. Así que mover los toques
+  // adentro de la ventana los saca del alcance del tope.
 
   const s = cargarCon({});
   const H = 60 * 60 * 1000;
   chequear("son 3 pasos", s.PASOS.length === 3);
-  chequear("el 1 va a las 20h y es texto libre", s.PASOS[0].desde === 20 * H && s.PASOS[0].tipo === "texto");
-  chequear("el 2 va a las 44h y es plantilla", s.PASOS[1].desde === 44 * H && s.PASOS[1].tipo === "plantilla");
-  chequear("el 3 va a las 68h y es plantilla", s.PASOS[2].desde === 68 * H && s.PASOS[2].tipo === "plantilla");
+  chequear("el 1 va a las 2h y es texto libre", s.PASOS[0].desde === 2 * H && s.PASOS[0].tipo === "texto");
+  chequear("el 2 va a las 20h y es texto libre", s.PASOS[1].desde === 20 * H && s.PASOS[1].tipo === "texto");
+  chequear("el 3 va a las 44h y es plantilla", s.PASOS[2].desde === 44 * H && s.PASOS[2].tipo === "plantilla");
   chequear(
-    "🔑 el paso 1 cae DENTRO de las 24h (si no, Meta no deja texto libre)",
-    s.PASOS[0].hasta <= 24 * H,
-    "pasadas las 24h el texto libre se rechaza"
+    "🔑 los DOS primeros caen dentro de las 24h (texto libre, sin tope de frecuencia)",
+    s.PASOS[0].hasta <= 24 * H && s.PASOS[1].hasta <= 24 * H,
+    "pasadas las 24h Meta rechaza el texto libre"
   );
   chequear(
-    "🔑 y el paso 3 cierra ANTES de las 72h (si no, deja de ser gratis)",
+    "🔑 SOLO UNA plantilla de marketing por persona, no dos",
+    s.PASOS.filter((x) => x.tipo === "plantilla").length === 1,
+    "cada plantilla extra suma al tope de frecuencia y al riesgo de la calificación"
+  );
+  chequear(
+    "y el último cierra antes de las 72h (si no, deja de ser gratis)",
     s.PASOS[2].hasta <= 72 * H
+  );
+  chequear(
+    "los dos textos son distintos (a las 2h no se recuerda, se resuelve la duda)",
+    s.TEXTO_1 !== s.TEXTO_2 && s.TEXTO_1.length > 0
+  );
+  chequear("el de 2h va directo a la duda que frena", /duda/i.test(s.TEXTO_1));
+  chequear("y ofrece la salida fácil", /despacho/i.test(s.TEXTO_1));
+
+  console.log("\n── 6-B. 📊 SE PUEDE MEDIR CUÁL TOQUE PAGA ──");
+  //
+  // 🔴 `seguimientos` NO sirve para medir: cuando el cliente contesta se
+  // reinicia a 0, así que borra justo a los que respondieron — los éxitos.
+  // Medir con ese contador daría que el seguimiento no sirve nunca.
+
+  const st0 = require("./src/store");
+  const P = "573009998811";
+  st0.pushMsg(P, "user", "hola");
+  st0.reclamarSeguimiento(P, 0, 1);
+
+  let est = st0.estadisticasSeguimiento();
+  chequear("el paso 1 queda registrado como enviado", est[1].enviados === 1);
+  chequear("todavía sin respuesta", est[1].respondieron === 0);
+
+  st0.pushMsg(P, "user", "sí me interesa");
+  est = st0.estadisticasSeguimiento();
+  chequear("🔑 la respuesta se atribuye al paso que la provocó", est[1].respondieron === 1);
+  chequear(
+    "el contador de decisión se reinició (el lead vuelve a estar activo)",
+    st0.getConv(P).seguimientos === 0
+  );
+  chequear(
+    "🔑 pero el historial de medición NO se borró",
+    st0.estadisticasSeguimiento()[1].enviados === 1,
+    "si se borrara, los éxitos desaparecerían del conteo"
+  );
+  st0.pushMsg(P, "user", "dale");
+  chequear(
+    "un segundo mensaje no cuenta como otra respuesta",
+    st0.estadisticasSeguimiento()[1].respondieron === 1
+  );
+
+  st0.saveOrder({
+    nombre: "Prueba Seg", celular: "3009998811", ciudad: "Cali",
+    direccion: "Calle 1 #2-3", talla: "M", color: "Rojo", total: 82000, telefono_chat: P,
+  });
+  est = st0.estadisticasSeguimiento();
+  chequear("🔑 la venta se atribuye al paso que la trajo", est[1].compraron === 1);
+  chequear(
+    "y el pedido queda marcado",
+    st0.todosLosPedidos().some((o) => o.venta_tras_seguimiento === 1)
+  );
+  chequear("calcula tasa de respuesta", est[1].tasaRespuesta === 100);
+  chequear("y tasa de compra", est[1].tasaCompra === 100);
+  chequear(
+    "un paso que no se usó queda en cero, no en error",
+    est[3].enviados === 0 && est[3].tasaRespuesta === 0
+  );
+
+  const srv = fs.readFileSync(`${__dirname}/src/server.js`, "utf8");
+  chequear(
+    "la pantalla /seguimiento muestra el desglose por paso",
+    /porPaso: store\.estadisticasSeguimiento\(\)/.test(srv)
   );
 
   console.log("\n── 7. El texto del paso 1 trae el argumento que más cierra ──");
 
-  chequear("menciona contraentrega", /contraentrega/i.test(s.TEXTO_1));
-  chequear("aclara que paga al recibir", /pagas cuando lo/i.test(s.TEXTO_1));
-  chequear("y termina pidiendo la ciudad, que es lo que desbloquea el total", /ciudad/i.test(s.TEXTO_1));
-  chequear("sin presionar con descuentos", !/descuento|oferta|ultima oportunidad/i.test(s.TEXTO_1));
+  chequear("el de 2h tranquiliza sobre el pago", /cuando lo recib/i.test(s.TEXTO_1));
+  chequear("el de 20h menciona contraentrega", /contraentrega/i.test(s.TEXTO_2));
+  chequear("y pide la ciudad, que es lo que desbloquea el total", /ciudad/i.test(s.TEXTO_2));
+  chequear(
+    "ninguno presiona con descuentos",
+    !/descuento|oferta|ultima oportunidad/i.test(s.TEXTO_1 + s.TEXTO_2)
+  );
 
   console.log("\n── 8. La ruta del panel muestra la config efectiva ──");
 
@@ -191,8 +267,11 @@ function seguir() {
   {
     const archivo = `${DIR}/conversations.json`;
     const convs = JSON.parse(fs.readFileSync(archivo, "utf8"));
+    // ⚠️ Solo las conversaciones de ESTA sección. Antes el loop tocaba TODAS las
+    // del archivo, así que al agregar casos en otra sección este conteo cambiaba
+    // y la prueba fallaba sin que nada estuviera roto.
     let n = 0;
-    for (const k in convs) {
+    for (const k of Object.keys(convs).filter((x) => /^57300(111|222)000/.test(x))) {
       convs[k].ultimoDelCliente = ahora2 - 21 * H2;
       convs[k].seguimientos = 1;
       if (n >= 6) convs[k].compro = true; // recibieron seguimiento Y compraron
@@ -219,13 +298,21 @@ function seguir() {
     d.compraron === 2 && d.recibieron1 === 8,
     "son justo los que prueban que el seguimiento sirve: se contaban en cero"
   );
+  // Con la cadencia nueva (2h · 20h · 44h), alguien con 21h de espera y 1
+  // seguimiento hecho le toca el PASO 2, que es justo la ventana de 20-23h.
+  // Los 7 tienen 21h de espera, así que TODOS caen en la ventana del paso 2
+  // (20-23h): los 6 que ya tenían un seguimiento y el que no tenía ninguno.
+  // 🔑 Que el de cero seguimientos también entre es el arreglo importante: con la
+  // lógica vieja (PASOS[hechos]) le tocaba el paso 1, cuya ventana de 2-5h ya
+  // había pasado, y quedaba trabado sin recibir nada nunca.
   chequear(
-    `el que no recibió nada aparece esperando el paso 1 (dio ${d.esperandoPaso1})`,
-    d.esperandoPaso1 === 1
+    `los 7 con 21h de espera entran al paso 2 (dio ${d.esperandoPaso2})`,
+    d.esperandoPaso2 === 7,
+    "si dan menos, alguno quedó trabado al angostar la primera ventana"
   );
   chequear(
-    `los que ya tienen 1 quedan esperando las 44h, no en el paso 1 (dio ${d.enEspera})`,
-    d.enEspera === 6
+    "🔑 incluido el que se perdió el toque de 2h: recibe el de 20h, no cero",
+    d.esperandoPaso2 === 7 && d.esperandoPaso1 === 0
   );
   chequear("los contadores arrancan en cero cuando no hay nada", (() => {
     const vacio = { recibieron1: 0, recibieron2: 0, recibieron3: 0 };
@@ -273,7 +360,7 @@ function seguir() {
 
   const src2 = fs.readFileSync(`${__dirname}/src/seguimiento.js`, "utf8");
   const iReclama = src2.indexOf("reclamarSeguimiento(phone");
-  const iManda = src2.indexOf("await sendText(phone, TEXTO_1)");
+  const iManda = src2.indexOf("await sendText(phone, paso.texto())");
   chequear(
     "🔑 el código reserva el turno ANTES de mandar",
     iReclama > 0 && iManda > 0 && iReclama < iManda,
@@ -281,7 +368,7 @@ function seguir() {
   );
   chequear(
     "ya no registra después de mandar",
-    !/await sendText\(phone, TEXTO_1\);\s*\n\s*store\.registrarSeguimiento/.test(src2)
+    !/await sendText\([^)]*\);\s*\n\s*store\.registrarSeguimiento/.test(src2)
   );
   chequear(
     "⚠️ y la falta de plantilla se revisa ANTES de reservar (si no, se gasta un turno sin mandar)",

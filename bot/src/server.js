@@ -1904,6 +1904,9 @@ app.get("/seguimiento", (req, res) => {
   // tomar la decisión al revés. Ver el comentario en seguimiento.js.
   res.json({
     ...seguimiento.configuracionEfectiva(),
+    // 📊 Qué pasó con cada paso: enviados, cuántos contestaron, cuántos
+    // compraron. Es la única forma de saber cuál de los tres toques paga.
+    porPaso: store.estadisticasSeguimiento(),
     estado: seguimiento.diagnostico(),
   });
 });
