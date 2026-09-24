@@ -178,6 +178,55 @@ function registrarSeguimiento(phone) {
   writeJSON(CONV_FILE, all);
 }
 
+// ============================================================================
+// 🔴 RECLAMAR EL TURNO ANTES DE MANDAR, NO DESPUÉS
+//
+// DE DÓNDE SALE (24-sep): el seguimiento mandaba primero y registraba después:
+//
+//     await sendText(phone, TEXTO_1);      // ~1 segundo de red
+//     store.registrarSeguimiento(phone);   // recién acá queda anotado
+//
+// Durante ese segundo, el cliente sigue apareciendo como "no le hemos escrito".
+// Si otra corrida entra en esa ventana, le manda el MISMO mensaje otra vez.
+//
+// Y no es hipotético: el dueño abrió /seguimiento/correr a mano mientras el reloj
+// automático corre cada 30 minutos, y en los logs de esa noche aparecieron dos
+// identificadores de instancia distintos. Con dos procesos leyendo el mismo disco,
+// los dos ven `seguimientos: 0` y los dos mandan.
+//
+// Un cliente que recibe el mismo mensaje de marketing dos veces es una queja y un
+// golpe a la calificación del número — que es lo único que no se puede comprar de
+// vuelta.
+//
+// LA SOLUCIÓN: comparar-y-guardar. Se exige que el contador esté EXACTAMENTE en
+// el valor esperado; si otra corrida ya lo subió, esta se retira sin mandar.
+//
+// ⚠️ No es un candado perfecto (no hay bloqueo de archivo), pero reduce la ventana
+// de riesgo de ~1 segundo de red a unos milisegundos de disco.
+//
+// ⚠️ Y SE RECLAMA ANTES DE MANDAR A PROPÓSITO: si el envío falla después, se
+// pierde UN seguimiento. Eso es mucho más barato que mandarlo dos veces.
+// ============================================================================
+
+/**
+ * Reserva el turno de seguimiento si nadie más lo tomó.
+ * @param {string} phone
+ * @param {number} esperados cuántos seguimientos creíamos que tenía
+ * @returns {boolean} true si quedó reservado para nosotros
+ */
+function reclamarSeguimiento(phone, esperados) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone];
+  if (!c) return false;
+  if ((c.seguimientos || 0) !== esperados) return false; // otra corrida se adelantó
+  c.seguimientos = esperados + 1;
+  c.ultimoSeguimiento = Date.now();
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+  return true;
+}
+
 /**
  * Guarda el nombre y el username del cliente.
  *
@@ -698,7 +747,7 @@ function estadoDelDisco() {
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   registrarArranque, estadoDelDisco,
-  marcarComprado, registrarSeguimiento, marcarNoMolestar, todasLasConversaciones,
+  marcarComprado, registrarSeguimiento, reclamarSeguimiento, marcarNoMolestar, todasLasConversaciones,
   guardarPerfil, guardarAtribucion, atribucionDe,
   reemplazarPedidos,
   todosLosPedidos,

@@ -99,23 +99,53 @@ async function correrSeguimientos() {
 
     const horas = ((ahora - c.ultimoDelCliente) / H).toFixed(1);
 
+    // ⚠️ Esto va ANTES de reclamar el turno. Si se reclama primero y después se
+    // descubre que falta la plantilla, se consume un seguimiento sin mandar nada
+    // y el cliente pierde ese toque para siempre.
+    if (paso.tipo === "plantilla" && !paso.plantilla) {
+      saltados++;
+      console.log(
+        `[seguimiento ${paso.n}] ${phone} (${horas}h) SALTADO: ` +
+          `falta configurar SEGUIMIENTO_PLANTILLA_${paso.n}. ` +
+          "Pasadas las 24h Meta solo acepta plantillas aprobadas."
+      );
+      continue;
+    }
+
+    // 🔒 Se reserva el turno ANTES de mandar. Si otra corrida ya lo tomó —el
+    // reloj automático y un clic manual pueden cruzarse— esta se retira en vez
+    // de mandarle al cliente el mismo mensaje dos veces.
+    if (!store.reclamarSeguimiento(phone, c.seguimientos || 0)) {
+      saltados++;
+      console.log(
+        `[seguimiento ${paso.n}] ${phone} SALTADO: otra corrida ya le escribió ` +
+          "(el reloj y un envío manual se cruzaron)"
+      );
+      continue;
+    }
+
     if (paso.tipo === "texto") {
-      await sendText(phone, TEXTO_1);
-      store.registrarSeguimiento(phone);
+      const r = await sendText(phone, TEXTO_1);
+      if (r && r.ok === false) {
+        console.error(
+          `🔴 [seguimiento ${paso.n}] ${phone} NO SE ENTREGÓ: ${JSON.stringify(r.body?.error || r.body).slice(0, 180)}. ` +
+            "El turno ya quedó consumido: se pierde este seguimiento, pero no se manda doble."
+        );
+      }
       enviados++;
       console.log(`[seguimiento ${paso.n}] ${phone} (${horas}h) texto libre enviado`);
     } else {
-      if (!paso.plantilla) {
-        saltados++;
-        console.log(
-          `[seguimiento ${paso.n}] ${phone} (${horas}h) SALTADO: ` +
-          `falta configurar SEGUIMIENTO_PLANTILLA_${paso.n}. ` +
-          `Pasadas las 24h Meta solo acepta plantillas aprobadas.`
+      const r = await sendTemplate(phone, paso.plantilla, IDIOMA);
+      if (r && r.ok === false) {
+        // 🔴 Acá es donde se va a ver si la plantilla tiene variables: Meta la
+        // rechaza y el error lo dice. Se registra fuerte porque es el estreno.
+        console.error(
+          `🔴 [seguimiento ${paso.n}] ${phone} PLANTILLA '${paso.plantilla}' RECHAZADA: ` +
+            `${JSON.stringify(r.body?.error || r.body).slice(0, 220)}. ` +
+            "Si dice que faltan parámetros, la plantilla tiene variables {{1}} y hay que " +
+            "mandarla con componentes. Si habla del idioma, revisar que sea es_CO."
         );
-        continue;
       }
-      await sendTemplate(phone, paso.plantilla, IDIOMA);
-      store.registrarSeguimiento(phone);
       enviados++;
       console.log(`[seguimiento ${paso.n}] ${phone} (${horas}h) plantilla '${paso.plantilla}' enviada`);
     }
