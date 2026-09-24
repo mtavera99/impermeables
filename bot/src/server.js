@@ -14,6 +14,7 @@ const guias = require("./guias");
 const panelNovedades = require("./panel-novedades");
 const panelChat = require("./panel-chat");
 const { avisoParaElDueno: avisoDireccion } = require("./direccion");
+const panelAuditoria = require("./panel-auditoria");
 const novedades = require("./novedades");
 const audio = require("./audio");
 const resumen = require("./resumen");
@@ -371,6 +372,32 @@ app.get("/chat", (req, res) => {
     );
   } catch (e) {
     res.status(500).send("Error armando la pantalla: " + esc(e.message));
+  }
+});
+
+// ============================================================================
+// GET /auditoria?token=...[&dia=2026-09-23]
+//
+// 🔍 ¿Entraron todos los chats? ¿Se perdió alguna venta por el camino?
+//
+// DE DÓNDE SALE (23-sep): con 1 sola venta y $92.000 de pauta, el dueño pidió
+// "una verificación de que entraron todos los chats y que no haya un error
+// quizás con las ventas tomadas". No había forma de contestarle.
+//
+// Lo importante que mide: conversaciones donde el bot mandó el cuadro y el
+// cliente dijo que confirmaba, pero NO quedó pedido guardado. Esa es una venta
+// cerrada que se perdió.
+// ============================================================================
+app.get("/auditoria", (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) {
+    return res.status(403).send("<h3>Falta el token.</h3><p>Usá /auditoria?token=TU_PANEL_TOKEN</p>");
+  }
+  try {
+    res
+      .set("Content-Type", "text/html; charset=utf-8")
+      .send(panelAuditoria.render({ token: PANEL_TOKEN, dia: req.query.dia ? String(req.query.dia) : "" }));
+  } catch (e) {
+    res.status(500).send("Error armando la auditoría: " + esc(e.message));
   }
 });
 
