@@ -20,7 +20,9 @@
  *
  * Y la razón que decide no depende de la elasticidad: 🔑 LA 2ª UNIDAD NO PAGA
  * PAUTA. El costo de traer al cliente se paga una vez por PEDIDO. Después de
- * publicidad, 1 unidad deja $3.303–$5.094 y un combo deja $16.168–$27.403.
+ * publicidad, 1 unidad deja $3.303–$5.094 y un combo deja $16.168–$23.786.
+ * (El piso $16.168 es banda D, que el dueño dejó en $140.000 el 24-sep para
+ *  ganar volumen: sigue dejando $12.455 más que vender una sola unidad.)
  *
  * 🔴 LO QUE ESTA PRUEBA CUIDA: el guion decía "🚫 NUNCA [descuento] en pedidos de
  * 2 unidades" — exactamente al revés de lo que dicen los costos. Prohibía
