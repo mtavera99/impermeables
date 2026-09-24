@@ -70,13 +70,41 @@ function auditar(dia) {
   const conversaciones = store.todasLasConversaciones();
   const pedidos = store.todosLosPedidos();
 
-  // Pedidos guardados ese día, por chat.
-  const pedidoPorChat = new Map();
+  // ==========================================================================
+  // 🔴 ESTO ESTABA MAL MEDIDO Y LO DELATÓ LA PRIMERA CORRIDA REAL (23-sep).
+  //
+  // La primera versión comparaba contra TODOS los pedidos de la historia. Con
+  // eso, un cliente que ya había comprado antes y volvió a confirmar hoy
+  // aparecía como "tiene pedido" y no se contaba como venta perdida.
+  //
+  // Y el número lo delató: la pantalla mostró 9 confirmaciones, 2 pedidos
+  // guardados y 1 sola venta perdida. Faltaban 6 sin explicar. Un total que no
+  // cuadra no es un detalle de presentación: es la señal de que la cuenta está
+  // mal hecha.
+  //
+  // Ahora los pedidos se separan en los de HOY y los ANTERIORES, y cada
+  // confirmación de hoy cae en una de tres canastas:
+  //
+  //   · pedido guardado hoy ......... la venta se tomó bien
+  //   · solo tiene pedido anterior ... ya había comprado: NO es venta nueva, y
+  //                                    es lo que hace el candado antiduplicados
+  //   · ningún pedido ............... 🔴 venta cerrada que se perdió
+  //
+  // Así los números suman y se puede confiar en ellos.
+  // ==========================================================================
+  const pedidoDeHoy = new Map();
+  const pedidoAnterior = new Map();
   let pedidosDelDia = 0;
   for (const p of pedidos) {
+    const chat = String(p.telefono_chat || "");
+    if (!chat) continue;
     const t = new Date(p.fecha).getTime();
-    if (Number.isFinite(t) && diaBogota(t) === hoy) pedidosDelDia++;
-    if (p.telefono_chat) pedidoPorChat.set(String(p.telefono_chat), p);
+    if (Number.isFinite(t) && diaBogota(t) === hoy) {
+      pedidosDelDia++;
+      pedidoDeHoy.set(chat, p);
+    } else if (!pedidoAnterior.has(chat)) {
+      pedidoAnterior.set(chat, p);
+    }
   }
 
   const cuenta = {
@@ -88,10 +116,13 @@ function auditar(dia) {
     confirmaron: 0,
     conPedido: 0,
     pausadas: 0,
+    confirmadasConPedido: 0,
+    yaHabianComprado: 0,
   };
   const sinRespuesta = [];
   const confirmadasSinPedido = [];
   const cuadroSinConfirmar = [];
+  const yaHabianComprado = [];
 
   for (const chatId in conversaciones) {
     const conv = conversaciones[chatId];
@@ -128,35 +159,78 @@ function auditar(dia) {
     const mandoCuadro = RE_CUADRO.test(textoBot);
     if (mandoCuadro) cuenta.conCuadro++;
 
-    // ¿El cliente confirmó DESPUÉS de ver el cuadro?
+    // ¿El cliente confirmó DESPUÉS de ver el cuadro, y HOY?
+    //
+    // Lo de "hoy" importa: el historial guarda mensajes de días anteriores, así
+    // que un cuadro viejo más un "listo" de hoy se contaban como un cierre de
+    // hoy que nunca ocurrió.
     let vistoCuadro = false;
     let confirmo = false;
+    let cuandoConfirmo = null;
     for (const m of msgs) {
-      if (m.role === "assistant" && RE_CUADRO.test(String(m.content || ""))) vistoCuadro = true;
-      else if (m.role === "user" && vistoCuadro && RE_CONFIRMA.test(limpiar(m.content)))
-        confirmo = true;
+      if (m.role === "assistant" && RE_CUADRO.test(String(m.content || ""))) {
+        vistoCuadro = true;
+      } else if (m.role === "user" && vistoCuadro && RE_CONFIRMA.test(limpiar(m.content))) {
+        // Solo cuenta si ESA confirmación es de hoy.
+        if (Number.isFinite(m.at) && diaBogota(m.at) === hoy) {
+          confirmo = true;
+          cuandoConfirmo = m.at;
+        }
+      }
     }
     if (confirmo) cuenta.confirmaron++;
 
-    const pedido = pedidoPorChat.get(String(chatId));
-    if (pedido) cuenta.conPedido++;
+    const deHoy = pedidoDeHoy.get(String(chatId));
+    const anterior = pedidoAnterior.get(String(chatId));
+    if (deHoy) cuenta.conPedido++;
 
-    // 🔑 LA FUGA QUE HAY QUE CAZAR: confirmó y no quedó pedido.
-    if (confirmo && !pedido) {
-      confirmadasSinPedido.push({
-        chatId,
-        cuando: ultimaMarca,
-        mensajes: delCliente.length,
-      });
+    if (confirmo) {
+      if (deHoy) {
+        cuenta.confirmadasConPedido++;
+      } else if (anterior) {
+        // Ya había comprado antes: no es una venta nueva. Es justo lo que frena
+        // el candado antiduplicados, y contarlo como perdido sería inventar una
+        // fuga que no existe.
+        cuenta.yaHabianComprado++;
+        yaHabianComprado.push({
+          chatId,
+          cuando: cuandoConfirmo || ultimaMarca,
+          mensajes: delCliente.length,
+          previo: anterior.total,
+        });
+      } else {
+        // 🔑 LA FUGA DE VERDAD: confirmó hoy y no hay pedido en ninguna parte.
+        confirmadasSinPedido.push({
+          chatId,
+          cuando: cuandoConfirmo || ultimaMarca,
+          mensajes: delCliente.length,
+        });
+      }
     }
     // Mandó el cuadro y el cliente no contestó: no es un error, es una venta
     // que quedó a un paso. Sirve para saber cuántas se están quedando ahí.
-    if (mandoCuadro && !confirmo && !pedido) {
+    if (mandoCuadro && !confirmo && !deHoy) {
       cuadroSinConfirmar.push({ chatId, cuando: ultimaMarca });
     }
   }
 
-  return { dia: hoy, cuenta, pedidosDelDia, sinRespuesta, confirmadasSinPedido, cuadroSinConfirmar };
+  // 🧮 La comprobación de que la cuenta cierra. Si esto no cuadra, el número
+  // que se muestra no es de fiar y hay que decirlo en la pantalla en vez de
+  // dejar al dueño sumando a mano y desconfiando de todo.
+  const cuadra =
+    cuenta.confirmaron ===
+    cuenta.confirmadasConPedido + cuenta.yaHabianComprado + confirmadasSinPedido.length;
+
+  return {
+    dia: hoy,
+    cuenta,
+    pedidosDelDia,
+    sinRespuesta,
+    confirmadasSinPedido,
+    cuadroSinConfirmar,
+    yaHabianComprado,
+    cuadra,
+  };
 }
 
 function fila(etiqueta, valor, nota, estado) {
@@ -265,14 +339,37 @@ function render({ token, dia } = {}) {
   <div class="caja">
     ${fila("Recibieron un total cotizado", c.cotizadas, "el bot les dijo el precio con envío")}
     ${fila("Llegaron al cuadro de confirmación", c.conCuadro, "el bot les pidió confirmar")}
-    ${fila("Dijeron que confirmaban", c.confirmaron, "el cliente cerró la venta")}
-    ${fila("Pedidos guardados hoy", a.pedidosDelDia, "lo que cuenta como venta")}
+    ${fila("Dijeron que confirmaban HOY", c.confirmaron, "el cliente cerró la venta")}
+  </div>
+
+  <h2>Y esas confirmaciones, ¿en qué terminaron?</h2>
+  <p class="nota">Las tres canastas suman exactamente el número de arriba. Si no sumaran, el dato no
+    sería de fiar.</p>
+  <div class="caja">
+    ${fila("✅ Quedaron guardadas como pedido", c.confirmadasConPedido, "ventas nuevas de hoy", "bien")}
     ${fila(
-      "🔴 Confirmaron y NO quedó pedido",
+      "↩️ Ya habían comprado antes",
+      c.yaHabianComprado,
+      "clientes viejos que volvieron a escribir: NO son ventas nuevas"
+    )}
+    ${fila(
+      "🔴 No quedó pedido en ninguna parte",
       a.confirmadasSinPedido.length,
-      "ventas perdidas por el camino",
+      "ventas cerradas que se perdieron",
       hayFuga ? "mal" : "bien"
     )}
+    ${fila(
+      a.cuadra ? "🧮 La cuenta cierra" : "🔴 La cuenta NO cierra",
+      a.cuadra ? "sí" : "revisar",
+      a.cuadra
+        ? `${c.confirmadasConPedido} + ${c.yaHabianComprado} + ${a.confirmadasSinPedido.length} = ${c.confirmaron}`
+        : "hay confirmaciones sin clasificar: el número no es de fiar",
+      a.cuadra ? "bien" : "mal"
+    )}
+  </div>
+
+  <div class="caja" style="margin-top:14px">
+    ${fila("Pedidos guardados hoy en total", a.pedidosDelDia, "lo que cuenta como venta del día")}
   </div>
 
   ${listaChats(
@@ -289,6 +386,14 @@ function render({ token, dia } = {}) {
     "🔴 Nadie les contestó",
     "Escribieron y el bot no respondió nunca. Son leads pagados tirados.",
     "mal"
+  )}
+
+  ${listaChats(
+    a.yaHabianComprado,
+    token,
+    "↩️ Ya habían comprado antes",
+    "Confirmaron otra vez, pero ya tenían un pedido de antes. No son ventas nuevas: casi siempre es alguien contestando su guía. El candado antiduplicados es el que evita que entren al conteo.",
+    "ok"
   )}
 
   ${listaChats(

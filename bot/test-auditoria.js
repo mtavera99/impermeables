@@ -171,6 +171,100 @@ chequear("explica que el log de eventos no sirve para esto", /vive en memoria/.t
 chequear("tiene botón de volver al panel", /href="\/panel\?token=/.test(html));
 chequear("sirve en el celular", /name="viewport"/.test(html));
 
+console.log("\n── 5-B. 🧮 LA CUENTA TIENE QUE CERRAR ──");
+//
+// 🔴 ESTO LO DELATÓ LA PRIMERA CORRIDA REAL. La pantalla mostró 9
+// confirmaciones, 2 pedidos guardados y 1 venta perdida: faltaban 6 sin
+// explicar. La causa era que se comparaba contra TODOS los pedidos de la
+// historia, así que un cliente viejo que volvió a confirmar hoy parecía estar
+// bien y no caía en ninguna canasta visible.
+//
+// Un total que no cuadra no es un detalle de presentación: es la señal de que la
+// cuenta está mal hecha. Ahora cada confirmación de hoy cae en exactamente una
+// de tres canastas, y se verifica que sumen.
+
+// Un cliente que YA había comprado antes de hoy y hoy vuelve a confirmar.
+{
+  const VIEJO = "573001110006";
+  // El pedido anterior se guarda con fecha de hace 3 días.
+  const previo = store.saveOrder({
+    nombre: "Cliente Viejo",
+    celular: "3001110006",
+    ciudad: "Cali",
+    direccion: "Calle 7 #8-9",
+    talla: "L",
+    color: "Azul",
+    total: 82000,
+    telefono_chat: VIEJO,
+  });
+  // Se envejece a mano, que es lo que pasa en la vida real.
+  {
+    const archivo = `${DIR}/orders.json`;
+    const todos = JSON.parse(fs.readFileSync(archivo, "utf8"));
+    const i = todos.findIndex((o) => o.fecha === previo.fecha);
+    todos[i].fecha = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    fs.writeFileSync(archivo, JSON.stringify(todos));
+  }
+  conversacion(VIEJO, [
+    ["user", "hola, ya me llego la guia"],
+    ["assistant", CUADRO],
+    ["user", "listo"],
+  ]);
+}
+
+const c = auditoria.auditar();
+chequear(
+  `las 3 canastas suman las confirmaciones (${c.cuenta.confirmadasConPedido} + ${c.cuenta.yaHabianComprado} + ${c.confirmadasSinPedido.length} = ${c.cuenta.confirmaron})`,
+  c.cuadra === true,
+  "hay confirmaciones sin clasificar"
+);
+chequear(
+  "el cliente viejo NO se cuenta como venta perdida",
+  !c.confirmadasSinPedido.some((x) => x.chatId === "573001110006"),
+  "se inventaría una fuga que no existe"
+);
+chequear(
+  "se clasifica como 'ya había comprado'",
+  c.cuenta.yaHabianComprado === 1 && c.yaHabianComprado[0].chatId === "573001110006"
+);
+chequear("y se muestra cuánto fue su pedido anterior", c.yaHabianComprado[0].previo === 82000);
+chequear("la venta perdida de verdad sigue siendo 1", c.confirmadasSinPedido.length === 1);
+
+const htmlC = auditoria.render({ token: "clave_de_prueba" });
+chequear("la pantalla dice que la cuenta cierra", /La cuenta cierra/.test(htmlC));
+chequear("y muestra la suma explícita", /1 \+ 1 \+ 1 = 3/.test(htmlC));
+chequear(
+  "lista aparte a los que ya habían comprado",
+  /Ya habían comprado antes/.test(htmlC)
+);
+chequear(
+  "explicando que no son ventas nuevas",
+  /No son ventas nuevas/.test(htmlC)
+);
+
+console.log("\n── 5-C. Un cuadro viejo con un 'ok' de hoy no es un cierre de hoy ──");
+
+{
+  // El cuadro se mandó ANTES de hoy; hoy solo dijo "ok". No debe contar.
+  const CHAT = "573001110007";
+  store.pushMsg(CHAT, "assistant", CUADRO);
+  store.pushMsg(CHAT, "user", "ok");
+  const archivo = `${DIR}/conversations.json`;
+  const todas = JSON.parse(fs.readFileSync(archivo, "utf8"));
+  // Se envejecen los dos mensajes a anteayer.
+  const anteayer = Date.now() - 2 * 24 * 60 * 60 * 1000;
+  todas[CHAT].messages.forEach((m) => (m.at = anteayer));
+  todas[CHAT].ultimoDelCliente = anteayer;
+  fs.writeFileSync(archivo, JSON.stringify(todas));
+
+  const d = auditoria.auditar();
+  chequear(
+    "una conversación de anteayer no entra en el día de hoy",
+    !d.confirmadasSinPedido.some((x) => x.chatId === CHAT) &&
+      !d.yaHabianComprado.some((x) => x.chatId === CHAT)
+  );
+}
+
 console.log("\n── 6. Cuando todo está bien, lo dice claro ──");
 
 // Se guarda el pedido que faltaba: la fuga desaparece.
