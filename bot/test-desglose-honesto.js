@@ -360,6 +360,47 @@ chequear(
 // 🔑 Lo más importante: que la IA reciba el número CON su condición. Si el
 // prompt trae el precio suelto, la IA lo usa de entrada y se vuelve la lista.
 const t = f.tablaFletesTexto();
+// ───────────────────────────────────────────────────────────────────────────
+// 23-sep: el desglose del combo se dice SIEMPRE, no solo si lo piden.
+//
+// DE DÓNDE SALE: el dueño vio chats con "$158.000" y escribió *"súper carísimo"*.
+// Medido en el export, el precio NO es la objeción declarada (1,9% de los combos
+// perdidos lo mencionó) y banda E es solo el 12,4% de las ventas. Pero el número
+// suelto sí se lee mal, y partirlo no cuesta un peso de margen: el cliente ve que
+// cada conjunto le sale ~$56.000 y que el número grande es el flete.
+// ───────────────────────────────────────────────────────────────────────────
+// El texto vive en el GUION completo, no en la tabla de fletes: `t` es solo la
+// tabla, así que hay que mirar buildSystemPrompt().
+const guionCompleto = require("./src/prompt").buildSystemPrompt();
+chequear(
+  "el guion manda decir el desglose del combo siempre",
+  /DEC[ÍI] SIEMPRE EL DESGLOSE/.test(guionCompleto)
+);
+chequear(
+  "explicando que cada conjunto sale más barato así",
+  /cada conjunto le sale en ~\$56\.000/.test(guionCompleto)
+);
+chequear(
+  "y prohíbe inventar o redondear el desglose",
+  /Nunca inventes el desglose ni lo redondees/.test(guionCompleto)
+);
+chequear(
+  "🚨 el desglose de CADA banda suma exacto al total",
+  ["A", "B", "C", "D", "E"].every((b) => {
+    const d = f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]);
+    return d.producto + d.envio === f.PROMO_2_TOTAL[b];
+  }),
+  "si no suma, el cliente hace la cuenta y nos pilla"
+);
+chequear(
+  "🚨 y el envío mostrado del combo nunca pasa el real, en ninguna banda",
+  ["A", "B", "C", "D", "E"].every((b) => {
+    const d = f.desgloseDe(b, 2, f.PROMO_2_TOTAL[b]);
+    return d.envio <= f.ENVIO_REAL_2[b];
+  }),
+  "el cliente puede verificar el flete en 99 Envíos"
+);
+
 chequear("el prompt trae el bloque del precio de rescate", t.includes("PRECIO DE RESCATE"));
 chequear("y dice que es SOLO si ya dijo que está caro", t.includes("SOLO si ya dijo que está caro"));
 chequear("y prohíbe ofrecerlo de entrada", t.includes("NUNCA ofrezcas este precio de entrada"));
