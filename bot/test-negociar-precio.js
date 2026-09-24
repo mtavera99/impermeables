@@ -173,13 +173,19 @@ chequear(
   "y dice que lo que hay que arreglar es el precio de lista",
   /el problema es el precio de LISTA, no la falta de descuento/i.test(fuente)
 );
-chequear(
-  "banda D es efectivamente la de menor margen al rescate",
-  BANDAS.every((b) => {
-    const q = (x) => f.PROMO_2_RESCATE[x] - 2 * COSTO_UD - f.ENVIO_REAL_2[x] - PAUTA;
-    return q("D") <= q(b);
-  })
-);
+// 23-sep: con el combo a $110.000 + envío, banda D ya NO es la más delgada —
+// era la única desalineada y este cambio la alinea. Ahora las cinco quedan
+// parejas, que es justo lo que se quería.
+{
+  const q = (x) => f.PROMO_2_RESCATE[x] - 2 * COSTO_UD - f.ENVIO_REAL_2[x] - PAUTA;
+  const valores = BANDAS.map(q);
+  const spread = Math.max(...valores) - Math.min(...valores);
+  chequear(
+    `las 5 bandas quedan parejas al rescate (se diferencian ${pesos(spread)})`,
+    spread < 2000,
+    `valores: ${BANDAS.map((b) => b + " " + pesos(q(b))).join(", ")}`
+  );
+}
 
 console.log("\n── 8. Queda avisado que el piso se mueve con el cierre ──");
 

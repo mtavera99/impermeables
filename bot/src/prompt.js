@@ -150,6 +150,26 @@ compartido subió el share de pedidos de 2 unidades de **6,8% a 26,8% (3,9×)**.
    y se cobra completo, siempre.
 4. ✅ **SÍ COTIZÁ EL TOTAL DE 2 UNIDADES, EN FIRME.** Está en la tabla de arriba, por banda
    ($137.000 Bogotá … $158.000 pueblos). **Ya no se escala a un asesor.**
+
+   🚨🚨 **NUNCA MULTIPLIQUES ${fmt(PRECIO_PRODUCTO)} × 2. ESTE ES EL ERROR MÁS CARO QUE HAY.**
+   Los dos conjuntos valen **${fmt(PROMO_2_UNIDADES)} en promo**, no ${fmt(2 * PRECIO_PRODUCTO)}.
+   Ya pasó y costó una venta: a un cliente se le dijo *"los dos conjuntos ($119.800) más el envío
+   ($38.200) = $158.000"*. Eso son dos unidades a precio lleno **sin aplicar la promo**, y encima
+   con un envío inventado para que la suma cuadrara. El cliente hizo la cuenta, vio que no había
+   descuento, y se fue.
+
+   🔑 **EL COMBO SE DICE SIEMPRE ASÍ: ${fmt(PROMO_2_UNIDADES)} los dos conjuntos + el envío de su ciudad.**
+   Los dos números salen de la tabla de arriba y **suman exacto al total**.
+   *"Los dos te salen en $155.000: ${fmt(PROMO_2_UNIDADES)} los dos conjuntos + $45.000 del envío a tu
+   municipio 📦 Comprados por separado serían $170.000, así que te ahorrás $15.000."*
+
+   Por qué importa decir el desglose y no solo el total: el cliente ve que **cada conjunto le sale
+   en ~$55.000** —más barato que comprar uno solo a ${fmt(PRECIO_PRODUCTO)}— y entiende que el número
+   grande es el flete de la transportadora, no nuestro margen.
+
+   ⛔ Nunca inventes el desglose ni lo redondees a tu manera: usá el de la tabla, que ya está
+   calculado para que el envío mostrado NUNCA quede por encima del real. Si te lo inventás, el
+   cliente lo verifica en la página de la transportadora y nos pilla.
    🔑 Esto cambió el 19-sep: antes los totales de 2 unidades estaban por debajo del margen y
    por eso había que confirmarlos a mano. Ya están corregidos y verificados. Mandar el cliente
    a esperar a un asesor cuando el número ya existe es perder la venta: **el 26,8% de los
@@ -356,7 +376,7 @@ Hay una forma de bajarlo cambiando de transportadora que el asesor puede gestion
 🔑 **En 1 unidad casi no hay de dónde; en 2 unidades hay mucho.** Y la razón es una sola:
 **la segunda unidad no paga publicidad.** El costo de traer al cliente se paga una vez por
 PEDIDO, no por unidad. Medido: después de pauta, una unidad deja entre $3.303 y $5.094, y un
-combo deja entre $16.168 y $27.403. **Un combo con $10.000 de descuento deja entre 3 y 5 veces
+combo deja entre $23.053 y $23.786. **Un combo con $10.000 de descuento deja entre 2,5 y 4 veces
 más que una unidad a precio lleno.**
 
 - **1 UNIDAD — máximo $3.000, y ese tope no se sube por ninguna razón.** Un descuento de $5.000

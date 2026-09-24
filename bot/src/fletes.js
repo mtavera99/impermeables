@@ -337,7 +337,54 @@ const FLETE_2_OBSERVADO = {
 //
 // 🔔 GATILLO: si el envío de 2 uds de banda D pasa de $44.000, a $140.000 el
 // margen cae bajo $15.000/ud y hay que volver a mirarlo.
-const PROMO_2_TOTAL = { A: 137000, B: 146000, C: 152000, D: 140000, E: 158000 };
+// ============================================================================
+// 💰 EL COMBO SE COTIZA COMO $110.000 LOS DOS + EL ENVÍO (23-sep)
+//
+// LO QUE PASÓ. El dueño encontró chats donde el bot cotizaba el combo como DOS
+// UNIDADES A PRECIO LLENO en vez de usar la promo. Literal, a un cliente de San
+// Juan de Urabá:
+//
+//   "Si multiplicas los dos conjuntos ($119.800) y le sumas el envío ($38.200),
+//    el total sería de $158.000"
+//
+// Dos cosas mal ahí: $119.800 es 2 × $59.900 —la promo de $110.000 no se aplicó
+// nunca— y el envío se inventó en $38.200 cuando el real es $45.214, para que la
+// suma cuadrara. El cliente contestó "Digites 58.900 por 2. Cuanto te da" y se
+// fue. Sus palabras: *"una persona ya está pagando como 48.000 pesos de envío,
+// carísimo"*.
+//
+// 🔑 EL PROBLEMA DE FONDO ERA ESTRUCTURAL, no del modelo. Con los totales viejos
+// era IMPOSIBLE mostrar los $110.000 sin mentir sobre el flete: en banda A el
+// total era $137.000 y el envío real $23.947, así que $110.000 + envío daba
+// $133.000 ≠ $137.000. Para cuadrar había que inflar el envío a $27.000 — justo
+// lo que perdió la venta de Montería.
+//
+// LA SOLUCIÓN: los totales del combo SON $110.000 + el envío real redondeado al
+// millar abajo. Así el desglose da exacto y el envío mostrado nunca pasa el real.
+//
+//   banda   antes      ahora      desglose que ve el cliente
+//   A       $137.000   $133.000   $110.000 + $23.000  (real $23.947)
+//   B       $146.000   $142.000   $110.000 + $32.000  (real $32.597)
+//   C       $152.000   $148.000   $110.000 + $38.000  (real $38.784)
+//   D       $140.000   $147.000   $110.000 + $37.000  (real $37.832)  ⬆️ SUBE
+//   E       $158.000   $155.000   $110.000 + $45.000  (real $45.214)
+//
+// ⚠️ BANDA D SUBE $7.000, Y ES A PROPÓSITO. El dueño la había bajado a $140.000
+// el 22-sep y eso dejó su combo en $36.168 de margen contra ~$47.000 de las
+// demás: era la única banda desalineada, y ya lo veníamos marcando. Con esta
+// estructura todas quedan en ~$43.000, incluida D.
+//
+// EL EFECTO EN PLATA, ponderado por el volumen real de cada banda (A 32,7%,
+// B 7,1%, C 31,9%, D 15,9%, E 12,4% de las ventas cerradas del export):
+//   −$2.127 de margen por combo, y el cierre del combo solo tiene que subir
+//   4,9% para empatar. Es la barra más baja de todos los cambios de precio que
+//   hemos evaluado (una rebaja plana de $10.000 exigía +27%).
+//
+// Y EL GANCHO SE HACE MÁS GRANDE, que es lo que de verdad vende: el ahorro
+// contra comprar dos sueltos pasa de $9.000 a $13.000 en Bogotá, y de $12.000 a
+// $16.000 en capitales.
+// ============================================================================
+const PROMO_2_TOTAL = { A: 133000, B: 142000, C: 148000, D: 147000, E: 155000 };
 
 // ============================================================================
 // 💬 PRECIO DE RESCATE — el descuento que NO se regala
@@ -394,7 +441,11 @@ const PROMO_2_TOTAL = { A: 137000, B: 146000, C: 152000, D: 140000, E: 158000 };
 // de $20.000. Descontar cuando el cierre está bajo es justo cuando menos se
 // puede. Si el cierre se queda por debajo del 4%, revisar esta tabla.
 // ============================================================================
-const PROMO_2_RESCATE = { A: 127000, B: 136000, C: 142000, D: 137000, E: 148000 };
+// Los mismos $10.000 de margen para negociar, sobre los totales nuevos.
+// Después de pauta dejan entre $13.053 y $13.786 — consistente en todas las
+// bandas, y siempre por encima de lo que deja una unidad a precio lleno
+// ($3.303 a $5.094). Hay pruebas que lo verifican banda por banda.
+const PROMO_2_RESCATE = { A: 123000, B: 132000, C: 138000, D: 137000, E: 145000 };
 
 // ============================================================================
 // 🔴 EL ENVÍO QUE SE LE MUESTRA AL CLIENTE (agregado 22-sep por una venta perdida)
