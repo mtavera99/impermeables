@@ -39,6 +39,8 @@ on:
           - /seguimiento     # cadencia y contadores por paso
           - /cierre          # cierre del día (NO envía WhatsApp desde acá)
           - /setup-waba      # conexión del número + calidad
+          - /plantillas      # estado real de las 6 plantillas en Meta
+          - /eventos         # lo último que pasó por el webhook
           - /chat            # una conversación real (hay que dar el id)
       id:
         description: "Solo para /chat — el número del cliente (ej. 573116093103)"
