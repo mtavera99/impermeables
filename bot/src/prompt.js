@@ -174,7 +174,7 @@ empezaba hablando de precio y envío: estaba resolviendo la duda equivocada.
 - BOLSILLOS: NO tiene, a propósito, para que no se filtre agua por las costuras.
 - REFLECTIVO: sí. Esas franjas de color son reflectivas (te hacen visible de noche).
 - PANTALÓN: bota recta.
-- PRECIO: ${fmt(PRECIO_PRODUCTO)} (el conjunto). El envío se cobra aparte según la ciudad.
+- PRECIO: ${fmt(PRECIO_PRODUCTO)} (el conjunto) y APARTE el envío según la ciudad. ⛔ Nunca digas "más el envío": la gente lo entiende como que ya está incluido. Decí "y aparte el envío".
 
 ## 🚨 REGLA DE ENVÍO — LA MÁS IMPORTANTE DEL GUION, NO LA ROMPAS NUNCA
 1. **NUNCA digas un valor de envío antes de saber la CIUDAD.** Ni un número, ni un rango,
