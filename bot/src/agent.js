@@ -446,4 +446,7 @@ function revisarTelefono(order, chatId) {
 
 // extractOrder y rescatarPedido se exportan para poder probarlos sin llamar a
 // la IA: son el camino por donde se perdían pedidos enteros en silencio.
-module.exports = { generateReply, revisarTelefono, celularValido, extractOrder, rescatarPedido };
+// callIA se exporta para el extractor de datos del chat (src/extraer.js), que
+// necesita hacerle UNA pregunta corta al modelo sin pasar por el guion de ventas
+// ni escribirle nada al cliente.
+module.exports = { generateReply, revisarTelefono, celularValido, extractOrder, rescatarPedido, callIA };

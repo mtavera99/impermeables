@@ -269,6 +269,9 @@ function cajonDeVenta(p, token, pedidosPrevios) {
       <p class="nota">El bot no la pudo tomar porque este chat está en modo humano:
         cuando vos contestás, el bot se calla, y el pedido lo arma él. Cargala acá y
         entra igual que las otras (guía, cierre, CPA).</p>
+      <button type="button" class="leerchat" onclick="llenarDesdeChat(this)">
+        📋 Leer el chat y llenar los cajones</button>
+      <div class="leermsg"></div>
       <form method="post" action="/pedido-manual">
         <input type="hidden" name="token" value="${esc(token || "")}">
         <input type="hidden" name="telefono_chat" value="${esc(tel)}">
@@ -301,6 +304,78 @@ function cajonDeVenta(p, token, pedidosPrevios) {
           </select></label>
         <button type="submit" class="ventabtn">Guardar la venta</button>
       </form>
+      <script>
+        // ====================================================================
+        // ⚠️ ESTE BLOQUE VIVE DENTRO DE UN TEMPLATE LITERAL DE JAVASCRIPT.
+        // Acá NO se pueden usar comillas invertidas, ni el signo de dólar
+        // seguido de llave -salvo las sustituciones que SÍ se quieren evaluar al
+        // generar la página-. Las dos cosas ya rompieron el panel antes, y la
+        // primera versión de este mismo comentario lo rompió otra vez por
+        // escribir el símbolo de ejemplo. Por eso todo lo demás va concatenado.
+        // ====================================================================
+        var VENTA_ID = ${JSON.stringify(tel)};
+        var VENTA_TOKEN = ${JSON.stringify(token || "")};
+
+        function llenarDesdeChat(btn) {
+          var caja = btn.closest(".venta");
+          var msg = caja.querySelector(".leermsg");
+          var original = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = "Leyendo el chat...";
+          msg.className = "leermsg";
+          msg.textContent = "";
+
+          var url = "/extraer-datos?token=" + encodeURIComponent(VENTA_TOKEN) +
+                    "&id=" + encodeURIComponent(VENTA_ID);
+
+          fetch(url)
+            .then(function (r) {
+              if (r.status === 403) throw new Error("La clave del panel no coincide.");
+              return r.json();
+            })
+            .then(function (d) {
+              if (!d || d.ok === false) throw new Error((d && d.error) || "No se pudo leer.");
+              var datos = d.datos || {};
+              var puestos = 0;
+              var vacios = [];
+              Object.keys(datos).forEach(function (campo) {
+                var el = caja.querySelector('[name="' + campo + '"]');
+                if (!el) return;
+                var v = datos[campo];
+                if (v === null || v === undefined || String(v) === "") {
+                  // Solo se cuenta como faltante lo que de verdad hace falta.
+                  if (campo === "nombre" || campo === "ciudad" || campo === "celular") {
+                    vacios.push(campo);
+                  }
+                  return;
+                }
+                // ⚠️ NO se pisa lo que el dueño ya escribió a mano: si él corrigió
+                // un campo, su valor manda sobre lo que diga el chat.
+                if (String(el.value).trim() !== "") return;
+                el.value = String(v);
+                el.classList.add("lleno");
+                puestos++;
+              });
+
+              var partes = [];
+              partes.push("Se llenaron " + puestos + " campo" + (puestos === 1 ? "" : "s") + ".");
+              if (d.conIA === false) partes.push("Sin IA: solo lo que se pudo leer con reglas.");
+              if (d.aviso) partes.push(d.aviso);
+              if (vacios.length) partes.push("Falta completar: " + vacios.join(", ") + ".");
+              if (!datos.total) partes.push("El total lo calcula el tarifario al guardar.");
+              msg.className = "leermsg " + (vacios.length ? "aviso" : "ok");
+              msg.textContent = partes.join(" ");
+            })
+            .catch(function (e) {
+              msg.className = "leermsg mal";
+              msg.textContent = "No se pudo leer el chat: " + e.message + ". Cargalo a mano.";
+            })
+            .then(function () {
+              btn.disabled = false;
+              btn.textContent = original;
+            });
+        }
+      </script>
     </div>`;
 }
 
@@ -467,6 +542,17 @@ function render({ id, q, token, resultado, venta } = {}) {
   .venta .dos label{flex:1;min-width:0}
   .ventabtn{width:100%;margin-top:14px;background:#2ea043;border:0;color:#fff;
     border-radius:10px;padding:14px;font-size:16px;font-weight:600;cursor:pointer}
+  /* 📋 El botón que lee el chat. Va ARRIBA de los campos: es lo primero que se
+     toca, antes de empezar a escribir a mano. */
+  .leerchat{width:100%;background:#16263a;border:1px solid #2f5177;color:#9fc6f5;
+    border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer}
+  .leerchat:disabled{opacity:.6}
+  .leermsg{font-size:12px;margin-top:7px;min-height:1px}
+  .leermsg.ok{color:#8ff0b5}
+  .leermsg.aviso{color:#ffd79a}
+  .leermsg.mal{color:var(--rojo)}
+  /* Los campos que se llenaron solos se marcan, para saber qué revisar. */
+  .venta input.lleno,.venta select.lleno{border-color:#2f5177;background:#0f1722}
   .prospecto h2{font-size:17px;margin:0 0 4px}
   .ventana{font-size:13px;padding:9px 11px;border-radius:10px;margin-bottom:12px;line-height:1.4}
   .ventana.ok{background:#12351f;color:#7ee2a8}
