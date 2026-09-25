@@ -950,7 +950,10 @@ app.post("/responder", async (req, res) => {
   if (envio.ok) {
     // Queda en el historial como mensaje del negocio, así el bot lo ve como
     // contexto y no repite lo que ya dijo el humano.
-    store.pushMsg(to, "assistant", texto);
+    // `por: "humano"` es lo que permite saber después que este chat lo contestó
+    // una persona y no el bot. De eso sale el "ya lo atendí" del panel: sin la
+    // marca, la respuesta del dueño es indistinguible de la del bot.
+    store.pushMsg(to, "assistant", texto, { por: "humano" });
     // Y el bot se calla en ese chat: dos voces contestando confunden al cliente.
     store.setPaused(to, true);
     anotarEvento({ tipo: "respuesta-humana", para: to, texto: texto.slice(0, 80) });
@@ -1039,6 +1042,39 @@ app.post("/pausar", (req, res) => {
   if (!tel) return res.status(400).send("Falta el número.");
   store.setPaused(tel, valor);
   anotarEvento({ tipo: valor ? "bot-pausado" : "bot-reactivado", para: tel });
+  res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}#c${tel}`);
+});
+
+// ============================================================================
+// POST /atendido — "esto ya lo resolví, sacalo de la lista"
+//
+// POR QUÉ EXISTE: la mayoría de los chats se marcan solos (si se contesta desde
+// `/chat`, queda registrado). Pero el dueño resuelve mucho POR FUERA del panel:
+// llama por teléfono — así mantiene el rechazo en 5,0% (0-AF) — o simplemente ya
+// no hace falta contestar. Sin este botón esos chats se quedan en la lista para
+// siempre, que es exactamente la queja del 25-sep.
+//
+// ⚠️ NO es un "ocultar". Se guarda la HORA, y si el cliente vuelve a escribir
+// después el chat reaparece solo. Un chat silenciado a mano para siempre sería
+// una venta perdida en silencio.
+// ============================================================================
+app.post("/atendido", (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const tel = idDestino(req.body?.tel);
+  if (!tel) return res.status(400).send("Falta el número.");
+  const deshacer = String(req.body?.deshacer) === "1";
+
+  if (deshacer) {
+    store.desmarcarAtendido(tel);
+    anotarEvento({ tipo: "atendido-deshecho", para: tel });
+  } else {
+    store.marcarAtendido(tel, "dueño");
+    anotarEvento({ tipo: "atendido-a-mano", para: tel });
+  }
+
+  if (req.query.json === "1" || req.body?.json === "1") {
+    return res.json({ ok: true, atendido: !deshacer });
+  }
   res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}#c${tel}`);
 });
 

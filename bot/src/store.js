@@ -121,11 +121,36 @@ function getConv(phone) {
   const all = readJSON(CONV_FILE, {});
   return all[phone] || { messages: [], paused: false };
 }
-function pushMsg(phone, role, content) {
+// ============================================================================
+// 👤 QUIÉN CONTESTÓ: EL BOT O EL DUEÑO (25-sep)
+//
+// DE DÓNDE SALE, en palabras del dueño:
+//
+//   "hay muchos chats que ya los abrí y yo les respondí, entonces debería haber
+//    un sistema para saber qué he hecho yo, ya entré, y tu intervención también"
+//
+// 🔴 EL PROBLEMA ERA QUE NO SE PODÍA SABER. `/responder` guardaba la respuesta
+// del dueño con `role: "assistant"`, exactamente igual que las del bot, así que
+// en el historial las dos son indistinguibles. Sin eso no hay forma de calcular
+// "este chat ya lo atendí" ni de mostrar quién hizo qué.
+//
+// 🔑 POR QUÉ NO SE CAMBIA EL `role`: ese campo va tal cual a la IA, y los roles
+// válidos son "user" y "assistant". Meter un "human" rompería la llamada al
+// modelo. Así que el rol NO se toca y la marca va en un campo aparte, `por`.
+// Para la IA sigue siendo el negocio hablando, que es lo correcto: el bot tiene
+// que ver lo que dijo el dueño para no repetirlo ni contradecirlo.
+// ============================================================================
+function pushMsg(phone, role, content, extra) {
   ensure();
   const all = readJSON(CONV_FILE, {});
   const c = all[phone] || { messages: [], paused: false };
-  c.messages.push({ role, content, at: Date.now() });
+  c.messages.push({ role, content, at: Date.now(), ...(extra || null) });
+  // Si contestó una persona, se anota aparte del historial de mensajes: ese
+  // historial está topeado en MAX_MSGS y se va recortando, y la marca de "ya lo
+  // atendí" no puede desaparecer porque el cliente escribió 24 mensajes.
+  if (extra && extra.por === "humano") {
+    c.ultimaRespuestaHumana = Date.now();
+  }
   if (c.messages.length > MAX_MSGS) c.messages = c.messages.slice(-MAX_MSGS);
   // Marca de tiempo del ULTIMO mensaje DEL CLIENTE. De aqui salen las dos ventanas:
   //   - 24h: mientras este abierta se puede escribir texto libre
@@ -484,6 +509,44 @@ function reactivarPedido(fechaPedido) {
     return null;
   }
 }
+// ============================================================================
+// ✅ "YA LO ATENDÍ" — PARA LO QUE NO PASA POR EL PANEL (25-sep)
+//
+// `ultimaRespuestaHumana` cubre las respuestas escritas desde `/chat`, pero el
+// dueño resuelve muchas cosas POR FUERA: llama por teléfono (es así como
+// mantiene el rechazo en 5,0%, ver 0-AF) o lo arregla y no hace falta escribir.
+// Sin una forma de decir "esto ya está", esos chats se quedan en la lista para
+// siempre — que es justo la queja: "pueden pasar dos días y me siguen saliendo".
+//
+// Se guarda CUÁNDO se atendió, no un simple `true`. La diferencia es todo: si el
+// cliente vuelve a escribir después, el chat tiene que volver a la lista solo.
+// Un booleano lo dejaría enterrado para siempre.
+// ============================================================================
+function marcarAtendido(phone, quien) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone] || { messages: [], paused: false };
+  c.atendidoAt = Date.now();
+  c.atendidoPor = quien || "dueño";
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+  console.log(`✅ Chat marcado como atendido: ${phone} (${c.atendidoPor})`);
+  return c;
+}
+
+/** Deshace el "ya lo atendí": el chat vuelve a la lista de pendientes. */
+function desmarcarAtendido(phone) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone];
+  if (!c) return null;
+  delete c.atendidoAt;
+  delete c.atendidoPor;
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+  return c;
+}
+
 function isPaused(phone) {
   return !!getConv(phone).paused;
 }
@@ -829,6 +892,7 @@ function estadoDelDisco() {
 
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
+  marcarAtendido, desmarcarAtendido,
   registrarArranque, estadoDelDisco,
   marcarComprado, registrarSeguimiento, reclamarSeguimiento,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
