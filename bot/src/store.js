@@ -680,6 +680,39 @@ function saveOrder(order) {
       );
     }
 
+    // ======================================================================
+    // 🔒 ¿EL TOTAL AGUANTA EL PISO DE SU CIUDAD? (24-sep)
+    //
+    // El 24-sep entraron dos pedidos a La Vega por $73.000 (precio de Bogotá)
+    // cuando esa ciudad no está en el tarifario y su piso es $85.000. El mismo
+    // día, Sahagún / Caloto / Dagua —igual de desconocidas— sí cobraron bien.
+    // O sea: la regla del guion se cumple casi siempre, y "casi siempre" sobre
+    // el precio es una fuga silenciosa. El detalle está en `fletes.revisarTotal`.
+    //
+    // Se MARCA y se guarda. No se rechaza: el cliente ya tiene un precio
+    // prometido y una venta no se tira por esto.
+    //
+    // ⚠️ En try/catch propio y a propósito: si la revisión de precio se rompe,
+    // el pedido tiene que guardarse igual. La venta manda sobre el chequeo.
+    // ======================================================================
+    try {
+      const revision = require("./fletes").revisarTotal({
+        ciudad: record.ciudad,
+        total: record.total,
+      });
+      if (revision && revision.ok === false) {
+        record.precio_bajo_lista = true;
+        record.precio_revision = revision;
+        console.warn(
+          `🔴 PRECIO POR DEBAJO DEL PISO: ${record.nombre || "?"} (${record.celular || record.telefono_chat}) ` +
+            `— ${record.ciudad || "?"} por $${record.total}. ${revision.detalle} ` +
+            "SE GUARDA, pero revisalo antes de despachar."
+        );
+      }
+    } catch (e) {
+      console.error(`⚠️  No se pudo revisar el precio del pedido: ${e.message}`);
+    }
+
     orders.push(record);
     writeJSON(ORDERS_FILE, orders);
   } catch (e) {

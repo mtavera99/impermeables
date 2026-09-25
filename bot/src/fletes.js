@@ -1021,10 +1021,180 @@ SIN PRECIO CONFIRMADO — ${sinDato}
     los $85.000 de pueblos tampoco alcanzaba. Donde no hay dato, se escala.`;
 }
 
+// ============================================================================
+// 🔒 EL PISO DE PRECIO — UN CANDADO, NO UNA INSTRUCCIÓN (24-sep)
+//
+// DE DÓNDE SALE: el cierre del 24-sep trajo dos pedidos a La Vega por $73.000
+// cada uno. La Vega NO está en el tarifario, así que su piso de seguridad es la
+// banda E: $85.000. El bot no usó el piso — le puso el precio de Bogotá,
+// probablemente porque "La Vega" le sonó a sabana.
+//
+// 🔑 Y LO QUE LO HACE GRAVE ES EL CONTRASTE: ese mismo día entraron Sahagún,
+// Caloto y Dagua, las tres igual de desconocidas, y las tres SÍ cobraron los
+// $85.000 correctos. O sea que el piso funciona… cuando el modelo se acuerda.
+// Eso no es un candado, es una sugerencia con buena tasa de éxito.
+//
+// Es la misma lección que ya se pagó cinco veces en la sesión del 23-24:
+//   > una instrucción al modelo NO es un candado.
+//   > lo que toca plata va en código, con una prueba.
+//
+// Y ya había cobrado antes: en El Charco se cobró $59.900 contra un envío real
+// de $55.563 — una sola guía se comió $28.663.
+//
+// ⛔ LO QUE ESTO NO HACE: no rechaza el pedido ni lo corrige solo. Una venta no
+// se tira por un precio raro, y el bot no puede re-cotizarle al cliente algo que
+// ya le prometió. Se MARCA, igual que `posible_duplicado` y `sin_confirmar`, y
+// el dueño decide antes de despachar. El pedido siempre se guarda.
+// ============================================================================
+
+// Cuánto cuesta el producto. Vive acá y no en las pruebas para que el margen se
+// calcule en un solo lugar (era $25.900 hasta el 8-sep; ver 0-AE).
+const COSTO_PRODUCTO = 33000;
+
+// Tope de descuento de cierre en 1 unidad. En 2 unidades el piso NO es este:
+// es el precio de rescate de la banda, que ya está en PROMO_2_RESCATE.
+const TOPE_DESCUENTO_1 = 3000;
+
+/** El total más bajo que se puede cobrar legítimamente en esa banda. */
+function pisoDe(claveBanda, uds) {
+  if (uds === 1) {
+    const b = BANDAS[claveBanda];
+    return b ? b.total - TOPE_DESCUENTO_1 : null;
+  }
+  if (uds === 2) {
+    // El rescate ES el piso: por debajo de eso no hay un tercer precio.
+    return PROMO_2_RESCATE[claveBanda] ?? PROMO_2_TOTAL[claveBanda] ?? null;
+  }
+  // 3+ unidades se escalan a un humano y se cotizan a mano: no hay piso automático.
+  return null;
+}
+
+/**
+ * ¿El total que se cobró aguanta el piso de su ciudad?
+ *
+ * El pedido NO guarda cuántas unidades son (el bloque ##ORDER## solo trae el
+ * total), así que las unidades se DEDUCEN: se toma la configuración de la banda
+ * cuyo precio de lista queda más cerca de lo cobrado.
+ *
+ * @param {{ciudad: string, total: number}} pedido
+ * @returns {object} `ok:true` si está sano. Si no, trae `faltante` y `motivo`.
+ */
+function revisarTotal({ ciudad, total } = {}) {
+  const cobrado = Number(total);
+  const base = { ciudad: String(ciudad || ""), total: cobrado, ok: true, motivo: null };
+
+  // Sin total no hay nada que revisar (un pedido a medio armar, por ejemplo).
+  if (!Number.isFinite(cobrado) || cobrado <= 0) return { ...base, sinDato: true };
+
+  // ---- Nombre repetido en varios departamentos: no hay un piso contra el que
+  // comparar. Un Mosquera de la sabana y uno de Nariño no comparten tarifa.
+  const ambiguas = departamentosPosibles(ciudad);
+  if (ambiguas) {
+    return {
+      ...base,
+      ok: false,
+      motivo: "ciudad_ambigua",
+      preguntarDepartamento: ambiguas,
+      detalle:
+        `"${base.ciudad}" existe en varios departamentos (${ambiguas.join(", ")}) y el envío ` +
+        `cambia mucho entre uno y otro. Hay que confirmar cuál es antes de despachar.`,
+    };
+  }
+
+  // ---- Difícil acceso: o hay un total medido, o no se cotiza con tabla.
+  const dificil = zonaDificilDe(ciudad);
+  if (dificil) {
+    if (dificil.total === null) {
+      return {
+        ...base,
+        ok: false,
+        motivo: "dificil_sin_tarifa",
+        detalle:
+          `${base.ciudad} es zona de difícil acceso y NO tiene tarifa medida. Este pedido se ` +
+          `cotizó a ojo. Es el caso de El Charco, donde una sola guía se comió $28.663.`,
+      };
+    }
+    if (cobrado < dificil.total) {
+      return {
+        ...base,
+        ok: false,
+        motivo: "bajo_dificil_acceso",
+        esperado: dificil.total,
+        piso: dificil.total,
+        faltante: dificil.total - cobrado,
+        detalle:
+          `${base.ciudad} es difícil acceso y su total confirmado es ${fmt(dificil.total)}. ` +
+          `Se cobró ${fmt(cobrado)}: faltan ${fmt(dificil.total - cobrado)}.`,
+      };
+    }
+    return { ...base, esperado: dificil.total, piso: dificil.total };
+  }
+
+  const claveReal = bandaDe(ciudad);
+  const clave = claveReal || BANDA_POR_DEFECTO;
+  const reconocida = claveReal !== null;
+
+  // Las dos configuraciones que el bot puede cotizar solo.
+  const configs = [
+    { uds: 1, lista: BANDAS[clave].total, fleteReal: ENVIO_REAL_1[clave] },
+    { uds: 2, lista: PROMO_2_TOTAL[clave], fleteReal: ENVIO_REAL_2[clave] },
+  ]
+    .filter((c) => Number.isFinite(c.lista))
+    .map((c) => ({ ...c, piso: pisoDe(clave, c.uds) }));
+
+  // Se deduce la cantidad por cercanía al precio de lista. Un pedido de 3+ cae
+  // muy por encima de la lista de 2 y pasa holgado el piso, que es lo correcto:
+  // esos se cotizan a mano y no los vigila esta función.
+  const elegida = configs.reduce((mejor, c) =>
+    Math.abs(cobrado - c.lista) < Math.abs(cobrado - mejor.lista) ? c : mejor
+  );
+
+  const margen = cobrado - COSTO_PRODUCTO * elegida.uds - elegida.fleteReal;
+  const comun = {
+    ...base,
+    banda: clave,
+    nombreBanda: BANDAS[clave].nombre,
+    reconocida,
+    unidadesProbables: elegida.uds,
+    esperado: elegida.lista,
+    piso: elegida.piso,
+    margen,
+  };
+
+  if (!Number.isFinite(elegida.piso) || cobrado >= elegida.piso) return comun;
+
+  // Cobró solo el producto, sin envío. Es legítimo SI el cliente recoge en la
+  // bodega (ahí deja $26.900 y es la venta más rentable que hay) — pero es
+  // exactamente la forma que tuvo el error de El Charco, así que se marca igual
+  // y el dueño confirma cuál de las dos es.
+  const pareceBodega =
+    cobrado === PRECIO_PRODUCTO || cobrado === PROMO_2_UNIDADES;
+
+  return {
+    ...comun,
+    ok: false,
+    motivo: pareceBodega ? "sin_envio" : "bajo_el_piso",
+    faltante: elegida.piso - cobrado,
+    pareceBodega,
+    detalle: pareceBodega
+      ? `Se cobró ${fmt(cobrado)}, que es el producto SIN envío. Está bien solo si el cliente ` +
+        `recoge en la bodega. Si hay que despacharlo a ${base.ciudad}, el total es ` +
+        `${fmt(elegida.lista)} y falta cobrar el envío.`
+      : `${base.ciudad} es banda ${clave}${reconocida ? "" : " (no está en el tarifario: se le " +
+          "aplica el piso de pueblos)"}: ${elegida.uds === 1 ? "una unidad" : "el combo"} vale ` +
+        `${fmt(elegida.lista)} y con descuento no baja de ${fmt(elegida.piso)}. Se cobró ` +
+        `${fmt(cobrado)}: faltan ${fmt(elegida.piso - cobrado)}. Queda un margen de ${fmt(margen)}.`,
+  };
+}
+
 module.exports = {
   BANDAS,
   BANDA_POR_DEFECTO,
   CIUDADES_AMBIGUAS,
+  COSTO_PRODUCTO,
+  TOPE_DESCUENTO_1,
+  pisoDe,
+  revisarTotal,
   ENVIO_REAL_1,
   ENVIO_REAL_2,
   PROMO_2_RESCATE,

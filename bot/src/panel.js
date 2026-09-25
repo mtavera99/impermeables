@@ -113,6 +113,13 @@ function render(aviso) {
   const despachados = pedidos.filter((p) => p.guia);
   const totalPendiente = pendientes.reduce((s, p) => s + Number(p.total || 0), 0);
   const sinCelularCuantos = pendientes.filter((p) => !String(p.celular || "").trim()).length;
+  // 🔒 Pedidos cuyo total quedó bajo el piso de su ciudad. Se cuentan acá arriba
+  // porque es plata que se revisa ANTES de imprimir la guía, no después.
+  const precioBajoCuantos = pendientes.filter((p) => p.precio_bajo_lista).length;
+  const precioBajoFaltante = pendientes.reduce(
+    (s, p) => s + Number((p.precio_revision && p.precio_revision.faltante) || 0),
+    0
+  );
 
   // Ordenar por el último mensaje del cliente: lo más reciente arriba
   const lista = Object.entries(convs)
@@ -263,6 +270,11 @@ function render(aviso) {
       // 🔴 El cliente no dijo un "sí" reconocible. Puede ser un "hágale" que no
       // entendimos, o puede que no haya comprado. No se despacha sin leer el chat.
       p.sin_confirmar ? ' <span class="tag no">🔴 SIN CONFIRMAR</span>' : ""
+    }${
+      // 🔒 El total quedó por debajo del piso de su ciudad. Puede ser un retiro
+      // en bodega o puede ser el bot poniéndole precio de Bogotá a un pueblo,
+      // que es lo que pasó el 24-sep con La Vega. Se revisa antes de despachar.
+      p.precio_bajo_lista ? ' <span class="tag no">🔴 PRECIO BAJO</span>' : ""
     }<div class="sub">${esc(p.celular || p.telefono_chat)}${
       sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""
     }${
@@ -274,6 +286,10 @@ function render(aviso) {
     }${
       p.sin_confirmar
         ? '<br><b style="color:#ff9aa4">🔴 no dijo un "sí" claro — leé el chat antes de despachar</b>'
+        : ""
+    }${
+      p.precio_bajo_lista && p.precio_revision
+        ? `<br><b style="color:#ff9aa4">🔴 ${esc(p.precio_revision.detalle || "precio por debajo del piso")}</b>`
         : ""
     }</div></td>
       <td data-label="Dirección">${esc(p.ciudad)}${
@@ -845,6 +861,12 @@ function render(aviso) {
          Suman <b>${esc(fmtCOP(totalPendiente))}</b> por recaudar.${
            sinCelularCuantos
              ? ` <b style="color:#ff9aa4">${sinCelularCuantos} sin celular: a esos no les podés hacer la guía todavía.</b>`
+             : ""
+         }${
+           precioBajoCuantos
+             ? ` <b style="color:#ff9aa4">🔴 ${precioBajoCuantos} con precio bajo el piso${
+                 precioBajoFaltante ? ` (faltan ${esc(fmtCOP(precioBajoFaltante))})` : ""
+               }: revisalos antes de imprimir la guía.</b>`
              : ""
          }</p>`
       : ""
