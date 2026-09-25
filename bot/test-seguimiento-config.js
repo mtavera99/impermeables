@@ -42,7 +42,7 @@ function chequear(nombre, condicion, detalle) {
 
 /** Carga seguimiento.js de cero con las variables de entorno que se le pasen. */
 function cargarCon(env) {
-  for (const k of ["SEGUIMIENTO_ACTIVO", "SEGUIMIENTO_PLANTILLA_2", "SEGUIMIENTO_PLANTILLA_3", "SEGUIMIENTO_IDIOMA"]) {
+  for (const k of ["SEGUIMIENTO_ACTIVO", "SEGUIMIENTO_PLANTILLA_2", "SEGUIMIENTO_PLANTILLA_3", "SEGUIMIENTO_IDIOMA", "SEGUIMIENTO_44H"]) {
     delete process.env[k];
   }
   Object.assign(process.env, env || {});
@@ -428,6 +428,73 @@ function seguir() {
     chequear(
       "y se puede cambiar por otra",
       s.configuracionEfectiva().plantilla_2 === "otra_plantilla"
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // 🔘 EL INTERRUPTOR, QUE ES LO QUE SE VA A USAR DE VERDAD
+  //
+  // La primera versión se apagaba dejando la variable de la plantilla VACÍA, y
+  // el dueño preguntó con razón "¿cómo así que poner la variable en blanco?".
+  // Apagar algo que mueve plata no puede depender de escribir nada en una
+  // casilla. Ahora es SEGUIMIENTO_44H=0, y acepta varias formas de decir no
+  // porque se escribe desde un celular.
+  // ══════════════════════════════════════════════════════════════════════════
+  console.log("\n── El interruptor SEGUIMIENTO_44H ──");
+
+  for (const valor of ["0", "no", "NO", "off", "false", "apagado", " 0 "]) {
+    const s = cargarCon({ SEGUIMIENTO_44H: valor });
+    const c = s.configuracionEfectiva();
+    chequear(
+      `con SEGUIMIENTO_44H="${valor}" el toque de 44h queda apagado`,
+      /APAGADO/.test(c.toque_44h) && !s.PASOS.some((p) => p.n === 3),
+      c.toque_44h
+    );
+  }
+
+  for (const valor of ["1", "si", "cualquier_cosa"]) {
+    const s = cargarCon({ SEGUIMIENTO_44H: valor });
+    chequear(
+      `con SEGUIMIENTO_44H="${valor}" sigue prendido`,
+      /ACTIVO/.test(s.configuracionEfectiva().toque_44h)
+    );
+  }
+
+  {
+    const s = cargarCon({});
+    const c = s.configuracionEfectiva();
+    chequear("sin poner la variable, viene prendido", /ACTIVO/.test(c.toque_44h));
+    chequear("y los tres toques están en pie", s.PASOS.length === 3);
+    chequear(
+      "la pantalla lista los toques en horas, para confirmar de un vistazo",
+      c.toques.join(" ") === "2h (texto) 20h (texto) 44h (plantilla)",
+      c.toques.join(" ")
+    );
+  }
+
+  {
+    const s = cargarCon({ SEGUIMIENTO_44H: "0" });
+    chequear(
+      "apagado, quedan solo los dos toques de texto libre",
+      s.PASOS.length === 2 && s.PASOS.every((p) => p.tipo === "texto"),
+      JSON.stringify(s.configuracionEfectiva().toques)
+    );
+    chequear(
+      "y esos dos NO gastan plantilla ni tocan la calificación del número",
+      s.PASOS.every((p) => !p.plantilla)
+    );
+    chequear(
+      "la pantalla explica qué recibe el cliente ahora",
+      /2h y 20h/.test(s.configuracionEfectiva().toque_44h)
+    );
+  }
+
+  {
+    const s = cargarCon({ SEGUIMIENTO_44H: "0" });
+    chequear(
+      "el origen dice de dónde salió el apagado",
+      /SEGUIMIENTO_44H=0/.test(s.configuracionEfectiva().origen.toque_44h),
+      s.configuracionEfectiva().origen.toque_44h
     );
   }
 

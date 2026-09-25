@@ -103,10 +103,36 @@ const IDIOMA = process.env.SEGUIMIENTO_IDIOMA || "es_CO";
 // las políticas, no de una medición. Por eso se agregó la medición por paso
 // (store.estadisticasSeguimiento): en una semana se sabe cuál toque paga.
 // ============================================================================
+// ============================================================================
+// 🔘 EL INTERRUPTOR DEL TOQUE DE 44H —  SEGUIMIENTO_44H=0  lo apaga
+//
+// POR QUÉ EXISTE ASÍ (25-sep): la primera versión se apagaba dejando la variable
+// de la plantilla VACÍA. El dueño preguntó, con razón: "¿cómo así que poner la
+// variable en blanco?". Apagar algo que mueve plata no puede depender de escribir
+// nada en una casilla y confiar en que quede guardado como cadena vacía.
+//
+// Ahora es un interruptor explícito, y acepta varias formas de decir que no
+// (0, no, off, false, apagado) porque se va a escribir desde un celular.
+//
+// LO QUE DICEN LOS DATOS (medido con 949 mensajes):
+//   paso 1 (2h)  ... 268 enviados -> 8 compras   ← el único que vende
+//   paso 2 (20h) ... 309 enviados -> 0 compras
+//   paso 3 (44h) ... 432 enviados -> 0 compras   ← y es el que gasta plantilla
+// ============================================================================
+const APAGADO = new Set(["0", "no", "off", "false", "apagado"]);
+const PASO_44H_ACTIVO = !APAGADO.has(
+  String(process.env.SEGUIMIENTO_44H ?? "1").trim().toLowerCase()
+);
+
 const PASOS = [
   { n: 1, desde: 2 * H, hasta: 5 * H, tipo: "texto", texto: () => TEXTO_1 },
   { n: 2, desde: 20 * H, hasta: 23 * H, tipo: "texto", texto: () => TEXTO_2 },
-  { n: 3, desde: 44 * H, hasta: 47 * H, tipo: "plantilla", plantilla: PLANTILLA_2 }
+  // El de 44h entra solo si está prendido Y tiene plantilla. Si se saca de la
+  // lista, nadie queda "esperándolo": simplemente recibe dos toques en vez de
+  // tres, y no se ensucia el log con un salto cada 30 minutos.
+  ...(PASO_44H_ACTIVO && PLANTILLA_2
+    ? [{ n: 3, desde: 44 * H, hasta: 47 * H, tipo: "plantilla", plantilla: PLANTILLA_2 }]
+    : []),
 ];
 
 // El texto del seguimiento 1. Va sin presion y le devuelve el argumento que
@@ -348,6 +374,15 @@ function configuracionEfectiva() {
   return {
     activo: ACTIVO,
     idioma: IDIOMA,
+    // 🔘 En palabras, no en código. Esta línea es la que se mira para confirmar
+    // que el interruptor quedó como se quería, sin entrar a Render otra vez.
+    toque_44h: !PASO_44H_ACTIVO
+      ? "🔴 APAGADO por SEGUIMIENTO_44H — el cliente recibe solo los toques de 2h y 20h"
+      : PLANTILLA_2
+        ? `🟢 ACTIVO — manda la plantilla "${PLANTILLA_2}" a las 44h`
+        : "🔴 APAGADO — no hay plantilla configurada",
+    // Los toques que quedan en pie ahora mismo, en horas.
+    toques: PASOS.map((p) => `${p.desde / H}h (${p.tipo})`),
     plantilla_2: PLANTILLA_2 || "(ninguna: el paso 2 se salta)",
     plantilla_3: PLANTILLA_3 || "(ninguna: el paso 3 se salta)",
     // De dónde viene cada uno, para no volver a confundirse.
@@ -355,6 +390,9 @@ function configuracionEfectiva() {
       plantilla_2: process.env.SEGUIMIENTO_PLANTILLA_2 ? "variable de entorno" : "default del código",
       plantilla_3: process.env.SEGUIMIENTO_PLANTILLA_3 ? "variable de entorno" : "default del código",
       idioma: process.env.SEGUIMIENTO_IDIOMA ? "variable de entorno" : "default del código (es_CO)",
+      toque_44h: process.env.SEGUIMIENTO_44H
+        ? `variable de entorno (SEGUIMIENTO_44H=${process.env.SEGUIMIENTO_44H})`
+        : "no está puesta: viene prendido por default",
     },
   };
 }
