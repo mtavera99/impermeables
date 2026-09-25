@@ -542,12 +542,64 @@ app.post("/novedades/enviar", async (req, res) => {
   const indices = Array.isArray(req.body?.indices) ? req.body.indices : [];
   const resultados = [];
 
+  // ==========================================================================
+  // 🔴 LOS DATOS DE LA OFICINA SE APLICAN ACÁ MISMO (25-sep)
+  //
+  // DE DÓNDE SALE. El dueño: "otro salió así pidiendo detalles, no sé por qué;
+  // igual se los puse pero a ese no le envió".
+  //
+  // LA CAUSA: los campos de "en qué oficina" y "hasta cuándo" se mandaban solo
+  // en el paso de Revisar. Si se completaban y se le daba Enviar —que es lo
+  // natural, porque los campos están ahí mismo en la fila— el plan seguía
+  // teniendo esa fila marcada como NO enviable y el envío la saltaba en
+  // silencio. Había que darle "Revisar otra vez", y eso solo se decía en una
+  // línea de ayuda que es fácil no leer.
+  //
+  // 🔑 No se arregla con un cartel más grande. Se arregla haciendo que completar
+  // los campos y darle Enviar funcione, porque es lo que cualquiera va a hacer.
+  //
+  // El plan se recalcula con los datos recién llegados. `revisar` es puro sobre
+  // el mismo texto, así que las filas salen en el mismo orden y los índices que
+  // marcó el dueño siguen apuntando a lo mismo.
+  // ==========================================================================
+  let filas = plan.filas;
+  const datos = req.body?.datos || {};
+  if (plan.texto && Object.keys(datos).length) {
+    try {
+      const recalculado = novedades.revisar(plan.texto, { datos });
+      if (recalculado.filas.length === plan.filas.length) {
+        filas = recalculado.filas;
+      } else {
+        // Si el recálculo no da la misma cantidad de filas, los índices ya no
+        // significan lo mismo: se usa el plan original antes que mandarle el
+        // mensaje de un cliente a otro.
+        console.warn(
+          `⚠️  El recálculo de novedades dio ${recalculado.filas.length} filas y el plan tenía ` +
+            `${plan.filas.length}. Se usa el plan original.`
+        );
+      }
+    } catch (e) {
+      console.error(`⚠️  No se pudo recalcular el plan con los datos nuevos: ${e.message}`);
+    }
+  }
+
   for (const i of indices) {
-    const f = plan.filas[i];
+    const f = filas[i];
     // No se manda nada que la revisión haya marcado como no enviable, aunque
     // llegue en la lista: la pantalla puede estar vieja.
     if (!f || !f.enviar || !f.destino || !f.texto) {
-      resultados.push({ guia: f ? f.guia : "?", ok: false, error: "quedó marcada como no enviable" });
+      // 🔑 El motivo, no un "no enviable" seco. Antes esta fila se saltaba sin
+      // decir por qué y el dueño no tenía cómo saber qué le faltaba: veía que
+      // "sólo dejó enviar 1" y ninguna explicación.
+      const porQue = f
+        ? f.motivoNoEnvio ||
+          (f.pidoDatos
+            ? "falta completar en qué oficina está y hasta cuándo tiene para reclamarlo"
+            : !f.destino
+              ? "no encontré a quién corresponde esta guía"
+              : "quedó marcada como no enviable")
+        : "esa fila ya no existe en el plan";
+      resultados.push({ guia: f ? f.guia : "?", nombre: f ? f.nombre : "", ok: false, error: porQue });
       continue;
     }
 
