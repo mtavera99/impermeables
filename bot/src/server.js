@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const { generateReply } = require("./agent");
+const { generateReply, callIA } = require("./agent");
 const {
   sendText, sendImage, sendVideo, sendCatalog, catalogoActivo,
   sendPdf, sendPdfPorPlantilla, sendTemplate, esBsuid,
@@ -17,6 +17,7 @@ const { avisoParaElDueno: avisoDireccion } = require("./direccion");
 const panelAuditoria = require("./panel-auditoria");
 const novedades = require("./novedades");
 const fletes = require("./fletes");
+const extraer = require("./extraer");
 const plantillas = require("./plantillas");
 const audio = require("./audio");
 const resumen = require("./resumen");
@@ -1206,6 +1207,42 @@ app.get("/plantillas", async (req, res) => {
         ultimos: store.fallosDeEntrega(25),
       },
     });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ============================================================================
+// GET /extraer-datos — leer el chat y devolver los campos del pedido
+//
+// DE DÓNDE SALE (25-sep). El dueño: "ponle algún botón para que copie todos los
+// datos del chat a los cajones y no tener que escribir cajón por cajón".
+//
+// No es solo comodidad: transcribir un pedido a mano a las 4 de la mañana es
+// como se escriben mal una talla, un color o una dirección, y eso se descubre
+// con el paquete ya despachado.
+//
+// ⛔ NO guarda nada y NO le escribe nada al cliente. Devuelve datos para llenar
+// el formulario; el dueño los revisa y le da guardar.
+// ============================================================================
+app.get("/extraer-datos", async (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const id = idDestino(req.query.id) || String(req.query.id || "").trim();
+  if (!id) return res.status(400).json({ ok: false, error: "Falta el id del chat." });
+
+  try {
+    const conv = store.getConv(id);
+    const mensajes = (conv && conv.messages) || [];
+    if (mensajes.length === 0) {
+      return res.json({
+        ok: true,
+        datos: extraer.heuristica({ mensajes: [], conv, chatId: id }),
+        conIA: false,
+        aviso: "No hay mensajes guardados de este chat.",
+      });
+    }
+    const r = await extraer.extraer({ mensajes, conv, chatId: id, llamarIA: callIA });
+    res.json({ ok: true, ...r });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
