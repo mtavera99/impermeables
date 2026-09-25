@@ -939,9 +939,15 @@ function todasLasGuiasEnviadas() {
 /**
  * Le pega el número de guía al pedido, para que el CSV de despacho salga
  * completo y se pueda cruzar contra el export de la transportadora.
- * Se identifica por `fecha` (el ISO del momento en que se guardó, único).
+ * ⚠️ Se identifica por `id`. El comentario que había acá decía "por `fecha` (el
+ * ISO del momento en que se guardó, único)" y ERA FALSO: `toISOString()` tiene
+ * resolución de milisegundo y dos pedidos del mismo instante comparten fecha.
+ * Ese comentario es el que hizo que la guía pudiera quedar pegada al pedido
+ * equivocado — un paquete a otra persona. Se acepta `fecha` solo para los
+ * pedidos viejos que se guardaron sin id.
  */
-function anotarGuiaEnPedido(fechaPedido, guia) {
+function anotarGuiaEnPedido(refPedido, guia) {
+  const fechaPedido = refPedido;
   try {
     ensure();
     const orders = readJSON(ORDERS_FILE, []);

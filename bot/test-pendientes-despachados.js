@@ -52,7 +52,19 @@ store.saveOrder(pedido("Sin Celular", 83000, { celular: "", telefono_chat: "CO.9
 
 // A Luis se le mandó la guía: eso es lo que lo marca como despachado.
 const luis = store.todosLosPedidos().find((p) => p.nombre === "Luis Despachado");
-store.anotarGuiaEnPedido(luis.fecha, "240099998888");
+// ⚠️ POR `id`, NO POR `fecha` (arreglado el 25-sep).
+//
+// Esta prueba fallaba 3 de cada 8 corridas y parecia ruido. No lo era: crea
+// tres pedidos seguidos, y `Date.now()` tiene resolucion de milisegundo, asi
+// que dos caian en el MISMO instante y compartian `fecha`. Al pegar la guia por
+// fecha, `indiceDePedido` devolvia el primero que coincidia y la guia quedaba
+// en el pedido equivocado.
+//
+// Es la trampa #1 del proyecto, y produccion ya la tiene resuelta: server.js
+// usa `fila.pedido.id || fila.pedido.fecha`. La que se quedo atras fue esta
+// prueba — y una prueba que falla al azar se empieza a ignorar, asi que deja de
+// proteger justo lo que vino a cuidar.
+store.anotarGuiaEnPedido(luis.id, "240099998888");
 
 const html = require("./src/panel").render();
 const num = (re) => {
@@ -102,7 +114,7 @@ delete require.cache[require.resolve("./src/embudo")];
 const store2 = require("./src/store");
 store2.saveOrder(pedido("Todo Listo", 73000));
 const p2 = store2.todosLosPedidos()[0];
-store2.anotarGuiaEnPedido(p2.fecha, "240011112222");
+store2.anotarGuiaEnPedido(p2.id, "240011112222");
 const html2 = require("./src/panel").render();
 
 chequear("dice que no hay nada pendiente", /No hay nada pendiente/.test(html2));

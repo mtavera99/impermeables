@@ -45,6 +45,13 @@ function render(opciones = {}) {
   textarea{width:100%;min-height:150px;background:#0f1319;border:1px solid #39424f;border-radius:12px;
            padding:12px;color:#e7e9ee;font:16px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
   textarea:focus{outline:none;border-color:#3b82f6}
+  /* 📄 La carga del archivo. Va ARRIBA del textarea: es el camino recomendado,
+     y el de pegar a mano queda como alternativa. */
+  .cargar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+  .btn.verde{background:#16341f;border-color:#2ea043;color:#8ff0b5;font-weight:600;cursor:pointer}
+  .cargarMsg{font-size:12px;color:#8b93a4}
+  .cargarMsg.ok{color:#8ff0b5}
+  .cargarMsg.mal{color:#ff9aa4}
   .btn{background:#1b212b;border:1px solid #2d3542;color:#e7e9ee;padding:0 16px;min-height:46px;
        border-radius:12px;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
        touch-action:manipulation;font-weight:500}
@@ -118,14 +125,21 @@ function render(opciones = {}) {
     <div class="como">
       <b>Cómo se usa</b>
       <ol>
-        <li>Entrá a 99 Envíos, a la lista de novedades</li>
-        <li><b>Seleccioná y copiá</b> las filas (o pegá el CSV si lo podés descargar)</li>
-        <li>Pegalo acá abajo y dale <b>Revisar</b> — eso <b>no envía nada</b></li>
+        <li>Entrá a 99 Envíos y <b>descargá el Excel</b> de novedades</li>
+        <li><b>Cargalo acá abajo</b> con el botón — o pegá las filas a mano si preferís</li>
+        <li>Dale <b>Revisar</b> — eso <b>no envía nada</b></li>
         <li>Mirás a quién le va a llegar qué, y recién ahí <b>Enviar</b></li>
       </ol>
       No importa el formato: busca los números de guía en cada línea y el resto lo toma como motivo.
     </div>
-    <textarea id="pegado" placeholder="Pegá acá las novedades. Por ejemplo:&#10;240012345678  INTERRAPIDISIMO  Direccion incompleta&#10;240098765432  Destinatario ausente"></textarea>
+    <!-- 📄 Cargar el archivo en vez de copiar filas a mano. El dueño trabaja del
+         celular, y copiar una tabla ahí es incómodo y se pierden columnas. -->
+    <div class="cargar">
+      <label class="btn verde" for="archivo">📄 Cargar el Excel de 99 Envíos</label>
+      <input type="file" id="archivo" accept=".xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain" hidden>
+      <span id="archivoMsg" class="cargarMsg"></span>
+    </div>
+    <textarea id="pegado" placeholder="Cargá el Excel arriba, o pegá acá las novedades. Por ejemplo:&#10;240012345678  INTERRAPIDISIMO  Direccion incompleta&#10;240098765432  Destinatario ausente"></textarea>
     <div class="acciones">
       <button class="btn azul" id="btnRevisar">🔍 Revisar (no envía nada)</button>
       <a class="btn" href="/panel?token=${esc(tk)}">← Volver al panel</a>
@@ -255,6 +269,51 @@ function revisar(btn) {
 }
 
 document.getElementById("btnRevisar").addEventListener("click", function () { revisar(this); });
+
+// ============================================================================
+// 📄 CARGAR EL ARCHIVO
+//
+// Se manda el archivo CRUDO, sin multipart: el servidor lo recibe con
+// express.raw, igual que el PDF de las guías. Una dependencia menos.
+//
+// El archivo NO se envía a nadie: el servidor devuelve el texto por líneas, se
+// pone en el textarea, y de ahí sigue el flujo normal de Revisar → Enviar. Así
+// el dueño ve exactamente lo mismo que si lo hubiera pegado a mano.
+// ============================================================================
+document.getElementById("archivo").addEventListener("change", function (ev) {
+  var archivo = ev.target.files && ev.target.files[0];
+  if (!archivo) return;
+  var msg = document.getElementById("archivoMsg");
+  msg.className = "cargarMsg";
+  msg.textContent = "Leyendo " + archivo.name + "...";
+
+  fetch("/novedades/archivo?token=" + encodeURIComponent(TOKEN) +
+        "&nombre=" + encodeURIComponent(archivo.name), {
+    method: "POST",
+    headers: { "Content-Type": "application/octet-stream" },
+    body: archivo
+  })
+    .then(function (r) {
+      if (r.status === 403) throw new Error("La clave del panel no coincide.");
+      return r.json();
+    })
+    .then(function (d) {
+      if (!d || d.ok === false) throw new Error((d && d.error) || "No se pudo leer el archivo.");
+      document.getElementById("pegado").value = d.texto;
+      msg.className = "cargarMsg ok";
+      msg.textContent = "Leí " + d.cuantas + " novedad" + (d.cuantas === 1 ? "" : "es") +
+        " del archivo. Dale Revisar.";
+    })
+    .catch(function (e) {
+      msg.className = "cargarMsg mal";
+      msg.textContent = e.message;
+    })
+    .then(function () {
+      // Se limpia para que cargar el MISMO archivo otra vez vuelva a disparar el
+      // evento: si no, corregir el archivo y recargarlo no hacía nada.
+      ev.target.value = "";
+    });
+});
 
 document.getElementById("btnEnviar").addEventListener("click", function () {
   if (!PLAN) return;

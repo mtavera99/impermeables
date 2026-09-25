@@ -18,6 +18,7 @@ const panelAuditoria = require("./panel-auditoria");
 const novedades = require("./novedades");
 const fletes = require("./fletes");
 const extraer = require("./extraer");
+const excel = require("./excel");
 const plantillas = require("./plantillas");
 const audio = require("./audio");
 const resumen = require("./resumen");
@@ -423,6 +424,50 @@ app.get("/novedades", (req, res) => {
     res.status(500).send("Error armando la pantalla: " + esc(e.message));
   }
 });
+
+// ============================================================================
+// POST /novedades/archivo — cargar el Excel de 99 Envíos en vez de copiar filas
+//
+// DE DÓNDE SALE (25-sep). El dueño: "me gustaría que dejes la posibilidad de
+// poder cargar el Excel que me da 99 envíos, para no tener que copiar
+// manualmente lo que está en el Excel sino que sólo sea cargarlo y ya".
+//
+// Copiar filas de una tabla en el celular es de las cosas más incómodas que hay,
+// y encima se pierden columnas por el camino.
+//
+// El archivo llega como cuerpo crudo, igual que el PDF de las guías: así no hace
+// falta multer ni busboy. Una dependencia menos que pueda romperse al desplegar.
+//
+// ⛔ NO envía nada: devuelve el texto por líneas para que el dueño lo revise con
+// el mismo paso de siempre.
+// ============================================================================
+app.post(
+  "/novedades/archivo",
+  express.raw({ type: () => true, limit: "10mb" }),
+  (req, res) => {
+    if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+    const buf = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body || "");
+    if (!buf.length) {
+      return res.status(400).json({ ok: false, error: "El archivo llegó vacío." });
+    }
+    try {
+      const { texto, formato } = excel.aTextoDeNovedades(buf, String(req.query.nombre || ""));
+      const filas = novedades.parsear(texto);
+      if (!filas.length) {
+        return res.status(400).json({
+          ok: false,
+          error:
+            `Leí el archivo (${formato}) pero no encontré ningún número de guía. ` +
+            "Revisá que sea el listado de novedades y que traiga la columna de la guía.",
+        });
+      }
+      anotarEvento({ tipo: "novedades-archivo", formato, filas: filas.length });
+      res.json({ ok: true, texto, formato, cuantas: filas.length });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e.message });
+    }
+  }
+);
 
 app.post("/novedades/revisar", (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
