@@ -176,7 +176,29 @@ function primerMensaje() {
     "PVC siliconado calibre 8 con costura termosellada, así que el agua no se filtra ni por las puntadas 💧",
     "Va de talla S a 3XL — te recomiendo pedir una talla más de la que usas normalmente, porque se pone encima de la ropa.",
     "El impermeable es negro y la franja reflectiva la eliges en blanco, negro, rojo, verde, morado o azul.",
-    `Son ${fmt(PRECIO_PRODUCTO)} el conjunto, más el envío, y pagas contraentrega cuando lo recibes 📦`,
+    // ========================================================================
+    // 🔴 "MÁS EL ENVÍO" SE ENTIENDE AL REVÉS (25-sep)
+    //
+    // Lo vio el dueño, y es de los errores más difíciles de detectar: lo
+    // escribimos nosotros, así que lo leemos con la intención con que lo
+    // escribimos. El cliente no.
+    //
+    //   "Son $59.900 el conjunto, más el envío"
+    //
+    // En español "más" hace doble trabajo: puede ser "+ el costo del envío"
+    // (lo que queríamos decir) o "y además el envío" = envío incluido (lo que
+    // mucha gente entiende). Y el que lo entiende como incluido se lleva una
+    // sorpresa cuando le damos el total — justo en el escalón donde más se cae.
+    //
+    // 🔑 "APARTE" NO TIENE ESA AMBIGÜEDAD. Y se agrega "pagas todo junto", que
+    // es la pregunta real detrás de la confusión: cuánto voy a pagar en la
+    // puerta. El mensaje siguiente ya promete el total exacto, así que el
+    // cliente sabe que falta un número y no lo toma como precio final.
+    //
+    // ⚠️ Este es el mensaje de MÁS tráfico de toda la operación. Si el cierre se
+    // mueve para abajo después de este cambio, el sospechoso es esta línea.
+    // ========================================================================
+    `Son ${fmt(PRECIO_PRODUCTO)} el conjunto, y aparte el envío según tu ciudad. Pagas todo junto contraentrega cuando lo recibes 📦`,
     "¿Para qué ciudad sería? Así te doy el total exacto.",
   ].join("\n\n");
 }

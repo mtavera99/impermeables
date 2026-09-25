@@ -183,7 +183,32 @@ console.log("\n── 6. 🚨 La regla más importante: ni un precio de envío s
 
 chequear(
   "dice que el envío va aparte",
-  /m[áa]s el env[íi]o|\+ env[íi]o/i.test(arranque)
+  /aparte el env[íi]o|env[íi]o (va )?aparte|no est[áa] incluido/i.test(arranque)
+);
+// ==========================================================================
+// 🔴 Y NO PUEDE DECIRLO CON "MÁS EL ENVÍO" (25-sep)
+//
+// Lo vio el dueño, y es de los errores más difíciles de detectar: lo
+// escribimos nosotros, así que lo leemos con la intención con que lo
+// escribimos. En español "más" hace doble trabajo — puede ser "+ el costo del
+// envío" o "y además el envío" = incluido. El que lo entiende como incluido se
+// lleva una sorpresa al recibir el total, justo en el escalón donde más se cae.
+// ==========================================================================
+chequear(
+  '🔴 NO dice "más el envío", que se entiende como incluido',
+  !/m[áa]s el env[íi]o/i.test(arranque),
+  "la gente lo lee como que el envío ya está adentro"
+);
+chequear(
+  "y aclara que se paga todo junto, que es la duda real",
+  /todo junto/i.test(arranque),
+  "la pregunta detrás de la confusión es cuánto se paga en la puerta"
+);
+// El guion de la IA lleva la misma prohibición: si no, el bot lo dice con sus
+// propias palabras y el arreglo del mensaje fijo no sirve de nada.
+chequear(
+  "el guion de la IA también lo prohíbe",
+  /Nunca digas "más el envío"/i.test(require("./src/prompt").buildSystemPrompt())
 );
 chequear(
   "NO da ninguna cifra de envío ni un total",
