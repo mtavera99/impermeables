@@ -146,27 +146,132 @@ function render(aviso) {
   const urgentes = lista.filter((x) => prior.get(x.tel)?.nivel === "alta");
   const medios = lista.filter((x) => prior.get(x.tel)?.nivel === "media");
 
-  const bloqueAtencion = (urgentes.length || medios.length)
+  // ==========================================================================
+  // 📅 AGRUPADO POR DÍA (25-sep), a pedido del dueño:
+  //
+  //   "deberíamos crear algo en el que el día de hoy me salgan los del día de
+  //    hoy y no los de dos o tres días atrás, o sea organizar eso más para que
+  //    visualmente sea más fácil y más rápido"
+  //
+  // Se agrupa por el día del ÚLTIMO MENSAJE DEL CLIENTE, no por cuándo se
+  // escaló: lo que importa es desde cuándo está esperando él.
+  //
+  // ⚠️ El día se calcula en hora de Bogotá con `resumen.diaBogota`. Render corre
+  // en UTC, y a partir de las 19:00 de Bogotá un `new Date()` pelado ya dice
+  // "mañana": los chats de la tarde saldrían en el grupo equivocado.
+  // ==========================================================================
+  const HOY = resumen.hoyBogota();
+  const AYER = resumen.ayerBogota();
+  const chatsPendientes = [...urgentes, ...medios];
+  const diaDe = (x) => {
+    const e = prior.get(x.tel);
+    return resumen.diaBogota(e?.esperaDesde || x.cuando);
+  };
+  const grupos = [
+    { clave: "hoy", titulo: "Hoy", items: chatsPendientes.filter((x) => diaDe(x) === HOY) },
+    { clave: "ayer", titulo: "Ayer", items: chatsPendientes.filter((x) => diaDe(x) === AYER) },
+    {
+      clave: "antes",
+      titulo: "Más viejos",
+      items: chatsPendientes.filter((x) => diaDe(x) !== HOY && diaDe(x) !== AYER),
+    },
+  ].filter((g) => g.items.length);
+
+  const filaAtencion = (x) => {
+    const e = prior.get(x.tel);
+    const q = comoSeLlama(x.tel, x.c);
+    return `<div class="fila ${e.nivel}">
+      <a class="filaLink" href="#c${esc(x.tel)}">
+        <b>${esc(q.texto)}${q.sinTelefono ? " 🕵️" : ""}</b>
+        <span class="por">${esc(e.motivos[0] || "")}</span>
+      </a>
+      <span class="cuando">${esc(hace(e.esperaDesde || x.cuando))}</span>
+      <form method="post" action="/atendido" class="listo">
+        <input type="hidden" name="token" value="${esc(panelToken())}">
+        <input type="hidden" name="tel" value="${esc(x.tel)}">
+        <button type="submit" title="Ya lo resolví: sacalo de la lista">✅</button>
+      </form>
+    </div>`;
+  };
+
+  // ---- Lo que YA se respondió: control de lo hecho, no trabajo pendiente ----
+  // El dueño: "para que tenga orden y control de lo que se respondió".
+  const todosAtendidos = atencion.atendidos(convs);
+  const atendidoDe = new Map(todosAtendidos.map((a) => [a.tel, a]));
+  const yaAtendidos = todosAtendidos.filter((a) => resumen.diaBogota(a.atendidoAt) === HOY);
+
+  const bloqueAtencion = chatsPendientes.length
     ? `<div class="atencion">
-         <h3>${urgentes.length ? "🔴" : "🟡"} ${urgentes.length + medios.length} chat(s) necesitan que entres vos</h3>
-         ${[...urgentes, ...medios].slice(0, 12).map((x) => {
-           const e = prior.get(x.tel);
-           const q = comoSeLlama(x.tel, x.c);
-           return `<a class="fila ${e.nivel}" href="#c${esc(x.tel)}">
-             <b>${esc(q.texto)}${q.sinTelefono ? " 🕵️" : ""}</b>
-             <span class="por">${esc(e.motivos[0] || "")}</span>
-             <span class="cuando">${esc(hace(x.cuando))}</span>
-           </a>`;
-         }).join("")}
+         <h3>${urgentes.length ? "🔴" : "🟡"} ${chatsPendientes.length} chat(s) esperando respuesta${
+           grupos.length > 1
+             ? ` · <span class="desglose">${grupos
+                 .map((g) => `${g.items.length} ${g.titulo.toLowerCase()}`)
+                 .join(" · ")}</span>`
+             : ""
+         }</h3>
+         ${grupos
+           .map(
+             (g) => `<div class="grupo">
+               <h4>${esc(g.titulo)} · ${g.items.length}</h4>
+               ${g.items.slice(0, 15).map(filaAtencion).join("")}
+               ${
+                 g.items.length > 15
+                   ? `<p class="nota">…y ${g.items.length - 15} más de ${g.titulo.toLowerCase()}.</p>`
+                   : ""
+               }
+             </div>`
+           )
+           .join("")}
+         <p class="nota">Con ✅ lo sacás de la lista. Si el cliente vuelve a escribir, reaparece solo.</p>
        </div>`
-    : `<div class="atencion ok"><h3>🟢 Ningún chat necesita atención humana</h3></div>`;
+    : `<div class="atencion ok"><h3>🟢 Ningún chat está esperando respuesta</h3></div>`;
+
+  const bloqueAtendidos = yaAtendidos.length
+    ? `<div class="atencion hecho">
+         <h3>✅ Ya respondiste hoy · ${yaAtendidos.length}</h3>
+         ${yaAtendidos
+           .slice(0, 15)
+           .map((a) => {
+             const q = comoSeLlama(a.tel, a.c);
+             // No es lo mismo haberle escrito que haberlo marcado: lo primero
+             // queda en el chat, lo segundo pudo ser una llamada. El dueño pidió
+             // "control de lo que se respondió", así que se dicen distinto.
+             const quien =
+               a.atendidoComo === "marca"
+                 ? "lo marcaste como resuelto"
+                 : "le respondiste vos";
+             return `<div class="fila ok">
+               <a class="filaLink" href="#c${esc(a.tel)}">
+                 <b>${esc(q.texto)}${q.sinTelefono ? " 🕵️" : ""}</b>
+                 <span class="por">${esc(quien)}</span>
+               </a>
+               <span class="cuando">${esc(hace(a.atendidoAt))}</span>
+               <form method="post" action="/atendido" class="listo">
+                 <input type="hidden" name="token" value="${esc(panelToken())}">
+                 <input type="hidden" name="tel" value="${esc(a.tel)}">
+                 <input type="hidden" name="deshacer" value="1">
+                 <button type="submit" title="Volver a ponerlo en pendientes">↩️</button>
+               </form>
+             </div>`;
+           })
+           .join("")}
+         ${
+           yaAtendidos.length > 15
+             ? `<p class="nota">…y ${yaAtendidos.length - 15} más.</p>`
+             : ""
+         }
+       </div>`
+    : "";
 
   const totalMsgsCliente = lista.reduce(
     (s, x) => s + x.msgs.filter((m) => m.role === "user").length,
     0
   );
   const conPedido = lista.filter((x) => x.c.compro).length;
-  const enHumano = lista.filter((x) => x.c.paused).length;
+  // ⚠️ Antes esto contaba `paused`, y `paused` no se apaga al contestar: el KPI
+  // decía "12 esperando humano" cuando los 12 ya estaban respondidos. Ahora
+  // cuenta los que de verdad esperan una respuesta.
+  const enHumano = chatsPendientes.length;
 
   // ---- Números del día, en hora de Bogotá, comparados contra ayer ----
   const hoy = resumen.delDia(resumen.hoyBogota());
@@ -471,7 +576,14 @@ function render(aviso) {
           const etiquetas = [
             etiquetaAtencion,
             x.c.compro ? `<span class="tag ok">compró</span>` : "",
-            x.c.paused ? `<span class="tag warn">esperando humano</span>` : "",
+            // ✅ Ya se le contestó después de su último mensaje. Se distingue de
+            // "esperando humano", que antes salía igual en los dos casos y era
+            // la razón de que la lista pareciera un desorden de cosas sin hacer.
+            atendidoDe.get(x.tel)
+              ? `<span class="tag ok">✅ respondido</span>`
+              : x.c.paused
+                ? `<span class="tag warn">esperando humano</span>`
+                : "",
             x.c.noMolestar ? `<span class="tag no">no molestar</span>` : "",
           ].join("");
           const burbujas = x.msgs
@@ -707,6 +819,22 @@ function render(aviso) {
   .fila:hover{background:#232b36}
   .fila .por{font-size:12px;color:#c8cfdd;flex:1}
   .fila .cuando{font-size:11px;color:#8b93a4}
+  /* Agrupado por día: el título de cada grupo y el botón de "ya lo atendí". */
+  .atencion .grupo{margin-bottom:10px}
+  .atencion .grupo h4{margin:8px 0 5px;font-size:12px;color:#9aa4b8;text-transform:uppercase;
+    letter-spacing:.5px;font-weight:600}
+  .atencion .desglose{font-weight:400;color:#9aa4b8;font-size:12px}
+  .fila .filaLink{display:flex;gap:8px;align-items:center;flex:1;min-width:0;
+    text-decoration:none;color:#e7e9ee}
+  .fila .filaLink b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+  /* El ✅ tiene que ser cómodo de tocar con el pulgar: el dueño opera del celular. */
+  .fila .listo{margin:0;display:block}
+  .fila .listo button{background:#1f2630;border:1px solid #2c3340;color:#9aa4b8;
+    border-radius:8px;padding:5px 9px;font-size:14px;line-height:1;cursor:pointer;min-width:38px}
+  .fila .listo button:hover{background:#2a323e;color:#e7e9ee}
+  .atencion.hecho{background:#131a16;border-color:#1f3328}
+  .atencion.hecho h3{color:#8ff0b5}
+  .fila.ok{border-left-color:#2ea043;background:#141c17}
   .tag.alta{background:#3a1414;color:#ff9b9b}
   .tag.media{background:#3a2d0c;color:#ffd479}
   .porque{margin-top:8px;font-size:12px;color:#ffd479;background:#241f14;padding:7px 9px;border-radius:8px}
@@ -836,6 +964,7 @@ function render(aviso) {
   ${aviso || ""}
   ${avisoDatos}
   ${bloqueAtencion}
+  ${bloqueAtendidos}
   ${tarjetas}
   ${bloqueEmbudo}
   <h2>📋 Pendientes de despachar${pendientes.length ? ` · ${pendientes.length}` : ""}</h2>
