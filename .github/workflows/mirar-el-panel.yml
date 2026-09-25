@@ -1,0 +1,131 @@
+name: Mirar el panel
+
+# ══════════════════════════════════════════════════════════════════════════════
+# UNA VENTANA DE LECTURA AL BOT, DESDE EL LOG DE UN ACTION.
+#
+# POR QUÉ EXISTE (25-sep): el entorno donde trabaja Kiro NO tiene salida a
+# internet — el proxy devuelve 403 para el bot, para Meta y hasta para
+# example.com. Así que no se puede abrir el panel para diagnosticar, y durante la
+# sesión del 23-24 casi todos los bugs de plata se cazaron LEYENDO el panel y los
+# chats reales (pedidos duplicados, el combo mal cotizado, el "No confirmo" que
+# se guardó igual). Sin esa ventana, el dueño tiene que pegar pantallazos a mano
+# desde el celular.
+#
+# 🔑 LA IDEA: los runners de GitHub SÍ tienen internet, y el log de un Action se
+# puede leer con la API. El mismo truco que ya usa `cierre-diario.yml`, que
+# imprime el cierre en el log a propósito.
+#
+# 🔒 POR QUÉ ES SEGURO:
+#   · el token vive en los secretos del repo, NUNCA pasa por el chat. Eso importa
+#     especialmente ahora: el PANEL_TOKEN se expuso 4 veces en la sesión del
+#     23-24 y está pendiente de rotar
+#   · la URL jamás se imprime (imprimirla filtraría el token al log)
+#   · las rutas son una lista cerrada, y TODAS son de solo lectura. A propósito
+#     NO está `/seguimiento/correr`, que dispara mensajes a clientes
+#   · solo quien puede lanzar workflows en este repo puede usarlo
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      ruta:
+        description: "Qué pantalla mirar"
+        required: true
+        default: "/auditoria"
+        type: choice
+        options:
+          - /panel           # pedidos, el tablero principal
+          - /auditoria       # cuadrar conversaciones vs pedidos vs ventas
+          - /seguimiento     # cadencia y contadores por paso
+          - /cierre          # cierre del día (NO envía WhatsApp desde acá)
+          - /setup-waba      # conexión del número + calidad
+          - /chat            # una conversación real (hay que dar el id)
+      id:
+        description: "Solo para /chat — el número del cliente (ej. 573116093103)"
+        required: false
+        default: ""
+      extra:
+        description: "Parámetros extra, sin el ? inicial (ej. dia=2026-09-24)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  mirar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pedirle la pantalla al bot y dejarla en el log
+        env:
+          BOT_URL: ${{ secrets.BOT_URL }}
+          BOT_TOKEN: ${{ secrets.BOT_VERIFY_TOKEN }}
+          RUTA: ${{ inputs.ruta }}
+          ID: ${{ inputs.id }}
+          EXTRA: ${{ inputs.extra }}
+        run: |
+          set -uo pipefail
+
+          if [ -z "${BOT_URL:-}" ] || [ -z "${BOT_TOKEN:-}" ]; then
+            echo "::error::Faltan los secretos BOT_URL y/o BOT_VERIFY_TOKEN del repositorio."
+            exit 1
+          fi
+
+          if [ "$RUTA" = "/chat" ] && [ -z "$ID" ]; then
+            echo "::error::La ruta /chat necesita el campo 'id' con el número del cliente."
+            exit 1
+          fi
+
+          # ⚠️ La URL se arma pero NO se imprime: lleva el token adentro.
+          URL="${BOT_URL}${RUTA}?token=${BOT_TOKEN}"
+          [ -n "$ID" ] && URL="${URL}&id=${ID}"
+          [ -n "$EXTRA" ] && URL="${URL}&${EXTRA}"
+
+          echo "Pidiendo ${RUTA}${ID:+ (id $ID)}..."
+
+          # --max-time alto: Render puede tardar en despertar si estuvo inactivo.
+          CODE=$(curl -s -o cruda.txt -w "%{http_code}" --max-time 120 "$URL" || echo "000")
+          echo "HTTP $CODE · $(wc -c < cruda.txt) bytes"
+
+          if [ "$CODE" != "200" ]; then
+            echo "::error::El bot respondió HTTP $CODE"
+            # El cuerpo de un error no trae el token, así que se puede mostrar.
+            head -c 2000 cruda.txt || true
+            exit 1
+          fi
+
+          echo "─────────────────── ${RUTA} ───────────────────"
+          # El panel es HTML y en el log crudo es ilegible. Se pasa a texto para
+          # poder leerlo de un vistazo (y desde el celular).
+          python3 - <<'PY'
+          import html, json, re, sys
+
+          crudo = open("cruda.txt", encoding="utf-8", errors="replace").read()
+
+          # /cierre y /setup-waba responden JSON: se imprime tal cual, indentado.
+          limpio = crudo.lstrip()
+          if limpio[:1] in "{[":
+              try:
+                  print(json.dumps(json.loads(crudo), indent=2, ensure_ascii=False))
+                  sys.exit(0)
+              except ValueError:
+                  pass
+
+          t = crudo
+          t = re.sub(r"(?is)<(script|style)\b.*?</\1>", " ", t)
+          # Los cortes de fila y de bloque se vuelven saltos de línea, si no toda
+          # la tabla sale pegada en un renglón.
+          t = re.sub(r"(?i)<(br|/tr|/p|/h[1-6]|/div|/li)\s*/?>", "\n", t)
+          # Las celdas se separan con ' · ' para que se entienda qué va con qué.
+          t = re.sub(r"(?i)</t[dh]>", " · ", t)
+          # Cada etiqueta deja un espacio, no nada: si no, los números se pegan
+          # a su rótulo ("2pedidos hoy", "PRECIO BAJO3001112233") y no se leen.
+          t = re.sub(r"(?s)<[^>]+>", " ", t)
+          t = html.unescape(t)
+          # Espacios de sobra y renglones vacíos repetidos.
+          t = re.sub(r"[ \t\u00a0]+", " ", t)
+          t = re.sub(r" *·? *\n", "\n", t)
+          t = re.sub(r"\n{3,}", "\n\n", t)
+          print("\n".join(l.strip() for l in t.splitlines() if l.strip()))
+          PY
+          echo "──────────────────────────────────────────────"
