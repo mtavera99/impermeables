@@ -254,14 +254,85 @@ const html = require("./src/panel").render();
 
 chequear("el título habla de chats esperando respuesta", /esperando respuesta/.test(html));
 chequear("hay un grupo por día", /<h4>Hoy · \d+<\/h4>/.test(html));
-chequear("aparece el bloque de lo ya respondido hoy", /Ya respondiste hoy/.test(html));
-chequear("con el botón ✅ para sacar de la lista", /action="\/atendido"/.test(html));
-chequear("y explica que reaparece si el cliente escribe", /reaparece solo/.test(html));
+
+// ⛔ UNA SOLA LISTA. El dueño: "que reaccione rápido y no que se vaya a otras
+// listas o cosas más complejas". Los respondidos se quedan donde están.
+chequear(
+  "NO hay un segundo bloque para los respondidos",
+  !/Ya respondiste hoy/.test(html),
+  "los atendidos tienen que quedarse en la misma lista"
+);
+chequear(
+  "cada chat tiene su punto",
+  (html.match(/class="punto"/g) || []).length === 3,
+  `encontré ${(html.match(/class="punto"/g) || []).length}`
+);
+chequear(
+  "el punto de un chat respondido viene prendido",
+  /data-tel="573200000002" data-listo="1"/.test(html)
+);
+chequear(
+  "y el de uno sin responder viene apagado",
+  /data-tel="573200000001" data-listo="0"/.test(html)
+);
+chequear(
+  "el respondido queda marcado como hecho, en su lugar",
+  /class="fila hecho" data-tel="573200000002"/.test(html)
+);
+
+// 🔑 Se toca y se pinta SIN recargar: antes era un POST con redirect y el panel
+// entero se recargaba, que en un celular con datos es un segundo en blanco.
+chequear("el punto no es un formulario que recargue", !/action="\/atendido"/.test(html));
+chequear("se guarda por fetch", /fetch\("\/atendido\?json=1"/.test(html));
+chequear("y reacciona antes de esperar la red", /marcarChat/.test(html));
+chequear("y explica que se prende solo si el cliente escribe", /se prende solo/.test(html));
+
+// El contador de arriba cuenta lo que FALTA, no el total de la lista.
+chequear(
+  "el contador cuenta solo lo que falta responder",
+  /<span id="faltan">1<\/span>/.test(html),
+  "de 3 chats, 2 están respondidos: falta 1"
+);
 
 // Distingue haber contestado de haber marcado: lo primero queda escrito en el
 // chat, lo segundo pudo ser una llamada. Es el "control de lo que se respondió".
 chequear("dice cuál se respondió de verdad", /le respondiste vos/.test(html));
 chequear("y cuál solo se marcó como resuelto", /lo marcaste como resuelto/.test(html));
+
+// ===========================================================================
+// 🔴 EL JAVASCRIPT DE LA PÁGINA TIENE QUE PARSEAR
+//
+// El script del panel vive DENTRO de un template literal, y eso ya rompió el
+// panel dos veces (una comilla invertida en un comentario alcanza). Y hay una
+// trampa peor porque es silenciosa: en un template literal "\\s" se convierte
+// en "s" al generarse la página, así que una expresión regular escrita
+// /·\s*\d+$/ llega al navegador como /·s*d+$/ — parsea bien y no coincide con
+// nada. No hay error, solo un contador que no se actualiza nunca.
+// ===========================================================================
+const vm = require("vm");
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+chequear("la página trae su script", scripts.length >= 1);
+let jsOk = true;
+let jsErr = "";
+try {
+  new vm.Script(scripts.join("\n;\n"));
+} catch (e) {
+  jsOk = false;
+  jsErr = e.message;
+}
+chequear("y es JavaScript válido", jsOk, jsErr);
+const js = scripts.join("");
+chequear(
+  "las barras invertidas de la expresión regular sobrevivieron",
+  js.includes("/·\\s*\\d+\\s*$/"),
+  "la expresión tiene que llegar al navegador con sus barras invertidas"
+);
+chequear(
+  "y NO llegó comida como /·s*d+s*$/",
+  !js.includes("/·s*d+s*$/"),
+  "si se comen las barras, parsea igual y el contador no se actualiza nunca: falla en silencio"
+);
+chequear("el token quedó disponible para el fetch", /var PANEL_TOKEN_JS = "/.test(html));
 
 // "hace 1800 min" no se lee de un vistazo.
 const eva7 = atencion.evaluar("x", conv([delCliente(ahora - 30 * HORA, "hola?")]));
@@ -277,9 +348,9 @@ chequear(
   )
 );
 chequear(
-  "los dos atendidos salen en el registro y no en pendientes",
-  (html.match(/Ya respondiste hoy · 2/) || []).length === 1,
-  "se esperaban 2 atendidos hoy"
+  "los pendientes van arriba y los respondidos abajo, en el mismo grupo",
+  html.indexOf('data-tel="573200000001"') < html.indexOf('data-tel="573200000002"'),
+  "el que falta responder tiene que ir primero"
 );
 chequear(
   "el que falta responder sigue visible como pendiente",

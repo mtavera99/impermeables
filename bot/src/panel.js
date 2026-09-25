@@ -163,105 +163,117 @@ function render(aviso) {
   const HOY = resumen.hoyBogota();
   const AYER = resumen.ayerBogota();
   const chatsPendientes = [...urgentes, ...medios];
+
+  // ==========================================================================
+  // 🔘 UN PUNTO QUE SE PRENDE AL TOQUE — UNA SOLA LISTA (25-sep)
+  //
+  // DE DÓNDE SALE, en palabras del dueño:
+  //
+  //   "optimizá más lo de los mensajes que ya se van respondiendo, los de
+  //    atención humana, porque el sistema para saber que ya se respondieron o no
+  //    está muy obsoleto. Ponle algún punto o algo que reaccione rápido, y no
+  //    que se vaya a otras listas o cosas más complejas"
+  //
+  // 🔴 LO QUE ESTABA MAL EN MI PRIMERA VERSIÓN: el ✅ era un formulario que hacía
+  // POST, el servidor respondía un redirect y el navegador RECARGABA TODO EL
+  // PANEL. En un celular con datos eso es un segundo largo de pantalla en
+  // blanco. Y encima el chat desaparecía de la lista y reaparecía en otro bloque
+  // más abajo, así que había que buscarlo con el ojo para confirmar que pasó algo.
+  //
+  // Tres problemas: lento, la fila salta, y la información del mismo chat vivía
+  // en dos lugares distintos.
+  //
+  // 🔑 AHORA: un punto al lado de cada chat, se toca y cambia de color EN EL
+  // MOMENTO, sin esperar la red y sin recargar nada. Un solo listado: los
+  // respondidos se quedan donde están, apagados. Se lee como una lista de
+  // tareas tachadas.
+  //
+  // ⚠️ La fila NO se reordena al tocarla, y es a propósito: si se moviera, el
+  // dedo quedaría sobre otro chat y el siguiente toque marcaría al equivocado.
+  // El orden se acomoda en el próximo refresco, cuando ya no hay un dedo encima.
+  // ==========================================================================
+  const todosAtendidos = atencion.atendidos(convs);
+  const atendidoDe = new Map(todosAtendidos.map((a) => [a.tel, a]));
+
+  // Los atendidos siguen en la MISMA lista. Solo se muestran los de hoy y ayer:
+  // un chat resuelto anteayer ya no es información, es ruido.
+  const atendidosVisibles = todosAtendidos.filter((a) => {
+    const d = resumen.diaBogota(a.esperaDesde || a.atendidoAt);
+    return d === HOY || d === AYER;
+  });
+
   const diaDe = (x) => {
-    const e = prior.get(x.tel);
-    return resumen.diaBogota(e?.esperaDesde || x.cuando);
+    const e = prior.get(x.tel) || atendidoDe.get(x.tel);
+    return resumen.diaBogota(e?.esperaDesde || x.cuando || e?.atendidoAt);
+  };
+  const todosLosChats = [...chatsPendientes, ...atendidosVisibles];
+  const armarGrupo = (titulo, filtro) => {
+    const items = todosLosChats.filter(filtro);
+    // Los pendientes primero; los ya respondidos abajo, apagados.
+    items.sort((a, b) => {
+      const la = atendidoDe.has(a.tel) ? 1 : 0;
+      const lb = atendidoDe.has(b.tel) ? 1 : 0;
+      if (la !== lb) return la - lb;
+      return (prior.get(b.tel)?.puntos || 0) - (prior.get(a.tel)?.puntos || 0);
+    });
+    return { titulo, items, faltan: items.filter((x) => !atendidoDe.has(x.tel)).length };
   };
   const grupos = [
-    { clave: "hoy", titulo: "Hoy", items: chatsPendientes.filter((x) => diaDe(x) === HOY) },
-    { clave: "ayer", titulo: "Ayer", items: chatsPendientes.filter((x) => diaDe(x) === AYER) },
-    {
-      clave: "antes",
-      titulo: "Más viejos",
-      items: chatsPendientes.filter((x) => diaDe(x) !== HOY && diaDe(x) !== AYER),
-    },
+    armarGrupo("Hoy", (x) => diaDe(x) === HOY),
+    armarGrupo("Ayer", (x) => diaDe(x) === AYER),
+    armarGrupo("Más viejos", (x) => diaDe(x) !== HOY && diaDe(x) !== AYER),
   ].filter((g) => g.items.length);
 
   const filaAtencion = (x) => {
-    const e = prior.get(x.tel);
+    const hecho = atendidoDe.get(x.tel);
+    const e = prior.get(x.tel) || hecho;
     const q = comoSeLlama(x.tel, x.c);
-    return `<div class="fila ${e.nivel}">
+    // Si ya se atendió, el renglón dice CÓMO: escribirle queda en el chat,
+    // marcarlo pudo ser una llamada. Es el control de lo que se respondió.
+    const texto = hecho
+      ? hecho.atendidoComo === "marca"
+        ? "lo marcaste como resuelto"
+        : "le respondiste vos"
+      : e.motivos?.[0] || "";
+    return `<div class="fila ${hecho ? "hecho" : e.nivel}" data-tel="${esc(x.tel)}" data-listo="${
+      hecho ? "1" : "0"
+    }">
+      <button type="button" class="punto" onclick="marcarChat(this)"
+        title="Tocar para marcar que ya lo respondiste"><span></span></button>
       <a class="filaLink" href="#c${esc(x.tel)}">
         <b>${esc(q.texto)}${q.sinTelefono ? " 🕵️" : ""}</b>
-        <span class="por">${esc(e.motivos[0] || "")}</span>
+        <span class="por">${esc(texto)}</span>
       </a>
-      <span class="cuando">${esc(hace(e.esperaDesde || x.cuando))}</span>
-      <form method="post" action="/atendido" class="listo">
-        <input type="hidden" name="token" value="${esc(panelToken())}">
-        <input type="hidden" name="tel" value="${esc(x.tel)}">
-        <button type="submit" title="Ya lo resolví: sacalo de la lista">✅</button>
-      </form>
+      <span class="cuando">${esc(hace(hecho ? hecho.atendidoAt : e.esperaDesde || x.cuando))}</span>
     </div>`;
   };
 
-  // ---- Lo que YA se respondió: control de lo hecho, no trabajo pendiente ----
-  // El dueño: "para que tenga orden y control de lo que se respondió".
-  const todosAtendidos = atencion.atendidos(convs);
-  const atendidoDe = new Map(todosAtendidos.map((a) => [a.tel, a]));
-  const yaAtendidos = todosAtendidos.filter((a) => resumen.diaBogota(a.atendidoAt) === HOY);
-
-  const bloqueAtencion = chatsPendientes.length
+  const faltanTotal = chatsPendientes.length;
+  const bloqueAtencion = todosLosChats.length
     ? `<div class="atencion">
-         <h3>${urgentes.length ? "🔴" : "🟡"} ${chatsPendientes.length} chat(s) esperando respuesta${
+         <h3><span id="faltan">${faltanTotal}</span> chat(s) esperando respuesta${
            grupos.length > 1
              ? ` · <span class="desglose">${grupos
-                 .map((g) => `${g.items.length} ${g.titulo.toLowerCase()}`)
+                 .map((g) => `${g.faltan} ${g.titulo.toLowerCase()}`)
                  .join(" · ")}</span>`
              : ""
          }</h3>
          ${grupos
            .map(
              (g) => `<div class="grupo">
-               <h4>${esc(g.titulo)} · ${g.items.length}</h4>
-               ${g.items.slice(0, 15).map(filaAtencion).join("")}
+               <h4>${esc(g.titulo)} · ${g.faltan}</h4>
+               ${g.items.slice(0, 20).map(filaAtencion).join("")}
                ${
-                 g.items.length > 15
-                   ? `<p class="nota">…y ${g.items.length - 15} más de ${g.titulo.toLowerCase()}.</p>`
+                 g.items.length > 20
+                   ? `<p class="nota">…y ${g.items.length - 20} más de ${g.titulo.toLowerCase()}.</p>`
                    : ""
                }
              </div>`
            )
            .join("")}
-         <p class="nota">Con ✅ lo sacás de la lista. Si el cliente vuelve a escribir, reaparece solo.</p>
+         <p class="nota">Tocá el punto cuando ya le respondiste. Si el cliente vuelve a escribir, se prende solo.</p>
        </div>`
     : `<div class="atencion ok"><h3>🟢 Ningún chat está esperando respuesta</h3></div>`;
-
-  const bloqueAtendidos = yaAtendidos.length
-    ? `<div class="atencion hecho">
-         <h3>✅ Ya respondiste hoy · ${yaAtendidos.length}</h3>
-         ${yaAtendidos
-           .slice(0, 15)
-           .map((a) => {
-             const q = comoSeLlama(a.tel, a.c);
-             // No es lo mismo haberle escrito que haberlo marcado: lo primero
-             // queda en el chat, lo segundo pudo ser una llamada. El dueño pidió
-             // "control de lo que se respondió", así que se dicen distinto.
-             const quien =
-               a.atendidoComo === "marca"
-                 ? "lo marcaste como resuelto"
-                 : "le respondiste vos";
-             return `<div class="fila ok">
-               <a class="filaLink" href="#c${esc(a.tel)}">
-                 <b>${esc(q.texto)}${q.sinTelefono ? " 🕵️" : ""}</b>
-                 <span class="por">${esc(quien)}</span>
-               </a>
-               <span class="cuando">${esc(hace(a.atendidoAt))}</span>
-               <form method="post" action="/atendido" class="listo">
-                 <input type="hidden" name="token" value="${esc(panelToken())}">
-                 <input type="hidden" name="tel" value="${esc(a.tel)}">
-                 <input type="hidden" name="deshacer" value="1">
-                 <button type="submit" title="Volver a ponerlo en pendientes">↩️</button>
-               </form>
-             </div>`;
-           })
-           .join("")}
-         ${
-           yaAtendidos.length > 15
-             ? `<p class="nota">…y ${yaAtendidos.length - 15} más.</p>`
-             : ""
-         }
-       </div>`
-    : "";
 
   const totalMsgsCliente = lista.reduce(
     (s, x) => s + x.msgs.filter((m) => m.role === "user").length,
@@ -819,7 +831,7 @@ function render(aviso) {
   .fila:hover{background:#232b36}
   .fila .por{font-size:12px;color:#c8cfdd;flex:1}
   .fila .cuando{font-size:11px;color:#8b93a4}
-  /* Agrupado por día: el título de cada grupo y el botón de "ya lo atendí". */
+  /* Agrupado por día. */
   .atencion .grupo{margin-bottom:10px}
   .atencion .grupo h4{margin:8px 0 5px;font-size:12px;color:#9aa4b8;text-transform:uppercase;
     letter-spacing:.5px;font-weight:600}
@@ -827,14 +839,22 @@ function render(aviso) {
   .fila .filaLink{display:flex;gap:8px;align-items:center;flex:1;min-width:0;
     text-decoration:none;color:#e7e9ee}
   .fila .filaLink b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
-  /* El ✅ tiene que ser cómodo de tocar con el pulgar: el dueño opera del celular. */
-  .fila .listo{margin:0;display:block}
-  .fila .listo button{background:#1f2630;border:1px solid #2c3340;color:#9aa4b8;
-    border-radius:8px;padding:5px 9px;font-size:14px;line-height:1;cursor:pointer;min-width:38px}
-  .fila .listo button:hover{background:#2a323e;color:#e7e9ee}
-  .atencion.hecho{background:#131a16;border-color:#1f3328}
-  .atencion.hecho h3{color:#8ff0b5}
-  .fila.ok{border-left-color:#2ea043;background:#141c17}
+  /* 🔘 EL PUNTO. El área de toque es de 34px aunque el círculo mida 15: el dueño
+     opera del celular y un blanco de 15px se falla. El círculo chico es solo lo
+     que se VE; lo que se toca es el botón entero. */
+  .fila .punto{-webkit-appearance:none;appearance:none;background:transparent;border:0;
+    padding:0;margin:0;width:34px;height:34px;min-width:34px;display:flex;
+    align-items:center;justify-content:center;cursor:pointer;flex:none}
+  .fila .punto span{display:block;width:15px;height:15px;border-radius:50%;
+    border:2px solid #7d8698;background:transparent;transition:background .12s,border-color .12s}
+  .fila.alta .punto span{border-color:#ff6b6b}
+  .fila.media .punto span{border-color:#ffb020}
+  .fila .punto:active span{transform:scale(.88)}
+  /* Respondido: el punto se llena de verde y el renglón se apaga. Se queda en su
+     lugar — se lee como una lista de tareas tachadas. */
+  .fila.hecho{border-left-color:#2ea043;background:#151a18;opacity:.55}
+  .fila.hecho .punto span{background:#2ea043;border-color:#2ea043}
+  .fila.hecho .filaLink b{text-decoration:line-through;text-decoration-color:#6b7280}
   .tag.alta{background:#3a1414;color:#ff9b9b}
   .tag.media{background:#3a2d0c;color:#ffd479}
   .porque{margin-top:8px;font-size:12px;color:#ffd479;background:#241f14;padding:7px 9px;border-radius:8px}
@@ -964,7 +984,6 @@ function render(aviso) {
   ${aviso || ""}
   ${avisoDatos}
   ${bloqueAtencion}
-  ${bloqueAtendidos}
   ${tarjetas}
   ${bloqueEmbudo}
   <h2>📋 Pendientes de despachar${pendientes.length ? ` · ${pendientes.length}` : ""}</h2>
@@ -996,6 +1015,10 @@ function render(aviso) {
   ${bloquesConv}
 </main>
 <script>
+// La clave del panel, para los envíos que van por fetch. No agrega exposición:
+// ya viaja en los campos ocultos de cada formulario de esta misma página.
+var PANEL_TOKEN_JS = ${JSON.stringify(panelToken())};
+
 // ── ENVIAR SIN RECARGAR ──────────────────────────────────────────────────────
 // Antes el formulario hacía POST normal y el navegador recargaba la página.
 // Eso cerraba la conversación abierta y no dejaba ver si el mensaje salió, así
@@ -1129,6 +1152,9 @@ document.querySelectorAll("form.resp").forEach(function (f) {
     if (hayTexto) return true;
     // Hay un mensaje enviándose
     if (document.querySelector(".envio.wait")) return true;
+    // 🔘 Hay un punto guardándose. Si se recargara justo ahora, el panel podría
+    // pintarse con el estado viejo y el punto "se desprendería" solo a la vista.
+    if (window.__puntosEnVuelo > 0) return true;
     return false;
   }
 
@@ -1136,6 +1162,77 @@ document.querySelectorAll("form.resp").forEach(function (f) {
     if (!ocupado()) location.reload();
   }, 45000);
 })();
+
+// ============================================================================
+// 🔘 MARCAR UN CHAT COMO RESPONDIDO, SIN RECARGAR NADA
+//
+// Antes esto era un formulario: POST → redirect → el navegador recargaba el
+// panel entero. En un celular con datos es un segundo largo de pantalla en
+// blanco, y el chat además saltaba a otro bloque.
+//
+// 🔑 AHORA SE PINTA PRIMERO Y SE GUARDA DESPUÉS (respuesta optimista). El punto
+// cambia de color en el mismo toque, sin esperar la red. Si el guardado falla,
+// se revierte y se avisa: es mejor eso que un dedo esperando a que el servidor
+// conteste para saber si el toque sirvió.
+// ============================================================================
+window.__puntosEnVuelo = 0;
+function marcarChat(btn) {
+  var fila = btn.closest(".fila");
+  if (!fila || fila.dataset.guardando === "1") return;
+  var tel = fila.dataset.tel;
+  var estaba = fila.dataset.listo === "1";
+
+  // 1) Reacciona YA.
+  fila.dataset.listo = estaba ? "0" : "1";
+  fila.classList.toggle("hecho", !estaba);
+  fila.dataset.guardando = "1";
+  window.__puntosEnVuelo++;
+  recontarFaltan();
+
+  // 2) Y recién después se guarda.
+  var cuerpo =
+    "token=" + encodeURIComponent(PANEL_TOKEN_JS) + "&tel=" + encodeURIComponent(tel) + "&json=1";
+  if (estaba) cuerpo += "&deshacer=1";
+
+  fetch("/atendido?json=1", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: cuerpo,
+  })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+    })
+    .catch(function () {
+      // Revertir: que la pantalla no diga algo que el servidor no guardó.
+      fila.dataset.listo = estaba ? "1" : "0";
+      fila.classList.toggle("hecho", estaba);
+      recontarFaltan();
+      alert("No se pudo guardar. Revisá la conexión y tocá de nuevo.");
+    })
+    .then(function () {
+      fila.dataset.guardando = "0";
+      window.__puntosEnVuelo--;
+    });
+}
+
+/** Mantiene los contadores al día sin ir al servidor. */
+function recontarFaltan() {
+  var total = 0;
+  document.querySelectorAll(".atencion .grupo").forEach(function (g) {
+    var faltan = g.querySelectorAll('.fila[data-listo="0"]').length;
+    total += faltan;
+    var h4 = g.querySelector("h4");
+    // ⚠️ Las barras invertidas van DOBLES, y no es un descuido. Este bloque vive
+    // dentro de un template literal de JavaScript, y ahí una barra invertida
+    // sola se descarta al generar la página: los atajos de la expresión regular
+    // llegarían al navegador convertidos en letras sueltas y no coincidirían con
+    // nada. Parsea igual, así que no hay error: el contador simplemente no se
+    // actualiza nunca. Lo vigila test-atendido-y-orden.js.
+    if (h4) h4.textContent = h4.textContent.replace(/·\\s*\\d+\\s*$/, "· " + faltan);
+  });
+  var etiqueta = document.getElementById("faltan");
+  if (etiqueta) etiqueta.textContent = total;
+}
 </script>
 </body></html>`;
 }
