@@ -76,11 +76,33 @@ function tallaDe(textos) {
   return "";
 }
 
-/** El color de la franja. */
+/**
+ * El color de la franja.
+ *
+ * ⚠️ TIENE QUE ACEPTAR EL FEMENINO, y no es un detalle: lo que lleva color es la
+ * FRANJA, que es femenina, así que la gente escribe "franja roja", "franja
+ * blanca", "franja negra". La primera versión buscaba el color pegándole un
+ * sufijo al nombre completo ("rojo" + "a" = "rojoa"), así que "roja" no
+ * coincidía con nada y el campo quedaba vacío justo en la forma MÁS común.
+ *
+ * Lo cazó la verificación de punta a punta, no una prueba: el ejemplo que usé al
+ * escribir el extractor decía "franja rojo", que nadie escribe.
+ *
+ * Devuelve siempre el nombre del catálogo (masculino), que es lo que espera el
+ * formulario: si el cliente dice "blanca", se guarda "blanco".
+ */
+function patronDeColor(color) {
+  // blanco/blanca/blancos/blancas · negro/negra · rojo/roja · morado/morada
+  if (/o$/.test(color)) return color.slice(0, -1) + "[oa]s?";
+  if (color === "verde") return "verdes?";
+  if (color === "azul") return "azul(?:es)?";
+  return color + "s?";
+}
+
 function colorDe(textos) {
   const t = limpiar(textos.join(" · "));
   for (const c of COLORES) {
-    if (new RegExp(`(^|[^a-z])${c}(s|a|as)?([^a-z]|$)`).test(t)) return c;
+    if (new RegExp(`(^|[^a-z])${patronDeColor(c)}([^a-z]|$)`).test(t)) return c;
   }
   return "";
 }

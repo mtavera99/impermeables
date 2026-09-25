@@ -123,6 +123,40 @@ chequear(
 );
 chequear("si no dice talla, queda vacío", x.tallaDe(["hola, precio?"]) === "");
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 🔴 EL COLOR EN FEMENINO — lo que lleva color es la FRANJA
+//
+// Y eso no es un detalle: la franja es femenina, así que la gente escribe
+// "franja roja", "franja blanca", "franja negra". La primera versión de esto le
+// pegaba un sufijo al nombre completo ("rojo" + "a" = "rojoa"), así que "roja"
+// no coincidía con nada y el campo quedaba vacío justo en la forma MÁS común.
+//
+// Lo cazó la verificación de punta a punta, no una prueba: el ejemplo que usé al
+// escribir el extractor decía "franja rojo", que nadie escribe. Una prueba
+// escrita con el mismo supuesto que el código no prueba nada.
+// ═══════════════════════════════════════════════════════════════════════════
+console.log("\n── 3-B. El color en femenino, que es como se escribe de verdad ──");
+
+for (const [texto, esperado] of [
+  ["franja roja", "rojo"],
+  ["franja blanca", "blanco"],
+  ["franja negra", "negro"],
+  ["franja morada", "morado"],
+  ["franja azul", "azul"],
+  ["franja verde", "verde"],
+  ["las rojas", "rojo"],
+  ["franjas blancas", "blanco"],
+  ["quiero azules", "azul"],
+  ["color rojo", "rojo"],
+]) {
+  chequear(`"${texto}" -> ${esperado}`, x.colorDe([texto]) === esperado, `dio ${JSON.stringify(x.colorDe([texto]))}`);
+}
+// Y sigue sin confundirse con palabras que contienen el color adentro.
+for (const t of ["el negocio", "la verdad", "rojizo", "azulejo"]) {
+  chequear(`no confunde "${t}"`, x.colorDe([t]) === "", `dio ${JSON.stringify(x.colorDe([t]))}`);
+}
+chequear("se devuelve el nombre del catálogo, no lo que escribió el cliente", x.colorDe(["franja blanca"]) === "blanco");
+
 // ───────────────────────────────────────────────────────────────────────────
 console.log("\n── 4. La ciudad sale del tarifario, no de una lista aparte ──");
 
