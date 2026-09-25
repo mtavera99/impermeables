@@ -1025,9 +1025,27 @@ function render(aviso) {
   </nav>
   ${aviso || ""}
   ${avisoDatos}
+  ${
+    // ======================================================================
+    // 💰 LOS NÚMEROS DEL DÍA, PRIMERO (25-sep)
+    //
+    // El dueño: "lo único que cambiaría es dejar el apartado de ventas —cuántas
+    // ventas, unidades y todo eso— como arriba, para que se viera cuando entro".
+    //
+    // Es la primera pregunta cuando se abre el panel: cómo vamos hoy. Antes
+    // había que pasar por la lista de chats por atender para llegar a los
+    // números.
+    //
+    // 🔑 Y ESTO SE PUEDE MOVER AHORA SIN RIESGO, no antes: la barra de atajos
+    // muestra "Atender (N)" con el conteo y salta ahí de un toque. Sin esa
+    // barra, bajar la lista de atención habría sido enterrar plata en riesgo —
+    // los chats que esperan respuesta son lo único de esta pantalla que se
+    // pierde si nadie lo ve.
+    // ======================================================================
+    tarjetas
+  }
   <span id="atencion"></span>
   ${bloqueAtencion}
-  ${tarjetas}
   ${bloqueEmbudo}
   <h2 id="pendientes">📋 Pendientes de despachar${pendientes.length ? ` · ${pendientes.length}` : ""}</h2>
   ${
