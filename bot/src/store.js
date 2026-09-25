@@ -40,6 +40,7 @@ if (!process.env.DATA_DIR) {
 const CONV_FILE = path.join(DIR, "conversations.json");
 const ORDERS_FILE = path.join(DIR, "orders.json");
 const GUIAS_FILE = path.join(DIR, "guias-enviadas.json");
+const FALLOS_FILE = path.join(DIR, "fallos-entrega.json");
 const MARCADOR_FILE = path.join(DIR, "marcador-disco.json");
 
 const MAX_MSGS = 24; // historial máximo por cliente que enviamos a la IA
@@ -766,6 +767,55 @@ function saveOrder(order) {
 // mundo. Es exactamente el fallo que ya pasó dos veces hoy con otra forma.
 // ============================================================================
 
+// ============================================================================
+// 🔴 LOS FALLOS DE ENTREGA, EN DISCO (25-sep)
+//
+// DE DÓNDE SALE: el cierre del día se mandó dos noches seguidas por plantilla,
+// Meta respondió 200 con id de mensaje las dos veces, y NUNCA LLEGÓ.
+//
+// El motivo sí venía: Meta lo manda por webhook como un evento `statuses` con
+// `status: "failed"` y un código de error. El bot ya lo escuchaba… y lo guardaba
+// en un array en MEMORIA (los últimos 60), que se borra en cada reinicio. Render
+// reinicia por cualquier cosa, así que cuando se fue a buscar la explicación ya
+// no estaba. Está anotado como trampa #6 del proyecto.
+//
+// 🔑 Por eso esto va a DISCO. Un envío que Meta acepta y después descarta se ve
+// idéntico a uno que funcionó: el registro del fallo es la ÚNICA forma de
+// distinguirlos, y no puede depender de que nadie haya reiniciado el servicio.
+//
+// Se guardan solo los FALLOS, no todos los estados. Cada mensaje genera varios
+// eventos (sent, delivered, read) y escribirlos todos en disco sería mucho ruido
+// y mucha escritura; lo que hace falta para diagnosticar es lo que se rompió.
+// ============================================================================
+const MAX_FALLOS = 200;
+
+/** Anota que Meta descartó un mensaje, con el motivo que ella misma dio. */
+function anotarFalloEntrega(datos) {
+  // 🛟 Al log primero, igual que con los pedidos: si el disco falla, el motivo
+  // no se pierde. Es justamente el dato que nunca hay cuando se necesita.
+  console.error("FALLO_ENTREGA_JSON " + JSON.stringify(datos));
+  try {
+    ensure();
+    const todos = readJSON(FALLOS_FILE, []);
+    todos.push({ ...datos, cuando: new Date().toISOString() });
+    writeJSON(FALLOS_FILE, todos.slice(-MAX_FALLOS));
+    return true;
+  } catch (e) {
+    console.error(`⚠️  No se pudo guardar el fallo de entrega: ${e.message}`);
+    return false;
+  }
+}
+
+/** Los fallos de entrega guardados, del más nuevo al más viejo. */
+function fallosDeEntrega(limite = 50) {
+  try {
+    ensure();
+    return readJSON(FALLOS_FILE, []).slice(-limite).reverse();
+  } catch (e) {
+    return [];
+  }
+}
+
 /** ¿Esta guía ya se le envió? Devuelve el registro o null. */
 function guiaYaEnviada(guia) {
   if (!guia) return null;
@@ -893,6 +943,7 @@ function estadoDelDisco() {
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarAtendido, desmarcarAtendido,
+  anotarFalloEntrega, fallosDeEntrega,
   registrarArranque, estadoDelDisco,
   marcarComprado, registrarSeguimiento, reclamarSeguimiento,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
