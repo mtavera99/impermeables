@@ -18,6 +18,7 @@ const panelAuditoria = require("./panel-auditoria");
 const novedades = require("./novedades");
 const fletes = require("./fletes");
 const extraer = require("./extraer");
+const excel = require("./excel");
 const plantillas = require("./plantillas");
 const audio = require("./audio");
 const resumen = require("./resumen");
@@ -296,7 +297,11 @@ app.get("/limpiar-duplicados", (req, res) => {
 // subir el PDF dos veces. Es a propósito efímero: son 30 minutos y un reinicio
 // de Render solo obliga a subirlo de nuevo, que es el lado seguro del error.
 const PLANES_GUIAS = new Map(); // id -> { filas, creado }
-const PLAN_TTL_MS = 30 * 60 * 1000;
+// 2 horas. Eran 30 minutos, y con el plan en memoria eso alcanzaba para que un
+// despliegue lo borrara en medio del trabajo. Ahora el de novedades vive en
+// disco, así que el límite es solo para que un plan viejo no se mande por
+// error: si pasaron horas, la ventana de 24h de esos clientes pudo cambiar.
+const PLAN_TTL_MS = 2 * 60 * 60 * 1000;
 
 function limpiarPlanesViejos() {
   const ahora = Date.now();
@@ -306,6 +311,8 @@ function limpiarPlanesViejos() {
   for (const [id, p] of PLANES_NOVEDADES) {
     if (ahora - p.creado > PLAN_TTL_MS) PLANES_NOVEDADES.delete(id);
   }
+  // Los guardados en disco también, para que el archivo no crezca sin control.
+  store.limpiarPlanesGuardados(PLAN_TTL_MS);
 }
 
 // Mismo mecanismo que las guías: el plan vive entre "revisar" y "enviar" para
@@ -418,6 +425,50 @@ app.get("/novedades", (req, res) => {
   }
 });
 
+// ============================================================================
+// POST /novedades/archivo — cargar el Excel de 99 Envíos en vez de copiar filas
+//
+// DE DÓNDE SALE (25-sep). El dueño: "me gustaría que dejes la posibilidad de
+// poder cargar el Excel que me da 99 envíos, para no tener que copiar
+// manualmente lo que está en el Excel sino que sólo sea cargarlo y ya".
+//
+// Copiar filas de una tabla en el celular es de las cosas más incómodas que hay,
+// y encima se pierden columnas por el camino.
+//
+// El archivo llega como cuerpo crudo, igual que el PDF de las guías: así no hace
+// falta multer ni busboy. Una dependencia menos que pueda romperse al desplegar.
+//
+// ⛔ NO envía nada: devuelve el texto por líneas para que el dueño lo revise con
+// el mismo paso de siempre.
+// ============================================================================
+app.post(
+  "/novedades/archivo",
+  express.raw({ type: () => true, limit: "10mb" }),
+  (req, res) => {
+    if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+    const buf = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body || "");
+    if (!buf.length) {
+      return res.status(400).json({ ok: false, error: "El archivo llegó vacío." });
+    }
+    try {
+      const { texto, formato } = excel.aTextoDeNovedades(buf, String(req.query.nombre || ""));
+      const filas = novedades.parsear(texto);
+      if (!filas.length) {
+        return res.status(400).json({
+          ok: false,
+          error:
+            `Leí el archivo (${formato}) pero no encontré ningún número de guía. ` +
+            "Revisá que sea el listado de novedades y que traiga la columna de la guía.",
+        });
+      }
+      anotarEvento({ tipo: "novedades-archivo", formato, filas: filas.length });
+      res.json({ ok: true, texto, formato, cuantas: filas.length });
+    } catch (e) {
+      res.status(400).json({ ok: false, error: e.message });
+    }
+  }
+);
+
 app.post("/novedades/revisar", (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
@@ -431,6 +482,9 @@ app.post("/novedades/revisar", (req, res) => {
     const plan = novedades.revisar(texto, { datos: req.body?.datos || {} });
     const id = Math.random().toString(36).slice(2, 10);
     PLANES_NOVEDADES.set(id, { filas: plan.filas, creado: Date.now(), texto });
+    // Y también a disco: si Render reinicia entre "Revisar" y "Enviar" —un
+    // despliegue alcanza— el plan en memoria se pierde y el envío responde 400.
+    store.guardarPlan("novedades", id, { filas: plan.filas, texto });
 
     anotarEvento({
       tipo: "novedades-revisadas",
@@ -471,11 +525,17 @@ app.post("/novedades/revisar", (req, res) => {
 app.post("/novedades/enviar", async (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
-  const plan = PLANES_NOVEDADES.get(String(req.body?.id || ""));
+  const idPlan = String(req.body?.id || "");
+  // Memoria primero (lo normal), y si no está, disco: es lo que salva el caso de
+  // un reinicio entre "Revisar" y "Enviar". Antes esto respondía 400 y el dueño
+  // tenía que pegar todo otra vez, sin entender por qué.
+  const plan = PLANES_NOVEDADES.get(idPlan) || store.leerPlan("novedades", idPlan, PLAN_TTL_MS);
   if (!plan) {
     return res.status(400).json({
       ok: false,
-      error: "El plan venció o el bot se reinició. Pegá las novedades otra vez y volvé a revisar.",
+      error:
+        `El plan ya no existe (dura ${Math.round(PLAN_TTL_MS / 60000)} minutos desde que lo revisaste). ` +
+        "Pegá las novedades otra vez y dale Revisar.",
     });
   }
 
@@ -532,6 +592,7 @@ app.post("/novedades/enviar", async (req, res) => {
 
   // El plan se consume: un segundo clic no puede reenviar lo mismo.
   PLANES_NOVEDADES.delete(String(req.body.id));
+  store.borrarPlan("novedades", String(req.body.id));
 
   const enviados = resultados.filter((r) => r.ok).length;
   res.json({

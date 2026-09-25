@@ -87,6 +87,21 @@ const TIPOS = [
       "direccion incompleta", "dirección incompleta", "direccion errada", "dirección errada",
       "no reside", "no conocen", "no existe la direccion", "no existe la dirección",
       "direccion no encontrada", "dirección no encontrada", "no ubicada", "sin nomenclatura",
+      // 🔴 AGREGADO EL 25-SEP, Y ERA EL MÁS COMÚN DE TODOS.
+      //
+      // "No se localiza dirección del destinatario" es el texto LITERAL que
+      // manda 99 Envíos, y no estaba en la lista: esas novedades caían en
+      // "No se reconoció el motivo" y no se le avisaba al cliente.
+      //
+      // Lo encontré comparando la lista con la pantalla real del dueño. Las
+      // señales se escribieron a mano, adivinando cómo redacta la
+      // transportadora, y este es el precio de adivinar: el caso más frecuente
+      // quedó afuera sin que nada lo avisara.
+      //
+      // Cubre también "no se localiza el destinatario": en los dos casos lo que
+      // desatasca el reparto es pedirle la dirección completa y un punto de
+      // referencia, que es justo lo que dice el mensaje de este tipo.
+      "no se localiza",
     ],
     // Pide un punto de referencia. Es lo que de verdad desatasca el reparto.
     mensaje: (n) =>

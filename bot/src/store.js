@@ -41,6 +41,7 @@ const CONV_FILE = path.join(DIR, "conversations.json");
 const ORDERS_FILE = path.join(DIR, "orders.json");
 const GUIAS_FILE = path.join(DIR, "guias-enviadas.json");
 const FALLOS_FILE = path.join(DIR, "fallos-entrega.json");
+const PLANES_FILE = path.join(DIR, "planes.json");
 const MARCADOR_FILE = path.join(DIR, "marcador-disco.json");
 
 const MAX_MSGS = 24; // historial máximo por cliente que enviamos a la IA
@@ -816,6 +817,92 @@ function fallosDeEntrega(limite = 50) {
   }
 }
 
+// ============================================================================
+// 🔴 LOS PLANES PENDIENTES DE CONFIRMAR, EN DISCO (25-sep)
+//
+// DE DÓNDE SALE. El dueño intentó avisar las primeras novedades y el panel le
+// devolvió "No salió: el servidor respondió 400".
+//
+// LA CAUSA: entre "Revisar" y "Enviar" hay dos pasos. El primero calcula a quién
+// se le puede escribir y qué, y guarda ese plan; el segundo lo manda. El plan
+// vivía en un `new Map()` en memoria, y Render reinicia el proceso por cualquier
+// cosa — sobre todo un despliegue, y ese día hubo varios seguidos. Al reiniciar,
+// el plan desaparecía y el segundo paso respondía 400.
+//
+// 🔑 Y LO QUE LO HACE PEOR ES QUE EL ERROR NO SE ENTIENDE. El dueño hizo todo
+// bien: pegó las novedades, revisó, marcó y le dio enviar. El sistema le dijo
+// "400" por algo que pasó por dentro y que él no podía ni ver ni evitar.
+//
+// Es la misma familia que la trampa #6 (el log de eventos en memoria) y que los
+// fallos de entrega: estado que importa, guardado donde no sobrevive.
+//
+// ⚠️ ACÁ NO SE GUARDAN LOS PLANES DE GUÍAS, y es a propósito: esos llevan las
+// páginas del PDF como Buffer, y volcarlas a disco en cada subida es pesado. Ese
+// caso tiene el mismo bug y se arregla distinto (guardando el PDF una vez).
+// ============================================================================
+function guardarPlan(tipo, id, datos) {
+  try {
+    ensure();
+    const todos = readJSON(PLANES_FILE, {});
+    todos[`${tipo}:${id}`] = { tipo, id, creado: Date.now(), ...datos };
+    writeJSON(PLANES_FILE, todos);
+    return true;
+  } catch (e) {
+    // Que no se pueda guardar en disco no puede impedir el envío: el plan sigue
+    // en memoria y el flujo normal (sin reinicio en medio) funciona igual.
+    console.error(`⚠️  No se pudo guardar el plan ${tipo}:${id}: ${e.message}`);
+    return false;
+  }
+}
+
+/** Devuelve el plan guardado, o null si no está o ya venció. */
+function leerPlan(tipo, id, ttlMs) {
+  try {
+    ensure();
+    const p = readJSON(PLANES_FILE, {})[`${tipo}:${id}`];
+    if (!p) return null;
+    // ⚠️ `ttlMs != null` y no `ttlMs`: con `if (ttlMs)` un TTL de 0 se saltaba el
+    // chequeo y devolvía el plan como si estuviera fresco. Y `>=` en vez de `>`
+    // por la trampa #1: `Date.now()` tiene resolución de milisegundo, así que un
+    // plan guardado y leído en el mismo milisegundo daba edad 0.
+    if (ttlMs != null && Date.now() - Number(p.creado || 0) >= ttlMs) return null;
+    return p;
+  } catch (e) {
+    return null;
+  }
+}
+
+function borrarPlan(tipo, id) {
+  try {
+    ensure();
+    const todos = readJSON(PLANES_FILE, {});
+    delete todos[`${tipo}:${id}`];
+    writeJSON(PLANES_FILE, todos);
+  } catch (e) {
+    /* si no se puede borrar, el TTL lo limpia */
+  }
+}
+
+/** Borra los planes vencidos, para que el archivo no crezca sin control. */
+function limpiarPlanesGuardados(ttlMs) {
+  try {
+    ensure();
+    const todos = readJSON(PLANES_FILE, {});
+    const ahora = Date.now();
+    let cambio = false;
+    for (const [k, p] of Object.entries(todos)) {
+      // `>=` por lo mismo que en leerPlan: si no, un TTL de 0 no limpia nada.
+      if (ahora - Number(p.creado || 0) >= ttlMs) {
+        delete todos[k];
+        cambio = true;
+      }
+    }
+    if (cambio) writeJSON(PLANES_FILE, todos);
+  } catch (e) {
+    /* no es crítico */
+  }
+}
+
 /** ¿Esta guía ya se le envió? Devuelve el registro o null. */
 function guiaYaEnviada(guia) {
   if (!guia) return null;
@@ -852,9 +939,15 @@ function todasLasGuiasEnviadas() {
 /**
  * Le pega el número de guía al pedido, para que el CSV de despacho salga
  * completo y se pueda cruzar contra el export de la transportadora.
- * Se identifica por `fecha` (el ISO del momento en que se guardó, único).
+ * ⚠️ Se identifica por `id`. El comentario que había acá decía "por `fecha` (el
+ * ISO del momento en que se guardó, único)" y ERA FALSO: `toISOString()` tiene
+ * resolución de milisegundo y dos pedidos del mismo instante comparten fecha.
+ * Ese comentario es el que hizo que la guía pudiera quedar pegada al pedido
+ * equivocado — un paquete a otra persona. Se acepta `fecha` solo para los
+ * pedidos viejos que se guardaron sin id.
  */
-function anotarGuiaEnPedido(fechaPedido, guia) {
+function anotarGuiaEnPedido(refPedido, guia) {
+  const fechaPedido = refPedido;
   try {
     ensure();
     const orders = readJSON(ORDERS_FILE, []);
@@ -944,6 +1037,7 @@ module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarAtendido, desmarcarAtendido,
   anotarFalloEntrega, fallosDeEntrega,
+  guardarPlan, leerPlan, borrarPlan, limpiarPlanesGuardados,
   registrarArranque, estadoDelDisco,
   marcarComprado, registrarSeguimiento, reclamarSeguimiento,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
