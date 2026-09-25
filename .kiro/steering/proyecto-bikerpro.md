@@ -9,10 +9,17 @@ la quincena queda descartada, el colmena se dio vuelta (231% de su equilibrio) y
 Y el error #24: casi corto `Domiciliarios`, que fue el conjunto que MÁS utilidad dejó.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR `TRASPASO-SESION-24SEP.md`.**
-> Es lo más reciente y está escrito para retomar: pendientes del dueño, los 23 PRs del 23-24 de
-> septiembre, los precios vigentes, los números ya medidos (para no volver a medirlos), las 25
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR `TRASPASO-SESION-25SEP.md`.**
+> Es lo más reciente y está escrito para retomar: pendientes del dueño, los 16 PRs del 25 de
+> septiembre, los precios vigentes, los números ya medidos (para no volver a medirlos), las 32
 > baterías de prueba, las trampas conocidas y cómo trabajar con el dueño.
+> El anterior (`TRASPASO-SESION-24SEP.md`) sigue sirviendo para el detalle de los 23 PRs del 23-24.
+>
+> ⚠️ **Antes de tocar nada, leé la sección "ENTORNO" del traspaso del 25-sep.** Hay dos cosas que
+> hacen perder una hora si no se saben: **`unset NODE_OPTIONS`** (si no, las 32 baterías fallan todas
+> en falso) y que **este entorno no tiene salida a internet** (no se puede instalar nada, 5 baterías
+> no corren, y el servidor no arranca — eso es el estado sano, no una regresión).
+>
 > **El bot de WhatsApp ya reemplazó al agente de Meta y está en producción** —
 > `https://bikerpro-bot.onrender.com` — así que las secciones de este archivo que dicen que el bot
 > no está corriendo (0-BD) están vencidas.
