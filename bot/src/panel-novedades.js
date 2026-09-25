@@ -52,6 +52,10 @@ function render(opciones = {}) {
   .cargarMsg{font-size:12px;color:#8b93a4}
   .cargarMsg.ok{color:#8ff0b5}
   .cargarMsg.mal{color:#ff9aa4}
+  /* 🕵️ Aviso de "lo encontré por nombre, confirmá". Amarillo, no verde: es una
+     suposición nuestra y hay que mirarla antes de mandar. */
+  .probable{background:#2a2113;border:1px solid #5a4418;border-radius:9px;
+    padding:8px 10px;margin-bottom:8px;color:#ffd79a;font-size:12px;line-height:1.4}
   .btn{background:#1b212b;border:1px solid #2d3542;color:#e7e9ee;padding:0 16px;min-height:46px;
        border-radius:12px;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
        touch-action:manipulation;font-weight:500}
@@ -223,9 +227,16 @@ function revisar(btn) {
         // Esos datos salen de la novedad y los completa el dueño: el bot no los
         // puede inventar (el 14-sep prometió una oficina de Servientrega que no
         // presta ese servicio, y la clienta lo leyó).
+        // 🕵️ Cuando la guía no cruzó y el cliente se encontró por NOMBRE, se
+        // avisa fuerte: es una suposición nuestra, no un dato. Mandarle la
+        // novedad de un cliente a otro es peor que no mandar nada.
+        var aviso = f.probable
+          ? '<div class="probable">🕵️ <b>No es seguro:</b> esta guía no está en nuestros datos. ' +
+            'Lo encontré porque ' + f.probable.porQue + '. <b>Revisá que sea la persona</b> antes de enviar.</div>'
+          : "";
         var cuerpo;
         if (f.pidoDatos) {
-          cuerpo =
+          cuerpo = aviso +
             '<span class="motivo">' + (f.motivoNoEnvio || "") + "</span>" +
             '<div class="pide">' +
               '<input class="dato" data-guia="' + f.guia + '" data-campo="oficina" ' +
@@ -234,7 +245,7 @@ function revisar(btn) {
                 'placeholder="¿Hasta cuándo? ej: el 27 de septiembre">' +
             "</div>";
         } else if (f.enviar) {
-          cuerpo =
+          cuerpo = aviso +
             '<div class="msg">' + f.texto + "</div>" +
             (f.porPlantilla
               ? '<span class="sub">se manda por la plantilla <b>' + f.plantilla + "</b></span>"
@@ -327,7 +338,11 @@ document.getElementById("btnEnviar").addEventListener("click", function () {
   fetch("/novedades/enviar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token: TOKEN, id: PLAN.id, indices: marcados })
+    // 🔑 Van también los campos de oficina/plazo. Antes NO se mandaban: había
+    // que completarlos y darle "Revisar otra vez" para que contaran, y eso no
+    // es obvio — los campos están ahí mismo, en la fila, así que lo natural es
+    // llenarlos y darle Enviar. El dueño lo hizo así y esa novedad no salió.
+    body: JSON.stringify({ token: TOKEN, id: PLAN.id, indices: marcados, datos: juntarDatos() })
   })
     .then(function (r) {
       if (r.status === 403) throw new Error("la clave del panel no coincide.");

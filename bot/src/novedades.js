@@ -209,6 +209,69 @@ const VENTANA_24H = 24 * 60 * 60 * 1000;
  * Devuelve, por cada novedad: a quién le corresponde, qué se le diría, si su
  * ventana de 24h está abierta, y si se puede enviar o por qué no.
  */
+/** Quita tildes y pasa a minúsculas, para comparar nombres y ciudades. */
+const aplanar = (s) =>
+  String(s == null ? "" : s)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+/**
+ * Busca el pedido que corresponde a una novedad cuando la GUÍA no cruza.
+ *
+ * Se exige coincidencia FUERTE y GANADOR ÚNICO:
+ *   · al menos 2 palabras del nombre del cliente (con "Mauricio" solo no alcanza:
+ *     hay varios, y mandarle la novedad al Mauricio equivocado es peor que nada)
+ *   · o 1 palabra del nombre MÁS la ciudad, que es corroboración independiente
+ *   · y si dos pedidos empatan en el mejor puntaje, no se sugiere ninguno
+ *
+ * @returns {{pedido:object, porQue:string}|null}
+ */
+function buscarPorNombre(motivo, pedidos) {
+  const texto = " " + aplanar(motivo).replace(/[^a-z0-9ñ]+/g, " ") + " ";
+  const suelta = (p) => new RegExp(`(^|[^a-z0-9])${p}([^a-z0-9]|$)`).test(texto);
+
+  let mejor = null;
+  let empate = false;
+
+  for (const p of pedidos) {
+    // Un pedido ya despachado y entregado no tiene novedades pendientes, pero no
+    // se filtra por eso acá: el estado de entrega no lo sabemos con certeza.
+    const palabras = aplanar(p.nombre)
+      .split(/[^a-z0-9ñ]+/)
+      .filter((w) => w.length >= 4);
+    if (!palabras.length) continue;
+
+    const coinciden = palabras.filter(suelta);
+    const ciudad = aplanar(p.ciudad).split(/[^a-z0-9ñ]+/).filter((w) => w.length >= 4);
+    const ciudadCoincide = ciudad.length > 0 && ciudad.some(suelta);
+
+    // El puntaje pondera la ciudad como una palabra más, pero exige nombre:
+    // una ciudad sola coincide con demasiados pedidos.
+    if (coinciden.length === 0) continue;
+    const fuerte = coinciden.length >= 2 || (coinciden.length >= 1 && ciudadCoincide);
+    if (!fuerte) continue;
+
+    const puntos = coinciden.length + (ciudadCoincide ? 1 : 0);
+    if (!mejor || puntos > mejor.puntos) {
+      mejor = { pedido: p, puntos, coinciden, ciudadCoincide };
+      empate = false;
+    } else if (puntos === mejor.puntos && mejor.pedido.id !== p.id) {
+      empate = true;
+    }
+  }
+
+  // Empate = no hay ganador claro. Mejor no sugerir que sugerir el equivocado.
+  if (!mejor || empate) return null;
+
+  return {
+    pedido: mejor.pedido,
+    porQue:
+      `coincide por nombre (${mejor.coinciden.join(", ")})` +
+      (mejor.ciudadCoincide ? ` y por la ciudad (${mejor.pedido.ciudad})` : ""),
+  };
+}
+
 function revisar(texto, opciones = {}) {
   const ahora = opciones.ahora || Date.now();
   const pedidos = store.todosLosPedidos();
@@ -231,13 +294,58 @@ function revisar(texto, opciones = {}) {
     const registro = guiasEnviadas[n.guia] || null;
     const pedido = pedidos.find((p) => String(p.guia || "") === String(n.guia)) || null;
 
-    const destino = registro ? String(registro.telefono) : pedido ? String(pedido.telefono_chat || "") : "";
-    const nombre = (registro && registro.nombre) || (pedido && pedido.nombre) || "";
+    let destino = registro ? String(registro.telefono) : pedido ? String(pedido.telefono_chat || "") : "";
+    let nombre = (registro && registro.nombre) || (pedido && pedido.nombre) || "";
+    let porNombre = null;
 
-    const base = { ...n, tipo: tipo.clave, tipoNombre: tipo.nombre, destino, nombre, pedido };
+    // ======================================================================
+    // 🕵️ RESCATE POR NOMBRE (25-sep)
+    //
+    // DE DÓNDE SALE: de tres novedades, dos salieron "No encontré a quién
+    // corresponde esta guía". Sus números eran de 8 dígitos (10091647,
+    // 10090311) mientras que las guías reales tienen 12 (240061942387): eran
+    // números de otra columna del Excel, no la guía.
+    //
+    // 🔑 Y LA CONSECUENCIA ERA LA PEOR POSIBLE: esos clientes existen, tienen su
+    // pedido y su novedad, y el sistema no podía avisarles nada. Una novedad sin
+    // avisar termina en devolución, y una devolución cuesta $17.384.
+    //
+    // Así que si la guía no cruza, se busca por NOMBRE Y CIUDAD contra nuestros
+    // propios pedidos. El texto de la novedad trae las dos cosas.
+    //
+    // ⛔ Y NO SE MANDA SOLO. Se devuelve marcado `probable`, para que el panel lo
+    // muestre distinto y el dueño confirme. Mandarle la novedad de un cliente a
+    // otro es peor que no mandar nada: el que recibe se confunde y el que
+    // esperaba sigue esperando.
+    // ======================================================================
+    if (!destino) {
+      porNombre = buscarPorNombre(n.motivo, pedidos);
+      if (porNombre) {
+        destino = String(porNombre.pedido.telefono_chat || "");
+        nombre = porNombre.pedido.nombre || "";
+      }
+    }
+
+    const base = {
+      ...n,
+      tipo: tipo.clave,
+      tipoNombre: tipo.nombre,
+      destino,
+      nombre,
+      pedido: pedido || (porNombre && porNombre.pedido) || null,
+      // El panel lo usa para pintarlo distinto y pedir confirmación.
+      probable: porNombre ? { porQue: porNombre.porQue, guiaDelPedido: porNombre.pedido.guia || null } : null,
+    };
 
     if (!destino) {
-      return { ...base, enviar: false, motivoNoEnvio: "No encontré a quién corresponde esta guía" };
+      return {
+        ...base,
+        enviar: false,
+        motivoNoEnvio:
+          `No encontré a quién corresponde esta guía. Los números que leí en la línea fueron ` +
+          `${(n.candidatos || []).join(", ") || "ninguno"}, y ninguno coincide con una guía nuestra. ` +
+          `Puede ser un pedido del número anterior, o un despacho que no pasó por el bot.`,
+      };
     }
 
     // ¿Su ventana de 24h está abierta? Sale del último mensaje DEL CLIENTE.
