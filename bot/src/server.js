@@ -16,6 +16,7 @@ const panelChat = require("./panel-chat");
 const { avisoParaElDueno: avisoDireccion } = require("./direccion");
 const panelAuditoria = require("./panel-auditoria");
 const novedades = require("./novedades");
+const plantillas = require("./plantillas");
 const audio = require("./audio");
 const resumen = require("./resumen");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -1078,6 +1079,37 @@ app.post("/atendido", (req, res) => {
   res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}#c${tel}`);
 });
 
+// ============================================================================
+// GET /plantillas — ¿cuáles de las 6 plantillas van a funcionar de verdad?
+//
+// POR QUÉ EXISTE (25-sep): el resumen del cierre se mandó dos noches seguidas,
+// Meta respondió 200 con id las dos veces, y nunca llegó. Desde el código no se
+// puede saber por qué: que el bot arme bien el envío no dice nada sobre si la
+// plantilla existe, está aprobada, en qué idioma quedó, cuántas variables tiene
+// o en qué categoría la puso Meta. Eso vive en la cuenta y hay que preguntarlo.
+//
+// Devuelve, por cada plantilla que el bot usa: su estado real en Meta, el
+// problema si lo hay, y QUÉ HACER para arreglarlo. Más los fallos de entrega
+// guardados, que es donde Meta explica lo que descartó.
+// ============================================================================
+app.get("/plantillas", async (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  try {
+    const diag = await plantillas.diagnosticar();
+    res.json({
+      ...diag,
+      fallosDeEntrega: {
+        nota:
+          "Lo que Meta descartó DESPUÉS de aceptarlo. Si está vacío y un mensaje no llegó, " +
+          "el webhook no está recibiendo los estados de entrega.",
+        ultimos: store.fallosDeEntrega(25),
+      },
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // Salud
 app.get("/", (_req, res) => res.send("BikerPro bot activo 🏍️"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
@@ -1632,6 +1664,19 @@ async function handleWebhook(body) {
         });
         if (st.status === "failed") {
           console.error(`🔴 ENVÍO FALLIDO a ${st.recipient_id}: ${JSON.stringify(errores)}`);
+          // 🔴 Y AHORA TAMBIÉN A DISCO. La bitácora de arriba vive en memoria y
+          // se borra en cada reinicio (trampa #6): cuando el 25-sep se fue a
+          // buscar por qué no llegaba el cierre, la explicación ya no estaba.
+          // Un mensaje que Meta acepta y después descarta se ve igual que uno
+          // que funcionó; este registro es lo único que los distingue.
+          store.anotarFalloEntrega({
+            para: st.recipient_id,
+            errores,
+            // El id permite cruzarlo con el envío que lo originó.
+            mensaje: st.id || null,
+            conversacion: st.conversation?.id || null,
+            categoria: st.pricing?.category || null,
+          });
         } else {
           console.log(`· estado ${st.status} para ${st.recipient_id}`);
         }
