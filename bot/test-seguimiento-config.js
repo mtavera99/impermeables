@@ -383,6 +383,67 @@ function seguir() {
     /variables \{\{1\}\}/.test(src2)
   );
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // 🔴 EL PASO DE LA PLANTILLA TIENE QUE PODERSE APAGAR DESDE RENDER (25-sep)
+  //
+  // Con `||` una cadena vacía caía de vuelta en el default: se ponía la variable
+  // en blanco, parecía apagado, y el bot seguía mandando. Misma trampa que
+  // BODEGA_DIRECCION (trampa #10), otra vez.
+  //
+  // 🔑 Y HACE FALTA. Medido con 949 mensajes reales el 25-sep:
+  //     paso 1 (2h)  268 enviados -> 8 compras
+  //     paso 2 (20h) 309 enviados -> 0 compras
+  //     paso 3 (44h) 432 enviados -> 0 compras
+  // El de 44h es el único que gasta plantilla de marketing: consume el tope de
+  // frecuencia de Meta y desgasta la calificación del número, que es lo único
+  // que no se puede comprar de vuelta. 432 envíos por cero ventas es riesgo puro.
+  // ══════════════════════════════════════════════════════════════════════════
+  console.log("\n── El toque de 44h se puede apagar sin tocar código ──");
+
+  {
+    const s = cargarCon({ SEGUIMIENTO_PLANTILLA_2: "" });
+    const c = s.configuracionEfectiva();
+    chequear(
+      "con la variable en BLANCO el paso se apaga de verdad",
+      c.plantilla_2 !== "seguimiento_impermeable",
+      `quedó en ${JSON.stringify(c.plantilla_2)} — con || caía de vuelta en el default`
+    );
+    chequear(
+      "y la pantalla dice que se salta",
+      /se salta/.test(String(c.plantilla_2)),
+      String(c.plantilla_2)
+    );
+  }
+
+  {
+    const s = cargarCon({});
+    chequear(
+      "sin la variable sigue usando el default del código",
+      s.configuracionEfectiva().plantilla_2 === "seguimiento_impermeable"
+    );
+  }
+
+  {
+    const s = cargarCon({ SEGUIMIENTO_PLANTILLA_2: "otra_plantilla" });
+    chequear(
+      "y se puede cambiar por otra",
+      s.configuracionEfectiva().plantilla_2 === "otra_plantilla"
+    );
+  }
+
+  // Apagarlo NO le puede consumir el turno a nadie: si se saltara después de
+  // reclamar, el cliente perdería ese toque para siempre sin recibir nada.
+  chequear(
+    "el salto por falta de plantilla ocurre ANTES de reclamar el turno",
+    (() => {
+      const src = fs.readFileSync("./src/seguimiento.js", "utf8");
+      const salto = src.indexOf('SALTADO: ');
+      const reclamo = src.indexOf("reclamarSeguimiento(phone");
+      return salto !== -1 && reclamo !== -1 && salto < reclamo;
+    })(),
+    "si no, se consume un seguimiento sin mandar nada"
+  );
+
   fs.rmSync(DIR, { recursive: true, force: true });
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   process.exit(mal === 0 ? 0 : 1);

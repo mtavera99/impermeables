@@ -39,8 +39,28 @@ const ACTIVO = process.env.SEGUIMIENTO_ACTIVO === "1";
 // `seguimiento_impermeable` el 22-sep y sirve para los dos pasos: es el mismo
 // mensaje, mandado un dia despues. Si algun dia quiere textos distintos, se
 // cambian por variable de entorno sin tocar codigo.
-const PLANTILLA_2 = process.env.SEGUIMIENTO_PLANTILLA_2 || "seguimiento_impermeable";
-const PLANTILLA_3 = process.env.SEGUIMIENTO_PLANTILLA_3 || "seguimiento_impermeable";
+// ⚠️⚠️ `??` Y NO `||`, Y ACÁ SÍ CAMBIA EL NEGOCIO (25-sep).
+//
+// Con `||` una cadena VACÍA caía de vuelta en el default, así que el paso de la
+// plantilla NO SE PODÍA APAGAR desde Render: se ponía la variable en blanco,
+// parecía apagado, y el bot seguía mandando. Es la misma trampa que ya estaba
+// documentada para BODEGA_DIRECCION (trampa #10) y volvió a aparecer.
+//
+// 🔑 Y HACE FALTA PODER APAGARLO. Medido el 25-sep con 949 mensajes reales:
+//
+//     paso 1 (2h)  ... 268 enviados -> 8 compras
+//     paso 2 (20h) ... 309 enviados -> 0 compras
+//     paso 3 (44h) ... 432 enviados -> 0 compras
+//
+// El paso 3 es el ÚNICO que gasta una plantilla de marketing: consume el tope de
+// frecuencia que Meta cuenta por persona entre todas las marcas, y desgasta la
+// calificación del número, que es lo único de esta operación que no se puede
+// comprar de vuelta. 432 envíos por cero ventas es riesgo puro.
+//
+// Poner SEGUIMIENTO_PLANTILLA_2 en blanco en Render ahora sí lo apaga: el paso
+// se salta (ver correrSeguimientos) sin consumirle el turno a nadie.
+const PLANTILLA_2 = process.env.SEGUIMIENTO_PLANTILLA_2 ?? "seguimiento_impermeable";
+const PLANTILLA_3 = process.env.SEGUIMIENTO_PLANTILLA_3 ?? "seguimiento_impermeable";
 
 // 🔴 es_CO, NO es. Las plantillas se subieron en "Spanish (COL)", que en la API
 // es es_CO. Con "es" Meta RECHAZA el envio aunque la plantilla este aprobada, y
