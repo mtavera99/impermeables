@@ -228,6 +228,69 @@ function cajonDeEnvio(p, conv, token) {
     </div>`;
 }
 
+// ============================================================================
+// 🟢 REGISTRAR LA VENTA A MANO
+//
+// DE DÓNDE SALE (25-sep). El dueño: "ya el señor dijo que sí, ¿cómo hago para
+// que quede marcado como venta? No sé por qué no se marcó solo."
+//
+// 🔴 NO SE MARCÓ SOLO PORQUE EL CHAT ESTABA EN MODO HUMANO. El webhook hace
+// `continue` antes de llamar a la IA cuando un chat está pausado, y el bloque
+// del pedido lo emite la IA. Sin IA no hay bloque, y sin bloque no hay venta.
+//
+// O sea que TODO chat que se escala a humano pierde la captura automática — y
+// son justo los más calientes, los que el dueño cierra a mano porque ahí cierra
+// mejor. Esas ventas vivían en WhatsApp y no en la contabilidad.
+//
+// El total es OPCIONAL: si se deja vacío lo calcula el tarifario con la ciudad.
+// A las 3 de la mañana nadie se acuerda de la banda de Sahagún.
+// ============================================================================
+function cajonDeVenta(p, token, yaTienePedido) {
+  if (yaTienePedido) return "";
+  const tel = String(p.telefono_chat || "");
+  // Si escribe desde un teléfono, ese mismo sirve de celular de despacho. Si usa
+  // nombre de usuario de WhatsApp (BSUID) no hay número y hay que pedírselo.
+  const celular = /^\d+$/.test(tel) ? tel.replace(/^57/, "") : "";
+  return `<div class="venta">
+      <h3>🟢 Registrar la venta</h3>
+      <p class="nota">El bot no la pudo tomar porque este chat está en modo humano:
+        cuando vos contestás, el bot se calla, y el pedido lo arma él. Cargala acá y
+        entra igual que las otras (guía, cierre, CPA).</p>
+      <form method="post" action="/pedido-manual">
+        <input type="hidden" name="token" value="${esc(token || "")}">
+        <input type="hidden" name="telefono_chat" value="${esc(tel)}">
+        <label>Nombre completo
+          <input name="nombre" required value="${esc(p.nombre || "")}" autocomplete="off"></label>
+        <label>Celular
+          <input name="celular" inputmode="numeric" value="${esc(celular)}" autocomplete="off">
+          <small>Sin celular la transportadora no hace la guía.</small></label>
+        <label>Ciudad
+          <input name="ciudad" required value="${esc(p.ciudad || "")}" autocomplete="off"></label>
+        <label>Dirección
+          <input name="direccion" value="${esc(p.direccion || "")}" autocomplete="off"></label>
+        <div class="dos">
+          <label>Talla
+            <input name="talla" value="${esc(p.talla || "")}" autocomplete="off"></label>
+          <label>Color
+            <input name="color" value="${esc(p.color || "")}" autocomplete="off"></label>
+        </div>
+        <div class="dos">
+          <label>Unidades
+            <select name="unidades"><option value="1">1</option><option value="2">2</option></select></label>
+          <label>Total
+            <input name="total" inputmode="numeric" placeholder="se calcula solo">
+            <small>Dejalo vacío y lo saca del tarifario.</small></label>
+        </div>
+        <label>Pago
+          <select name="pago">
+            <option value="contraentrega">Contraentrega</option>
+            <option value="anticipado">Anticipado</option>
+          </select></label>
+        <button type="submit" class="ventabtn">Guardar la venta</button>
+      </form>
+    </div>`;
+}
+
 /**
  * @param {object} opciones
  * @param {string} [opciones.id]  telefono_chat exacto
@@ -235,13 +298,53 @@ function cajonDeEnvio(p, conv, token) {
  * @param {string} opciones.token para armar el enlace de vuelta al panel
  * @param {string} [opciones.resultado] "ok" o el motivo del fallo del último envío
  */
-function render({ id, q, token, resultado } = {}) {
+function render({ id, q, token, resultado, venta } = {}) {
   const encontrados = buscar({ id, q });
   const conversaciones = store.todasLasConversaciones();
 
   let cuerpo;
   if (!id && !q) {
     cuerpo = `<p class="nota">Buscá por nombre o celular del cliente.</p>`;
+  } else if (encontrados.length === 0 && id && conversaciones[id]) {
+    // ======================================================================
+    // 🔴 EL CHAT DE UN CLIENTE QUE TODAVÍA NO COMPRÓ (25-sep)
+    //
+    // `buscar()` busca en los PEDIDOS, así que esta pantalla solo funcionaba
+    // con gente que ya había comprado. Pero el enlace "ver chat" del panel
+    // aparece en la lista de atención humana, que es justamente la de los que
+    // NO han comprado: al tocarlo salía "No encontré ningún pedido con eso".
+    //
+    // O sea que el chat que más falta leer —el del cliente que está esperando
+    // respuesta— era el único que no se podía abrir. Y es la pantalla con la
+    // que se cazaron casi todos los bugs de la sesión del 23-24.
+    // ======================================================================
+    const conv = conversaciones[id];
+    const msgs = (conv && conv.messages) || [];
+    const perfil = (conv && conv.perfil) || {};
+    const p = {
+      telefono_chat: id,
+      nombre: perfil.nombre || perfil.username || "",
+      ciudad: "",
+      direccion: "",
+      talla: "",
+      color: "",
+    };
+    const quien = p.nombre ? `${esc(p.nombre)} · ${esc(id)}` : esc(id);
+    cuerpo =
+      `<div class="prospecto">
+         <h2>${quien}</h2>
+         <p class="nota">Todavía no hay pedido de este cliente.${
+           conv && conv.paused
+             ? " <b>El chat está en modo humano:</b> el bot no le contesta, y por eso " +
+               "no le puede tomar el pedido tampoco."
+             : ""
+         }</p>
+       </div>` +
+      `<div class="chat">${
+        msgs.length ? msgs.map(burbuja).join("") : `<p class="nota">No hay mensajes guardados.</p>`
+      }</div>` +
+      cajonDeEnvio(p, conv, token) +
+      cajonDeVenta(p, token, false);
   } else if (encontrados.length === 0) {
     // Ayuda concreta en vez de un "no encontrado" seco: los últimos nombres,
     // que es lo que uno necesita cuando escribió el nombre distinto.
@@ -317,6 +420,21 @@ function render({ id, q, token, resultado } = {}) {
   .enviar{background:var(--card);border:1px solid var(--linea);border-radius:14px;
     padding:14px;margin-top:16px}
   .enviar h3{font-size:15px;margin:0 0 10px}
+  /* 🟢 El cajón de la venta a mano. Verde para que no se confunda con el de
+     escribirle: uno manda un mensaje, el otro registra plata. */
+  .venta{background:#111a14;border:1px solid #1f3328;border-radius:14px;
+    padding:14px;margin-top:14px}
+  .venta h3{font-size:15px;margin:0 0 8px;color:#8ff0b5}
+  .venta label{display:block;margin:10px 0 0;font-size:13px;color:var(--gris)}
+  .venta input,.venta select{width:100%;margin-top:4px;background:#0f141b;
+    border:1px solid var(--linea);color:#e6edf3;border-radius:9px;padding:11px 10px;
+    font-size:16px}
+  .venta small{display:block;margin-top:3px;font-size:11px;color:var(--gris)}
+  .venta .dos{display:flex;gap:10px}
+  .venta .dos label{flex:1;min-width:0}
+  .ventabtn{width:100%;margin-top:14px;background:#2ea043;border:0;color:#fff;
+    border-radius:10px;padding:14px;font-size:16px;font-weight:600;cursor:pointer}
+  .prospecto h2{font-size:17px;margin:0 0 4px}
   .ventana{font-size:13px;padding:9px 11px;border-radius:10px;margin-bottom:12px;line-height:1.4}
   .ventana.ok{background:#12351f;color:#7ee2a8}
   .ventana.mal{background:#3a1414;color:#ffc2c8}
@@ -336,6 +454,12 @@ function render({ id, q, token, resultado } = {}) {
       ? resultado === "ok"
         ? '<div class="res ok">✅ Mensaje enviado. El bot quedó en pausa en este chat.</div>'
         : `<div class="res mal">🔴 No se envió: ${esc(resultado)}</div>`
+      : ""
+  }
+  ${
+    venta === "ok"
+      ? '<div class="res ok">🟢 Venta registrada. Ya cuenta en el cierre y en el CPA, ' +
+        'y se le cortó el seguimiento. Aparece en “Pendientes de despachar” del panel.</div>'
       : ""
   }
   <div class="barra">

@@ -16,6 +16,7 @@ const panelChat = require("./panel-chat");
 const { avisoParaElDueno: avisoDireccion } = require("./direccion");
 const panelAuditoria = require("./panel-auditoria");
 const novedades = require("./novedades");
+const fletes = require("./fletes");
 const plantillas = require("./plantillas");
 const audio = require("./audio");
 const resumen = require("./resumen");
@@ -369,6 +370,7 @@ app.get("/chat", (req, res) => {
         q: req.query.q ? String(req.query.q) : "",
         token: PANEL_TOKEN,
         resultado: req.query.r ? String(req.query.r) : "",
+        venta: req.query.venta ? String(req.query.venta) : "",
       })
     );
   } catch (e) {
@@ -1077,6 +1079,105 @@ app.post("/atendido", (req, res) => {
     return res.json({ ok: true, atendido: !deshacer });
   }
   res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}#c${tel}`);
+});
+
+// ============================================================================
+// POST /pedido-manual — registrar una venta que el bot no pudo capturar
+//
+// DE DÓNDE SALE (25-sep). El dueño: "un chat que escribió hace como 30 minutos
+// y lo marcó el bot como atender humano, y ya el señor dijo que sí. ¿Cómo hago
+// para que quede marcado como venta? No sé por qué no se marcó solo."
+//
+// 🔴 POR QUÉ NO SE MARCÓ SOLO, y es un hueco estructural: cuando un chat pasa a
+// modo humano, el webhook hace `continue` ANTES de llamar a la IA:
+//
+//     if (store.isPaused(from)) { ...; continue; }
+//
+// El bloque ##ORDER## lo emite la IA. Si la IA no corre, no hay bloque, y por lo
+// tanto NO HAY VENTA REGISTRADA — pase lo que pase en la conversación.
+//
+// O sea: **todo chat escalado a humano pierde la captura automática del pedido.**
+// Y son justo los chats más calientes, los que el dueño atiende a mano porque
+// ahí cierra mejor. Las ventas existían en WhatsApp y no en la contabilidad:
+// CPA, cierre y share de 2 unidades quedaban todos subestimados.
+//
+// ⛔ NO se arregla dejando que la IA corra en chats pausados: el sentido de
+// pausar es que no contesten dos voces a la vez, y eso ya costó clientes.
+// Se arregla dándole al dueño la forma de registrar la venta él.
+// ============================================================================
+app.post("/pedido-manual", async (req, res) => {
+  const b = req.body || {};
+  if (b.token !== PANEL_TOKEN) return res.sendStatus(403);
+
+  const chat = idDestino(b.telefono_chat) || String(b.telefono_chat || "").trim();
+  const nombre = String(b.nombre || "").trim();
+  const ciudad = String(b.ciudad || "").trim();
+  if (!chat || !nombre || !ciudad) {
+    return res.status(400).json({
+      ok: false,
+      error: "Hacen falta el nombre y la ciudad (el chat se toma del enlace).",
+    });
+  }
+
+  const unidades = Math.max(1, Number(b.unidades) || 1);
+  // El total es opcional: si no se pone, se calcula con el tarifario. Así no hay
+  // que acordarse de la banda de cada ciudad a las 3 de la mañana.
+  let total = Number(String(b.total || "").replace(/[^\d]/g, "")) || 0;
+  let totalCalculado = false;
+  if (!total) {
+    const q = fletes.cotizar(ciudad, unidades);
+    if (q && q.total) {
+      total = q.total;
+      totalCalculado = true;
+    }
+  }
+  if (!total) {
+    return res.status(400).json({
+      ok: false,
+      error:
+        `No pude calcular el total para "${ciudad}" (puede ser zona de difícil acceso o un ` +
+        `nombre que existe en varios departamentos). Escribilo a mano.`,
+    });
+  }
+
+  // Sale por el MISMO camino que un pedido del bot: así hereda el id único, el
+  // candado antiduplicados, la atribución del anuncio, la del seguimiento y la
+  // red de seguridad del log. Un pedido a mano que se guarde distinto sería un
+  // pedido que las auditorías no ven.
+  const guardado = store.saveOrder({
+    nombre,
+    celular: String(b.celular || "").replace(/\D/g, ""),
+    ciudad,
+    direccion: String(b.direccion || "").trim(),
+    talla: String(b.talla || "").trim(),
+    color: String(b.color || "").trim(),
+    pago: String(b.pago || "contraentrega").trim(),
+    total,
+    telefono_chat: chat,
+    // Queda marcado para siempre: una venta cargada a mano no se puede
+    // confundir con una que el bot cerró solo, o el cierre del bot se infla.
+    origen: "manual",
+    registrado_por: "dueño",
+  });
+
+  if (guardado && guardado.duplicadoIgnorado) {
+    return res.status(409).json({
+      ok: false,
+      error: "Ya existe un pedido igual de este cliente. No se guardó otro.",
+      pedido: guardado,
+    });
+  }
+
+  // Ya compró: se le corta el seguimiento y sale de la lista de pendientes.
+  store.marcarComprado(chat);
+  store.marcarAtendido(chat, "dueño");
+  anotarEvento({ tipo: "pedido-manual", para: chat, total, porQue: "chat en modo humano" });
+  console.log(`🟢 PEDIDO A MANO: ${nombre} · ${ciudad} · $${total} (chat ${chat})`);
+
+  if (req.query.json === "1" || b.json === "1") {
+    return res.json({ ok: true, pedido: guardado, totalCalculado });
+  }
+  res.redirect(`/chat?token=${encodeURIComponent(PANEL_TOKEN)}&id=${encodeURIComponent(chat)}&venta=ok`);
 });
 
 // ============================================================================
