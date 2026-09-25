@@ -35,10 +35,26 @@ const BANDAS = {
     // ⚠️ 19-SEP: sube de $77.000 a $78.000. El envío real de septiembre
     // (flete+seguro) es $21.038 y el total viejo dejaba el margen en $22.962,
     // o sea $282 bajo la meta de $23.244. Medido sobre 5 guías del export.
+    // 🆕 25-SEP: entran NILO y TOLEMAIDA (Cundinamarca, corredor de Girardot).
+    //
+    // DE DÓNDE SALE: un cliente del Fuerte Militar de Tolemaida —que queda en el
+    // municipio de Nilo— recibió una cotización de $158.000 por el combo, con
+    // $48.000 de envío. El dueño lo revisó en la plataforma de la transportadora:
+    // el envío real es $36.000.
+    //
+    // 🔴 LA CAUSA: ninguna ciudad de ese corredor estaba en el tarifario, así que
+    // todas caían al default de banda E (pueblos y zona extendida), que cobra
+    // $155.000 el combo y MUESTRA $45.000 de envío. Ese es el error que más
+    // espanta clientes, y ya pasó con Montería: el cliente entra a la plataforma,
+    // ve que el envío cuesta bastante menos de lo que le dijimos, y se va.
+    //
+    // Con el flete medido de $36.000 en FLETE_2_OBSERVADO, el combo queda en
+    // $146.000 ($110.000 + $36.000) — que es lo que pidió el dueño — y el envío
+    // que se le muestra al cliente es exactamente el que puede verificar.
     nombre: "Boyacá, Casanare y Meta cercano",
     flete: 16843,
     total: 78000,
-    ciudades: ["TUNJA", "PAIPA", "AGUAZUL", "TOCANCIPA", "VILLAVICENCIO", "DUITAMA", "SOGAMOSO", "YOPAL", "ACACIAS", "CUCUNUBA", "UBATE", "CHOCONTA", "VILLA DE LEYVA"],
+    ciudades: ["TUNJA", "PAIPA", "AGUAZUL", "TOCANCIPA", "VILLAVICENCIO", "DUITAMA", "SOGAMOSO", "YOPAL", "ACACIAS", "CUCUNUBA", "UBATE", "CHOCONTA", "VILLA DE LEYVA", "NILO", "TOLEMAIDA"],
   },
   C: {
     // ⚠️ 19-SEP: sube de $81.000 a $82.000. El envío real de septiembre
@@ -293,6 +309,17 @@ const FLETE_2_OBSERVADO = {
   "EL TAMBO": 31774,
   GUARNE: 31774,
   "LA MONTANITA": 32458,
+  // 🆕 25-sep, confirmado por el dueño en la plataforma de la transportadora.
+  // "TOLEMAIDA" va aparte de "NILO" porque el cliente nombra el fuerte militar,
+  // no el municipio: bandaDe() encuentra la ciudad dentro de una cadena más
+  // larga, así que "Fuerte Militar de Tolemaida" cae bien con esta entrada.
+  //
+  // 🔑 Y ES ESTE NÚMERO, no la banda, el que fija el total: cotizar() toma el
+  // mayor entre el total de la banda ($142.000) y producto+flete ($146.000). Sin
+  // esta línea el combo quedaría en $142.000 y el envío mostrado en $32.000,
+  // por debajo del real — y ahí el margen se lo come el flete.
+  "NILO": 36000,
+  "TOLEMAIDA": 36000,
 };
 
 // Total de la promo de 2 unidades POR BANDA.
@@ -515,6 +542,30 @@ const ENVIO_REAL_2 = { A: 23947, B: 32597, C: 38784, D: 37832, E: 45214 };
 // exactamente lo que el cliente de Montería vio en la plataforma.
 function alMillarAbajo(n) {
   return Math.floor(n / 1000) * 1000;
+}
+
+/**
+ * El flete medido de 2 unidades de una ciudad, buscándola también DENTRO de una
+ * cadena más larga.
+ *
+ * 🔴 DE DÓNDE SALE (25-sep): la búsqueda era por clave exacta, así que un cliente
+ * que escribía "Fuerte Militar de Tolemaida" no encontraba la entrada de
+ * TOLEMAIDA y su combo salía $142.000, mientras que escribiendo "Tolemaida"
+ * pelado salía $146.000. El mismo destino a dos precios según cómo lo escriba.
+ *
+ * `bandaDe` ya resolvía esto para la banda —está hecho para "BOGOTA USAQUEN
+ * CODITO"— pero el flete medido se quedó atrás. Y afectaba a las ciudades que ya
+ * estaban: "Cartagena Barrio Olaya" tampoco encontraba el flete de CARTAGENA.
+ *
+ * Se devuelve el de la clave MÁS LARGA que coincida, para que
+ * "CARTAGENA DE INDIAS" gane sobre "CARTAGENA".
+ */
+function fleteObservadoDe(normalizado) {
+  if (!normalizado) return undefined;
+  const directo = FLETE_2_OBSERVADO[normalizado];
+  if (directo !== undefined) return directo;
+  const clave = mejorCoincidencia(normalizado, Object.keys(FLETE_2_OBSERVADO));
+  return clave ? FLETE_2_OBSERVADO[clave] : undefined;
 }
 
 /**
@@ -827,7 +878,7 @@ function cotizar(ciudad, unidades = 1) {
   // ---- 2 o más unidades: precio de promo por banda ----
   const c = normalizar(ciudad);
   const claveBanda = clave || BANDA_POR_DEFECTO;
-  const fleteObservado = uds === 2 ? FLETE_2_OBSERVADO[c] : undefined;
+  const fleteObservado = uds === 2 ? fleteObservadoDe(c) : undefined;
   // Sin dato real se estima con el peor aumento visto, para no absorber.
   const flete = fleteObservado ?? banda.flete + (uds - 1) * RECARGO_UNIDAD_EXTRA;
 
