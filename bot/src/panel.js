@@ -245,6 +245,8 @@ function render(aviso) {
         <span class="por">${esc(texto)}</span>
       </a>
       <span class="cuando">${esc(hace(hecho ? hecho.atendidoAt : e.esperaDesde || x.cuando))}</span>
+      <a class="vendio" title="Registrar la venta de este cliente"
+         href="/chat?token=${esc(panelToken())}&id=${encodeURIComponent(x.tel)}#venta">💰</a>
     </div>`;
   };
 
@@ -855,6 +857,13 @@ function render(aviso) {
   .fila.hecho{border-left-color:#2ea043;background:#151a18;opacity:.55}
   .fila.hecho .punto span{background:#2ea043;border-color:#2ea043}
   .fila.hecho .filaLink b{text-decoration:line-through;text-decoration-color:#6b7280}
+  /* 💰 Atajo para registrar la venta sin entrar a buscar el formulario. El bot no
+     puede tomar el pedido en un chat que atiende un humano, así que este camino
+     es el único que existe para esas ventas. */
+  .fila .vendio{display:flex;align-items:center;justify-content:center;
+    width:34px;height:34px;min-width:34px;flex:none;text-decoration:none;
+    border:1px solid #2c3340;border-radius:8px;background:#1f2630;font-size:14px}
+  .fila .vendio:hover{background:#16341f;border-color:#2ea043}
   .tag.alta{background:#3a1414;color:#ff9b9b}
   .tag.media{background:#3a2d0c;color:#ffd479}
   .porque{margin-top:8px;font-size:12px;color:#ffd479;background:#241f14;padding:7px 9px;border-radius:8px}

@@ -173,12 +173,51 @@ chequear(
 );
 
 // ───────────────────────────────────────────────────────────────────────────
-console.log("\n── 6. Ya con pedido, el formulario no vuelve a aparecer ──");
+console.log("\n── 6. Ya con pedido, el cajón SIGUE estando ──");
 
+// ==========================================================================
+// 🔴 ESTO ESTABA AL REVÉS Y EL DUEÑO LO PESCÓ (25-sep): "no me sale ningún
+// botón para marcarlo como vendido".
+//
+// La primera versión escondía el cajón cuando el cliente YA tenía un pedido.
+// Pero un cliente que vuelve a comprar es normal: el 24-sep Patricia pidió dos
+// veces el mismo día. Con el cajón escondido, esa segunda venta no se podía
+// registrar de ninguna forma.
+//
+// El candado antiduplicados del store es el que decide si la segunda es real:
+// si el total y la talla coinciden, no la guarda. Esconder el formulario no
+// protegía de nada — solo tapaba ventas.
+// ==========================================================================
 delete require.cache[require.resolve("./src/panel-chat")];
 html = require("./src/panel-chat").render({ id: TEL, token: "clave_de_prueba" });
-chequear("el cajón de venta desaparece", !/action="\/pedido-manual"/.test(html));
+chequear("el cajón de venta SIGUE disponible", /action="\/pedido-manual"/.test(html));
+chequear(
+  "pero avisa que ya tenía un pedido",
+  /ya tiene 1 pedido/.test(html),
+  "puede ser una compra nueva o una carga repetida: lo decide el dueño"
+);
+chequear(
+  "y sale UNA sola vez, no uno por pedido",
+  (html.match(/action="\/pedido-manual"/g) || []).length === 1
+);
 chequear("y ahora se ve la ficha del pedido", /Juan Pérez/.test(html));
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 6-B. El botón tiene que verse SIN scrollear ──");
+
+// El cajón queda al final de la página, debajo de toda la conversación y del
+// cajón de escribirle. En un celular con un chat largo, es invisible: por eso el
+// dueño dijo que no le salía ningún botón. El atajo va arriba, en la barra.
+chequear("hay un botón arriba que salta al formulario", /href="#venta"/.test(html));
+chequear("y el formulario tiene el ancla", /id="venta"/.test(html));
+chequear(
+  "el botón aparece ANTES del formulario en la página",
+  html.indexOf('href="#venta"') < html.indexOf('action="/pedido-manual"')
+);
+chequear(
+  "no aparece en la pantalla de búsqueda, donde no hay a quién cargarle nada",
+  !/href="#venta"/.test(require("./src/panel-chat").render({ token: "clave_de_prueba" }))
+);
 
 // ───────────────────────────────────────────────────────────────────────────
 console.log("\n── 7. La venta entra en el panel como cualquier otra ──");
@@ -187,6 +226,21 @@ delete require.cache[require.resolve("./src/panel")];
 const panel = require("./src/panel").render();
 chequear("sale en pendientes de despachar", panel.includes("Juan Pérez"));
 chequear("y suma en lo que hay por recaudar", /73\.000/.test(panel));
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 7-B. Atajo 💰 desde la lista de atención humana ──");
+
+// Para no tener que entrar al chat y buscar el formulario: desde la lista de
+// chats que esperan respuesta se va directo al cajón de venta de ese cliente.
+store.pushMsg("573009990001", "user", "es estafa esto?");
+delete require.cache[require.resolve("./src/panel")];
+const panel2 = require("./src/panel").render();
+chequear("hay un atajo 💰 en cada fila", /class="vendio"/.test(panel2));
+chequear(
+  "y lleva al formulario de ESE cliente",
+  /id=573009990001#venta/.test(panel2),
+  "el ancla #venta hace que la página abra directo en el cajón"
+);
 
 // ───────────────────────────────────────────────────────────────────────────
 console.log("\n── 8. Registrar una venta NO le escribe al cliente ──");

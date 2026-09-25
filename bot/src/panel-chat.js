@@ -245,14 +245,27 @@ function cajonDeEnvio(p, conv, token) {
 // El total es OPCIONAL: si se deja vacío lo calcula el tarifario con la ciudad.
 // A las 3 de la mañana nadie se acuerda de la banda de Sahagún.
 // ============================================================================
-function cajonDeVenta(p, token, yaTienePedido) {
-  if (yaTienePedido) return "";
+function cajonDeVenta(p, token, pedidosPrevios) {
   const tel = String(p.telefono_chat || "");
   // Si escribe desde un teléfono, ese mismo sirve de celular de despacho. Si usa
   // nombre de usuario de WhatsApp (BSUID) no hay número y hay que pedírselo.
   const celular = /^\d+$/.test(tel) ? tel.replace(/^57/, "") : "";
-  return `<div class="venta">
+  // ⚠️ El cliente YA tenía pedido. No se esconde el formulario: un cliente que
+  // vuelve a comprar es normal (pasó con Patricia el 24-sep, que pidió dos veces
+  // el mismo día). Pero se avisa, porque también puede ser que se esté cargando
+  // dos veces la misma venta. El candado antiduplicados del store es el que
+  // decide: si el total y la talla coinciden, no guarda el segundo.
+  const avisoPrevio =
+    pedidosPrevios > 0
+      ? `<p class="aviso">⚠️ Este cliente ya tiene ${pedidosPrevios} pedido${
+          pedidosPrevios === 1 ? "" : "s"
+        } registrado${pedidosPrevios === 1 ? "" : "s"}. Si está comprando otra vez, cargalo;
+         si es el mismo, no lo cargues de nuevo.</p>`
+      : "";
+
+  return `<div class="venta" id="venta">
       <h3>🟢 Registrar la venta</h3>
+      ${avisoPrevio}
       <p class="nota">El bot no la pudo tomar porque este chat está en modo humano:
         cuando vos contestás, el bot se calla, y el pedido lo arma él. Cargala acá y
         entra igual que las otras (guía, cierre, CPA).</p>
@@ -344,7 +357,7 @@ function render({ id, q, token, resultado, venta } = {}) {
         msgs.length ? msgs.map(burbuja).join("") : `<p class="nota">No hay mensajes guardados.</p>`
       }</div>` +
       cajonDeEnvio(p, conv, token) +
-      cajonDeVenta(p, token, false);
+      cajonDeVenta(p, token, 0);
   } else if (encontrados.length === 0) {
     // Ayuda concreta en vez de un "no encontrado" seco: los últimos nombres,
     // que es lo que uno necesita cuando escribió el nombre distinto.
@@ -372,6 +385,23 @@ function render({ id, q, token, resultado, venta } = {}) {
         return `${fichaPedido(p)}<div class="chat">${chat}</div>${cajonDeEnvio(p, conv, token)}`;
       })
       .join('<hr class="sep">');
+
+    // ======================================================================
+    // 🟢 Y EL CAJÓN DE VENTA TAMBIÉN ACÁ (25-sep)
+    //
+    // El dueño: "no me sale ningún botón para marcarlo como vendido". Una de las
+    // razones: si el cliente YA tenía un pedido, esta rama no mostraba el cajón
+    // — solo la rama de "cliente sin pedido" lo tenía.
+    //
+    // Y un cliente que vuelve a comprar es normal: el 24-sep Patricia pidió dos
+    // veces el mismo día. Con el cajón escondido, esa segunda venta no se podía
+    // registrar de ninguna forma.
+    //
+    // Va UNA sola vez aunque haya varios pedidos, y prellenado con el último,
+    // que es el que tiene los datos de despacho más frescos.
+    // ======================================================================
+    const ultimo = encontrados[encontrados.length - 1];
+    cuerpo += cajonDeVenta(ultimo, token, encontrados.length);
   }
 
   return `<!doctype html><html lang="es"><head>
@@ -422,14 +452,17 @@ function render({ id, q, token, resultado, venta } = {}) {
   .enviar h3{font-size:15px;margin:0 0 10px}
   /* 🟢 El cajón de la venta a mano. Verde para que no se confunda con el de
      escribirle: uno manda un mensaje, el otro registra plata. */
+  .btn.verde{background:#16341f;border-color:#2ea043;color:#8ff0b5;font-weight:600}
   .venta{background:#111a14;border:1px solid #1f3328;border-radius:14px;
-    padding:14px;margin-top:14px}
+    padding:14px;margin-top:14px;scroll-margin-top:10px}
   .venta h3{font-size:15px;margin:0 0 8px;color:#8ff0b5}
   .venta label{display:block;margin:10px 0 0;font-size:13px;color:var(--gris)}
   .venta input,.venta select{width:100%;margin-top:4px;background:#0f141b;
     border:1px solid var(--linea);color:#e6edf3;border-radius:9px;padding:11px 10px;
     font-size:16px}
   .venta small{display:block;margin-top:3px;font-size:11px;color:var(--gris)}
+  .venta .aviso{margin:0 0 8px;padding:9px 10px;background:#2a2113;border:1px solid #5a4418;
+    border-radius:9px;color:#ffd79a;font-size:13px}
   .venta .dos{display:flex;gap:10px}
   .venta .dos label{flex:1;min-width:0}
   .ventabtn{width:100%;margin-top:14px;background:#2ea043;border:0;color:#fff;
@@ -464,6 +497,14 @@ function render({ id, q, token, resultado, venta } = {}) {
   }
   <div class="barra">
     <a class="btn" href="/panel?token=${esc(token || "")}">← Volver al panel</a>
+    ${
+      // 🟢 EL BOTÓN ARRIBA, Y NO ES UN ADORNO (25-sep). El dueño: "no me sale
+      // ningún botón para marcarlo como vendido". Estaba — al 83% del largo de
+      // la página, debajo de toda la conversación y del cajón de escribirle. En
+      // un celular con un chat largo eso es invisible. Acá arriba salta al
+      // formulario sin scrollear.
+      id ? `<a class="btn verde" href="#venta">🟢 Registrar venta</a>` : ""
+    }
   </div>
   <form method="get" action="/chat">
     <input type="hidden" name="token" value="${esc(token || "")}">
