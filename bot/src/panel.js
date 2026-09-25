@@ -773,6 +773,30 @@ function render(aviso) {
     list-style:none;min-height:32px;
   }
   .conv summary::-webkit-details-marker{display:none}
+  /* 🧭 Barra de atajos, pegada arriba. Con scroll-margin en los destinos para que
+     el título no quede tapado por ella al saltar. */
+  .atajos{position:sticky;top:0;z-index:20;display:flex;gap:6px;
+    background:rgba(13,17,23,.94);backdrop-filter:blur(6px);
+    padding:8px 0 9px;margin:0 0 10px;border-bottom:1px solid #242a35}
+  .atajos a{flex:1;text-align:center;text-decoration:none;color:#c8cfdd;font-size:13px;
+    font-weight:600;background:#1b212b;border:1px solid #2c3340;border-radius:9px;
+    padding:10px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .atajos a:active{background:#232b36}
+  h2,.atencion,#atencion,#chats{scroll-margin-top:64px}
+  /* 📁 Secciones plegadas: lo que es de consulta no ocupa media pantalla. */
+  .plegable{background:#161a21;border:1px solid #242a35;border-radius:10px;
+    padding:10px 12px;margin:14px 0}
+  .plegable>summary{cursor:pointer;list-style:none;font-size:15px;color:#e7e9ee}
+  .plegable>summary::-webkit-details-marker{display:none}
+  .plegable>summary::after{content:"▸";float:right;color:#8b93a4;transition:transform .15s}
+  .plegable[open]>summary::after{transform:rotate(90deg)}
+  .plegable .pista{display:block;font-size:11px;color:#8b93a4;font-weight:400;margin-top:2px}
+  /* ⬆️ Volver arriba. Aparece solo cuando ya se bajó, para no tapar nada. */
+  .subir{position:fixed;right:14px;bottom:16px;z-index:30;width:46px;height:46px;
+    display:none;align-items:center;justify-content:center;text-decoration:none;
+    font-size:22px;color:#e7e9ee;background:#1f6feb;border-radius:50%;
+    box-shadow:0 3px 12px rgba(0,0,0,.45)}
+  .subir.verse{display:flex}
   .conv summary::after{
     content:"›";margin-left:auto;color:var(--gris);font-size:22px;line-height:1;
     transition:transform .18s ease;
@@ -989,13 +1013,23 @@ function render(aviso) {
   <h1>🏍️ BikerPro · panel del bot</h1>
   <div class="sub2">${esc(numBot || "poné BOT_WHATSAPP en Render para ver acá el número del bot")} · se refresca cada 45 s (nunca mientras escribís)</div>
 </header>
-<main>
+<main id="arriba">
+  <!-- 🧭 ATAJOS. Barra pegada arriba: de acá se salta directo a lo que se usa,
+       sobre todo a las conversaciones, que están al final de la página porque
+       arriba van los números y los pendientes. Antes había que deslizar por los
+       38 despachados para llegar a un chat. -->
+  <nav class="atajos">
+    <a href="#atencion">🔴 Atender${chatsPendientes.length ? ` (${chatsPendientes.length})` : ""}</a>
+    <a href="#pendientes">📋 Despachar${pendientes.length ? ` (${pendientes.length})` : ""}</a>
+    <a href="#chats">💬 Chats</a>
+  </nav>
   ${aviso || ""}
   ${avisoDatos}
+  <span id="atencion"></span>
   ${bloqueAtencion}
   ${tarjetas}
   ${bloqueEmbudo}
-  <h2>📋 Pendientes de despachar${pendientes.length ? ` · ${pendientes.length}` : ""}</h2>
+  <h2 id="pendientes">📋 Pendientes de despachar${pendientes.length ? ` · ${pendientes.length}` : ""}</h2>
   ${
     pendientes.length
       ? `<p class="nota">Del más viejo al más nuevo: lo de arriba es lo que lleva más tiempo esperando.
@@ -1013,16 +1047,51 @@ function render(aviso) {
 
   ${bloqueAnulados}
 
-  <h2>✅ Ya despachados${despachados.length ? ` · ${despachados.length}` : ""}</h2>
-  <p class="nota">Estos ya tienen su guía enviada al cliente. Quedan acá para consultar: <b>no se borran nunca</b>.</p>
-  <div class="tabla"><table>
-    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Guía</th><th></th></tr>
-    ${filasDespachados}
-  </table></div>
-  ${bloqueAnuncios}
-  <h2>Conversaciones</h2>
+  ${
+    // ======================================================================
+    // 📁 LOS DESPACHADOS VAN PLEGADOS (25-sep)
+    //
+    // DE DÓNDE SALE. El dueño: "ya hay como 38 pedidos que se han despachado,
+    // entonces salen literalmente el listado de los 38 para abajo. Cuando estoy
+    // respondiendo al chat, que lo hago desde el celular, me baja de una vez a
+    // los chats de abajo y para subir toca deslizar mucho mucho".
+    //
+    // 🔑 Y EL PROBLEMA CRECE SOLO: los despachados no se borran nunca (a
+    // propósito, es contabilidad), así que cada día que pasa la página es más
+    // larga y las conversaciones —lo que más se usa— quedan más abajo.
+    //
+    // Plegado se ve el número, que es lo que se consulta de un vistazo, y la
+    // tabla se abre solo cuando hace falta buscar una guía.
+    // ======================================================================
+    despachados.length
+      ? `<details class="plegable">
+           <summary><b>✅ Ya despachados · ${despachados.length}</b><span
+             class="pista">tocá para ver la lista</span></summary>
+           <p class="nota">Ya tienen su guía enviada al cliente. Quedan acá para consultar:
+             <b>no se borran nunca</b>.</p>
+           <div class="tabla"><table>
+             <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Guía</th><th></th></tr>
+             ${filasDespachados}
+           </table></div>
+         </details>`
+      : `<h2>✅ Ya despachados</h2><p class="nota">Todavía no hay ninguno despachado hoy.</p>`
+  }
+  ${
+    // La tabla de anuncios es de consulta, no de trabajo diario: también plegada.
+    bloqueAnuncios
+      ? `<details class="plegable">
+           <summary><b>📣 Pedidos por anuncio</b>
+             <span class="pista">de qué anuncio viene cada venta</span></summary>
+           ${bloqueAnuncios}
+         </details>`
+      : ""
+  }
+  <h2 id="chats">💬 Conversaciones</h2>
   ${bloquesConv}
 </main>
+<!-- ⬆️ Volver arriba. Fijo, porque el dueño trabaja del celular y la página es
+     larga por diseño: los despachados no se borran nunca. -->
+<a href="#arriba" class="subir" id="subir" title="Volver arriba">↑</a>
 <script>
 // La clave del panel, para los envíos que van por fetch. No agrega exposición:
 // ya viaja en los campos ocultos de cada formulario de esta misma página.
@@ -1184,6 +1253,33 @@ document.querySelectorAll("form.resp").forEach(function (f) {
 // se revierte y se avisa: es mejor eso que un dedo esperando a que el servidor
 // conteste para saber si el toque sirvió.
 // ============================================================================
+// ============================================================================
+// ⬆️ EL BOTÓN DE VOLVER ARRIBA
+//
+// Aparece recién cuando ya se bajó una pantalla, para no tapar nada mientras se
+// lee el principio. La página es larga por diseño —los despachados no se borran
+// nunca— así que este botón no es un adorno: es el atajo de vuelta.
+//
+// ⚠️ Nada de comillas invertidas ni de dólar-llave acá: este bloque vive dentro
+// de un template literal y eso ya rompió el panel dos veces.
+// ============================================================================
+(function () {
+  var btn = document.getElementById("subir");
+  if (!btn) return;
+  function revisar() {
+    if (window.scrollY > 400) btn.classList.add("verse");
+    else btn.classList.remove("verse");
+  }
+  window.addEventListener("scroll", revisar, { passive: true });
+  revisar();
+  btn.addEventListener("click", function (ev) {
+    ev.preventDefault();
+    // Suave, y sin dejar "#arriba" pegado en la barra de direcciones: si queda,
+    // el refresco automático vuelve a saltar ahí solo.
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+})();
+
 window.__puntosEnVuelo = 0;
 function marcarChat(btn) {
   var fila = btn.closest(".fila");
