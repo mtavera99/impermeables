@@ -1025,5 +1025,177 @@ console.log("\n── R16. 📍 El municipio dicho en el saludo ──");
   chequear("   y no marca cualquier palabra", c.departamentoEn("quiero un impermeable") === "");
 }
 
+console.log("\n── R17. 🛡️ Un lugar genérico no es un municipio, y el historial sí se lee ──");
+// Dos casos reportados sobre f213031:
+//   1. `destinoDelHilo({messages:[]}, "estoy en el trabajo")` devolvía "el trabajo"
+//      y `calcular()` autorizaba $85.000. "estoy en" es preposición de lugar, y con
+//      eso alcanzaba. Un lugar donde el cliente ESTÁ no es un destino de despacho.
+//   2. Con el historial de Padrino y SIN cotización guardada, "Cuánto es el precio"
+//      seguía devolviendo `no_hay`: la búsqueda hacia atrás solo miraba `ciudadesEn`,
+//      que reconoce el tarifario, y Pitalito no está en el tarifario.
+{
+  const u = (t) => ({ role: "user", content: t });
+  const a = (t) => ({ role: "assistant", content: t });
+  const dest = (t) => c.destinoDelHilo({ messages: [u(t)] }, t);
+
+  // ── 1. Lugares genéricos: se pregunta la ciudad ────────────────────────────
+  const GENERICOS = [
+    "estoy en el trabajo",
+    "la casa",
+    "mi finca",
+    "estoy en la oficina",
+    "voy para el hospital",
+    "en la bodega",
+    "estoy de viaje",
+    "en la moto",
+    "para mi negocio",
+    "estoy en la universidad",
+    "en el terminal",
+    "para el colegio",
+  ];
+  for (const t of GENERICOS)
+    chequear(`🔴 NO es municipio: ${JSON.stringify(t)}`, dest(t).ciudad === "", `dio ${JSON.stringify(dest(t).ciudad)}`);
+
+  // 🔑 La segunda red: sin departamento se exige que esté escrito como nombre
+  // propio, así que "el pueblo" y "el campo" quedan fuera SIN estar en la lista.
+  // Hacía falta que quedaran fuera por esta vía y no por vocabulario, porque
+  // "Pueblo Nuevo", "Pueblo Rico" y "Campo de la Cruz" son municipios de verdad.
+  chequear("🔑 «estoy en el pueblo» queda fuera por minúscula", dest("estoy en el pueblo").ciudad === "");
+  chequear("   y «estoy en el campo» también", dest("estoy en el campo").ciudad === "");
+  chequear(
+    "🔑 pero «Campo de la Cruz Atlántico» SÍ se reconoce",
+    dest("Campo de la Cruz Atlántico").ciudad === "Campo de la Cruz",
+    JSON.stringify(dest("Campo de la Cruz Atlántico").ciudad)
+  );
+  chequear(
+    "   y «Pueblo Nuevo Córdoba» también",
+    dest("soy de Pueblo Nuevo Córdoba").ciudad === "Pueblo Nuevo",
+    JSON.stringify(dest("soy de Pueblo Nuevo Córdoba").ciudad)
+  );
+
+  // ⚠️ La mayúscula se exige SOLO cuando nadie preguntó: si el bot preguntó la
+  // ciudad, la respuesta corta vale aunque venga en minúscula, porque así escribe
+  // la gente. Esta distinción es la que evita romper el caso del 26-sep.
+  const preguntado = { messages: [a("¿Para qué ciudad sería el envío?")] };
+  chequear(
+    "🔑 contestando la pregunta, «pitalito» en minúscula vale",
+    c.destinoDelHilo(preguntado, "pitalito").ciudad === "pitalito",
+    JSON.stringify(c.destinoDelHilo(preguntado, "pitalito"))
+  );
+  chequear(
+    "🔴 pero «el trabajo» NO vale ni contestando la pregunta",
+    c.destinoDelHilo(preguntado, "el trabajo").ciudad === "",
+    JSON.stringify(c.destinoDelHilo(preguntado, "el trabajo"))
+  );
+
+  // Y el precio no se autoriza sobre un lugar genérico.
+  chequear(
+    "🔑 calcular() no cotiza «el trabajo»",
+    c.calcular(dest("estoy en el trabajo").ciudad, "uno").ok !== true,
+    JSON.stringify(c.calcular(dest("estoy en el trabajo").ciudad, "uno").motivo)
+  );
+
+  // ── 2. destinoPlausibleEn, la pieza expuesta ───────────────────────────────
+  chequear("destinoPlausibleEn ignora un lugar genérico", c.destinoPlausibleEn("estoy en el trabajo") === null);
+  chequear(
+    "   y lee el municipio con departamento",
+    (c.destinoPlausibleEn("Hola buenos días, Pitalito Huila") || {}).ciudad === "Pitalito"
+  );
+  chequear(
+    "🔑 los nombres que empiezan por tilde también (el `\\b` de JS falla con acentos)",
+    (c.destinoPlausibleEn("soy de Úmbita Boyacá") || {}).ciudad === "Úmbita",
+    JSON.stringify(c.destinoPlausibleEn("soy de Úmbita Boyacá"))
+  );
+  chequear(
+    "   y «Ábrego Norte de Santander»",
+    (c.destinoPlausibleEn("Ábrego Norte de Santander") || {}).ciudad === "Ábrego",
+    JSON.stringify(c.destinoPlausibleEn("Ábrego Norte de Santander"))
+  );
+
+  // ── 3. El destino se recupera del historial, sin cotización guardada ───────
+  const padrino = {
+    messages: [
+      u("Buenas"),
+      a("¡Hola! ¿Para qué ciudad sería el envío?"),
+      u("Hola buenos días, Pitalito Huila"),
+      a("Permíteme confirmarte bien el valor del envío."),
+      u("Gracias"),
+    ],
+  };
+  chequear(
+    "🔑 EL CASO: «Cuánto es el precio» recupera Pitalito del historial",
+    c.destinoDelHilo(padrino, "Cuánto es el precio").ciudad === "Pitalito",
+    JSON.stringify(c.destinoDelHilo(padrino, "Cuánto es el precio"))
+  );
+  chequear(
+    "   y cotiza con la predeterminada",
+    c.calcular(c.destinoDelHilo(padrino, "Cuánto es el precio").ciudad, "uno").total === 85000
+  );
+  chequear(
+    "   sin presentarla como flete medido",
+    c.calcular(c.destinoDelHilo(padrino, "Cuánto es el precio").ciudad, "uno").reconocida === false
+  );
+
+  // 🔑 Aunque la haya escrito en minúscula, si el bot se lo había preguntado.
+  const minuscula = {
+    messages: [a("¿Para qué ciudad sería el envío?"), u("pitalito"), a("Ya te confirmo."), u("Gracias")],
+  };
+  chequear(
+    "🔑 la respuesta en minúscula se recupera dos mensajes después",
+    c.destinoDelHilo(minuscula, "Cuánto vale").ciudad === "pitalito",
+    JSON.stringify(c.destinoDelHilo(minuscula, "Cuánto vale"))
+  );
+
+  // 🔑 Una corrección posterior GANA: se recorre del más nuevo al más viejo.
+  const corregido = {
+    messages: [a("¿Para qué ciudad sería el envío?"), u("Pitalito Huila"), u("no, mejor para Garzón Huila")],
+  };
+  chequear(
+    "🔑 la corrección posterior gana sobre la primera ciudad",
+    c.destinoDelHilo(corregido, "Cuánto vale").ciudad === "Garzón",
+    JSON.stringify(c.destinoDelHilo(corregido, "Cuánto vale"))
+  );
+  const corregidoTarifario = { messages: [u("para Cali"), u("no, mejor a Palmira")] };
+  chequear(
+    "   también entre ciudades del tarifario",
+    c.destinoDelHilo(corregidoTarifario, "Cuánto vale").ciudad === "Palmira",
+    JSON.stringify(c.destinoDelHilo(corregidoTarifario, "Cuánto vale"))
+  );
+
+  // ⛔ Ambigüedades: no se elige por su cuenta.
+  const varias = { messages: [u("estoy entre Medellín y Cali"), u("Gracias")] };
+  const rv = c.destinoDelHilo(varias, "Cuánto vale");
+  chequear("🔑 varias ciudades en el historial → se pregunta", rv.ciudad === "" && rv.varias.length === 2, JSON.stringify(rv));
+  chequear(
+    "🔑 un nombre repetido en varios departamentos sigue siendo ambiguo",
+    c.calcular(c.destinoDelHilo({ messages: [u("Buenas, La Unión")] }, "Buenas, La Unión").ciudad, "uno").motivo === "ambiguo",
+    JSON.stringify(c.destinoDelHilo({ messages: [u("Buenas, La Unión")] }, "Buenas, La Unión"))
+  );
+  chequear(
+    "   y con departamento se conserva para desambiguar",
+    /nari[ñn]o/i.test((c.destinoPlausibleEn("soy de La Unión Nariño") || {}).ciudad || ""),
+    JSON.stringify(c.destinoPlausibleEn("soy de La Unión Nariño"))
+  );
+
+  // ⛔ Un historial sin municipio no se rellena a dedo.
+  const sinNada = { messages: [u("Buenas"), a("¿Para qué ciudad sería?"), u("estoy en el trabajo, después te digo")] };
+  chequear(
+    "🔑 historial sin municipio → no_hay, se pregunta",
+    c.destinoDelHilo(sinNada, "cuánto es").ciudad === "",
+    JSON.stringify(c.destinoDelHilo(sinNada, "cuánto es"))
+  );
+
+  // 🔑 Lo del 26-sep sigue en pie: nada de esto rompió el caso anterior.
+  for (const [t, esp] of [
+    ["Hola buenos días, Pitalito Huila", "Pitalito"],
+    ["Hola buenas, El Bagre Antioquia", "El Bagre"],
+    ["buenos días, Sahagún Córdoba", "Sahagún"],
+    ["Hola, vivo en Corozal Sucre", "Corozal"],
+    ["Hola, soy de Pitalito", "Pitalito"],
+    ["quiero dos impermeables para Pitalito Huila", "Pitalito"],
+  ])
+    chequear(`  sigue bien: ${JSON.stringify(t)} → ${esp}`, dest(t).ciudad === esp, JSON.stringify(dest(t).ciudad));
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

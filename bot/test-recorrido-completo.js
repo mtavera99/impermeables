@@ -1123,6 +1123,113 @@ const datosBase = {
     chequear("18· y tampoco escala", t2.revisionHumana === null, JSON.stringify(t2.revisionHumana));
   }
 
+  // ==========================================================================
+  console.log("\n── 19. 🛡️ «estoy en el trabajo» NO es un municipio cotizable ──");
+  // Reportado sobre f213031: `destinoDelHilo({messages:[]}, "estoy en el trabajo")`
+  // devolvía ciudad:"el trabajo" y `calcular()` autorizaba $85.000. Un lugar donde
+  // el cliente ESTÁ no es un destino de despacho: hay que pedirle la ciudad,
+  // conservando el reconocimiento de los municipios válidos.
+  // ==========================================================================
+  {
+    const tel = "573008880020";
+    const t = await turno(
+      tel,
+      "estoy en el trabajo",
+      // El modelo intenta cotizar: la etapa 5 lo rechaza las dos veces.
+      "Te queda en $85.000 en total puesto en el trabajo.",
+      "Te queda en $85.000 en total puesto en el trabajo."
+    );
+    chequear("19· 🔑 no sale ningún precio sobre un lugar genérico", !/\$85\.000|\$82\.000/.test(t.reply), `salió: ${t.reply}`);
+    chequear("19· 🔑 se le PREGUNTA la ciudad", /qu[eé] ciudad/i.test(t.reply), `salió: ${t.reply}`);
+    chequear(
+      "19· 🔑 y NO se guardó una cotización de «el trabajo»",
+      store.leerCotizacion(tel) === null || !/trabajo/i.test(String((store.leerCotizacion(tel) || {}).ciudad)),
+      JSON.stringify(store.leerCotizacion(tel))
+    );
+    chequear("19· sin derivar a un humano", t.revisionHumana === null, JSON.stringify(t.revisionHumana));
+    chequear("19· el chat sigue con el bot", !store.isPaused(tel));
+
+    // 🔑 Y en el turno siguiente, cuando SÍ dice el municipio, se cotiza normal.
+    const t2 = await turno(
+      tel,
+      "ah perdón, estoy en Pitalito Huila",
+      "Te queda en $85.000 en total puesto en Pitalito, y pagas al recibir 📦"
+    );
+    const cot = store.leerCotizacion(tel);
+    chequear("19· 🔑 el municipio de verdad sí se reconoce", Boolean(cot) && /pitalito/i.test(String(cot.ciudad)), JSON.stringify(cot && cot.ciudad));
+    chequear("19· con la tarifa predeterminada", cot && cot.total === 85000, `${cot && cot.total}`);
+    chequear("19· y el precio llega al cliente", /\$85\.000/.test(t2.reply), `salió: ${t2.reply}`);
+  }
+
+  // ==========================================================================
+  console.log("\n── 20. 🔁 El destino se recupera del historial, sin cotización guardada ──");
+  // Reportado sobre f213031: con el historial de Padrino ya en el disco —el bot
+  // pregunta la ciudad, el cliente contesta "Hola buenos días, Pitalito Huila", el
+  // bot responde con esperas, el cliente dice "Gracias"— y SIN cotización guardada,
+  // el turno "Cuánto es el precio" seguía devolviendo `no_hay`.
+  //
+  // 🔑 El historial se siembra a mano a propósito: así son AHORA los chats que ya
+  // están en producción, abiertos por la versión que perdía el municipio. Si la
+  // recuperación solo funcionara en chats nuevos, esos clientes seguirían colgados.
+  // ==========================================================================
+  {
+    const tel = "573008880021";
+    store.pushMsg(tel, "user", "Buenas");
+    store.pushMsg(tel, "assistant", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    store.pushMsg(tel, "user", "Hola buenos días, Pitalito Huila");
+    store.pushMsg(tel, "assistant", "Permíteme confirmarte bien el valor del envío.");
+    store.pushMsg(tel, "user", "Gracias");
+    store.pushMsg(tel, "assistant", "Con gusto, ya te confirmo.");
+    chequear("20· el chat arranca SIN cotización guardada", store.leerCotizacion(tel) === null, JSON.stringify(store.leerCotizacion(tel)));
+
+    const t = await turno(
+      tel,
+      "Cuánto es el precio",
+      "Te queda en $85.000 en total puesto en Pitalito, y pagas al recibir 📦"
+    );
+    chequear("20· 🔑 el destino se recupera y el precio sale", /\$85\.000/.test(t.reply), `salió: ${t.reply}`);
+    chequear(
+      "20· 🔑 NO se repite «déjame confirmar el envío»",
+      !/confirmarte bien el valor del env[ií]o/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear("20· 🔑 ni se deriva a un humano", t.revisionHumana === null, JSON.stringify(t.revisionHumana));
+    chequear("20· el chat sigue con el bot", !store.isPaused(tel));
+    const cot = store.leerCotizacion(tel);
+    chequear("20· la cotización queda sobre Pitalito", Boolean(cot) && /pitalito/i.test(String(cot.ciudad)), JSON.stringify(cot && cot.ciudad));
+    chequear("20· con la tarifa predeterminada", cot && cot.total === 85000, `${cot && cot.total}`);
+    chequear("20· y marcada reconocida:false", cot && cot.reconocida === false, `reconocida=${cot && cot.reconocida}`);
+
+    // 🔑 Una corrección posterior manda sobre lo que dijo antes.
+    const tel2 = "573008880022";
+    store.pushMsg(tel2, "user", "Buenas");
+    store.pushMsg(tel2, "assistant", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    store.pushMsg(tel2, "user", "Pitalito Huila");
+    store.pushMsg(tel2, "assistant", "Permíteme confirmarte el envío.");
+    store.pushMsg(tel2, "user", "no, mejor para Garzón Huila");
+    store.pushMsg(tel2, "assistant", "Anotado.");
+    const t2 = await turno(tel2, "cuánto queda", "Te queda en $85.000 en total puesto en Garzón, y pagas al recibir 📦");
+    const cot2 = store.leerCotizacion(tel2);
+    chequear("20· 🔑 gana la corrección posterior, no la primera ciudad", Boolean(cot2) && /garz[oó]n/i.test(String(cot2.ciudad)), JSON.stringify(cot2 && cot2.ciudad));
+    chequear("20· y el precio sale sobre esa", /\$85\.000/.test(t2.reply), `salió: ${t2.reply}`);
+
+    // 🔑 Un historial donde el cliente nunca dijo un municipio NO se rellena a dedo.
+    const tel3 = "573008880023";
+    store.pushMsg(tel3, "user", "Buenas");
+    store.pushMsg(tel3, "assistant", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    store.pushMsg(tel3, "user", "estoy en el trabajo, después te digo");
+    store.pushMsg(tel3, "assistant", "Claro, cuando puedas me dices.");
+    const t3 = await turno(
+      tel3,
+      "cuánto es",
+      "Te queda en $85.000 en total.",
+      "Te queda en $85.000 en total."
+    );
+    chequear("20· 🔑 sin municipio en el historial se PREGUNTA", /qu[eé] ciudad/i.test(t3.reply), `salió: ${t3.reply}`);
+    chequear("20· sin inventar un precio", !/\$85\.000|\$82\.000/.test(t3.reply), `salió: ${t3.reply}`);
+    chequear("20· y sin escalar", t3.revisionHumana === null, JSON.stringify(t3.revisionHumana));
+  }
+
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   try {
     fs.rmSync(DIR, { recursive: true, force: true });
