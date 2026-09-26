@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-09-26 11:30 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-09-26 12:30 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,14 +9,14 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$107,406** |
-| gastado hoy (hasta las 11h) | $37,050 |
+| **saldo ahora** | **$100,358** |
+| gastado hoy (hasta las 12h) | $44,454 |
 | presupuesto activo | $155,000/día |
-| cierre proyectado del día | $120,750 |
-| saldo proyectado a medianoche | $23,706 |
+| cierre proyectado del día | $119,158 |
+| saldo proyectado a medianoche | $25,654 |
 | objetivo (cubrir un día de 143% + colchón) | $241,650 |
 
-### 🟠 Recargar $97,194 para cubrir un día malo
+### 🟠 Recargar $96,838 para cubrir un día malo
 
 Hoy aguanta, pero no cubre un día de sobre-entrega alta.
 
@@ -24,31 +24,31 @@ Hoy aguanta, pero no cubre un día de sobre-entrega alta.
 
 ---
 
-## 📈 Hoy contra los días anteriores — mismo tramo 00:00–11:59
+## 📈 Hoy contra los días anteriores — mismo tramo 00:00–12:59
 
 *(Comparar medio día contra un día completo es el error #10. Acá va el mismo tramo.)*
 
 | día | gasto | conv | $/conv | CPM | conv/mil |
 |---|---|---|---|---|---|
-| 2026-09-22 | $66,437 | 60 | **$1,107** | $3,769 | 3.40 |
-| 2026-09-23 | $57,441 | 58 | **$990** | $4,640 | 4.69 |
-| 2026-09-24 | $85,960 | 81 | **$1,061** | $4,094 | 3.86 |
-| 2026-09-25 | $64,190 | 73 | **$879** | $4,737 | 5.39 |
-| 2026-09-26 **HOY** | $37,050 | 52 | **$712** | $5,557 | 7.80 |
+| 2026-09-22 | $75,419 | 73 | **$1,033** | $3,876 | 3.75 |
+| 2026-09-23 | $63,323 | 61 | **$1,038** | $4,738 | 4.56 |
+| 2026-09-24 | $96,522 | 94 | **$1,027** | $4,090 | 3.98 |
+| 2026-09-25 | $71,698 | 86 | **$834** | $4,673 | 5.60 |
+| 2026-09-26 **HOY** | $44,372 | 63 | **$704** | $5,591 | 7.94 |
 
-🟢 **Hoy va mejor que ayer a la misma hora** ($712 vs $879).
+🟢 **Hoy va mejor que ayer a la misma hora** ($704 vs $834).
 
 ### La descomposición — dónde está el problema
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$   712  =  $ 5,557  ÷  7.80
+$   704  =  $ 5,591  ÷  7.94
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $5,557 | ~$3.615 | 🔴 alto |
-| **conv/mil** (la calidad de la audiencia) | 7.80 | 5,33 | 🟢 |
+| **CPM** (el precio de la subasta) | $5,591 | ~$3.615 | 🔴 alto |
+| **conv/mil** (la calidad de la audiencia) | 7.94 | 5,33 | 🟢 |
 
 🔑 **El CPM está alto: hay algo en la subasta** (fecha comercial del país). Antes de culpar a la cuenta, mirar el calendario.
 
@@ -58,11 +58,11 @@ $   712  =  $ 5,557  ÷  7.80
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
-| Domiciliarios - Expancion - API | $40,000 | $10,402 | 26% | 15 | $693 | 6.58 |
-| TEST Creativos - API | $40,000 | $9,478 | 24% | 9 | $1,053 | 7.95 |
-| Domiciliarios - API | $35,000 | $7,502 | 21% | 5 | $1,500 | 3.62 |
-| Motorizados - API | $20,000 | $5,074 | 25% | 15 | $338 | 14.90 |
-| Domiciliarios VIDEO - API | $20,000 | $4,594 | 23% | 8 | $574 | 9.21 |
+| Domiciliarios - Expancion - API | $40,000 | $12,135 | 30% | 17 | $714 | 6.42 |
+| TEST Creativos - API | $40,000 | $11,320 | 28% | 11 | $1,029 | 8.04 |
+| Domiciliarios - API | $35,000 | $9,644 | 28% | 8 | $1,206 | 4.52 |
+| Motorizados - API | $20,000 | $6,127 | 31% | 18 | $340 | 15.11 |
+| Domiciliarios VIDEO - API | $20,000 | $5,228 | 26% | 8 | $654 | 8.25 |
 
 ### Cada producto contra SU propio equilibrio
 
@@ -70,12 +70,12 @@ $   712  =  $ 5,557  ÷  7.80
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
-| **TRADICIONAL** | $37,050 | 52 | **$712** | $2,402 | **30%** 🟢 |
+| **TRADICIONAL** | $44,454 | 62 | **$717** | $2,402 | **30%** 🟢 |
 
 | | |
 |---|---|
-| CPA implícito (cierre 8.4%) | **$8,482**/pedido |
-| utilidad estimada de lo que va del día | **$67,014** |
+| CPA implícito (cierre 8.4%) | **$8,536**/pedido |
+| utilidad estimada de lo que va del día | **$79,622** |
 
 ---
 
@@ -87,21 +87,21 @@ $   712  =  $ 5,557  ÷  7.80
 
 | conjunto | 09-21 | 09-22 | 09-23 | 09-24 | 09-25 | 09-26 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios - Expancion - API | — | $1,103 | $778 | $1,140 | $732 | $693 | 🟢 |
-| TEST Creativos - API | — | $1,086 | $735 | $757 | $820 | $1,053 | 🔴 |
-| Domiciliarios - API | — | $942 | $889 | $1,108 | $1,003 | $1,500 | 🔴 |
-| Motorizados - API | — | $1,265 | $745 | $701 | $674 | $338 | 🟢 |
-| Domiciliarios VIDEO - API | — | $972 | $1,254 | $681 | $694 | $574 | 🟢 |
+| Domiciliarios - Expancion - API | — | $1,103 | $778 | $1,140 | $732 | $714 | 🟡 |
+| TEST Creativos - API | — | $1,086 | $735 | $757 | $820 | $1,029 | 🔴 |
+| Domiciliarios - API | — | $942 | $889 | $1,108 | $1,003 | $1,206 | 🔴 |
+| Motorizados - API | — | $1,265 | $745 | $701 | $675 | $340 | 🟢 |
+| Domiciliarios VIDEO - API | — | $972 | $1,254 | $681 | $694 | $654 | 🟢 |
 
 ### conv/mil por día *(la calidad de la audiencia de cada uno)*
 
 | conjunto | 09-21 | 09-22 | 09-23 | 09-24 | 09-25 | 09-26 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios - Expancion - API | — | 3.42 | 4.66 | 2.81 | 5.39 | 6.58 | 🟢 |
-| TEST Creativos - API | — | 8.43 | 13.10 | 10.08 | 8.99 | 7.95 | 🟡 |
-| Domiciliarios - API | — | 4.24 | 4.84 | 4.04 | 5.48 | 3.62 | 🔴 |
-| Motorizados - API | — | 3.17 | 5.36 | 5.39 | 7.41 | 14.90 | 🟢 |
-| Domiciliarios VIDEO - API | — | 5.10 | 4.36 | 6.86 | 6.88 | 9.21 | 🟢 |
+| Domiciliarios - Expancion - API | — | 3.42 | 4.66 | 2.81 | 5.39 | 6.42 | 🟢 |
+| TEST Creativos - API | — | 8.43 | 13.10 | 10.08 | 8.98 | 8.04 | 🟡 |
+| Domiciliarios - API | — | 4.24 | 4.84 | 4.04 | 5.48 | 4.52 | 🔴 |
+| Motorizados - API | — | 3.17 | 5.36 | 5.39 | 7.41 | 15.11 | 🟢 |
+| Domiciliarios VIDEO - API | — | 5.10 | 4.36 | 6.86 | 6.87 | 8.25 | 🟢 |
 
 🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). Eso es canibalización, y se arregla diferenciando la segmentación.
 
@@ -116,7 +116,7 @@ $   712  =  $ 5,557  ÷  7.80
 | 2026-09-22 | $179,806 | 175 | $1,027 | $4,763 | 4.64 | $170,408 |
 | 2026-09-23 | $141,915 | 173 | $820 | $5,018 | 6.12 | $204,297 |
 | 2026-09-24 | $177,412 | 202 | $878 | $4,357 | 4.96 | $226,835 |
-| 2026-09-25 | $140,139 | 179 | $783 | $5,071 | 6.48 | $218,080 |
+| 2026-09-25 | $140,216 | 179 | $783 | $5,071 | 6.47 | $218,003 |
 
 ---
 
