@@ -111,7 +111,18 @@ function render(aviso) {
   // una lista de trabajo lo urgente es lo que lleva más tiempo esperando.
   const pendientes = pedidos.filter((p) => !p.guia).slice().reverse();
   const despachados = pedidos.filter((p) => p.guia);
+  // 🚦 De los pendientes, los que NO se pueden despachar todavía se cuentan
+  // aparte. Antes un pedido con el total mal cuadraba dentro de "pendientes de
+  // despachar" como si estuviera listo, y el número de arriba decía que había
+  // plata por recaudar que en realidad no estaba confirmada.
+  const paraRevisar = pendientes.filter((p) => store.requiereRevision(p));
+  const listos = pendientes.filter((p) => store.listoParaDespachar(p));
+  // ⚠️ La plata por recaudar sigue siendo la de TODOS los pendientes, no solo la
+  // de los listos: la venta existe aunque falte revisarla, y descontarla de acá
+  // haría parecer que hay menos por cobrar del que hay. Lo que cambia es que
+  // ahora se ve, aparte, cuántos no se pueden despachar todavía.
   const totalPendiente = pendientes.reduce((s, p) => s + Number(p.total || 0), 0);
+  const totalPorRevisar = paraRevisar.reduce((s, p) => s + Number(p.total || 0), 0);
   const sinCelularCuantos = pendientes.filter((p) => !String(p.celular || "").trim()).length;
 
   // Ordenar por el último mensaje del cliente: lo más reciente arriba
@@ -316,6 +327,16 @@ function render(aviso) {
       <div class="kpi ${pendientes.length ? "warn" : "ok"}"><b>${pendientes.length}</b><span>pendientes de despachar</span>
         <span class="d">${pendientes.length ? esc(fmtCOP(totalPendiente)) + " por recaudar" : "todo despachado"}</span>
       </div>
+      <!-- 🚦 De los pendientes, cuántos NO se pueden despachar todavía. Va en su
+           propia tarjeta porque antes esta información no existía en ninguna
+           parte: la marca se guardaba en el pedido y nadie la leía. -->
+      ${
+        paraRevisar.length
+          ? `<div class="kpi no"><b>${paraRevisar.length}</b><span>🔴 revisar antes de despachar</span>
+        <span class="d">${esc(fmtCOP(totalPorRevisar))} sin confirmar</span>
+      </div>`
+          : ""
+      }
     </div>
     ${hoy.cierreTopado ? `<p class="nota">* Hay más pedidos que conversaciones de hoy: alguien escribió ayer y confirmó hoy. El cierre se topa en 100%.</p>` : ""}
     ${hoy.topCiudades.length ? `<p class="nota">📍 ${hoy.topCiudades.map(([c, n]) => `${esc(c)} <b>${n}</b>`).join(" · ")}</p>` : ""}
@@ -382,6 +403,11 @@ function render(aviso) {
       // 🔴 El cliente no dijo un "sí" reconocible. Puede ser un "hágale" que no
       // entendimos, o puede que no haya comprado. No se despacha sin leer el chat.
       p.sin_confirmar ? ' <span class="tag no">🔴 SIN CONFIRMAR</span>' : ""
+    }${
+      // 🔴 El total del pedido no coincide con la cotización validada. Es el
+      // motivo más caro de todos: despachar así cobra mal en la puerta del
+      // cliente. Antes esta marca se guardaba y NADIE la miraba.
+      p.precio_no_cuadra ? ' <span class="tag no">🔴 PRECIO NO CUADRA</span>' : ""
     }<div class="sub">${esc(p.celular || p.telefono_chat)}${
       sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""
     }${
@@ -393,6 +419,12 @@ function render(aviso) {
     }${
       p.sin_confirmar
         ? '<br><b style="color:#ff9aa4">🔴 no dijo un "sí" claro — leé el chat antes de despachar</b>'
+        : ""
+    }${
+      p.precio_no_cuadra
+        ? `<br><b style="color:#ff9aa4">🔴 el total no cuadra con la cotización${
+            p.total_esperado ? ` — debería ser ${esc(fmtCOP(p.total_esperado))}` : ""
+          }${p.motivo_precio ? `<br><span style="opacity:.85">${esc(p.motivo_precio)}</span>` : ""}</b>`
         : ""
     }</div></td>
       <td data-label="Dirección">${esc(p.ciudad)}${
@@ -444,6 +476,11 @@ function render(aviso) {
     </tr>`;
   };
 
+  // ⚠️ El orden NO se toca: los pendientes van del más viejo al más nuevo, porque
+  // en una lista de trabajo lo urgente es lo que lleva más tiempo esperando. Esa
+  // decisión está documentada y protegida por test-pendientes-despachados.js, y
+  // los que hay que revisar ya se distinguen por su etiqueta y por la tarjeta de
+  // arriba. No hacía falta romper el orden para que se vieran.
   const filasPendientes = pendientes.length
     ? pendientes.map((p) => filaPedido(p)).join("")
     : `<tr><td colspan="7" class="vacio">🎉 No hay nada pendiente: todos los pedidos tienen su guía enviada.</td></tr>`;
@@ -1323,14 +1360,22 @@ function marcarChat(btn) {
     body: cuerpo,
   })
     .then(function (r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
+      // 🔴 Un 403 es la clave del panel, no un problema de conexión. Sin este
+      // caso el dueño leía "No se pudo guardar. Revisá la conexión" y se iba a
+      // buscar el problema al router. Mismo tratamiento que /responder.
+      if (r.status === 403) {
+        throw new Error(
+          "la clave del panel no coincide. Volvé a abrir el panel con el token correcto."
+        );
+      }
+      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
     })
-    .catch(function () {
+    .catch(function (e) {
       // Revertir: que la pantalla no diga algo que el servidor no guardó.
       fila.dataset.listo = estaba ? "1" : "0";
       fila.classList.toggle("hecho", estaba);
       recontarFaltan();
-      alert("No se pudo guardar. Revisá la conexión y tocá de nuevo.");
+      alert("No se pudo guardar: " + (e && e.message ? e.message : "revisá la conexión") + " Tocá de nuevo.");
     })
     .then(function () {
       fila.dataset.guardando = "0";

@@ -19,6 +19,7 @@ const novedades = require("./novedades");
 const fletes = require("./fletes");
 const extraer = require("./extraer");
 const excel = require("./excel");
+const rechazo = require("./rechazo");
 const plantillas = require("./plantillas");
 const audio = require("./audio");
 const resumen = require("./resumen");
@@ -1363,7 +1364,37 @@ app.get("/extraer-datos", async (req, res) => {
 
 // Salud
 app.get("/", (_req, res) => res.send("BikerPro bot activo 🏍️"));
-app.get("/health", (_req, res) => res.json({ ok: true }));
+// ============================================================================
+// 🩺 /health — AHORA DICE QUÉ VERSIÓN ESTÁ CORRIENDO
+//
+// Antes devolvía `{ok:true}`, que confirma que el proceso está vivo pero NO qué
+// código quedó desplegado. Después de un despliegue eso es justo lo que hay que
+// saber: si Render tomó el commit nuevo o quedó sirviendo el anterior.
+//
+// Render publica `RENDER_GIT_COMMIT` solo; no hay que configurar nada.
+//
+// 🔒 No lleva token porque no expone nada sensible: el hash del commit, hace
+// cuánto arrancó y si el disco está montado. Ningún dato de cliente, ninguna
+// credencial. Y es de SOLO LECTURA: no manda mensajes ni toca pedidos.
+// ============================================================================
+const ARRANCO_EN = Date.now();
+app.get("/health", (_req, res) => {
+  const commit = String(process.env.RENDER_GIT_COMMIT || "");
+  let disco = null;
+  try {
+    disco = store.estadoDelDisco();
+  } catch {}
+  res.json({
+    ok: true,
+    commit: commit ? commit.slice(0, 7) : "desconocido",
+    commit_completo: commit || null,
+    rama: process.env.RENDER_GIT_BRANCH || null,
+    arrancado_hace_seg: Math.round((Date.now() - ARRANCO_EN) / 1000),
+    // Para poder confirmar que la nota comercial quedó APAGADA sin entrar a Render.
+    nota_comercial: String(process.env.NOTA_COMERCIAL ?? "0").trim() === "1" ? "ENCENDIDA" : "apagada",
+    disco: disco ? { configurado: disco.configurado, aparte: disco.discoAparte, arranques: disco.arranques } : null,
+  });
+});
 
 // ============================================================================
 // PROBAR EL BOT SIN WHATSAPP  —  GET /probar?token=...&msg=...
@@ -2093,9 +2124,23 @@ async function handleWebhook(body) {
         // Si pide que no le escriban mas, se respeta para siempre y se saca
         // del seguimiento. Esto va ANTES de la pausa: aunque un humano tenga el
         // chat, la peticion se registra igual.
-        if (/\b(no me escrib|no escrib|dejen? de escrib|no molest|ya no me interesa|elimin[ae]me|no quiero)\b/i.test(text)) {
+        // ====================================================================
+        // 🛑 ¿PIDIÓ QUE NO LE ESCRIBAN? (mejorado el 26-sep)
+        //
+        // La expresión que había acá tenía dos problemas medidos:
+        //   · de cuatro frases reales de rechazo, detectaba UNA
+        //   · y `no quiero` marcaba como noMolestar a quien decía
+        //     "no quiero rojo, quiero azul" — le cortaba el seguimiento a un
+        //     cliente que estaba ELIGIENDO EL COLOR
+        //
+        // Ahora una corrección del pedido gana sobre el rechazo. Ver rechazo.js.
+        // ====================================================================
+        const evalRechazo = rechazo.evaluar(text);
+        if (evalRechazo.rechaza) {
           store.marcarNoMolestar(from);
-          console.log(`(${from}) pidio no ser contactado. Marcado como noMolestar.`);
+          console.log(`(${from}) pidio no ser contactado (${evalRechazo.motivo}). Marcado como noMolestar.`);
+        } else if (evalRechazo.esCorreccion) {
+          console.log(`(${from}) dijo "no" pero es una corrección del pedido, NO un rechazo.`);
         }
 
         if (store.isPaused(from)) {
@@ -2104,7 +2149,7 @@ async function handleWebhook(body) {
         }
 
         console.log(`Cliente ${from}: ${text}`);
-        const { reply, order, handoff, media, pedidoRescatado } = await generateReply(from, text);
+        const { reply, order, handoff, media, pedidoRescatado, revisionHumana } = await generateReply(from, text);
         if (reply) {
           // 🔴 Registrar el RESULTADO del envío, no solo el intento. Si Meta
           // rechaza el mensaje, esto es lo único que lo delata en los logs.
@@ -2188,11 +2233,28 @@ async function handleWebhook(body) {
               `El cliente usa nombre de usuario de WhatsApp, así que no tenemos su número.\n` +
               `⛔ NO LO DESPACHES: pedile el celular por el chat primero.\n\n`
             : "";
+          // ==================================================================
+          // 🚦 EL ENCABEZADO DEL AVISO DICE LA VERDAD
+          //
+          // 🔴 Antes TODO pedido llegaba como "🟢 NUEVO PEDIDO", incluido uno con
+          // el total sin cuadrar. El dueño lee el aviso en el celular y despacha;
+          // el verde le dice que está todo bien. Un pedido que requiere revisión
+          // no puede anunciarse con el mismo encabezado que uno listo.
+          //
+          // Los motivos salen de store.motivosDeRevision(), que es el mismo
+          // criterio que usa el panel y el CSV. Una sola fuente de verdad.
+          // ==================================================================
+          const revisiones = store.motivosDeRevision(order);
+          const encabezado = revisiones.length
+            ? `🔴 PEDIDO QUE NO SE PUEDE DESPACHAR TODAVÍA\n` +
+              revisiones.map((m) => `• ${m.etiqueta}${m.detalle ? `: ${m.detalle}` : ""}`).join("\n") +
+              `\n\n`
+            : `🟢 NUEVO PEDIDO BikerPro\n`;
           await sendText(
             OWNER,
             avisoRescate +
               alerta +
-              `🟢 NUEVO PEDIDO BikerPro\n` +
+              encabezado +
               `Nombre: ${order.nombre}\nCel: ${order.celular || "🔴 FALTA"}\n` +
               `Ciudad: ${order.ciudad}\nDir: ${order.direccion || "🔴 FALTA"}\n` +
               `Color: ${order.color} · Talla: ${order.talla}\n` +
@@ -2219,6 +2281,27 @@ async function handleWebhook(body) {
         }
         if (handoff && OWNER) {
           await sendText(OWNER, `🙋 El cliente ${from} pidió hablar con un asesor. El bot quedó en pausa para ese chat.`);
+        }
+        // ==================================================================
+        // 🔧 El bot dijo algo que no puede respaldar y se corrigió al vuelo.
+        //
+        // 🔴 Antes esto solo pausaba el chat, y una pausa no le avisa a nadie: el
+        // dueño se enteraba si abría ese chat por casualidad. Acá se conecta la
+        // derivación con el aviso, que es lo que pedía la revisión.
+        // ==================================================================
+        if (revisionHumana && OWNER) {
+          await sendText(
+            OWNER,
+            `🔧 REVISÁ ESTE CHAT: ${from}
+` +
+              `El bot escribió algo que no podemos sostener y se corrigió antes de enviarlo.
+
+` +
+              `Lo que se cambió: ${revisionHumana.detalle}
+
+` +
+              `El cliente recibió una versión sin esa promesa. El chat quedó en pausa: seguí vos.`
+          );
         }
       }
     }

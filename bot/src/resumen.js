@@ -27,10 +27,71 @@ function ayerBogota() {
 const fmtCOP = (n) => "$" + Number(n || 0).toLocaleString("es-CO").replace(/,/g, ".");
 
 /** Cuántas unidades tiene un pedido, leyendo el producto. */
+/**
+ * La cantidad del pedido, con DE DÓNDE SALIÓ y si es confiable.
+ *
+ * ⛔ NO SE INVENTA DESDE EL PRECIO EN LOS PEDIDOS NUEVOS. El esquema ##ORDER##
+ * ahora trae `unidades`, así que un pedido nuevo siempre lo dice. Deducirlo del
+ * total era una conjetura disfrazada de dato: convertía cualquier pedido de
+ * ≥$130.000 en "dos unidades", incluido uno de UNA unidad con el total mal.
+ *
+ * ⚠️ PERO LOS REGISTROS VIEJOS NO TIENEN EL CAMPO, y borrarles la cantidad
+ * cambiaría la serie histórica hacia atrás. Para esos se conserva la deducción
+ * por precio, marcada `cierta: false` para que se pueda distinguir de un dato.
+ *
+ * @returns {{uds:number, origen:string, cierta:boolean}}
+ */
+function cantidadDe(p) {
+  const explicito = Number(p.unidades);
+  if (Number.isFinite(explicito) && explicito > 0) {
+    return { uds: explicito, origen: "declarada en el pedido", cierta: true };
+  }
+
+  const tallas = String(p.talla || "")
+    .split(/\s*(?:,|\/|\+|\by\b)\s*/i)
+    .map((s) => s.trim())
+    .filter((s) => /^(xs|s|m|l|xl|2xl|3xl|xxl|xxxl|\d{1,2})$/i.test(s));
+  if (tallas.length > 1) return { uds: tallas.length, origen: `${tallas.length} tallas`, cierta: true };
+
+  const t = String(p.producto || "").toLowerCase();
+  if (/\b3\b|tres/.test(t)) return { uds: 3, origen: "el texto del producto", cierta: true };
+  if (/\b2\b|\bdos\b|x2|2x|promo 2|combo/.test(t)) {
+    return { uds: 2, origen: "el texto del producto", cierta: true };
+  }
+
+  // Registro viejo, sin el campo: se deduce del total y se marca como incierto.
+  if (Number(p.total) >= 130000) {
+    return { uds: 2, origen: "deducida del total (registro anterior al campo unidades)", cierta: false };
+  }
+  return { uds: 1, origen: "no la declara", cierta: false };
+}
+
 function unidadesDe(p) {
-  const t = `${p.producto || ""} ${p.talla || ""}`.toLowerCase();
+  // Si el pedido lo dice, se le cree.
+  const explicito = Number(p.unidades);
+  if (Number.isFinite(explicito) && explicito > 0) return explicito;
+
+  // ========================================================================
+  // 🔴 LA TALLA NO ES UNA CANTIDAD (encontrado el 26-sep)
+  //
+  // Antes se miraba `producto + talla` junto, y el patrón traía `2x`. Resultado:
+  // **una talla "2XL" se contaba como DOS UNIDADES**, y una "3XL" como tres.
+  //
+  // No es cosmético: `unidadesDe` alimenta la columna `unidades` del CSV y el KPI
+  // de "share 2 uds" del panel — el número con el que se justifica el gancho del
+  // combo. Cada cliente de talla 2XL o 3XL venía inflando ese share.
+  //
+  // Ahora la talla se lee como talla, y la cantidad sale del producto.
+  // ========================================================================
+  const tallas = String(p.talla || "")
+    .split(/\s*(?:,|\/|\+|\by\b)\s*/i)
+    .map((s) => s.trim())
+    .filter((s) => /^(xs|s|m|l|xl|2xl|3xl|xxl|xxxl|\d{1,2})$/i.test(s));
+  if (tallas.length > 1) return tallas.length;
+
+  const t = String(p.producto || "").toLowerCase();
   if (/\b3\b|tres/.test(t)) return 3;
-  if (/\b2\b|dos|x2|2x|promo 2/.test(t)) return 2;
+  if (/\b2\b|\bdos\b|x2|2x|promo 2|combo/.test(t)) return 2;
   // Si no dice nada, se deduce del total: la promo de 2 arranca en $137.000
   if (Number(p.total) >= 130000) return 2;
   return 1;
@@ -151,10 +212,20 @@ function pedidosCSV() {
   // Con esto el CSV se puede cruzar contra el gasto por anuncio de Meta Ads y
   // sacar el CPA REAL por anuncio — no el costo por conversación, que es lo
   // único que se podía ver hasta ahora.
-  const cab = ["fecha", "dia_bogota", "nombre", "celular", "ciudad", "direccion", "talla", "color", "pago", "unidades", "total", "anuncio_id", "anuncio_origen"];
+  // 🚦 `estado` va PRIMERO y no al final, a propósito: este CSV se abre para
+  // armar guías, y una fila que se ve igual que las demás se despacha igual que
+  // las demás. Si el pedido necesita revisión tiene que verse en la primera
+  // columna, antes de leer el nombre.
+  //
+  // ⚠️ La fila NO se borra: un pedido real con un número mal escrito sigue siendo
+  // una venta, y esconderlo sería perderla. Se marca, no se oculta.
+  const cab = ["estado", "revisar_porque", "fecha", "dia_bogota", "nombre", "celular", "ciudad", "direccion", "talla", "color", "pago", "unidades", "unidades_origen", "total", "total_esperado", "anuncio_id", "anuncio_origen"];
   const filas = pedidos.map((p) => {
     const q = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+    const revisar = store.textoDeRevision(p);
     return [
+      p.anulado ? "ANULADO" : revisar ? "🔴 REVISAR" : "LISTO",
+      revisar,
       p.fecha,
       diaBogota(new Date(p.fecha).getTime()),
       p.nombre,
@@ -164,8 +235,10 @@ function pedidosCSV() {
       p.talla,
       p.color,
       p.pago,
-      unidadesDe(p),
+      cantidadDe(p).uds,
+      cantidadDe(p).cierta ? cantidadDe(p).origen : `⚠️ ${cantidadDe(p).origen}`,
       p.total,
+      p.total_esperado == null ? "" : p.total_esperado,
       p.anuncio_id || "",
       p.anuncio_origen || "",
     ].map(q).join(",");
@@ -173,4 +246,4 @@ function pedidosCSV() {
   return [cab.join(","), ...filas].join("\n");
 }
 
-module.exports = { delDia, textoCierre, pedidosCSV, hoyBogota, ayerBogota, fmtCOP, unidadesDe, diaBogota };
+module.exports = { delDia, textoCierre, pedidosCSV, hoyBogota, ayerBogota, fmtCOP, unidadesDe, cantidadDe, diaBogota };

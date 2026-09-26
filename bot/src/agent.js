@@ -5,6 +5,9 @@ const { respuestaDeArranque } = require("./primer-mensaje");
 const { revisarDireccionDePedido } = require("./direccion");
 const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
+const cotizacion = require("./cotizacion");
+const promesas = require("./promesas");
+const comercial = require("./comercial");
 
 // ============================================================================
 // PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
@@ -167,6 +170,10 @@ function rescatarPedido(fragmento) {
     direccion: txt("direccion"),
     color: txt("color"),
     talla: txt("talla"),
+    // ⚠️ `unidades` se rescata igual que los demás: si el bloque llegó cortado
+    // justo después de la talla, un pedido de dos conjuntos se reconstruiría como
+    // de uno y se despacharía de menos contra un recaudo de dos.
+    unidades: num("unidades"),
     pago: txt("pago"),
     total: num("total"),
   };
@@ -310,22 +317,144 @@ async function generateReply(phone, userText) {
   const arranque = respuestaDeArranque(conv.messages, userText);
   if (arranque) {
     store.pushMsg(phone, "assistant", arranque);
-    return { reply: arranque, order: null, handoff: false, media: [], pedidoRescatado: false };
+    return { reply: arranque, order: null, handoff: false, media: [], pedidoRescatado: false, revisionHumana: null };
   }
 
+  // ==========================================================================
+  // 🧾 EL PRECIO SE CALCULA EN CÓDIGO, NO LO RESUELVE EL MODELO (26-sep)
+  //
+  // Hasta hoy el guion llevaba una tabla de 107 ciudades en 5 bandas y el modelo
+  // leía la fila y sumaba. `cotizar()` —probado y correcto— no se llamaba nunca.
+  //
+  // Ahora: el código resuelve destino y cantidad, calcula, y le pasa al modelo
+  // los números ya validados. El modelo pone la explicación comercial.
+  // ==========================================================================
+  // ⚠️ Destino y cantidad se resuelven contra TODO el hilo, no contra una ventana
+  // de dos mensajes. La revisión del 26-sep encontró que la cantidad se perdía:
+  // después de "quiero dos conjuntos", la ciudad y la talla la devolvían a una
+  // unidad. Las dos funciones viven en cotizacion.js para que las pruebas
+  // recorran exactamente este camino y no una versión de laboratorio.
+  const previa = store.leerCotizacion(phone);
+  const destino = cotizacion.destinoDelHilo(conv, userText);
+  const cantidad = cotizacion.cantidadDelHilo(conv, userText, previa && previa.uds);
+  let cot = cotizacion.calcular(destino.ciudad, userText, { cantidad });
+  // 🏷️ La cotización guardada es la que trae `oferta_id`: un identificador que
+  // PERSISTE mientras las condiciones no cambien, en vez de nacer en cada mensaje.
+  if (cot.ok) cot = store.guardarCotizacion(phone, cot);
+  const objecionDePrecio = cotizacion.hayObjecionDePrecio(conv.messages);
+  const contextoPrecio = { objecionDePrecio };
+
   let reply;
+  let validacion = null;
+  // ==========================================================================
+  // 🙋 UN SOLO CAMINO PARA MANDAR UN CHAT A UN HUMANO
+  //
+  // Las entregas 1 y 2 llegaron cada una con su mecanismo: la 1 tenía un
+  // `forzarHumano` para el pedido que no cuadra, y la 2 un `revisionHumana` para
+  // la promesa sin respaldo. Al juntarlas se unificaron en este, y no por
+  // prolijidad: el de la entrega 1 solo pausaba el chat, y una pausa NO AVISA a
+  // nadie. Con los dos por el mismo camino, los dos casos le llegan al dueño.
+  //
+  // Queda distinto de null → el chat se pausa Y se manda el aviso desde server.js.
+  // ==========================================================================
+  let revisionHumana = null;
   if (!TIENE_IA) {
     reply =
       "¡Hola! 🏍️ Gracias por escribir a BikerPro. (Bot en modo prueba: falta configurar la API de IA). " +
       "El conjunto impermeable de 4 piezas cuesta $59.900 con pago contraentrega 📦";
   } else {
-    try {
-      reply = await callIA(buildSystemPrompt(), conv.messages);
-    } catch (e) {
-      console.error("Error IA:", e.message);
-      // Respaldo que NO reinicia la conversación (evita el saludo genérico a mitad de charla)
-      reply =
-        "Perdón, se me cruzó la señal un momento 🙏 ¿Me repites lo último, por favor? Con gusto sigo con tu pedido 🏍️";
+    // ========================================================================
+    // ========================================================================
+    // 🔑 ETAPA 5: SE REVISA EL MENSAJE ANTES DE QUE SALGA
+    //
+    // Sin esto, pasarle los números al modelo sigue siendo una instrucción — y
+    // este proyecto ya aprendió cinco veces que una instrucción no es un candado.
+    //
+    // ⚠️ SE VALIDA EL TEXTO LIMPIO, el que ve el cliente: el bloque ##ORDER##
+    // lleva el total adentro y validarlo ahí sería revisar el dato contra sí mismo.
+    //
+    // ⚠️ Y SI SE REGENERA, LO DE LA VUELTA ANTERIOR SE DESCARTA COMPLETO. El
+    // pedido se extrae DESPUÉS de aceptar una respuesta: así un intento fallido
+    // no puede guardar un pedido ni disparar un efecto duplicado.
+    // ========================================================================
+
+    // ========================================================================
+    // 🧩 ACÁ SE JUNTAN LAS TRES ENTREGAS, Y ESTE ES EL ÚNICO LUGAR DONDE PASA
+    //
+    // El prompt de cada turno se arma en tres capas, en este orden:
+    //
+    //   1. buildSystemPrompt()      el guion de ventas        (~7.555 tokens)
+    //   2. cotizacion.bloqueDeDatos los números ya calculados  (entrega 1)
+    //   3. comercial.guionConNota   la nota del turno          (entrega 3, apagada
+    //                                                          por defecto)
+    //
+    // 🔑 Y el ORDEN IMPORTA: la nota comercial va ÚLTIMA. Si fuera antes del bloque
+    // de precio, el "usá estos números tal cual" quedaría enterrado en el medio del
+    // prompt, y lo que no puede fallar es el precio.
+    //
+    // 📏 El techo de 9.000 tokens se mide sobre el prompt COMPLETO, con las tres
+    // capas puestas — no solo sobre el guion. Medirlo sin el bloque de precio era
+    // medir otra cosa.
+    //
+    // 🔗 Y la cotización le PASA datos a la nota: si el destino es de difícil
+    // acceso, `comboEncaja` se entera por acá y no tiene que adivinarlo.
+    //
+    // 🔘 La capa 3 ARRANCA APAGADA: se prende con NOTA_COMERCIAL=1 y se apaga
+    // volviéndola a 0, sin desplegar nada. Las capas 1 y 2 van siempre, porque no
+    // son una mejora a medir: son el precio, y el precio no puede fallar.
+    // ========================================================================
+    const guionConPrecio = buildSystemPrompt() + "\n\n" + cotizacion.bloqueDeDatos(cot, contextoPrecio);
+    const conNota = comercial.guionConNota(guionConPrecio, conv.messages, userText, {
+      sinPromo2: Boolean(
+        cot.sinPromo2 || (cot.destino && cot.destino.sinPromo2) || cot.motivo === "dificil_sin_promo"
+      ),
+      yaConocidos: { ciudad: cot.ok ? cot.ciudad : "" },
+    });
+    if (conNota.nota && !conNota.cupo) {
+      // 🔴 La red de seguridad saltó: la nota está prendida pero no cabe. Se avisa
+      // fuerte en vez de apagarla en silencio, porque si esto pasa hay que
+      // recortar el guion, no resignarse.
+      console.warn(
+        `🔴 NOTA COMERCIAL OMITIDA POR TAMAÑO: el prompt completo da ${conNota.tokens} tokens y el ` +
+          `techo es ${comercial.TECHO_TOKENS}. La nota está ACTIVA pero no cabe: hay que recortar el guion.`
+      );
+    }
+    const guion = conNota.prompt;
+
+    const MAX_INTENTOS = 2;
+    for (let intento = 1; intento <= MAX_INTENTOS; intento++) {
+      let candidata;
+      try {
+        candidata = await callIA(guion, conv.messages);
+      } catch (e) {
+        console.error("Error IA:", e.message);
+        reply =
+          "Perdón, se me cruzó la señal un momento 🙏 ¿Me repites lo último, por favor? Con gusto sigo con tu pedido 🏍️";
+        validacion = null;
+        break;
+      }
+      // Se valida solo la parte visible: sin marcadores ni bloque de pedido.
+      const soloTexto = extractMedia(extractOrder(candidata.replace(/##HANDOFF##/g, "")).clean).clean;
+      validacion = cotizacion.validarRespuesta(soloTexto, cot, contextoPrecio);
+      reply = candidata;
+      if (validacion.ok) break;
+
+      console.warn(
+        `⚠️  Respuesta con importes no validados (intento ${intento}/${MAX_INTENTOS}) para ${phone}: ` +
+          validacion.problemas.map((p) => p.detalle).join(" · ")
+      );
+    }
+
+    // Si después del reintento sigue mal, NO sale un precio inventado.
+    if (validacion && !validacion.ok) {
+      if (cot.ok) {
+        reply = cotizacion.lineaDePrecio(cot);
+        console.warn(`🔧 Se reemplazó la respuesta por la línea de precio calculada para ${phone}.`);
+      } else {
+        reply =
+          "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
+        console.warn(`🔧 Sin cotización válida para ${phone}: se escala en vez de dar un número.`);
+      }
     }
   }
 
@@ -356,8 +485,101 @@ async function generateReply(phone, userText) {
 
   const mediaRes = extractMedia(reply);
   reply = mediaRes.clean;
+
+  // ==========================================================================
+  // 🚫 PROMESAS QUE EL BOT NO PUEDE RESPALDAR (26-sep)
+  //
+  // Cuatro casos reportados: afirmó haber actualizado un pedido, dijo conocer el
+  // estado del despacho, prometió despacho "hoy mismo", y garantizó cubrir una
+  // maleta sin saber sus medidas. Más un "¡Así es!" a "están en Cali", cuando la
+  // bodega está en Bogotá.
+  //
+  // 🔑 El cliente TOMA DECISIONES con eso: confirma creyendo que el teléfono
+  // quedó cambiado, o espera el paquete un día que nadie prometió. La novedad, la
+  // queja o la devolución las paga el negocio.
+  //
+  // ⚠️ NO se reescribe ni se borra la respuesta: un detector que deja al cliente
+  // sin contestación es peor. Se manda igual y el chat pasa a modo humano, para
+  // que el dueño lo vea y corrija antes de que el cliente actúe sobre eso.
+  // ==========================================================================
+  // 🔧 Se CORRIGE antes de enviar, frase por frase. La revisión del 26-sep señaló
+  // —con razón— que mandar el mensaje falso y pausar después no protege a nadie:
+  // el cliente ya lo leyó y actúa sobre eso. Ver promesas.js.
+  const chequeoPromesas = promesas.revisar(reply);
+  if (!chequeoPromesas.ok) {
+    const corregido = promesas.corregir(reply);
+    if (corregido.cambios.length) {
+      console.warn(
+        `🔧 PROMESA SIN RESPALDO de ${phone}: ` +
+          corregido.cambios
+            .map((c) => `${c.clave} · "${c.antes}" → ${c.despues === null ? `(sin reemplazo: ${c.sinReemplazo})` : `"${c.despues}"`}`)
+            .join(" | ")
+      );
+      reply = corregido.texto;
+      revisionHumana = {
+        motivo: "promesa_sin_respaldo",
+        detalle: corregido.cambios.map((c) => `${c.clave}: "${c.antes}"`).join(" · "),
+      };
+    } else {
+      console.warn(
+        `⚠️  PROMESA SIN RESPALDO SIN REEMPLAZO de ${phone}: ${promesas.resumir(chequeoPromesas)}`
+      );
+      revisionHumana = { motivo: "promesa_sin_respaldo", detalle: promesas.resumir(chequeoPromesas) };
+    }
+  }
+
+  // ==========================================================================
+  // 🔒 RECONCILIACIÓN FINAL: LO QUE SALE TIENE QUE PASAR LAS DOS VALIDACIONES
+  //
+  // 🔴 DE DÓNDE SALE (revisión 26-sep): corregir una promesa es una TRANSFORMACIÓN
+  // DE TEXTO, y una transformación de texto puede romper el precio. El caso
+  // reportado partía "$82.000" en dos y dejaba "según la ciudad.000".
+  //
+  // `promesas.corregir` ya tiene su propio candado de importes, pero acá se revisa
+  // el resultado FINAL contra las dos validaciones, después de TODAS las
+  // transformaciones del turno. Es el último punto donde se puede mirar lo que el
+  // cliente va a leer de verdad.
+  //
+  // Si algo no cuadra —el precio quedó mal, o la promesa no se pudo aislar del
+  // importe— NO se manda eso: sale la línea escrita por el código, que dice el
+  // precio correcto y no promete nada. El cliente igual recibe respuesta.
+  // ==========================================================================
+  {
+    const visible = extractMedia(extractOrder(reply).clean).clean;
+    const precioFinal = cotizacion.validarRespuesta(visible, cot, contextoPrecio);
+    const promesaFinal = promesas.revisar(visible);
+    if (!precioFinal.ok || !promesaFinal.ok) {
+      const porQue = [
+        !precioFinal.ok ? `precio: ${precioFinal.problemas.map((p) => p.detalle).join(" · ")}` : "",
+        !promesaFinal.ok ? `promesa: ${promesas.resumir(promesaFinal)}` : "",
+      ]
+        .filter(Boolean)
+        .join(" | ");
+      console.warn(`🔒 RESPUESTA FINAL RECHAZADA para ${phone}: ${porQue}`);
+      reply = cot.ok
+        ? cotizacion.lineaDePrecio(cot)
+        : "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
+      revisionHumana = { motivo: "respuesta_final_rechazada", detalle: porQue };
+    }
+  }
   // Combina lo que pidió la IA (marcadores) con la detección por palabras clave del cliente
   const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
+
+  // ==========================================================================
+  // 📊 LA CUENTA DE LO COMERCIAL — esto es lo que hace la mejora medible
+  //
+  // ⚠️ NO bloquea, NO reescribe y NO pausa el chat. Una mejora comercial que deja
+  // al cliente esperando no es una mejora: acá lo peor que puede pasar es que el
+  // mensaje salga menos bien, y eso no se arregla con silencio.
+  //
+  // Solo deja un renglón con prefijo estable por cada cosa que no se cumplió, para
+  // poder contarlas y saber después si esto sirvió de algo. Sin la cuenta, "mejora
+  // comercial" es una opinión.
+  // ==========================================================================
+  const chequeoComercial = comercial.revisar(reply, { userText, messages: conv.messages });
+  if (!chequeoComercial.ok) {
+    console.log(`📊 COMERCIAL ${phone}: ${comercial.resumir(chequeoComercial)}`);
+  }
 
   let savedOrder = null;
   if (order) {
@@ -383,22 +605,141 @@ async function generateReply(phone, userText) {
       // los pedía y el modelo no siempre obedecía.
       const conTelefono = revisarTelefono(order, phone);
       const conDireccion = revisarDireccionDePedido({ ...conTelefono, telefono_chat: phone });
+
+      // ======================================================================
+      // 🧾 ETAPA 6: EL PEDIDO NO PUEDE CONTRADECIR LA COTIZACIÓN
+      //
+      // Si el total del bloque no es el validado —ni la negociación autorizada—
+      // el pedido NO se descarta y NO se confirma como si todo hubiera salido
+      // bien: se guarda marcado y fuera del flujo normal de despacho.
+      //
+      // 🔑 Borrarlo en silencio sería perder una venta real por un número mal
+      // escrito. Confirmarlo como bueno sería despachar con el recaudo mal.
+      // ======================================================================
+      const chequeoPrecio = cotizacion.verificarPedido(conDireccion, cot, contextoPrecio);
+      if (!chequeoPrecio.ok) {
+        console.warn(
+          `🔴 PEDIDO QUE NO CUADRA CON LA COTIZACIÓN (${phone}): ` +
+            chequeoPrecio.problemas.map((p) => p.detalle).join(" · ") +
+            ". SE GUARDA marcado para revisión, fuera del flujo de despacho."
+        );
+      }
+
+      // ======================================================================
+      // 🔗 EL VÍNCULO CON EL PEDIDO PENDIENTE CONCRETO
+      //
+      // No alcanza con "hay un pendiente de este cliente": eso emparejó el pedido
+      // de un destinatario con el de otro. Acá se le dice a `saveOrder` CUÁL es el
+      // pendiente de ESTA oferta, y si el cliente pidió una corrección.
+      // ======================================================================
+      const contextoPedido = {
+        pedidoPendienteId: store.pedidoPendienteDeOferta(phone, cot.oferta_id),
+        hayCorreccion: pidioUnaCorreccion(userText),
+      };
       savedOrder = store.saveOrder({
         ...conDireccion,
         ...(conf.marcar ? { sin_confirmar: true, motivo_sin_confirmar: conf.motivo } : {}),
-      });
+        ...(chequeoPrecio.ok
+          ? {}
+          : {
+              precio_no_cuadra: true,
+              pendiente_revision: true,
+              motivo_precio: chequeoPrecio.problemas.map((p) => p.detalle).join(" · "),
+              total_esperado: chequeoPrecio.totalEsperado,
+            }),
+        ...(cot.ok
+          ? {
+              cotizacion_politica: cot.politica,
+              cotizacion_total: cot.total,
+              cotizacion_banda: cot.banda,
+              // 🏷️ Identifica la OFERTA que el cliente confirmó. Es lo que permite
+              // saber si un pedido posterior es la confirmación de ésta o algo
+              // distinto, en vez de adivinarlo por el total.
+              // 🏷️ La IDENTIDAD de la oferta (persiste durante la compra) y la
+              // FIRMA de sus condiciones (describe la tarifa). Son dos cosas
+              // distintas: la firma se repite entre compras, el id no.
+              oferta_id: cot.oferta_id || "",
+              condiciones_firma: cot.firma || cotizacion.firmaDeCondiciones(cot),
+              // La cantidad cotizada, para poder compararla con la del bloque.
+              unidades_cotizadas: cot.uds,
+            }
+          : {}),
+      }, contextoPedido);
       if (conf.marcar) {
         console.warn(
           `⚠️  PEDIDO SIN CONFIRMACIÓN CLARA de ${phone}: ${conf.motivo}. ` +
             "SE GUARDA, pero hay que leer el chat antes de despachar."
         );
       }
+
+      // ======================================================================
+      // 🔴 SI EL PEDIDO QUEDÓ EN REVISIÓN, NO SE LE CONFIRMA AL CLIENTE
+      //
+      // Guardar la marca no alcanza si al cliente ya se le dijo "¡listo, te lo
+      // despacho!": queda esperando un paquete a un precio que no podemos
+      // sostener. Se reemplaza SOLO la afirmación de cierre —si la hay— por una
+      // respuesta que no promete nada y no lo deja sin contestación, y el chat
+      // pasa al dueño.
+      // ======================================================================
+      if (savedOrder && store.requiereRevision(savedOrder) && cotizacion.afirmaCierre(reply)) {
+        const motivos = store.textoDeRevision(savedOrder);
+        console.warn(
+          `🔴 RESPUESTA DE CIERRE REEMPLAZADA (${phone}): el pedido requiere revisión (${motivos}) ` +
+            "y el mensaje le confirmaba la venta al cliente. Se manda una respuesta que no promete despacho."
+        );
+        reply = cotizacion.respuestaEnRevision(savedOrder);
+        // 🔑 Avisa, no solo pausa: este caso nacía silencioso en la entrega 1.
+        revisionHumana = { motivo: "pedido_en_revision", detalle: motivos };
+      }
     }
   }
-  if (handoff) store.setPaused(phone, true);
+  // Un pedido en revisión o una promesa corregida mandan el chat a un humano igual
+  // que un ##HANDOFF##: el dueño tiene que cerrar esa venta a mano.
+  if (handoff || revisionHumana) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
-  return { reply, order: savedOrder, handoff, media, pedidoRescatado };
+  return { reply, order: savedOrder, handoff, media, pedidoRescatado, revisionHumana };
+}
+
+// ============================================================================
+// 🧭 De dónde salen la ciudad y la cantidad: ver cotizacion.js
+//
+// `detectarCiudad()` y `textoDelCliente()` vivían acá y se movieron a
+// cotizacion.js como `destinoDelHilo()` y `cantidadDelHilo()`.
+//
+// 🔴 POR QUÉ SE MOVIERON (revisión 26-sep): acá no se podían probar sin levantar
+// el bot, y las dos tenían un defecto que ninguna batería veía:
+//
+//   · `textoDelCliente()` miraba solo los dos últimos mensajes del cliente, así
+//     que "quiero dos conjuntos" se perdía en cuanto contestaba ciudad y talla, y
+//     el pedido volvía a UNA unidad en silencio.
+//   · `detectarCiudad()` solo reconocía ciudades del tarifario, así que
+//     "Gachancipá" era invisible y el bot preguntaba la ciudad para siempre.
+//
+// Ahora las pruebas recorren el mismo camino que este archivo usa.
+// ============================================================================
+
+// ============================================================================
+// 🔧 ¿EL CLIENTE PIDIÓ UNA CORRECCIÓN?
+//
+// 🔴 POR QUÉ HACE FALTA (revisión 26-sep): la versión anterior daba por corrección
+// cualquier diferencia en los datos de entrega. La reproducción mostró que eso
+// también puede ser una SEGUNDA COMPRA para otra persona — y el pedido del primer
+// destinatario se perdía.
+//
+// Así que ahora una actualización necesita respaldo: algo en el mensaje del cliente
+// que diga que está corrigiendo. Si no lo hay, no hay nada que corregir y los dos
+// pedidos se conservan para revisión.
+//
+// ⚠️ Deliberadamente conservador: ante la duda devuelve false, y eso lleva a
+// conservar los dos registros. Marcar de más cuesta una revisión; marcar de menos
+// cuesta una venta.
+// ============================================================================
+const RE_PIDE_CORRECCION =
+  /\b(corrij|correcci[oó]n|correg|me equivoqu|est[aá] mal|no es (esa|ese|esa la|la)|en realidad|mejor (a|en|la|el)\b|c[aá]mbi|cambia[rl]|actualiz|anot[aá]|apunt[aá]|ojo|perd[oó]n|disculp|la direcci[oó]n es|mi direcci[oó]n es|es en la|olvid[eé])/i;
+
+function pidioUnaCorreccion(texto) {
+  return RE_PIDE_CORRECCION.test(String(texto == null ? "" : texto));
 }
 
 // Identificador de cliente con username (no es un teléfono).
@@ -449,4 +790,4 @@ function revisarTelefono(order, chatId) {
 // callIA se exporta para el extractor de datos del chat (src/extraer.js), que
 // necesita hacerle UNA pregunta corta al modelo sin pasar por el guion de ventas
 // ni escribirle nada al cliente.
-module.exports = { generateReply, revisarTelefono, celularValido, extractOrder, rescatarPedido, callIA };
+module.exports = { generateReply, pidioUnaCorreccion, revisarTelefono, celularValido, extractOrder, rescatarPedido, callIA };
