@@ -744,14 +744,57 @@ function saveOrder(order) {
     if (repetido && repetido.sin_confirmar && !record.sin_confirmar) {
       const i = indiceDePedido(orders, repetido.id || repetido.fecha);
       if (i !== -1) {
+        // ==================================================================
+        // 🔴 QUITAR LA MARCA NO ALCANZA SI EL REGISTRO QUEDÓ VIEJO
+        //
+        // LO QUE SEÑALÓ LA REVISIÓN (26-sep), y es exacto: `mismoPedido` compara
+        // SOLO el total y la talla:
+        //
+        //     Number(a.total) === Number(b.total) && a.talla === b.talla
+        //
+        // Así que si el cliente CORRIGIÓ el color o la dirección, el pedido nuevo
+        // sigue contando como duplicado —mismo total, misma talla— y la versión
+        // guardada conserva el color viejo. Levantarle la marca ahí es peor que
+        // dejarla puesta: el pedido queda "confirmado" con el dato equivocado y
+        // se despacha una franja roja a quien la cambió a azul.
+        //
+        // 🔑 Ahora ANTES de quitar la marca se traen las correcciones. El dato más
+        // nuevo gana, pero solo si viene con contenido: un campo vacío en el
+        // pedido nuevo NO borra uno bueno del anterior.
+        // ==================================================================
+        const CAMPOS_VIGENTES = ["nombre", "celular", "ciudad", "direccion", "color", "talla", "pago"];
+        const correcciones = [];
+        const traidos = {};
+        for (const campo of CAMPOS_VIGENTES) {
+          const nuevo = String(record[campo] == null ? "" : record[campo]).trim();
+          const viejo = String(orders[i][campo] == null ? "" : orders[i][campo]).trim();
+          if (!nuevo) continue; // vacío no corrige nada
+          if (nuevo.toLowerCase() === viejo.toLowerCase()) continue;
+          traidos[campo] = record[campo];
+          correcciones.push(`${campo}: "${viejo || "(vacío)"}" → "${nuevo}"`);
+        }
+
         const { sin_confirmar, motivo_sin_confirmar, ...limpio } = orders[i];
-        orders[i] = { ...limpio, confirmado_despues: new Date().toISOString() };
+        orders[i] = {
+          ...limpio,
+          ...traidos,
+          confirmado_despues: new Date().toISOString(),
+          ...(correcciones.length ? { correcciones_aplicadas: correcciones } : {}),
+        };
         writeJSON(ORDERS_FILE, orders);
         console.log(
-          `✅ CONFIRMACIÓN POSTERIOR: el pedido de ${limpio.nombre || "?"} por $${limpio.total} ` +
-            "ya tenía el 'sí' del cliente. Se le quitó la marca de sin confirmar (no se duplicó)."
+          `✅ CONFIRMACIÓN POSTERIOR: el pedido de ${orders[i].nombre || "?"} por $${orders[i].total} ` +
+            "ya tenía el 'sí' del cliente. Se le quitó la marca de sin confirmar (no se duplicó)." +
+            (correcciones.length
+              ? `\n   🔧 Y se trajeron las correcciones del cliente: ${correcciones.join(" · ")}`
+              : "")
         );
-        return { ...orders[i], duplicadoIgnorado: true, confirmadoDespues: true };
+        return {
+          ...orders[i],
+          duplicadoIgnorado: true,
+          confirmadoDespues: true,
+          correccionesAplicadas: correcciones,
+        };
       }
     }
 

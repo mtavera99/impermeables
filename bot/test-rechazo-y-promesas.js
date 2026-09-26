@@ -241,5 +241,141 @@ chequear(
   JSON.stringify(t3.map((p) => p.sin_confirmar))
 );
 
+// ============================================================================
+// 🔴 LO QUE SEÑALÓ LA REVISIÓN DEL 26-SEP
+// ============================================================================
+
+console.log("\n── R6. 🔧 La promesa se CORRIGE antes de enviarla, no después ──");
+// Textual de la revisión: "#164 envía expresamente el mensaje detectado como
+// falso y luego pausa el chat. Eso no cumple el requisito."
+// Tenía razón: el cliente ya lo había leído, y la pausa no le avisa a nadie.
+{
+  const CASOS = [
+    [
+      "operacion_ya_hecha",
+      "¡Hola Ana! Ya actualicé tu pedido con el teléfono nuevo. Te llega a $82.000 contraentrega 📦",
+      /\$82\.000/, // lo que hay que CONSERVAR
+    ],
+    ["conoce_el_despacho", "Tu pedido ya salió, va en camino. Cualquier cosa me escribís 🙌", /me escrib/],
+    ["promesa_de_fecha", "Se despacha hoy mismo. El conjunto es negro y la franja la eliges en 6 colores.", /6 colores/],
+    ["garantia_de_medida", "Tranquilo que te cubre la maleta sin problema. Es PVC calibre 8.", /calibre 8/],
+    ["escasez_inventada", "Quedan pocas unidades, se agota hoy. Pásame nombre completo, dirección y celular.", /nombre completo/],
+    ["ubicacion_equivocada", "¡Así es! Estamos en Cali. ¿Para qué ciudad sería el envío?", /qué ciudad/],
+  ];
+  for (const [clave, texto, conservar] of CASOS) {
+    const r = promesas.corregir(texto);
+    chequear(`${clave}: se corrige`, r.cambios.some((c) => c.clave === clave), JSON.stringify(r.cambios));
+    chequear(
+      `  🔑 y la corregida ya NO tiene la promesa`,
+      promesas.revisar(r.texto).ok,
+      promesas.resumir(promesas.revisar(r.texto))
+    );
+    chequear(`  ✅ conservando el resto del mensaje`, conservar.test(r.texto), r.texto);
+  }
+
+  // 🔑 Lo que NO se puede perder: un mensaje limpio tiene que salir idéntico.
+  const limpio = "El conjunto es negro y la franja la eliges en 6 colores 🌈 ¿Para qué ciudad sería?";
+  chequear("🔑 un mensaje sin promesas sale idéntico", promesas.corregir(limpio).texto === limpio, promesas.corregir(limpio).texto);
+  chequear("y no reporta cambios", promesas.corregir(limpio).cambios.length === 0);
+
+  // Cada regla tiene que tener su reemplazo escrito: una regla que detecta y no
+  // sabe con qué reemplazar vuelve al problema de solo llevar la cuenta.
+  for (const r of promesas.REGLAS) {
+    chequear(`  la regla ${r.clave} tiene reemplazo`, typeof promesas.REEMPLAZOS[r.clave] === "string" && promesas.REEMPLAZOS[r.clave].length > 15);
+  }
+  chequear(
+    "y el reemplazo de la ubicación también",
+    typeof promesas.REEMPLAZOS.ubicacion_equivocada === "string"
+  );
+  // Ningún reemplazo puede traer una promesa nueva adentro.
+  for (const [clave, texto] of Object.entries(promesas.REEMPLAZOS)) {
+    chequear(`  el reemplazo de ${clave} no promete nada`, promesas.revisar(texto).ok, promesas.resumir(promesas.revisar(texto)));
+  }
+}
+
+console.log("\n── R6b. 🙋 La derivación a un humano AVISA ──");
+// `store.setPaused` no manda ninguna alerta: el chat quedaba en pausa y el dueño
+// se enteraba solo si lo abría por casualidad.
+{
+  const fuenteAgente = fs.readFileSync(`${__dirname}/src/agent.js`, "utf8");
+  chequear("agent.js corrige el texto antes de devolverlo", /promesas\.corregir\(/.test(fuenteAgente));
+  chequear(
+    "🔑 y ya NO manda el mensaje tal como vino",
+    !/El mensaje sale igual/.test(fuenteAgente),
+    "quedó el comentario de la versión que mandaba la promesa"
+  );
+  chequear("devuelve revisionHumana para poder avisar", /revisionHumana/.test(fuenteAgente));
+  const fuenteServer = fs.readFileSync(`${__dirname}/src/server.js`, "utf8");
+  chequear(
+    "🔑 server.js le avisa al dueño cuando hay revisión",
+    /revisionHumana && OWNER/.test(fuenteServer),
+    "sin esto la pausa es silenciosa"
+  );
+  chequear(
+    "y el aviso dice qué se cambió",
+    /Lo que se cambió/.test(fuenteServer),
+    "un aviso sin el detalle obliga a leer todo el chat"
+  );
+}
+
+console.log("\n── R7. 🔴 La confirmación posterior sobre los datos VIGENTES ──");
+// Textual: "quitar sin_confirmar no basta si el registro conserva un color o
+// dirección anterior". Es exacto: mismoPedido() compara solo total y talla.
+{
+  // ⚠️ Se usa el mismo `store` que el resto de la batería: `require` está cacheado,
+  // así que cambiar DATA_DIR acá no tendría ningún efecto. Y los datos son únicos
+  // a propósito — `pedidosDelMismoCliente` empareja por CELULAR, y reutilizar uno
+  // de otra sección hacía que este pedido se tomara por duplicado de aquel.
+  const store7 = store;
+
+  const base = {
+    nombre: "Marta Ruiz",
+    celular: "3007770001",
+    ciudad: "Cali",
+    direccion: "Cra 1 #2-3",
+    talla: "L",
+    color: "rojo",
+    pago: "contraentrega",
+    total: 82000,
+    telefono_chat: "573001117777",
+  };
+
+  // 1) El bot emite el bloque antes del "sí": queda sin confirmar, color rojo.
+  store7.saveOrder({ ...base, sin_confirmar: true, motivo_sin_confirmar: "no hubo un sí claro" });
+  // 2) El cliente CORRIGE color y dirección, y ahí sí confirma.
+  const r = store7.saveOrder({ ...base, color: "azul", direccion: "Cra 9 #45-12 barrio Prado" });
+
+  const mios = store7.todosLosPedidos().filter((p) => p.telefono_chat === base.telefono_chat);
+  chequear("sigue habiendo UN solo pedido", mios.length === 1, `hay ${mios.length}`);
+  const p = mios[0];
+  chequear("🔑 el color corregido NO se perdió", p.color === "azul", `quedó "${p.color}"`);
+  chequear("🔑 ni la dirección corregida", /Prado/.test(String(p.direccion)), `quedó "${p.direccion}"`);
+  chequear("se le quitó la marca de sin confirmar", !p.sin_confirmar);
+  chequear("queda registrado que se confirmó después", Boolean(p.confirmado_despues));
+  chequear(
+    "🔑 y queda auditable QUÉ se corrigió",
+    Array.isArray(p.correcciones_aplicadas) && p.correcciones_aplicadas.length === 2,
+    JSON.stringify(p.correcciones_aplicadas)
+  );
+  chequear("el detalle nombra el color", /color/.test(String(p.correcciones_aplicadas)), JSON.stringify(p.correcciones_aplicadas));
+  chequear("🚦 y el pedido queda listo para despachar", store7.listoParaDespachar ? store7.listoParaDespachar(p) : !p.sin_confirmar);
+
+  // ⚠️ Un campo vacío en el pedido nuevo NO puede borrar uno bueno del anterior.
+  const base2 = { ...base, telefono_chat: "573001118888", celular: "3007770002" };
+  store7.saveOrder({ ...base2, sin_confirmar: true, motivo_sin_confirmar: "x" });
+  store7.saveOrder({ ...base2, color: "", direccion: "" });
+  const p2 = store7.todosLosPedidos().filter((x) => x.telefono_chat === base2.telefono_chat)[0];
+  chequear("🔴 un campo vacío NO borra el color que ya estaba", p2.color === "rojo", `quedó "${p2.color}"`);
+  chequear("ni la dirección", /Cra 1/.test(String(p2.direccion)), `quedó "${p2.direccion}"`);
+
+  // Y si nada cambió, no se inventan correcciones.
+  const base3 = { ...base, telefono_chat: "573001119999", celular: "3007770003" };
+  store7.saveOrder({ ...base3, sin_confirmar: true, motivo_sin_confirmar: "x" });
+  store7.saveOrder({ ...base3 });
+  const p3 = store7.todosLosPedidos().filter((x) => x.telefono_chat === base3.telefono_chat)[0];
+  chequear("sin cambios, no se reporta ninguna corrección", p3.correcciones_aplicadas === undefined);
+  chequear("y la marca igual se levanta", !p3.sin_confirmar);
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

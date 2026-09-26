@@ -149,10 +149,110 @@ function revisar(texto, contexto = {}) {
   return { ok: hallazgos.length === 0, hallazgos };
 }
 
+// ============================================================================
+// 🔧 CORREGIR LA AFIRMACIÓN ANTES DE ENVIARLA (revisión 26-sep)
+//
+// 🔴 LO QUE LA REVISIÓN SEÑALÓ, y tenía razón: la primera versión de este módulo
+// DETECTABA la promesa, MANDABA el mensaje igual, y después pausaba el chat. Eso
+// no protege a nadie:
+//
+//   · el cliente ya leyó "ya cambié tu dirección" y actúa como si fuera cierto
+//   · la pausa no le avisa a nadie: `store.setPaused` no manda ninguna alerta
+//   · el dueño se enteraba solo si abría ese chat por casualidad
+//
+// O sea que el daño ocurría completo y el aviso no existía. Detectar sin corregir
+// es llevar la cuenta de los accidentes.
+//
+// 🔑 AHORA SE CORRIGE FRASE POR FRASE, no se descarta el mensaje. La frase que
+// afirma algo sin respaldo se reemplaza por la versión que sí se puede sostener, y
+// TODO EL RESTO DEL MENSAJE SE CONSERVA: el saludo, el precio, la talla, lo que el
+// cliente preguntó. Borrar el mensaje entero perdería información buena para
+// arreglar una frase mala.
+// ============================================================================
+
+// Con qué se reemplaza cada afirmación. No es "no puedo ayudarte": es lo mismo
+// que se quería decir, dicho sin prometer lo que no se puede sostener.
+const REEMPLAZOS = {
+  operacion_ya_hecha:
+    "Ya le paso tu solicitud al equipo para que la ajusten y te confirmo en un momento",
+  conoce_el_despacho: "Déjame confirmar cómo va tu envío y te escribo enseguida",
+  promesa_de_fecha:
+    "La transportadora normalmente entrega entre 1 y 3 días hábiles según la ciudad",
+  garantia_de_medida:
+    "El conjunto va encima de la ropa y la bolsa es amplia; si querés te confirmo las medidas exactas antes de que lo pidas",
+  ajuste_de_talla:
+    "Te recomiendo pedir una talla más de la que usás normalmente, porque va encima de la ropa",
+  escasez_inventada: "Hay disponibilidad, así que podés pedirlo con calma",
+  ubicacion_equivocada: "Nuestra bodega está en Bogotá",
+};
+
+/**
+ * Parte el texto en frases CONSERVANDO los separadores, para poder reemplazar una
+ * sola frase y volver a armar el mensaje igual que estaba.
+ */
+function enFrases(texto) {
+  const partes = String(texto == null ? "" : texto).split(/([.!?\n]+)/);
+  const frases = [];
+  for (let i = 0; i < partes.length; i += 2) {
+    const cuerpo = partes[i];
+    const cierre = partes[i + 1] || "";
+    if (cuerpo === "" && cierre === "") continue;
+    frases.push({ cuerpo, cierre });
+  }
+  return frases;
+}
+
+/**
+ * Reemplaza las afirmaciones sin respaldo y devuelve el mensaje corregido.
+ *
+ * @returns {{texto:string, cambios:Array<{clave,antes,despues}>, ok:boolean}}
+ */
+function corregir(texto, contexto = {}) {
+  const frases = enFrases(texto);
+  const cambios = [];
+  const bodega = aplanar(contexto.ciudadBodega || CIUDAD_BODEGA);
+
+  const salida = frases.map(({ cuerpo, cierre }) => {
+    const plano = aplanar(cuerpo);
+    if (!plano) return cuerpo + cierre;
+
+    for (const r of REGLAS) {
+      if (!r.patron.test(plano)) continue;
+      const reemplazo = REEMPLAZOS[r.clave];
+      if (!reemplazo) continue;
+      cambios.push({ clave: r.clave, antes: cuerpo.trim(), despues: reemplazo });
+      // Se conserva el espacio de adelante para no pegar la frase a la anterior.
+      const sangria = cuerpo.match(/^\s*/)[0];
+      return sangria + reemplazo + (cierre || ".");
+    }
+
+    // La ciudad equivocada se revisa aparte, igual que en `revisar`.
+    const afirma = plano.match(
+      /\b(estamos|quedamos|nuestra bodega esta|la bodega esta|somos) (en|de) ([a-z ]{3,22})\b/
+    );
+    if (afirma) {
+      const dicha = aplanar(afirma[3]).split(/\s+/)[0];
+      if (dicha && dicha.length >= 4 && !bodega.includes(dicha) && !dicha.includes(bodega)) {
+        cambios.push({
+          clave: "ubicacion_equivocada",
+          antes: cuerpo.trim(),
+          despues: REEMPLAZOS.ubicacion_equivocada,
+        });
+        const sangria = cuerpo.match(/^\s*/)[0];
+        return sangria + REEMPLAZOS.ubicacion_equivocada + (cierre || ".");
+      }
+    }
+
+    return cuerpo + cierre;
+  });
+
+  return { texto: salida.join("").trim(), cambios, ok: cambios.length === 0 };
+}
+
 /** Un resumen de una línea para el log. */
 function resumir(resultado) {
   if (!resultado || resultado.ok) return "";
   return resultado.hallazgos.map((h) => `${h.clave} ("${h.fragmento}")`).join(" · ");
 }
 
-module.exports = { revisar, resumir, REGLAS, CIUDAD_BODEGA };
+module.exports = { revisar, corregir, resumir, enFrases, REGLAS, REEMPLAZOS, CIUDAD_BODEGA };

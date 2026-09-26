@@ -311,10 +311,14 @@ async function generateReply(phone, userText) {
   const arranque = respuestaDeArranque(conv.messages, userText);
   if (arranque) {
     store.pushMsg(phone, "assistant", arranque);
-    return { reply: arranque, order: null, handoff: false, media: [], pedidoRescatado: false };
+    return { reply: arranque, order: null, handoff: false, media: [], pedidoRescatado: false, revisionHumana: null };
   }
 
   let reply;
+  // 🙋 Si queda distinto de null, el chat pasa a un humano Y SE AVISA. La revisión
+  // del 26-sep encontró que `store.setPaused` no manda ninguna alerta: el chat
+  // quedaba en pausa y nadie se enteraba hasta abrirlo por casualidad.
+  let revisionHumana = null;
   if (!TIENE_IA) {
     reply =
       "¡Hola! 🏍️ Gracias por escribir a BikerPro. (Bot en modo prueba: falta configurar la API de IA). " +
@@ -374,12 +378,30 @@ async function generateReply(phone, userText) {
   // sin contestación es peor. Se manda igual y el chat pasa a modo humano, para
   // que el dueño lo vea y corrija antes de que el cliente actúe sobre eso.
   // ==========================================================================
+  // 🔧 Se CORRIGE antes de enviar, frase por frase. La revisión del 26-sep señaló
+  // —con razón— que mandar el mensaje falso y pausar después no protege a nadie:
+  // el cliente ya lo leyó y actúa sobre eso. Ver promesas.js.
   const chequeoPromesas = promesas.revisar(reply);
   if (!chequeoPromesas.ok) {
-    console.warn(
-      `⚠️  PROMESA SIN RESPALDO de ${phone}: ${promesas.resumir(chequeoPromesas)}. ` +
-        "El mensaje sale igual, pero el chat pasa a modo humano para que lo revises."
-    );
+    const corregido = promesas.corregir(reply);
+    if (corregido.cambios.length) {
+      console.warn(
+        `🔧 PROMESA SIN RESPALDO CORREGIDA de ${phone}: ` +
+          corregido.cambios.map((c) => `${c.clave} · "${c.antes}" → "${c.despues}"`).join(" | ")
+      );
+      reply = corregido.texto;
+      revisionHumana = {
+        motivo: "promesa_sin_respaldo",
+        detalle: corregido.cambios.map((c) => `${c.clave}: "${c.antes}"`).join(" · "),
+      };
+    } else {
+      // Se detectó algo para lo que no hay reemplazo escrito. No se manda a
+      // ciegas: se avisa igual y el dueño decide.
+      console.warn(
+        `⚠️  PROMESA SIN RESPALDO SIN REEMPLAZO de ${phone}: ${promesas.resumir(chequeoPromesas)}`
+      );
+      revisionHumana = { motivo: "promesa_sin_respaldo", detalle: promesas.resumir(chequeoPromesas) };
+    }
   }
   // Combina lo que pidió la IA (marcadores) con la detección por palabras clave del cliente
   const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
@@ -422,10 +444,10 @@ async function generateReply(phone, userText) {
   }
   // Una promesa sin respaldo también manda el chat a modo humano: el dueño tiene
   // que poder corregirla antes de que el cliente actúe sobre ella.
-  if (handoff || !chequeoPromesas.ok) store.setPaused(phone, true);
+  if (handoff || revisionHumana) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
-  return { reply, order: savedOrder, handoff, media, pedidoRescatado };
+  return { reply, order: savedOrder, handoff, media, pedidoRescatado, revisionHumana };
 }
 
 // Identificador de cliente con username (no es un teléfono).

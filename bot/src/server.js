@@ -2119,7 +2119,7 @@ async function handleWebhook(body) {
         }
 
         console.log(`Cliente ${from}: ${text}`);
-        const { reply, order, handoff, media, pedidoRescatado } = await generateReply(from, text);
+        const { reply, order, handoff, media, pedidoRescatado, revisionHumana } = await generateReply(from, text);
         if (reply) {
           // 🔴 Registrar el RESULTADO del envío, no solo el intento. Si Meta
           // rechaza el mensaje, esto es lo único que lo delata en los logs.
@@ -2234,6 +2234,27 @@ async function handleWebhook(body) {
         }
         if (handoff && OWNER) {
           await sendText(OWNER, `🙋 El cliente ${from} pidió hablar con un asesor. El bot quedó en pausa para ese chat.`);
+        }
+        // ==================================================================
+        // 🔧 El bot dijo algo que no puede respaldar y se corrigió al vuelo.
+        //
+        // 🔴 Antes esto solo pausaba el chat, y una pausa no le avisa a nadie: el
+        // dueño se enteraba si abría ese chat por casualidad. Acá se conecta la
+        // derivación con el aviso, que es lo que pedía la revisión.
+        // ==================================================================
+        if (revisionHumana && OWNER) {
+          await sendText(
+            OWNER,
+            `🔧 REVISÁ ESTE CHAT: ${from}
+` +
+              `El bot escribió algo que no podemos sostener y se corrigió antes de enviarlo.
+
+` +
+              `Lo que se cambió: ${revisionHumana.detalle}
+
+` +
+              `El cliente recibió una versión sin esa promesa. El chat quedó en pausa: seguí vos.`
+          );
         }
       }
     }
