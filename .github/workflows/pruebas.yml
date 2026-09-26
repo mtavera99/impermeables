@@ -71,6 +71,12 @@ jobs:
         env:
           TZ: America/Bogota
         run: |
+          # ⚠️ `set +e` PRIMERO. GitHub Actions corre los `run` con `bash -eo
+          # pipefail`, así que la PRIMERA batería que falle aborta el paso entero y
+          # el resto no se ejecuta — se pierde justo el cuadro completo que se vino
+          # a buscar. Ya pasó en la primera corrida: cortó en test-cotizacion.js.
+          set +e
+
           # ⚠️ NODE_OPTIONS se limpia a propósito: si viene con algo heredado, las
           # 36 baterías fallan todas en falso y parece un desastre del código.
           unset NODE_OPTIONS
@@ -118,6 +124,7 @@ jobs:
         env:
           TZ: America/Bogota
         run: |
+          set +e
           unset NODE_OPTIONS
           for f in test-botones-y-plantillas.js test-clientes-con-username.js \
                    test-guias.js test-panel-movil.js test-token-del-panel.js; do
