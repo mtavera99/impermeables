@@ -633,24 +633,80 @@ function reactivarPedido(fechaPedido) {
 // Cambiar una oferta ya prometida por detrás es peor que cotizar mal: el cliente
 // vio un número y nosotros mostraríamos otro.
 // ============================================================================
+// ============================================================================
+// 🏷️ LA IDENTIDAD DE LA OFERTA — distinta de la firma de sus condiciones
+//
+// 🔴 POR QUÉ HACE FALTA (revisión 26-sep): antes se usaba
+// `política|ciudad|unidades|total` como identidad. Eso es una TARIFA: dos compras
+// distintas del mismo producto a la misma ciudad dan la misma cadena. Emparejar por
+// ahí hizo que el pedido de un destinatario se escribiera encima del de otro.
+//
+// 🔑 LA OFERTA ES DE UN CHAT Y TIENE UN COMIENZO. Este es el único lugar que sabe
+// las dos cosas, así que acá se le pone el identificador:
+//
+//   · MISMA firma de condiciones  → se REUSA el identificador que ya tenía.
+//     Esto es lo que hace que el id **persista durante toda la compra** en vez de
+//     nacer de nuevo en cada mensaje.
+//   · Firma DISTINTA (cambió ciudad, cantidad o total) → oferta nueva, id nuevo,
+//     y la anterior se archiva.
+// ============================================================================
+function nuevoIdDeOferta(phone) {
+  return `${String(phone || "sin-tel")}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 function guardarCotizacion(phone, cot) {
   ensure();
   const all = readJSON(CONV_FILE, {});
   const c = all[phone] || { messages: [], paused: false };
   const anterior = c.cotizacion || null;
   // Solo se archiva si de verdad cambió la oferta (ciudad, cantidad o total).
-  if (
+  const cambio =
     anterior &&
-    (anterior.ciudad !== cot.ciudad || anterior.uds !== cot.uds || anterior.total !== cot.total)
-  ) {
+    (anterior.ciudad !== cot.ciudad || anterior.uds !== cot.uds || anterior.total !== cot.total);
+  if (cambio) {
     c.cotizacionesPrevias = (c.cotizacionesPrevias || []).concat([anterior]).slice(-5);
     // La oferta cambió: lo que el cliente confirmó antes ya no aplica a esta.
     c.cotizacionCambiada = true;
   }
-  c.cotizacion = cot;
+  // 🔑 El id se REUSA mientras las condiciones sean las mismas. Sin esto, cada
+  // mensaje generaría una oferta "nueva" y el pedido pendiente quedaría huérfano.
+  const mismaOferta = anterior && !cambio && anterior.oferta_id;
+  c.cotizacion = {
+    ...cot,
+    oferta_id: mismaOferta ? anterior.oferta_id : nuevoIdDeOferta(phone),
+    desde: mismaOferta ? anterior.desde || anterior.creado : cot.creado || Date.now(),
+  };
   all[phone] = c;
   writeJSON(CONV_FILE, all);
-  return cot;
+  return c.cotizacion;
+}
+
+/**
+ * 🔗 El pedido pendiente de confirmación que corresponde a UNA oferta concreta.
+ *
+ * Devuelve su id, o "" si no hay. Es el vínculo que faltaba: sin él, `saveOrder`
+ * solo podía preguntar "¿hay algún pendiente de este cliente?", y eso emparejó el
+ * pedido de un destinatario con el de otro.
+ *
+ * ⚠️ Si hay MÁS DE UN pendiente para la misma oferta, no se elige ninguno: eso
+ * significa que ya hay ambigüedad servida, y elegir sería justo el error que se
+ * está corrigiendo.
+ */
+function pedidoPendienteDeOferta(phone, ofertaId) {
+  if (!ofertaId) return "";
+  ensure();
+  const orders = readJSON(ORDERS_FILE, []);
+  const candidatos = orders.filter(
+    (o) =>
+      o &&
+      o.sin_confirmar &&
+      !o.anulado &&
+      !o.guia &&
+      String(o.oferta_id || "") === String(ofertaId) &&
+      String(o.telefono_chat || "") === String(phone)
+  );
+  if (candidatos.length !== 1) return "";
+  return String(candidatos[0].id || candidatos[0].fecha || "");
 }
 
 /** La última cotización validada del chat, o null. */
@@ -760,17 +816,33 @@ const mismoPedido = (a, b) =>
  * pedido de ese cliente marcado `sin_confirmar` y todavía fresco — la corrección
  * puede haber tocado cualquier campo, incluido el total.
  */
-function previoSinConfirmar(orders, nuevo) {
+/**
+ * @param {object} [contexto] { pedidoPendienteId } — el pedido concreto que el
+ *   agente identificó como pendiente para esta conversación.
+ */
+function previoSinConfirmar(orders, nuevo, contexto = {}) {
   const ahora = Date.now();
-  const ofertaNueva = String(nuevo.cotizacion_id || "");
+
+  // 1️⃣ LO MEJOR: el agente dice EXACTAMENTE cuál es el pedido pendiente. Es un
+  //    pedido concreto, no "alguno de este cliente".
+  const pedido = contexto.pedidoPendienteId
+    ? orders.find((o) => String(o.id || o.fecha) === String(contexto.pedidoPendienteId))
+    : null;
+  if (pedido) {
+    return pedido.sin_confirmar && !pedido.anulado ? pedido : null;
+  }
+
+  // 2️⃣ Si no vino, se busca por IDENTIDAD DE OFERTA —no por firma de tarifa— y
+  //    solo si la oferta coincide de verdad.
+  const ofertaNueva = String(nuevo.oferta_id || "");
   for (const o of pedidosDelMismoCliente(orders, nuevo)) {
     if (!o.sin_confirmar || o.anulado) continue;
     const cuando = new Date(o.fecha).getTime();
     if (!Number.isFinite(cuando) || ahora - cuando > VENTANA_PEDIDO_DUPLICADO_MS) continue;
-    // 🏷️ Si los dos traen identificador de oferta, tiene que ser LA MISMA oferta.
-    // Sin esto, "el pedido pendiente de este cliente" era la única pista, y eso no
-    // distingue la confirmación de una oferta de la confirmación de otra.
-    const ofertaVieja = String(o.cotizacion_id || "");
+    const ofertaVieja = String(o.oferta_id || "");
+    // ⚠️ Si los dos traen identidad de oferta y NO coinciden, no son la misma
+    // compra. Y si alguno no la trae (registro viejo), se sigue permitiendo el
+    // emparejamiento por cliente + ventana, que es lo que había antes.
     if (ofertaNueva && ofertaVieja && ofertaNueva !== ofertaVieja) continue;
     return o;
   }
@@ -795,7 +867,18 @@ function previoSinConfirmar(orders, nuevo) {
 // una venta por fusionarla es peor que tener dos pedidos que alguien revisa.
 // ============================================================================
 const CAMPOS_DEL_PRODUCTO = ["talla", "color", "ciudad", "total", "unidades"];
-const CAMPOS_DE_ENTREGA = ["nombre", "celular", "direccion", "pago"];
+
+// 🔴 QUIÉN RECIBE EL PEDIDO ES IDENTIDAD, NO UN DATO DE ENTREGA MÁS.
+//
+// La versión anterior metía `nombre` y `celular` entre los "datos de entrega" que
+// se corrigen solos. La revisión lo reprodujo: un pedido para el destinatario A se
+// escribió encima con los datos del destinatario B, y quedó despachable. Cambiar a
+// quién va dirigido no es corregir un pedido, es —posiblemente— otro pedido.
+const CAMPOS_DE_IDENTIDAD = ["nombre", "celular"];
+
+// Lo único que puede corregirse sin cambiar ni el producto ni el destinatario. Y
+// aun así, solo con una corrección identificable de por medio.
+const CAMPOS_DE_ENTREGA = ["direccion", "pago"];
 
 /** Las diferencias entre dos pedidos, separadas por lo que significan. */
 function diferenciasEntre(viejo, nuevo, campos) {
@@ -865,7 +948,7 @@ function indiceDePedido(orders, ref) {
   return orders.findIndex((o) => o.fecha === r);
 }
 
-function saveOrder(order) {
+function saveOrder(order, contexto = {}) {
   const record = { ...order, id: randomUUID(), fecha: new Date().toISOString() };
 
   // 🎯 Pegarle el anuncio que trajo al cliente. Va ACÁ, en el store, y no en
@@ -944,7 +1027,7 @@ function saveOrder(order) {
     // corregía la talla y confirmaba generaba un pedido NUEVO y dejaba el anterior
     // marcado para siempre: dos pedidos donde había una venta.
     // ========================================================================
-    const esperandoConfirmacion = previoSinConfirmar(orders, record);
+    const esperandoConfirmacion = previoSinConfirmar(orders, record, contexto);
     if (esperandoConfirmacion && !record.sin_confirmar) {
       const i = indiceDePedido(orders, esperandoConfirmacion.id || esperandoConfirmacion.fecha);
       if (i !== -1) {
@@ -1004,13 +1087,43 @@ function saveOrder(order) {
         // una persona lo mire. El pedido viejo CONSERVA su marca de sin confirmar.
         // ==================================================================
         const cambiosDeProducto = diferenciasEntre(orders[i], record, CAMPOS_DEL_PRODUCTO);
-        if (cambiosDeProducto.length) {
-          const resumenCambios = cambiosDeProducto
+        const cambiosDeIdentidad = diferenciasEntre(orders[i], record, CAMPOS_DE_IDENTIDAD);
+        const cambiosDeEntrega = diferenciasEntre(orders[i], record, CAMPOS_DE_ENTREGA);
+
+        // ==================================================================
+        // 🔑 CUÁNDO SE PUEDE ACTUALIZAR EL PEDIDO PENDIENTE, Y CUÁNDO NO
+        //
+        // Tres condiciones, y las tres tienen que darse:
+        //   1. hay un pedido pendiente CONCRETO (lo trae el contexto o la oferta)
+        //   2. no cambió ni el producto ni el destinatario
+        //   3. si cambia algo de la entrega, hay una CORRECCIÓN IDENTIFICABLE
+        //      del cliente que lo respalde
+        //
+        // 🔴 La condición 3 es la que faltaba. Antes cualquier diferencia en los
+        // "datos de entrega" se daba por corrección; el reporte mostró que también
+        // puede ser una segunda compra para otra persona. Si nadie corrigió nada,
+        // no hay nada que corregir.
+        // ==================================================================
+        const hayCorreccion = contexto.hayCorreccion === true;
+        const ambiguo =
+          cambiosDeProducto.length > 0 ||
+          cambiosDeIdentidad.length > 0 ||
+          (cambiosDeEntrega.length > 0 && !hayCorreccion);
+
+        if (ambiguo) {
+          const todos = [...cambiosDeIdentidad, ...cambiosDeProducto, ...cambiosDeEntrega];
+          const resumenCambios = todos
             .map((d) => `${d.campo}: "${d.viejo || "(vacío)"}" vs "${d.nuevo}"`)
             .join(" · ");
+          const porQue = cambiosDeIdentidad.length
+            ? "cambia a QUIÉN va dirigido"
+            : cambiosDeProducto.length
+            ? "cambia QUÉ se vende"
+            : "cambian datos de entrega y el cliente no pidió ninguna corrección";
           const motivo =
             `puede ser una corrección del pedido anterior o una compra nueva, y no se puede ` +
-            `distinguir: ${resumenCambios}. Los DOS quedan guardados; hay que decidir cuál vale.`;
+            `distinguir (${porQue}): ${resumenCambios}. Los DOS quedan guardados; hay que ` +
+            `decidir cuál vale.`;
 
           orders[i] = {
             ...orders[i],
@@ -1026,21 +1139,23 @@ function saveOrder(order) {
           orders.push(nuevoMarcado);
           writeJSON(ORDERS_FILE, orders);
           console.warn(
-            `🔀 DOS PEDIDOS QUE PUEDEN SER UNO (${record.nombre || "?"}): ${resumenCambios}. ` +
-              "NO se fusionaron y NINGUNO queda listo para despachar: lo resuelve una persona."
+            `🔀 DOS PEDIDOS QUE PUEDEN SER UNO (${record.nombre || "?"}): ${porQue} — ` +
+              `${resumenCambios}. NO se fusionaron y NINGUNO queda listo para despachar: ` +
+              "lo resuelve una persona."
           );
           return nuevoMarcado;
         }
 
-        // Llegados acá, lo que se vende es lo mismo: solo cambian datos de entrega.
+        // Llegados acá: mismo producto, mismo destinatario, y si algo de la entrega
+        // cambió es porque el cliente lo corrigió explícitamente.
         const correcciones = [];
         const traidos = {};
-        for (const d of diferenciasEntre(orders[i], record, CAMPOS_DE_ENTREGA)) {
+        for (const d of cambiosDeEntrega) {
           traidos[d.campo] = record[d.campo];
           correcciones.push(`${d.campo}: "${d.viejo || "(vacío)"}" → "${d.nuevo}"`);
         }
-        const cambioElTotal = false; // el total es campo de producto: si cambió, no se llega acá
-        const totalNuevo = Number(record.total);
+        // ⚠️ Acá ya NO puede haber cambiado ni la ciudad ni el total: los dos son
+        // campos de producto, así que ese caso salió por la rama de arriba.
 
         // ==================================================================
         // 🔒 RECONCILIAR LAS VALIDACIONES CON LOS DATOS FINALES
@@ -1059,7 +1174,6 @@ function saveOrder(order) {
         // Un cambio de destino o de total además OBLIGA a recotizar: el "sí" del
         // cliente fue sobre el cuadro anterior, no sobre estos números.
         // ==================================================================
-        const cambioElDestino = Object.prototype.hasOwnProperty.call(traidos, "ciudad");
         const alertas = {};
         const heredarAlerta = (campo) => {
           if (record[campo] !== undefined && record[campo] !== null && record[campo] !== false) {
@@ -1081,14 +1195,6 @@ function saveOrder(order) {
           "entrega",
         ]) {
           heredarAlerta(campo);
-        }
-
-        const motivosExtra = [];
-        if (cambioElDestino) motivosExtra.push(`cambió el destino a "${traidos.ciudad}": hay que recotizar el envío`);
-        if (cambioElTotal) motivosExtra.push(`cambió el total a $${totalNuevo}: el cliente confirmó sobre otro número`);
-        if (motivosExtra.length) {
-          alertas.pendiente_revision = true;
-          alertas.motivo_precio = [alertas.motivo_precio, ...motivosExtra].filter(Boolean).join(" · ");
         }
 
         const { sin_confirmar, motivo_sin_confirmar, ...limpio } = orders[i];
@@ -1476,7 +1582,7 @@ function estadoDelDisco() {
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarAtendido, desmarcarAtendido,
-  guardarCotizacion, leerCotizacion,
+  guardarCotizacion, leerCotizacion, pedidoPendienteDeOferta,
   anotarFalloEntrega, fallosDeEntrega,
   guardarPlan, leerPlan, borrarPlan, limpiarPlanesGuardados,
   registrarArranque, estadoDelDisco,

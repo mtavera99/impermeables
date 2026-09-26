@@ -560,7 +560,7 @@ function calcular(ciudad, texto, opciones = {}) {
       nota: destino.nota || null,
       politica: POLITICA_VERSION,
       creado: Date.now(),
-      id: `${POLITICA_VERSION}|${fletes.normalizar(String(destino.ciudad || ""))}|1|${total}`,
+      firma: `${POLITICA_VERSION}|${fletes.normalizar(String(destino.ciudad || ""))}|1|${total}`,
     };
   }
 
@@ -600,7 +600,7 @@ function calcular(ciudad, texto, opciones = {}) {
     rescate: uds === 2 ? q.rescate || null : q.total - TOPE_DESCUENTO_1_UNIDAD,
     politica: POLITICA_VERSION,
     creado: Date.now(),
-    id: `${POLITICA_VERSION}|${fletes.normalizar(String(destino.ciudad || ""))}|${uds}|${q.total}`,
+    firma: `${POLITICA_VERSION}|${fletes.normalizar(String(destino.ciudad || ""))}|${uds}|${q.total}`,
   };
 }
 
@@ -611,17 +611,21 @@ function calcular(ciudad, texto, opciones = {}) {
 // su trabajo es la explicación comercial.
 // ---------------------------------------------------------------------------
 // ============================================================================
-// 🏷️ EL IDENTIFICADOR DE LA OFERTA
+// 🏷️ LA FIRMA DE LAS CONDICIONES — Y LO QUE **NO** ES
 //
-// Identifica QUÉ se le ofreció al cliente: destino, cantidad y total, bajo qué
-// versión de la política. Se estampa en el pedido, así que después se puede saber
-// si un pedido que llega es la confirmación de ESA oferta o de otra.
+// 🔴 CORRECCIÓN DE FONDO (revisión 26-sep). Esto se llamaba `idDeOferta` y se
+// usaba como identidad de la oferta. **No lo es, y confundirlo costó una venta en
+// la reproducción:** `política|ciudad|unidades|total` describe una TARIFA, así que
+// dos compras distintas del mismo producto a la misma ciudad producen la MISMA
+// cadena. Usarla para emparejar hizo que el pedido de un destinatario se
+// escribiera encima del de otro.
 //
-// 🔑 Sin esto, "el pedido pendiente de este cliente" era la única pista, y eso no
-// distingue una corrección de una compra nueva: dos pedidos del mismo cliente por
-// el mismo total pueden ser lo mismo o pueden ser dos ventas.
+// Lo que esta función devuelve es una FIRMA DE CONDICIONES: sirve para saber si la
+// oferta cambió (otra ciudad, otra cantidad, otro total), no para saber de QUIÉN
+// es. La identidad de la oferta la asigna `store.guardarCotizacion`, que es el
+// único que sabe a qué chat pertenece y cuándo empezó.
 // ============================================================================
-function idDeOferta(cot) {
+function firmaDeCondiciones(cot) {
   if (!cot || !cot.ok) return "";
   const ciudad = fletes.normalizar(String(cot.ciudad || ""));
   return `${cot.politica}|${ciudad}|${cot.uds}|${cot.total}`;
@@ -1361,7 +1365,7 @@ module.exports = {
   lineaDePrecio,
   bloqueDeDatos,
   ciudadesEn,
-  idDeOferta,
+  firmaDeCondiciones,
   extraerImportes,
   importesAutorizados,
   rolesEnTexto,

@@ -337,8 +337,10 @@ async function generateReply(phone, userText) {
   const previa = store.leerCotizacion(phone);
   const destino = cotizacion.destinoDelHilo(conv, userText);
   const cantidad = cotizacion.cantidadDelHilo(conv, userText, previa && previa.uds);
-  const cot = cotizacion.calcular(destino.ciudad, userText, { cantidad });
-  if (cot.ok) store.guardarCotizacion(phone, cot);
+  let cot = cotizacion.calcular(destino.ciudad, userText, { cantidad });
+  // 🏷️ La cotización guardada es la que trae `oferta_id`: un identificador que
+  // PERSISTE mientras las condiciones no cambien, en vez de nacer en cada mensaje.
+  if (cot.ok) cot = store.guardarCotizacion(phone, cot);
   const objecionDePrecio = cotizacion.hayObjecionDePrecio(conv.messages);
   const contextoPrecio = { objecionDePrecio };
 
@@ -623,6 +625,17 @@ async function generateReply(phone, userText) {
         );
       }
 
+      // ======================================================================
+      // 🔗 EL VÍNCULO CON EL PEDIDO PENDIENTE CONCRETO
+      //
+      // No alcanza con "hay un pendiente de este cliente": eso emparejó el pedido
+      // de un destinatario con el de otro. Acá se le dice a `saveOrder` CUÁL es el
+      // pendiente de ESTA oferta, y si el cliente pidió una corrección.
+      // ======================================================================
+      const contextoPedido = {
+        pedidoPendienteId: store.pedidoPendienteDeOferta(phone, cot.oferta_id),
+        hayCorreccion: pidioUnaCorreccion(userText),
+      };
       savedOrder = store.saveOrder({
         ...conDireccion,
         ...(conf.marcar ? { sin_confirmar: true, motivo_sin_confirmar: conf.motivo } : {}),
@@ -642,12 +655,16 @@ async function generateReply(phone, userText) {
               // 🏷️ Identifica la OFERTA que el cliente confirmó. Es lo que permite
               // saber si un pedido posterior es la confirmación de ésta o algo
               // distinto, en vez de adivinarlo por el total.
-              cotizacion_id: cot.id || cotizacion.idDeOferta(cot),
+              // 🏷️ La IDENTIDAD de la oferta (persiste durante la compra) y la
+              // FIRMA de sus condiciones (describe la tarifa). Son dos cosas
+              // distintas: la firma se repite entre compras, el id no.
+              oferta_id: cot.oferta_id || "",
+              condiciones_firma: cot.firma || cotizacion.firmaDeCondiciones(cot),
               // La cantidad cotizada, para poder compararla con la del bloque.
               unidades_cotizadas: cot.uds,
             }
           : {}),
-      });
+      }, contextoPedido);
       if (conf.marcar) {
         console.warn(
           `⚠️  PEDIDO SIN CONFIRMACIÓN CLARA de ${phone}: ${conf.motivo}. ` +
@@ -702,6 +719,29 @@ async function generateReply(phone, userText) {
 // Ahora las pruebas recorren el mismo camino que este archivo usa.
 // ============================================================================
 
+// ============================================================================
+// 🔧 ¿EL CLIENTE PIDIÓ UNA CORRECCIÓN?
+//
+// 🔴 POR QUÉ HACE FALTA (revisión 26-sep): la versión anterior daba por corrección
+// cualquier diferencia en los datos de entrega. La reproducción mostró que eso
+// también puede ser una SEGUNDA COMPRA para otra persona — y el pedido del primer
+// destinatario se perdía.
+//
+// Así que ahora una actualización necesita respaldo: algo en el mensaje del cliente
+// que diga que está corrigiendo. Si no lo hay, no hay nada que corregir y los dos
+// pedidos se conservan para revisión.
+//
+// ⚠️ Deliberadamente conservador: ante la duda devuelve false, y eso lleva a
+// conservar los dos registros. Marcar de más cuesta una revisión; marcar de menos
+// cuesta una venta.
+// ============================================================================
+const RE_PIDE_CORRECCION =
+  /\b(corrij|correcci[oó]n|correg|me equivoqu|est[aá] mal|no es (esa|ese|esa la|la)|en realidad|mejor (a|en|la|el)\b|c[aá]mbi|cambia[rl]|actualiz|anot[aá]|apunt[aá]|ojo|perd[oó]n|disculp|la direcci[oó]n es|mi direcci[oó]n es|es en la|olvid[eé])/i;
+
+function pidioUnaCorreccion(texto) {
+  return RE_PIDE_CORRECCION.test(String(texto == null ? "" : texto));
+}
+
 // Identificador de cliente con username (no es un teléfono).
 const RE_BSUID_AG = /^[A-Za-z]{2}\.[A-Za-z0-9]{1,128}$/;
 
@@ -750,4 +790,4 @@ function revisarTelefono(order, chatId) {
 // callIA se exporta para el extractor de datos del chat (src/extraer.js), que
 // necesita hacerle UNA pregunta corta al modelo sin pasar por el guion de ventas
 // ni escribirle nada al cliente.
-module.exports = { generateReply, revisarTelefono, celularValido, extractOrder, rescatarPedido, callIA };
+module.exports = { generateReply, pidioUnaCorreccion, revisarTelefono, celularValido, extractOrder, rescatarPedido, callIA };

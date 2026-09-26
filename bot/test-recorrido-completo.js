@@ -496,6 +496,176 @@ const datosBase = {
     );
   }
 
+  // ==========================================================================
+  console.log("\n── 12. 🔗 RECORRIDO: corrección vs compra adicional vs ambigüedad ──");
+  // De la revisión: cotizacion_id era `política|ciudad|unidades|total`, o sea una
+  // TARIFA. Dos compras distintas del mismo producto daban el mismo id, así que el
+  // pedido de un destinatario se escribía encima del de otro y quedaba despachable.
+  //
+  // Los cuatro recorridos que pidió la revisión, de mensaje a mensaje.
+  // ==========================================================================
+
+  /** Arma el cuadro de confirmación con los datos que se le pasen. */
+  const cuadroDe = (d) =>
+    `Confirmemos tu pedido:\nNombre: ${d.nombre}\nCelular: ${d.celular}\nCiudad: ${d.ciudad}\n` +
+    `Dirección: ${d.direccion}\nColor de la franja: ${d.color}\nTalla: ${d.talla}\n` +
+    `Pago: contraentrega\nTOTAL: ${pesos(d.total)}\n¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`;
+
+  const A = {
+    nombre: "Ana Restrepo", celular: "3004440001", ciudad: "Cali",
+    direccion: "Cra 1 #1-11 barrio Uno", color: "rojo", talla: "M",
+    pago: "contraentrega", total: 82000, unidades: 1,
+  };
+
+  // ── 12a. Corrección EXPLÍCITA de la dirección del pedido pendiente ──────
+  {
+    const tel = "573004440001";
+    const r = await recorrer(tel, [
+      { cliente: "hola", ia: "¡Hola! ¿Para qué ciudad sería?" },
+      { cliente: "Cali", ia: "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali. Pásame nombre completo, dirección con barrio y celular" },
+      { cliente: "Ana Restrepo, Cra 1 #1-11 barrio Uno, 3004440001, talla M roja", ia: cuadroDe(A) },
+      // El bot emite el bloque antes del sí → queda sin confirmar.
+      { cliente: "mmm dame un segundo", ia: `Con gusto. ${ORDER(A)}` },
+      // 🔧 Y AHORA el cliente CORRIGE la dirección y confirma.
+      {
+        cliente: "ojo, me equivoqué: la dirección es Cra 9 #45-12 barrio Prado. Sí confirmo",
+        ia: `¡Listo Ana! ${ORDER({ ...A, direccion: "Cra 9 #45-12 barrio Prado" })}`,
+      },
+    ]);
+    chequear("12a· 🔑 la corrección NO duplica la venta", r.pedidos.length === 1, `hay ${r.pedidos.length}`);
+    chequear("12a· la dirección corregida quedó", /Prado/.test(String(r.pedido.direccion)), r.pedido.direccion);
+    chequear("12a· el destinatario no cambió", r.pedido.nombre === "Ana Restrepo", r.pedido.nombre);
+    chequear("12a· se levantó la marca de sin confirmar", !r.pedido.sin_confirmar);
+    chequear("12a· 🚦 y queda LISTO para despachar", store.listoParaDespachar(r.pedido), store.textoDeRevision(r.pedido));
+    chequear(
+      "12a· con la corrección registrada",
+      Array.isArray(r.pedido.correcciones_aplicadas) && /direccion/.test(String(r.pedido.correcciones_aplicadas)),
+      JSON.stringify(r.pedido.correcciones_aplicadas)
+    );
+  }
+
+  // ── 12b. COMPRA ADICIONAL del mismo producto para OTRO destinatario ──────
+  {
+    const tel = "573004440002";
+    const B1 = { ...A, nombre: "Clara Ruiz", celular: "3004440002", direccion: "Cra 1 #1-11 barrio Uno" };
+    const B2 = { ...B1, nombre: "Diego Ruiz", direccion: "Cra 2 #2-22 barrio Dos" };
+    const r = await recorrer(tel, [
+      { cliente: "hola", ia: "¡Hola! ¿Para qué ciudad sería?" },
+      { cliente: "Cali", ia: "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali. Pásame nombre completo, dirección con barrio y celular" },
+      { cliente: "Clara Ruiz, Cra 1 #1-11 barrio Uno, 3004440002, talla M roja", ia: cuadroDe(B1) },
+      // ⚠️ "espera" NO sirve acá: confirmacion.js lo lee como un NO y el pedido no
+      // se guarda. Hace falta algo que caiga en "no se sabe" para que quede pendiente.
+      { cliente: "dame un segundo", ia: `Con gusto. ${ORDER(B1)}` },
+      // 🔑 Segunda compra, MISMO producto y MISMA tarifa, OTRO destinatario.
+      // No dice que se equivocó: dice que quiere otro para otra persona.
+      {
+        cliente: "sí confirmo. Y quiero otro igual para Diego Ruiz, Cra 2 #2-22 barrio Dos",
+        ia: `¡Listo! ${ORDER(B2)}`,
+      },
+    ]);
+    chequear("12b· 🔑 se conservan LOS DOS pedidos", r.pedidos.length === 2, `hay ${r.pedidos.length}`);
+    chequear(
+      "12b· 🔑 el de Clara NO se sobrescribió",
+      r.pedidos.some((p) => p.nombre === "Clara Ruiz" && /barrio Uno/.test(String(p.direccion))),
+      JSON.stringify(r.pedidos.map((p) => ({ nombre: p.nombre, dir: p.direccion })))
+    );
+    chequear(
+      "12b· y el de Diego también está",
+      r.pedidos.some((p) => p.nombre === "Diego Ruiz"),
+      JSON.stringify(r.pedidos.map((p) => p.nombre))
+    );
+    chequear(
+      "12b· 🚦 NINGUNO queda listo para despachar",
+      r.pedidos.every((p) => store.listoParaDespachar(p) === false),
+      r.pedidos.map((p) => store.textoDeRevision(p)).join(" || ")
+    );
+    chequear(
+      "12b· y el motivo dice que cambia a quién va dirigido",
+      r.pedidos.some((p) => /cambia a QUIÉN va dirigido/.test(String(p.motivo_precio))),
+      r.pedidos.map((p) => p.motivo_precio).join(" || ")
+    );
+  }
+
+  // ── 12c. CASO AMBIGUO: cambia la dirección y NADIE pidió corregir ────────
+  {
+    const tel = "573004440003";
+    const C1 = { ...A, nombre: "Elena Mora", celular: "3004440003", direccion: "Cra 1 #1-11 barrio Uno" };
+    const C2 = { ...C1, direccion: "Cra 3 #3-33 barrio Tres" };
+    const r = await recorrer(tel, [
+      { cliente: "hola", ia: "¡Hola! ¿Para qué ciudad sería?" },
+      { cliente: "Cali", ia: "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali. Pásame nombre completo, dirección con barrio y celular" },
+      { cliente: "Elena Mora, Cra 1 #1-11 barrio Uno, 3004440003, talla M roja", ia: cuadroDe(C1) },
+      { cliente: "ya te digo", ia: `Con gusto. ${ORDER(C1)}` },
+      // 🔑 Otra dirección, sin ninguna señal de corrección. No se puede saber si se
+      // equivocó, si es otra entrega, o si el modelo se confundió.
+      { cliente: "sí confirmo", ia: `¡Listo Elena! ${ORDER(C2)}` },
+    ]);
+    chequear("12c· 🔑 ante la duda se conservan los dos", r.pedidos.length === 2, `hay ${r.pedidos.length}`);
+    chequear(
+      "12c· 🔑 la dirección original NO se perdió",
+      r.pedidos.some((p) => /barrio Uno/.test(String(p.direccion))),
+      JSON.stringify(r.pedidos.map((p) => p.direccion))
+    );
+    chequear(
+      "12c· 🚦 ninguno despachable",
+      r.pedidos.every((p) => store.listoParaDespachar(p) === false),
+      r.pedidos.map((p) => store.textoDeRevision(p)).join(" || ")
+    );
+    chequear(
+      "12c· y el motivo dice que nadie pidió corrección",
+      r.pedidos.some((p) => /no pidió ninguna corrección/.test(String(p.motivo_precio))),
+      r.pedidos.map((p) => p.motivo_precio).join(" || ")
+    );
+  }
+
+  // ── 12d. El MISMO mensaje repetido NO duplica la venta ───────────────────
+  {
+    const tel = "573004440004";
+    const D = { ...A, nombre: "Fabio Lara", celular: "3004440004" };
+    const r = await recorrer(tel, [
+      { cliente: "hola", ia: "¡Hola! ¿Para qué ciudad sería?" },
+      { cliente: "Cali", ia: "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali. Pásame nombre completo, dirección con barrio y celular" },
+      { cliente: "Fabio Lara, Cra 1 #1-11 barrio Uno, 3004440004, talla M roja", ia: cuadroDe(D) },
+      { cliente: "un momento", ia: `Con gusto. ${ORDER(D)}` },
+      // El cliente confirma y el bot vuelve a emitir EL MISMO bloque.
+      { cliente: "sí confirmo", ia: `¡Listo Fabio! ${ORDER(D)}` },
+      // Y lo emite otra vez, idéntico.
+      { cliente: "gracias", ia: `Con gusto 🙌 ${ORDER(D)}` },
+    ]);
+    chequear("12d· 🔑 UNA sola venta", r.pedidos.length === 1, `hay ${r.pedidos.length}`);
+    chequear("12d· sin marca de sin confirmar", !r.pedido.sin_confirmar);
+    chequear("12d· 🚦 y LISTO para despachar", store.listoParaDespachar(r.pedido), store.textoDeRevision(r.pedido));
+    chequear("12d· sin correcciones inventadas", r.pedido.correcciones_aplicadas === undefined, JSON.stringify(r.pedido.correcciones_aplicadas));
+  }
+
+  // ── 12e. 🏷️ El identificador de oferta PERSISTE durante la compra ────────
+  {
+    const tel = "573004440005";
+    const ids = [];
+    for (const m of ["hola", "Cali", "talla M", "franja roja", "Gabriel Soto, Cra 1 #1-11, 3004440005"]) {
+      ia.poner("Listo, seguimos 🙌");
+      await agent.generateReply(tel, m);
+      const c = store.leerCotizacion(tel);
+      if (c && c.oferta_id) ids.push(c.oferta_id);
+    }
+    const unicos = [...new Set(ids)];
+    chequear(
+      "12e· 🔑 el mismo id de oferta en todos los mensajes de la compra",
+      unicos.length === 1,
+      `hubo ${unicos.length} ids distintos: ${JSON.stringify(unicos)}`
+    );
+    chequear("12e· y no es la firma de la tarifa", !/^2026/.test(unicos[0] || ""), unicos[0]);
+    // Y si cambian las condiciones, la oferta es otra.
+    ia.poner("Los dos te quedan en $148.000 en total 📦");
+    await agent.generateReply(tel, "mejor quiero dos conjuntos");
+    const despues = store.leerCotizacion(tel);
+    chequear(
+      "12e· 🔑 pero al cambiar la cantidad, es OTRA oferta",
+      despues.oferta_id !== unicos[0],
+      `antes ${unicos[0]}, después ${despues.oferta_id}`
+    );
+  }
+
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   try {
     fs.rmSync(DIR, { recursive: true, force: true });

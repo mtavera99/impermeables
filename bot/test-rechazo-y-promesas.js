@@ -344,9 +344,12 @@ console.log("\n── R7. 🔴 La confirmación posterior sobre los datos VIGENT
   };
   const mios = (tel) => store7.todosLosPedidos().filter((p) => p.telefono_chat === tel);
 
-  // ── Datos de ENTREGA: se corrigen y la venta queda lista ────────────────
+  // ── Datos de ENTREGA CON corrección identificable: se corrigen ──────────
+  // ⚠️ El segundo argumento es el contexto que arma agent.js. `hayCorreccion`
+  // significa que el cliente pidió corregir algo; sin eso, un cambio de dirección
+  // podría ser una segunda entrega y NO se fusiona (se prueba más abajo).
   store7.saveOrder({ ...base, sin_confirmar: true, motivo_sin_confirmar: "no hubo un sí claro" });
-  store7.saveOrder({ ...base, direccion: "Cra 9 #45-12 barrio Prado" });
+  store7.saveOrder({ ...base, direccion: "Cra 9 #45-12 barrio Prado" }, { hayCorreccion: true });
   const p = mios(base.telefono_chat)[0];
   chequear("sigue habiendo UN solo pedido", mios(base.telefono_chat).length === 1, `hay ${mios(base.telefono_chat).length}`);
   chequear("🔑 la dirección corregida NO se perdió", /Prado/.test(String(p.direccion)), `quedó "${p.direccion}"`);
@@ -362,7 +365,7 @@ console.log("\n── R7. 🔴 La confirmación posterior sobre los datos VIGENT
   // ── Un campo vacío NO borra uno bueno ──────────────────────────────────
   const base2 = { ...base, telefono_chat: "573001118888", celular: "3007770002" };
   store7.saveOrder({ ...base2, sin_confirmar: true, motivo_sin_confirmar: "x" });
-  store7.saveOrder({ ...base2, direccion: "" });
+  store7.saveOrder({ ...base2, direccion: "" }, { hayCorreccion: true });
   const p2 = mios(base2.telefono_chat)[0];
   chequear("🔴 un campo vacío NO borra la dirección que ya estaba", /Cra 1/.test(String(p2.direccion)), `quedó "${p2.direccion}"`);
 
@@ -373,6 +376,47 @@ console.log("\n── R7. 🔴 La confirmación posterior sobre los datos VIGENT
   const p3 = mios(base3.telefono_chat)[0];
   chequear("sin cambios, no se reporta ninguna corrección", p3.correcciones_aplicadas === undefined);
   chequear("y la marca igual se levanta", !p3.sin_confirmar);
+
+  // ── 🔴 La MISMA dirección distinta, pero SIN corrección identificable ────
+  // Es el caso que destapó la 3ª revisión: sin una señal del cliente, un cambio de
+  // dirección puede ser una segunda entrega para otra persona. No se fusiona.
+  const base4 = { ...base, telefono_chat: "573001116666", celular: "3007770004" };
+  store7.saveOrder({ ...base4, sin_confirmar: true, motivo_sin_confirmar: "x" });
+  store7.saveOrder({ ...base4, direccion: "Cra 3 #3-33 barrio Tres" });
+  const cuatro = mios(base4.telefono_chat);
+  chequear("🔑 sin señal de corrección, se conservan los DOS", cuatro.length === 2, `hay ${cuatro.length}`);
+  chequear(
+    "🔑 y ninguno queda despachable",
+    cuatro.every((x) => store7.listoParaDespachar(x) === false),
+    cuatro.map((x) => store7.textoDeRevision(x)).join(" || ")
+  );
+  chequear(
+    "el motivo dice que nadie pidió corrección",
+    cuatro.some((x) => /no pidió ninguna corrección/.test(String(x.motivo_precio))),
+    cuatro.map((x) => x.motivo_precio).join(" || ")
+  );
+
+  // ── 🔑 Y el destinatario es IDENTIDAD, no un dato de entrega ─────────────
+  // El caso textual del reporte: misma tarifa, otro destinatario.
+  const base5 = { ...base, telefono_chat: "573001115555", celular: "3007770005" };
+  store7.saveOrder({ ...base5, nombre: "Destinataria A", sin_confirmar: true, motivo_sin_confirmar: "x" });
+  store7.saveOrder({ ...base5, nombre: "Destinatario B", direccion: "Cra 2 #2-22" }, { hayCorreccion: true });
+  const cinco = mios(base5.telefono_chat);
+  chequear(
+    "🔑 otro destinatario NO sobrescribe, ni con señal de corrección",
+    cinco.length === 2,
+    `hay ${cinco.length}`
+  );
+  chequear(
+    "🔑 el primer destinatario sigue ahí",
+    cinco.some((x) => x.nombre === "Destinataria A"),
+    JSON.stringify(cinco.map((x) => x.nombre))
+  );
+  chequear(
+    "y el motivo dice que cambia a quién va dirigido",
+    cinco.some((x) => /cambia a QUIÉN va dirigido/.test(String(x.motivo_precio))),
+    cinco.map((x) => x.motivo_precio).join(" || ")
+  );
 }
 
 console.log("\n── R8. 🔴 Corregir una promesa NO puede romper el precio ──");
