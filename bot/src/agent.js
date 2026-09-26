@@ -5,6 +5,7 @@ const { respuestaDeArranque } = require("./primer-mensaje");
 const { revisarDireccionDePedido } = require("./direccion");
 const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
+const comercial = require("./comercial");
 
 // ============================================================================
 // PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
@@ -319,8 +320,29 @@ async function generateReply(phone, userText) {
       "¡Hola! 🏍️ Gracias por escribir a BikerPro. (Bot en modo prueba: falta configurar la API de IA). " +
       "El conjunto impermeable de 4 piezas cuesta $59.900 con pago contraentrega 📦";
   } else {
+    // ========================================================================
+    // 💼 LA NOTA COMERCIAL DE ESTE TURNO (26-sep) — ver comercial.js
+    //
+    // Tres cosas que el guion no cubre: contestar la duda ANTES de pedir los
+    // datos, adaptar el cierre a lo que el cliente mostró, y no ofrecer los 2
+    // conjuntos cuando estorba (difícil acceso, ya dijo que uno, venta cerrada).
+    //
+    // 🔑 Va acá y NO dentro de buildSystemPrompt() por dos razones: el guion ya
+    // está en ~8.989 tokens contra un techo de 9.000, y porque una regla que solo
+    // aplica a veces no tiene por qué pagarse en todos los turnos.
+    //
+    // 📏 Si la nota no cabe bajo el techo, guionConNota NO la pega y el bot queda
+    // igual que hoy. El espacio aparece cuando la tabla de fletes sale del guion.
+    // ========================================================================
+    const conNota = comercial.guionConNota(buildSystemPrompt(), conv.messages, userText);
+    if (conNota.nota && !conNota.cupo) {
+      console.log(
+        `📏 nota comercial omitida: el guion + la nota dan ${conNota.tokens} tokens y el techo es ` +
+          `${comercial.TECHO_TOKENS}. Entra sola cuando la tabla de fletes salga del guion.`
+      );
+    }
     try {
-      reply = await callIA(buildSystemPrompt(), conv.messages);
+      reply = await callIA(conNota.prompt, conv.messages);
     } catch (e) {
       console.error("Error IA:", e.message);
       // Respaldo que NO reinicia la conversación (evita el saludo genérico a mitad de charla)
@@ -358,6 +380,22 @@ async function generateReply(phone, userText) {
   reply = mediaRes.clean;
   // Combina lo que pidió la IA (marcadores) con la detección por palabras clave del cliente
   const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
+
+  // ==========================================================================
+  // 📊 LA CUENTA DE LO COMERCIAL — esto es lo que hace la mejora medible
+  //
+  // ⚠️ NO bloquea, NO reescribe y NO pausa el chat. Una mejora comercial que deja
+  // al cliente esperando no es una mejora: acá lo peor que puede pasar es que el
+  // mensaje salga menos bien, y eso no se arregla con silencio.
+  //
+  // Solo deja un renglón con prefijo estable por cada cosa que no se cumplió, para
+  // poder contarlas y saber después si esto sirvió de algo. Sin la cuenta, "mejora
+  // comercial" es una opinión.
+  // ==========================================================================
+  const chequeoComercial = comercial.revisar(reply, { userText, messages: conv.messages });
+  if (!chequeoComercial.ok) {
+    console.log(`📊 COMERCIAL ${phone}: ${comercial.resumir(chequeoComercial)}`);
+  }
 
   let savedOrder = null;
   if (order) {
