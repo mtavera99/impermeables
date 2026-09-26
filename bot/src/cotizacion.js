@@ -521,12 +521,77 @@ const NO_ES_CIUDAD = new Set(
     "impermeable traje foto fotos video catalogo hoy manana ahora despues luego " +
     "aqui alli casa apartamento barrio direccion celular numero nombre cedula " +
     "uno dos tres una negro azul rojo verde amarillo naranja blanco gris morado " +
-    "grande pequeno mediano espere esperen momento senor senora amigo")
+    "grande pequeno mediano espere esperen momento senor senora amigo " +
+    // 🔴 LUGARES GENÉRICOS. "estoy en el trabajo" se estaba convirtiendo en un
+    // municipio cotizable a $85.000. Un lugar donde el cliente ESTÁ no es un
+    // destino de despacho.
+    //
+    // ⚠️ Cuidado con qué se agrega acá: esta lista rechaza el candidato completo si
+    // alguna palabra coincide, y hay municipios reales que llevan palabras comunes
+    // —"Pueblo Nuevo", "Campo de la Cruz"—, así que `pueblo` y `campo` NO van.
+    "trabajo oficina finca empresa negocio local colegio universidad hospital " +
+    "moto viaje carretera taller tienda terminal aeropuerto edificio vereda bodega")
     .split(/\s+/)
 );
 
 const RE_RELLENO_CIUDAD =
   /^\s*(?:es\s+)?(?:para|en|de|desde|hacia|soy\s+de|vivo\s+en|estoy\s+en|seria\s+para|ser[ií]a\s+en|ac[aá]\s+en|aqu[ií]\s+en|mi\s+ciudad\s+es|la\s+ciudad\s+es)\s+/i;
+
+// ============================================================================
+// 🔴 EL SALUDO TAPABA LA CIUDAD (caso 26-sep)
+//
+// LO QUE PASÓ: el cliente abrió con **"Hola buenos días, Pitalito Huila"**. Ahí ya
+// había dicho su municipio, y el recorrido lo perdió:
+//
+//   ciudadesEn("Hola buenos días, Pitalito Huila")  → []   (no está en el tarifario)
+//   ciudadPlausible(...)                            → ""   (el saludo lo tapaba)
+//   destinoDelHilo(...)                             → ciudad vacía
+//
+// Y como la extracción por contexto solo corría si el bot HABÍA PREGUNTADO la
+// ciudad —y este era el primer mensaje del cliente— no llegó a intentarlo.
+//
+// Resultado: dos horas y media después el cliente preguntó "Cuánto es el precio" y
+// volvió a recibir "déjame confirmar el envío". El municipio estaba escrito en la
+// primera línea del chat.
+//
+// 🔑 Se arregla en general, no para Pitalito: se quita el saludo antes de leer, y
+// el nombre de un DEPARTAMENTO se toma como la señal de que eso es un destino.
+// ============================================================================
+
+// Saludos y cortesías que vienen pegados al municipio.
+const RE_SALUDO =
+  /\b(hola+|buen[oa]s?\s+(?:d[ií]as?|tardes?|noches?)|buen\s+d[ií]a|buenas|buenos|qu[eé]\s+tal|c[oó]mo\s+est[aá]s?|saludos|se[nñ]or(?:a)?|do[nñ]a?|gracias|por\s+favor|much[ao]s?\s+gracias|cordial\s+saludo)\b/gi;
+
+// Los 32 departamentos y Bogotá. Es la señal más fuerte de que el cliente está
+// diciendo DE DÓNDE ES: "Pitalito Huila", "El Bagre Antioquia", "Sahagún Córdoba".
+//
+// ⚠️ Es una lista general, NO una excepción para un municipio. Y no toca el
+// tarifario: solo sirve para RECONOCER que hay un destino en la frase.
+const DEPARTAMENTOS = [
+  "amazonas", "antioquia", "arauca", "atlantico", "bolivar", "boyaca", "caldas",
+  "caqueta", "casanare", "cauca", "cesar", "choco", "cordoba", "cundinamarca",
+  "guainia", "guaviare", "huila", "guajira", "magdalena", "meta", "narino",
+  "norte de santander", "putumayo", "quindio", "risaralda", "san andres",
+  "santander", "sucre", "tolima", "valle del cauca", "valle", "vaupes", "vichada",
+  "bogota", "cundinamarca",
+];
+
+const sinTilde = (s) =>
+  String(s == null ? "" : s)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+/** ¿El texto nombra un departamento? Devuelve cuál, o "". */
+function departamentoEn(texto) {
+  const plano = sinTilde(texto);
+  // Los de dos palabras primero, para que "valle del cauca" no quede en "valle".
+  const orden = [...DEPARTAMENTOS].sort((a, b) => b.length - a.length);
+  for (const d of orden) {
+    if (new RegExp(`\\b${d.replace(/ /g, "\\s+")}\\b`).test(plano)) return d;
+  }
+  return "";
+}
 
 /**
  * Un nombre de municipio plausible dentro de una respuesta corta.
@@ -542,7 +607,18 @@ function ciudadPlausible(texto) {
   // Una pregunta no es una respuesta con la ciudad.
   if (/[?¿]/.test(t)) return "";
   if (/\d/.test(t)) return ""; // direcciones y teléfonos no son ciudades
-  t = t.replace(RE_RELLENO_CIUDAD, "").trim();
+  // 🔑 El saludo se quita ANTES de leer. "Hola buenos días, Pitalito Huila" tenía
+  // cinco palabras y empezaba por "hola", así que se descartaba entera.
+  t = t.replace(RE_SALUDO, " ").replace(/\s+/g, " ").trim();
+  // ⚠️ Y hay que quitar la puntuación que deja el saludo: sin esto queda
+  // ", soy de Pitalito", el relleno está anclado a `^` y no coincide.
+  t = t.replace(/^[\s,.;:¡!¿?-]+/, "").trim();
+  // El relleno se aplica hasta que deje de cambiar: "es para", "soy de"...
+  for (let i = 0; i < 3; i++) {
+    const antes = t;
+    t = t.replace(RE_RELLENO_CIUDAD, "").replace(/^[\s,.;:-]+/, "").trim();
+    if (t === antes) break;
+  }
   // Se queda solo con letras y espacios (quita emojis y signos).
   t = t.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g, " ").replace(/\s+/g, " ").trim();
   if (!t) return "";
@@ -558,6 +634,125 @@ function ciudadPlausible(texto) {
   }
   const cand = palabras.join(" ");
   return cand.length >= 4 ? cand : "";
+}
+
+// ============================================================================
+// 🛡️ LA SEÑAL DE QUE ESO ES UN MUNICIPIO Y NO UN LUGAR CUALQUIERA
+//
+// 🔴 Reproducido: `destinoDelHilo({messages:[]}, "estoy en el trabajo")` devolvía
+// "el trabajo" y `calcular()` autorizaba $85.000. "estoy en" es una preposición de
+// lugar, así que alcanzaba para dar un destino por bueno.
+//
+// 🔑 Cuando NADIE preguntó la ciudad hace falta algo más que una preposición:
+//   · un DEPARTAMENTO nombrado → "Pitalito Huila"
+//   · o el nombre escrito como nombre propio, con mayúscula → "estoy en Pitalito"
+//
+// "el trabajo" no tiene ninguna de las dos. Y el vocabulario de lugares genéricos
+// lo rechaza además en la rama donde el bot SÍ preguntó.
+// ============================================================================
+
+/**
+ * ¿El candidato está escrito como un nombre propio?
+ *
+ * ⚠️ Acá había un `\b` armado con el nombre del municipio, y el `\b` de JavaScript
+ * se define sobre `\w`, que es ASCII: con "Úmbita" o "Ábrego" —que empiezan por
+ * tilde— no hay frontera de palabra y la comprobación fallaba en falso. Es la
+ * cuarta vez en este repo que los acentos rompen un patrón.
+ *
+ * No hace falta ningún patrón: el candidato sale del texto del cliente sin tocarle
+ * las mayúsculas, así que basta con mirarlo.
+ */
+function pareceNombrePropio(candidato) {
+  return String(candidato || "")
+    .split(/\s+/)
+    .filter((w) => w.length >= 3)
+    .some((w) => /^[A-ZÁÉÍÓÚÜÑ]/.test(w));
+}
+
+// ============================================================================
+// 🔴 LA CORRECCIÓN POSTERIOR TIENE QUE GANAR
+//
+// Encontrado probando: con "Pitalito Huila" y después **"no, mejor para Garzón
+// Huila"**, se devolvía Pitalito. El recorrido hacia atrás sí iba del más nuevo al
+// más viejo; el problema era que el mensaje nuevo no se podía LEER: son cinco
+// palabras, y `ciudadPlausible` corta en cuatro porque una frase larga no es un
+// destino. Así que la corrección se caía y ganaba lo viejo.
+//
+// 🔑 Cuando el nombre no se lee de corrido, se lee lo que viene DESPUÉS de una
+// preposición de lugar: "…para Garzón" → Garzón.
+//
+// ⚠️ "de" a secas NO entra en esta lista, aunque sea preposición de lugar: vive
+// dentro de los nombres compuestos —"Campo de la Cruz", "San Juan de Pasto",
+// "Villa de Leyva"— y cortar ahí daría "la Cruz" como municipio. De un municipio
+// equivocado sale un precio equivocado, que es peor que volver a preguntar.
+// ============================================================================
+
+const RE_PREPOSICION_DE_LUGAR =
+  /(?:^|[\s,.;:])(?:para|en|desde|hacia|hasta|soy\s+de|vivo\s+en|estoy\s+en|ser[ií]a\s+para|ser[ií]a\s+en|ac[aá]\s+en|aqu[ií]\s+en|mi\s+ciudad\s+es|la\s+ciudad\s+es)\s+/gi;
+
+/**
+ * Lee el municipio que viene después de una preposición de lugar.
+ *
+ * Se prueban las preposiciones de IZQUIERDA A DERECHA y gana la primera lectura
+ * plausible, para que la más larga tenga prioridad: en "para San Juan de Pasto" se
+ * queda con el nombre completo y no con "Pasto".
+ */
+function candidatoTrasPreposicion(texto) {
+  const crudo = String(texto == null ? "" : texto);
+  for (const m of crudo.matchAll(RE_PREPOSICION_DE_LUGAR)) {
+    const resto = crudo.slice(m.index + m[0].length);
+    const cand = ciudadPlausible(resto);
+    if (cand) return cand;
+  }
+  return "";
+}
+
+/** ¿El texto trae alguna preposición de lugar, esté al principio o en medio? */
+function hayPreposicionDeLugar(texto) {
+  const crudo = String(texto == null ? "" : texto);
+  const limpio = crudo.replace(RE_SALUDO, " ").replace(/^[\s,.;:]+/, "");
+  if (RE_RELLENO_CIUDAD.test(limpio)) return true;
+  return [...crudo.matchAll(RE_PREPOSICION_DE_LUGAR)].length > 0;
+}
+
+/**
+ * Un destino plausible en un texto donde NADIE preguntó la ciudad.
+ * @returns {{ciudad:string, origen:string}|null}
+ */
+function destinoPlausibleEn(texto) {
+  const crudo = String(texto == null ? "" : texto);
+  const depto = departamentoEn(crudo);
+  if (!depto && !hayPreposicionDeLugar(crudo)) return null;
+
+  // 🔑 El departamento se quita ANTES de medir el largo de la frase. Si no,
+  // "Campo de la Cruz Atlántico" son cinco palabras y se descartaba entero.
+  let sinDepto = crudo;
+  if (depto) {
+    const i = sinTilde(crudo).lastIndexOf(depto);
+    if (i > 0) sinDepto = crudo.slice(0, i).replace(/[\s,.;:]+$/, "");
+  }
+
+  const cand = ciudadPlausible(sinDepto) || candidatoTrasPreposicion(sinDepto);
+  if (!cand) return null;
+
+  // 🛡️ Sin departamento, se exige que esté escrito como nombre propio.
+  //
+  // 🔑 Esto es lo que separa "estoy en Pitalito" de "estoy en el trabajo" cuando la
+  // palabra genérica todavía no está en el vocabulario: "el pueblo" y "la bodega de
+  // mi jefe" quedan fuera sin tener que enumerarlos uno por uno.
+  if (!depto && !pareceNombrePropio(cand)) return null;
+
+  // Se devuelve el MUNICIPIO SOLO, no "Municipio Departamento": si no, el pedido
+  // diría "Pitalito" y la cotización "Pitalito Huila", y `verificarPedido` lo
+  // marcaría como ciudad_distinta; cada pedido con departamento quedaría frenado.
+  //
+  // 🔑 Única excepción: los nombres que existen en varios departamentos. Ahí el
+  // departamento ES el dato que desambigua, así que se conserva.
+  const esAmbiguo = Boolean(fletes.departamentosPosibles(cand));
+  return {
+    ciudad: esAmbiguo && depto ? `${cand} ${depto}` : cand,
+    origen: depto ? "dijo ciudad y departamento" : "dijo de dónde es",
+  };
 }
 
 /** ¿El último mensaje del bot le preguntó la ciudad al cliente? */
@@ -600,13 +795,55 @@ function destinoDelHilo(conv, userText) {
     if (cand) return { ciudad: cand, varias: [], origen: "respuesta_a_la_pregunta" };
   }
 
+  // El cliente dice su municipio sin que nadie le haya preguntado.
+  {
+    const rec = destinoPlausibleEn(userText);
+    if (rec) return { ciudad: rec.ciudad, varias: [], origen: rec.origen };
+  }
+
   const guardada = (conv && conv.cotizacion && conv.cotizacion.ciudad) || "";
   if (guardada) return { ciudad: guardada, varias: [], origen: "cotizacion_guardada" };
 
-  const delCliente = messages.filter((m) => m && m.role === "user");
-  for (let i = delCliente.length - 1; i >= 0; i--) {
-    const c = ciudadesEn(String(delCliente[i].content || ""));
-    if (c.length === 1) return { ciudad: c[0], varias: [], origen: "historial" };
+  // ==========================================================================
+  // 🔴 RECUPERAR EL DESTINO DE LOS MENSAJES ANTERIORES
+  //
+  // Reproducido: con el historial de Padrino —el bot pregunta la ciudad, el cliente
+  // contesta "Hola buenos días, Pitalito Huila", el bot responde con esperas, el
+  // cliente dice "Gracias"— y SIN cotización guardada, el turno "Cuánto es el
+  // precio" seguía devolviendo `no_hay`. Esta búsqueda solo miraba `ciudadesEn`, que
+  // reconoce el tarifario, y Pitalito no está en el tarifario.
+  //
+  // ⚠️ Se recorre del mensaje MÁS NUEVO al más viejo, así una corrección posterior
+  // le gana a lo que dijo antes. Y si un mensaje nombra varias ciudades, no se elige
+  // ninguna: se pregunta.
+  // ==========================================================================
+  // ⚠️ Se recorre sobre `messages` y no sobre los mensajes del cliente filtrados,
+  // porque hace falta saber QUÉ le había dicho el bot justo antes de cada uno.
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (!messages[i] || messages[i].role !== "user") continue;
+    const texto = String(messages[i].content || "");
+
+    const enTarifario = ciudadesEn(texto);
+    if (enTarifario.length > 1) {
+      return { ciudad: "", varias: enTarifario, origen: "varios_en_el_historial" };
+    }
+    if (enTarifario.length === 1) {
+      return { ciudad: enTarifario[0], varias: [], origen: "historial" };
+    }
+
+    const rec = destinoPlausibleEn(texto);
+    if (rec) return { ciudad: rec.ciudad, varias: [], origen: `historial · ${rec.origen}` };
+
+    // 🔑 Si el bot le había preguntado la ciudad JUSTO ANTES de este mensaje, la
+    // respuesta corta ES la ciudad, aunque venga en minúscula y sin departamento.
+    // Sin esto, el cliente que contestó "pitalito" a la pregunta del bot seguía
+    // perdiendo su destino dos mensajes más tarde.
+    if (botPidioCiudad(messages.slice(0, i))) {
+      const cand = ciudadPlausible(texto);
+      if (cand) {
+        return { ciudad: cand, varias: [], origen: "historial · respondio_la_pregunta" };
+      }
+    }
   }
   return { ciudad: "", varias: [], origen: "no_hay" };
 }
@@ -1626,6 +1863,8 @@ module.exports = {
   cantidadDelHilo,
   destinoDelHilo,
   ciudadPlausible,
+  departamentoEn,
+  destinoPlausibleEn,
   botPidioCiudad,
   calcular,
   lineaDePrecio,
