@@ -341,5 +341,159 @@ chequear(
   `pasaron ${cierran}`
 );
 
+// ============================================================================
+// 🔴 LOS CINCO DEFECTOS QUE ENCONTRÓ LA REVISIÓN DEL 26-SEP
+//
+// Ninguno de estos casos fallaba en el cálculo: fallaban en el encadenamiento de
+// turnos o en la validación. Las 83 pruebas de arriba pasaban con los cinco
+// defectos presentes, y eso es lo que los hace valiosos como regresión.
+// ============================================================================
+const u = (t) => ({ role: "user", content: t });
+const b = (t) => ({ role: "assistant", content: t });
+const pesos = (n) => "$" + Number(n || 0).toLocaleString("es-CO");
+
+console.log("\n── R1. La cantidad se conserva hasta una corrección explícita ──");
+{
+  chequear('"dos" suelto cuenta como dos', c.resolverCantidad("dos").uds === 2, "era la respuesta natural a «¿uno o dos?» y se leía como UNA");
+  chequear('"quiero 2" cuenta como dos', c.resolverCantidad("quiero 2").uds === 2);
+  chequear("y queda marcada como explícita", c.resolverCantidad("dos conjuntos").explicita === true);
+  chequear(
+    "🔑 no decir nada NO es lo mismo que pedir una",
+    c.resolverCantidad("Cali").explicita === false,
+    "confundir esos dos casos era lo que hacía desaparecer la segunda unidad"
+  );
+  chequear("sin cantidad previa, el default sigue siendo 1", c.resolverCantidad("Cali").uds === 1);
+  chequear("con cantidad previa, se hereda", c.resolverCantidad("Cali", 2).uds === 2);
+  chequear("y se marca como heredada", c.resolverCantidad("Cali", 2).heredada === true);
+
+  // 🔑 El recorrido que fallaba: la cantidad sobrevive a ciudad, talla y dirección.
+  const conv = { messages: [u("quiero dos conjuntos"), b("¿ciudad?"), u("Cali"), b("ok"), u("talla L"), b("ok"), u("Cra 1 #2-3")] };
+  chequear(
+    "🔑 «quiero dos conjuntos» sobrevive 3 turnos después",
+    c.cantidadDelHilo(conv, "Cra 1 #2-3").uds === 2,
+    `dio ${c.cantidadDelHilo(conv, "Cra 1 #2-3").uds}`
+  );
+  chequear(
+    "🔴 y una dirección con un «1» NO la baja a una unidad",
+    c.resolverCantidad("Calle 1 #2-3, celular 3001234567").explicita === false,
+    "si un dígito suelto contara como «pidió una», una dirección borraría el pedido de dos"
+  );
+  const conv2 = { messages: [...conv.messages, b("ok"), u("mejor uno solo")] };
+  chequear("la corrección explícita sí la baja", c.cantidadDelHilo(conv2, "mejor uno solo").uds === 1);
+  chequear("3 o más se sigue escalando", c.resolverCantidad("12 conjuntos").escalar === true);
+}
+
+console.log("\n── R2. El destino: departamento y ciudades fuera del tarifario ──");
+{
+  chequear(
+    "🔑 «Mosquera Nariño» no pierde el departamento",
+    c.ciudadesEn("Mosquera Nariño").length === 1 && /nari/i.test(c.ciudadesEn("Mosquera Nariño")[0]),
+    JSON.stringify(c.ciudadesEn("Mosquera Nariño"))
+  );
+  const nar = c.resolverDestino("Mosquera Nariño");
+  chequear(
+    "y se resuelve al Mosquera del Pacífico, sin tarifa medida",
+    nar.estado === "dificil_sin_tarifa",
+    `dio ${nar.estado}`
+  );
+  const cun = c.resolverDestino("Mosquera Cundinamarca");
+  chequear("mientras el de Cundinamarca es banda A", cun.estado === "reconocida" && cun.banda === "A", `dio ${cun.estado}/${cun.banda}`);
+  chequear(
+    `y cotiza ${pesos(73000)} de verdad, no $0`,
+    c.calcular("Mosquera Cundinamarca", "uno").total === 73000,
+    `dio ${pesos(c.calcular("Mosquera Cundinamarca", "uno").total)}`
+  );
+  chequear("sin departamento sigue preguntando", c.resolverDestino("Mosquera").estado === "ambiguo");
+
+  // 🔑 Gachancipá: el problema nunca fue cotizar, fue DETECTAR.
+  chequear(
+    "resolverDestino(Gachancipá) siempre funcionó",
+    c.resolverDestino("Gachancipá").estado === "predeterminada"
+  );
+  const convG = { messages: [u("hola"), b("¿Para qué ciudad sería, para darte el total?"), u("Gachancipá")] };
+  chequear(
+    "🔑 y ahora la extracción real también la ve",
+    c.destinoDelHilo(convG, "Gachancipá").ciudad === "Gachancipá",
+    JSON.stringify(c.destinoDelHilo(convG, "Gachancipá"))
+  );
+  chequear("por el contexto de la pregunta", c.destinoDelHilo(convG, "Gachancipá").origen === "respuesta_a_la_pregunta");
+  // Conservador: si no es una respuesta a la pregunta, no inventa un destino.
+  chequear("🔴 una pregunta no se toma por ciudad", c.ciudadPlausible("cuánto vale?") === "");
+  chequear("🔴 ni un agradecimiento", c.ciudadPlausible("gracias") === "");
+  chequear("🔴 ni una dirección", c.ciudadPlausible("Cra 1 #2-3") === "");
+  chequear("pero sí con relleno adelante", c.ciudadPlausible("soy de Gachancipá") === "Gachancipá");
+}
+
+console.log("\n── R3. 🔑 El precio se valida por SIGNIFICADO, no por pertenencia ──");
+{
+  const cali = c.calcular("Cali", "uno");
+  const sinDestino = c.calcular("", "uno");
+
+  // El caso textual de la revisión: los tres números existen y están bien, pero
+  // intercambiados de rol.
+  const invertido = "El producto vale $22.100 y el envío $59.900. Total $82.000.";
+  chequear(
+    "🔑 roles invertidos: se rechaza",
+    !c.validarRespuesta(invertido, cali, {}).ok,
+    "los tres importes pertenecen a la cotización; lo que está mal es qué dice que es cada uno"
+  );
+  chequear(
+    "y el motivo dice cuál es cuál",
+    c.validarRespuesta(invertido, cali, {}).problemas.some((p) => p.tipo === "rol_equivocado")
+  );
+  chequear(
+    "🔑 «Total con envío incluido: $59.900» sin destino: se rechaza",
+    !c.validarRespuesta("Total con envío incluido: $59.900", sinDestino, {}).ok,
+    "$59.900 es el precio base, así que por pertenencia pasaba"
+  );
+  chequear("el envío presentado como total se rechaza", !c.validarRespuesta("El envío a Cali es $82.000", cali, {}).ok);
+
+  // Y lo que NO debe marcar, que es la otra mitad del trabajo.
+  chequear("✅ la línea del código pasa", c.validarRespuesta(c.lineaDePrecio(cali), cali, {}).ok);
+  chequear(
+    "✅ la del combo también",
+    c.validarRespuesta(c.lineaDePrecio(c.calcular("Cali", "dos conjuntos")), c.calcular("Cali", "dos conjuntos"), {}).ok
+  );
+  chequear(
+    "✅ 🔑 «El conjunto cuesta $59.900» NO se marca",
+    c.validarRespuesta("El conjunto cuesta $59.900 y el envío depende de tu ciudad", sinDestino, {}).ok,
+    "el rol lo da el sujeto («el conjunto»), no el verbo («cuesta»)"
+  );
+  chequear(
+    "✅ el precio base de los dos sin destino tampoco",
+    c.validarRespuesta("Los dos conjuntos salen $110.000 más el envío según tu ciudad.", sinDestino, {}).ok
+  );
+  // Los roles se leen bien en la forma normal del español: etiqueta pegada después.
+  const roles = c.rolesEnTexto("$59.900 el conjunto + $22.100 de envío");
+  chequear(
+    "las etiquetas pegadas después se atribuyen bien",
+    roles[0].rol === "producto" && roles[1].rol === "envio",
+    JSON.stringify(roles.map((r) => [r.valor, r.rol]))
+  );
+}
+
+console.log("\n── R4. Tadó: sinPromo2 no tumba la tarifa de una unidad ──");
+{
+  const una = c.calcular("Tadó", "uno");
+  chequear("🔑 una unidad SÍ se cotiza", una.ok === true, `dio ok=${una.ok} motivo=${una.motivo}`);
+  chequear(`con el total confirmado ${pesos(93000)}`, una.total === 93000, `dio ${pesos(una.total)}`);
+  chequear("y sin inventar el desglose", una.envio === null && una.desgloseDesconocido === true);
+  chequear("la línea de precio dice solo el total", !/de envío/.test(c.lineaDePrecio(una)), c.lineaDePrecio(una));
+  chequear("🔴 pero un envío inventado ahí se rechaza", !c.validarRespuesta("$59.900 el conjunto + $33.100 de envío", una, {}).ok);
+  chequear("dos unidades sigue sin promo", c.calcular("Tadó", "dos conjuntos").motivo === "dificil_sin_promo");
+  chequear("y no hay precio de negociación donde el margen no está medido", una.rescate === null);
+}
+
+console.log("\n── R5. No se le confirma al cliente lo que no se puede despachar ──");
+{
+  chequear("se reconoce una afirmación de cierre", c.afirmaCierre("¡Listo! Tu pedido quedó confirmado y te lo despacho hoy"));
+  chequear("y una respuesta neutral no lo es", !c.afirmaCierre("Con gusto, ¿me confirmas la talla?"));
+  const texto = c.respuestaEnRevision({ nombre: "Ana Gómez", ciudad: "Cali", total: 99000 });
+  chequear("el reemplazo saluda por el nombre", /Ana/.test(texto), texto);
+  chequear("dice que los datos quedaron", /datos/i.test(texto), texto);
+  chequear("🔑 no afirma que esté confirmado", !c.afirmaCierre(texto), texto);
+  chequear("y no promete fecha", !/hoy|mañana/i.test(texto), texto);
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

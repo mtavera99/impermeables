@@ -323,14 +323,23 @@ async function generateReply(phone, userText) {
   // Ahora: el código resuelve destino y cantidad, calcula, y le pasa al modelo
   // los números ya validados. El modelo pone la explicación comercial.
   // ==========================================================================
-  const ciudadDetectada = detectarCiudad(conv, userText);
-  const cot = cotizacion.calcular(ciudadDetectada, textoDelCliente(conv, userText));
+  // ⚠️ Destino y cantidad se resuelven contra TODO el hilo, no contra una ventana
+  // de dos mensajes. La revisión del 26-sep encontró que la cantidad se perdía:
+  // después de "quiero dos conjuntos", la ciudad y la talla la devolvían a una
+  // unidad. Las dos funciones viven en cotizacion.js para que las pruebas
+  // recorran exactamente este camino y no una versión de laboratorio.
+  const previa = store.leerCotizacion(phone);
+  const destino = cotizacion.destinoDelHilo(conv, userText);
+  const cantidad = cotizacion.cantidadDelHilo(conv, userText, previa && previa.uds);
+  const cot = cotizacion.calcular(destino.ciudad, userText, { cantidad });
   if (cot.ok) store.guardarCotizacion(phone, cot);
   const objecionDePrecio = cotizacion.hayObjecionDePrecio(conv.messages);
   const contextoPrecio = { objecionDePrecio };
 
   let reply;
   let validacion = null;
+  // Se prende si el pedido queda en revisión: el chat tiene que pasar a un humano.
+  let forzarHumano = false;
   if (!TIENE_IA) {
     reply =
       "¡Hola! 🏍️ Gracias por escribir a BikerPro. (Bot en modo prueba: falta configurar la API de IA). " +
@@ -482,53 +491,52 @@ async function generateReply(phone, userText) {
             "SE GUARDA, pero hay que leer el chat antes de despachar."
         );
       }
+
+      // ======================================================================
+      // 🔴 SI EL PEDIDO QUEDÓ EN REVISIÓN, NO SE LE CONFIRMA AL CLIENTE
+      //
+      // Guardar la marca no alcanza si al cliente ya se le dijo "¡listo, te lo
+      // despacho!": queda esperando un paquete a un precio que no podemos
+      // sostener. Se reemplaza SOLO la afirmación de cierre —si la hay— por una
+      // respuesta que no promete nada y no lo deja sin contestación, y el chat
+      // pasa al dueño.
+      // ======================================================================
+      if (savedOrder && store.requiereRevision(savedOrder) && cotizacion.afirmaCierre(reply)) {
+        const motivos = store.textoDeRevision(savedOrder);
+        console.warn(
+          `🔴 RESPUESTA DE CIERRE REEMPLAZADA (${phone}): el pedido requiere revisión (${motivos}) ` +
+            "y el mensaje le confirmaba la venta al cliente. Se manda una respuesta que no promete despacho."
+        );
+        reply = cotizacion.respuestaEnRevision(savedOrder);
+        forzarHumano = true;
+      }
     }
   }
-  if (handoff) store.setPaused(phone, true);
+  // Un pedido en revisión manda el chat a un humano igual que un ##HANDOFF##: el
+  // dueño tiene que cerrar esa venta a mano.
+  if (handoff || forzarHumano) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
   return { reply, order: savedOrder, handoff, media, pedidoRescatado };
 }
 
 // ============================================================================
-// De dónde sale la ciudad para cotizar.
+// 🧭 De dónde salen la ciudad y la cantidad: ver cotizacion.js
 //
-// Prioridad: lo que el cliente dijo EN ESTE TURNO manda sobre la cotización
-// guardada. Si cambió de ciudad, la oferta cambia — y `store.guardarCotizacion`
-// archiva la anterior en vez de pisarla.
+// `detectarCiudad()` y `textoDelCliente()` vivían acá y se movieron a
+// cotizacion.js como `destinoDelHilo()` y `cantidadDelHilo()`.
 //
-// Si en este turno no nombró ninguna, se conserva la de la cotización vigente:
-// así "y cuánto sale si llevo dos" no pierde el destino que ya había dado.
+// 🔴 POR QUÉ SE MOVIERON (revisión 26-sep): acá no se podían probar sin levantar
+// el bot, y las dos tenían un defecto que ninguna batería veía:
+//
+//   · `textoDelCliente()` miraba solo los dos últimos mensajes del cliente, así
+//     que "quiero dos conjuntos" se perdía en cuanto contestaba ciudad y talla, y
+//     el pedido volvía a UNA unidad en silencio.
+//   · `detectarCiudad()` solo reconocía ciudades del tarifario, así que
+//     "Gachancipá" era invisible y el bot preguntaba la ciudad para siempre.
+//
+// Ahora las pruebas recorren el mismo camino que este archivo usa.
 // ============================================================================
-function detectarCiudad(conv, userText) {
-  const enEsteTurno = cotizacion.ciudadesEn(userText || "");
-  if (enEsteTurno.length === 1) return enEsteTurno[0];
-  if (enEsteTurno.length > 1) return ""; // varios destinos: lo resuelve calcular()
-  const guardada = (conv && conv.cotizacion && conv.cotizacion.ciudad) || "";
-  if (guardada) return guardada;
-  // Última opción: buscarla en lo que el cliente dijo antes en el chat.
-  const delCliente = ((conv && conv.messages) || []).filter((m) => m.role === "user");
-  for (let i = delCliente.length - 1; i >= 0; i--) {
-    const c = cotizacion.ciudadesEn(String(delCliente[i].content || ""));
-    if (c.length === 1) return c[0];
-  }
-  return "";
-}
-
-/**
- * El texto sobre el que se lee la CANTIDAD.
- *
- * Se usa el turno actual más el anterior del cliente: "quiero dos" y la ciudad
- * suelen venir en mensajes distintos. No se usa todo el historial a propósito —
- * un "dos" de hace diez mensajes no es el pedido de ahora.
- */
-function textoDelCliente(conv, userText) {
-  const delCliente = ((conv && conv.messages) || [])
-    .filter((m) => m.role === "user")
-    .slice(-2)
-    .map((m) => String(m.content || ""));
-  return [...delCliente, String(userText || "")].join(" · ");
-}
 
 // Identificador de cliente con username (no es un teléfono).
 const RE_BSUID_AG = /^[A-Za-z]{2}\.[A-Za-z0-9]{1,128}$/;

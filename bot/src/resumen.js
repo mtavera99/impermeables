@@ -151,10 +151,20 @@ function pedidosCSV() {
   // Con esto el CSV se puede cruzar contra el gasto por anuncio de Meta Ads y
   // sacar el CPA REAL por anuncio — no el costo por conversación, que es lo
   // único que se podía ver hasta ahora.
-  const cab = ["fecha", "dia_bogota", "nombre", "celular", "ciudad", "direccion", "talla", "color", "pago", "unidades", "total", "anuncio_id", "anuncio_origen"];
+  // 🚦 `estado` va PRIMERO y no al final, a propósito: este CSV se abre para
+  // armar guías, y una fila que se ve igual que las demás se despacha igual que
+  // las demás. Si el pedido necesita revisión tiene que verse en la primera
+  // columna, antes de leer el nombre.
+  //
+  // ⚠️ La fila NO se borra: un pedido real con un número mal escrito sigue siendo
+  // una venta, y esconderlo sería perderla. Se marca, no se oculta.
+  const cab = ["estado", "revisar_porque", "fecha", "dia_bogota", "nombre", "celular", "ciudad", "direccion", "talla", "color", "pago", "unidades", "total", "total_esperado", "anuncio_id", "anuncio_origen"];
   const filas = pedidos.map((p) => {
     const q = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+    const revisar = store.textoDeRevision(p);
     return [
+      p.anulado ? "ANULADO" : revisar ? "🔴 REVISAR" : "LISTO",
+      revisar,
       p.fecha,
       diaBogota(new Date(p.fecha).getTime()),
       p.nombre,
@@ -166,6 +176,7 @@ function pedidosCSV() {
       p.pago,
       unidadesDe(p),
       p.total,
+      p.total_esperado == null ? "" : p.total_esperado,
       p.anuncio_id || "",
       p.anuncio_origen || "",
     ].map(q).join(",");

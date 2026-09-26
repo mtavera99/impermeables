@@ -458,6 +458,99 @@ function todosLosPedidos(opciones) {
   return todos.filter((p) => !p.anulado);
 }
 
+// ============================================================================
+// 🚦 ¿ESTE PEDIDO SE PUEDE DESPACHAR? — una sola fuente de verdad
+//
+// 🔴 LO QUE LA REVISIÓN ENCONTRÓ (26-sep): `precio_no_cuadra` y
+// `pendiente_revision` se ESCRIBÍAN en el pedido y NO SE LEÍAN EN NINGÚN LADO.
+// Se verificó con un grep: los dos campos aparecían una sola vez en todo el
+// repositorio, en la línea que los guarda.
+//
+// O sea que un pedido con el total mal aparecía en el panel igual que cualquier
+// otro, entraba en "pendientes de despachar", salía en el CSV sin distintivo, y
+// el dueño recibía el mismo aviso de "🟢 NUEVO PEDIDO". **Guardar una marca que
+// nadie mira es exactamente igual a no guardarla.**
+//
+// Por eso esto vive acá y no en cada pantalla: si cada lugar decide por su cuenta
+// qué es "listo", tarde o temprano uno de ellos se olvida de un caso. Los cinco
+// motivos ya existían y ya decían "no despachar" en sus comentarios; lo que
+// faltaba era que alguien lo hiciera cumplir.
+// ============================================================================
+
+const MOTIVOS_REVISION = [
+  {
+    clave: "precio_no_cuadra",
+    cuando: (o) => o.precio_no_cuadra === true,
+    // El más caro de todos: se despacha con el recaudo equivocado y la diferencia
+    // la pone el negocio o se discute en la puerta del cliente.
+    etiqueta: "el total no cuadra con la cotización",
+    detalle: (o) =>
+      o.motivo_precio ||
+      (o.total_esperado ? `debería ser $${Number(o.total_esperado).toLocaleString("es-CO")}` : ""),
+  },
+  {
+    clave: "pendiente_revision",
+    cuando: (o) => o.pendiente_revision === true && o.precio_no_cuadra !== true,
+    etiqueta: "marcado para revisión",
+    detalle: (o) => o.motivo_precio || "",
+  },
+  {
+    clave: "sin_confirmar",
+    cuando: (o) => o.sin_confirmar === true,
+    etiqueta: 'el cliente no dijo un "sí" claro',
+    detalle: (o) => o.motivo_sin_confirmar || "",
+  },
+  {
+    clave: "sin_telefono",
+    cuando: (o) => o.sinTelefono === true || !String(o.celular || "").trim(),
+    etiqueta: "no tiene celular y la transportadora lo exige para la guía",
+    detalle: () => "",
+  },
+  {
+    clave: "posible_duplicado",
+    cuando: (o) => o.posible_duplicado === true,
+    etiqueta: "el cliente ya tenía un pedido",
+    detalle: (o) =>
+      o.pedido_previo_total ? `el anterior era de $${Number(o.pedido_previo_total).toLocaleString("es-CO")}` : "",
+  },
+];
+
+/**
+ * Por qué este pedido NO está listo para despachar.
+ * @returns {Array<{clave:string, etiqueta:string, detalle:string}>} vacío si está listo
+ */
+function motivosDeRevision(order) {
+  if (!order) return [];
+  return MOTIVOS_REVISION.filter((m) => {
+    try {
+      return m.cuando(order) === true;
+    } catch {
+      return false;
+    }
+  }).map((m) => ({ clave: m.clave, etiqueta: m.etiqueta, detalle: String(m.detalle(order) || "") }));
+}
+
+/** ¿Hay que revisarlo antes de despacharlo? */
+function requiereRevision(order) {
+  return motivosDeRevision(order).length > 0;
+}
+
+/**
+ * ¿Está listo para despachar? Un pedido anulado no lo está, y uno que ya tiene
+ * guía tampoco "está listo": ya se despachó.
+ */
+function listoParaDespachar(order) {
+  if (!order || order.anulado) return false;
+  return !requiereRevision(order);
+}
+
+/** Una línea legible con todos los motivos, para avisos y para el CSV. */
+function textoDeRevision(order) {
+  return motivosDeRevision(order)
+    .map((m) => m.etiqueta + (m.detalle ? ` (${m.detalle})` : ""))
+    .join(" · ");
+}
+
 /** Solo los anulados, para poder revisarlos y revertir si hizo falta. */
 function pedidosAnulados() {
   return todosLosPedidos({ incluirAnulados: true }).filter((p) => p.anulado);
@@ -1087,6 +1180,8 @@ module.exports = {
   guardarPerfil, guardarAtribucion, atribucionDe,
   reemplazarPedidos,
   todosLosPedidos,
+  motivosDeRevision, requiereRevision, listoParaDespachar, textoDeRevision,
+  MOTIVOS_REVISION,
   pedidosAnulados,
   anularPedido,
   reactivarPedido,

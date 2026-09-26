@@ -2188,11 +2188,28 @@ async function handleWebhook(body) {
               `El cliente usa nombre de usuario de WhatsApp, así que no tenemos su número.\n` +
               `⛔ NO LO DESPACHES: pedile el celular por el chat primero.\n\n`
             : "";
+          // ==================================================================
+          // 🚦 EL ENCABEZADO DEL AVISO DICE LA VERDAD
+          //
+          // 🔴 Antes TODO pedido llegaba como "🟢 NUEVO PEDIDO", incluido uno con
+          // el total sin cuadrar. El dueño lee el aviso en el celular y despacha;
+          // el verde le dice que está todo bien. Un pedido que requiere revisión
+          // no puede anunciarse con el mismo encabezado que uno listo.
+          //
+          // Los motivos salen de store.motivosDeRevision(), que es el mismo
+          // criterio que usa el panel y el CSV. Una sola fuente de verdad.
+          // ==================================================================
+          const revisiones = store.motivosDeRevision(order);
+          const encabezado = revisiones.length
+            ? `🔴 PEDIDO QUE NO SE PUEDE DESPACHAR TODAVÍA\n` +
+              revisiones.map((m) => `• ${m.etiqueta}${m.detalle ? `: ${m.detalle}` : ""}`).join("\n") +
+              `\n\n`
+            : `🟢 NUEVO PEDIDO BikerPro\n`;
           await sendText(
             OWNER,
             avisoRescate +
               alerta +
-              `🟢 NUEVO PEDIDO BikerPro\n` +
+              encabezado +
               `Nombre: ${order.nombre}\nCel: ${order.celular || "🔴 FALTA"}\n` +
               `Ciudad: ${order.ciudad}\nDir: ${order.direccion || "🔴 FALTA"}\n` +
               `Color: ${order.color} · Talla: ${order.talla}\n` +
