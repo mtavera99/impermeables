@@ -1436,6 +1436,128 @@ const datosBase = {
     chequear("24c· con su monto", /\$82\.000/.test(t3.reply), `salió: ${t3.reply}`);
   }
 
+  // ==========================================================================
+  console.log("\n── 25. 🧍 LA FRASE REAL de José, tal como la escribió ──");
+  // 🔴 LO QUE SE ESCAPÓ EN EL PR #170. La prueba §21 usaba
+  // "José Bello, 3001234567, San Onofre, entrega en oficina" y pasaba, pero la frase
+  // real del cliente era otra y seguía fallando:
+  //
+  //   "Jose bello San onofre Sucre 3001234567 Melo envía ala oficina"  → ciudad "bello"
+  //
+  // Al escribir la prueba sin "Sucre" le quité al caso justo la condición que lo
+  // hacía fallar: quedó verde sobre un mensaje que ya no era el del cliente.
+  //
+  // 🔎 El mecanismo: `senalDeDestinoPara` preguntaba `departamentoEn(texto)` sobre el
+  // mensaje COMPLETO, sin atarlo al municipio candidato. "Sucre" —el departamento de
+  // San Onofre— legitimaba "bello", que estaba diez palabras antes y era el apellido.
+  //
+  // ⚠️ Acá se conserva la frase con su forma y sus typos ("ala oficina", "bello" en
+  // minúscula, sin comas). Solo se cambian el nombre de pila y el celular. El
+  // apellido "bello" se mantiene a propósito: ES el mecanismo del caso.
+  // ==========================================================================
+  {
+    const tel = "573008880031";
+    const CEL = "3009990031";
+    const FRASE = `Pedro bello San onofre Sucre ${CEL} Nieto envía ala oficina`;
+    const CUADRO_SO =
+      `Confirmemos tu pedido ✅\nNombre: Pedro Bello Nieto\nCelular: ${CEL}\nCiudad: San Onofre\n` +
+      `Dirección: oficina de Interrapidísimo\nColor de la franja: negro\nTalla: L\n` +
+      `Pago: contraentrega\nTOTAL a pagar al recibir: $85.000\n` +
+      `¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`;
+
+    await turno(tel, "hola, cuánto vale?", "¡Hola! 🏍️ Es el conjunto de 4 piezas. ¿Para qué ciudad sería el envío?");
+    await turno(tel, "San onofre Sucre", "Te queda en $85.000 en total puesto en San onofre 📦 Pásame nombre completo, dirección con barrio y celular");
+    const cotAntes = store.leerCotizacion(tel);
+    chequear("25· el destino queda establecido en San Onofre", cotAntes && /san\s*onofre/i.test(cotAntes.ciudad), JSON.stringify(cotAntes && cotAntes.ciudad));
+    chequear("25· 🔑 y SIN el departamento pegado", cotAntes && !/sucre/i.test(cotAntes.ciudad), JSON.stringify(cotAntes && cotAntes.ciudad));
+    chequear("25· con su total de $85.000", cotAntes && cotAntes.total === 85000, `${cotAntes && cotAntes.total}`);
+
+    // 🔴 LA FRASE DEL CASO.
+    const t = await turno(tel, FRASE, CUADRO_SO);
+    const cot = store.leerCotizacion(tel);
+    chequear("25· 🔑 EL CASO: la cotización sigue en San Onofre", cot && /san\s*onofre/i.test(cot.ciudad), JSON.stringify(cot && cot.ciudad));
+    chequear("25· 🔑 y NO se pasó a «bello»", cot && !/^bello$/i.test(String(cot.ciudad).trim()), JSON.stringify(cot && cot.ciudad));
+    chequear("25· 🔑 el total sigue en $85.000, no baja a $83.000", cot && cot.total === 85000, `${cot && cot.total}`);
+    chequear("25· el cliente ve su total", /\$85\.000/.test(t.reply), `salió: ${t.reply}`);
+    chequear("25· y NO ve el de otra ciudad", !/\$83\.000/.test(t.reply), `salió: ${t.reply}`);
+
+    await turno(
+      tel,
+      "sí confirmo",
+      `¡Listo Pedro! ${ORDER({
+        nombre: "Pedro Bello Nieto", celular: CEL, ciudad: "San Onofre",
+        direccion: "OFICINA Interrapidísimo - San Onofre", color: "negro", talla: "L",
+        unidades: 1, pago: "contraentrega", total: 85000,
+      })}`
+    );
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("25· 🔑 el pedido queda con San Onofre", pedido && /san onofre/i.test(pedido.ciudad), JSON.stringify(pedido && pedido.ciudad));
+    chequear("25· con el total correcto", pedido && pedido.total === 85000, `${pedido && pedido.total}`);
+    chequear(
+      "25· 🔑 y SE PUEDE DESPACHAR",
+      pedido && store.listoParaDespachar(pedido) === true,
+      store.textoDeRevision(pedido)
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 26. 🤔 El departamento pegado al apellido: se PREGUNTA ──");
+  // La variante sin la ciudad: "Pedro bello Sucre 3009990032 oficina". El
+  // departamento queda pegado al nombre del tarifario, así que podría ser un
+  // destino… o el apellido más el departamento de la ciudad que ya tenía. No se
+  // puede distinguir sin la tabla de municipios por departamento, que no existe acá.
+  //
+  // 🔑 Se pregunta. Lo que NO se hace es tomar Bello en silencio y cobrarle $2.000
+  // menos sobre una ciudad a la que el paquete no va.
+  // ==========================================================================
+  {
+    const tel = "573008880032";
+    await turno(tel, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel, "San onofre Sucre", "Te queda en $85.000 en total puesto en San onofre 📦 Pásame nombre completo, dirección con barrio y celular");
+
+    const t = await turno(
+      tel,
+      "Pedro bello Sucre 3009990032 oficina",
+      "Te queda en $83.000 en total puesto en Bello 📦",
+      "Te queda en $83.000 en total puesto en Bello 📦"
+    );
+    chequear("26· 🔑 NO sale el total de Bello", !/\$83\.000/.test(t.reply), `salió: ${t.reply}`);
+    chequear("26· 🔑 se le PREGUNTA la ciudad", /qu[eé] ciudad/i.test(t.reply), `salió: ${t.reply}`);
+    const cot = store.leerCotizacion(tel);
+    chequear("26· 🔑 y la cotización guardada NO se sobrescribe", cot && /san\s*onofre/i.test(cot.ciudad), JSON.stringify(cot && cot.ciudad));
+    chequear("26· con su total intacto", cot && cot.total === 85000, `${cot && cot.total}`);
+    chequear("26· sin derivar a un humano", t.revisionHumana === null, JSON.stringify(t.revisionHumana));
+    chequear("26· y sin guardar pedido", store.todosLosPedidos().filter((p) => p.telefono_chat === tel).length === 0);
+  }
+
+  // ==========================================================================
+  console.log("\n── 27. 🔀 «Bello, Antioquia» sigue siendo un cambio válido ──");
+  // No se prohíbe Bello. Si esto no funcionara, el arreglo habría cambiado un
+  // defecto por otro peor: no poder cambiar de ciudad.
+  // ==========================================================================
+  {
+    const tel = "573008880033";
+    await turno(tel, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel, "San onofre Sucre", "Te queda en $85.000 en total puesto en San onofre 📦 Pásame nombre completo, dirección con barrio y celular");
+
+    const t = await turno(tel, "Bello Antioquia", "Te queda en $83.000 en total: $59.900 el conjunto + $23.100 de envío a Bello 📦");
+    const cot = store.leerCotizacion(tel);
+    chequear("27· 🔑 el cambio auténtico SÍ cambia el destino", cot && /bello/i.test(cot.ciudad), JSON.stringify(cot && cot.ciudad));
+    chequear("27· 🔑 y recalcula a $83.000", cot && cot.total === 83000, `${cot && cot.total}`);
+    chequear("27· el cliente recibe el total nuevo", /\$83\.000/.test(t.reply), `salió: ${t.reply}`);
+    chequear("27· sin el departamento pegado", cot && !/antioquia/i.test(cot.ciudad), JSON.stringify(cot && cot.ciudad));
+
+    // Y dicho como corrección en medio de los datos, también.
+    const tel2 = "573008880034";
+    await turno(tel2, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel2, "San onofre Sucre", "Te queda en $85.000 en total puesto en San onofre 📦 Pásame nombre completo, dirección con barrio y celular");
+    const t2 = await turno(tel2, "Pedro Nieto 3009990034 mejor envíalo a Bello Antioquia", "Te queda en $83.000 en total: $59.900 el conjunto + $23.100 de envío a Bello 📦");
+    const cot2 = store.leerCotizacion(tel2);
+    chequear("27· 🔑 la corrección dentro de los datos también vale", cot2 && /bello/i.test(cot2.ciudad), JSON.stringify(cot2 && cot2.ciudad));
+    chequear("27· con su total recalculado", cot2 && cot2.total === 83000, `${cot2 && cot2.total}`);
+    chequear("27· y el cliente lo ve", /\$83\.000/.test(t2.reply), `salió: ${t2.reply}`);
+  }
+
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   try {
     fs.rmSync(DIR, { recursive: true, force: true });

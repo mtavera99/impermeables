@@ -1374,5 +1374,117 @@ console.log("\n── R18. 🧍 La cotización sigue al DESTINO, no a los datos 
   );
 }
 
+console.log("\n── R19. 🏷️ Nombre, municipio y departamento, distinguidos en el MISMO mensaje ──");
+// 🔴 LO QUE SE ESCAPÓ EN EL PR #170. La prueba §R18 usaba
+// "José Bello, 3001234567, San Onofre, entrega en oficina" y pasaba. La frase REAL
+// del cliente era otra y seguía dando "bello":
+//
+//   "Jose bello San onofre Sucre 3001234567 Melo envía ala oficina"
+//
+// Al escribir la prueba sin "Sucre" le quité al caso justo la condición que lo hacía
+// fallar. La prueba quedó verde sobre un mensaje que ya no era el del cliente.
+//
+// 🔎 El mecanismo: `senalDeDestinoPara` preguntaba `departamentoEn(texto)` sobre el
+// mensaje COMPLETO, sin atarlo al municipio candidato. "Sucre" —el departamento de
+// San Onofre— legitimaba "bello", que estaba diez palabras antes y era el apellido.
+//
+// ⚠️ Se conserva la forma de la frase, con sus typos. Solo se cambian el nombre de
+// pila y el celular; el apellido "bello" se mantiene porque ES el mecanismo.
+{
+  const a = (t) => ({ role: "assistant", content: t });
+  const PIDE_DATOS = "Pásame nombre completo, dirección con barrio y celular";
+  const conDestino = (ciudad, ultimoBot) => ({
+    messages: [a(ultimoBot || PIDE_DATOS)],
+    cotizacion: { ciudad, uds: 1, total: 85000 },
+  });
+  const FRASE = "Pedro bello San onofre Sucre 3009990031 Nieto envía ala oficina";
+
+  // ── 1. El caso exacto ──────────────────────────────────────────────────────
+  const d = c.destinoDelHilo(conDestino("San Onofre"), FRASE);
+  chequear("🔑 EL CASO: la frase real conserva San Onofre", d.ciudad === "San Onofre", JSON.stringify(d));
+  chequear("   y no se queda con el apellido", !/^bello$/i.test(String(d.ciudad).trim()), JSON.stringify(d.ciudad));
+  chequear(
+    "   el total sigue siendo el de San Onofre",
+    c.calcular(d.ciudad, FRASE, { cantidad: { uds: 1 } }).total === 85000
+  );
+  chequear(
+    "🔑 y la señal de destino ya NO se le aplica a «bello»",
+    c.senalDeDestinoPara(FRASE, "bello") === false,
+    "un departamento suelto no puede legitimar un apellido"
+  );
+
+  // Variantes de la misma frase: el orden de las palabras no debe cambiar nada.
+  for (const t of [
+    "Pedro bello San onofre Sucre 3009990031 Nieto envía ala oficina",
+    "pedro bello san onofre sucre 3009990031",
+    "bello Nieto Pedro, San Onofre Sucre, 3009990031",
+    "Pedro bello Nieto San onofre Sucre celular 3009990031 oficina",
+  ]) {
+    chequear(
+      `  conserva el destino: ${JSON.stringify(t.slice(0, 44))}`,
+      c.destinoDelHilo(conDestino("San Onofre"), t).ciudad === "San Onofre",
+      JSON.stringify(c.destinoDelHilo(conDestino("San Onofre"), t))
+    );
+  }
+
+  // ── 2. El departamento tiene que estar PEGADO al municipio ─────────────────
+  chequear("🔑 «Bello Antioquia» sí es Bello con su departamento", c.senalDeDestinoPara("Bello Antioquia", "Bello") === true);
+  chequear("   «Bello, Antioquia» también", c.senalDeDestinoPara("Bello, Antioquia", "Bello") === true);
+  chequear("   y «Antioquia, Bello» al revés", c.senalDeDestinoPara("Antioquia, Bello", "Bello") === true);
+  chequear(
+    "🔴 pero «bello … Sucre» a diez palabras NO",
+    c.senalDeDestinoPara("Pedro bello San onofre Sucre 3009990031 oficina", "bello") === false
+  );
+
+  // ── 3. Ante la duda real se pregunta, sin sobrescribir ─────────────────────
+  // "Pedro bello Sucre 3009990032 oficina": el departamento queda pegado al nombre
+  // del tarifario. Podría ser un destino o el apellido más el departamento de la
+  // ciudad que ya tenía, y no se puede distinguir: el proyecto no tiene la tabla de
+  // municipios por departamento.
+  const dudoso = c.destinoDelHilo(conDestino("San Onofre"), "Pedro bello Sucre 3009990032 oficina");
+  chequear("🔑 departamento pegado al apellido → no elige", dudoso.ciudad === "", JSON.stringify(dudoso));
+  chequear("   lo deja como duda explícita", dudoso.origen === "duda_entre_el_dato_y_el_destino", dudoso.origen);
+  chequear("   y termina en sin_destino, que PREGUNTA", c.calcular(dudoso.ciudad, "Pedro bello Sucre").motivo === "sin_destino");
+
+  // ── 4. Un cambio auténtico a Bello, Antioquia sigue pasando ────────────────
+  const CAMBIOS = [
+    "Bello Antioquia",
+    "Bello, Antioquia",
+    "Bello Antioquia 3009990033",
+    "mejor a Bello Antioquia",
+    "no, envíalo a Bello, Antioquia",
+    "cámbialo para Bello Antioquia 3009990033",
+    "Pedro Nieto 3009990034 mejor envíalo a Bello Antioquia",
+  ];
+  for (const t of CAMBIOS) {
+    const r = c.destinoDelHilo(conDestino("San Onofre"), t);
+    chequear(`🔑 cambio auténtico: ${JSON.stringify(t)}`, r.ciudad === "Bello", JSON.stringify(r));
+  }
+  chequear("   con el departamento recortado", c.destinoDelHilo(conDestino("San Onofre"), "Bello Antioquia").ciudad === "Bello");
+  chequear("   y cotiza su banda", c.calcular("Bello", "uno").total === 83000);
+
+  // ── 5. El typo «envía ala oficina» no es una corrección de destino ─────────
+  // Sin el corte de palabra, "envía ala" se leía como "envía a" y pasaba por
+  // corrección explícita, que es señal FUERTE de cambio de destino.
+  chequear(
+    "🔑 «envía ala oficina» no legitima un cambio",
+    c.destinoDelHilo(conDestino("San Onofre"), "Pedro bello Sucre 3009990031 envía ala oficina").ciudad !== "Bello",
+    JSON.stringify(c.destinoDelHilo(conDestino("San Onofre"), "Pedro bello Sucre 3009990031 envía ala oficina"))
+  );
+  chequear(
+    "   pero «envíalo a Bello Antioquia» sí",
+    c.destinoDelHilo(conDestino("San Onofre"), "envíalo a Bello Antioquia").ciudad === "Bello"
+  );
+
+  // ── 6. Y no se rompe el resto ──────────────────────────────────────────────
+  chequear("«buena calidad» no cuenta como mención de Cali", c.destinoDelHilo(conDestino("Cali"), "muy buena calidad, gracias").origen === "cotizacion_guardada");
+  chequear(
+    "dos ciudades siguen preguntando",
+    c.destinoDelHilo(conDestino("Cali"), "para Palmira, no Cali").origen === "varios_en_el_turno"
+  );
+  chequear("Pitalito en el saludo sigue funcionando", c.destinoDelHilo({ messages: [] }, "Hola buenos días, Pitalito Huila").ciudad === "Pitalito");
+  chequear("y la transportadora sigue sin ser municipio", c.destinoDelHilo(conDestino("Yarumal", "¿A tu dirección o a oficina?"), "en Interrapidísimo").ciudad === "Yarumal");
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);
