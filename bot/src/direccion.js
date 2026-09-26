@@ -237,8 +237,9 @@ function avisoParaElDueno(order) {
 //      lo podemos prometer. Se conserva su preferencia y se pide aclaración; no se
 //      le cambia el pedido en silencio ni se le promete esa sede.
 //
-// 🔑 Y "Terranova" no es una ciudad ni una oficina verificada: es una referencia
-// dentro de Jamundí. El tarifario general no se toca por esto.
+// 🔑 Y "Terranova" no es una ciudad: es una REFERENCIA dentro de Jamundí. El
+// tarifario general no se toca por esto, y no hay nada que verificar sobre ella:
+// para una entrega normal a oficina basta la ciudad.
 // ============================================================================
 
 // Las transportadoras. Nombrarlas NO es pedir una sede: es decir con quién se manda.

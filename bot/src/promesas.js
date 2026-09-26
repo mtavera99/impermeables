@@ -89,10 +89,17 @@ const REGLAS = [
   {
     // 🔴 DEL CASO DEL 26-SEP: el cliente pidió recibirlo en "la oficina de
     // Terranova" y el bot contestó *"Te lo enviamos a la oficina de Interrapidísimo
-    // en Terranova, Jamundí"*. No hay NADA en el sistema sobre esa oficina —se
-    // verificó: cero menciones en el repositorio— así que el bot confirmó como
-    // hecho algo que nadie comprobó. Si esa oficina no existe o no recibe envíos,
-    // el paquete se devuelve y el flete de ida y vuelta lo paga el negocio.
+    // en Terranova, Jamundí"*, dando por hecha una sede concreta.
+    //
+    // ⚠️ CORRECCIÓN AL MOTIVO QUE ESTABA ESCRITO ACÁ. Decía que "no hay nada en el
+    // sistema sobre esa oficina" y de ahí sacaba que podría no existir y que el
+    // flete de ida y vuelta lo pagaría el negocio. Eso era una suposición mía: que
+    // el repositorio no la mencione no dice nada sobre si la oficina existe.
+    // Terranova es una referencia dentro de Jamundí y no hay nada que verificar.
+    //
+    // 🔑 EL MOTIVO REAL, que no depende de eso: la oficina de recogida la ASIGNA LA
+    // TRANSPORTADORA. Prometer una sede es comprometer algo que el negocio no
+    // decide, exista o no. Por eso se corrige la frase, no porque falte un dato.
     clave: "oficina_asegurada",
     // ⚠️ SE ESTRECHÓ. La primera versión marcaba cualquier "te lo enviamos a
     // oficina", y eso es el FLUJO NORMAL: se registra ciudad + entrega en oficina
