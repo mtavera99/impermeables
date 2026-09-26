@@ -736,22 +736,78 @@ const datosBase = {
     );
     chequear("13· 🙋 y avisa para revisar el chat", t.revisionHumana !== null, JSON.stringify(t.revisionHumana));
 
-    // 4) El pedido, con la cantidad bien, queda DESPACHABLE.
+    // ==========================================================================
+    // 4) 🔴 LA PAUSA ES REAL: el bot deja de contestar
+    //
+    // ⚠️ ESTA PRUEBA ESTABA MAL. La versión anterior seguía llamando a
+    // generateReply() después de la pausa y terminaba declarando el pedido
+    // despachable. Pero `generateReply` NO mira la pausa —el que la mira es
+    // server.js antes de llamarlo— así que la prueba pasaba por un camino que en
+    // producción no existe: el bot callado no habría armado ese pedido.
+    // ==========================================================================
+    chequear("13· 🔑 el chat quedó en pausa de verdad", store.isPaused(tel) === true);
+
+    const fuenteServer = require("fs").readFileSync(`${__dirname}/src/server.js`, "utf8");
+    chequear(
+      "13· y server.js NO llama al bot cuando está en pausa",
+      /if \(store\.isPaused\(from\)\)/.test(fuenteServer),
+      "sin ese guardia la pausa no sirve de nada"
+    );
+
+    // Así que se simula el guardia real: mientras esté en pausa, no se contesta.
+    const comoEnProduccion = async (texto) => {
+      if (store.isPaused(tel)) return { reply: null, pausado: true };
+      return turno(tel, texto, "(el bot no debería llegar acá)");
+    };
+    const r1 = await comoEnProduccion("¿y cuándo me llega?");
+    chequear("13· 🔑 el cliente escribe y el bot NO contesta", r1.pausado === true && r1.reply === null);
+    chequear(
+      "13· y NO se creó ningún pedido mientras estaba en pausa",
+      store.todosLosPedidos().filter((p) => p.telefono_chat === tel).length === 0,
+      "el bot callado no puede estar armando pedidos"
+    );
+
+    // ==========================================================================
+    // 5) 🔑 LA REVISIÓN DE LA OFICINA SE RESUELVE EXPLÍCITAMENTE, O NO SE DESPACHA
+    // ==========================================================================
+    // El dueño verifica y devuelve el chat al bot (el botón del panel).
+    store.setPaused(tel, false);
     const datos = {
       nombre: "Petra Vargas", celular: "3005550013", ciudad: "Jamundí",
       direccion: "OFICINA Interrapidísimo - Terranova", color: "verde",
       talla: "XL y L", unidades: 2, pago: "contraentrega", total: 148000,
     };
     await turno(tel, "Petra Vargas, 3005550013", CUADRO(148000).replace("Ana Gómez", "Petra Vargas").replace("3001234567", "3005550013").replace("Cali", "Jamundí"));
-    t = await turno(tel, "sí confirmo", `¡Listo Petra! ${ORDER(datos)}`);
+    await turno(tel, "sí confirmo", `¡Listo Petra! ${ORDER(datos)}`);
+
     const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
     chequear("13· el pedido se guarda con 2 unidades", pedido && Number(pedido.unidades) === 2, `${pedido && pedido.unidades}`);
     chequear("13· cobrando los dos", pedido && Number(pedido.total) === 148000, `${pedido && pedido.total}`);
     chequear(
-      "13· 🚦 y AHORA sí queda listo para despachar",
-      pedido && store.listoParaDespachar(pedido),
+      "13· 🔑 la cantidad ya NO lo bloquea",
+      pedido && !pedido.precio_no_cuadra,
+      String(pedido && pedido.motivo_precio)
+    );
+    chequear(
+      "13· 🔑 pero la OFICINA sin confirmar SÍ lo bloquea",
+      pedido && store.listoParaDespachar(pedido) === false,
+      "una oficina que nadie verificó no puede contar como lista"
+    );
+    chequear(
+      "13· y el aviso dice qué hay que confirmar",
+      /oficina de la transportadora no está confirmada/.test(store.textoDeRevision(pedido)),
       store.textoDeRevision(pedido)
     );
+
+    // Y recién cuando alguien la confirma, queda listo.
+    const i = store.todosLosPedidos().findIndex((p) => p.id === pedido.id);
+    const todos = store.todosLosPedidos();
+    chequear(
+      "13· 🔑 solo al marcarla verificada queda despachable",
+      store.listoParaDespachar({ ...pedido, oficina_verificada: true }) === true,
+      store.textoDeRevision({ ...pedido, oficina_verificada: true })
+    );
+    void i; void todos;
   }
 
   // ==========================================================================
@@ -775,8 +831,29 @@ const datosBase = {
       !/\$82\.000/.test(t1.reply),
       `salió: ${t1.reply}`
     );
-    chequear("14· se le contesta algo, no silencio", t1.reply.trim().length > 30, JSON.stringify(t1.reply));
-    chequear("14· 🙋 y se escala para que un humano conteste", t1.revisionHumana !== null, JSON.stringify(t1.revisionHumana));
+    chequear("14· se le contesta algo, no silencio", t1.reply.trim().length > 20, JSON.stringify(t1.reply));
+    // 🔑 Y lo importante: se CONSERVA la parte que contestaba la pregunta. Antes se
+    // tiraba la respuesta entera y se escalaba; eso dejaba al cliente esperando a
+    // una persona por algo que el propio texto ya explicaba.
+    chequear(
+      "14· 🔑 se conserva la explicación de las tallas",
+      /3XL/.test(t1.reply),
+      `salió: ${t1.reply}`
+    );
+    chequear("14· y se quitó el importe inválido", !/\$70\.000/.test(t1.reply), `salió: ${t1.reply}`);
+    chequear(
+      "14· 🙋 y NO hace falta un humano: la conversación quedó resuelta",
+      t1.revisionHumana === null,
+      JSON.stringify(t1.revisionHumana)
+    );
+
+    // Pero si NO queda nada que salvar, ahí sí se escala.
+    const tel3 = "573005550016";
+    await turno(tel3, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel3, "Cali", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali. Pásame tus datos");
+    const t2 = await turno(tel3, "y cómo son las tallas?", "Cada uno sale en $70.000.", "Cada uno sale en $70.000.");
+    chequear("14· 🔑 si no hay nada que salvar, SÍ se escala", t2.revisionHumana !== null, JSON.stringify(t2.revisionHumana));
+    chequear("14· y no sale el importe inválido", !/\$70\.000/.test(t2.reply), `salió: ${t2.reply}`);
 
     // Y si el turno siguiente vuelve a fallar, no se repite la misma línea.
     const tel2 = "573005550015";

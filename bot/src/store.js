@@ -518,6 +518,27 @@ const MOTIVOS_REVISION = [
     detalle: () => "",
   },
   {
+    // ============================================================================
+    // 🏢 UNA OFICINA NO VERIFICADA NO SE DESPACHA HASTA QUE ALGUIEN LA CONFIRME
+    //
+    // DEL CASO DEL 26-SEP: el cliente pidió recibirlo en "la oficina de Terranova",
+    // el bot la dio por buena, y el pedido terminaba contando como listo. Se
+    // verificó que NO hay ningún registro de oficinas en el sistema: no tenemos con
+    // qué saber si esa oficina existe ni si recibe envíos.
+    //
+    // 🔑 Y no alcanza con avisar: el aviso se lee una vez y el pedido sigue ahí. La
+    // revisión tiene que RESOLVERSE explícitamente — alguien confirma la oficina y
+    // se marca `oficina_verificada` — y hasta entonces no está listo. Si se
+    // despacha a una oficina que no recibe, el flete de ida y vuelta lo paga el
+    // negocio.
+    // ============================================================================
+    clave: "oficina_sin_verificar",
+    cuando: (o) => o.entrega === "oficina" && o.oficina_verificada !== true,
+    etiqueta: "la oficina de la transportadora no está confirmada",
+    detalle: (o) =>
+      `${o.direccion || "sin dirección"} — confirmá con la transportadora que esa oficina recibe envíos`,
+  },
+  {
     clave: "posible_duplicado",
     cuando: (o) => o.posible_duplicado === true,
     etiqueta: "el cliente ya tenía un pedido",

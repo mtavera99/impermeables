@@ -734,5 +734,85 @@ console.log("\n── R10. 🔴 La alerta dice la causa REAL, no un total que s�
   chequear("✅ si el total de verdad difiere, lo dice", /debería ser \$82\.000/.test(store.textoDeRevision(otro)), store.textoDeRevision(otro));
 }
 
+console.log("\n── R11. 🔴 Tres casos más de cantidad, reproducidos ──");
+{
+  const q = (t) => { const r = c.resolverCantidad(t); return r.escalar ? "ESC" : r.ambiguo ? "AMB" : String(r.uds); };
+
+  // El orden de las comprobaciones es el arreglo: primero lo que escala, después
+  // lo que el cliente declaró, y solo al final la inferencia por tallas.
+  chequear('🔑 CASO OMAR: "Talla M 2 Juegos." son DOS', q("Talla M 2 Juegos.") === "2", q("Talla M 2 Juegos."));
+  chequear('   y "2 juegos" suelto también', q("2 juegos") === "2");
+  chequear('   igual que "dos pintas"', q("dos pintas") === "2");
+  chequear(
+    '🔑 "Quiero un impermeable, ¿tienen L y XL?" es UNO',
+    q("Quiero un impermeable, ¿tienen L y XL?") === "1",
+    q("Quiero un impermeable, ¿tienen L y XL?")
+  );
+  chequear("   porque lo que el cliente declara gana sobre la inferencia", c.resolverCantidad("un impermeable").uds === 1);
+  chequear(
+    "   y una pregunta por disponibilidad no enumera unidades",
+    c.dosPorTallas("¿tienen L y XL?").dos === false,
+    JSON.stringify(c.dosPorTallas("¿tienen L y XL?"))
+  );
+  chequear('   "hay M y L disponible?" tampoco', q("hay M y L disponible?") === "1");
+  chequear(
+    '🔑 "tres impermeables: uno XL y otro L y otro M" ESCALA',
+    q("Quiero tres impermeables: uno XL y otro L y otro M") === "ESC",
+    q("Quiero tres impermeables: uno XL y otro L y otro M")
+  );
+  chequear('   y tres tallas sin decir "tres" también', q("uno XL y otro L y otro M") === "ESC", q("uno XL y otro L y otro M"));
+  chequear("   con el motivo escrito", /3 o m[aá]s/.test(String(c.resolverCantidad("uno XL y otro L y otro M").motivo)));
+
+  // Y nada de lo que ya funcionaba cambió.
+  chequear("✅ el caso real de dos sigue dando dos", q("la una talla normal XL y la otra es L") === "2");
+  chequear("✅ la alternativa sigue ambigua", q("¿me sirve XL o L?") === "AMB");
+  chequear("✅ 2XL sigue siendo una talla", q("talla 2XL") === "1");
+  chequear("✅ 12 conjuntos sigue escalando", q("12 conjuntos") === "ESC");
+}
+
+console.log("\n── R12. ✂️ Se conserva la parte útil en vez de escalar ──");
+{
+  const cot = c.calcular("Cali", "uno");
+  const salvable = (t) => {
+    const d = c.depurarImportes(t, cot, {});
+    const palabras = d.texto.split(/\s+/).filter(Boolean).length;
+    return { ...d, ok: palabras >= 4 && d.texto.length >= 20 && c.validarRespuesta(d.texto, cot, {}).ok };
+  };
+
+  const a = salvable("Las tallas van de S a 3XL y cada conjunto sale en $70.000.");
+  chequear("🔑 se conserva la explicación de las tallas", a.ok && /3XL/.test(a.texto), JSON.stringify(a));
+  chequear("   y se quita el importe inválido", !/70\.000/.test(a.texto), a.texto);
+
+  const b = salvable("Sí, hay franja verde. El combo de dos sale en $200.000.");
+  chequear("🔑 se conserva la respuesta del color", b.ok && /verde/.test(b.texto), JSON.stringify(b));
+
+  const d = salvable("Cada uno sale en $70.000.");
+  chequear("🔑 si NO queda nada útil, no se inventa: se escala", d.ok === false, JSON.stringify(d));
+
+  const e = salvable(c.lineaDePrecio(cot));
+  chequear("✅ una respuesta válida no se toca", e.ok && e.quitadas.length === 0, JSON.stringify(e.quitadas));
+  chequear("✅ y no se parte un $82.000 al separar oraciones", /\$82\.000/.test(e.texto), e.texto);
+}
+
+console.log("\n── R13. 🏢 Una oficina sin confirmar no se despacha ──");
+{
+  const store = require("./src/store");
+  const base = { nombre: "X", celular: "3001234567", ciudad: "Jamundi", talla: "L", total: 82000, unidades: 1 };
+  const aOficina = { ...base, entrega: "oficina", direccion: "OFICINA Interrapidísimo - Terranova" };
+  chequear("🔑 a oficina sin confirmar: NO despachable", store.listoParaDespachar(aOficina) === false);
+  chequear(
+    "   y el aviso dice qué confirmar",
+    /oficina de la transportadora no está confirmada/.test(store.textoDeRevision(aOficina)),
+    store.textoDeRevision(aOficina)
+  );
+  chequear("   con la dirección adentro", /Terranova/.test(store.textoDeRevision(aOficina)));
+  chequear(
+    "🔑 solo al marcarla verificada queda despachable",
+    store.listoParaDespachar({ ...aOficina, oficina_verificada: true }) === true,
+    store.textoDeRevision({ ...aOficina, oficina_verificada: true })
+  );
+  chequear("✅ un pedido a casa no se ve afectado", store.listoParaDespachar({ ...base, direccion: "Cra 1 #2-3" }) === true);
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

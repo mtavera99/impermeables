@@ -480,7 +480,34 @@ async function generateReply(phone, userText) {
         cotizacion.botPidioCiudad(conv.messages);
       const esperaUnPrecio = preguntoPorPrecio || contestoLaCiudad;
 
-      if (!cot.ok) {
+      // ======================================================================
+      // ✂️ PRIMERO SE INTENTA SALVAR LA RESPUESTA, no reemplazarla
+      //
+      // Casi siempre el problema es UNA frase con un número mal, y el resto del
+      // mensaje contesta bien lo que el cliente preguntó. Se quita esa parte y se
+      // conserva lo demás; si hacía falta un precio, se le pega el calculado.
+      //
+      // 🔑 Y no se escala: la conversación queda resuelta. Mandar a un humano cada
+      // vez que aparece un número mal deja al cliente esperando por algo que el
+      // propio texto ya contestaba.
+      // ======================================================================
+      const depurado = cot.ok ? cotizacion.depurarImportes(reply, cot, contextoPrecio) : { texto: "" };
+      // ⚠️ El umbral estaba en 40 caracteres y tiraba respuestas útiles: "Las tallas
+      // van de S a 3XL." son 26 y contesta perfecto la pregunta. Se pide que quede
+      // una frase de verdad (4 palabras), no una longitud arbitraria.
+      const palabrasQueQuedan = depurado.texto.split(/\s+/).filter(Boolean).length;
+      const seSalva =
+        palabrasQueQuedan >= 4 &&
+        depurado.texto.length >= 20 &&
+        cotizacion.validarRespuesta(depurado.texto, cot, contextoPrecio).ok;
+
+      if (seSalva) {
+        reply = esperaUnPrecio ? `${depurado.texto}\n\n${lineaCalculada}` : depurado.texto;
+        console.log(
+          `✂️  RESPUESTA DEPURADA para ${phone}: se quitó ${JSON.stringify(depurado.quitadas)} y se ` +
+            "conservó el resto. No se escala: la conversación sigue."
+        );
+      } else if (!cot.ok) {
         reply = "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
         console.warn(`🔧 Sin cotización válida para ${phone}: se escala en vez de dar un número.`);
         revisionHumana = { motivo: "sin_cotizacion", detalle: String(cot.motivo || "") };
