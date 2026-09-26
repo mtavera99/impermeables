@@ -855,6 +855,84 @@ function saveOrder(order) {
     const orders = readJSON(ORDERS_FILE, []);
 
     const repetido = esPedidoDuplicado(orders, record);
+
+    // ======================================================================
+    // ✅ LA CONFIRMACIÓN QUE LLEGA DESPUÉS COMPLETA EL PEDIDO, NO CREA OTRO
+    //
+    // DE DÓNDE SALE (26-sep): un pedido seguía marcado `sin_confirmar` después
+    // de un "Sí" explícito del cliente.
+    //
+    // La secuencia era ésta: el bot muestra el cuadro y emite el bloque antes de
+    // que el cliente conteste → el pedido se guarda marcado `sin_confirmar`
+    // (candado del 23-sep, correcto). El cliente dice "Sí". El bot vuelve a
+    // emitir el bloque → el candado antiduplicados lo descarta, y hace bien.
+    //
+    // 🔴 PERO EL PRIMERO SE QUEDABA MARCADO PARA SIEMPRE. El dueño veía
+    // "🔴 SIN CONFIRMAR" en un pedido que el cliente sí había confirmado, y la
+    // regla del panel es no despachar esos sin leer el chat. O sea: una venta
+    // confirmada frenada por una marca vieja.
+    //
+    // Ahora, si llega un duplicado que YA viene confirmado y el original estaba
+    // marcado, se le levanta la marca al original en vez de descartar y olvidar.
+    // No se crea un pedido nuevo: se completa el que ya existe.
+    // ======================================================================
+    if (repetido && repetido.sin_confirmar && !record.sin_confirmar) {
+      const i = indiceDePedido(orders, repetido.id || repetido.fecha);
+      if (i !== -1) {
+        // ==================================================================
+        // 🔴 QUITAR LA MARCA NO ALCANZA SI EL REGISTRO QUEDÓ VIEJO
+        //
+        // LO QUE SEÑALÓ LA REVISIÓN (26-sep), y es exacto: `mismoPedido` compara
+        // SOLO el total y la talla:
+        //
+        //     Number(a.total) === Number(b.total) && a.talla === b.talla
+        //
+        // Así que si el cliente CORRIGIÓ el color o la dirección, el pedido nuevo
+        // sigue contando como duplicado —mismo total, misma talla— y la versión
+        // guardada conserva el color viejo. Levantarle la marca ahí es peor que
+        // dejarla puesta: el pedido queda "confirmado" con el dato equivocado y
+        // se despacha una franja roja a quien la cambió a azul.
+        //
+        // 🔑 Ahora ANTES de quitar la marca se traen las correcciones. El dato más
+        // nuevo gana, pero solo si viene con contenido: un campo vacío en el
+        // pedido nuevo NO borra uno bueno del anterior.
+        // ==================================================================
+        const CAMPOS_VIGENTES = ["nombre", "celular", "ciudad", "direccion", "color", "talla", "pago"];
+        const correcciones = [];
+        const traidos = {};
+        for (const campo of CAMPOS_VIGENTES) {
+          const nuevo = String(record[campo] == null ? "" : record[campo]).trim();
+          const viejo = String(orders[i][campo] == null ? "" : orders[i][campo]).trim();
+          if (!nuevo) continue; // vacío no corrige nada
+          if (nuevo.toLowerCase() === viejo.toLowerCase()) continue;
+          traidos[campo] = record[campo];
+          correcciones.push(`${campo}: "${viejo || "(vacío)"}" → "${nuevo}"`);
+        }
+
+        const { sin_confirmar, motivo_sin_confirmar, ...limpio } = orders[i];
+        orders[i] = {
+          ...limpio,
+          ...traidos,
+          confirmado_despues: new Date().toISOString(),
+          ...(correcciones.length ? { correcciones_aplicadas: correcciones } : {}),
+        };
+        writeJSON(ORDERS_FILE, orders);
+        console.log(
+          `✅ CONFIRMACIÓN POSTERIOR: el pedido de ${orders[i].nombre || "?"} por $${orders[i].total} ` +
+            "ya tenía el 'sí' del cliente. Se le quitó la marca de sin confirmar (no se duplicó)." +
+            (correcciones.length
+              ? `\n   🔧 Y se trajeron las correcciones del cliente: ${correcciones.join(" · ")}`
+              : "")
+        );
+        return {
+          ...orders[i],
+          duplicadoIgnorado: true,
+          confirmadoDespues: true,
+          correccionesAplicadas: correcciones,
+        };
+      }
+    }
+
     if (repetido) {
       console.warn(
         `⏭️  PEDIDO DUPLICADO NO GUARDADO: ${record.nombre || "?"} (${record.celular || record.telefono_chat}) ` +

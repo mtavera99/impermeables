@@ -19,6 +19,7 @@ const novedades = require("./novedades");
 const fletes = require("./fletes");
 const extraer = require("./extraer");
 const excel = require("./excel");
+const rechazo = require("./rechazo");
 const plantillas = require("./plantillas");
 const audio = require("./audio");
 const resumen = require("./resumen");
@@ -2093,9 +2094,23 @@ async function handleWebhook(body) {
         // Si pide que no le escriban mas, se respeta para siempre y se saca
         // del seguimiento. Esto va ANTES de la pausa: aunque un humano tenga el
         // chat, la peticion se registra igual.
-        if (/\b(no me escrib|no escrib|dejen? de escrib|no molest|ya no me interesa|elimin[ae]me|no quiero)\b/i.test(text)) {
+        // ====================================================================
+        // 🛑 ¿PIDIÓ QUE NO LE ESCRIBAN? (mejorado el 26-sep)
+        //
+        // La expresión que había acá tenía dos problemas medidos:
+        //   · de cuatro frases reales de rechazo, detectaba UNA
+        //   · y `no quiero` marcaba como noMolestar a quien decía
+        //     "no quiero rojo, quiero azul" — le cortaba el seguimiento a un
+        //     cliente que estaba ELIGIENDO EL COLOR
+        //
+        // Ahora una corrección del pedido gana sobre el rechazo. Ver rechazo.js.
+        // ====================================================================
+        const evalRechazo = rechazo.evaluar(text);
+        if (evalRechazo.rechaza) {
           store.marcarNoMolestar(from);
-          console.log(`(${from}) pidio no ser contactado. Marcado como noMolestar.`);
+          console.log(`(${from}) pidio no ser contactado (${evalRechazo.motivo}). Marcado como noMolestar.`);
+        } else if (evalRechazo.esCorreccion) {
+          console.log(`(${from}) dijo "no" pero es una corrección del pedido, NO un rechazo.`);
         }
 
         if (store.isPaused(from)) {
@@ -2104,7 +2119,7 @@ async function handleWebhook(body) {
         }
 
         console.log(`Cliente ${from}: ${text}`);
-        const { reply, order, handoff, media, pedidoRescatado } = await generateReply(from, text);
+        const { reply, order, handoff, media, pedidoRescatado, revisionHumana } = await generateReply(from, text);
         if (reply) {
           // 🔴 Registrar el RESULTADO del envío, no solo el intento. Si Meta
           // rechaza el mensaje, esto es lo único que lo delata en los logs.
@@ -2236,6 +2251,27 @@ async function handleWebhook(body) {
         }
         if (handoff && OWNER) {
           await sendText(OWNER, `🙋 El cliente ${from} pidió hablar con un asesor. El bot quedó en pausa para ese chat.`);
+        }
+        // ==================================================================
+        // 🔧 El bot dijo algo que no puede respaldar y se corrigió al vuelo.
+        //
+        // 🔴 Antes esto solo pausaba el chat, y una pausa no le avisa a nadie: el
+        // dueño se enteraba si abría ese chat por casualidad. Acá se conecta la
+        // derivación con el aviso, que es lo que pedía la revisión.
+        // ==================================================================
+        if (revisionHumana && OWNER) {
+          await sendText(
+            OWNER,
+            `🔧 REVISÁ ESTE CHAT: ${from}
+` +
+              `El bot escribió algo que no podemos sostener y se corrigió antes de enviarlo.
+
+` +
+              `Lo que se cambió: ${revisionHumana.detalle}
+
+` +
+              `El cliente recibió una versión sin esa promesa. El chat quedó en pausa: seguí vos.`
+          );
         }
       }
     }

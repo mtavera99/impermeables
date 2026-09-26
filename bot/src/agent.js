@@ -6,6 +6,7 @@ const { revisarDireccionDePedido } = require("./direccion");
 const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
 const cotizacion = require("./cotizacion");
+const promesas = require("./promesas");
 
 // ============================================================================
 // PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
@@ -311,7 +312,7 @@ async function generateReply(phone, userText) {
   const arranque = respuestaDeArranque(conv.messages, userText);
   if (arranque) {
     store.pushMsg(phone, "assistant", arranque);
-    return { reply: arranque, order: null, handoff: false, media: [], pedidoRescatado: false };
+    return { reply: arranque, order: null, handoff: false, media: [], pedidoRescatado: false, revisionHumana: null };
   }
 
   // ==========================================================================
@@ -338,8 +339,18 @@ async function generateReply(phone, userText) {
 
   let reply;
   let validacion = null;
-  // Se prende si el pedido queda en revisión: el chat tiene que pasar a un humano.
-  let forzarHumano = false;
+  // ==========================================================================
+  // 🙋 UN SOLO CAMINO PARA MANDAR UN CHAT A UN HUMANO
+  //
+  // Las entregas 1 y 2 llegaron cada una con su mecanismo: la 1 tenía un
+  // `forzarHumano` para el pedido que no cuadra, y la 2 un `revisionHumana` para
+  // la promesa sin respaldo. Al juntarlas se unificaron en este, y no por
+  // prolijidad: el de la entrega 1 solo pausaba el chat, y una pausa NO AVISA a
+  // nadie. Con los dos por el mismo camino, los dos casos le llegan al dueño.
+  //
+  // Queda distinto de null → el chat se pausa Y se manda el aviso desde server.js.
+  // ==========================================================================
+  let revisionHumana = null;
   if (!TIENE_IA) {
     reply =
       "¡Hola! 🏍️ Gracias por escribir a BikerPro. (Bot en modo prueba: falta configurar la API de IA). " +
@@ -423,6 +434,48 @@ async function generateReply(phone, userText) {
 
   const mediaRes = extractMedia(reply);
   reply = mediaRes.clean;
+
+  // ==========================================================================
+  // 🚫 PROMESAS QUE EL BOT NO PUEDE RESPALDAR (26-sep)
+  //
+  // Cuatro casos reportados: afirmó haber actualizado un pedido, dijo conocer el
+  // estado del despacho, prometió despacho "hoy mismo", y garantizó cubrir una
+  // maleta sin saber sus medidas. Más un "¡Así es!" a "están en Cali", cuando la
+  // bodega está en Bogotá.
+  //
+  // 🔑 El cliente TOMA DECISIONES con eso: confirma creyendo que el teléfono
+  // quedó cambiado, o espera el paquete un día que nadie prometió. La novedad, la
+  // queja o la devolución las paga el negocio.
+  //
+  // ⚠️ NO se reescribe ni se borra la respuesta: un detector que deja al cliente
+  // sin contestación es peor. Se manda igual y el chat pasa a modo humano, para
+  // que el dueño lo vea y corrija antes de que el cliente actúe sobre eso.
+  // ==========================================================================
+  // 🔧 Se CORRIGE antes de enviar, frase por frase. La revisión del 26-sep señaló
+  // —con razón— que mandar el mensaje falso y pausar después no protege a nadie:
+  // el cliente ya lo leyó y actúa sobre eso. Ver promesas.js.
+  const chequeoPromesas = promesas.revisar(reply);
+  if (!chequeoPromesas.ok) {
+    const corregido = promesas.corregir(reply);
+    if (corregido.cambios.length) {
+      console.warn(
+        `🔧 PROMESA SIN RESPALDO CORREGIDA de ${phone}: ` +
+          corregido.cambios.map((c) => `${c.clave} · "${c.antes}" → "${c.despues}"`).join(" | ")
+      );
+      reply = corregido.texto;
+      revisionHumana = {
+        motivo: "promesa_sin_respaldo",
+        detalle: corregido.cambios.map((c) => `${c.clave}: "${c.antes}"`).join(" · "),
+      };
+    } else {
+      // Se detectó algo para lo que no hay reemplazo escrito. No se manda a
+      // ciegas: se avisa igual y el dueño decide.
+      console.warn(
+        `⚠️  PROMESA SIN RESPALDO SIN REEMPLAZO de ${phone}: ${promesas.resumir(chequeoPromesas)}`
+      );
+      revisionHumana = { motivo: "promesa_sin_respaldo", detalle: promesas.resumir(chequeoPromesas) };
+    }
+  }
   // Combina lo que pidió la IA (marcadores) con la detección por palabras clave del cliente
   const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
 
@@ -508,16 +561,17 @@ async function generateReply(phone, userText) {
             "y el mensaje le confirmaba la venta al cliente. Se manda una respuesta que no promete despacho."
         );
         reply = cotizacion.respuestaEnRevision(savedOrder);
-        forzarHumano = true;
+        // 🔑 Avisa, no solo pausa: este caso nacía silencioso en la entrega 1.
+        revisionHumana = { motivo: "pedido_en_revision", detalle: motivos };
       }
     }
   }
-  // Un pedido en revisión manda el chat a un humano igual que un ##HANDOFF##: el
-  // dueño tiene que cerrar esa venta a mano.
-  if (handoff || forzarHumano) store.setPaused(phone, true);
+  // Un pedido en revisión o una promesa corregida mandan el chat a un humano igual
+  // que un ##HANDOFF##: el dueño tiene que cerrar esa venta a mano.
+  if (handoff || revisionHumana) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
-  return { reply, order: savedOrder, handoff, media, pedidoRescatado };
+  return { reply, order: savedOrder, handoff, media, pedidoRescatado, revisionHumana };
 }
 
 // ============================================================================
