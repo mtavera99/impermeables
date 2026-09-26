@@ -392,6 +392,10 @@ async function generateReply(phone, userText) {
     //
     // 🔗 Y la cotización le PASA datos a la nota: si el destino es de difícil
     // acceso, `comboEncaja` se entera por acá y no tiene que adivinarlo.
+    //
+    // 🔘 La capa 3 ARRANCA APAGADA: se prende con NOTA_COMERCIAL=1 y se apaga
+    // volviéndola a 0, sin desplegar nada. Las capas 1 y 2 van siempre, porque no
+    // son una mejora a medir: son el precio, y el precio no puede fallar.
     // ========================================================================
     const guionConPrecio = buildSystemPrompt() + "\n\n" + cotizacion.bloqueDeDatos(cot, contextoPrecio);
     const conNota = comercial.guionConNota(guionConPrecio, conv.messages, userText, {
@@ -445,7 +449,6 @@ async function generateReply(phone, userText) {
           "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
         console.warn(`🔧 Sin cotización válida para ${phone}: se escala en vez de dar un número.`);
       }
-    }
     }
   }
 

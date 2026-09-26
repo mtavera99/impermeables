@@ -482,10 +482,14 @@ console.log("\n── 6b. 🔘 El interruptor es explícito, no el espacio del p
   // 🔑 El interruptor manda sobre el espacio: prendida y con espacio, entra.
   //    Prendida y SIN espacio, la red de seguridad avisa — pero eso NO es el
   //    interruptor, es una protección.
-  const sinEspacio = comercial.guionConNota(guion, CARGADO, CARGADO_TXT, { yaConocidos: { ciudad: "Bogotá" } });
+  // ⚠️ Se fabrica un guion pasado de tamaño a propósito, en vez de usar el real:
+  //    cuánto mide el guion depende de qué otras ramas estén mergeadas, y una
+  //    prueba que cambia de resultado según eso no prueba nada.
+  const guionEnorme = "x".repeat(comercial.TECHO_TOKENS * 4);
+  const sinEspacio = comercial.guionConNota(guionEnorme, CARGADO, CARGADO_TXT, { yaConocidos: { ciudad: "Bogotá" } });
   chequear(
     "📏 la red de seguridad sigue existiendo: si no cabe, no desborda",
-    sinEspacio.activa === true && sinEspacio.cupo === false && sinEspacio.prompt === guion,
+    sinEspacio.activa === true && sinEspacio.cupo === false && sinEspacio.prompt === guionEnorme,
     `activa=${sinEspacio.activa} cupo=${sinEspacio.cupo} tokens=${sinEspacio.tokens}`
   );
   chequear(
@@ -553,8 +557,10 @@ chequear(
   "quien lea agent.js tiene que saber cómo prenderla"
 );
 chequear(
-  "🔑 el prompt que se manda es el de guionConNota, no buildSystemPrompt() suelto",
-  /callIA\(conNota\.prompt/.test(fuenteAgente) && !/callIA\(buildSystemPrompt\(\)/.test(fuenteAgente),
+  "🔑 el prompt que se manda sale de guionConNota, no de buildSystemPrompt() suelto",
+  /guionConNota\(/.test(fuenteAgente) &&
+    /callIA\((?:conNota\.prompt|guion)\b/.test(fuenteAgente) &&
+    !/callIA\(buildSystemPrompt\(\)/.test(fuenteAgente),
   "si se manda buildSystemPrompt() directo, la nota nunca llega"
 );
 chequear(
