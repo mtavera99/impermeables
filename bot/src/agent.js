@@ -7,6 +7,7 @@ const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
 const cotizacion = require("./cotizacion");
 const promesas = require("./promesas");
+const comercial = require("./comercial");
 
 // ============================================================================
 // PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
@@ -357,6 +358,7 @@ async function generateReply(phone, userText) {
       "El conjunto impermeable de 4 piezas cuesta $59.900 con pago contraentrega 📦";
   } else {
     // ========================================================================
+    // ========================================================================
     // 🔑 ETAPA 5: SE REVISA EL MENSAJE ANTES DE QUE SALGA
     //
     // Sin esto, pasarle los números al modelo sigue siendo una instrucción — y
@@ -369,7 +371,46 @@ async function generateReply(phone, userText) {
     // pedido se extrae DESPUÉS de aceptar una respuesta: así un intento fallido
     // no puede guardar un pedido ni disparar un efecto duplicado.
     // ========================================================================
-    const guion = buildSystemPrompt() + "\n\n" + cotizacion.bloqueDeDatos(cot, contextoPrecio);
+
+    // ========================================================================
+    // 🧩 ACÁ SE JUNTAN LAS TRES ENTREGAS, Y ESTE ES EL ÚNICO LUGAR DONDE PASA
+    //
+    // El prompt de cada turno se arma en tres capas, en este orden:
+    //
+    //   1. buildSystemPrompt()      el guion de ventas        (~7.555 tokens)
+    //   2. cotizacion.bloqueDeDatos los números ya calculados  (entrega 1)
+    //   3. comercial.guionConNota   la nota del turno          (entrega 3, apagada
+    //                                                          por defecto)
+    //
+    // 🔑 Y el ORDEN IMPORTA: la nota comercial va ÚLTIMA. Si fuera antes del bloque
+    // de precio, el "usá estos números tal cual" quedaría enterrado en el medio del
+    // prompt, y lo que no puede fallar es el precio.
+    //
+    // 📏 El techo de 9.000 tokens se mide sobre el prompt COMPLETO, con las tres
+    // capas puestas — no solo sobre el guion. Medirlo sin el bloque de precio era
+    // medir otra cosa.
+    //
+    // 🔗 Y la cotización le PASA datos a la nota: si el destino es de difícil
+    // acceso, `comboEncaja` se entera por acá y no tiene que adivinarlo.
+    // ========================================================================
+    const guionConPrecio = buildSystemPrompt() + "\n\n" + cotizacion.bloqueDeDatos(cot, contextoPrecio);
+    const conNota = comercial.guionConNota(guionConPrecio, conv.messages, userText, {
+      sinPromo2: Boolean(
+        cot.sinPromo2 || (cot.destino && cot.destino.sinPromo2) || cot.motivo === "dificil_sin_promo"
+      ),
+      yaConocidos: { ciudad: cot.ok ? cot.ciudad : "" },
+    });
+    if (conNota.nota && !conNota.cupo) {
+      // 🔴 La red de seguridad saltó: la nota está prendida pero no cabe. Se avisa
+      // fuerte en vez de apagarla en silencio, porque si esto pasa hay que
+      // recortar el guion, no resignarse.
+      console.warn(
+        `🔴 NOTA COMERCIAL OMITIDA POR TAMAÑO: el prompt completo da ${conNota.tokens} tokens y el ` +
+          `techo es ${comercial.TECHO_TOKENS}. La nota está ACTIVA pero no cabe: hay que recortar el guion.`
+      );
+    }
+    const guion = conNota.prompt;
+
     const MAX_INTENTOS = 2;
     for (let intento = 1; intento <= MAX_INTENTOS; intento++) {
       let candidata;
@@ -404,6 +445,7 @@ async function generateReply(phone, userText) {
           "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
         console.warn(`🔧 Sin cotización válida para ${phone}: se escala en vez de dar un número.`);
       }
+    }
     }
   }
 
@@ -478,6 +520,22 @@ async function generateReply(phone, userText) {
   }
   // Combina lo que pidió la IA (marcadores) con la detección por palabras clave del cliente
   const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
+
+  // ==========================================================================
+  // 📊 LA CUENTA DE LO COMERCIAL — esto es lo que hace la mejora medible
+  //
+  // ⚠️ NO bloquea, NO reescribe y NO pausa el chat. Una mejora comercial que deja
+  // al cliente esperando no es una mejora: acá lo peor que puede pasar es que el
+  // mensaje salga menos bien, y eso no se arregla con silencio.
+  //
+  // Solo deja un renglón con prefijo estable por cada cosa que no se cumplió, para
+  // poder contarlas y saber después si esto sirvió de algo. Sin la cuenta, "mejora
+  // comercial" es una opinión.
+  // ==========================================================================
+  const chequeoComercial = comercial.revisar(reply, { userText, messages: conv.messages });
+  if (!chequeoComercial.ok) {
+    console.log(`📊 COMERCIAL ${phone}: ${comercial.resumir(chequeoComercial)}`);
+  }
 
   let savedOrder = null;
   if (order) {
