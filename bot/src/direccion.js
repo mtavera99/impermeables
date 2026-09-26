@@ -296,38 +296,137 @@ function sedeEspecificaEn(direccionTexto, ciudad) {
 }
 
 // ============================================================================
-// 🙋 ¿NOMBRA UNA REFERENCIA, O EXIGE ESA SEDE Y NINGUNA OTRA?
+// 🙋 ¿EXIGE ESA SEDE, O SOLO LA NOMBRÓ COMO REFERENCIA?
 //
-// 🔴 OTRA CORRECCIÓN A LO QUE YO HABÍA HECHO. Primero bloqueé cualquier pedido
-// que nombrara una sede. El dueño lo ajustó:
+// 🔴 DOS CORRECCIONES ENCADENADAS, Y LAS DOS FUERON MÍAS.
 //
-//   "No bloquees un pedido normal a oficina. Solo pide aclaración si el cliente
-//    exige recoger exclusivamente en una sede específica."
+// Primero bloqueé cualquier pedido que nombrara una sede. El dueño lo ajustó: la
+// mayoría nombra un barrio como REFERENCIA de su zona y con eso el pedido sigue
+// normal; solo hay que aclarar cuando lo exige en exclusiva.
 //
-// Y tiene sentido: la mayoría nombra un barrio o un punto conocido como REFERENCIA
-// de su zona —"mándalo a Terranova, que me queda cerca"— y con eso el pedido sigue
-// normal. Frenarlo era convertir un dato útil en una traba.
+// Después la exigencia la busqué con un "solo" suelto, y eso marcaba esto:
 //
-// Lo que sí necesita aclaración es la exigencia: "solo ahí", "tiene que ser en
-// Terranova", "si no es ahí no me sirve". Eso no se lo podemos prometer.
+//     "Solo quiero un impermeable"     → es la CANTIDAD
+//     "¿Solo pago cuando llegue?"      → es el PAGO
+//     "Solo la talla L"                → es la TALLA
+//
+// Encima `agent.js` lo buscaba en CUALQUIER mensaje del historial, así que un
+// "solo" dicho sobre la talla veinte mensajes antes frenaba el pedido si la
+// dirección nombraba Terranova.
+//
+// 🔑 LA EXIGENCIA TIENE QUE SER SOBRE EL LUGAR DE RECOGIDA. Se exige, en la MISMA
+// oración: una marca de exclusividad Y una referencia al lugar. Y si la marca está
+// gobernando la cantidad, el pago o la talla, no cuenta.
 // ============================================================================
-// ⚠️ SIN `\b` pegado a letras acentuadas. En JavaScript `\b` se define sobre `\w`,
-// que es ASCII: "ú" no cuenta como letra, así que `\búnicamente` NUNCA coincide.
-// Me pasó con "únicamente" y con "si no es ahí" — los dos se escapaban.
-const RE_EXIGE_SEDE_UNICA =
-  /\bsolo\b|s[oó]lo\b|\bsolamente\b|[uú]nicamente|nada m[aá]s|exclusivamente|tiene que ser|debe ser|obligatoriamente|no me sirve otra|ninguna otra|no puede ser otra|si no es ah[ií]|si no es en|s[ií] o s[ií]/i;
+
+// ⚠️ SIN `\b` pegado a letras acentuadas: en JavaScript `\b` se define sobre `\w`,
+// que es ASCII, así que `\búnicamente` NUNCA coincide. Ya me pasó una vez.
+const RE_EXCLUSIVIDAD =
+  /\bsolo\b|s[oó]lo\b|\bsolamente\b|[uú]nicamente|nada m[aá]s|exclusivamente|tiene que ser|debe ser|obligatoriamente|no me sirve|ninguna otra|no puede ser otra|si no es ah[ií]|si no es en/i;
+
+// El lugar de recogida: la palabra, o un demostrativo que lo señale.
+// ⚠️ TERCERA VEZ que los acentos me rompen un patrón en este trabajo: `ah[ií]\b`
+// NO coincide con "ahí", porque `\b` se define sobre `\w` (ASCII) y `í` no cuenta
+// como letra. Se usa un lookahead de letras en vez del límite de palabra.
+const LETRA = "a-záéíóúñ";
+const RE_LUGAR_RECOGIDA = new RegExp(
+  `oficina|sucursal|agencia|sede|cede|punto|bodega|ah[ií](?![${LETRA}])|all[ií](?![${LETRA}])|` +
+    `ese lugar|esa parte|por all[aá]|ese barrio`,
+  "i"
+);
+
+// Lo que un "solo" puede estar gobernando y NO es el lugar.
+const RE_OTRA_COSA =
+  /\b(quiero|necesito|pido|pedir|me interesa|llevo|pago|pagar|pagu|abono|consigno|talla|tallas|color|colores|franja|uno|una|1\b|dos|2\b|impermeable|conjunto|juego|unidad|efectivo|contraentrega|transferencia)/i;
+
+/** Las oraciones del texto, para no mezclar un "solo" de una con el lugar de otra. */
+function enOracionesSede(texto) {
+  return String(texto == null ? "" : texto)
+    .split(/[.!?;\n]+/)
+    .map((o) => o.trim())
+    .filter(Boolean);
+}
 
 /**
- * ¿El cliente EXIGE esa sede, o solo la nombró como referencia?
- * @returns {boolean} true solo si la exige de forma excluyente
+ * ¿El cliente EXIGE un lugar de recogida concreto?
+ *
+ * Solo cuenta si la exclusividad y el lugar están en la MISMA oración, y si esa
+ * exclusividad no está gobernando la cantidad, el pago o la talla.
+ *
+ * @param {string} texto
+ * @param {string} [sede] el nombre que nombró, si se conoce ("Terranova")
  */
-function exigeSedeUnica(texto) {
-  return RE_EXIGE_SEDE_UNICA.test(String(texto == null ? "" : texto));
+function exigeSedeUnica(texto, sede) {
+  const nombre = String(sede || "").trim();
+  const reSede = nombre
+    ? new RegExp(nombre.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i")
+    : null;
+
+  for (const oracion of enOracionesSede(texto)) {
+    const marca = oracion.match(RE_EXCLUSIVIDAD);
+    if (!marca) continue;
+
+    const hablaDelLugar = RE_LUGAR_RECOGIDA.test(oracion) || (reSede && reSede.test(oracion));
+    if (!hablaDelLugar) continue; // "Solo la talla L" no habla del lugar
+
+    // ¿La exclusividad gobierna otra cosa? Se mira lo que viene DESPUÉS de la
+    // marca: si aparece cantidad/pago/talla antes que el lugar, es de eso.
+    const despues = oracion.slice(marca.index + marca[0].length);
+    const iOtra = despues.search(RE_OTRA_COSA);
+    const iLugar = (() => {
+      const m = despues.match(RE_LUGAR_RECOGIDA);
+      const mS = reSede ? despues.match(reSede) : null;
+      const pos = [m ? m.index : -1, mS ? mS.index : -1].filter((x) => x >= 0);
+      return pos.length ? Math.min(...pos) : -1;
+    })();
+
+    // La marca puede venir DESPUÉS del lugar ("otra oficina no me sirve"): ahí no
+    // hay nada después que mirar y la oración ya habla del lugar.
+    if (iLugar === -1 && iOtra === -1) return true;
+    if (iLugar === -1 && iOtra >= 0) continue; // gobierna otra cosa
+    if (iOtra >= 0 && iOtra < iLugar) continue; // la otra cosa va primero
+    return true;
+  }
+  return false;
+}
+
+// ============================================================================
+// ✅ Y SI DESPUÉS ACEPTA LA OFICINA QUE ASIGNEN, LA EXIGENCIA QUEDA RESUELTA
+//
+// El cliente exige una sede, se le explica que la asigna la transportadora, y
+// contesta "bueno, la que sea". Si la exigencia quedara marcada para siempre, el
+// pedido seguiría frenado por algo que el propio cliente ya resolvió.
+// ============================================================================
+const RE_ACEPTA_ASIGNADA =
+  /\b(cualquier(a)? (oficina|sede|punto)|la que (asignen|asigne|manden|quede|sea|pongan)|donde (sea|asignen|la manden|quede)|no importa (la oficina|cu[aá]l|donde)|como (sea|ustedes digan)|est[aá] bien (as[ií]|cualquiera|la que)|dale as[ií]|listo as[ií]|me sirve cualquiera|la que me toque)/i;
+
+function aceptaOficinaAsignada(texto) {
+  return RE_ACEPTA_ASIGNADA.test(String(texto == null ? "" : texto));
+}
+
+/**
+ * 🔎 El estado de la sede a lo largo de la conversación: gana la ÚLTIMA señal.
+ *
+ * Así una exigencia vieja no pesa más que una aceptación nueva, y tampoco al revés.
+ *
+ * @returns {{exige:boolean, acepto:boolean, sede:string}}
+ */
+function estadoDeLaSede(messages, sede) {
+  let ultima = null;
+  for (const m of Array.isArray(messages) ? messages : []) {
+    if (!m || m.role !== "user") continue;
+    const texto = String(m.content || "");
+    if (aceptaOficinaAsignada(texto)) ultima = "acepto";
+    else if (exigeSedeUnica(texto, sede)) ultima = "exige";
+  }
+  return { exige: ultima === "exige", acepto: ultima === "acepto", sede: String(sede || "") };
 }
 
 module.exports = {
   sedeEspecificaEn,
   exigeSedeUnica,
+  aceptaOficinaAsignada,
+  estadoDeLaSede,
   revisar,
   revisarDireccionDePedido,
   avisoParaElDueno,

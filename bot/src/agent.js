@@ -2,7 +2,7 @@
 // (detecta pedidos confirmados y solicitudes de pasar a un humano).
 const { buildSystemPrompt } = require("./prompt");
 const { respuestaDeArranque } = require("./primer-mensaje");
-const { revisarDireccionDePedido, sedeEspecificaEn, exigeSedeUnica } = require("./direccion");
+const { revisarDireccionDePedido, sedeEspecificaEn, estadoDeLaSede } = require("./direccion");
 const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
 const cotizacion = require("./cotizacion");
@@ -708,13 +708,19 @@ async function generateReply(phone, userText) {
           ? sedeEspecificaEn(conDireccion.direccion, conDireccion.ciudad)
           : "";
       if (sedeNombrada) {
+        // ======================================================================
         // 🔑 Nombrar un punto NO frena el pedido: casi siempre es la REFERENCIA de
-        // la zona del cliente, y eso es un dato útil. Solo se pide aclaración si lo
-        // EXIGE de forma excluyente, porque esa sede no se la podemos prometer.
-        const loExige = ((conv.messages || []).some(
-          (m) => m && m.role === "user" && exigeSedeUnica(String(m.content || ""))
-        ));
-        if (loExige) {
+        // la zona del cliente. Solo se pide aclaración si lo EXIGE de forma
+        // excluyente, porque esa sede no se la podemos prometer.
+        //
+        // 🔴 Y la exigencia tiene que ser SOBRE EL LUGAR. Antes se buscaba un "solo"
+        // en cualquier mensaje del historial, así que "Solo la talla L" dicho veinte
+        // mensajes antes frenaba el pedido. Ahora lo resuelve `estadoDeLaSede`, que
+        // ata la exclusividad al lugar y deja ganar la ÚLTIMA señal: si después el
+        // cliente acepta la oficina que asignen, la exigencia queda resuelta.
+        // ======================================================================
+        const estadoSede = estadoDeLaSede(conv.messages, sedeNombrada);
+        if (estadoSede.exige) {
           conDireccion.sede_pedida = sedeNombrada;
           console.warn(
             `🏢 EXIGE UNA SEDE por ${phone}: "${sedeNombrada}". Se conserva su preferencia y se marca ` +
@@ -722,9 +728,12 @@ async function generateReply(phone, userText) {
           );
         } else {
           conDireccion.sede_referencia = sedeNombrada;
+          // Si antes la exigió y después aceptó la que asignen, queda resuelta: el
+          // pedido no puede seguir frenado por algo que el cliente ya resolvió.
+          if (estadoSede.acepto) conDireccion.sede_resuelta = true;
           console.log(
             `🏢 Referencia de zona de ${phone}: "${sedeNombrada}". El pedido sigue normal; se usa como ` +
-              "referencia, no como sede prometida."
+              `referencia, no como sede prometida.${estadoSede.acepto ? " El cliente aceptó la oficina que asignen." : ""}`
           );
         }
       }

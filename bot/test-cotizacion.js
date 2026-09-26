@@ -900,5 +900,60 @@ console.log("\n── R14. 🏢 El bot no promete una sede, pero sí ofrece ofic
   chequear("y NO promete una sede", promesas.revisar(corregido.texto).ok === true, corregido.texto);
 }
 
+console.log("\n── R15. 🙋 La exigencia tiene que ser sobre el LUGAR ──");
+// 🔴 Reproducido: un "solo" suelto marcaba exigencia de sede aunque hablara de la
+// cantidad, del pago o de la talla.
+{
+  const d = require("./src/direccion");
+  const NO = [
+    "Solo quiero un impermeable",
+    "¿Solo pago cuando llegue?",
+    "Solo la talla L",
+    "Solo pago contraentrega",
+    "solo me queda bien esa talla",
+    "solo quiero uno y que sea en la oficina de Terranova",
+    "me lo manda a Terranova que me queda más cerca",
+    "mándelo a la oficina de Terranova",
+  ];
+  for (const t of NO)
+    chequear(`🔴 NO es exigencia de sede: "${t.slice(0, 44)}"`, d.exigeSedeUnica(t, "Terranova") === false);
+
+  const SI = [
+    "únicamente en Terranova; otra oficina no me sirve",
+    "tiene que ser en la oficina de Terranova",
+    "si no es ahí no me sirve",
+    "solo en Terranova, ninguna otra",
+    "solamente ahí lo puedo recoger",
+    "debe ser en esa oficina",
+  ];
+  for (const t of SI)
+    chequear(`🔑 SÍ es exigencia de sede: "${t.slice(0, 44)}"`, d.exigeSedeUnica(t, "Terranova") === true);
+
+  chequear(
+    "🔑 y «si no es ahí» funciona con tilde",
+    d.exigeSedeUnica("si no es ahí no me sirve") === true,
+    "`\\b` de JavaScript no reconoce letras acentuadas: fue la tercera vez en este trabajo"
+  );
+
+  // ✅ La aceptación posterior.
+  for (const t of ["bueno, la que asignen está bien", "cualquier oficina me sirve", "donde sea", "no importa la oficina"])
+    chequear(`✅ acepta la asignada: "${t.slice(0, 36)}"`, d.aceptaOficinaAsignada(t) === true);
+  chequear("y una exigencia NO es una aceptación", d.aceptaOficinaAsignada("tiene que ser en Terranova") === false);
+
+  // 🔑 Gana la ÚLTIMA señal.
+  const u = (t) => ({ role: "user", content: t });
+  const exige = [u("hola"), u("tiene que ser en la oficina de Terranova")];
+  chequear("🔑 si lo último fue exigir, exige", d.estadoDeLaSede(exige, "Terranova").exige === true);
+  const luegoAcepta = [...exige, u("ah bueno, la que asignen está bien")];
+  chequear("🔑 si después acepta, queda resuelto", d.estadoDeLaSede(luegoAcepta, "Terranova").acepto === true);
+  chequear("   y ya no cuenta como exigencia", d.estadoDeLaSede(luegoAcepta, "Terranova").exige === false);
+  const vuelveAExigir = [...luegoAcepta, u("no, únicamente en Terranova")];
+  chequear("   y si vuelve a exigir, vuelve a exigir", d.estadoDeLaSede(vuelveAExigir, "Terranova").exige === true);
+  chequear(
+    "🔴 un «solo» sobre la talla en el historial NO cuenta",
+    d.estadoDeLaSede([u("Solo la talla L"), u("me lo manda a Terranova")], "Terranova").exige === false
+  );
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);
