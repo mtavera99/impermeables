@@ -669,5 +669,291 @@ console.log("\n── R7. 🔢 LA CANTIDAD EXPLÍCITA, DE PUNTA A PUNTA ──")
   chequear("y se marca como rescatado", r.rescatado === true);
 }
 
+console.log("\n── R8. 🔴 EL CASO DEL 26-SEP: dos tallas enumeradas son dos conjuntos ──");
+{
+  const REAL = "Exactamente, la una talla normal XL y la otra es L normal. Bueno, muchas gracias, me confirma.";
+  chequear("🔑 la frase real se lee como DOS unidades", c.resolverCantidad(REAL).uds === 2, JSON.stringify(c.resolverCantidad(REAL)));
+  chequear("   y queda como cantidad explícita", c.resolverCantidad(REAL).explicita === true);
+  chequear("   con las dos tallas leídas", JSON.stringify(c.resolverCantidad(REAL).tallas) === '["XL","L"]', JSON.stringify(c.resolverCantidad(REAL).tallas));
+  chequear(
+    "   así que cotiza el total de dos",
+    c.calcular("Jamundi", REAL).total === 148000,
+    `dio ${pesos(c.calcular("Jamundi", REAL).total)}`
+  );
+
+  const DOS = [["XL y L", 2], ["una XL y otra L", 2], ["quiero una talla XL y la otra en L", 2], ["una para mí y la otra para mi esposa", 2]];
+  for (const [t, esp] of DOS) chequear(`  dos: "${t}"`, c.resolverCantidad(t).uds === esp, JSON.stringify(c.resolverCantidad(t)));
+
+  // ⛔ Las tres cosas que NO son dos unidades.
+  chequear("🔴 «XL o L» es una PREGUNTA: no se cotiza, se pregunta", c.resolverCantidad("¿me sirve XL o L?").ambiguo === true);
+  chequear("   y el motivo lo explica", /no se sabe si quiere las dos/.test(String(c.resolverCantidad("¿me sirve XL o L?").motivo)));
+  chequear("🔴 «no sé si XL o L» también es ambiguo", c.resolverCantidad("no sé si XL o L").ambiguo === true, JSON.stringify(c.resolverCantidad("no sé si XL o L")));
+  for (const t of ["talla 2XL", "3XL", "quiero la 2XL"])
+    chequear(`🔴 "${t}" es UNA talla, no dos unidades`, c.resolverCantidad(t).uds === 1 && !c.resolverCantidad(t).ambiguo, JSON.stringify(c.resolverCantidad(t)));
+  for (const t of ["no, mejor L", "me equivoqué, cambia a XL", "no es esa talla, la L"])
+    chequear(`🔴 "${t}" es una CORRECCIÓN`, c.resolverCantidad(t).uds === 1 && !c.resolverCantidad(t).ambiguo, JSON.stringify(c.resolverCantidad(t)));
+  chequear("🔴 una dirección con dígitos no cambia la cantidad", c.resolverCantidad("Calle 1 #2-3, cel 3001234567").explicita === false);
+
+  // Ambigüedad → el bloque le dice al modelo que PREGUNTE, sin dar total.
+  const amb = c.calcular("Jamundi", "¿me sirve XL o L?");
+  chequear("🔑 con cantidad ambigua NO se cotiza", amb.ok === false && amb.motivo === "cantidad_ambigua", JSON.stringify({ ok: amb.ok, motivo: amb.motivo }));
+  const bloque = c.bloqueDeDatos(amb, {});
+  chequear("   y el bloque prohíbe dar el total", /NO des ningún total/.test(bloque), bloque);
+  chequear("   pero deja decir el precio base", /\$59\.900/.test(bloque), bloque);
+  chequear("   y pide confirmar cuántos", /cu[aá]ntos conjuntos/.test(bloque), bloque);
+}
+
+console.log("\n── R9. 🔴 No se anuncia una venta que está bloqueada ──");
+{
+  // Las dos frases reales con las que se le dio la compra por hecha.
+  const REALES = [
+    "¡Excelente, Petronel! Todo listo. En cuanto la transportadora genere tu número de guía, te lo estaré enviando por aquí.",
+    "¡Así es, Petronel! Ya quedó registrado con franja verde y para recoger en la oficina de Terranova. ¡Muchas gracias por tu compra con BikerPro!",
+  ];
+  for (const t of REALES) chequear(`🔑 se reconoce como cierre: "${t.slice(0, 46)}…"`, c.afirmaCierre(t) === true);
+  for (const t of ["Con gusto, ¿me confirmas la talla?", "Te queda en $82.000 en total, pagas al recibir 📦", "¿De qué color prefieres la franja?"])
+    chequear(`✅ y NO se marca lo que no es cierre: "${t.slice(0, 40)}…"`, c.afirmaCierre(t) === false);
+}
+
+console.log("\n── R10. 🔴 La alerta dice la causa REAL, no un total que sí coincide ──");
+{
+  const store = require("./src/store");
+  // El caso: total correcto, cantidad incoherente. Antes decía "debería ser $82.000"
+  // al lado de un pedido de $82.000.
+  const pedido = {
+    nombre: "X", celular: "3001234567", ciudad: "Jamundi", talla: "XL y L", total: 82000,
+    precio_no_cuadra: true, pendiente_revision: true, total_esperado: 82000,
+    motivo_precio: "el pedido es de 2 unidades (según las 2 tallas del pedido) y la cotización validada es de 1, por $82.000",
+  };
+  const texto = store.textoDeRevision(pedido);
+  chequear("🔑 el aviso nombra la cantidad", /unidades/.test(texto), texto);
+  chequear("🔑 y NO dice «debería ser $82.000» junto a un pedido de $82.000", !/debería ser \$82\.000/.test(texto), texto);
+  chequear("la etiqueta ya no habla solo del total", /el pedido no cuadra/.test(texto) || /unidades/.test(texto), texto);
+  // Y cuando el total SÍ difiere, el número esperado sigue apareciendo.
+  const otro = { ...pedido, total: 99000, total_esperado: 82000, motivo_precio: "" };
+  chequear("✅ si el total de verdad difiere, lo dice", /debería ser \$82\.000/.test(store.textoDeRevision(otro)), store.textoDeRevision(otro));
+}
+
+console.log("\n── R11. 🔴 Tres casos más de cantidad, reproducidos ──");
+{
+  const q = (t) => { const r = c.resolverCantidad(t); return r.escalar ? "ESC" : r.ambiguo ? "AMB" : String(r.uds); };
+
+  // El orden de las comprobaciones es el arreglo: primero lo que escala, después
+  // lo que el cliente declaró, y solo al final la inferencia por tallas.
+  chequear('🔑 CASO OMAR: "Talla M 2 Juegos." son DOS', q("Talla M 2 Juegos.") === "2", q("Talla M 2 Juegos."));
+  chequear('   y "2 juegos" suelto también', q("2 juegos") === "2");
+  chequear('   igual que "dos pintas"', q("dos pintas") === "2");
+  chequear(
+    '🔑 "Quiero un impermeable, ¿tienen L y XL?" es UNO',
+    q("Quiero un impermeable, ¿tienen L y XL?") === "1",
+    q("Quiero un impermeable, ¿tienen L y XL?")
+  );
+  chequear("   porque lo que el cliente declara gana sobre la inferencia", c.resolverCantidad("un impermeable").uds === 1);
+  chequear(
+    "   y una pregunta por disponibilidad no enumera unidades",
+    c.dosPorTallas("¿tienen L y XL?").dos === false,
+    JSON.stringify(c.dosPorTallas("¿tienen L y XL?"))
+  );
+  chequear('   "hay M y L disponible?" tampoco', q("hay M y L disponible?") === "1");
+  chequear(
+    '🔑 "tres impermeables: uno XL y otro L y otro M" ESCALA',
+    q("Quiero tres impermeables: uno XL y otro L y otro M") === "ESC",
+    q("Quiero tres impermeables: uno XL y otro L y otro M")
+  );
+  chequear('   y tres tallas sin decir "tres" también', q("uno XL y otro L y otro M") === "ESC", q("uno XL y otro L y otro M"));
+  chequear("   con el motivo escrito", /3 o m[aá]s/.test(String(c.resolverCantidad("uno XL y otro L y otro M").motivo)));
+
+  // Y nada de lo que ya funcionaba cambió.
+  chequear("✅ el caso real de dos sigue dando dos", q("la una talla normal XL y la otra es L") === "2");
+  chequear("✅ la alternativa sigue ambigua", q("¿me sirve XL o L?") === "AMB");
+  chequear("✅ 2XL sigue siendo una talla", q("talla 2XL") === "1");
+  chequear("✅ 12 conjuntos sigue escalando", q("12 conjuntos") === "ESC");
+}
+
+console.log("\n── R12. ✂️ Se conserva la parte útil en vez de escalar ──");
+{
+  const cot = c.calcular("Cali", "uno");
+  const salvable = (t) => {
+    const d = c.depurarImportes(t, cot, {});
+    const palabras = d.texto.split(/\s+/).filter(Boolean).length;
+    return { ...d, ok: palabras >= 4 && d.texto.length >= 20 && c.validarRespuesta(d.texto, cot, {}).ok };
+  };
+
+  const a = salvable("Las tallas van de S a 3XL y cada conjunto sale en $70.000.");
+  chequear("🔑 se conserva la explicación de las tallas", a.ok && /3XL/.test(a.texto), JSON.stringify(a));
+  chequear("   y se quita el importe inválido", !/70\.000/.test(a.texto), a.texto);
+
+  const b = salvable("Sí, hay franja verde. El combo de dos sale en $200.000.");
+  chequear("🔑 se conserva la respuesta del color", b.ok && /verde/.test(b.texto), JSON.stringify(b));
+
+  const d = salvable("Cada uno sale en $70.000.");
+  chequear("🔑 si NO queda nada útil, no se inventa: se escala", d.ok === false, JSON.stringify(d));
+
+  const e = salvable(c.lineaDePrecio(cot));
+  chequear("✅ una respuesta válida no se toca", e.ok && e.quitadas.length === 0, JSON.stringify(e.quitadas));
+  chequear("✅ y no se parte un $82.000 al separar oraciones", /\$82\.000/.test(e.texto), e.texto);
+}
+
+console.log("\n── R13. 🏢 La oficina la asigna la transportadora ──");
+// ⚠️ ESTE BLOQUE CAMBIÓ Y EL CAMBIO ES UNA CORRECCIÓN A LO QUE YO HABÍA HECHO.
+// Después del caso del 26-sep marqué TODOS los pedidos a oficina como "sin
+// verificar" y los saqué del despacho. El dueño lo corrigió con la operación real:
+// se registra la ciudad y la entrega en oficina de Interrapidísimo, y la SEDE de
+// recogida la asigna la transportadora. Pedir que verificáramos la sede era pedir
+// verificar algo que no elegimos, y frenaba pedidos que estaban bien.
+{
+  const store = require("./src/store");
+  const direccion = require("./src/direccion");
+  const base = { nombre: "X", celular: "3001234567", ciudad: "Jamundi", talla: "L", total: 82000, unidades: 1 };
+
+  // ── A. El flujo normal NO se bloquea ────────────────────────────────────
+  const normal = { ...base, entrega: "oficina", direccion: "OFICINA Interrapidísimo" };
+  chequear("🔑 A· pedido a oficina (flujo normal): despachable", store.listoParaDespachar(normal) === true, store.textoDeRevision(normal));
+  chequear("   sin ningún aviso", store.textoDeRevision(normal) === "", store.textoDeRevision(normal));
+
+  // ── B. 🔑 LOS PEDIDOS ANTERIORES no quedan bloqueados por la regla nueva ──
+  // Un pedido ya guardado no tiene los campos nuevos. Si la regla dependiera de la
+  // dirección, todos los pedidos a oficina del pasado quedarían frenados de golpe.
+  const anterior = { ...base, entrega: "oficina", direccion: "OFICINA Interrapidísimo - Terranova" };
+  chequear(
+    "🔑 B· un pedido ANTERIOR a oficina sigue despachable",
+    store.listoParaDespachar(anterior) === true,
+    store.textoDeRevision(anterior)
+  );
+  chequear("   incluso nombrando una sede en la dirección", store.textoDeRevision(anterior) === "", store.textoDeRevision(anterior));
+
+  // ── C. El que EXIGE una sede sí se frena, y su preferencia se conserva ───
+  const conSede = { ...anterior, sede_pedida: "Terranova" };
+  chequear("🔑 C· si pidió una sede concreta: NO despachable", store.listoParaDespachar(conSede) === false);
+  chequear(
+    "   el aviso dice que la asigna la transportadora",
+    /la oficina la asigna la transportadora/.test(store.textoDeRevision(conSede)),
+    store.textoDeRevision(conSede)
+  );
+  chequear("   y conserva lo que el cliente pidió", /Terranova/.test(store.textoDeRevision(conSede)), store.textoDeRevision(conSede));
+  chequear(
+    "   🔑 sin cambiarle la dirección en silencio",
+    conSede.direccion === "OFICINA Interrapidísimo - Terranova",
+    conSede.direccion
+  );
+  chequear("   y al resolverlo queda despachable", store.listoParaDespachar({ ...conSede, sede_resuelta: true }) === true);
+
+  // ── D. El detector: qué es una sede y qué no ────────────────────────────
+  const SEDES = [
+    ["OFICINA Interrapidísimo - Terranova", "Jamundí", "Terranova"],
+    ["la oficina de Terranova", "Jamundí", "Terranova"],
+    ["OFICINA Interrapidísimo", "Jamundí", ""],
+    ["OFICINA Interrapidísimo Jamundí", "Jamundí", ""],
+    ["oficina principal de Jamundí", "Jamundí", ""],
+    ["OFICINA Servientrega", "Cali", ""],
+    ["Cra 1 #2-3 barrio Centro", "Cali", ""],
+  ];
+  for (const [dir, ciu, esp] of SEDES) {
+    chequear(
+      `D· ${esp ? `sede "${esp}"` : "sin sede"}: ${JSON.stringify(dir)}`,
+      direccion.sedeEspecificaEn(dir, ciu) === esp,
+      `dio ${JSON.stringify(direccion.sedeEspecificaEn(dir, ciu))}`
+    );
+  }
+  chequear(
+    "   🔑 nombrar la transportadora NO es pedir una sede",
+    direccion.sedeEspecificaEn("OFICINA Interrapidísimo", "Cali") === "",
+    "es con quién se manda, no dónde"
+  );
+
+  // ── E. Terranova es una referencia dentro de Jamundí, no una ciudad ──────
+  chequear(
+    "🔑 E· Jamundí sigue cotizando banda C, sin tocar el tarifario",
+    c.calcular("Jamundi", "uno").banda === "C" && c.calcular("Jamundi", "uno").total === 82000,
+    JSON.stringify({ banda: c.calcular("Jamundi", "uno").banda, total: c.calcular("Jamundi", "uno").total })
+  );
+  chequear(
+    "   y una dirección de oficina NO cambia la ciudad del pedido",
+    c.verificarPedido({ ...conSede, ciudad: "Jamundi" }, c.calcular("Jamundi", "uno"), {}).ok,
+    JSON.stringify(c.verificarPedido({ ...conSede, ciudad: "Jamundi" }, c.calcular("Jamundi", "uno"), {}).problemas)
+  );
+}
+
+console.log("\n── R14. 🏢 El bot no promete una sede, pero sí ofrece oficina ──");
+{
+  const promesas = require("./src/promesas");
+  for (const t of [
+    "Te lo enviamos a la oficina de Interrapidísimo en Terranova, Jamundí.",
+    "Te lo dejamos en la oficina de Terranova.",
+  ])
+    chequear(`🔑 promete una sede → se marca: "${t.slice(0, 44)}…"`, promesas.revisar(t).ok === false);
+  for (const t of [
+    "Te lo enviamos a oficina de Interrapidísimo y pagas al recibir 📦",
+    "Lo despachamos a oficina de Interrapidísimo en tu ciudad.",
+    "Se puede enviar a oficina de la transportadora si te queda mejor.",
+    "Podés recogerlo en nuestra bodega en Bogotá.",
+  ])
+    chequear(`✅ el flujo normal NO se marca: "${t.slice(0, 44)}…"`, promesas.revisar(t).ok === true, promesas.resumir(promesas.revisar(t)));
+
+  const corregido = promesas.corregir("Te lo enviamos a la oficina de Interrapidísimo en Terranova, Jamundí.");
+  // 🔑 Tono tranquilo, sin advertencias: se confirma la oficina y se promete lo
+  // único que sí controlamos, avisar la sede asignada cuando esté la guía.
+  chequear("el reemplazo es corto y tranquilo", /te compartimos la oficina asignada/.test(corregido.texto), corregido.texto);
+  chequear("   y no mete advertencias", !/no puedo|no podemos|lamentablemente/i.test(corregido.texto), corregido.texto);
+  const conRef = promesas.fraseDeOficina("Jamundí", "Terranova");
+  chequear("   y con la referencia del cliente sale como pidió el dueño", /oficina de Interrapidísimo en Jamundí, tomando Terranova como referencia de tu zona/.test(conRef), conRef);
+  chequear("y NO promete una sede", promesas.revisar(corregido.texto).ok === true, corregido.texto);
+}
+
+console.log("\n── R15. 🙋 La exigencia tiene que ser sobre el LUGAR ──");
+// 🔴 Reproducido: un "solo" suelto marcaba exigencia de sede aunque hablara de la
+// cantidad, del pago o de la talla.
+{
+  const d = require("./src/direccion");
+  const NO = [
+    "Solo quiero un impermeable",
+    "¿Solo pago cuando llegue?",
+    "Solo la talla L",
+    "Solo pago contraentrega",
+    "solo me queda bien esa talla",
+    "solo quiero uno y que sea en la oficina de Terranova",
+    "me lo manda a Terranova que me queda más cerca",
+    "mándelo a la oficina de Terranova",
+  ];
+  for (const t of NO)
+    chequear(`🔴 NO es exigencia de sede: "${t.slice(0, 44)}"`, d.exigeSedeUnica(t, "Terranova") === false);
+
+  const SI = [
+    "únicamente en Terranova; otra oficina no me sirve",
+    "tiene que ser en la oficina de Terranova",
+    "si no es ahí no me sirve",
+    "solo en Terranova, ninguna otra",
+    "solamente ahí lo puedo recoger",
+    "debe ser en esa oficina",
+  ];
+  for (const t of SI)
+    chequear(`🔑 SÍ es exigencia de sede: "${t.slice(0, 44)}"`, d.exigeSedeUnica(t, "Terranova") === true);
+
+  chequear(
+    "🔑 y «si no es ahí» funciona con tilde",
+    d.exigeSedeUnica("si no es ahí no me sirve") === true,
+    "`\\b` de JavaScript no reconoce letras acentuadas: fue la tercera vez en este trabajo"
+  );
+
+  // ✅ La aceptación posterior.
+  for (const t of ["bueno, la que asignen está bien", "cualquier oficina me sirve", "donde sea", "no importa la oficina"])
+    chequear(`✅ acepta la asignada: "${t.slice(0, 36)}"`, d.aceptaOficinaAsignada(t) === true);
+  chequear("y una exigencia NO es una aceptación", d.aceptaOficinaAsignada("tiene que ser en Terranova") === false);
+
+  // 🔑 Gana la ÚLTIMA señal.
+  const u = (t) => ({ role: "user", content: t });
+  const exige = [u("hola"), u("tiene que ser en la oficina de Terranova")];
+  chequear("🔑 si lo último fue exigir, exige", d.estadoDeLaSede(exige, "Terranova").exige === true);
+  const luegoAcepta = [...exige, u("ah bueno, la que asignen está bien")];
+  chequear("🔑 si después acepta, queda resuelto", d.estadoDeLaSede(luegoAcepta, "Terranova").acepto === true);
+  chequear("   y ya no cuenta como exigencia", d.estadoDeLaSede(luegoAcepta, "Terranova").exige === false);
+  const vuelveAExigir = [...luegoAcepta, u("no, únicamente en Terranova")];
+  chequear("   y si vuelve a exigir, vuelve a exigir", d.estadoDeLaSede(vuelveAExigir, "Terranova").exige === true);
+  chequear(
+    "🔴 un «solo» sobre la talla en el historial NO cuenta",
+    d.estadoDeLaSede([u("Solo la talla L"), u("me lo manda a Terranova")], "Terranova").exige === false
+  );
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

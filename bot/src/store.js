@@ -483,10 +483,21 @@ const MOTIVOS_REVISION = [
     cuando: (o) => o.precio_no_cuadra === true,
     // El más caro de todos: se despacha con el recaudo equivocado y la diferencia
     // la pone el negocio o se discute en la puerta del cliente.
-    etiqueta: "el total no cuadra con la cotización",
-    detalle: (o) =>
-      o.motivo_precio ||
-      (o.total_esperado ? `debería ser $${Number(o.total_esperado).toLocaleString("es-CO")}` : ""),
+    // ⚠️ La etiqueta ya no dice "el total no cuadra" a secas: en el caso del
+    // 26-sep lo que no cuadraba era la CANTIDAD (2 tallas contra 1 unidad
+    // cotizada) y el total era idéntico. Decir "el total no cuadra" mandaba al
+    // dueño a mirar el número equivocado.
+    etiqueta: "el pedido no cuadra con la cotización",
+    detalle: (o) => {
+      if (o.motivo_precio) return o.motivo_precio;
+      // "debería ser $X" solo si de verdad es OTRO número. Si es el mismo, esa
+      // frase no explica nada y confunde.
+      const esperado = Number(o.total_esperado);
+      if (Number.isFinite(esperado) && esperado > 0 && esperado !== Number(o.total)) {
+        return `debería ser $${esperado.toLocaleString("es-CO")}`;
+      }
+      return "";
+    },
   },
   {
     clave: "pendiente_revision",
@@ -505,6 +516,35 @@ const MOTIVOS_REVISION = [
     cuando: (o) => o.sinTelefono === true || !String(o.celular || "").trim(),
     etiqueta: "no tiene celular y la transportadora lo exige para la guía",
     detalle: () => "",
+  },
+  {
+    // ========================================================================
+    // 🏢 SOLO SE FRENA SI EL CLIENTE EXIGE UNA SEDE CONCRETA
+    //
+    // 🔴 ESTO REEMPLAZA UN BLOQUEO MÍO QUE ESTABA MAL. Después del caso del
+    // 26-sep marqué TODOS los pedidos a oficina como "sin verificar" y los saqué
+    // del despacho. El dueño lo corrigió con cómo funciona la operación:
+    //
+    //   "Registramos la ciudad y entrega en oficina de Interrapidísimo. La
+    //    transportadora asigna la oficina de recogida; nosotros no seleccionamos
+    //    ni garantizamos una sede específica."
+    //
+    // O sea que pedía verificar algo que no elegimos nosotros, y frenaba pedidos
+    // que estaban perfectos —incluidos los ya guardados—. Retirado.
+    //
+    // 🔑 Lo que sí hay que frenar es distinto: cuando el cliente EXIGE una sede.
+    // Ahí su preferencia se conserva tal cual (no se le cambia en silencio) y se
+    // pide aclaración, porque esa sede no se la podemos prometer.
+    //
+    // ⚠️ Depende de un campo que solo se pone al detectarlo, así que los pedidos
+    // anteriores NO quedan bloqueados por esta regla.
+    // ========================================================================
+    clave: "sede_especifica_pedida",
+    cuando: (o) => Boolean(o.sede_pedida) && o.sede_resuelta !== true,
+    etiqueta: "el cliente pidió una sede concreta y la oficina la asigna la transportadora",
+    detalle: (o) =>
+      `pidió "${o.sede_pedida}" — no se la podemos garantizar: hay que aclararle que se entrega en ` +
+      `la oficina que asigne Interrapidísimo en ${o.ciudad || "su ciudad"}`,
   },
   {
     clave: "posible_duplicado",
@@ -707,6 +747,29 @@ function pedidoPendienteDeOferta(phone, ofertaId) {
   );
   if (candidatos.length !== 1) return "";
   return String(candidatos[0].id || candidatos[0].fecha || "");
+}
+
+/**
+ * 🔴 El pedido de este chat que está esperando revisión, si hay.
+ *
+ * DE DÓNDE SALE (caso 26-sep): la sustitución de la respuesta de cierre solo se
+ * evaluaba en el turno que emitía el `##ORDER##`. El cliente confirmó a las 08:08
+ * —ahí se guardó el pedido, bloqueado— y a las 08:09 el bot le contestó *"ya quedó
+ * registrado… ¡gracias por tu compra!"*. En ESE turno no había pedido nuevo, así
+ * que nadie revisó lo que se le estaba diciendo.
+ *
+ * Con esto el chequeo puede correr en cualquier turno.
+ */
+function pedidoEnRevisionDe(phone) {
+  ensure();
+  const orders = readJSON(ORDERS_FILE, []);
+  const mios = orders.filter(
+    (o) => o && String(o.telefono_chat || "") === String(phone) && !o.anulado && !o.guia
+  );
+  for (let i = mios.length - 1; i >= 0; i--) {
+    if (requiereRevision(mios[i])) return mios[i];
+  }
+  return null;
 }
 
 /** La última cotización validada del chat, o null. */
@@ -1582,7 +1645,7 @@ function estadoDelDisco() {
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarAtendido, desmarcarAtendido,
-  guardarCotizacion, leerCotizacion, pedidoPendienteDeOferta,
+  guardarCotizacion, leerCotizacion, pedidoPendienteDeOferta, pedidoEnRevisionDe,
   anotarFalloEntrega, fallosDeEntrega,
   guardarPlan, leerPlan, borrarPlan, limpiarPlanesGuardados,
   registrarArranque, estadoDelDisco,

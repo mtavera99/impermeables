@@ -93,6 +93,14 @@ function chequear(nombre, condicion, detalle) {
 
 const pesos = (n) => "$" + Number(n || 0).toLocaleString("es-CO");
 
+/** Un solo turno, devolviendo también lo que la IA recibió. Útil para mirar un
+ *  mensaje concreto en vez de toda la conversación. */
+async function turno(telefono, cliente, ...respuestasIA) {
+  ia.poner(...respuestasIA);
+  const r = await agent.generateReply(telefono, cliente);
+  return { ...r, prompts: ia.prompts.slice(), llamadas: ia.llamadas };
+}
+
 /** Corre una conversación entera y devuelve lo que quedó. */
 async function recorrer(telefono, turnos) {
   const respuestas = [];
@@ -664,6 +672,371 @@ const datosBase = {
       despues.oferta_id !== unicos[0],
       `antes ${unicos[0]}, después ${despues.oferta_id}`
     );
+  }
+
+  // ==========================================================================
+  console.log("\n── 13. 🔴 EL CASO DEL 26-SEP, recorrido completo ──");
+  // Caso real (datos cambiados). El cliente pidió DOS conjuntos enumerando tallas,
+  // por notas de voz, y salió mal en cascada:
+  //   · la cantidad se leyó como UNA
+  //   · el modelo intentaba cotizar los dos → la etapa 5 lo rechazaba → salía la
+  //     línea de precio de UNA unidad, cuatro veces, contra preguntas distintas
+  //   · el pedido quedó bloqueado, y al cliente se le dio las gracias por su compra
+  // ==========================================================================
+  {
+    const tel = "573005550013";
+    const FRASE_TALLAS = "Exactamente, la una talla normal XL y la otra es L normal. Bueno, muchas gracias, me confirma.";
+
+    // 1) Ciudad → total de UNA (todavía no dijo cuántos)
+    let t = await turno(tel, "hola, cuánto vale?", "Son $59.900 el conjunto + envío. ¿Para qué ciudad sería?");
+    t = await turno(tel, "Jamundí", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Jamundí, y pagas todo junto al recibir 📦");
+    chequear("13· con una unidad, el total es el de una", store.leerCotizacion(tel).total === 82000, `${store.leerCotizacion(tel).total}`);
+
+    // 2) 🔑 Y ACÁ dice que son DOS, enumerando las tallas.
+    t = await turno(
+      tel,
+      FRASE_TALLAS,
+      // El modelo cotiza los dos, que ahora ES lo correcto.
+      "¡Listo! Los dos te quedan en $148.000 en total: $110.000 los dos conjuntos + $38.000 de envío a Jamundí. Pásame nombre completo, dirección con barrio y celular"
+    );
+    const cot = store.leerCotizacion(tel);
+    chequear("13· 🔑 la cantidad se reconoce: DOS conjuntos", cot.uds === 2, `uds=${cot.uds}`);
+    chequear("13· y el total pasa al de dos", cot.total === 148000, `${cot.total}`);
+    chequear(
+      "13· 🔑 la respuesta del modelo YA NO se rechaza",
+      /\$148\.000/.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "13· 🔑 y NO salió la línea de precio de una unidad",
+      !/^Te queda en \$82\.000/.test(t.reply.trim()),
+      `salió: ${t.reply}`
+    );
+
+    // 3) La oficina: no se asegura, y no se promete lo que hará la transportadora.
+    t = await turno(
+      tel,
+      "me lo manda a la oficina de Terranova que me queda más cerca",
+      "¡Excelente decisión! Te lo enviamos a la oficina de Interrapidísimo en Terranova, Jamundí. Ellos te enviarán un mensaje de texto cuando esté listo para reclamar."
+    );
+    chequear(
+      "13· 🔑 no asegura esa oficina como verificada",
+      !/oficina de Interrapidísimo en Terranova/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "13· y no promete lo que hará la transportadora",
+      !/ellos te enviar/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "13· pero SÍ conserva que se puede enviar a oficina",
+      /oficina/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear("13· 🙋 y avisa para revisar el chat", t.revisionHumana !== null, JSON.stringify(t.revisionHumana));
+
+    // ==========================================================================
+    // 4) 🔴 LA PAUSA ES REAL: el bot deja de contestar
+    //
+    // ⚠️ ESTA PRUEBA ESTABA MAL. La versión anterior seguía llamando a
+    // generateReply() después de la pausa y terminaba declarando el pedido
+    // despachable. Pero `generateReply` NO mira la pausa —el que la mira es
+    // server.js antes de llamarlo— así que la prueba pasaba por un camino que en
+    // producción no existe: el bot callado no habría armado ese pedido.
+    // ==========================================================================
+    chequear("13· 🔑 el chat quedó en pausa de verdad", store.isPaused(tel) === true);
+
+    const fuenteServer = require("fs").readFileSync(`${__dirname}/src/server.js`, "utf8");
+    chequear(
+      "13· y server.js NO llama al bot cuando está en pausa",
+      /if \(store\.isPaused\(from\)\)/.test(fuenteServer),
+      "sin ese guardia la pausa no sirve de nada"
+    );
+
+    // Así que se simula el guardia real: mientras esté en pausa, no se contesta.
+    const comoEnProduccion = async (texto) => {
+      if (store.isPaused(tel)) return { reply: null, pausado: true };
+      return turno(tel, texto, "(el bot no debería llegar acá)");
+    };
+    const r1 = await comoEnProduccion("¿y cuándo me llega?");
+    chequear("13· 🔑 el cliente escribe y el bot NO contesta", r1.pausado === true && r1.reply === null);
+    chequear(
+      "13· y NO se creó ningún pedido mientras estaba en pausa",
+      store.todosLosPedidos().filter((p) => p.telefono_chat === tel).length === 0,
+      "el bot callado no puede estar armando pedidos"
+    );
+
+    // ==========================================================================
+    // 5) 🔑 LA REVISIÓN DE LA OFICINA SE RESUELVE EXPLÍCITAMENTE, O NO SE DESPACHA
+    // ==========================================================================
+    // El dueño verifica y devuelve el chat al bot (el botón del panel).
+    store.setPaused(tel, false);
+    const datos = {
+      nombre: "Petra Vargas", celular: "3005550013", ciudad: "Jamundí",
+      direccion: "OFICINA Interrapidísimo - Terranova", color: "verde",
+      talla: "XL y L", unidades: 2, pago: "contraentrega", total: 148000,
+    };
+    await turno(tel, "Petra Vargas, 3005550013", CUADRO(148000).replace("Ana Gómez", "Petra Vargas").replace("3001234567", "3005550013").replace("Cali", "Jamundí"));
+    await turno(tel, "sí confirmo", `¡Listo Petra! ${ORDER(datos)}`);
+
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("13· el pedido se guarda con 2 unidades", pedido && Number(pedido.unidades) === 2, `${pedido && pedido.unidades}`);
+    chequear("13· cobrando los dos", pedido && Number(pedido.total) === 148000, `${pedido && pedido.total}`);
+    chequear(
+      "13· 🔑 la cantidad ya NO lo bloquea",
+      pedido && !pedido.precio_no_cuadra,
+      String(pedido && pedido.motivo_precio)
+    );
+    // 🔑 Y ACÁ ESTÁ LA CORRECCIÓN: el cliente nombró Terranova como REFERENCIA de su
+    // zona, no la exigió. Así que el pedido sigue normal — la transportadora asigna
+    // la oficina. Bloquearlo era convertir un dato útil en una traba.
+    chequear(
+      "13· 🔑 el pedido a oficina NO se bloquea",
+      pedido && store.listoParaDespachar(pedido) === true,
+      store.textoDeRevision(pedido)
+    );
+    chequear(
+      "13· y la referencia del cliente se conserva",
+      pedido && (pedido.sede_referencia === "Terranova" || /Terranova/.test(String(pedido.direccion))),
+      JSON.stringify({ ref: pedido && pedido.sede_referencia, dir: pedido && pedido.direccion })
+    );
+    chequear(
+      "13· sin marcarla como sede pedida",
+      pedido && !pedido.sede_pedida,
+      `sede_pedida=${pedido && pedido.sede_pedida}`
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 14. 🔁 El candado no deja al cliente atrapado ──");
+  // Lo que el cliente vivió: preguntó por las tallas y recibió un precio. Cuatro veces.
+  // ==========================================================================
+  {
+    const tel = "573005550014";
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel, "Cali", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali. Pásame nombre completo, dirección con barrio y celular");
+
+    // El cliente pregunta por las TALLAS y el modelo contesta con un importe inválido.
+    const t1 = await turno(
+      tel,
+      "una preguntica, quiero que me explique cómo son las tallas",
+      "Las tallas van de S a 3XL y cada conjunto sale en $70.000.",
+      "Las tallas van de S a 3XL y cada conjunto sale en $70.000."
+    );
+    chequear(
+      "14· 🔑 preguntó por TALLAS y NO se le contesta con un precio",
+      !/\$82\.000/.test(t1.reply),
+      `salió: ${t1.reply}`
+    );
+    chequear("14· se le contesta algo, no silencio", t1.reply.trim().length > 20, JSON.stringify(t1.reply));
+    // 🔑 Y lo importante: se CONSERVA la parte que contestaba la pregunta. Antes se
+    // tiraba la respuesta entera y se escalaba; eso dejaba al cliente esperando a
+    // una persona por algo que el propio texto ya explicaba.
+    chequear(
+      "14· 🔑 se conserva la explicación de las tallas",
+      /3XL/.test(t1.reply),
+      `salió: ${t1.reply}`
+    );
+    chequear("14· y se quitó el importe inválido", !/\$70\.000/.test(t1.reply), `salió: ${t1.reply}`);
+    chequear(
+      "14· 🙋 y NO hace falta un humano: la conversación quedó resuelta",
+      t1.revisionHumana === null,
+      JSON.stringify(t1.revisionHumana)
+    );
+
+    // Pero si NO queda nada que salvar, ahí sí se escala.
+    const tel3 = "573005550016";
+    await turno(tel3, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel3, "Cali", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali. Pásame tus datos");
+    const t2 = await turno(tel3, "y cómo son las tallas?", "Cada uno sale en $70.000.", "Cada uno sale en $70.000.");
+    chequear("14· 🔑 si no hay nada que salvar, SÍ se escala", t2.revisionHumana !== null, JSON.stringify(t2.revisionHumana));
+    chequear("14· y no sale el importe inválido", !/\$70\.000/.test(t2.reply), `salió: ${t2.reply}`);
+
+    // Y si el turno siguiente vuelve a fallar, no se repite la misma línea.
+    const tel2 = "573005550015";
+    await turno(tel2, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    const p1 = await turno(tel2, "Cali", "El envío a Cali es $82.000.", "El envío a Cali es $82.000.");
+    chequear("14· contestar la ciudad SÍ da el precio calculado", /\$82\.000/.test(p1.reply) && /de envío/.test(p1.reply), p1.reply);
+    const p2 = await turno(tel2, "y a Palmira?", "El envío a Palmira es $82.000.", "El envío a Palmira es $82.000.");
+    chequear(
+      "14· 🔑 pero NO se repite la misma línea dos turnos seguidos",
+      p2.reply.trim() !== p1.reply.trim(),
+      `las dos veces salió: ${p2.reply}`
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 15. 🏢 Los DOS recorridos de entrega en oficina ──");
+  // Operación real: se registra ciudad + entrega en oficina de Interrapidísimo, y la
+  // SEDE de recogida la asigna la transportadora.
+  //   · nombrarla como referencia  → el pedido sigue normal
+  //   · exigirla en exclusiva      → se conserva y se pide aclaración
+  // ==========================================================================
+
+  // ── 15a. La nombra como REFERENCIA → sigue normal ────────────────────────
+  {
+    const tel = "573006660015";
+    const datos = {
+      nombre: "Rosa Lara", celular: "3006660015", ciudad: "Jamundí",
+      direccion: "OFICINA Interrapidísimo - Terranova", color: "negro",
+      talla: "L", unidades: 1, pago: "contraentrega", total: 82000,
+    };
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel, "Jamundí", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Jamundí. Pásame nombre completo, dirección con barrio y celular");
+    const t = await turno(
+      tel,
+      "me lo manda a Terranova que me queda más cerca",
+      "¡Claro! Te lo enviamos a la oficina de Interrapidísimo en Terranova, Jamundí."
+    );
+    chequear(
+      "15a· 🔑 el mensaje NO promete la sede",
+      !/oficina de Interrapidísimo en Terranova/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "15a· y usa Terranova como REFERENCIA de su zona",
+      /referencia de tu zona/.test(t.reply) && /Terranova/.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "15a· prometiendo solo lo que sí controlamos",
+      /te compartimos la oficina asignada/.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear("15a· corto y sin advertencias", !/no puedo|no podemos|lamentablemente/i.test(t.reply), t.reply);
+
+    store.setPaused(tel, false);
+    await turno(tel, "Rosa Lara, 3006660015, talla L negra", CUADRO(82000).replace("Ana Gómez", "Rosa Lara").replace("3001234567", "3006660015").replace("Cali", "Jamundí"));
+    await turno(tel, "sí confirmo", `¡Listo Rosa! ${ORDER(datos)}`);
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear(
+      "15a· 🔑 el pedido a oficina queda DESPACHABLE",
+      pedido && store.listoParaDespachar(pedido) === true,
+      store.textoDeRevision(pedido)
+    );
+    chequear("15a· con la referencia guardada", pedido && pedido.sede_referencia === "Terranova", `${pedido && pedido.sede_referencia}`);
+    chequear("15a· y sin marca de sede pedida", pedido && !pedido.sede_pedida);
+  }
+
+  // ── 15b. La EXIGE en exclusiva → se conserva y se pide aclaración ─────────
+  {
+    const tel = "573006660016";
+    const datos = {
+      nombre: "Iván Soto", celular: "3006660016", ciudad: "Jamundí",
+      direccion: "OFICINA Interrapidísimo - Terranova", color: "negro",
+      talla: "L", unidades: 1, pago: "contraentrega", total: 82000,
+    };
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel, "Jamundí", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Jamundí. Pásame nombre completo, dirección con barrio y celular");
+    await turno(tel, "tiene que ser en la oficina de Terranova, si no es ahí no me sirve", "Entendido, lo registro así.");
+    store.setPaused(tel, false);
+    await turno(tel, "Iván Soto, 3006660016, talla L negra", CUADRO(82000).replace("Ana Gómez", "Iván Soto").replace("3001234567", "3006660016").replace("Cali", "Jamundí"));
+    await turno(tel, "sí confirmo", `¡Listo Iván! ${ORDER(datos)}`);
+
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("15b· 🔑 exigir la sede SÍ frena el despacho", pedido && store.listoParaDespachar(pedido) === false, store.textoDeRevision(pedido));
+    chequear("15b· y queda anotada como sede pedida", pedido && pedido.sede_pedida === "Terranova", `${pedido && pedido.sede_pedida}`);
+    chequear(
+      "15b· 🔑 sin cambiarle la dirección en silencio",
+      pedido && /Terranova/.test(String(pedido.direccion)),
+      `${pedido && pedido.direccion}`
+    );
+    chequear(
+      "15b· el aviso explica que la asigna la transportadora",
+      /la oficina la asigna la transportadora/.test(store.textoDeRevision(pedido)),
+      store.textoDeRevision(pedido)
+    );
+    chequear(
+      "15b· y al resolverlo queda despachable",
+      store.listoParaDespachar({ ...pedido, sede_resuelta: true }) === true
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 16. 🙋 «Solo» tiene que hablar del LUGAR, no de otra cosa ──");
+  // 🔴 Reproducido: exigeSedeUnica() daba true para "Solo quiero un impermeable",
+  // "¿Solo pago cuando llegue?" y "Solo la talla L". Y agent.js lo buscaba en
+  // CUALQUIER mensaje del historial, así que un "solo" sobre la talla frenaba el
+  // pedido si la dirección nombraba Terranova.
+  // ==========================================================================
+
+  const pedidoOficina = (nombre, cel) => ({
+    nombre, celular: cel, ciudad: "Jamundí",
+    direccion: "OFICINA Interrapidísimo - Terranova", color: "negro",
+    talla: "L", unidades: 1, pago: "contraentrega", total: 82000,
+  });
+  const cuadroJamundi = (nombre, cel) =>
+    CUADRO(82000).replace("Ana Gómez", nombre).replace("3001234567", cel).replace("Cali", "Jamundí");
+
+  // ── 16a. Los tres «solo» que NO son del lugar ────────────────────────────
+  {
+    const tel = "573007770016";
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel, "Jamundí", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Jamundí. Pásame nombre completo, dirección con barrio y celular");
+    // Los tres falsos positivos, dichos de verdad en la conversación.
+    await turno(tel, "Solo quiero un impermeable", "¡Perfecto, uno entonces!");
+    await turno(tel, "¿Solo pago cuando llegue?", "Así es, pagas contraentrega cuando lo recibes 📦");
+    await turno(tel, "Solo la talla L", "¡Listo, talla L!");
+    // Y nombra Terranova como referencia, sin exigirla.
+    await turno(tel, "me lo manda a Terranova que me queda cerca", "¡Claro! Te lo enviamos a oficina de Interrapidísimo en Jamundí.");
+    store.setPaused(tel, false);
+    await turno(tel, "Hugo Prieto, 3007770016", cuadroJamundi("Hugo Prieto", "3007770016"));
+    await turno(tel, "sí confirmo", `¡Listo Hugo! ${ORDER(pedidoOficina("Hugo Prieto", "3007770016"))}`);
+
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear(
+      "16a· 🔑 tres «solo» sobre cantidad, pago y talla NO frenan la sede",
+      pedido && store.listoParaDespachar(pedido) === true,
+      store.textoDeRevision(pedido)
+    );
+    chequear("16a· y no se marcó sede pedida", pedido && !pedido.sede_pedida, `sede_pedida=${pedido && pedido.sede_pedida}`);
+    chequear("16a· la referencia sí se guarda", pedido && pedido.sede_referencia === "Terranova", `${pedido && pedido.sede_referencia}`);
+  }
+
+  // ── 16b. 🔑 El caso positivo: lo exige de verdad ──────────────────────────
+  {
+    const tel = "573007770017";
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel, "Jamundí", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Jamundí. Pásame nombre completo, dirección con barrio y celular");
+    await turno(tel, "únicamente en Terranova; otra oficina no me sirve", "Entendido, lo anoto así.");
+    store.setPaused(tel, false);
+    await turno(tel, "Nora Quintero, 3007770017", cuadroJamundi("Nora Quintero", "3007770017"));
+    await turno(tel, "sí confirmo", `¡Listo Nora! ${ORDER(pedidoOficina("Nora Quintero", "3007770017"))}`);
+
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("16b· 🔑 la exigencia SÍ frena el despacho", pedido && store.listoParaDespachar(pedido) === false, store.textoDeRevision(pedido));
+    chequear("16b· con la sede anotada", pedido && pedido.sede_pedida === "Terranova", `${pedido && pedido.sede_pedida}`);
+    chequear("16b· y la dirección intacta", pedido && /Terranova/.test(String(pedido.direccion)), `${pedido && pedido.direccion}`);
+    chequear(
+      "16b· el aviso explica quién asigna la oficina",
+      /la oficina la asigna la transportadora/.test(store.textoDeRevision(pedido)),
+      store.textoDeRevision(pedido)
+    );
+  }
+
+  // ── 16c. 🔑 Y si DESPUÉS acepta la que asignen, queda resuelta ────────────
+  {
+    const tel = "573007770018";
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel, "Jamundí", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Jamundí. Pásame nombre completo, dirección con barrio y celular");
+    // Primero la exige…
+    await turno(tel, "tiene que ser en la oficina de Terranova", "Entendido.");
+    store.setPaused(tel, false);
+    // …se le explica, y la acepta.
+    await turno(tel, "ah bueno, la que asignen está bien entonces", "¡Perfecto! Te compartimos la oficina asignada cuando tengamos la guía.");
+    store.setPaused(tel, false);
+    await turno(tel, "Omar Cifuentes, 3007770018", cuadroJamundi("Omar Cifuentes", "3007770018"));
+    await turno(tel, "sí confirmo", `¡Listo Omar! ${ORDER(pedidoOficina("Omar Cifuentes", "3007770018"))}`);
+
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear(
+      "16c· 🔑 la exigencia anterior queda RESUELTA y se puede despachar",
+      pedido && store.listoParaDespachar(pedido) === true,
+      store.textoDeRevision(pedido)
+    );
+    chequear("16c· gana la última señal, no la primera", pedido && !pedido.sede_pedida, `sede_pedida=${pedido && pedido.sede_pedida}`);
+    chequear("16c· y queda constancia de que la aceptó", pedido && pedido.sede_resuelta === true, `sede_resuelta=${pedido && pedido.sede_resuelta}`);
   }
 
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);

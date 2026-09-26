@@ -2,7 +2,7 @@
 // (detecta pedidos confirmados y solicitudes de pasar a un humano).
 const { buildSystemPrompt } = require("./prompt");
 const { respuestaDeArranque } = require("./primer-mensaje");
-const { revisarDireccionDePedido } = require("./direccion");
+const { revisarDireccionDePedido, sedeEspecificaEn, estadoDeLaSede } = require("./direccion");
 const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
 const cotizacion = require("./cotizacion");
@@ -445,15 +445,102 @@ async function generateReply(phone, userText) {
       );
     }
 
-    // Si después del reintento sigue mal, NO sale un precio inventado.
+    // ========================================================================
+    // 🔴 EL CANDADO SE QUEDA, PERO NO PUEDE DEJAR AL CLIENTE ATRAPADO
+    //
+    // LO QUE PASÓ EL 26-SEP: el cliente pidió dos conjuntos enumerando tallas, el
+    // código leyó uno, y cada vez que el modelo intentaba cotizar los dos la
+    // etapa 5 le rechazaba la respuesta. Resultado: **la misma línea de precio de
+    // UNA unidad salió cuatro veces**, contra cuatro preguntas distintas — cómo
+    // son las tallas, la oficina, el teléfono, la talla otra vez. El cliente
+    // preguntaba una cosa y recibía un precio.
+    //
+    // 🔑 El candado hizo su trabajo: evitó que saliera un número mal. El error fue
+    // el reemplazo: contestar con un PRECIO a quien no preguntó por el precio, y
+    // repetirlo. Ahora:
+    //
+    //   · si el cliente no preguntó por precio → no se le contesta con un precio
+    //   · si la misma línea ya salió en el turno anterior → NO se repite: se
+    //     escala a un humano, porque el bot está en un bucle que no va a resolver
+    // ========================================================================
     if (validacion && !validacion.ok) {
-      if (cot.ok) {
-        reply = cotizacion.lineaDePrecio(cot);
+      const ultimaDelBot =
+        [...conv.messages].reverse().find((m) => m && m.role === "assistant")?.content || "";
+      const lineaCalculada = cot.ok ? cotizacion.lineaDePrecio(cot) : "";
+      const yaSalioEstaLinea = Boolean(lineaCalculada) && String(ultimaDelBot).trim() === lineaCalculada.trim();
+      // ⚠️ "Esperar un precio" no es solo preguntarlo con palabras. Cuando el
+      // cliente contesta la CIUDAD está pidiendo el total: es el paso siguiente del
+      // flujo. Sin esto, la respuesta correcta —la línea de precio— se cambiaba por
+      // un "dame un momento" justo en el turno donde el precio es lo que toca.
+      const preguntoPorPrecio =
+        cotizacion.hayObjecionDePrecio([{ role: "user", content: userText }]) ||
+        /\b(precio|vale|cuesta|cu[aá]nto|total|env[ií]o|domicilio)\b/i.test(String(userText || ""));
+      const contestoLaCiudad =
+        cotizacion.ciudadesEn(String(userText || "")).length > 0 ||
+        cotizacion.botPidioCiudad(conv.messages);
+      const esperaUnPrecio = preguntoPorPrecio || contestoLaCiudad;
+
+      // ======================================================================
+      // ✂️ PRIMERO SE INTENTA SALVAR LA RESPUESTA, no reemplazarla
+      //
+      // Casi siempre el problema es UNA frase con un número mal, y el resto del
+      // mensaje contesta bien lo que el cliente preguntó. Se quita esa parte y se
+      // conserva lo demás; si hacía falta un precio, se le pega el calculado.
+      //
+      // 🔑 Y no se escala: la conversación queda resuelta. Mandar a un humano cada
+      // vez que aparece un número mal deja al cliente esperando por algo que el
+      // propio texto ya contestaba.
+      // ======================================================================
+      const depurado = cot.ok ? cotizacion.depurarImportes(reply, cot, contextoPrecio) : { texto: "" };
+      // ⚠️ El umbral estaba en 40 caracteres y tiraba respuestas útiles: "Las tallas
+      // van de S a 3XL." son 26 y contesta perfecto la pregunta. Se pide que quede
+      // una frase de verdad (4 palabras), no una longitud arbitraria.
+      const palabrasQueQuedan = depurado.texto.split(/\s+/).filter(Boolean).length;
+      const seSalva =
+        palabrasQueQuedan >= 4 &&
+        depurado.texto.length >= 20 &&
+        cotizacion.validarRespuesta(depurado.texto, cot, contextoPrecio).ok;
+
+      if (seSalva) {
+        reply = esperaUnPrecio ? `${depurado.texto}\n\n${lineaCalculada}` : depurado.texto;
+        console.log(
+          `✂️  RESPUESTA DEPURADA para ${phone}: se quitó ${JSON.stringify(depurado.quitadas)} y se ` +
+            "conservó el resto. No se escala: la conversación sigue."
+        );
+      } else if (!cot.ok) {
+        reply = "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
+        console.warn(`🔧 Sin cotización válida para ${phone}: se escala en vez de dar un número.`);
+        revisionHumana = { motivo: "sin_cotizacion", detalle: String(cot.motivo || "") };
+      } else if (yaSalioEstaLinea) {
+        // 🔁 Segunda vez seguida: el bot no está avanzando. Se corta el bucle.
+        reply =
+          "Dejame revisarlo bien para no darte un dato equivocado 🙏 Te escribo en unos minutos con " +
+          "la confirmación.";
+        console.warn(
+          `🔁 BUCLE CORTADO para ${phone}: la línea de precio ya había salido en el turno anterior. ` +
+            "Se escala a un humano en vez de repetirla."
+        );
+        revisionHumana = {
+          motivo: "bucle_de_precio",
+          detalle:
+            "la misma línea de precio se iba a repetir. El modelo no logra una respuesta válida: " +
+            (validacion.problemas || []).map((p) => p.detalle).join(" · "),
+        };
+      } else if (esperaUnPrecio) {
+        reply = lineaCalculada;
         console.warn(`🔧 Se reemplazó la respuesta por la línea de precio calculada para ${phone}.`);
       } else {
+        // 🔑 Preguntó otra cosa: no se le contesta con un precio.
         reply =
-          "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
-        console.warn(`🔧 Sin cotización válida para ${phone}: se escala en vez de dar un número.`);
+          "Con gusto te confirmo eso 🙌 Dame un momento para revisarlo y te escribo enseguida.";
+        console.warn(
+          `🔧 Respuesta no validada para ${phone} y el cliente NO preguntó por precio: ` +
+            "se escala en vez de contestarle con la línea de precio."
+        );
+        revisionHumana = {
+          motivo: "respuesta_no_validada",
+          detalle: (validacion.problemas || []).map((p) => p.detalle).join(" · "),
+        };
       }
     }
   }
@@ -505,9 +592,15 @@ async function generateReply(phone, userText) {
   // 🔧 Se CORRIGE antes de enviar, frase por frase. La revisión del 26-sep señaló
   // —con razón— que mandar el mensaje falso y pausar después no protege a nadie:
   // el cliente ya lo leyó y actúa sobre eso. Ver promesas.js.
-  const chequeoPromesas = promesas.revisar(reply);
+  // La ciudad y la referencia del cliente hacen falta para distinguir "oficina de
+  // Interrapidísimo en Jamundí" (correcto) de prometer una sede concreta.
+  const ctxPromesas = {
+    ciudad: cot.ok ? cot.ciudad : "",
+    referencia: sedeEspecificaEn(userText, cot.ok ? cot.ciudad : ""),
+  };
+  const chequeoPromesas = promesas.revisar(reply, ctxPromesas);
   if (!chequeoPromesas.ok) {
-    const corregido = promesas.corregir(reply);
+    const corregido = promesas.corregir(reply, ctxPromesas);
     if (corregido.cambios.length) {
       console.warn(
         `🔧 PROMESA SIN RESPALDO de ${phone}: ` +
@@ -547,7 +640,7 @@ async function generateReply(phone, userText) {
   {
     const visible = extractMedia(extractOrder(reply).clean).clean;
     const precioFinal = cotizacion.validarRespuesta(visible, cot, contextoPrecio);
-    const promesaFinal = promesas.revisar(visible);
+    const promesaFinal = promesas.revisar(visible, ctxPromesas);
     if (!precioFinal.ok || !promesaFinal.ok) {
       const porQue = [
         !precioFinal.ok ? `precio: ${precioFinal.problemas.map((p) => p.detalle).join(" · ")}` : "",
@@ -605,6 +698,45 @@ async function generateReply(phone, userText) {
       // los pedía y el modelo no siempre obedecía.
       const conTelefono = revisarTelefono(order, phone);
       const conDireccion = revisarDireccionDePedido({ ...conTelefono, telefono_chat: phone });
+
+      // 🏢 ¿Pidió una SEDE concreta? Se conserva su preferencia tal como la dijo y
+      // se marca para aclarársela. La oficina la asigna la transportadora, así que
+      // prometerle una sede sería prometer algo que no controlamos — y cambiarle la
+      // preferencia en silencio sería peor. Ver direccion.js.
+      const sedeNombrada =
+        conDireccion.entrega === "oficina"
+          ? sedeEspecificaEn(conDireccion.direccion, conDireccion.ciudad)
+          : "";
+      if (sedeNombrada) {
+        // ======================================================================
+        // 🔑 Nombrar un punto NO frena el pedido: casi siempre es la REFERENCIA de
+        // la zona del cliente. Solo se pide aclaración si lo EXIGE de forma
+        // excluyente, porque esa sede no se la podemos prometer.
+        //
+        // 🔴 Y la exigencia tiene que ser SOBRE EL LUGAR. Antes se buscaba un "solo"
+        // en cualquier mensaje del historial, así que "Solo la talla L" dicho veinte
+        // mensajes antes frenaba el pedido. Ahora lo resuelve `estadoDeLaSede`, que
+        // ata la exclusividad al lugar y deja ganar la ÚLTIMA señal: si después el
+        // cliente acepta la oficina que asignen, la exigencia queda resuelta.
+        // ======================================================================
+        const estadoSede = estadoDeLaSede(conv.messages, sedeNombrada);
+        if (estadoSede.exige) {
+          conDireccion.sede_pedida = sedeNombrada;
+          console.warn(
+            `🏢 EXIGE UNA SEDE por ${phone}: "${sedeNombrada}". Se conserva su preferencia y se marca ` +
+              "para aclarar: la oficina de recogida la asigna la transportadora."
+          );
+        } else {
+          conDireccion.sede_referencia = sedeNombrada;
+          // Si antes la exigió y después aceptó la que asignen, queda resuelta: el
+          // pedido no puede seguir frenado por algo que el cliente ya resolvió.
+          if (estadoSede.acepto) conDireccion.sede_resuelta = true;
+          console.log(
+            `🏢 Referencia de zona de ${phone}: "${sedeNombrada}". El pedido sigue normal; se usa como ` +
+              `referencia, no como sede prometida.${estadoSede.acepto ? " El cliente aceptó la oficina que asignen." : ""}`
+          );
+        }
+      }
 
       // ======================================================================
       // 🧾 ETAPA 6: EL PEDIDO NO PUEDE CONTRADECIR LA COTIZACIÓN
@@ -693,6 +825,27 @@ async function generateReply(phone, userText) {
       }
     }
   }
+  // ==========================================================================
+  // 🔴 NO SE ANUNCIA UNA VENTA LISTA SI HAY UN PEDIDO EN REVISIÓN
+  //
+  // Esto corre AUNQUE EN ESTE TURNO NO SE HAYA EMITIDO UN PEDIDO, que es el hueco
+  // del caso del 26-sep: el pedido se guardó bloqueado a las 08:08, y a las 08:09
+  // —sin ##ORDER## de por medio— el bot le dijo "ya quedó registrado, gracias por
+  // tu compra". El candado existía pero solo mirába los turnos con pedido.
+  // ==========================================================================
+  if (!savedOrder && cotizacion.afirmaCierre(reply)) {
+    const bloqueado = store.pedidoEnRevisionDe(phone);
+    if (bloqueado) {
+      const motivos = store.textoDeRevision(bloqueado);
+      console.warn(
+        `🔴 CIERRE ANUNCIADO SOBRE UN PEDIDO EN REVISIÓN (${phone}): ${motivos}. ` +
+          "Se reemplaza el mensaje: el cliente no puede quedar creyendo que su compra está hecha."
+      );
+      reply = cotizacion.respuestaEnRevision(bloqueado);
+      revisionHumana = { motivo: "cierre_sobre_pedido_en_revision", detalle: motivos };
+    }
+  }
+
   // Un pedido en revisión o una promesa corregida mandan el chat a un humano igual
   // que un ##HANDOFF##: el dueño tiene que cerrar esa venta a mano.
   if (handoff || revisionHumana) store.setPaused(phone, true);
