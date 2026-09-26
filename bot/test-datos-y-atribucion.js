@@ -297,7 +297,24 @@ const store3 = require("./src/store");
 const panel3 = require("./src/panel");
 
 const bueno = store3.estadoDelDisco();
-chequear("reconoce un disco montado de verdad", bueno.discoAparte === true, `discoAparte=${bueno.discoAparte}`);
+// ⚠️ ESTA PRUEBA DEPENDÍA DEL ENTORNO, y por eso no se podía usar como puerta.
+//
+// `estadoDelDisco` compara el DISPOSITIVO de DATA_DIR con el del código: distinto
+// = disco montado aparte. En este sandbox /tmp y el repo están en dispositivos
+// distintos, así que pasaba; en un runner de GitHub están en el MISMO, así que
+// fallaba — sin que hubiera nada roto.
+//
+// Ahora se comprueba la LÓGICA contra el mismo dato que el sistema reporta, en vez
+// de dar por hecho cómo está montado el disco de quien corre las pruebas.
+const mismoDispositivo =
+  require("fs").statSync(DIR3).dev === require("fs").statSync(`${__dirname}/src`).dev;
+chequear(
+  mismoDispositivo
+    ? "reconoce que NO hay disco aparte (acá /tmp y el código comparten dispositivo)"
+    : "reconoce un disco montado de verdad",
+  bueno.discoAparte === !mismoDispositivo,
+  `discoAparte=${bueno.discoAparte}, mismoDispositivo=${mismoDispositivo}`
+);
 
 // El contador de arranques es la evidencia directa de que los datos aguantan.
 store3.registrarArranque();
@@ -307,10 +324,23 @@ chequear("cuenta los arranques que sobrevivieron los datos", tras3.arranques ===
 chequear("guarda desde cuándo existen los datos", Boolean(tras3.desde));
 
 const html3 = panel3.render();
+// ⚠️ Igual que arriba: el mensaje del panel depende de si el disco está montado
+// aparte, y eso es del entorno. Lo que SÍ se puede exigir en cualquier entorno es
+// que el panel muestre la evidencia que tiene —los arranques contados— y que no
+// afirme "comprobado" cuando no lo está.
 chequear(
-  "con el disco comprobado, el panel lo dice como prueba y no como suposición",
-  html3.includes("Disco persistente comprobado") && html3.includes("2 arranques"),
+  "el panel muestra la evidencia que ya tiene (los arranques contados)",
+  html3.includes("2 arranques"),
   "no está mostrando la evidencia que ya tiene"
+);
+chequear(
+  mismoDispositivo
+    ? "y NO afirma «comprobado» donde no hay disco aparte"
+    : "con el disco comprobado, lo dice como prueba y no como suposición",
+  mismoDispositivo
+    ? !html3.includes("Disco persistente comprobado")
+    : html3.includes("Disco persistente comprobado"),
+  "el panel no puede afirmar más de lo que sabe"
 );
 
 fs.rmSync(DIR3, { recursive: true, force: true });

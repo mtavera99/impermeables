@@ -1360,14 +1360,22 @@ function marcarChat(btn) {
     body: cuerpo,
   })
     .then(function (r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
+      // 🔴 Un 403 es la clave del panel, no un problema de conexión. Sin este
+      // caso el dueño leía "No se pudo guardar. Revisá la conexión" y se iba a
+      // buscar el problema al router. Mismo tratamiento que /responder.
+      if (r.status === 403) {
+        throw new Error(
+          "la clave del panel no coincide. Volvé a abrir el panel con el token correcto."
+        );
+      }
+      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
     })
-    .catch(function () {
+    .catch(function (e) {
       // Revertir: que la pantalla no diga algo que el servidor no guardó.
       fila.dataset.listo = estaba ? "1" : "0";
       fila.classList.toggle("hecho", estaba);
       recontarFaltan();
-      alert("No se pudo guardar. Revisá la conexión y tocá de nuevo.");
+      alert("No se pudo guardar: " + (e && e.message ? e.message : "revisá la conexión") + " Tocá de nuevo.");
     })
     .then(function () {
       fila.dataset.guardando = "0";
