@@ -261,7 +261,11 @@ chequear(
 );
 
 // El rescate como total del pedido: solo con objeción.
-const pedidoRescate = { nombre: "Ana", ciudad: "Cucuta", total: cucuta2.rescate };
+// ⚠️ `unidades: 2` va explícito porque `cucuta2` es una cotización de DOS, y desde
+// la revisión del 26-sep `verificarPedido` también compara la cantidad. El fixture
+// venía sin declararla: pasaba porque la comprobación no existía, no porque el
+// pedido estuviera bien.
+const pedidoRescate = { nombre: "Ana", ciudad: "Cucuta", total: cucuta2.rescate, unidades: 2 };
 chequear(
   "un pedido al precio de negociación SIN objeción se marca",
   c.verificarPedido(pedidoRescate, cucuta2, { objecionDePrecio: false }).ok === false
@@ -493,6 +497,67 @@ console.log("\n── R5. No se le confirma al cliente lo que no se puede despac
   chequear("dice que los datos quedaron", /datos/i.test(texto), texto);
   chequear("🔑 no afirma que esté confirmado", !c.afirmaCierre(texto), texto);
   chequear("y no promete fecha", !/hoy|mañana/i.test(texto), texto);
+}
+
+console.log("\n── R6. 🔴 El pedido tiene que cuadrar en CANTIDAD, no solo en total ──");
+// Textual de la 2ª revisión: "verificarPedido() acepta una cotización de dos
+// conjuntos con un pedido que indica una unidad si total y ciudad coinciden".
+{
+  const dos = c.calcular("Cali", "dos conjuntos");
+  const una = c.calcular("Cali", "uno");
+  const base = { nombre: "Ana", celular: "3001234567", ciudad: "Cali", direccion: "Cra 1", color: "rojo", pago: "contraentrega" };
+  const problemasDe = (o, cot) => c.verificarPedido(o, cot, {}).problemas.map((p) => p.tipo);
+
+  chequear(
+    "🔑 el caso reportado se rechaza: 1 unidad contra cotización de 2",
+    problemasDe({ ...base, talla: "L", total: 148000, unidades: 1 }, dos).includes("cantidad_distinta"),
+    JSON.stringify(c.verificarPedido({ ...base, talla: "L", total: 148000, unidades: 1 }, dos).problemas)
+  );
+  chequear(
+    "y el motivo dice de cuántas es cada uno",
+    /es de 1 unidad/.test(c.verificarPedido({ ...base, talla: "L", total: 148000, unidades: 1 }, dos).problemas.map((p) => p.detalle).join(" "))
+  );
+  chequear(
+    "un pedido de 2 sin declararlo también se rechaza",
+    problemasDe({ ...base, talla: "L", total: 148000 }, dos).includes("cantidad_distinta")
+  );
+  chequear(
+    "y al revés: 2 unidades contra cotización de 1",
+    problemasDe({ ...base, talla: "L", total: 82000, unidades: 2 }, una).includes("cantidad_distinta")
+  );
+  chequear(
+    "más tallas que unidades es incoherente",
+    problemasDe({ ...base, talla: "L, M, XL", total: 148000, unidades: 2 }, dos).includes("tallas_incoherentes")
+  );
+
+  // Y lo que NO se puede marcar, que es la otra mitad.
+  chequear("✅ 2 declaradas con una sola talla pasa (dos del mismo talle)", c.verificarPedido({ ...base, talla: "L", total: 148000, unidades: 2 }, dos).ok);
+  chequear("✅ dos tallas cuentan como dos unidades", c.verificarPedido({ ...base, talla: "L y M", total: 148000 }, dos).ok);
+  chequear("✅ un pedido de una unidad normal pasa", c.verificarPedido({ ...base, talla: "L", total: 82000 }, una).ok);
+
+  // 🔴 EL DEFECTO QUE APARECIÓ ARREGLANDO ESTO: la talla no es una cantidad.
+  chequear(
+    "🔴 una talla 2XL NO son dos unidades",
+    c.unidadesDelPedido({ talla: "2XL" }).uds === 1,
+    "el criterio heredado miraba `producto + talla` junto y el patrón traía `2x`"
+  );
+  chequear("🔴 ni una 3XL son tres", c.unidadesDelPedido({ talla: "3XL" }).uds === 1);
+  chequear("✅ pero «L y M» siguen siendo dos", c.unidadesDelPedido({ talla: "L y M" }).uds === 2);
+  chequear("✅ y el campo unidades manda", c.unidadesDelPedido({ unidades: 2, talla: "L" }).uds === 2);
+  chequear(
+    "✅ un pedido de talla 2XL pasa la verificación de una unidad",
+    c.verificarPedido({ ...base, talla: "2XL", total: 82000 }, una).ok,
+    "antes lo habría marcado como cantidad_distinta"
+  );
+
+  // Y el mismo criterio en resumen.js, que alimenta el CSV y el KPI de share.
+  const resumen = require("./src/resumen");
+  chequear(
+    "🔑 resumen.unidadesDe tampoco cuenta la talla como cantidad",
+    resumen.unidadesDe({ talla: "2XL", total: 82000 }) === 1,
+    "inflaba el share de 2 uds, que es el número con el que se justifica el combo"
+  );
+  chequear("y sigue contando bien las de verdad", resumen.unidadesDe({ talla: "L y M", total: 148000 }) === 2);
 }
 
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);

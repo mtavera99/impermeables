@@ -28,9 +28,31 @@ const fmtCOP = (n) => "$" + Number(n || 0).toLocaleString("es-CO").replace(/,/g,
 
 /** Cuántas unidades tiene un pedido, leyendo el producto. */
 function unidadesDe(p) {
-  const t = `${p.producto || ""} ${p.talla || ""}`.toLowerCase();
+  // Si el pedido lo dice, se le cree.
+  const explicito = Number(p.unidades);
+  if (Number.isFinite(explicito) && explicito > 0) return explicito;
+
+  // ========================================================================
+  // 🔴 LA TALLA NO ES UNA CANTIDAD (encontrado el 26-sep)
+  //
+  // Antes se miraba `producto + talla` junto, y el patrón traía `2x`. Resultado:
+  // **una talla "2XL" se contaba como DOS UNIDADES**, y una "3XL" como tres.
+  //
+  // No es cosmético: `unidadesDe` alimenta la columna `unidades` del CSV y el KPI
+  // de "share 2 uds" del panel — el número con el que se justifica el gancho del
+  // combo. Cada cliente de talla 2XL o 3XL venía inflando ese share.
+  //
+  // Ahora la talla se lee como talla, y la cantidad sale del producto.
+  // ========================================================================
+  const tallas = String(p.talla || "")
+    .split(/\s*(?:,|\/|\+|\by\b)\s*/i)
+    .map((s) => s.trim())
+    .filter((s) => /^(xs|s|m|l|xl|2xl|3xl|xxl|xxxl|\d{1,2})$/i.test(s));
+  if (tallas.length > 1) return tallas.length;
+
+  const t = String(p.producto || "").toLowerCase();
   if (/\b3\b|tres/.test(t)) return 3;
-  if (/\b2\b|dos|x2|2x|promo 2/.test(t)) return 2;
+  if (/\b2\b|\bdos\b|x2|2x|promo 2|combo/.test(t)) return 2;
   // Si no dice nada, se deduce del total: la promo de 2 arranca en $137.000
   if (Number(p.total) >= 130000) return 2;
   return 1;

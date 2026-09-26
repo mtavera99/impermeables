@@ -504,8 +504,10 @@ async function generateReply(phone, userText) {
     const corregido = promesas.corregir(reply);
     if (corregido.cambios.length) {
       console.warn(
-        `🔧 PROMESA SIN RESPALDO CORREGIDA de ${phone}: ` +
-          corregido.cambios.map((c) => `${c.clave} · "${c.antes}" → "${c.despues}"`).join(" | ")
+        `🔧 PROMESA SIN RESPALDO de ${phone}: ` +
+          corregido.cambios
+            .map((c) => `${c.clave} · "${c.antes}" → ${c.despues === null ? `(sin reemplazo: ${c.sinReemplazo})` : `"${c.despues}"`}`)
+            .join(" | ")
       );
       reply = corregido.texto;
       revisionHumana = {
@@ -513,12 +515,45 @@ async function generateReply(phone, userText) {
         detalle: corregido.cambios.map((c) => `${c.clave}: "${c.antes}"`).join(" · "),
       };
     } else {
-      // Se detectó algo para lo que no hay reemplazo escrito. No se manda a
-      // ciegas: se avisa igual y el dueño decide.
       console.warn(
         `⚠️  PROMESA SIN RESPALDO SIN REEMPLAZO de ${phone}: ${promesas.resumir(chequeoPromesas)}`
       );
       revisionHumana = { motivo: "promesa_sin_respaldo", detalle: promesas.resumir(chequeoPromesas) };
+    }
+  }
+
+  // ==========================================================================
+  // 🔒 RECONCILIACIÓN FINAL: LO QUE SALE TIENE QUE PASAR LAS DOS VALIDACIONES
+  //
+  // 🔴 DE DÓNDE SALE (revisión 26-sep): corregir una promesa es una TRANSFORMACIÓN
+  // DE TEXTO, y una transformación de texto puede romper el precio. El caso
+  // reportado partía "$82.000" en dos y dejaba "según la ciudad.000".
+  //
+  // `promesas.corregir` ya tiene su propio candado de importes, pero acá se revisa
+  // el resultado FINAL contra las dos validaciones, después de TODAS las
+  // transformaciones del turno. Es el último punto donde se puede mirar lo que el
+  // cliente va a leer de verdad.
+  //
+  // Si algo no cuadra —el precio quedó mal, o la promesa no se pudo aislar del
+  // importe— NO se manda eso: sale la línea escrita por el código, que dice el
+  // precio correcto y no promete nada. El cliente igual recibe respuesta.
+  // ==========================================================================
+  {
+    const visible = extractMedia(extractOrder(reply).clean).clean;
+    const precioFinal = cotizacion.validarRespuesta(visible, cot, contextoPrecio);
+    const promesaFinal = promesas.revisar(visible);
+    if (!precioFinal.ok || !promesaFinal.ok) {
+      const porQue = [
+        !precioFinal.ok ? `precio: ${precioFinal.problemas.map((p) => p.detalle).join(" · ")}` : "",
+        !promesaFinal.ok ? `promesa: ${promesas.resumir(promesaFinal)}` : "",
+      ]
+        .filter(Boolean)
+        .join(" | ");
+      console.warn(`🔒 RESPUESTA FINAL RECHAZADA para ${phone}: ${porQue}`);
+      reply = cot.ok
+        ? cotizacion.lineaDePrecio(cot)
+        : "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
+      revisionHumana = { motivo: "respuesta_final_rechazada", detalle: porQue };
     }
   }
   // Combina lo que pidió la IA (marcadores) con la detección por palabras clave del cliente

@@ -186,21 +186,75 @@ const REEMPLAZOS = {
   ubicacion_equivocada: "Nuestra bodega está en Bogotá",
 };
 
+// ============================================================================
+// 🔴 UN PUNTO ENTRE DÍGITOS NO ES EL FIN DE UNA FRASE (revisión 26-sep)
+//
+// LO QUE SE ENCONTRÓ, y era grave:
+//
+//   corregir("Sale hoy mismo y el total es $82.000. Pásame la dirección.")
+//   → "...entre 1 y 3 días hábiles según la ciudad.000. Pásame la dirección."
+//
+// El separador de miles de $82.000 se tomaba por final de frase. El texto se
+// partía en `"Sale hoy mismo y el total es $82."` + `"000."`, la primera mitad
+// coincidía con la promesa de fecha, se reemplazaba entera, y el `000` huérfano
+// quedaba pegado al reemplazo.
+//
+// 🔑 Un corrector de promesas que destroza el precio es peor que la promesa: el
+// cliente lee un total roto, y el módulo que existe para no decirle cosas falsas
+// termina diciéndole un número que no existe.
+// ============================================================================
+
+const ES_CIERRE = (ch) => ch === "." || ch === "!" || ch === "?" || ch === "\n";
+
+/** ¿Ese punto es separador de miles o decimal, y no un final de frase? */
+const esPuntoDeNumero = (t, i) =>
+  (t[i] === "." || t[i] === ",") && /\d/.test(t[i - 1] || "") && /\d/.test(t[i + 1] || "");
+
 /**
  * Parte el texto en frases CONSERVANDO los separadores, para poder reemplazar una
  * sola frase y volver a armar el mensaje igual que estaba.
+ *
+ * ⚠️ Se recorre a mano en vez de con un `split`: hay que poder mirar el carácter
+ * anterior y el siguiente para distinguir "$82.000" de un final de frase, y eso
+ * un split no lo hace.
  */
 function enFrases(texto) {
-  const partes = String(texto == null ? "" : texto).split(/([.!?\n]+)/);
+  const t = String(texto == null ? "" : texto);
   const frases = [];
-  for (let i = 0; i < partes.length; i += 2) {
-    const cuerpo = partes[i];
-    const cierre = partes[i + 1] || "";
-    if (cuerpo === "" && cierre === "") continue;
-    frases.push({ cuerpo, cierre });
+  let cuerpo = "";
+  let i = 0;
+  while (i < t.length) {
+    if (ES_CIERRE(t[i]) && !esPuntoDeNumero(t, i)) {
+      let cierre = "";
+      while (i < t.length && ES_CIERRE(t[i]) && !esPuntoDeNumero(t, i)) {
+        cierre += t[i];
+        i++;
+      }
+      frases.push({ cuerpo, cierre });
+      cuerpo = "";
+      continue;
+    }
+    cuerpo += t[i];
+    i++;
   }
+  if (cuerpo !== "") frases.push({ cuerpo, cierre: "" });
   return frases;
 }
+
+// Importes del texto, para comprobar que una corrección no se los llevó puestos.
+// No le importa cuánto valen —eso es de cotizacion.js—, solo que sigan iguales.
+const RE_IMPORTE = /\$\s?\d{1,3}(?:[.,]\d{3})+|\$\s?\d{4,6}|\b\d{1,3}(?:[.,]\d{3})+\b/g;
+const importesDe = (texto) =>
+  (String(texto == null ? "" : texto).match(RE_IMPORTE) || []).map((s) => s.replace(/[^\d]/g, ""));
+
+// Dentro de una frase, los pedazos que se pueden reemplazar por separado. Sirve
+// para "Sale hoy mismo Y el total es $82.000": se cambia la promesa y se deja el
+// precio donde estaba, en vez de tirar la frase completa.
+// Se incluyen preposiciones (`con`, `por`, `para`) y no solo conjunciones: el caso
+// "Se despacha hoy mismo CON un total de $82.000" no se puede separar sin ellas, y
+// si no se separa, la promesa sobrevive al corrector.
+const RE_CLAUSULA =
+  /(\s+(?:y|e|pero|aunque|adem[aá]s|tambi[eé]n|con|por|para|porque|as[ií] que|ya que|mientras)\s+|,\s*|;\s*|:\s*|\s+-\s+)/i;
 
 /**
  * Reemplaza las afirmaciones sin respaldo y devuelve el mensaje corregido.
@@ -208,45 +262,102 @@ function enFrases(texto) {
  * @returns {{texto:string, cambios:Array<{clave,antes,despues}>, ok:boolean}}
  */
 function corregir(texto, contexto = {}) {
-  const frases = enFrases(texto);
+  const original = String(texto == null ? "" : texto);
+  const frases = enFrases(original);
   const cambios = [];
   const bodega = aplanar(contexto.ciudadBodega || CIUDAD_BODEGA);
 
-  const salida = frases.map(({ cuerpo, cierre }) => {
-    const plano = aplanar(cuerpo);
-    if (!plano) return cuerpo + cierre;
-
+  /** Qué regla (si alguna) coincide con este pedazo de texto. */
+  const reglaDe = (pedazo) => {
+    const plano = aplanar(pedazo);
+    if (!plano) return null;
     for (const r of REGLAS) {
-      if (!r.patron.test(plano)) continue;
-      const reemplazo = REEMPLAZOS[r.clave];
-      if (!reemplazo) continue;
-      cambios.push({ clave: r.clave, antes: cuerpo.trim(), despues: reemplazo });
-      // Se conserva el espacio de adelante para no pegar la frase a la anterior.
-      const sangria = cuerpo.match(/^\s*/)[0];
-      return sangria + reemplazo + (cierre || ".");
+      if (r.patron.test(plano) && REEMPLAZOS[r.clave]) return { clave: r.clave, reemplazo: REEMPLAZOS[r.clave] };
     }
-
-    // La ciudad equivocada se revisa aparte, igual que en `revisar`.
     const afirma = plano.match(
       /\b(estamos|quedamos|nuestra bodega esta|la bodega esta|somos) (en|de) ([a-z ]{3,22})\b/
     );
     if (afirma) {
       const dicha = aplanar(afirma[3]).split(/\s+/)[0];
       if (dicha && dicha.length >= 4 && !bodega.includes(dicha) && !dicha.includes(bodega)) {
-        cambios.push({
-          clave: "ubicacion_equivocada",
-          antes: cuerpo.trim(),
-          despues: REEMPLAZOS.ubicacion_equivocada,
-        });
-        const sangria = cuerpo.match(/^\s*/)[0];
-        return sangria + REEMPLAZOS.ubicacion_equivocada + (cierre || ".");
+        return { clave: "ubicacion_equivocada", reemplazo: REEMPLAZOS.ubicacion_equivocada };
       }
     }
+    return null;
+  };
 
-    return cuerpo + cierre;
+  const salida = frases.map(({ cuerpo, cierre }) => {
+    if (!aplanar(cuerpo)) return cuerpo + cierre;
+    const regla = reglaDe(cuerpo);
+    if (!regla) return cuerpo + cierre;
+
+    const sangria = cuerpo.match(/^\s*/)[0];
+
+    // ======================================================================
+    // 🔑 SI LA FRASE TRAE UN IMPORTE, SE REEMPLAZA SOLO LA CLÁUSULA CULPABLE
+    //
+    // "Sale hoy mismo y el total es $82.000" tiene la promesa en la primera
+    // mitad y el precio en la segunda. Tirar la frase entera se lleva el precio.
+    // ======================================================================
+    if (importesDe(cuerpo).length > 0) {
+      const pedazos = cuerpo.split(RE_CLAUSULA);
+      let tocado = false;
+      const rearmado = pedazos.map((pedazo, i) => {
+        if (i % 2 === 1) return pedazo; // los separadores se dejan tal cual
+        const r = reglaDe(pedazo);
+        if (!r) return pedazo;
+        // No se toca una cláusula que lleve el importe adentro.
+        if (importesDe(pedazo).length > 0) return pedazo;
+        tocado = true;
+        cambios.push({ clave: r.clave, antes: pedazo.trim(), despues: r.reemplazo });
+        return pedazo.match(/^\s*/)[0] + r.reemplazo;
+      });
+      if (tocado) return rearmado.join("") + cierre;
+      // No se pudo aislar la promesa del importe: NO se reescribe nada. Mejor
+      // dejar el mensaje intacto y escalarlo que romper el precio.
+      cambios.push({
+        clave: regla.clave,
+        antes: cuerpo.trim(),
+        despues: null,
+        sinReemplazo: "la promesa y el importe están en la misma cláusula",
+      });
+      return cuerpo + cierre;
+    }
+
+    cambios.push({ clave: regla.clave, antes: cuerpo.trim(), despues: regla.reemplazo });
+    return sangria + regla.reemplazo + (cierre || ".");
   });
 
-  return { texto: salida.join("").trim(), cambios, ok: cambios.length === 0 };
+  let resultado = salida.join("").trim();
+
+  // ==========================================================================
+  // 🔒 CANDADO FINAL: LOS IMPORTES NO PUEDEN HABER CAMBIADO
+  //
+  // Es la red que atrapa el caso reportado y cualquier otro parecido que se nos
+  // escape. Si después de corregir los importes no son exactamente los mismos, se
+  // descarta TODA la corrección y se devuelve el texto original para que quien
+  // llama lo escale. Un mensaje con una promesa es un problema; un mensaje con un
+  // precio roto es otro peor.
+  // ==========================================================================
+  const antes = importesDe(original).join("|");
+  const despues = importesDe(resultado).join("|");
+  if (antes !== despues) {
+    return {
+      texto: original,
+      cambios: [
+        {
+          clave: "correccion_abortada",
+          antes: original.trim(),
+          despues: null,
+          sinReemplazo: `corregir habría cambiado los importes (${antes || "ninguno"} → ${despues || "ninguno"})`,
+        },
+      ],
+      ok: false,
+      abortada: true,
+    };
+  }
+
+  return { texto: resultado, cambios, ok: cambios.length === 0 };
 }
 
 /** Un resumen de una línea para el log. */
@@ -255,4 +366,4 @@ function resumir(resultado) {
   return resultado.hallazgos.map((h) => `${h.clave} ("${h.fragmento}")`).join(" · ");
 }
 
-module.exports = { revisar, corregir, resumir, enFrases, REGLAS, REEMPLAZOS, CIUDAD_BODEGA };
+module.exports = { revisar, corregir, resumir, enFrases, importesDe, REGLAS, REEMPLAZOS, CIUDAD_BODEGA };

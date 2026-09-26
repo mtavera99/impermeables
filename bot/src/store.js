@@ -751,6 +751,26 @@ function pedidosDelMismoCliente(orders, nuevo) {
 const mismoPedido = (a, b) =>
   Number(a.total) === Number(b.total) && String(a.talla || "") === String(b.talla || "");
 
+/**
+ * El pedido previo del MISMO cliente que quedó esperando el "sí", dentro de la
+ * ventana de duplicados.
+ *
+ * 🔑 NO usa `mismoPedido`: ese exige mismo total y misma talla, y las dos cosas
+ * cambian cuando el cliente corrige algo. Lo que define a este caso es que haya un
+ * pedido de ese cliente marcado `sin_confirmar` y todavía fresco — la corrección
+ * puede haber tocado cualquier campo, incluido el total.
+ */
+function previoSinConfirmar(orders, nuevo) {
+  const ahora = Date.now();
+  for (const o of pedidosDelMismoCliente(orders, nuevo)) {
+    if (!o.sin_confirmar || o.anulado) continue;
+    const cuando = new Date(o.fecha).getTime();
+    if (!Number.isFinite(cuando) || ahora - cuando > VENTANA_PEDIDO_DUPLICADO_MS) continue;
+    return o;
+  }
+  return null;
+}
+
 function esPedidoDuplicado(orders, nuevo) {
   const ahora = Date.now();
   for (const o of pedidosDelMismoCliente(orders, nuevo)) {
@@ -876,8 +896,18 @@ function saveOrder(order) {
     // marcado, se le levanta la marca al original en vez de descartar y olvidar.
     // No se crea un pedido nuevo: se completa el que ya existe.
     // ======================================================================
-    if (repetido && repetido.sin_confirmar && !record.sin_confirmar) {
-      const i = indiceDePedido(orders, repetido.id || repetido.fecha);
+    // ========================================================================
+    // 🔎 EL PEDIDO PREVIO QUE ESTÁ ESPERANDO EL "SÍ"
+    //
+    // 🔴 Se busca APARTE de `esPedidoDuplicado`, y por una razón concreta que
+    // señaló la revisión: ese exige MISMO TOTAL Y MISMA TALLA, y una corrección de
+    // talla cambia justamente la talla. Con el criterio viejo, el cliente que
+    // corregía la talla y confirmaba generaba un pedido NUEVO y dejaba el anterior
+    // marcado para siempre: dos pedidos donde había una venta.
+    // ========================================================================
+    const esperandoConfirmacion = previoSinConfirmar(orders, record);
+    if (esperandoConfirmacion && !record.sin_confirmar) {
+      const i = indiceDePedido(orders, esperandoConfirmacion.id || esperandoConfirmacion.fecha);
       if (i !== -1) {
         // ==================================================================
         // 🔴 QUITAR LA MARCA NO ALCANZA SI EL REGISTRO QUEDÓ VIEJO
@@ -897,6 +927,31 @@ function saveOrder(order) {
         // nuevo gana, pero solo si viene con contenido: un campo vacío en el
         // pedido nuevo NO borra uno bueno del anterior.
         // ==================================================================
+        // ==================================================================
+        // 🚚 SI EL ANTERIOR YA TIENE GUÍA, NO SE TOCA
+        //
+        // El paquete ya salió con esos datos. Reescribirle el color o la dirección
+        // a un pedido despachado es describir algo que no pasó: la guía dice una
+        // cosa y el registro diría otra. Se guarda el nuevo aparte, marcado, y lo
+        // resuelve una persona.
+        // ==================================================================
+        if (orders[i].guia) {
+          const conAviso = {
+            ...record,
+            pendiente_revision: true,
+            motivo_precio:
+              `el pedido anterior de este cliente ya tiene guía (${orders[i].guia}): ` +
+              "hay que decidir si esto es una corrección de ese despacho o una venta nueva",
+          };
+          orders.push(conAviso);
+          writeJSON(ORDERS_FILE, orders);
+          console.warn(
+            `🚚 PEDIDO SOBRE UNO YA DESPACHADO (${record.nombre || "?"}): el anterior tiene guía ` +
+              `${orders[i].guia}. NO se modificó el despachado; el nuevo queda marcado para revisión.`
+          );
+          return conAviso;
+        }
+
         const CAMPOS_VIGENTES = ["nombre", "celular", "ciudad", "direccion", "color", "talla", "pago"];
         const correcciones = [];
         const traidos = {};
@@ -908,20 +963,84 @@ function saveOrder(order) {
           traidos[campo] = record[campo];
           correcciones.push(`${campo}: "${viejo || "(vacío)"}" → "${nuevo}"`);
         }
+        // El total también puede haber cambiado, y no es un campo comercial más:
+        // es lo que se le cobra.
+        const totalNuevo = Number(record.total);
+        const totalViejo = Number(orders[i].total);
+        const cambioElTotal = Number.isFinite(totalNuevo) && totalNuevo > 0 && totalNuevo !== totalViejo;
+        if (cambioElTotal) {
+          traidos.total = totalNuevo;
+          correcciones.push(`total: "${totalViejo}" → "${totalNuevo}"`);
+        }
+
+        // ==================================================================
+        // 🔒 RECONCILIAR LAS VALIDACIONES CON LOS DATOS FINALES
+        //
+        // 🔴 LO QUE SEÑALÓ LA REVISIÓN, y era el peor de los tres bloqueos: al
+        // levantar `sin_confirmar` se copiaban los campos comerciales y se
+        // DESCARTABAN las alertas del pedido nuevo. Un pedido que llegaba con
+        // `precio_no_cuadra: true` terminaba sin ninguna marca y
+        // `listoParaDespachar()` devolvía **true**. O sea: el mecanismo que existe
+        // para frenar un despacho lo estaba habilitando.
+        //
+        // 🔑 Las alertas se UNEN, no se reemplazan: si la traía el viejo o la trae
+        // el nuevo, queda. Y `sin_confirmar` solo responde "¿el cliente dijo sí?" —
+        // que sí lo dijo. Las demás razones para no despachar siguen su camino.
+        //
+        // Un cambio de destino o de total además OBLIGA a recotizar: el "sí" del
+        // cliente fue sobre el cuadro anterior, no sobre estos números.
+        // ==================================================================
+        const cambioElDestino = Object.prototype.hasOwnProperty.call(traidos, "ciudad");
+        const alertas = {};
+        const heredarAlerta = (campo) => {
+          if (record[campo] !== undefined && record[campo] !== null && record[campo] !== false) {
+            alertas[campo] = record[campo];
+          } else if (orders[i][campo] !== undefined && orders[i][campo] !== null && orders[i][campo] !== false) {
+            alertas[campo] = orders[i][campo];
+          }
+        };
+        for (const campo of [
+          "precio_no_cuadra",
+          "pendiente_revision",
+          "motivo_precio",
+          "total_esperado",
+          "sinTelefono",
+          "posible_duplicado",
+          "pedido_previo_total",
+          "direccion_dudosa",
+          "direccion_falta",
+          "entrega",
+        ]) {
+          heredarAlerta(campo);
+        }
+
+        const motivosExtra = [];
+        if (cambioElDestino) motivosExtra.push(`cambió el destino a "${traidos.ciudad}": hay que recotizar el envío`);
+        if (cambioElTotal) motivosExtra.push(`cambió el total a $${totalNuevo}: el cliente confirmó sobre otro número`);
+        if (motivosExtra.length) {
+          alertas.pendiente_revision = true;
+          alertas.motivo_precio = [alertas.motivo_precio, ...motivosExtra].filter(Boolean).join(" · ");
+        }
 
         const { sin_confirmar, motivo_sin_confirmar, ...limpio } = orders[i];
         orders[i] = {
           ...limpio,
           ...traidos,
+          ...alertas,
           confirmado_despues: new Date().toISOString(),
           ...(correcciones.length ? { correcciones_aplicadas: correcciones } : {}),
         };
         writeJSON(ORDERS_FILE, orders);
+
+        const bloqueos = textoDeRevision(orders[i]);
         console.log(
           `✅ CONFIRMACIÓN POSTERIOR: el pedido de ${orders[i].nombre || "?"} por $${orders[i].total} ` +
             "ya tenía el 'sí' del cliente. Se le quitó la marca de sin confirmar (no se duplicó)." +
             (correcciones.length
               ? `\n   🔧 Y se trajeron las correcciones del cliente: ${correcciones.join(" · ")}`
+              : "") +
+            (bloqueos
+              ? `\n   🔴 PERO SIGUE SIN PODER DESPACHARSE: ${bloqueos}`
               : "")
         );
         return {
@@ -930,6 +1049,45 @@ function saveOrder(order) {
           confirmadoDespues: true,
           correccionesAplicadas: correcciones,
         };
+      }
+    }
+
+    // ========================================================================
+    // 🔧 UN DUPLICADO QUE TRAE UN DATO DISTINTO NO ES SOLO UN DUPLICADO
+    //
+    // Caso: el pedido anterior YA estaba confirmado y el cliente corrige el color.
+    // El candado antiduplicados lo descartaba en silencio y la corrección se
+    // perdía — el dueño despachaba el color viejo sin saber que el cliente lo
+    // había cambiado.
+    //
+    // ⚠️ Tampoco se aplica sola: el pedido ya estaba confirmado y puede estar
+    // alistado. Se marca para que una persona decida, que es lo único honesto
+    // cuando no se puede saber cuál de los dos datos vale.
+    // ========================================================================
+    if (repetido && !repetido.guia) {
+      const j = indiceDePedido(orders, repetido.id || repetido.fecha);
+      const diferencias = [];
+      for (const campo of ["nombre", "celular", "ciudad", "direccion", "color", "talla", "pago"]) {
+        const nuevo = String(record[campo] == null ? "" : record[campo]).trim();
+        const viejo = String(repetido[campo] == null ? "" : repetido[campo]).trim();
+        if (!nuevo || nuevo.toLowerCase() === viejo.toLowerCase()) continue;
+        diferencias.push(`${campo}: el pedido guardado dice "${viejo || "(vacío)"}" y el cliente ahora dice "${nuevo}"`);
+      }
+      if (j !== -1 && diferencias.length) {
+        orders[j] = {
+          ...orders[j],
+          pendiente_revision: true,
+          motivo_precio: [orders[j].motivo_precio, `hay datos que no coinciden — ${diferencias.join(" · ")}`]
+            .filter(Boolean)
+            .join(" · "),
+          correcciones_sin_aplicar: diferencias,
+        };
+        writeJSON(ORDERS_FILE, orders);
+        console.warn(
+          `🔧 DUPLICADO CON DATOS DISTINTOS: ${record.nombre || "?"} — ${diferencias.join(" · ")}. ` +
+            "NO se aplicó solo (el pedido ya estaba confirmado); queda marcado para revisión."
+        );
+        return { ...orders[j], duplicadoIgnorado: true, correccionesSinAplicar: diferencias };
       }
     }
 

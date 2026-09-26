@@ -377,5 +377,168 @@ console.log("\n── R7. 🔴 La confirmación posterior sobre los datos VIGENT
   chequear("y la marca igual se levanta", !p3.sin_confirmar);
 }
 
+// ============================================================================
+// 🔴 BLOQUEOS DE LA SEGUNDA REVISIÓN (26-sep)
+// ============================================================================
+
+console.log("\n── R8. 🔴 Corregir una promesa NO puede romper el precio ──");
+// Textual: corregir("Sale hoy mismo y el total es $82.000. Pásame la dirección.")
+// devolvía "...según la ciudad.000". El separador de miles se tomaba por fin de frase.
+{
+  chequear(
+    "🔑 enFrases NO parte $82.000 por la mitad",
+    promesas.enFrases("El total es $82.000. Listo.").length === 2,
+    JSON.stringify(promesas.enFrases("El total es $82.000. Listo.").map((f) => f.cuerpo + f.cierre))
+  );
+  chequear(
+    "ni un decimal con coma",
+    promesas.enFrases("Mide 1,5 metros. Listo.").length === 2,
+    JSON.stringify(promesas.enFrases("Mide 1,5 metros. Listo.").map((f) => f.cuerpo))
+  );
+
+  // El caso exacto del reporte.
+  const CASO = "Sale hoy mismo y el total es $82.000. Pásame la dirección.";
+  const r = promesas.corregir(CASO);
+  chequear("🔑 el caso reportado ya no rompe el importe", !/\.000\b/.test(r.texto.replace(/\$\d{1,3}\.\d{3}/g, "")), r.texto);
+  chequear("   el $82.000 sigue entero", /\$82\.000/.test(r.texto), r.texto);
+  chequear("   la promesa de fecha se fue", promesas.revisar(r.texto).ok, promesas.resumir(promesas.revisar(r.texto)));
+  chequear("   y la pedida de dirección se conservó", /dirección/.test(r.texto), r.texto);
+
+  // 🔑 El candado general: ninguna corrección puede alterar los importes.
+  const MENSAJES = [
+    "Sale hoy mismo y el total es $82.000. Pásame la dirección.",
+    "Se despacha hoy mismo con un total de $82.000 puesto en Cali.",
+    "Ya actualicé tu pedido. Te llega a $82.000 contraentrega 📦",
+    "Tu pedido ya salió, va en camino y el total era $148.000.",
+    "Quedan pocas unidades. Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío.",
+    "¡Así es! Estamos en Cali y el total es $82.000.",
+    "Tranquilo que te cubre la maleta, y son $82.000 al recibir.",
+    "Esa talla te queda perfecto. Total $148.000 por los dos.",
+  ];
+  for (const m of MENSAJES) {
+    const c = promesas.corregir(m);
+    chequear(
+      `🔒 importes intactos: "${m.slice(0, 44)}…"`,
+      JSON.stringify(promesas.importesDe(m)) === JSON.stringify(promesas.importesDe(c.texto)),
+      `${JSON.stringify(promesas.importesDe(m))} → ${JSON.stringify(promesas.importesDe(c.texto))}\n     ${c.texto}`
+    );
+  }
+}
+
+console.log("\n── R9. 🔴 La confirmación posterior RECONCILIA las validaciones ──");
+// Textual: "saveOrder() pierde nuevas alertas en la confirmación posterior […]
+// listoParaDespachar() devuelve true". Era el peor de los tres: el mecanismo que
+// existe para frenar un despacho lo estaba habilitando.
+{
+  const st = store;
+  const base = (tel) => ({
+    nombre: "Ana Gómez",
+    celular: tel,
+    ciudad: "Cali",
+    direccion: "Cra 1 #2-3",
+    talla: "L",
+    color: "rojo",
+    pago: "contraentrega",
+    total: 82000,
+    telefono_chat: "57" + tel,
+  });
+  const mios = (tel) => st.todosLosPedidos().filter((p) => p.telefono_chat === "57" + tel);
+
+  // ── A. El caso reportado ────────────────────────────────────────────────
+  {
+    const t = "3009990001";
+    st.saveOrder({ ...base(t), sin_confirmar: true, motivo_sin_confirmar: "no hubo un sí claro" });
+    st.saveOrder({
+      ...base(t),
+      precio_no_cuadra: true,
+      pendiente_revision: true,
+      motivo_precio: "el pedido dice $82.000 y la cotización es $73.000",
+      total_esperado: 73000,
+    });
+    const p = mios(t)[0];
+    chequear("A· sigue habiendo un solo pedido", mios(t).length === 1, `hay ${mios(t).length}`);
+    chequear("A· se levantó la marca de sin confirmar", !p.sin_confirmar);
+    chequear("A· 🔑 pero las alertas nuevas NO se perdieron", p.precio_no_cuadra === true && p.pendiente_revision === true, JSON.stringify(p));
+    chequear("A· 🔑 y listoParaDespachar da FALSE", st.listoParaDespachar(p) === false, "era el bloqueo reportado");
+    chequear("A· con el total esperado guardado", Number(p.total_esperado) === 73000, `${p.total_esperado}`);
+  }
+
+  // ── B. Corrección de TALLA ──────────────────────────────────────────────
+  // Antes no entraba por este camino: `mismoPedido` compara la talla, así que una
+  // talla distinta creaba un pedido NUEVO y dejaba el viejo marcado para siempre.
+  {
+    const t = "3009990002";
+    st.saveOrder({ ...base(t), sin_confirmar: true, motivo_sin_confirmar: "x" });
+    st.saveOrder({ ...base(t), talla: "2XL" });
+    chequear("B· 🔑 la talla corregida NO crea un segundo pedido", mios(t).length === 1, `hay ${mios(t).length}`);
+    const p = mios(t)[0];
+    chequear("B· y la talla guardada es la nueva", p.talla === "2XL", `quedó "${p.talla}"`);
+    chequear("B· se levantó la marca", !p.sin_confirmar);
+    chequear("B· y queda despachable, porque nada más lo bloquea", st.listoParaDespachar(p), st.textoDeRevision(p));
+  }
+
+  // ── C. Cambio de DESTINO ────────────────────────────────────────────────
+  {
+    const t = "3009990003";
+    st.saveOrder({ ...base(t), sin_confirmar: true, motivo_sin_confirmar: "x" });
+    st.saveOrder({ ...base(t), ciudad: "Pasto", total: 85000 });
+    const p = mios(t)[0];
+    chequear("C· el destino corregido se guarda", p.ciudad === "Pasto", `quedó "${p.ciudad}"`);
+    chequear("C· y el total también", Number(p.total) === 85000, `${p.total}`);
+    chequear(
+      "C· 🔑 pero NO queda despachable: hay que recotizar",
+      st.listoParaDespachar(p) === false,
+      "el sí del cliente fue sobre el cuadro anterior, no sobre estos números"
+    );
+    chequear("C· y el motivo lo dice", /recotizar/.test(st.textoDeRevision(p)), st.textoDeRevision(p));
+  }
+
+  // ── D. El pedido anterior YA estaba confirmado ──────────────────────────
+  {
+    const t = "3009990004";
+    st.saveOrder({ ...base(t) });
+    st.saveOrder({ ...base(t), color: "azul" });
+    chequear("D· no se duplica", mios(t).length === 1, `hay ${mios(t).length}`);
+    const p = mios(t)[0];
+    chequear(
+      "D· 🔑 el color viejo NO se sobrescribe solo",
+      p.color === "rojo",
+      "el pedido ya estaba confirmado y puede estar alistado: no se cambia sin que lo vea una persona"
+    );
+    chequear(
+      "D· 🔑 pero la diferencia NO se pierde en silencio",
+      Array.isArray(p.correcciones_sin_aplicar) && p.correcciones_sin_aplicar.length === 1,
+      JSON.stringify(p.correcciones_sin_aplicar)
+    );
+    chequear("D· y queda bloqueado para que alguien decida", st.listoParaDespachar(p) === false, st.textoDeRevision(p));
+  }
+
+  // ── E. El pedido anterior ya tiene GUÍA ─────────────────────────────────
+  {
+    const t = "3009990005";
+    st.saveOrder({ ...base(t), sin_confirmar: true, motivo_sin_confirmar: "x" });
+    const prev = mios(t)[0];
+    st.anotarGuiaEnPedido(prev.id, "240099998888");
+    st.saveOrder({ ...base(t), color: "azul" });
+    const todos = mios(t);
+    const despachado = todos.find((p) => p.guia);
+    const nuevo = todos.find((p) => !p.guia);
+    chequear("E· 🔑 el pedido DESPACHADO no se modifica", despachado && despachado.color === "rojo", `quedó "${despachado && despachado.color}"`);
+    chequear("E· el nuevo se guarda aparte", Boolean(nuevo), "no se puede perder la corrección");
+    chequear("E· marcado para revisión", nuevo && st.listoParaDespachar(nuevo) === false, st.textoDeRevision(nuevo));
+    chequear("E· y el motivo nombra la guía", /guía/.test(st.textoDeRevision(nuevo)), st.textoDeRevision(nuevo));
+  }
+
+  // ── F. Lo que NO puede pasar: que esto se coma una venta real ───────────
+  {
+    const t = "3009990006";
+    st.saveOrder({ ...base(t), sin_confirmar: true, motivo_sin_confirmar: "x" });
+    st.saveOrder({ ...base(t) });
+    chequear("F· una confirmación limpia levanta la marca", !mios(t)[0].sin_confirmar);
+    chequear("F· y queda despachable", st.listoParaDespachar(mios(t)[0]), st.textoDeRevision(mios(t)[0]));
+    chequear("F· sin inventar correcciones", mios(t)[0].correcciones_aplicadas === undefined);
+  }
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

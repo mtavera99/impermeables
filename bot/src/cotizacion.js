@@ -1122,6 +1122,54 @@ function validarRespuesta(texto, cot, contexto = {}) {
 // ---------------------------------------------------------------------------
 // ETAPA 6 — EL PEDIDO NO PUEDE CONTRADECIR LA COTIZACIÓN
 // ---------------------------------------------------------------------------
+// ============================================================================
+// 🔴 LA CANTIDAD TAMBIÉN TIENE QUE CUADRAR (revisión 26-sep)
+//
+// LO QUE SE ENCONTRÓ: `verificarPedido` daba ok:true a una cotización de DOS
+// conjuntos con un pedido que decía `unidades: 1`, porque el total y la ciudad
+// coincidían. Solo comparaba esas dos cosas.
+//
+// 🔑 Y es un error que se paga dos veces: si el pedido dice una unidad y el
+// cliente pagó dos, se despacha UN conjunto contra un recaudo de dos —el cliente
+// reclama en la puerta— y además el inventario queda mal contado. Que el total
+// coincida no significa que el pedido sea el mismo pedido.
+// ============================================================================
+
+/** Las tallas que nombra el pedido. "L y M" son dos; "L" es una. */
+function tallasDelPedido(order) {
+  const crudo = String((order && order.talla) || "").trim();
+  if (!crudo) return [];
+  return crudo
+    .split(/\s*(?:,|\/|\+|\by\b|\be\b)\s*/i)
+    .map((s) => s.trim())
+    .filter((s) => /^(xs|s|m|l|xl|2xl|3xl|xxl|xxxl|\d{1,2})$/i.test(s));
+}
+
+/**
+ * Cuántas unidades dice el pedido.
+ *
+ * Se respeta el campo `unidades` si viene; si no, se deduce del texto igual que
+ * `resumen.unidadesDe`, para no tener dos criterios distintos en el mismo repo.
+ *
+ * @returns {{uds:number, origen:string}}
+ */
+function unidadesDelPedido(order) {
+  const explicito = Number(order && order.unidades);
+  if (Number.isFinite(explicito) && explicito > 0) {
+    return { uds: explicito, origen: "el campo unidades del pedido" };
+  }
+  const tallas = tallasDelPedido(order);
+  if (tallas.length > 1) return { uds: tallas.length, origen: `las ${tallas.length} tallas del pedido` };
+
+  // ⚠️ El texto que se mira es el del PRODUCTO, no el de la talla. Una talla
+  // "2XL" contiene "2x" y el criterio heredado la contaba como DOS UNIDADES: un
+  // cliente que pide una talla 2XL quedaba registrado como una venta de dos.
+  const t = String((order && order.producto) || "").toLowerCase();
+  if (/\b3\b|tres/.test(t)) return { uds: 3, origen: "el texto del producto" };
+  if (/\b2\b|\bdos\b|x2|2x|promo 2|combo/.test(t)) return { uds: 2, origen: "el texto del producto" };
+  return { uds: 1, origen: "no lo dice, así que se asume una" };
+}
+
 /**
  * @returns {{ok:boolean, problemas:Array, totalEsperado:number|null}}
  */
@@ -1153,6 +1201,32 @@ function verificarPedido(order, cot, contexto = {}) {
     problemas.push({
       tipo: "ciudad_distinta",
       detalle: `el pedido va a "${order.ciudad}" y la cotización era para "${cot.ciudad}"`,
+    });
+  }
+
+  // ========================================================================
+  // La cantidad del pedido tiene que ser la cotizada, y las tallas tienen que
+  // poder corresponder a esa cantidad.
+  // ========================================================================
+  const cantidadPedido = unidadesDelPedido(order);
+  if (Number.isFinite(Number(cot.uds)) && cantidadPedido.uds !== Number(cot.uds)) {
+    problemas.push({
+      tipo: "cantidad_distinta",
+      detalle:
+        `el pedido es de ${cantidadPedido.uds} ${cantidadPedido.uds === 1 ? "unidad" : "unidades"} ` +
+        `(según ${cantidadPedido.origen}) y la cotización validada es de ${cot.uds}, por ${fmt(cot.total)}`,
+    });
+  }
+
+  // Más tallas que unidades no puede ser. Al revés SÍ: dos conjuntos de la misma
+  // talla es un pedido perfectamente normal.
+  const tallas = tallasDelPedido(order);
+  if (tallas.length > cantidadPedido.uds) {
+    problemas.push({
+      tipo: "tallas_incoherentes",
+      detalle:
+        `el pedido nombra ${tallas.length} tallas (${tallas.join(", ")}) pero ` +
+        `${cantidadPedido.uds} ${cantidadPedido.uds === 1 ? "unidad" : "unidades"}`,
     });
   }
 
@@ -1247,6 +1321,8 @@ module.exports = {
   valoresPorRol,
   validarRespuesta,
   verificarPedido,
+  unidadesDelPedido,
+  tallasDelPedido,
   afirmaCierre,
   respuestaEnRevision,
   hayObjecionDePrecio,

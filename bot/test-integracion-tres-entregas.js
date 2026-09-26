@@ -379,6 +379,77 @@ async function turno(telefono, cliente, ...respuestasIA) {
     chequear("y el interruptor de la nota es independiente del precio", comercial.TECHO_TOKENS === 9000);
   }
 
+  // ==========================================================================
+  console.log("\n── 8. 🔒 La reconciliación final, con las tres capas activas ──");
+  // 🔴 El riesgo que solo existe cuando están las tres: corregir una promesa es una
+  // transformación de TEXTO, y una transformación de texto puede romper el PRECIO
+  // que calculó la entrega 1. Acá se comprueba que lo que sale pasa las dos.
+  // ==========================================================================
+  {
+    const tel = "573002220008";
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    const t = await turno(
+      tel,
+      "Cali",
+      // Promesa de fecha pegada al importe, que es el caso que rompía el total.
+      "Sale hoy mismo y el total es $82.000. Pásame nombre completo, dirección con barrio y celular"
+    );
+    chequear("🔑 el total sobrevivió la corrección", /\$82\.000/.test(t.reply), t.reply);
+    chequear("   sin dejar un «.000» suelto", !/\.000\b/.test(t.reply.replace(/\$\d{1,3}\.\d{3}/g, "")), t.reply);
+    chequear("la promesa no salió", !/hoy mismo/i.test(t.reply), t.reply);
+    chequear("y la pedida de datos se conservó", /nombre completo/.test(t.reply), t.reply);
+    const cot = store.leerCotizacion(tel);
+    chequear(
+      "🔒 el mensaje final pasa precio Y promesas a la vez",
+      cotizacion.validarRespuesta(t.reply, cot, {}).ok && promesas.revisar(t.reply).ok,
+      JSON.stringify({
+        precio: cotizacion.validarRespuesta(t.reply, cot, {}).problemas,
+        promesa: promesas.resumir(promesas.revisar(t.reply)),
+      })
+    );
+
+    // Y el candado existe en el código, no solo por casualidad en este caso.
+    const fuente = fs.readFileSync(`${__dirname}/src/agent.js`, "utf8");
+    chequear(
+      "agent.js revalida la respuesta final tras todas las transformaciones",
+      /RESPUESTA FINAL RECHAZADA/.test(fuente),
+      "sin esta red, una transformación futura puede volver a romper el precio en silencio"
+    );
+    chequear(
+      "y si falla, cae en la línea escrita por el código",
+      /respuesta_final_rechazada/.test(fuente) && /lineaDePrecio\(cot\)/.test(fuente)
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 9. La cantidad cuadra de punta a punta ──");
+  // ==========================================================================
+  {
+    const tel = "573002220009";
+    const datos = {
+      nombre: "Sara Díaz",
+      celular: "3008880009",
+      ciudad: "Cali",
+      direccion: "Cra 7 #8-9 barrio Centro",
+      color: "verde",
+      talla: "M",
+      pago: "contraentrega",
+    };
+    await turno(tel, "quiero dos conjuntos", "¡Claro! ¿Para qué ciudad sería?");
+    await turno(tel, "Cali", "Los dos te quedan en $148.000 en total: $110.000 los dos conjuntos + $38.000 de envío a Cali. Pásame nombre completo, dirección con barrio y celular");
+    await turno(tel, "talla M, franja verde", "¡Listo! Me falta nombre, dirección y celular 🙌");
+    await turno(
+      tel,
+      "Sara Díaz, Cra 7 #8-9 barrio Centro, 3008880009",
+      "Confirmemos tu pedido:\nNombre: Sara Díaz\nCelular: 3008880009\nCiudad: Cali\nDirección: Cra 7 #8-9 barrio Centro\nColor de la franja: verde\nTalla: M\nPago: contraentrega\nTOTAL: $148.000\n¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️"
+    );
+    const t = await turno(tel, "sí confirmo", `¡Gracias Sara! ##ORDER## ${JSON.stringify({ ...datos, total: 148000, unidades: 2 })}`);
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("el pedido declara 2 unidades", pedido && Number(pedido.unidades) === 2, `${pedido && pedido.unidades}`);
+    chequear("🚦 y queda LISTO para despachar", pedido && store.listoParaDespachar(pedido), store.textoDeRevision(pedido));
+    chequear("sin avisos", t.revisionHumana === null, JSON.stringify(t.revisionHumana));
+  }
+
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   try {
     fs.rmSync(DIR, { recursive: true, force: true });

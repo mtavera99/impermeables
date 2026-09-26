@@ -426,6 +426,76 @@ const datosBase = {
     console.log(`   📏 prompt final del turno: ${Math.round(prompt.length / 4)} tokens`);
   }
 
+  // ==========================================================================
+  console.log("\n── 10. 🔑 RECORRIDO: el pedido de 1 unidad al precio de 2 se frena ──");
+  // Pedido de la 2ª revisión: "Añade una prueba completa mediante generateReply()".
+  // El defecto: verificarPedido solo comparaba total y ciudad, así que un pedido
+  // que decía UNA unidad con el total de DOS pasaba como bueno. Se despacharía un
+  // conjunto contra un recaudo de dos.
+  // ==========================================================================
+  {
+    const tel = "573001110010";
+    // ⚠️ Cliente propio: `pedidosDelMismoCliente` empareja por CELULAR, así que
+    // reusar el de otra sección hace que este pedido se reconcilie con aquel.
+    const otroCliente = { ...datosBase, nombre: "Lucía Peña", celular: "3005550010" };
+    const CUADRO10 = CUADRO(148000).replace("Ana Gómez", "Lucía Peña").replace("3001234567", "3005550010");
+    const r = await recorrer(tel, [
+      { cliente: "hola, quiero dos conjuntos", ia: "¡Claro! ¿Para qué ciudad sería?" },
+      { cliente: "Cali", ia: "Los dos te quedan en $148.000 en total: $110.000 los dos conjuntos + $38.000 de envío a Cali. Pásame nombre completo, dirección con barrio y celular" },
+      { cliente: "Lucía Peña, Cra 1 #2-3 barrio Centro, 3005550010", ia: CUADRO10 },
+      {
+        cliente: "sí confirmo",
+        // 🔴 El bloque sale con UNA unidad, al total de DOS.
+        ia: `¡Gracias Lucía! ${ORDER({ ...otroCliente, total: 148000, unidades: 1 })}`,
+      },
+    ]);
+
+    chequear("la cotización era de 2 unidades", r.cotizacion && r.cotizacion.uds === 2, `uds=${r.cotizacion && r.cotizacion.uds}`);
+    chequear("el pedido NO se perdió", r.pedidos.length === 1, `se guardaron ${r.pedidos.length}`);
+    chequear(
+      "🔑 quedó marcado porque la cantidad no cuadra",
+      r.pedido && r.pedido.precio_no_cuadra === true,
+      JSON.stringify(r.pedido && { unidades: r.pedido.unidades, total: r.pedido.total, precio_no_cuadra: r.pedido.precio_no_cuadra })
+    );
+    chequear(
+      "y el motivo nombra la cantidad",
+      /unidad/.test(String(r.pedido && r.pedido.motivo_precio)),
+      String(r.pedido && r.pedido.motivo_precio)
+    );
+    chequear("🚦 NO está listo para despachar", r.pedido && !store.listoParaDespachar(r.pedido), store.textoDeRevision(r.pedido));
+    chequear(
+      "🔑 y al cliente no se le confirmó la venta",
+      !/confirmad/i.test(r.ultima.reply),
+      r.ultima.reply
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 11. 🔒 La respuesta final se revalida tras TODAS las transformaciones ──");
+  // Corregir una promesa es una transformación de texto, y una transformación de
+  // texto puede romper el precio. Este es el último punto donde se revisa lo que
+  // el cliente va a leer de verdad.
+  // ==========================================================================
+  {
+    const tel = "573001110011";
+    const r = await recorrer(tel, [
+      { cliente: "hola", ia: "¡Hola! ¿Para qué ciudad sería?" },
+      {
+        cliente: "Cali",
+        ia: "Sale hoy mismo y el total es $82.000. Pásame nombre completo, dirección con barrio y celular",
+      },
+    ]);
+    const texto = r.ultima.reply;
+    chequear("🔑 el total sigue entero, sin partirse", /\$82\.000/.test(texto), texto);
+    chequear("   y no quedó un «.000» huérfano", !/\.000\b/.test(texto.replace(/\$\d{1,3}\.\d{3}/g, "")), texto);
+    chequear("la promesa de fecha no salió", !/hoy mismo/i.test(texto), texto);
+    chequear(
+      "y el mensaje final pasa la validación de precio",
+      cotizacion.validarRespuesta(texto, r.cotizacion, {}).ok,
+      JSON.stringify(cotizacion.validarRespuesta(texto, r.cotizacion, {}).problemas)
+    );
+  }
+
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   try {
     fs.rmSync(DIR, { recursive: true, force: true });
