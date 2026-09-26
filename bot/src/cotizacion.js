@@ -870,8 +870,82 @@ const RE_ANTES_ES_DESTINO =
 
 // Un cambio de destino dicho como corrección. Es señal FUERTE: el cliente está
 // hablando de a dónde va el paquete, no pasando un dato.
+//
+// ⚠️ El "a" del final lleva lookahead y no `\b`, y por dos razones distintas: el `\b`
+// de JavaScript es ASCII y falla con acentos (ya rompió cuatro patrones acá), y sin
+// el corte "envía ala oficina" —tal cual lo escribió el cliente, con el typo— se
+// leía como "envía a" y pasaba por corrección de destino.
 const RE_CORRIGE_DESTINO =
-  /\b(mejor|en vez de|en lugar de|ya no|cambi\w*|corrij\w*|es para|env[ií]\w*\s+a|mand\w*\s+a|despach\w*\s+a)\b/i;
+  /\b(mejor|en vez de|en lugar de|ya no|cambi\w*|corrij\w*|es para)\b|\b(env[ií]\w*|mand\w*|despach\w*)\s+a(?![a-záéíóúñ])/i;
+
+// ============================================================================
+// 🔴 EL DEPARTAMENTO SUELTO LEGITIMABA UN APELLIDO — caso real de José
+//
+// LO QUE SE ESCAPÓ. Mi prueba del PR #170 usó "José Bello, 3001234567, San Onofre,
+// entrega en oficina" y pasaba. La frase REAL era:
+//
+//   "Jose bello San onofre Sucre 3001234567 Melo envía ala oficina"
+//
+// y seguía dando `ciudad: "bello"`. Al escribir la prueba sin "Sucre" le quité al
+// caso justo la condición que lo hacía fallar: la prueba quedó verde sobre un
+// mensaje que ya no era el del cliente.
+//
+// 🔎 EL MECANISMO: `senalDeDestinoPara` preguntaba `departamentoEn(texto)` sobre el
+// mensaje COMPLETO, sin atarlo al municipio candidato. "Sucre" —que es el
+// departamento de San Onofre— aparecía en el mensaje, así que la función respondía
+// "sí, acá se está hablando de un lugar"… y esa señal se le aplicaba a "bello", que
+// era el apellido. Un departamento a diez palabras de distancia legitimaba el
+// apellido.
+//
+// 🔑 LA REGLA: el departamento tiene que estar PEGADO al municipio, antes o después,
+// con solo separadores en medio. Así los tres se distinguen dentro del mismo
+// mensaje: "bello" es el apellido, "San onofre" el municipio y "Sucre" SU
+// departamento, no el de Bello.
+//
+// ⚠️ Lo que esto NO comprueba: que el municipio exista de verdad en ese
+// departamento. Para eso haría falta la tabla de los 1.100 municipios con su
+// departamento, que el proyecto no tiene. La adyacencia es la señal disponible, y
+// alcanza para separar el apellido del destino.
+// ============================================================================
+
+// Los departamentos como alternativa de patrón, los largos primero para que
+// "valle del cauca" no se resuelva en "valle".
+const FUENTE_DEPTOS = [...DEPARTAMENTOS]
+  .sort((a, b) => b.length - a.length)
+  .map((d) => d.replace(/ /g, "\\s+"))
+  .join("|");
+
+// Un departamento justo DESPUÉS del municipio: "Bello Antioquia", "Bello, Antioquia".
+const RE_DEPTO_DESPUES = new RegExp(
+  `^[\\s,.;:-]*(?:departamento\\s+de\\s+|dpto\\.?\\s*|depto\\.?\\s*)?(?:${FUENTE_DEPTOS})(?![a-z])`
+);
+// Un departamento justo ANTES: "Antioquia, Bello".
+const RE_DEPTO_ANTES = new RegExp(`(?:^|[\\s,.;:-])(?:${FUENTE_DEPTOS})[\\s,.;:-]*$`);
+
+/**
+ * ¿El texto nombra ESTA ciudad?
+ *
+ * ⚠️ Con corte de palabra, y sin `\b` por lo de siempre (es ASCII y falla con
+ * acentos). Sin el corte, "buena calidad" contendría "cali".
+ */
+function mencionaLaCiudad(texto, ciudad) {
+  const objetivo = sinTilde(ciudad).trim();
+  if (!objetivo) return false;
+  const patron = objetivo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+  return new RegExp(`(?:^|[^a-z])${patron}(?![a-z])`).test(sinTilde(texto));
+}
+
+/** ¿Hay un departamento pegado a ESTE municipio? Se mide sobre el texto sin tildes. */
+function departamentoPegadoA(plano, objetivo) {
+  let desde = 0;
+  for (;;) {
+    const i = plano.indexOf(objetivo, desde);
+    if (i < 0) return false;
+    if (RE_DEPTO_DESPUES.test(plano.slice(i + objetivo.length))) return true;
+    if (RE_DEPTO_ANTES.test(plano.slice(0, i))) return true;
+    desde = i + 1;
+  }
+}
 
 /** ¿La ciudad está nombrada COMO DESTINO en este texto? */
 function senalDeDestinoPara(texto, ciudad) {
@@ -883,8 +957,22 @@ function senalDeDestinoPara(texto, ciudad) {
   const pelado = plano.replace(RE_SALUDO, " ").replace(/[^a-z\s]/g, " ").replace(/\s+/g, " ").trim();
   if (pelado === objetivo) return true;
 
-  // El departamento al lado también dice que se está hablando de un lugar.
-  if (departamentoEn(texto)) return true;
+  // El mensaje es solo la ciudad y su departamento: "Bello Antioquia",
+  // "Bello, Antioquia". Ahí no hay nada que interpretar, es un destino.
+  //
+  // ⚠️ Y esto es lo único que se acepta del departamento como señal FUERTE. Que el
+  // departamento esté pegado al municipio NO alcanza cuando viene en medio de un
+  // mensaje de datos: "Jose Bello Sucre 3001234567 oficina" tiene "Sucre" pegado a
+  // "Bello" y sigue siendo un apellido con el departamento de OTRA ciudad.
+  //
+  // No se puede comprobar que el municipio exista en ese departamento: haría falta
+  // la tabla de los 1.100 municipios con su departamento, que el proyecto no tiene.
+  // Así que cuando la lectura queda en duda, `destinoDelHilo` pregunta.
+  const sinDeptos = pelado
+    .replace(new RegExp(`(?:^|\\s)(?:${FUENTE_DEPTOS})(?![a-z])`, "g"), " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (sinDeptos === objetivo && departamentoPegadoA(plano, objetivo)) return true;
 
   // Y si no, lo que hay justo antes del nombre.
   let desde = 0;
@@ -918,6 +1006,30 @@ function destinoDelHilo(conv, userText) {
   const enEsteTurno = ciudadesEn(userText || "");
 
   if (enEsteTurno.length) {
+    // ======================================================================
+    // 🔑 SEGUNDA RED: EL CLIENTE REPITIÓ SU PROPIO DESTINO
+    //
+    // En el caso real de José el mensaje decía "San onofre" —su destino— y también
+    // "bello", su apellido. Si el cliente vuelve a escribir la ciudad que ya tenía
+    // y NO nombra otra COMO destino, no hay nada que decidir: su destino es el que
+    // él mismo acaba de repetir.
+    //
+    // ⚠️ Se exige que ninguna OTRA ciudad del mensaje venga como destino, para que
+    // "para Palmira, no Cali" siga preguntando en vez de quedarse con Cali.
+    // ======================================================================
+    const otraComoDestino = enEsteTurno.some(
+      (c) =>
+        fletes.normalizar(c) !== fletes.normalizar(establecido) && senalDeDestinoPara(userText, c)
+    );
+    if (
+      establecido &&
+      mencionaLaCiudad(userText, establecido) &&
+      !otraComoDestino &&
+      !RE_CORRIGE_DESTINO.test(String(userText || ""))
+    ) {
+      return { ciudad: establecido, varias: [], origen: "el_cliente_repitio_su_destino" };
+    }
+
     // 🔑 ¿Está diciendo a dónde despachar, o pasando sus datos?
     const comoDestino =
       botPidioCiudad(messages) || enEsteTurno.some((c) => senalDeDestinoPara(userText, c));
@@ -925,6 +1037,30 @@ function destinoDelHilo(conv, userText) {
     const pidieronDatos = esMensajeDeDatos(userText, messages);
 
     if (pidieronDatos && !comoDestino) {
+      // ====================================================================
+      // 🤔 PARECE UN LUGAR, PERO NO SE PUEDE AFIRMAR: SE PREGUNTA.
+      //
+      // "Jose Bello Sucre 3001234567 oficina": el departamento está pegado al
+      // nombre del tarifario, así que podría ser un destino… o ser el apellido
+      // más el departamento de la ciudad que ya tenía. No se puede distinguir sin
+      // la tabla de municipios por departamento.
+      //
+      // 🔑 Se pregunta, que es lo único honesto. Lo que NO se hace es tomar Bello
+      // en silencio y cobrarle $2.000 menos sobre una ciudad a la que no va.
+      // ====================================================================
+      const otraQueParece = enEsteTurno.find(
+        (c) =>
+          fletes.normalizar(c) !== fletes.normalizar(establecido) &&
+          departamentoPegadoA(sinTilde(userText), sinTilde(c))
+      );
+      if (establecido && otraQueParece && !RE_CORRIGE_DESTINO.test(String(userText || ""))) {
+        return {
+          ciudad: "",
+          varias: [establecido, otraQueParece],
+          origen: "duda_entre_el_dato_y_el_destino",
+        };
+      }
+
       // Es un apellido, un barrio o una transportadora dentro de los datos.
       if (establecido) {
         return { ciudad: establecido, varias: [], origen: "se_conserva_el_destino" };
