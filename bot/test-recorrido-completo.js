@@ -1039,6 +1039,90 @@ const datosBase = {
     chequear("16c· y queda constancia de que la aceptó", pedido && pedido.sede_resuelta === true, `sede_resuelta=${pedido && pedido.sede_resuelta}`);
   }
 
+  // ==========================================================================
+  console.log("\n── 17. 📍 El municipio dicho en el saludo NO se pierde ──");
+  // Caso real del 26-sep (datos cambiados). El cliente abrió con
+  // "Hola buenos días, Pitalito Huila" — ahí ya había dicho su municipio— y el
+  // recorrido lo perdió. Dos horas y media después preguntó "Cuánto es el precio" y
+  // volvió a recibir "déjame confirmar el envío", con el chat mandado a un humano.
+  // ==========================================================================
+  {
+    const tel = "573008880017";
+
+    // 1️⃣ El saludo con el municipio adentro.
+    const t1 = await turno(
+      tel,
+      "Hola buenos días, Pitalito Huila",
+      "¡Hola! 🏍️ Es el conjunto de 4 piezas. Te queda en $85.000 en total puesto en Pitalito, y pagas al recibir 📦"
+    );
+    const cot1 = store.leerCotizacion(tel);
+    chequear("17· 🔑 el municipio se identifica desde el saludo", Boolean(cot1) && /pitalito/i.test(String(cot1.ciudad)), JSON.stringify(cot1 && cot1.ciudad));
+    chequear("17· con la tarifa predeterminada", cot1 && cot1.total === 85000, `${cot1 && cot1.total}`);
+    chequear(
+      "17· 🔑 y marcada reconocida:false — no se presenta como flete medido",
+      cot1 && cot1.reconocida === false,
+      `reconocida=${cot1 && cot1.reconocida}`
+    );
+    chequear("17· el prompt avisa que no está en el tarifario", /NO está en el tarifario/.test(t1.prompts[0] || ""), "sin el aviso el modelo lo dice como si fuera medido");
+    chequear("17· y NO se derivó a un humano", t1.revisionHumana === null, JSON.stringify(t1.revisionHumana));
+
+    // 2️⃣ "Gracias" — un mensaje que no dice nada del destino.
+    await turno(tel, "Gracias", "¡Con gusto! ¿Te ayudo con la talla?");
+    const cot2 = store.leerCotizacion(tel);
+    chequear("17· «Gracias» no borra el destino", cot2 && /pitalito/i.test(String(cot2.ciudad)), JSON.stringify(cot2 && cot2.ciudad));
+
+    // 3️⃣ Y horas después vuelve a preguntar el precio.
+    const t3 = await turno(
+      tel,
+      "Cuánto es el precio",
+      "Te queda en $85.000 en total puesto en Pitalito, y pagas al recibir 📦"
+    );
+    chequear(
+      "17· 🔑 la pregunta posterior SÍ recibe el precio",
+      /\$85\.000/.test(t3.reply),
+      `salió: ${t3.reply}`
+    );
+    chequear(
+      "17· 🔑 y NO vuelve a salir «déjame confirmar el envío»",
+      !/confirmarte bien el valor del envío/i.test(t3.reply),
+      `salió: ${t3.reply}`
+    );
+    chequear("17· 🔑 ni se deriva a un humano", t3.revisionHumana === null, JSON.stringify(t3.revisionHumana));
+    chequear("17· el chat NO quedó en pausa", !store.isPaused(tel));
+  }
+
+  // ==========================================================================
+  console.log("\n── 18. 📍 Sin ciudad se PREGUNTA, no se escala ──");
+  // La otra mitad del caso: cuando de verdad no hay destino, el bot pide la ciudad.
+  // Mandarlo a una persona por un dato que el bot puede pedir deja al cliente
+  // esperando por nada.
+  // ==========================================================================
+  {
+    const tel = "573008880018";
+    const t = await turno(
+      tel,
+      "buenas, cuánto vale?",
+      // El modelo intenta un total sin destino: la etapa 5 lo rechaza dos veces.
+      "Te queda en $82.000 en total.",
+      "Te queda en $82.000 en total."
+    );
+    chequear("18· 🔑 se le PREGUNTA la ciudad", /qu[eé] ciudad/i.test(t.reply), `salió: ${t.reply}`);
+    chequear("18· 🔑 y NO se deriva a un humano", t.revisionHumana === null, JSON.stringify(t.revisionHumana));
+    chequear("18· el chat sigue con el bot", !store.isPaused(tel));
+
+    // Y varios destinos siguen pidiendo aclaración, sin elegir uno.
+    const tel2 = "573008880019";
+    const t2 = await turno(
+      tel2,
+      "cuánto a Cali y cuánto a Pasto?",
+      "Te queda en $82.000 en total.",
+      "Te queda en $82.000 en total."
+    );
+    chequear("18· 🔑 con varios destinos pregunta cuál", /cu[aá]l de esas ciudades/i.test(t2.reply), `salió: ${t2.reply}`);
+    chequear("18· sin elegir uno por su cuenta", !/\$82\.000|\$85\.000/.test(t2.reply), `salió: ${t2.reply}`);
+    chequear("18· y tampoco escala", t2.revisionHumana === null, JSON.stringify(t2.revisionHumana));
+  }
+
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   try {
     fs.rmSync(DIR, { recursive: true, force: true });

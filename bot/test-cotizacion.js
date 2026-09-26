@@ -955,5 +955,75 @@ console.log("\n── R15. 🙋 La exigencia tiene que ser sobre el LUGAR ──
   );
 }
 
+console.log("\n── R16. 📍 El municipio dicho en el saludo ──");
+// 🔴 Reproducido: "Hola buenos días, Pitalito Huila" devolvía ciudad vacía y el
+// cálculo terminaba en sin_destino, aunque calcular("Pitalito") funcionaba bien.
+{
+  const u = (t) => ({ role: "user", content: t });
+  const dest = (t) => c.destinoDelHilo({ messages: [u(t)] }, t);
+
+  // El caso exacto.
+  chequear(
+    '🔑 "Hola buenos días, Pitalito Huila" → Pitalito',
+    dest("Hola buenos días, Pitalito Huila").ciudad === "Pitalito",
+    JSON.stringify(dest("Hola buenos días, Pitalito Huila"))
+  );
+  chequear(
+    "   y cotiza con la predeterminada",
+    c.calcular(dest("Hola buenos días, Pitalito Huila").ciudad, "uno").total === 85000
+  );
+  chequear(
+    "🔑 sin presentarla como flete medido",
+    c.calcular("Pitalito", "uno").reconocida === false,
+    "reconocida tiene que seguir en false"
+  );
+
+  // 🔑 General, no una excepción para Pitalito.
+  const OTROS = [
+    ["Hola buenas, El Bagre Antioquia", "El Bagre"],
+    ["buenos días, Sahagún Córdoba", "Sahagún"],
+    ["buenas tardes, para Garzón Huila", "Garzón"],
+    ["Hola, vivo en Corozal Sucre", "Corozal"],
+    ["Buenas, La Dorada Caldas", "La Dorada"],
+    ["Hola, soy de Pitalito", "Pitalito"],
+  ];
+  for (const [t, esp] of OTROS)
+    chequear(`  ${JSON.stringify(t)} → ${esp}`, dest(t).ciudad === esp, JSON.stringify(dest(t).ciudad));
+
+  chequear("🔑 el departamento se recorta aunque lleve tilde", dest("buenos días, Sahagún Córdoba").ciudad === "Sahagún");
+  chequear("   y el municipio no arrastra el departamento", !/huila/i.test(dest("Hola buenos días, Pitalito Huila").ciudad));
+
+  // ⛔ Y no se inventa un destino donde no lo hay.
+  for (const t of ["Hola buenos días", "Gracias", "Cuánto es el precio", "Hola, quiero un impermeable", "buenas, qué tallas hay?", "muchas gracias señor"])
+    chequear(`🔴 NO inventa destino: ${JSON.stringify(t)}`, dest(t).ciudad === "", `dio ${JSON.stringify(dest(t).ciudad)}`);
+
+  // 🔑 Se conserva en los turnos siguientes (por la cotización guardada).
+  const convGuardada = { messages: [u("Hola buenos días, Pitalito Huila")], cotizacion: { ciudad: "Pitalito", uds: 1, total: 85000 } };
+  chequear(
+    "🔑 «Gracias» después conserva el destino",
+    c.destinoDelHilo(convGuardada, "Gracias").ciudad === "Pitalito",
+    JSON.stringify(c.destinoDelHilo(convGuardada, "Gracias"))
+  );
+  chequear(
+    "🔑 y «Cuánto es el precio» también",
+    c.destinoDelHilo(convGuardada, "Cuánto es el precio").ciudad === "Pitalito",
+    JSON.stringify(c.destinoDelHilo(convGuardada, "Cuánto es el precio"))
+  );
+
+  // 🔑 Los ambiguos y múltiples siguen pidiendo aclaración.
+  chequear("🔑 un nombre repetido sigue siendo ambiguo", c.calcular(dest("Buenas, Mosquera").ciudad, "uno").motivo === "ambiguo");
+  chequear(
+    "   y con departamento se resuelve sin inventar tarifa",
+    c.calcular(dest("Buenas, Mosquera Nariño").ciudad, "uno").motivo === "dificil_sin_tarifa",
+    JSON.stringify(c.calcular(dest("Buenas, Mosquera Nariño").ciudad, "uno").motivo)
+  );
+  chequear("🔑 varios destinos siguen sin elegirse", c.calcular("", "cuánto a Cali y cuánto a Pasto?").motivo === "varios_destinos");
+
+  // La lista de departamentos es general.
+  chequear("departamentoEn reconoce Huila", c.departamentoEn("Pitalito Huila") === "huila");
+  chequear("   y Valle del Cauca completo", c.departamentoEn("Tuluá Valle del Cauca") === "valle del cauca");
+  chequear("   y no marca cualquier palabra", c.departamentoEn("quiero un impermeable") === "");
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

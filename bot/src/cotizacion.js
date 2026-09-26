@@ -528,6 +528,62 @@ const NO_ES_CIUDAD = new Set(
 const RE_RELLENO_CIUDAD =
   /^\s*(?:es\s+)?(?:para|en|de|desde|hacia|soy\s+de|vivo\s+en|estoy\s+en|seria\s+para|ser[ií]a\s+en|ac[aá]\s+en|aqu[ií]\s+en|mi\s+ciudad\s+es|la\s+ciudad\s+es)\s+/i;
 
+// ============================================================================
+// 🔴 EL SALUDO TAPABA LA CIUDAD (caso 26-sep)
+//
+// LO QUE PASÓ: el cliente abrió con **"Hola buenos días, Pitalito Huila"**. Ahí ya
+// había dicho su municipio, y el recorrido lo perdió:
+//
+//   ciudadesEn("Hola buenos días, Pitalito Huila")  → []   (no está en el tarifario)
+//   ciudadPlausible(...)                            → ""   (el saludo lo tapaba)
+//   destinoDelHilo(...)                             → ciudad vacía
+//
+// Y como la extracción por contexto solo corría si el bot HABÍA PREGUNTADO la
+// ciudad —y este era el primer mensaje del cliente— no llegó a intentarlo.
+//
+// Resultado: dos horas y media después el cliente preguntó "Cuánto es el precio" y
+// volvió a recibir "déjame confirmar el envío". El municipio estaba escrito en la
+// primera línea del chat.
+//
+// 🔑 Se arregla en general, no para Pitalito: se quita el saludo antes de leer, y
+// el nombre de un DEPARTAMENTO se toma como la señal de que eso es un destino.
+// ============================================================================
+
+// Saludos y cortesías que vienen pegados al municipio.
+const RE_SALUDO =
+  /\b(hola+|buen[oa]s?\s+(?:d[ií]as?|tardes?|noches?)|buen\s+d[ií]a|buenas|buenos|qu[eé]\s+tal|c[oó]mo\s+est[aá]s?|saludos|se[nñ]or(?:a)?|do[nñ]a?|gracias|por\s+favor|much[ao]s?\s+gracias|cordial\s+saludo)\b/gi;
+
+// Los 32 departamentos y Bogotá. Es la señal más fuerte de que el cliente está
+// diciendo DE DÓNDE ES: "Pitalito Huila", "El Bagre Antioquia", "Sahagún Córdoba".
+//
+// ⚠️ Es una lista general, NO una excepción para un municipio. Y no toca el
+// tarifario: solo sirve para RECONOCER que hay un destino en la frase.
+const DEPARTAMENTOS = [
+  "amazonas", "antioquia", "arauca", "atlantico", "bolivar", "boyaca", "caldas",
+  "caqueta", "casanare", "cauca", "cesar", "choco", "cordoba", "cundinamarca",
+  "guainia", "guaviare", "huila", "guajira", "magdalena", "meta", "narino",
+  "norte de santander", "putumayo", "quindio", "risaralda", "san andres",
+  "santander", "sucre", "tolima", "valle del cauca", "valle", "vaupes", "vichada",
+  "bogota", "cundinamarca",
+];
+
+const sinTilde = (s) =>
+  String(s == null ? "" : s)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+/** ¿El texto nombra un departamento? Devuelve cuál, o "". */
+function departamentoEn(texto) {
+  const plano = sinTilde(texto);
+  // Los de dos palabras primero, para que "valle del cauca" no quede en "valle".
+  const orden = [...DEPARTAMENTOS].sort((a, b) => b.length - a.length);
+  for (const d of orden) {
+    if (new RegExp(`\\b${d.replace(/ /g, "\\s+")}\\b`).test(plano)) return d;
+  }
+  return "";
+}
+
 /**
  * Un nombre de municipio plausible dentro de una respuesta corta.
  *
@@ -542,7 +598,18 @@ function ciudadPlausible(texto) {
   // Una pregunta no es una respuesta con la ciudad.
   if (/[?¿]/.test(t)) return "";
   if (/\d/.test(t)) return ""; // direcciones y teléfonos no son ciudades
-  t = t.replace(RE_RELLENO_CIUDAD, "").trim();
+  // 🔑 El saludo se quita ANTES de leer. "Hola buenos días, Pitalito Huila" tenía
+  // cinco palabras y empezaba por "hola", así que se descartaba entera.
+  t = t.replace(RE_SALUDO, " ").replace(/\s+/g, " ").trim();
+  // ⚠️ Y hay que quitar la puntuación que deja el saludo: sin esto queda
+  // ", soy de Pitalito", el relleno está anclado a `^` y no coincide.
+  t = t.replace(/^[\s,.;:¡!¿?-]+/, "").trim();
+  // El relleno se aplica hasta que deje de cambiar: "es para", "soy de"...
+  for (let i = 0; i < 3; i++) {
+    const antes = t;
+    t = t.replace(RE_RELLENO_CIUDAD, "").replace(/^[\s,.;:-]+/, "").trim();
+    if (t === antes) break;
+  }
   // Se queda solo con letras y espacios (quita emojis y signos).
   t = t.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g, " ").replace(/\s+/g, " ").trim();
   if (!t) return "";
@@ -598,6 +665,51 @@ function destinoDelHilo(conv, userText) {
   if (botPidioCiudad(messages)) {
     const cand = ciudadPlausible(userText);
     if (cand) return { ciudad: cand, varias: [], origen: "respuesta_a_la_pregunta" };
+  }
+
+  // ======================================================================
+  // 🔴 Y ESTE ES EL QUE FALTABA PARA EL CASO DEL 26-SEP: el cliente dice su
+  // municipio SIN que nadie le haya preguntado, en el saludo de apertura.
+  //
+  // ⚠️ No alcanza con que "parezca" un nombre: de un destino sale un precio, así
+  // que hace falta una señal de que eso es un lugar. Se aceptan dos:
+  //   · nombra un DEPARTAMENTO  → "Pitalito Huila"
+  //   · viene tras una preposición de lugar → "soy de Pitalito", "para Pitalito"
+  //
+  // Sin ninguna de las dos NO se adivina: se deja que el bot pregunte la ciudad,
+  // que es lo que ya hacía.
+  // ======================================================================
+  {
+    const depto = departamentoEn(userText);
+    const traePreposicion = RE_RELLENO_CIUDAD.test(
+      String(userText || "").replace(RE_SALUDO, " ").replace(/^[\s,.;:]+/, "")
+    );
+    if (depto || traePreposicion) {
+      const cand = ciudadPlausible(userText);
+      if (cand) {
+        // ⚠️ SE DEVUELVE EL MUNICIPIO, NO "Municipio Departamento". Si no, el
+        // pedido diría "Pitalito" y la cotización "Pitalito Huila", y
+        // `verificarPedido` lo marcaría como ciudad_distinta: cada pedido que
+        // llegara con departamento quedaría frenado.
+        //
+        // 🔑 Única excepción: los nombres que existen en varios departamentos. Ahí
+        // el departamento ES el dato que desambigua, así que se conserva.
+        // ⚠️ Se corta por POSICIÓN sobre el texto sin tildes: "Córdoba" no coincide
+        // con "cordoba" en una comparación directa, y el departamento quedaba
+        // pegado al municipio.
+        let municipio = cand;
+        if (depto) {
+          const i = sinTilde(cand).lastIndexOf(depto);
+          if (i > 0) municipio = cand.slice(0, i).trim() || cand;
+        }
+        const esAmbiguo = Boolean(fletes.departamentosPosibles(municipio));
+        return {
+          ciudad: esAmbiguo && depto ? `${municipio} ${depto}` : municipio,
+          varias: [],
+          origen: depto ? "dijo ciudad y departamento" : "dijo de dónde es",
+        };
+      }
+    }
   }
 
   const guardada = (conv && conv.cotizacion && conv.cotizacion.ciudad) || "";
@@ -1626,6 +1738,7 @@ module.exports = {
   cantidadDelHilo,
   destinoDelHilo,
   ciudadPlausible,
+  departamentoEn,
   botPidioCiudad,
   calcular,
   lineaDePrecio,

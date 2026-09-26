@@ -508,9 +508,32 @@ async function generateReply(phone, userText) {
             "conservó el resto. No se escala: la conversación sigue."
         );
       } else if (!cot.ok) {
-        reply = "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
-        console.warn(`🔧 Sin cotización válida para ${phone}: se escala en vez de dar un número.`);
-        revisionHumana = { motivo: "sin_cotizacion", detalle: String(cot.motivo || "") };
+        // ====================================================================
+        // 🔴 FALTAR LA CIUDAD NO ES ALGO QUE UN HUMANO TENGA QUE VERIFICAR
+        //
+        // DEL CASO DEL 26-SEP: el cliente preguntó el precio, el código no tenía
+        // destino, y salió "déjame confirmar el envío" + chat a un humano. Dos
+        // horas y media después volvió a preguntar y recibió exactamente lo mismo.
+        //
+        // 🔑 Si lo único que falta es la ciudad, el bot la PREGUNTA. Mandar el chat
+        // a una persona por un dato que el propio bot puede pedir es dejar al
+        // cliente esperando por nada. Se escala solo lo que de verdad necesita a
+        // alguien: un destino sin tarifa medida, o un total que no se pudo calcular.
+        // ====================================================================
+        const soloFaltaLaCiudad = cot.motivo === "sin_destino" || cot.motivo === "varios_destinos";
+        if (soloFaltaLaCiudad) {
+          reply =
+            cot.motivo === "varios_destinos"
+              ? "Para darte el total exacto, ¿a cuál de esas ciudades sería el envío? 📦"
+              : "¡Con gusto te doy el total! ¿Para qué ciudad sería el envío? 📦";
+          console.log(
+            `📍 Sin destino para ${phone} (${cot.motivo}): se PREGUNTA la ciudad en vez de escalar.`
+          );
+        } else {
+          reply = "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
+          console.warn(`🔧 Sin cotización válida para ${phone} (${cot.motivo}): se escala.`);
+          revisionHumana = { motivo: "sin_cotizacion", detalle: String(cot.motivo || "") };
+        }
       } else if (yaSalioEstaLinea) {
         // 🔁 Segunda vez seguida: el bot no está avanzando. Se corta el bucle.
         reply =
