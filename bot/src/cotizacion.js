@@ -530,7 +530,17 @@ const NO_ES_CIUDAD = new Set(
     // alguna palabra coincide, y hay municipios reales que llevan palabras comunes
     // —"Pueblo Nuevo", "Campo de la Cruz"—, así que `pueblo` y `campo` NO van.
     "trabajo oficina finca empresa negocio local colegio universidad hospital " +
-    "moto viaje carretera taller tienda terminal aeropuerto edificio vereda bodega")
+    "moto viaje carretera taller tienda terminal aeropuerto edificio vereda bodega " +
+    // 🔴 LAS TRANSPORTADORAS NO SON MUNICIPIOS (caso 26-sep, 14:13).
+    // El cliente eligió "Interrapidísimo" y la cotización quedó con
+    // "Interrapidísimo" como CIUDAD, mientras el pedido decía Yarumal. El pedido
+    // quedó bloqueado por ciudad_distinta y el cliente esperando otra verificación.
+    //
+    // Pasaba porque es un nombre propio después de una preposición de lugar —"en
+    // Interrapidísimo"—, que es exactamente la señal que se aceptaba. Ser un nombre
+    // propio no lo vuelve un lugar a donde despachar.
+    "interrapidisimo inter rapidisimo servientrega coordinadora envia deprisa " +
+    "saferbo tcc transportadora transportadoras")
     .split(/\s+/)
 );
 
@@ -715,14 +725,35 @@ function hayPreposicionDeLugar(texto) {
   return [...crudo.matchAll(RE_PREPOSICION_DE_LUGAR)].length > 0;
 }
 
+// ============================================================================
+// 🔴 EL DEPARTAMENTO PEGADO AL MUNICIPIO FRENABA EL PEDIDO
+//
+// Encontrado escribiendo la prueba del caso de José: el cliente contestó
+// **"San Onofre, Sucre"** a la pregunta de la ciudad, y la cotización quedó
+// guardada sobre **"San Onofre Sucre"**. El modelo escribió el pedido con
+// "San Onofre", así que `verificarPedido` lo frenó por `ciudad_distinta`:
+//
+//   el pedido va a "San Onofre" y la cotización era para "San Onofre Sucre"
+//
+// 🔑 Esto frena CUALQUIER pedido en que el cliente conteste "Municipio,
+// Departamento", que es la forma más natural de contestar. El recorte ya existía
+// pero solo en la rama del municipio no preguntado; la rama de "el bot preguntó la
+// ciudad" —la más transitada— no lo tenía.
+//
+// Se factoriza acá para que las dos ramas lean el municipio igual.
+// ============================================================================
+
 /**
- * Un destino plausible en un texto donde NADIE preguntó la ciudad.
- * @returns {{ciudad:string, origen:string}|null}
+ * Lee el municipio de un texto, con el departamento recortado.
+ *
+ * El departamento se conserva SOLO en los nombres que existen en varios
+ * departamentos, donde es el dato que desambigua.
+ *
+ * @returns {{ciudad:string, depto:string}|null}
  */
-function destinoPlausibleEn(texto) {
+function municipioEn(texto) {
   const crudo = String(texto == null ? "" : texto);
   const depto = departamentoEn(crudo);
-  if (!depto && !hayPreposicionDeLugar(crudo)) return null;
 
   // 🔑 El departamento se quita ANTES de medir el largo de la frase. Si no,
   // "Campo de la Cruz Atlántico" son cinco palabras y se descartaba entero.
@@ -735,22 +766,35 @@ function destinoPlausibleEn(texto) {
   const cand = ciudadPlausible(sinDepto) || candidatoTrasPreposicion(sinDepto);
   if (!cand) return null;
 
+  const esAmbiguo = Boolean(fletes.departamentosPosibles(cand));
+  return {
+    ciudad: esAmbiguo && depto ? `${cand} ${depto}` : cand,
+    municipio: cand,
+    depto,
+  };
+}
+
+/**
+ * Un destino plausible en un texto donde NADIE preguntó la ciudad.
+ * @returns {{ciudad:string, origen:string}|null}
+ */
+function destinoPlausibleEn(texto) {
+  const crudo = String(texto == null ? "" : texto);
+  const depto = departamentoEn(crudo);
+  if (!depto && !hayPreposicionDeLugar(crudo)) return null;
+
+  const leido = municipioEn(crudo);
+  if (!leido) return null;
+
   // 🛡️ Sin departamento, se exige que esté escrito como nombre propio.
   //
   // 🔑 Esto es lo que separa "estoy en Pitalito" de "estoy en el trabajo" cuando la
   // palabra genérica todavía no está en el vocabulario: "el pueblo" y "la bodega de
   // mi jefe" quedan fuera sin tener que enumerarlos uno por uno.
-  if (!depto && !pareceNombrePropio(cand)) return null;
+  if (!depto && !pareceNombrePropio(leido.municipio)) return null;
 
-  // Se devuelve el MUNICIPIO SOLO, no "Municipio Departamento": si no, el pedido
-  // diría "Pitalito" y la cotización "Pitalito Huila", y `verificarPedido` lo
-  // marcaría como ciudad_distinta; cada pedido con departamento quedaría frenado.
-  //
-  // 🔑 Única excepción: los nombres que existen en varios departamentos. Ahí el
-  // departamento ES el dato que desambigua, así que se conserva.
-  const esAmbiguo = Boolean(fletes.departamentosPosibles(cand));
   return {
-    ciudad: esAmbiguo && depto ? `${cand} ${depto}` : cand,
+    ciudad: leido.ciudad,
     origen: depto ? "dijo ciudad y departamento" : "dijo de dónde es",
   };
 }
@@ -760,6 +804,96 @@ function botPidioCiudad(messages) {
   const delBot = (messages || []).filter((m) => m && m.role === "assistant");
   const ultimo = delBot[delBot.length - 1];
   return Boolean(ultimo && RE_BOT_PIDIO_CIUDAD.test(String(ultimo.content || "")));
+}
+
+// ============================================================================
+// 🔴 UN APELLIDO NO ES UN DESTINO — caso 26-sep, 13:12
+//
+// LO QUE PASÓ. El cliente ya tenía su destino establecido en San Onofre, Sucre, y
+// mandó en UN solo mensaje: **"José Bello, 3001234567, San Onofre, entrega en
+// oficina"**. La cotización se pasó sola a **Bello** y el total bajó de $85.000 a
+// $83.000. El pedido quedó con San Onofre y la cotización con Bello, así que
+// `verificarPedido` lo frenó por `ciudad_distinta`.
+//
+// 🔎 EL MECANISMO, comprobado: `ciudadesEn` busca nombres del tarifario en CUALQUIER
+// parte del mensaje, y ese resultado es la PRIMERA prioridad de `destinoDelHilo`,
+// por encima del destino ya establecido. "Bello" está en el tarifario (banda D) y
+// "San Onofre" NO, así que de ese mensaje salió una sola ciudad: el apellido.
+//
+//   ciudadesEn("José Bello, 3001234567, San Onofre, entrega en oficina") → ["Bello"]
+//
+// ⚠️ Esto NO viene de la entrega #168: se reprodujo igual en 2d382fc, antes de ella.
+//
+// 🔑 LA REGLA. Un nombre de ciudad que aparece dentro de un mensaje de DATOS solo
+// cambia el destino si viene con una señal de destino —una preposición de lugar o
+// una corrección explícita—. "Bello" sigue siendo una ciudad válida: "para Bello",
+// "mejor a Bello" o "Bello" a secas cambian el destino como siempre.
+//
+// ⚠️ Y si no hay destino establecido NO se adivina: se sigue el camino y el bot
+// pregunta la ciudad, en vez de sobrescribirla en silencio con un apellido.
+// ============================================================================
+
+// Un celular colombiano. Su presencia es la señal más clara de que el cliente está
+// pasando sus DATOS y no diciendo a dónde despachar.
+const RE_TRAE_CELULAR = /\b3\d{9}\b/;
+
+// Palabras de los datos del pedido. Si el mensaje las trae, es la respuesta al
+// "pásame nombre, dirección y celular", no un cambio de ciudad.
+const RE_DATO_DEL_PEDIDO =
+  /\b(talla|tallas|color|franja|c[eé]dula|direcci[oó]n|barrio|calle|carrera|cra|kr|manzana|apto|apartamento|oficina|sucursal|agencia|contraentrega|celular|tel[eé]fono|whatsapp|conjunto|conjuntos)\b/i;
+
+// Lo que el bot pide cuando está recogiendo datos, no destino.
+const RE_BOT_PIDIO_DATOS =
+  /\b(nombre completo|tus datos|c[eé]dula|direcci[oó]n|celular|tel[eé]fono|qu[eé] talla|cu[aá]l talla|talla|color de la franja)\b/i;
+
+/** ¿Este mensaje es el cliente pasando sus datos? */
+function esMensajeDeDatos(texto, messages) {
+  const crudo = String(texto == null ? "" : texto);
+  if (RE_TRAE_CELULAR.test(crudo)) return true;
+  if (RE_DATO_DEL_PEDIDO.test(crudo)) return true;
+  // Si el bot pidió datos y NO la ciudad, lo que llega es la respuesta a eso.
+  const delBot = (messages || []).filter((m) => m && m.role === "assistant");
+  const ultimo = delBot[delBot.length - 1];
+  const pidioDatos = Boolean(ultimo && RE_BOT_PIDIO_DATOS.test(String(ultimo.content || "")));
+  return pidioDatos && !botPidioCiudad(messages);
+}
+
+// Lo que convierte la mención de una ciudad en un destino: una preposición de lugar
+// justo antes, o una corrección explícita.
+//
+// ⚠️ Se mide sobre el texto SIN TILDES y mirando lo que hay inmediatamente antes del
+// nombre. Y las preposiciones de una sola letra ("a") se piden con frontera de
+// palabra, para que "Rosa Bello" o "Ana Bello" no la disparen desde el final del
+// nombre de pila.
+const RE_ANTES_ES_DESTINO =
+  /(?:^|[\s,.;:])(?:para|hacia|hasta|a|al|en|de|desde|env[ií]\w*|mand\w*|despach\w*|mejor|cambi\w*|vez de|ya no|es)\s+(?:el\s+|la\s+|los\s+|las\s+|mi\s+)?$/;
+
+// Un cambio de destino dicho como corrección. Es señal FUERTE: el cliente está
+// hablando de a dónde va el paquete, no pasando un dato.
+const RE_CORRIGE_DESTINO =
+  /\b(mejor|en vez de|en lugar de|ya no|cambi\w*|corrij\w*|es para|env[ií]\w*\s+a|mand\w*\s+a|despach\w*\s+a)\b/i;
+
+/** ¿La ciudad está nombrada COMO DESTINO en este texto? */
+function senalDeDestinoPara(texto, ciudad) {
+  const plano = sinTilde(texto);
+  const objetivo = sinTilde(ciudad);
+  if (!plano || !objetivo) return false;
+
+  // El mensaje es solo la ciudad (con saludo o puntuación alrededor): es un destino.
+  const pelado = plano.replace(RE_SALUDO, " ").replace(/[^a-z\s]/g, " ").replace(/\s+/g, " ").trim();
+  if (pelado === objetivo) return true;
+
+  // El departamento al lado también dice que se está hablando de un lugar.
+  if (departamentoEn(texto)) return true;
+
+  // Y si no, lo que hay justo antes del nombre.
+  let desde = 0;
+  for (;;) {
+    const i = plano.indexOf(objetivo, desde);
+    if (i < 0) return false;
+    if (RE_ANTES_ES_DESTINO.test(plano.slice(0, i))) return true;
+    desde = i + 1;
+  }
 }
 
 /**
@@ -780,25 +914,84 @@ function botPidioCiudad(messages) {
  */
 function destinoDelHilo(conv, userText) {
   const messages = (conv && conv.messages) || [];
+  const establecido = (conv && conv.cotizacion && conv.cotizacion.ciudad) || "";
   const enEsteTurno = ciudadesEn(userText || "");
-  if (enEsteTurno.length > 1) {
-    return { ciudad: "", varias: enEsteTurno, origen: "varios_en_el_turno" };
-  }
-  if (enEsteTurno.length === 1) {
-    return { ciudad: enEsteTurno[0], varias: [], origen: "este_turno" };
+
+  if (enEsteTurno.length) {
+    // 🔑 ¿Está diciendo a dónde despachar, o pasando sus datos?
+    const comoDestino =
+      botPidioCiudad(messages) || enEsteTurno.some((c) => senalDeDestinoPara(userText, c));
+
+    const pidieronDatos = esMensajeDeDatos(userText, messages);
+
+    if (pidieronDatos && !comoDestino) {
+      // Es un apellido, un barrio o una transportadora dentro de los datos.
+      if (establecido) {
+        return { ciudad: establecido, varias: [], origen: "se_conserva_el_destino" };
+      }
+      // Sin destino previo no se adivina con un apellido: se sigue el camino y el
+      // bot termina preguntando la ciudad.
+    } else if (
+      // ====================================================================
+      // 🤔 LA DUDA DE VERDAD: el bot pidió el NOMBRE y llegó "Bello" a secas.
+      //
+      // Puede ser su apellido o puede ser que cambió de ciudad, y las dos
+      // lecturas son razonables. Elegir una en silencio es lo que rompió el caso
+      // de José: se cambia el destino y el total sin avisarle a nadie.
+      //
+      // 🔑 Se PREGUNTA. Devolver la ciudad vacía deja el recorrido en
+      // `sin_destino`, que desde la entrega anterior pregunta la ciudad en vez de
+      // escalar — y NO sobrescribe la cotización guardada, porque `calcular`
+      // devuelve ok:false y `guardarCotizacion` no se llama.
+      // ====================================================================
+      pidieronDatos &&
+      establecido &&
+      enEsteTurno.length === 1 &&
+      fletes.normalizar(enEsteTurno[0]) !== fletes.normalizar(establecido) &&
+      !botPidioCiudad(messages) &&
+      !RE_CORRIGE_DESTINO.test(String(userText || "")) &&
+      !departamentoEn(userText)
+    ) {
+      return {
+        ciudad: "",
+        varias: [establecido, enEsteTurno[0]],
+        origen: "duda_entre_el_dato_y_el_destino",
+      };
+    } else if (enEsteTurno.length > 1) {
+      return { ciudad: "", varias: enEsteTurno, origen: "varios_en_el_turno" };
+    } else {
+      return { ciudad: enEsteTurno[0], varias: [], origen: "este_turno" };
+    }
   }
 
   // 🔑 El paso que faltaba. Ojo: `messages` ya puede traer el mensaje de este
   // turno, así que se mira el último del BOT, que siempre es anterior.
   if (botPidioCiudad(messages)) {
-    const cand = ciudadPlausible(userText);
-    if (cand) return { ciudad: cand, varias: [], origen: "respuesta_a_la_pregunta" };
+    // 🔑 Con el departamento RECORTADO. "San Onofre, Sucre" se guardaba como
+    // "San Onofre Sucre" y después todo pedido que dijera "San Onofre" quedaba
+    // frenado por ciudad_distinta.
+    const leido = municipioEn(userText);
+    if (leido) return { ciudad: leido.ciudad, varias: [], origen: "respuesta_a_la_pregunta" };
   }
 
   // El cliente dice su municipio sin que nadie le haya preguntado.
   {
     const rec = destinoPlausibleEn(userText);
-    if (rec) return { ciudad: rec.ciudad, varias: [], origen: rec.origen };
+    if (rec) {
+      // 🛡️ RED GENERAL, para la transportadora que no esté en el vocabulario.
+      //
+      // `destinoPlausibleEn` acepta con una señal DÉBIL: preposición de lugar más
+      // un nombre propio. Eso alcanza cuando no hay destino, pero no para pisar uno
+      // ya establecido en medio de un mensaje de datos —así se colaron
+      // "Interrapidísimo" y compañía—. Para cambiar un destino establecido hace
+      // falta una señal fuerte: el departamento, o decirlo como corrección.
+      const senalDebil =
+        establecido &&
+        esMensajeDeDatos(userText, messages) &&
+        !departamentoEn(userText) &&
+        !RE_CORRIGE_DESTINO.test(String(userText || ""));
+      if (!senalDebil) return { ciudad: rec.ciudad, varias: [], origen: rec.origen };
+    }
   }
 
   const guardada = (conv && conv.cotizacion && conv.cotizacion.ciudad) || "";
@@ -839,9 +1032,9 @@ function destinoDelHilo(conv, userText) {
     // Sin esto, el cliente que contestó "pitalito" a la pregunta del bot seguía
     // perdiendo su destino dos mensajes más tarde.
     if (botPidioCiudad(messages.slice(0, i))) {
-      const cand = ciudadPlausible(texto);
-      if (cand) {
-        return { ciudad: cand, varias: [], origen: "historial · respondio_la_pregunta" };
+      const leido = municipioEn(texto);
+      if (leido) {
+        return { ciudad: leido.ciudad, varias: [], origen: "historial · respondio_la_pregunta" };
       }
     }
   }
@@ -1443,14 +1636,59 @@ const NOMBRE_ROL = {
   descuento: "el descuento",
 };
 
+// ============================================================================
+// ¿El mensaje le está pidiendo al cliente que confirme el pedido?
+//
+// Es el encabezado del cuadro o el «SÍ CONFIRMO». Se mide sobre el texto sin
+// tildes: acordarse de que el `\b` de JavaScript es ASCII y ya rompió cuatro
+// patrones en este repositorio.
+// ============================================================================
+const RE_PIDE_CONFIRMACION = /confirmemos tu pedido|si confirmo/;
+
+/** ¿Este mensaje pide la confirmación del pedido? */
+function pideConfirmacion(texto) {
+  return RE_PIDE_CONFIRMACION.test(sinTilde(texto));
+}
+
+/**
+ * Lo que hay que aclarar antes de poder pedir una confirmación.
+ *
+ * 🔑 Se usa cuando el modelo intentó pedir «SÍ CONFIRMO» sin una cotización válida:
+ * en vez de mandar el cuadro sin total, se le dice al cliente QUÉ falta. Callar el
+ * dato y pedir la confirmación igual es lo que produjo el resumen sin monto.
+ */
+function faltaParaConfirmar(cot) {
+  const motivo = (cot && cot.motivo) || "";
+  if (motivo === "sin_destino") {
+    return "¡Casi listo! Solo me falta un dato para darte el total exacto: ¿para qué ciudad sería el envío? 📦";
+  }
+  if (motivo === "varios_destinos") {
+    return "¡Casi listo! Para darte el total exacto, ¿a cuál de esas ciudades sería el envío? 📦";
+  }
+  if (motivo === "cantidad_ambigua") {
+    return "¡Casi listo! Antes de confirmarte el total, ¿cuántos conjuntos querés llevar? 🏍️";
+  }
+  if (motivo === "ambiguo") {
+    return (
+      "¡Casi listo! Ese nombre de municipio existe en varios departamentos. " +
+      "¿En qué departamento queda, para darte el total exacto? 📦"
+    );
+  }
+  return (
+    "Antes de confirmar quiero darte el total exacto, así que lo estoy revisando " +
+    "para no darte un número equivocado. Te escribo en un momento 🙌"
+  );
+}
+
 /**
  * Revisa el mensaje que produjo el modelo ANTES de enviarlo.
  *
- * Comprueba cuatro cosas distintas:
+ * Comprueba cinco cosas distintas:
  *   1. que todo importe mencionado esté autorizado
  *   2. 🔑 que cada importe esté haciendo DE LO QUE EL TEXTO DICE que hace
  *   3. que las sumas que afirme el texto cuadren (A + B = C)
  *   4. que no aparezca un total ni un envío cuando no hay destino
+ *   5. 🔑 y que un mensaje que PIDE CONFIRMAR traiga el total — por ausencia
  *
  * @returns {{ok:boolean, problemas:Array<{tipo:string, detalle:string}>, importes:Array}}
  */
@@ -1534,6 +1772,47 @@ function validarRespuesta(texto, cot, contexto = {}) {
             : `dio ${fmt(imp.valor)} sin saber a dónde se despacha`,
         });
       }
+    }
+  }
+
+  // ========================================================================
+  // 🔴 NO SE PIDE CONFIRMAR UN RESUMEN SIN TOTAL — caso 26-sep, 13:16
+  //
+  // LO QUE LE LLEGÓ AL CLIENTE: el cuadro completo, con sus datos, terminando en
+  // **"TOTAL a pagar al recibir"** sin ninguna cifra, y aun así pidiéndole
+  // «SÍ CONFIRMO». Se le pidió confirmar un pedido sin decirle cuánto paga.
+  //
+  // 🔎 EL MECANISMO, comprobado con `depurarImportes`: el modelo escribió el cuadro
+  // con $85.000 (el total que el cliente venía viendo), pero la cotización ya se
+  // había pasado sola a Bello/$83.000, así que la validación rechazó ese importe.
+  // El rescate por depuración partió la línea en "TOTAL a pagar al recibir" y
+  // "$85.000", tiró la cifra, y el resto del cuadro volvió a validar —porque ya no
+  // quedaba ningún número que contradecir— y salió mutilado.
+  //
+  // 🔑 POR QUÉ HACÍA FALTA ESTA COMPROBACIÓN Y NO OTRA. Las cuatro de arriba son
+  // bucles sobre los importes ENCONTRADOS: validan por PRESENCIA. Un resumen sin
+  // cifras da `importes = []`, ningún bucle itera y el mensaje pasa por vacío. Esta
+  // es la única que valida por AUSENCIA: si el mensaje pide confirmar, el total
+  // tiene que estar, y tiene que ser el de ESTE destino y ESTA cantidad.
+  //
+  // ⚠️ No quita ninguna validación: agrega una. Los pedidos que de verdad no cuadran
+  // se siguen frenando igual.
+  // ========================================================================
+  if (pideConfirmacion(texto)) {
+    const posiblesTotal = porRol.get("total");
+    const traeElTotal = importes.some(
+      (i) => i.rol === "total" && posiblesTotal && posiblesTotal.has(i.valor)
+    );
+    if (!traeElTotal) {
+      problemas.push({
+        tipo: "resumen_sin_total",
+        detalle:
+          "pide confirmar el pedido sin decir el total" +
+          (cot && cot.ok
+            ? ` de ${cot.ciudad} para ${cot.uds === 2 ? "dos conjuntos" : `${cot.uds} conjunto${cot.uds > 1 ? "s" : ""}`} (${fmt(cot.total)})`
+            : ": no hay una cotización válida para este turno") +
+          ". No se le puede pedir «SÍ CONFIRMO» a alguien sin decirle cuánto paga",
+      });
     }
   }
 
@@ -1866,6 +2145,10 @@ module.exports = {
   departamentoEn,
   destinoPlausibleEn,
   botPidioCiudad,
+  esMensajeDeDatos,
+  senalDeDestinoPara,
+  pideConfirmacion,
+  faltaParaConfirmar,
   calcular,
   lineaDePrecio,
   bloqueDeDatos,

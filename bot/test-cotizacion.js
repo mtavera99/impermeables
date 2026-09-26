@@ -1197,5 +1197,182 @@ console.log("\n── R17. 🛡️ Un lugar genérico no es un municipio, y el h
     chequear(`  sigue bien: ${JSON.stringify(t)} → ${esp}`, dest(t).ciudad === esp, JSON.stringify(dest(t).ciudad));
 }
 
+console.log("\n── R18. 🧍 La cotización sigue al DESTINO, no a los datos del cliente ──");
+// Dos casos del 26-sep, y el mecanismo comprobado de cada uno:
+//
+//   13:12 José Bello · destino San Onofre. `ciudadesEn` busca nombres del tarifario
+//         en CUALQUIER parte del mensaje y es la primera prioridad de
+//         `destinoDelHilo`. "Bello" está en el tarifario y "San Onofre" no, así que
+//         de "José Bello, 3001234567, San Onofre, entrega en oficina" salía una
+//         sola ciudad: el apellido. El total cayó de $85.000 a $83.000.
+//         ⚠️ NO viene de #168: se reprodujo igual en 2d382fc.
+//
+//   14:13 Yarumal · el cliente eligió "Interrapidísimo" y quedó como CIUDAD.
+//         ⚠️ Esta SÍ es regresión de #168 (aparece en f213031, no en 2d382fc):
+//         "en Interrapidísimo" es preposición de lugar + nombre propio.
+{
+  const u = (t) => ({ role: "user", content: t });
+  const a = (t) => ({ role: "assistant", content: t });
+  const PIDE_DATOS = "Pásame nombre completo, dirección con barrio y celular";
+  const conDestino = (ciudad, ultimoBot) => ({
+    messages: [a(ultimoBot || PIDE_DATOS)],
+    cotizacion: { ciudad, uds: 1, total: 85000 },
+  });
+
+  // ── 1. El apellido no cambia el destino ────────────────────────────────────
+  const DATOS = [
+    "José Bello, 3001234567, San Onofre, entrega en oficina",
+    "José Bello",
+    "Ana Bello, 3009998877",
+    "Rosa Bello, talla L, franja negra",
+    "Juan Pereira, 3001112223, San Onofre",
+    "me llamo Carlos Bello y mi celular es 3004445566",
+  ];
+  for (const t of DATOS) {
+    const d = c.destinoDelHilo(conDestino("San Onofre"), t);
+    chequear(`🔑 conserva el destino: ${JSON.stringify(t.slice(0, 46))}`, d.ciudad === "San Onofre", JSON.stringify(d));
+  }
+
+  // ── 2. Pero NO se prohíbe Bello: sigue siendo una ciudad válida ────────────
+  const CAMBIOS = [
+    "mejor para Bello",
+    "cámbialo a Bello",
+    "envíalo a Bello",
+    "ya no, mándalo a Bello",
+    "no, es para Bello Antioquia",
+    "Bello",
+  ];
+  for (const t of CAMBIOS) {
+    const d = c.destinoDelHilo(conDestino("San Onofre", "Te queda en $85.000 en total."), t);
+    chequear(`🔑 cambio real reconocido: ${JSON.stringify(t)}`, d.ciudad === "Bello", JSON.stringify(d));
+  }
+  chequear(
+    "   y contestando la pregunta de la ciudad también",
+    c.destinoDelHilo(conDestino("San Onofre", "¿Para qué ciudad sería el envío?"), "Bello").ciudad === "Bello"
+  );
+  chequear("   Bello sigue cotizando su banda", c.calcular("Bello", "uno").total === 83000);
+
+  // ── 3. Ante la duda se PREGUNTA, no se sobrescribe ─────────────────────────
+  const duda = c.destinoDelHilo(conDestino("San Onofre"), "Bello");
+  chequear("🔑 bot pidió el NOMBRE + «Bello» a secas → no elige", duda.ciudad === "", JSON.stringify(duda));
+  chequear("   lo deja como duda explícita", duda.origen === "duda_entre_el_dato_y_el_destino", duda.origen);
+  chequear("   y eso termina en sin_destino, que PREGUNTA", c.calcular(duda.ciudad, "Bello").motivo === "sin_destino");
+
+  // ── 4. Las transportadoras nunca son municipios ────────────────────────────
+  const TRANSPORTADORAS = [
+    "en Interrapidísimo",
+    "Interrapidísimo",
+    "por Interrapidisimo",
+    "en la oficina de Interrapidísimo",
+    "a Servientrega",
+    "en Coordinadora",
+    "por Envía",
+    "en Deprisa",
+  ];
+  for (const t of TRANSPORTADORAS) {
+    const d = c.destinoDelHilo(conDestino("Yarumal", "¿A tu dirección o a oficina?"), t);
+    chequear(`🔑 no es municipio: ${JSON.stringify(t)}`, d.ciudad === "Yarumal", JSON.stringify(d));
+  }
+  chequear("destinoPlausibleEn ignora la transportadora", c.destinoPlausibleEn("en Interrapidísimo") === null);
+
+  // ── 5. El departamento recortado en la rama de «el bot preguntó» ───────────
+  // Encontrado escribiendo la prueba del recorrido: "San Onofre, Sucre" se guardaba
+  // como "San Onofre Sucre" y después el pedido que decía "San Onofre" quedaba
+  // frenado por ciudad_distinta. Pasaba en TODO pedido contestado así.
+  const preg = { messages: [a("¿Para qué ciudad sería el envío?")] };
+  for (const [t, esp] of [
+    ["San Onofre, Sucre", "San Onofre"],
+    ["Pitalito Huila", "Pitalito"],
+    ["Yarumal, Antioquia", "Yarumal"],
+    ["Sahagún Córdoba", "Sahagún"],
+    ["pitalito", "pitalito"],
+  ]) {
+    const d = c.destinoDelHilo(preg, t);
+    chequear(`🔑 sin el departamento pegado: ${JSON.stringify(t)} → ${esp}`, d.ciudad === esp, JSON.stringify(d.ciudad));
+  }
+  chequear(
+    "🔑 y el pedido con ese municipio YA NO se frena",
+    c.verificarPedido(
+      { nombre: "José Bello", celular: "3009990024", ciudad: "San Onofre", total: 85000, unidades: 1 },
+      c.calcular(c.destinoDelHilo(preg, "San Onofre, Sucre").ciudad, "uno", { cantidad: { uds: 1 } }),
+      {}
+    ).ok === true,
+    JSON.stringify(
+      c.verificarPedido(
+        { nombre: "José Bello", celular: "3009990024", ciudad: "San Onofre", total: 85000, unidades: 1 },
+        c.calcular(c.destinoDelHilo(preg, "San Onofre, Sucre").ciudad, "uno", { cantidad: { uds: 1 } }),
+        {}
+      ).problemas
+    )
+  );
+  chequear(
+    "   pero los ambiguos SÍ conservan el departamento",
+    /nari[ñn]o/i.test(c.destinoDelHilo(preg, "La Unión, Nariño").ciudad),
+    JSON.stringify(c.destinoDelHilo(preg, "La Unión, Nariño").ciudad)
+  );
+
+  // ── 6. No se pide confirmar un resumen sin total ───────────────────────────
+  const cotSO = c.calcular("San Onofre", "uno", { cantidad: { uds: 1 } });
+  const CUADRO_BASE =
+    "Confirmemos tu pedido ✅\nNombre: Marta Ríos\nCelular: 3004445566\nCiudad: San Onofre\n" +
+    "Dirección: Cra 5 #4-3\nColor de la franja: rojo\nTalla: M\nPago: contraentrega\n";
+  const PIE = "\n¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️";
+
+  chequear("pideConfirmacion ve el encabezado del cuadro", c.pideConfirmacion("Confirmemos tu pedido ✅") === true);
+  chequear("   y el «SÍ CONFIRMO» con tilde", c.pideConfirmacion("Respóndeme «SÍ CONFIRMO»") === true);
+  chequear("   y no marca un mensaje normal", c.pideConfirmacion("Las tallas van de S a 3XL.") === false);
+
+  chequear(
+    "🔑 EL CASO: resumen sin monto NO valida",
+    c.validarRespuesta(`${CUADRO_BASE}TOTAL a pagar al recibir${PIE}`, cotSO, {}).ok === false,
+    "validaba por ausencia: sin cifras, ningún bucle iteraba"
+  );
+  chequear(
+    "   con el tipo que lo explica",
+    c.validarRespuesta(`${CUADRO_BASE}TOTAL a pagar al recibir${PIE}`, cotSO, {}).problemas.some((p) => p.tipo === "resumen_sin_total")
+  );
+  chequear(
+    "🔑 con el total correcto SÍ valida",
+    c.validarRespuesta(`${CUADRO_BASE}TOTAL a pagar al recibir: $85.000${PIE}`, cotSO, {}).ok === true,
+    JSON.stringify(c.validarRespuesta(`${CUADRO_BASE}TOTAL a pagar al recibir: $85.000${PIE}`, cotSO, {}).problemas)
+  );
+  chequear(
+    "🔑 con el total de OTRA ciudad no valida",
+    c.validarRespuesta(`${CUADRO_BASE}TOTAL a pagar al recibir: $83.000${PIE}`, cotSO, {}).ok === false
+  );
+  chequear(
+    "🔑 y con el total de otra CANTIDAD tampoco",
+    c.validarRespuesta(
+      `${CUADRO_BASE}TOTAL a pagar al recibir: $85.000${PIE}`,
+      c.calcular("San Onofre", "dos", { cantidad: { uds: 2 } }),
+      {}
+    ).ok === false
+  );
+  // ⚠️ Un mensaje que no pide confirmar no se toca: la comprobación es nueva, no
+  // reemplaza a las otras cuatro.
+  chequear("un mensaje sin cuadro sigue pasando", c.validarRespuesta("Las tallas van de S a 3XL.", cotSO, {}).ok === true);
+  chequear(
+    "y la línea de precio de siempre sigue pasando",
+    c.validarRespuesta(c.lineaDePrecio(cotSO), cotSO, {}).ok === true,
+    JSON.stringify(c.validarRespuesta(c.lineaDePrecio(cotSO), cotSO, {}).problemas)
+  );
+
+  // Lo que se le dice al cliente cuando falta algo.
+  chequear("faltaParaConfirmar pide la ciudad si falta el destino", /qu[eé] ciudad/i.test(c.faltaParaConfirmar({ ok: false, motivo: "sin_destino" })));
+  chequear("   y la cantidad si es la cantidad", /cu[aá]ntos/i.test(c.faltaParaConfirmar({ ok: false, motivo: "cantidad_ambigua" })));
+  chequear("   sin prometer ni inventar un total", !/\$/.test(c.faltaParaConfirmar({ ok: false, motivo: "sin_destino" })));
+
+  // ── 7. Los bloqueos de pedidos que DE VERDAD no cuadran se quedan ──────────
+  chequear(
+    "🔑 sigue frenando un pedido a otra ciudad",
+    c.verificarPedido({ ciudad: "Medellín", total: 85000, unidades: 1 }, cotSO, {}).problemas.some((p) => p.tipo === "ciudad_distinta"),
+    JSON.stringify(c.verificarPedido({ ciudad: "Medellín", total: 85000, unidades: 1 }, cotSO, {}).problemas)
+  );
+  chequear(
+    "🔑 y uno con el total cambiado",
+    c.verificarPedido({ ciudad: "San Onofre", total: 70000, unidades: 1 }, cotSO, {}).ok === false
+  );
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);
