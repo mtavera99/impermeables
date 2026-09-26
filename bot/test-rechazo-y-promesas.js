@@ -321,13 +321,15 @@ console.log("\n── R6b. 🙋 La derivación a un humano AVISA ──");
 console.log("\n── R7. 🔴 La confirmación posterior sobre los datos VIGENTES ──");
 // Textual: "quitar sin_confirmar no basta si el registro conserva un color o
 // dirección anterior". Es exacto: mismoPedido() compara solo total y talla.
+//
+// ⚠️ ESTE BLOQUE CAMBIÓ EN LA 3ª REVISIÓN, y conviene decir por qué. La primera
+// versión traía la corrección de COLOR encima del pedido anterior. Eso resultó
+// inseguro: un pedido con el mismo total y otra talla/color puede ser una
+// corrección o UNA SEGUNDA COMPRA, y desde afuera no se distingue. Fusionarlos
+// borraba una venta. Ahora la dirección sí se corrige (no cambia qué se vende) y
+// el color NO: se conservan los dos registros para que alguien decida.
 {
-  // ⚠️ Se usa el mismo `store` que el resto de la batería: `require` está cacheado,
-  // así que cambiar DATA_DIR acá no tendría ningún efecto. Y los datos son únicos
-  // a propósito — `pedidosDelMismoCliente` empareja por CELULAR, y reutilizar uno
-  // de otra sección hacía que este pedido se tomara por duplicado de aquel.
   const store7 = store;
-
   const base = {
     nombre: "Marta Ruiz",
     celular: "3007770001",
@@ -337,49 +339,41 @@ console.log("\n── R7. 🔴 La confirmación posterior sobre los datos VIGENT
     color: "rojo",
     pago: "contraentrega",
     total: 82000,
+    unidades: 1,
     telefono_chat: "573001117777",
   };
+  const mios = (tel) => store7.todosLosPedidos().filter((p) => p.telefono_chat === tel);
 
-  // 1) El bot emite el bloque antes del "sí": queda sin confirmar, color rojo.
+  // ── Datos de ENTREGA: se corrigen y la venta queda lista ────────────────
   store7.saveOrder({ ...base, sin_confirmar: true, motivo_sin_confirmar: "no hubo un sí claro" });
-  // 2) El cliente CORRIGE color y dirección, y ahí sí confirma.
-  const r = store7.saveOrder({ ...base, color: "azul", direccion: "Cra 9 #45-12 barrio Prado" });
-
-  const mios = store7.todosLosPedidos().filter((p) => p.telefono_chat === base.telefono_chat);
-  chequear("sigue habiendo UN solo pedido", mios.length === 1, `hay ${mios.length}`);
-  const p = mios[0];
-  chequear("🔑 el color corregido NO se perdió", p.color === "azul", `quedó "${p.color}"`);
-  chequear("🔑 ni la dirección corregida", /Prado/.test(String(p.direccion)), `quedó "${p.direccion}"`);
+  store7.saveOrder({ ...base, direccion: "Cra 9 #45-12 barrio Prado" });
+  const p = mios(base.telefono_chat)[0];
+  chequear("sigue habiendo UN solo pedido", mios(base.telefono_chat).length === 1, `hay ${mios(base.telefono_chat).length}`);
+  chequear("🔑 la dirección corregida NO se perdió", /Prado/.test(String(p.direccion)), `quedó "${p.direccion}"`);
   chequear("se le quitó la marca de sin confirmar", !p.sin_confirmar);
   chequear("queda registrado que se confirmó después", Boolean(p.confirmado_despues));
   chequear(
     "🔑 y queda auditable QUÉ se corrigió",
-    Array.isArray(p.correcciones_aplicadas) && p.correcciones_aplicadas.length === 2,
+    Array.isArray(p.correcciones_aplicadas) && p.correcciones_aplicadas.some((c) => /direccion/.test(c)),
     JSON.stringify(p.correcciones_aplicadas)
   );
-  chequear("el detalle nombra el color", /color/.test(String(p.correcciones_aplicadas)), JSON.stringify(p.correcciones_aplicadas));
-  chequear("🚦 y el pedido queda listo para despachar", store7.listoParaDespachar ? store7.listoParaDespachar(p) : !p.sin_confirmar);
+  chequear("🚦 y el pedido queda listo para despachar", store7.listoParaDespachar(p), store7.textoDeRevision(p));
 
-  // ⚠️ Un campo vacío en el pedido nuevo NO puede borrar uno bueno del anterior.
+  // ── Un campo vacío NO borra uno bueno ──────────────────────────────────
   const base2 = { ...base, telefono_chat: "573001118888", celular: "3007770002" };
   store7.saveOrder({ ...base2, sin_confirmar: true, motivo_sin_confirmar: "x" });
-  store7.saveOrder({ ...base2, color: "", direccion: "" });
-  const p2 = store7.todosLosPedidos().filter((x) => x.telefono_chat === base2.telefono_chat)[0];
-  chequear("🔴 un campo vacío NO borra el color que ya estaba", p2.color === "rojo", `quedó "${p2.color}"`);
-  chequear("ni la dirección", /Cra 1/.test(String(p2.direccion)), `quedó "${p2.direccion}"`);
+  store7.saveOrder({ ...base2, direccion: "" });
+  const p2 = mios(base2.telefono_chat)[0];
+  chequear("🔴 un campo vacío NO borra la dirección que ya estaba", /Cra 1/.test(String(p2.direccion)), `quedó "${p2.direccion}"`);
 
-  // Y si nada cambió, no se inventan correcciones.
+  // ── Sin cambios, no se inventan correcciones ────────────────────────────
   const base3 = { ...base, telefono_chat: "573001119999", celular: "3007770003" };
   store7.saveOrder({ ...base3, sin_confirmar: true, motivo_sin_confirmar: "x" });
   store7.saveOrder({ ...base3 });
-  const p3 = store7.todosLosPedidos().filter((x) => x.telefono_chat === base3.telefono_chat)[0];
+  const p3 = mios(base3.telefono_chat)[0];
   chequear("sin cambios, no se reporta ninguna corrección", p3.correcciones_aplicadas === undefined);
   chequear("y la marca igual se levanta", !p3.sin_confirmar);
 }
-
-// ============================================================================
-// 🔴 BLOQUEOS DE LA SEGUNDA REVISIÓN (26-sep)
-// ============================================================================
 
 console.log("\n── R8. 🔴 Corregir una promesa NO puede romper el precio ──");
 // Textual: corregir("Sale hoy mismo y el total es $82.000. Pásame la dirección.")
@@ -463,34 +457,75 @@ console.log("\n── R9. 🔴 La confirmación posterior RECONCILIA las validac
     chequear("A· con el total esperado guardado", Number(p.total_esperado) === 73000, `${p.total_esperado}`);
   }
 
-  // ── B. Corrección de TALLA ──────────────────────────────────────────────
-  // Antes no entraba por este camino: `mismoPedido` compara la talla, así que una
-  // talla distinta creaba un pedido NUEVO y dejaba el viejo marcado para siempre.
+  // ── B. Corrección de TALLA: NO se fusiona ───────────────────────────────
+  // ⚠️ La 3ª revisión encontró que fusionar acá era el bloqueo: misma ciudad y
+  // total con otra talla puede ser corrección O segunda compra, y al fusionar
+  // quedaba UN registro listo para despachar. Una de las dos ventas desaparecía.
   {
     const t = "3009990002";
     st.saveOrder({ ...base(t), sin_confirmar: true, motivo_sin_confirmar: "x" });
     st.saveOrder({ ...base(t), talla: "2XL" });
-    chequear("B· 🔑 la talla corregida NO crea un segundo pedido", mios(t).length === 1, `hay ${mios(t).length}`);
-    const p = mios(t)[0];
-    chequear("B· y la talla guardada es la nueva", p.talla === "2XL", `quedó "${p.talla}"`);
-    chequear("B· se levantó la marca", !p.sin_confirmar);
-    chequear("B· y queda despachable, porque nada más lo bloquea", st.listoParaDespachar(p), st.textoDeRevision(p));
+    chequear("B· 🔑 se conservan los DOS registros", mios(t).length === 2, `hay ${mios(t).length}`);
+    chequear(
+      "B· 🔑 y NINGUNO queda listo para despachar",
+      mios(t).every((p) => st.listoParaDespachar(p) === false),
+      mios(t).map((p) => st.textoDeRevision(p)).join(" || ")
+    );
+    chequear(
+      "B· el motivo dice que puede ser corrección o compra nueva",
+      mios(t).some((p) => /corrección del pedido anterior o una compra nueva/.test(String(p.motivo_precio))),
+      mios(t).map((p) => p.motivo_precio).join(" || ")
+    );
+    chequear(
+      "B· y nombra la talla que difiere",
+      mios(t).some((p) => /talla: "L" vs "2XL"/.test(String(p.motivo_precio))),
+      mios(t).map((p) => p.motivo_precio).join(" || ")
+    );
+    chequear(
+      "B· el pedido viejo CONSERVA su marca de sin confirmar",
+      mios(t).some((p) => p.sin_confirmar === true),
+      "si se le quita, queda medio confirmado sin que nadie lo haya decidido"
+    );
+    chequear(
+      "B· y el nuevo apunta a cuál podría corregir",
+      mios(t).some((p) => Boolean(p.posible_correccion_de)),
+      JSON.stringify(mios(t).map((p) => p.posible_correccion_de))
+    );
   }
 
-  // ── C. Cambio de DESTINO ────────────────────────────────────────────────
+  // ── C. Cambio de DESTINO: tampoco se fusiona ────────────────────────────
+  // La ciudad define lo que se vende (cambia el flete), así que entra por la misma
+  // regla: dos registros y ninguno despachable.
   {
     const t = "3009990003";
     st.saveOrder({ ...base(t), sin_confirmar: true, motivo_sin_confirmar: "x" });
     st.saveOrder({ ...base(t), ciudad: "Pasto", total: 85000 });
-    const p = mios(t)[0];
-    chequear("C· el destino corregido se guarda", p.ciudad === "Pasto", `quedó "${p.ciudad}"`);
-    chequear("C· y el total también", Number(p.total) === 85000, `${p.total}`);
+    chequear("C· se conservan los dos", mios(t).length === 2, `hay ${mios(t).length}`);
     chequear(
-      "C· 🔑 pero NO queda despachable: hay que recotizar",
-      st.listoParaDespachar(p) === false,
-      "el sí del cliente fue sobre el cuadro anterior, no sobre estos números"
+      "C· 🔑 ninguno queda despachable",
+      mios(t).every((p) => st.listoParaDespachar(p) === false),
+      mios(t).map((p) => st.textoDeRevision(p)).join(" || ")
     );
-    chequear("C· y el motivo lo dice", /recotizar/.test(st.textoDeRevision(p)), st.textoDeRevision(p));
+    chequear(
+      "C· y el motivo nombra la ciudad y el total",
+      mios(t).some((p) => /ciudad/.test(String(p.motivo_precio)) && /total/.test(String(p.motivo_precio))),
+      mios(t).map((p) => p.motivo_precio).join(" || ")
+    );
+  }
+
+  // ── C2. Ofertas DISTINTAS no se confunden ───────────────────────────────
+  // 🏷️ El identificador de oferta: la confirmación de una cotización de 2 unidades
+  // no puede reconciliarse contra un pendiente de 1 unidad.
+  {
+    const t = "3009990007";
+    st.saveOrder({ ...base(t), sin_confirmar: true, motivo_sin_confirmar: "x", cotizacion_id: "P|CALI|1|82000" });
+    st.saveOrder({ ...base(t), total: 148000, unidades: 2, cotizacion_id: "P|CALI|2|148000" });
+    chequear("C2· 🏷️ dos ofertas distintas → dos registros", mios(t).length === 2, `hay ${mios(t).length}`);
+    chequear(
+      "C2· y el pendiente de 1 unidad sigue pendiente",
+      mios(t).some((p) => p.sin_confirmar === true && Number(p.total) === 82000),
+      JSON.stringify(mios(t).map((p) => ({ total: p.total, sin_confirmar: p.sin_confirmar })))
+    );
   }
 
   // ── D. El pedido anterior YA estaba confirmado ──────────────────────────

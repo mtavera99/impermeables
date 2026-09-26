@@ -546,7 +546,13 @@ en el mismo paquete y pagás un solo envío.
 
 ## FORMATO PARA GUARDAR EL PEDIDO
 Solo cuando el cliente CONFIRME (ej. "sí confirmo", "dale"), además del mensaje de cierre, agrega como ÚLTIMA línea EXACTAMENTE este bloque:
-##ORDER## {"nombre":"","celular":"","ciudad":"","direccion":"","color":"","talla":"","pago":"contraentrega","total":0}
+##ORDER## {"nombre":"","celular":"","ciudad":"","direccion":"","color":"","talla":"","unidades":1,"pago":"contraentrega","total":0}
+- 🔴 **"unidades" ES OBLIGATORIO: 1 o 2.** Es la cantidad de conjuntos, NO la talla.
+  Si el pedido es de dos, poné \`"unidades":2\` y en "talla" las tallas que pidió
+  (ej. \`"talla":"L y M"\`, o \`"talla":"XL"\` si quiere los dos del mismo talle).
+  ⛔ NUNCA metas la cantidad dentro de "talla": \`"talla":"2 unidades XL"\` está mal.
+  🔑 Sin esto no se sabe cuántos conjuntos empacar, y el total de dos con una unidad
+  anotada se despacha de menos contra un recaudo de dos.
 - "pago" es "contraentrega" o "anticipado".
 - "total" es un número, y es **exactamente el TOTAL de la zona del cliente** que aparece en la
   tabla de envío (ej. Cali → 81000). NO lo calcules a mano ni le sumes nada: si el número del

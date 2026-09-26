@@ -170,6 +170,10 @@ function rescatarPedido(fragmento) {
     direccion: txt("direccion"),
     color: txt("color"),
     talla: txt("talla"),
+    // ⚠️ `unidades` se rescata igual que los demás: si el bloque llegó cortado
+    // justo después de la talla, un pedido de dos conjuntos se reconstruiría como
+    // de uno y se despacharía de menos contra un recaudo de dos.
+    unidades: num("unidades"),
     pago: txt("pago"),
     total: num("total"),
   };
@@ -631,7 +635,17 @@ async function generateReply(phone, userText) {
               total_esperado: chequeoPrecio.totalEsperado,
             }),
         ...(cot.ok
-          ? { cotizacion_politica: cot.politica, cotizacion_total: cot.total, cotizacion_banda: cot.banda }
+          ? {
+              cotizacion_politica: cot.politica,
+              cotizacion_total: cot.total,
+              cotizacion_banda: cot.banda,
+              // 🏷️ Identifica la OFERTA que el cliente confirmó. Es lo que permite
+              // saber si un pedido posterior es la confirmación de ésta o algo
+              // distinto, en vez de adivinarlo por el total.
+              cotizacion_id: cot.id || cotizacion.idDeOferta(cot),
+              // La cantidad cotizada, para poder compararla con la del bloque.
+              unidades_cotizadas: cot.uds,
+            }
           : {}),
       });
       if (conf.marcar) {

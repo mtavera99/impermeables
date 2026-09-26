@@ -762,13 +762,52 @@ const mismoPedido = (a, b) =>
  */
 function previoSinConfirmar(orders, nuevo) {
   const ahora = Date.now();
+  const ofertaNueva = String(nuevo.cotizacion_id || "");
   for (const o of pedidosDelMismoCliente(orders, nuevo)) {
     if (!o.sin_confirmar || o.anulado) continue;
     const cuando = new Date(o.fecha).getTime();
     if (!Number.isFinite(cuando) || ahora - cuando > VENTANA_PEDIDO_DUPLICADO_MS) continue;
+    // 🏷️ Si los dos traen identificador de oferta, tiene que ser LA MISMA oferta.
+    // Sin esto, "el pedido pendiente de este cliente" era la única pista, y eso no
+    // distingue la confirmación de una oferta de la confirmación de otra.
+    const ofertaVieja = String(o.cotizacion_id || "");
+    if (ofertaNueva && ofertaVieja && ofertaNueva !== ofertaVieja) continue;
     return o;
   }
   return null;
+}
+
+// ============================================================================
+// 🔴 QUÉ DEFINE EL PRODUCTO, Y POR QUÉ IMPORTA LA DISTINCIÓN
+//
+// LO QUE SE ENCONTRÓ (revisión 26-sep): dos pedidos del mismo cliente con el mismo
+// total y la misma ciudad pero DISTINTA TALLA Y COLOR se fusionaban en uno, y el
+// resultado quedaba `listoParaDespachar: true`. O sea que una segunda compra podía
+// borrar la primera sin que nadie se enterara.
+//
+// 🔑 La distinción que faltaba: hay campos que describen A DÓNDE VA el pedido
+// (nombre, celular, dirección, pago) y campos que describen QUÉ SE VENDE (talla,
+// color, cantidad, ciudad, total). Corregir los primeros no cambia la venta.
+// Cambiar los segundos puede ser una corrección… o puede ser otra venta, y desde
+// afuera NO SE PUEDE SABER cuál de las dos.
+//
+// Ante esa duda no se elige: se conservan los dos registros y se marcan. Perder
+// una venta por fusionarla es peor que tener dos pedidos que alguien revisa.
+// ============================================================================
+const CAMPOS_DEL_PRODUCTO = ["talla", "color", "ciudad", "total", "unidades"];
+const CAMPOS_DE_ENTREGA = ["nombre", "celular", "direccion", "pago"];
+
+/** Las diferencias entre dos pedidos, separadas por lo que significan. */
+function diferenciasEntre(viejo, nuevo, campos) {
+  const fuera = [];
+  for (const campo of campos) {
+    const a = String(nuevo[campo] == null ? "" : nuevo[campo]).trim();
+    const b = String(viejo[campo] == null ? "" : viejo[campo]).trim();
+    if (!a) continue; // vacío no corrige ni contradice nada
+    if (a.toLowerCase() === b.toLowerCase()) continue;
+    fuera.push({ campo, viejo: b, nuevo: a });
+  }
+  return fuera;
 }
 
 function esPedidoDuplicado(orders, nuevo) {
@@ -952,26 +991,56 @@ function saveOrder(order) {
           return conAviso;
         }
 
-        const CAMPOS_VIGENTES = ["nombre", "celular", "ciudad", "direccion", "color", "talla", "pago"];
+        // ==================================================================
+        // 🔴 SI CAMBIÓ LO QUE SE VENDE, NO SE FUSIONA: SE CONSERVAN LOS DOS
+        //
+        // Acá estaba el agujero. Un pedido con la misma ciudad y el mismo total
+        // pero otra talla y otro color se tomaba por "corrección", se escribía
+        // encima del anterior y quedaba listo para despachar. Si eran dos compras,
+        // una desapareció sin dejar rastro.
+        //
+        // No hay forma de saber desde afuera si el cliente se corrigió o volvió a
+        // comprar. Así que no se decide: se guardan los dos y se marcan para que
+        // una persona lo mire. El pedido viejo CONSERVA su marca de sin confirmar.
+        // ==================================================================
+        const cambiosDeProducto = diferenciasEntre(orders[i], record, CAMPOS_DEL_PRODUCTO);
+        if (cambiosDeProducto.length) {
+          const resumenCambios = cambiosDeProducto
+            .map((d) => `${d.campo}: "${d.viejo || "(vacío)"}" vs "${d.nuevo}"`)
+            .join(" · ");
+          const motivo =
+            `puede ser una corrección del pedido anterior o una compra nueva, y no se puede ` +
+            `distinguir: ${resumenCambios}. Los DOS quedan guardados; hay que decidir cuál vale.`;
+
+          orders[i] = {
+            ...orders[i],
+            pendiente_revision: true,
+            motivo_precio: [orders[i].motivo_precio, motivo].filter(Boolean).join(" · "),
+          };
+          const nuevoMarcado = {
+            ...record,
+            pendiente_revision: true,
+            motivo_precio: motivo,
+            posible_correccion_de: orders[i].id || orders[i].fecha,
+          };
+          orders.push(nuevoMarcado);
+          writeJSON(ORDERS_FILE, orders);
+          console.warn(
+            `🔀 DOS PEDIDOS QUE PUEDEN SER UNO (${record.nombre || "?"}): ${resumenCambios}. ` +
+              "NO se fusionaron y NINGUNO queda listo para despachar: lo resuelve una persona."
+          );
+          return nuevoMarcado;
+        }
+
+        // Llegados acá, lo que se vende es lo mismo: solo cambian datos de entrega.
         const correcciones = [];
         const traidos = {};
-        for (const campo of CAMPOS_VIGENTES) {
-          const nuevo = String(record[campo] == null ? "" : record[campo]).trim();
-          const viejo = String(orders[i][campo] == null ? "" : orders[i][campo]).trim();
-          if (!nuevo) continue; // vacío no corrige nada
-          if (nuevo.toLowerCase() === viejo.toLowerCase()) continue;
-          traidos[campo] = record[campo];
-          correcciones.push(`${campo}: "${viejo || "(vacío)"}" → "${nuevo}"`);
+        for (const d of diferenciasEntre(orders[i], record, CAMPOS_DE_ENTREGA)) {
+          traidos[d.campo] = record[d.campo];
+          correcciones.push(`${d.campo}: "${d.viejo || "(vacío)"}" → "${d.nuevo}"`);
         }
-        // El total también puede haber cambiado, y no es un campo comercial más:
-        // es lo que se le cobra.
+        const cambioElTotal = false; // el total es campo de producto: si cambió, no se llega acá
         const totalNuevo = Number(record.total);
-        const totalViejo = Number(orders[i].total);
-        const cambioElTotal = Number.isFinite(totalNuevo) && totalNuevo > 0 && totalNuevo !== totalViejo;
-        if (cambioElTotal) {
-          traidos.total = totalNuevo;
-          correcciones.push(`total: "${totalViejo}" → "${totalNuevo}"`);
-        }
 
         // ==================================================================
         // 🔒 RECONCILIAR LAS VALIDACIONES CON LOS DATOS FINALES

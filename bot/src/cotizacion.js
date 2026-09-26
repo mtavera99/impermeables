@@ -560,6 +560,7 @@ function calcular(ciudad, texto, opciones = {}) {
       nota: destino.nota || null,
       politica: POLITICA_VERSION,
       creado: Date.now(),
+      id: `${POLITICA_VERSION}|${fletes.normalizar(String(destino.ciudad || ""))}|1|${total}`,
     };
   }
 
@@ -599,6 +600,7 @@ function calcular(ciudad, texto, opciones = {}) {
     rescate: uds === 2 ? q.rescate || null : q.total - TOPE_DESCUENTO_1_UNIDAD,
     politica: POLITICA_VERSION,
     creado: Date.now(),
+    id: `${POLITICA_VERSION}|${fletes.normalizar(String(destino.ciudad || ""))}|${uds}|${q.total}`,
   };
 }
 
@@ -608,6 +610,23 @@ function calcular(ciudad, texto, opciones = {}) {
 // Se genera en CÓDIGO. El modelo no calcula: recibe los números ya resueltos y
 // su trabajo es la explicación comercial.
 // ---------------------------------------------------------------------------
+// ============================================================================
+// 🏷️ EL IDENTIFICADOR DE LA OFERTA
+//
+// Identifica QUÉ se le ofreció al cliente: destino, cantidad y total, bajo qué
+// versión de la política. Se estampa en el pedido, así que después se puede saber
+// si un pedido que llega es la confirmación de ESA oferta o de otra.
+//
+// 🔑 Sin esto, "el pedido pendiente de este cliente" era la única pista, y eso no
+// distingue una corrección de una compra nueva: dos pedidos del mismo cliente por
+// el mismo total pueden ser lo mismo o pueden ser dos ventas.
+// ============================================================================
+function idDeOferta(cot) {
+  if (!cot || !cot.ok) return "";
+  const ciudad = fletes.normalizar(String(cot.ciudad || ""));
+  return `${cot.politica}|${ciudad}|${cot.uds}|${cot.total}`;
+}
+
 const fmt = fletes.fmt;
 
 /** La línea de precio, escrita por el código. Es la que debería salir tal cual. */
@@ -1135,12 +1154,25 @@ function validarRespuesta(texto, cot, contexto = {}) {
 // coincida no significa que el pedido sea el mismo pedido.
 // ============================================================================
 
+// El modelo a veces mete la cantidad dentro del campo de la talla:
+// "2 unidades en talla XL". El guion ahora lo prohíbe, pero leerlo igual cuesta
+// tres líneas y evita rechazar un combo que está bien.
+const RE_CANTIDAD_EN_TALLA =
+  /\b(\d{1,2}|dos|tres)\s*(?:unidades?|conjuntos?|trajes?|kits?|piezas de conjunto)\b/i;
+const PALABRA_A_NUMERO = { dos: 2, tres: 3 };
+
 /** Las tallas que nombra el pedido. "L y M" son dos; "L" es una. */
 function tallasDelPedido(order) {
-  const crudo = String((order && order.talla) || "").trim();
+  let crudo = String((order && order.talla) || "").trim();
   if (!crudo) return [];
+  // Se le quita la cantidad y las palabras de relleno ("en talla") antes de leer
+  // las tallas, para que "2 unidades en talla XL" deje "XL" y no basura.
+  crudo = crudo
+    .replace(RE_CANTIDAD_EN_TALLA, " ")
+    .replace(/\b(?:en|de|talla|tallas|cada una|c\/u)\b/gi, " ")
+    .trim();
   return crudo
-    .split(/\s*(?:,|\/|\+|\by\b|\be\b)\s*/i)
+    .split(/\s+|\s*(?:,|\/|\+|\by\b|\be\b)\s*/i)
     .map((s) => s.trim())
     .filter((s) => /^(xs|s|m|l|xl|2xl|3xl|xxl|xxxl|\d{1,2})$/i.test(s));
 }
@@ -1158,6 +1190,15 @@ function unidadesDelPedido(order) {
   if (Number.isFinite(explicito) && explicito > 0) {
     return { uds: explicito, origen: "el campo unidades del pedido" };
   }
+  // "2 unidades en talla XL" — cantidad escrita dentro del campo de la talla.
+  // ⚠️ Se lee ANTES de contar tallas: si no, "XL" cuenta como una sola y un combo
+  // perfectamente válido se rechazaba por cantidad.
+  const enTalla = String((order && order.talla) || "").match(RE_CANTIDAD_EN_TALLA);
+  if (enTalla) {
+    const n = PALABRA_A_NUMERO[enTalla[1].toLowerCase()] || Number(enTalla[1]);
+    if (Number.isFinite(n) && n > 0) return { uds: n, origen: "la cantidad escrita en el campo de la talla" };
+  }
+
   const tallas = tallasDelPedido(order);
   if (tallas.length > 1) return { uds: tallas.length, origen: `las ${tallas.length} tallas del pedido` };
 
@@ -1167,7 +1208,12 @@ function unidadesDelPedido(order) {
   const t = String((order && order.producto) || "").toLowerCase();
   if (/\b3\b|tres/.test(t)) return { uds: 3, origen: "el texto del producto" };
   if (/\b2\b|\bdos\b|x2|2x|promo 2|combo/.test(t)) return { uds: 2, origen: "el texto del producto" };
-  return { uds: 1, origen: "no lo dice, así que se asume una" };
+
+  // ⛔ NO se deduce del precio. Un total alto sugiere dos conjuntos, pero
+  // sugerir no es saber: si la cantidad falta, se dice que falta y el pedido se
+  // revisa. Inventarla desde el precio es justo lo que hace que un error de
+  // total se convierta en un error de empaque sin que nadie lo note.
+  return { uds: 1, origen: "no lo dice", incierta: true };
 }
 
 /**
@@ -1315,6 +1361,7 @@ module.exports = {
   lineaDePrecio,
   bloqueDeDatos,
   ciudadesEn,
+  idDeOferta,
   extraerImportes,
   importesAutorizados,
   rolesEnTexto,

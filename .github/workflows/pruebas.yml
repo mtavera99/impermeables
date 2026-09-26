@@ -1,0 +1,130 @@
+name: Pruebas del bot
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CORRE TODAS LAS BATERÍAS CON LAS DEPENDENCIAS INSTALADAS.
+#
+# POR QUÉ EXISTE (26-sep): el entorno donde trabaja Kiro NO tiene salida al
+# registro de npm — `npm ping` devuelve 403 Forbidden. Así que 5 de las 36
+# baterías NO ARRANCAN ahí: fallan en el `require` de `dotenv` o `pdf-lib`, antes
+# de la primera aserción.
+#
+#   test-botones-y-plantillas.js    dotenv
+#   test-clientes-con-username.js   pdf-lib
+#   test-guias.js                   pdf-lib
+#   test-panel-movil.js             pdf-lib
+#   test-token-del-panel.js         pdf-lib
+#
+# 🔴 Y NO SON AJENAS A LO QUE SE TOCA: cuatro de las cinco cargan `server.js`,
+# `agent.js`, `store.js` o `panel.js`. Decir que "no tocan los módulos que
+# cambiamos" era falso, y por eso hace falta ejecutarlas de verdad antes de
+# aprobar un despliegue.
+#
+# 🔑 Los runners de GitHub SÍ tienen internet. Es el mismo truco que ya usan
+# `cierre-diario.yml` y `mirar-el-panel.yml`: lo que no se puede hacer en el
+# sandbox se hace acá y se lee en el log.
+#
+# 🔒 No necesita ningún secreto: las baterías no llaman a la API de Meta ni a la
+# IA. Las que usan datos escriben en carpetas temporales del runner.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "bot/**"
+      - ".github/workflows/pruebas.yml"
+  pull_request:
+    paths:
+      - "bot/**"
+  workflow_dispatch:
+
+jobs:
+  baterias:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: bot
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar dependencias
+        # `npm install` y no `npm ci`: el repo no tiene package-lock.json.
+        run: npm install --no-audit --no-fund
+
+      - name: Confirmar que las librerías que faltaban en el sandbox están acá
+        run: |
+          for m in dotenv express pdf-lib pdfjs-dist; do
+            if node -e "require.resolve('$m')" 2>/dev/null; then
+              echo "✅ $m"
+            else
+              echo "🔴 FALTA $m"; exit 1
+            fi
+          done
+
+      - name: Correr TODAS las baterías
+        env:
+          TZ: America/Bogota
+        run: |
+          # ⚠️ NODE_OPTIONS se limpia a propósito: si viene con algo heredado, las
+          # 36 baterías fallan todas en falso y parece un desastre del código.
+          unset NODE_OPTIONS
+
+          pasan=0; fallan=0; aserciones=0
+          fallidas=""
+
+          printf "%-40s %-8s %s\n" "BATERIA" "ESTADO" "ASERCIONES"
+          printf "%-40s %-8s %s\n" "----------------------------------------" "--------" "----------"
+
+          for f in test-*.js; do
+            salida="$(node "$f" 2>&1)"; codigo=$?
+            a="$(printf '%s' "$salida" | grep -oE '[0-9]+/[0-9]+ correctos' | tail -1)"
+            n="$(printf '%s' "$a" | cut -d/ -f1)"
+            [ -n "$n" ] && aserciones=$((aserciones + n))
+
+            if [ "$codigo" -eq 0 ]; then
+              printf "%-40s %-8s %s\n" "$f" "✅ pasa" "${a:-—}"
+              pasan=$((pasan + 1))
+            else
+              printf "%-40s %-8s %s\n" "$f" "🔴 FALLA" "${a:-no arrancó}"
+              fallan=$((fallan + 1))
+              fallidas="$fallidas $f"
+              echo "···················· salida de $f ····················"
+              printf '%s\n' "$salida" | tail -40
+              echo "······················································"
+            fi
+          done
+
+          echo
+          echo "═══════════════════════════════════════════════════════════"
+          echo "  $pasan baterías pasan · $fallan fallan · $aserciones aserciones"
+          echo "═══════════════════════════════════════════════════════════"
+
+          if [ "$fallan" -ne 0 ]; then
+            echo "🔴 Fallaron:$fallidas"
+            exit 1
+          fi
+          echo "🟢 Todas las baterías pasan, con las dependencias instaladas."
+
+      - name: Las 5 que no arrancan en el sandbox, una por una
+        # Se listan aparte para que el resultado quede explícito en el log: son
+        # justamente las que no se pueden comprobar en el entorno de trabajo.
+        if: always()
+        env:
+          TZ: America/Bogota
+        run: |
+          unset NODE_OPTIONS
+          for f in test-botones-y-plantillas.js test-clientes-con-username.js \
+                   test-guias.js test-panel-movil.js test-token-del-panel.js; do
+            printf "%-34s " "$f"
+            if node "$f" >/tmp/o 2>&1; then
+              grep -oE '[0-9]+/[0-9]+ correctos' /tmp/o | tail -1 || echo "pasa"
+            else
+              echo "🔴 FALLA"; tail -25 /tmp/o
+            fi
+          done

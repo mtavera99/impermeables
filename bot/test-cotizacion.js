@@ -560,5 +560,114 @@ console.log("\n── R6. 🔴 El pedido tiene que cuadrar en CANTIDAD, no solo 
   chequear("y sigue contando bien las de verdad", resumen.unidadesDe({ talla: "L y M", total: 148000 }) === 2);
 }
 
+console.log("\n── R7. 🔢 LA CANTIDAD EXPLÍCITA, DE PUNTA A PUNTA ──");
+// Textual de la 3ª revisión: "Un combo válido con talla «2 unidades en talla XL»
+// […] se interpreta como una unidad y falla verificarPedido(). El esquema ##ORDER##
+// de prompt.js todavía no incluye unidades."
+{
+  const dos = c.calcular("Cali", "dos conjuntos");
+  const una = c.calcular("Cali", "uno");
+  const ped = (talla, extra = {}) => ({
+    nombre: "Ana", celular: "3001234567", ciudad: "Cali", direccion: "Cra 1",
+    color: "rojo", pago: "contraentrega", talla, ...extra,
+  });
+
+  // ── 1. El esquema ──────────────────────────────────────────────────────
+  const guion = require("./src/prompt").buildSystemPrompt();
+  chequear("🔑 el esquema ##ORDER## ya incluye unidades", /"unidades":1/.test(guion), "sin esto el modelo nunca lo emite");
+  chequear("y el guion dice que es obligatorio", /"unidades" ES OBLIGATORIO/.test(guion.replace(/\s+/g, " ")));
+  chequear(
+    "y prohíbe meter la cantidad en la talla",
+    /NUNCA metas la cantidad dentro de "talla"/.test(guion.replace(/\s+/g, " "))
+  );
+
+  // ── 2. El caso reportado ───────────────────────────────────────────────
+  chequear(
+    "🔑 «2 unidades en talla XL» son DOS unidades",
+    c.unidadesDelPedido(ped("2 unidades en talla XL")).uds === 2,
+    JSON.stringify(c.unidadesDelPedido(ped("2 unidades en talla XL")))
+  );
+  chequear(
+    "   y la talla que queda es XL",
+    JSON.stringify(c.tallasDelPedido(ped("2 unidades en talla XL"))) === '["XL"]',
+    JSON.stringify(c.tallasDelPedido(ped("2 unidades en talla XL")))
+  );
+  chequear(
+    "   así que el combo válido PASA la verificación",
+    c.verificarPedido(ped("2 unidades en talla XL", { total: 148000 }), dos, {}).ok,
+    JSON.stringify(c.verificarPedido(ped("2 unidades en talla XL", { total: 148000 }), dos, {}).problemas)
+  );
+
+  // ── 3. Los tres casos que pidió la revisión ────────────────────────────
+  chequear(
+    "dos conjuntos de la MISMA talla",
+    c.verificarPedido(ped("XL", { total: 148000, unidades: 2 }), dos, {}).ok,
+    JSON.stringify(c.verificarPedido(ped("XL", { total: 148000, unidades: 2 }), dos, {}).problemas)
+  );
+  chequear(
+    "dos conjuntos con tallas DISTINTAS",
+    c.verificarPedido(ped("L y M", { total: 148000, unidades: 2 }), dos, {}).ok,
+    JSON.stringify(c.verificarPedido(ped("L y M", { total: 148000, unidades: 2 }), dos, {}).problemas)
+  );
+  for (const t of ["2XL", "3XL"]) {
+    chequear(
+      `una unidad en talla ${t} sigue siendo UNA`,
+      c.unidadesDelPedido(ped(t)).uds === 1 && c.verificarPedido(ped(t, { total: 82000, unidades: 1 }), una, {}).ok,
+      JSON.stringify(c.unidadesDelPedido(ped(t)))
+    );
+  }
+
+  // ── 4. Compatibilidad con registros anteriores ─────────────────────────
+  // Los pedidos guardados antes de este cambio NO tienen el campo. No pueden
+  // empezar a fallar por eso.
+  chequear(
+    "un registro viejo sin `unidades` se sigue leyendo",
+    c.unidadesDelPedido({ talla: "L" }).uds === 1 && c.unidadesDelPedido({ talla: "L y M" }).uds === 2
+  );
+  chequear(
+    "y queda marcado como incierto cuando no se sabe",
+    c.unidadesDelPedido({ talla: "L" }).incierta === true,
+    "hay que poder distinguir «dice que es una» de «no dice nada»"
+  );
+
+  // ── 5. ⛔ La cantidad NO se deduce del precio ───────────────────────────
+  const resumen = require("./src/resumen");
+  chequear(
+    "🔑 cotizacion NO deduce la cantidad del total",
+    c.unidadesDelPedido({ talla: "L", total: 148000 }).uds === 1,
+    "un total alto sugiere dos, pero sugerir no es saber: si falta, se revisa"
+  );
+  chequear(
+    "y un pedido así se marca, no se aprueba",
+    !c.verificarPedido(ped("L", { total: 148000 }), dos, {}).ok
+  );
+  chequear(
+    "resumen: la cantidad declarada manda",
+    resumen.cantidadDe({ unidades: 2, talla: "L", total: 148000 }).cierta === true &&
+      resumen.cantidadDe({ unidades: 1, talla: "L", total: 148000 }).uds === 1,
+    JSON.stringify(resumen.cantidadDe({ unidades: 1, talla: "L", total: 148000 }))
+  );
+  chequear(
+    "resumen: en un registro viejo la deducción por precio queda marcada INCIERTA",
+    resumen.cantidadDe({ talla: "L", total: 148000 }).cierta === false,
+    JSON.stringify(resumen.cantidadDe({ talla: "L", total: 148000 }))
+  );
+  chequear(
+    "y el motivo lo dice",
+    /registro anterior/.test(resumen.cantidadDe({ talla: "L", total: 148000 }).origen)
+  );
+
+  // ── 6. El rescate de un bloque cortado también lee la cantidad ─────────
+  const { extractOrder } = require("./src/agent");
+  const cortado = '##ORDER## {"nombre":"Ana","celular":"3001234567","ciudad":"Cali","direccion":"Cra 1","color":"rojo","talla":"L","unidades":2,"pago":"contraentrega","total":148000';
+  const r = extractOrder(cortado);
+  chequear(
+    "🔑 un bloque CORTADO no pierde la cantidad",
+    r.order && Number(r.order.unidades) === 2,
+    JSON.stringify(r.order)
+  );
+  chequear("y se marca como rescatado", r.rescatado === true);
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);
