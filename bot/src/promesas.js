@@ -94,14 +94,25 @@ const REGLAS = [
     // hecho algo que nadie comprobó. Si esa oficina no existe o no recibe envíos,
     // el paquete se devuelve y el flete de ida y vuelta lo paga el negocio.
     clave: "oficina_asegurada",
+    // ⚠️ SE ESTRECHÓ. La primera versión marcaba cualquier "te lo enviamos a
+    // oficina", y eso es el FLUJO NORMAL: se registra ciudad + entrega en oficina
+    // de Interrapidísimo. Lo que NO se puede prometer es una SEDE concreta, porque
+    // la oficina de recogida la asigna la transportadora.
+    //
+    //   ✅ "te lo enviamos a oficina de Interrapidísimo"      → válido
+    //   🔴 "te lo enviamos a la oficina de Terranova"          → promete una sede
+    //   🔴 "a la oficina de Interrapidísimo en Terranova"      → promete una sede
+    // ⚠️ Solo la sede nombrada DIRECTAMENTE. El caso "oficina de Interrapidísimo en
+    // <lugar>" se revisa aparte, porque ahí hay que saber si <lugar> es la CIUDAD
+    // —que es correcto y es lo normal— o una sede —que no se puede prometer—.
     patron:
-      /\b(te lo (enviamos|mandamos|despachamos|dejamos)|lo (enviamos|mandamos) )[^.]{0,30}\b(a la |en la )?oficina\b|\bla oficina de \w+ en \w+|\boficina de (interrapidisimo|servientrega|coordinadora|envia|tcc|99 ?envios)\b/,
+      /\b(?:la |su )?oficina de (?!interrapidisimo|inter ?rapidisimo|servientrega|coordinadora|envia|tcc|deprisa|99 ?envios|la transportadora|transportadora|recogida)\w{4,}/,
     porQue:
-      "confirma una oficina concreta de la transportadora como si estuviera verificada. El bot no " +
-      "consulta la red de oficinas: no sabe si esa existe ni si recibe envíos.",
+      "promete una SEDE concreta de la transportadora. La oficina de recogida la asigna " +
+      "Interrapidísimo: nosotros registramos la ciudad y la entrega en oficina, no la sede.",
     queHacerEnLugar:
-      "decir que sí se puede enviar a oficina y que se confirma con la transportadora cuál le queda " +
-      "más cerca, sin nombrarla como un hecho.",
+      "confirmar que se entrega en oficina de Interrapidísimo en su ciudad, y aclarar que la sede la " +
+      "asigna la transportadora.",
   },
   {
     // La otra mitad del mismo caso: *"Ellos te enviarán un mensaje de texto al
@@ -158,6 +169,21 @@ function revisar(texto, contexto = {}) {
   // se puede detectar solo: hace falta mirar qué preguntó el cliente. Pero sí se
   // puede detectar que la respuesta AFIRME una ciudad que no es la de la bodega.
   // ========================================================================
+  // 🏢 Sede prometida dentro de "oficina de <transportadora> en <lugar>".
+  const sedePrometida = sedePrometidaEn(t, contexto.ciudad);
+  if (sedePrometida) {
+    hallazgos.push({
+      clave: "oficina_asegurada",
+      porQue:
+        `promete la sede de ${sedePrometida} como si estuviera asignada. La oficina de recogida la ` +
+        "asigna Interrapidísimo: nosotros registramos la ciudad y la entrega en oficina.",
+      queHacerEnLugar:
+        "confirmar la entrega en oficina de Interrapidísimo en su ciudad y usar lo que dijo como " +
+        "referencia de zona, sin prometer la sede.",
+      fragmento: sedePrometida,
+    });
+  }
+
   const bodega = aplanar(contexto.ciudadBodega || CIUDAD_BODEGA);
   const afirmaCiudad = t.match(
     /\b(estamos|quedamos|nuestra bodega esta|la bodega esta|somos) (en|de) ([a-z ]{3,22})\b/
@@ -211,8 +237,12 @@ const REEMPLAZOS = {
   ajuste_de_talla:
     "Te recomiendo pedir una talla más de la que usás normalmente, porque va encima de la ropa",
   escasez_inventada: "Hay disponibilidad, así que podés pedirlo con calma",
+  // 🔑 Tono tranquilo y corto, sin advertencias. Es el ejemplo que dio el dueño:
+  // se confirma la entrega en oficina, se usa lo que el cliente dijo como
+  // REFERENCIA de su zona, y se promete lo único que sí controlamos — avisarle la
+  // oficina asignada cuando esté la guía.
   oficina_asegurada:
-    "Sí podemos enviarlo a oficina; déjame confirmar con la transportadora cuál es la que te queda más cerca",
+    "Te lo enviamos para recoger en oficina de Interrapidísimo en tu ciudad. Cuando tengamos la guía, te compartimos la oficina asignada",
   promesa_de_la_transportadora:
     "En cuanto tengamos el número de guía te lo paso por acá para que le hagas seguimiento",
   ubicacion_equivocada: "Nuestra bodega está en Bogotá",
@@ -235,6 +265,32 @@ const REEMPLAZOS = {
 // cliente lee un total roto, y el módulo que existe para no decirle cosas falsas
 // termina diciéndole un número que no existe.
 // ============================================================================
+
+// ============================================================================
+// 🏢 "OFICINA DE INTERRAPIDÍSIMO EN <LUGAR>": ¿es la ciudad o una sede?
+//
+// Decirle al cliente "oficina de Interrapidísimo en Jamundí" es CORRECTO: es el
+// flujo normal, ciudad + entrega en oficina. Decirle "en Terranova" es prometer una
+// sede, y la sede la asigna la transportadora.
+//
+// La diferencia solo se puede saber con la ciudad del pedido a la vista, así que
+// esto se revisa aparte del patrón y necesita el contexto.
+// ============================================================================
+const RE_OFICINA_EN_LUGAR =
+  /oficina de (?:interrapidisimo|inter ?rapidisimo|servientrega|coordinadora|envia|tcc|deprisa|99 ?envios)\s+(?:en|de)\s+([a-z][a-z ]{3,24})/;
+
+function sedePrometidaEn(plano, ciudad) {
+  const m = plano.match(RE_OFICINA_EN_LUGAR);
+  if (!m) return "";
+  const lugar = aplanar(m[1]).split(/\s+/)[0];
+  const ciu = aplanar(ciudad || "").split(/\s+/)[0];
+  if (!lugar || lugar.length < 4) return "";
+  // Si nombra la ciudad, está bien: es el destino, no una sede.
+  if (ciu && (lugar === ciu || ciu.includes(lugar) || lugar.includes(ciu))) return "";
+  // "tu ciudad", "su ciudad" tampoco es una sede.
+  if (/^(tu|su|la|el|mi)$/.test(lugar) || lugar === "ciudad") return "";
+  return m[1].trim();
+}
 
 const ES_CIERRE = (ch) => ch === "." || ch === "!" || ch === "?" || ch === "\n";
 
@@ -293,6 +349,32 @@ const RE_CLAUSULA =
  *
  * @returns {{texto:string, cambios:Array<{clave,antes,despues}>, ok:boolean}}
  */
+/**
+ * La frase de entrega en oficina, con la ciudad y la referencia del cliente.
+ *
+ * "Te lo enviamos para recoger en oficina de Interrapidísimo en Jamundí, tomando
+ *  Terranova como referencia de tu zona. Cuando tengamos la guía, te compartimos
+ *  la oficina asignada."
+ */
+// La referencia se extrae del texto ya normalizado (en minúsculas), así que se le
+// devuelve la mayúscula: es un nombre propio y el cliente lo va a leer.
+const conMayuscula = (s) =>
+  String(s || "")
+    .trim()
+    .split(/\s+/)
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+
+function fraseDeOficina(ciudad, referencia) {
+  const donde = conMayuscula(ciudad);
+  const ref = conMayuscula(referencia);
+  return (
+    `Te lo enviamos para recoger en oficina de Interrapidísimo${donde ? ` en ${donde}` : " en tu ciudad"}` +
+    (ref ? `, tomando ${ref} como referencia de tu zona` : "") +
+    `. Cuando tengamos la guía, te compartimos la oficina asignada`
+  );
+}
+
 function corregir(texto, contexto = {}) {
   const original = String(texto == null ? "" : texto);
   const frases = enFrases(original);
@@ -304,8 +386,30 @@ function corregir(texto, contexto = {}) {
     const plano = aplanar(pedazo);
     if (!plano) return null;
     for (const r of REGLAS) {
-      if (r.patron.test(plano) && REEMPLAZOS[r.clave]) return { clave: r.clave, reemplazo: REEMPLAZOS[r.clave] };
+      if (r.patron.test(plano) && REEMPLAZOS[r.clave]) {
+        if (r.clave === "oficina_asegurada") {
+          // El nombre de la sede que nombró se conserva como referencia de zona.
+          const m = plano.match(/oficina de ([a-z][a-z ]{3,24})/);
+          const nombrada = m ? m[1].trim() : "";
+          return {
+            clave: r.clave,
+            reemplazo: fraseDeOficina(contexto.ciudad, contexto.referencia || nombrada),
+          };
+        }
+        return { clave: r.clave, reemplazo: REEMPLAZOS[r.clave] };
+      }
     }
+    // 🔑 La referencia sale de la sede que el bot IBA a prometer. El cliente puede
+    // haberla nombrado sin decir "oficina" ("mándalo a Terranova, me queda cerca"),
+    // así que buscarla solo en su mensaje la perdía.
+    const sedeEnLaFrase = sedePrometidaEn(plano, contexto.ciudad);
+    if (sedeEnLaFrase) {
+      return {
+        clave: "oficina_asegurada",
+        reemplazo: fraseDeOficina(contexto.ciudad, contexto.referencia || sedeEnLaFrase),
+      };
+    }
+
     const afirma = plano.match(
       /\b(estamos|quedamos|nuestra bodega esta|la bodega esta|somos) (en|de) ([a-z ]{3,22})\b/
     );
@@ -398,4 +502,4 @@ function resumir(resultado) {
   return resultado.hallazgos.map((h) => `${h.clave} ("${h.fragmento}")`).join(" · ");
 }
 
-module.exports = { revisar, corregir, resumir, enFrases, importesDe, REGLAS, REEMPLAZOS, CIUDAD_BODEGA };
+module.exports = { revisar, corregir, resumir, enFrases, importesDe, fraseDeOficina, sedePrometidaEn, REGLAS, REEMPLAZOS, CIUDAD_BODEGA };

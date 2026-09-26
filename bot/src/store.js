@@ -518,25 +518,33 @@ const MOTIVOS_REVISION = [
     detalle: () => "",
   },
   {
-    // ============================================================================
-    // 🏢 UNA OFICINA NO VERIFICADA NO SE DESPACHA HASTA QUE ALGUIEN LA CONFIRME
+    // ========================================================================
+    // 🏢 SOLO SE FRENA SI EL CLIENTE EXIGE UNA SEDE CONCRETA
     //
-    // DEL CASO DEL 26-SEP: el cliente pidió recibirlo en "la oficina de Terranova",
-    // el bot la dio por buena, y el pedido terminaba contando como listo. Se
-    // verificó que NO hay ningún registro de oficinas en el sistema: no tenemos con
-    // qué saber si esa oficina existe ni si recibe envíos.
+    // 🔴 ESTO REEMPLAZA UN BLOQUEO MÍO QUE ESTABA MAL. Después del caso del
+    // 26-sep marqué TODOS los pedidos a oficina como "sin verificar" y los saqué
+    // del despacho. El dueño lo corrigió con cómo funciona la operación:
     //
-    // 🔑 Y no alcanza con avisar: el aviso se lee una vez y el pedido sigue ahí. La
-    // revisión tiene que RESOLVERSE explícitamente — alguien confirma la oficina y
-    // se marca `oficina_verificada` — y hasta entonces no está listo. Si se
-    // despacha a una oficina que no recibe, el flete de ida y vuelta lo paga el
-    // negocio.
-    // ============================================================================
-    clave: "oficina_sin_verificar",
-    cuando: (o) => o.entrega === "oficina" && o.oficina_verificada !== true,
-    etiqueta: "la oficina de la transportadora no está confirmada",
+    //   "Registramos la ciudad y entrega en oficina de Interrapidísimo. La
+    //    transportadora asigna la oficina de recogida; nosotros no seleccionamos
+    //    ni garantizamos una sede específica."
+    //
+    // O sea que pedía verificar algo que no elegimos nosotros, y frenaba pedidos
+    // que estaban perfectos —incluidos los ya guardados—. Retirado.
+    //
+    // 🔑 Lo que sí hay que frenar es distinto: cuando el cliente EXIGE una sede.
+    // Ahí su preferencia se conserva tal cual (no se le cambia en silencio) y se
+    // pide aclaración, porque esa sede no se la podemos prometer.
+    //
+    // ⚠️ Depende de un campo que solo se pone al detectarlo, así que los pedidos
+    // anteriores NO quedan bloqueados por esta regla.
+    // ========================================================================
+    clave: "sede_especifica_pedida",
+    cuando: (o) => Boolean(o.sede_pedida) && o.sede_resuelta !== true,
+    etiqueta: "el cliente pidió una sede concreta y la oficina la asigna la transportadora",
     detalle: (o) =>
-      `${o.direccion || "sin dirección"} — confirmá con la transportadora que esa oficina recibe envíos`,
+      `pidió "${o.sede_pedida}" — no se la podemos garantizar: hay que aclararle que se entrega en ` +
+      `la oficina que asigne Interrapidísimo en ${o.ciudad || "su ciudad"}`,
   },
   {
     clave: "posible_duplicado",

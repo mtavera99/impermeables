@@ -2,7 +2,7 @@
 // (detecta pedidos confirmados y solicitudes de pasar a un humano).
 const { buildSystemPrompt } = require("./prompt");
 const { respuestaDeArranque } = require("./primer-mensaje");
-const { revisarDireccionDePedido } = require("./direccion");
+const { revisarDireccionDePedido, sedeEspecificaEn, exigeSedeUnica } = require("./direccion");
 const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
 const cotizacion = require("./cotizacion");
@@ -592,9 +592,15 @@ async function generateReply(phone, userText) {
   // 🔧 Se CORRIGE antes de enviar, frase por frase. La revisión del 26-sep señaló
   // —con razón— que mandar el mensaje falso y pausar después no protege a nadie:
   // el cliente ya lo leyó y actúa sobre eso. Ver promesas.js.
-  const chequeoPromesas = promesas.revisar(reply);
+  // La ciudad y la referencia del cliente hacen falta para distinguir "oficina de
+  // Interrapidísimo en Jamundí" (correcto) de prometer una sede concreta.
+  const ctxPromesas = {
+    ciudad: cot.ok ? cot.ciudad : "",
+    referencia: sedeEspecificaEn(userText, cot.ok ? cot.ciudad : ""),
+  };
+  const chequeoPromesas = promesas.revisar(reply, ctxPromesas);
   if (!chequeoPromesas.ok) {
-    const corregido = promesas.corregir(reply);
+    const corregido = promesas.corregir(reply, ctxPromesas);
     if (corregido.cambios.length) {
       console.warn(
         `🔧 PROMESA SIN RESPALDO de ${phone}: ` +
@@ -634,7 +640,7 @@ async function generateReply(phone, userText) {
   {
     const visible = extractMedia(extractOrder(reply).clean).clean;
     const precioFinal = cotizacion.validarRespuesta(visible, cot, contextoPrecio);
-    const promesaFinal = promesas.revisar(visible);
+    const promesaFinal = promesas.revisar(visible, ctxPromesas);
     if (!precioFinal.ok || !promesaFinal.ok) {
       const porQue = [
         !precioFinal.ok ? `precio: ${precioFinal.problemas.map((p) => p.detalle).join(" · ")}` : "",
@@ -692,6 +698,36 @@ async function generateReply(phone, userText) {
       // los pedía y el modelo no siempre obedecía.
       const conTelefono = revisarTelefono(order, phone);
       const conDireccion = revisarDireccionDePedido({ ...conTelefono, telefono_chat: phone });
+
+      // 🏢 ¿Pidió una SEDE concreta? Se conserva su preferencia tal como la dijo y
+      // se marca para aclarársela. La oficina la asigna la transportadora, así que
+      // prometerle una sede sería prometer algo que no controlamos — y cambiarle la
+      // preferencia en silencio sería peor. Ver direccion.js.
+      const sedeNombrada =
+        conDireccion.entrega === "oficina"
+          ? sedeEspecificaEn(conDireccion.direccion, conDireccion.ciudad)
+          : "";
+      if (sedeNombrada) {
+        // 🔑 Nombrar un punto NO frena el pedido: casi siempre es la REFERENCIA de
+        // la zona del cliente, y eso es un dato útil. Solo se pide aclaración si lo
+        // EXIGE de forma excluyente, porque esa sede no se la podemos prometer.
+        const loExige = ((conv.messages || []).some(
+          (m) => m && m.role === "user" && exigeSedeUnica(String(m.content || ""))
+        ));
+        if (loExige) {
+          conDireccion.sede_pedida = sedeNombrada;
+          console.warn(
+            `🏢 EXIGE UNA SEDE por ${phone}: "${sedeNombrada}". Se conserva su preferencia y se marca ` +
+              "para aclarar: la oficina de recogida la asigna la transportadora."
+          );
+        } else {
+          conDireccion.sede_referencia = sedeNombrada;
+          console.log(
+            `🏢 Referencia de zona de ${phone}: "${sedeNombrada}". El pedido sigue normal; se usa como ` +
+              "referencia, no como sede prometida."
+          );
+        }
+      }
 
       // ======================================================================
       // 🧾 ETAPA 6: EL PEDIDO NO PUEDE CONTRADECIR LA COTIZACIÓN

@@ -794,24 +794,110 @@ console.log("\n── R12. ✂️ Se conserva la parte útil en vez de escalar �
   chequear("✅ y no se parte un $82.000 al separar oraciones", /\$82\.000/.test(e.texto), e.texto);
 }
 
-console.log("\n── R13. 🏢 Una oficina sin confirmar no se despacha ──");
+console.log("\n── R13. 🏢 La oficina la asigna la transportadora ──");
+// ⚠️ ESTE BLOQUE CAMBIÓ Y EL CAMBIO ES UNA CORRECCIÓN A LO QUE YO HABÍA HECHO.
+// Después del caso del 26-sep marqué TODOS los pedidos a oficina como "sin
+// verificar" y los saqué del despacho. El dueño lo corrigió con la operación real:
+// se registra la ciudad y la entrega en oficina de Interrapidísimo, y la SEDE de
+// recogida la asigna la transportadora. Pedir que verificáramos la sede era pedir
+// verificar algo que no elegimos, y frenaba pedidos que estaban bien.
 {
   const store = require("./src/store");
+  const direccion = require("./src/direccion");
   const base = { nombre: "X", celular: "3001234567", ciudad: "Jamundi", talla: "L", total: 82000, unidades: 1 };
-  const aOficina = { ...base, entrega: "oficina", direccion: "OFICINA Interrapidísimo - Terranova" };
-  chequear("🔑 a oficina sin confirmar: NO despachable", store.listoParaDespachar(aOficina) === false);
+
+  // ── A. El flujo normal NO se bloquea ────────────────────────────────────
+  const normal = { ...base, entrega: "oficina", direccion: "OFICINA Interrapidísimo" };
+  chequear("🔑 A· pedido a oficina (flujo normal): despachable", store.listoParaDespachar(normal) === true, store.textoDeRevision(normal));
+  chequear("   sin ningún aviso", store.textoDeRevision(normal) === "", store.textoDeRevision(normal));
+
+  // ── B. 🔑 LOS PEDIDOS ANTERIORES no quedan bloqueados por la regla nueva ──
+  // Un pedido ya guardado no tiene los campos nuevos. Si la regla dependiera de la
+  // dirección, todos los pedidos a oficina del pasado quedarían frenados de golpe.
+  const anterior = { ...base, entrega: "oficina", direccion: "OFICINA Interrapidísimo - Terranova" };
   chequear(
-    "   y el aviso dice qué confirmar",
-    /oficina de la transportadora no está confirmada/.test(store.textoDeRevision(aOficina)),
-    store.textoDeRevision(aOficina)
+    "🔑 B· un pedido ANTERIOR a oficina sigue despachable",
+    store.listoParaDespachar(anterior) === true,
+    store.textoDeRevision(anterior)
   );
-  chequear("   con la dirección adentro", /Terranova/.test(store.textoDeRevision(aOficina)));
+  chequear("   incluso nombrando una sede en la dirección", store.textoDeRevision(anterior) === "", store.textoDeRevision(anterior));
+
+  // ── C. El que EXIGE una sede sí se frena, y su preferencia se conserva ───
+  const conSede = { ...anterior, sede_pedida: "Terranova" };
+  chequear("🔑 C· si pidió una sede concreta: NO despachable", store.listoParaDespachar(conSede) === false);
   chequear(
-    "🔑 solo al marcarla verificada queda despachable",
-    store.listoParaDespachar({ ...aOficina, oficina_verificada: true }) === true,
-    store.textoDeRevision({ ...aOficina, oficina_verificada: true })
+    "   el aviso dice que la asigna la transportadora",
+    /la oficina la asigna la transportadora/.test(store.textoDeRevision(conSede)),
+    store.textoDeRevision(conSede)
   );
-  chequear("✅ un pedido a casa no se ve afectado", store.listoParaDespachar({ ...base, direccion: "Cra 1 #2-3" }) === true);
+  chequear("   y conserva lo que el cliente pidió", /Terranova/.test(store.textoDeRevision(conSede)), store.textoDeRevision(conSede));
+  chequear(
+    "   🔑 sin cambiarle la dirección en silencio",
+    conSede.direccion === "OFICINA Interrapidísimo - Terranova",
+    conSede.direccion
+  );
+  chequear("   y al resolverlo queda despachable", store.listoParaDespachar({ ...conSede, sede_resuelta: true }) === true);
+
+  // ── D. El detector: qué es una sede y qué no ────────────────────────────
+  const SEDES = [
+    ["OFICINA Interrapidísimo - Terranova", "Jamundí", "Terranova"],
+    ["la oficina de Terranova", "Jamundí", "Terranova"],
+    ["OFICINA Interrapidísimo", "Jamundí", ""],
+    ["OFICINA Interrapidísimo Jamundí", "Jamundí", ""],
+    ["oficina principal de Jamundí", "Jamundí", ""],
+    ["OFICINA Servientrega", "Cali", ""],
+    ["Cra 1 #2-3 barrio Centro", "Cali", ""],
+  ];
+  for (const [dir, ciu, esp] of SEDES) {
+    chequear(
+      `D· ${esp ? `sede "${esp}"` : "sin sede"}: ${JSON.stringify(dir)}`,
+      direccion.sedeEspecificaEn(dir, ciu) === esp,
+      `dio ${JSON.stringify(direccion.sedeEspecificaEn(dir, ciu))}`
+    );
+  }
+  chequear(
+    "   🔑 nombrar la transportadora NO es pedir una sede",
+    direccion.sedeEspecificaEn("OFICINA Interrapidísimo", "Cali") === "",
+    "es con quién se manda, no dónde"
+  );
+
+  // ── E. Terranova es una referencia dentro de Jamundí, no una ciudad ──────
+  chequear(
+    "🔑 E· Jamundí sigue cotizando banda C, sin tocar el tarifario",
+    c.calcular("Jamundi", "uno").banda === "C" && c.calcular("Jamundi", "uno").total === 82000,
+    JSON.stringify({ banda: c.calcular("Jamundi", "uno").banda, total: c.calcular("Jamundi", "uno").total })
+  );
+  chequear(
+    "   y una dirección de oficina NO cambia la ciudad del pedido",
+    c.verificarPedido({ ...conSede, ciudad: "Jamundi" }, c.calcular("Jamundi", "uno"), {}).ok,
+    JSON.stringify(c.verificarPedido({ ...conSede, ciudad: "Jamundi" }, c.calcular("Jamundi", "uno"), {}).problemas)
+  );
+}
+
+console.log("\n── R14. 🏢 El bot no promete una sede, pero sí ofrece oficina ──");
+{
+  const promesas = require("./src/promesas");
+  for (const t of [
+    "Te lo enviamos a la oficina de Interrapidísimo en Terranova, Jamundí.",
+    "Te lo dejamos en la oficina de Terranova.",
+  ])
+    chequear(`🔑 promete una sede → se marca: "${t.slice(0, 44)}…"`, promesas.revisar(t).ok === false);
+  for (const t of [
+    "Te lo enviamos a oficina de Interrapidísimo y pagas al recibir 📦",
+    "Lo despachamos a oficina de Interrapidísimo en tu ciudad.",
+    "Se puede enviar a oficina de la transportadora si te queda mejor.",
+    "Podés recogerlo en nuestra bodega en Bogotá.",
+  ])
+    chequear(`✅ el flujo normal NO se marca: "${t.slice(0, 44)}…"`, promesas.revisar(t).ok === true, promesas.resumir(promesas.revisar(t)));
+
+  const corregido = promesas.corregir("Te lo enviamos a la oficina de Interrapidísimo en Terranova, Jamundí.");
+  // 🔑 Tono tranquilo, sin advertencias: se confirma la oficina y se promete lo
+  // único que sí controlamos, avisar la sede asignada cuando esté la guía.
+  chequear("el reemplazo es corto y tranquilo", /te compartimos la oficina asignada/.test(corregido.texto), corregido.texto);
+  chequear("   y no mete advertencias", !/no puedo|no podemos|lamentablemente/i.test(corregido.texto), corregido.texto);
+  const conRef = promesas.fraseDeOficina("Jamundí", "Terranova");
+  chequear("   y con la referencia del cliente sale como pidió el dueño", /oficina de Interrapidísimo en Jamundí, tomando Terranova como referencia de tu zona/.test(conRef), conRef);
+  chequear("y NO promete una sede", promesas.revisar(corregido.texto).ok === true, corregido.texto);
 }
 
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);

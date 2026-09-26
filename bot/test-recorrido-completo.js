@@ -788,26 +788,24 @@ const datosBase = {
       pedido && !pedido.precio_no_cuadra,
       String(pedido && pedido.motivo_precio)
     );
+    // 🔑 Y ACÁ ESTÁ LA CORRECCIÓN: el cliente nombró Terranova como REFERENCIA de su
+    // zona, no la exigió. Así que el pedido sigue normal — la transportadora asigna
+    // la oficina. Bloquearlo era convertir un dato útil en una traba.
     chequear(
-      "13· 🔑 pero la OFICINA sin confirmar SÍ lo bloquea",
-      pedido && store.listoParaDespachar(pedido) === false,
-      "una oficina que nadie verificó no puede contar como lista"
-    );
-    chequear(
-      "13· y el aviso dice qué hay que confirmar",
-      /oficina de la transportadora no está confirmada/.test(store.textoDeRevision(pedido)),
+      "13· 🔑 el pedido a oficina NO se bloquea",
+      pedido && store.listoParaDespachar(pedido) === true,
       store.textoDeRevision(pedido)
     );
-
-    // Y recién cuando alguien la confirma, queda listo.
-    const i = store.todosLosPedidos().findIndex((p) => p.id === pedido.id);
-    const todos = store.todosLosPedidos();
     chequear(
-      "13· 🔑 solo al marcarla verificada queda despachable",
-      store.listoParaDespachar({ ...pedido, oficina_verificada: true }) === true,
-      store.textoDeRevision({ ...pedido, oficina_verificada: true })
+      "13· y la referencia del cliente se conserva",
+      pedido && (pedido.sede_referencia === "Terranova" || /Terranova/.test(String(pedido.direccion))),
+      JSON.stringify({ ref: pedido && pedido.sede_referencia, dir: pedido && pedido.direccion })
     );
-    void i; void todos;
+    chequear(
+      "13· sin marcarla como sede pedida",
+      pedido && !pedido.sede_pedida,
+      `sede_pedida=${pedido && pedido.sede_pedida}`
+    );
   }
 
   // ==========================================================================
@@ -865,6 +863,93 @@ const datosBase = {
       "14· 🔑 pero NO se repite la misma línea dos turnos seguidos",
       p2.reply.trim() !== p1.reply.trim(),
       `las dos veces salió: ${p2.reply}`
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 15. 🏢 Los DOS recorridos de entrega en oficina ──");
+  // Operación real: se registra ciudad + entrega en oficina de Interrapidísimo, y la
+  // SEDE de recogida la asigna la transportadora.
+  //   · nombrarla como referencia  → el pedido sigue normal
+  //   · exigirla en exclusiva      → se conserva y se pide aclaración
+  // ==========================================================================
+
+  // ── 15a. La nombra como REFERENCIA → sigue normal ────────────────────────
+  {
+    const tel = "573006660015";
+    const datos = {
+      nombre: "Rosa Lara", celular: "3006660015", ciudad: "Jamundí",
+      direccion: "OFICINA Interrapidísimo - Terranova", color: "negro",
+      talla: "L", unidades: 1, pago: "contraentrega", total: 82000,
+    };
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel, "Jamundí", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Jamundí. Pásame nombre completo, dirección con barrio y celular");
+    const t = await turno(
+      tel,
+      "me lo manda a Terranova que me queda más cerca",
+      "¡Claro! Te lo enviamos a la oficina de Interrapidísimo en Terranova, Jamundí."
+    );
+    chequear(
+      "15a· 🔑 el mensaje NO promete la sede",
+      !/oficina de Interrapidísimo en Terranova/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "15a· y usa Terranova como REFERENCIA de su zona",
+      /referencia de tu zona/.test(t.reply) && /Terranova/.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "15a· prometiendo solo lo que sí controlamos",
+      /te compartimos la oficina asignada/.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear("15a· corto y sin advertencias", !/no puedo|no podemos|lamentablemente/i.test(t.reply), t.reply);
+
+    store.setPaused(tel, false);
+    await turno(tel, "Rosa Lara, 3006660015, talla L negra", CUADRO(82000).replace("Ana Gómez", "Rosa Lara").replace("3001234567", "3006660015").replace("Cali", "Jamundí"));
+    await turno(tel, "sí confirmo", `¡Listo Rosa! ${ORDER(datos)}`);
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear(
+      "15a· 🔑 el pedido a oficina queda DESPACHABLE",
+      pedido && store.listoParaDespachar(pedido) === true,
+      store.textoDeRevision(pedido)
+    );
+    chequear("15a· con la referencia guardada", pedido && pedido.sede_referencia === "Terranova", `${pedido && pedido.sede_referencia}`);
+    chequear("15a· y sin marca de sede pedida", pedido && !pedido.sede_pedida);
+  }
+
+  // ── 15b. La EXIGE en exclusiva → se conserva y se pide aclaración ─────────
+  {
+    const tel = "573006660016";
+    const datos = {
+      nombre: "Iván Soto", celular: "3006660016", ciudad: "Jamundí",
+      direccion: "OFICINA Interrapidísimo - Terranova", color: "negro",
+      talla: "L", unidades: 1, pago: "contraentrega", total: 82000,
+    };
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel, "Jamundí", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Jamundí. Pásame nombre completo, dirección con barrio y celular");
+    await turno(tel, "tiene que ser en la oficina de Terranova, si no es ahí no me sirve", "Entendido, lo registro así.");
+    store.setPaused(tel, false);
+    await turno(tel, "Iván Soto, 3006660016, talla L negra", CUADRO(82000).replace("Ana Gómez", "Iván Soto").replace("3001234567", "3006660016").replace("Cali", "Jamundí"));
+    await turno(tel, "sí confirmo", `¡Listo Iván! ${ORDER(datos)}`);
+
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("15b· 🔑 exigir la sede SÍ frena el despacho", pedido && store.listoParaDespachar(pedido) === false, store.textoDeRevision(pedido));
+    chequear("15b· y queda anotada como sede pedida", pedido && pedido.sede_pedida === "Terranova", `${pedido && pedido.sede_pedida}`);
+    chequear(
+      "15b· 🔑 sin cambiarle la dirección en silencio",
+      pedido && /Terranova/.test(String(pedido.direccion)),
+      `${pedido && pedido.direccion}`
+    );
+    chequear(
+      "15b· el aviso explica que la asigna la transportadora",
+      /la oficina la asigna la transportadora/.test(store.textoDeRevision(pedido)),
+      store.textoDeRevision(pedido)
+    );
+    chequear(
+      "15b· y al resolverlo queda despachable",
+      store.listoParaDespachar({ ...pedido, sede_resuelta: true }) === true
     );
   }
 

@@ -215,7 +215,119 @@ function avisoParaElDueno(order) {
   );
 }
 
+// ============================================================================
+// 🏢 «LA OFICINA QUE ASIGNE LA TRANSPORTADORA» vs «QUIERO ESTA SEDE»
+//
+// CÓMO FUNCIONA LA OPERACIÓN DE VERDAD (aclarado por el dueño el 26-sep):
+//
+//   "Registramos la ciudad y entrega en oficina de Interrapidísimo. La
+//    transportadora asigna la oficina de recogida; nosotros no seleccionamos ni
+//    garantizamos una sede específica."
+//
+// 🔴 POR ESO SE RETIRÓ UN BLOQUEO QUE YO HABÍA PUESTO. Después del caso del
+// 26-sep marqué TODOS los pedidos a oficina como "sin verificar" y los saqué del
+// despacho hasta que alguien los confirmara. Eso estaba mal por dos razones:
+//   · pedía verificar algo que no elegimos nosotros
+//   · y frenaba pedidos que estaban perfectos, incluidos los ya guardados
+//
+// Lo que sí hay que distinguir son dos situaciones distintas:
+//
+//   ✅ "mándalo a oficina de Interrapidísimo"  → es el flujo normal. Sigue.
+//   ⚠️ "mándalo a la oficina de Terranova"     → el cliente pide una SEDE. Eso no
+//      lo podemos prometer. Se conserva su preferencia y se pide aclaración; no se
+//      le cambia el pedido en silencio ni se le promete esa sede.
+//
+// 🔑 Y "Terranova" no es una ciudad ni una oficina verificada: es una referencia
+// dentro de Jamundí. El tarifario general no se toca por esto.
+// ============================================================================
+
+// Las transportadoras. Nombrarlas NO es pedir una sede: es decir con quién se manda.
+const RE_NOMBRE_TRANSPORTADORA =
+  /^(interrapidisimo|inter ?rapidisimo|servientrega|coordinadora|envia|env[ií]a|tcc|deprisa|99 ?envios|saferbo|rapidisimo)$/i;
+
+// Palabras que aparecen alrededor de una entrega en oficina y no son un lugar.
+const NO_ES_SEDE = new Set(
+  ("oficina oficinas sucursal agencia agencias sede cede punto puntos entrega recogida recoger " +
+    "reclamar retiro principal centro ciudad municipio direccion transportadora envio envios " +
+    "para en de del la el los las mi su una uno favor gracias bueno listo")
+    .split(/\s+/)
+);
+
+const aplanarSede = (s) =>
+  String(s == null ? "" : s)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+/**
+ * ¿La dirección nombra una SEDE concreta, más allá de la transportadora y la ciudad?
+ *
+ * "OFICINA Interrapidísimo - Terranova" → "Terranova"
+ * "OFICINA Interrapidísimo"             → ""   (flujo normal)
+ * "OFICINA Interrapidísimo Jamundí"     → ""   (es la ciudad, no una sede)
+ *
+ * @returns {string} el nombre de la sede pedida, o "" si no pidió ninguna
+ */
+function sedeEspecificaEn(direccionTexto, ciudad) {
+  const crudo = String(direccionTexto == null ? "" : direccionTexto);
+  if (!crudo.trim()) return "";
+  if (!RE_OFICINA.test(aplanarSede(crudo))) return "";
+
+  const ciudadPlana = aplanarSede(ciudad);
+  const trozos = crudo
+    .replace(/[-–—,.;:()/]+/g, " ")
+    .split(/\s+/)
+    .map((w) => w.trim())
+    .filter(Boolean);
+
+  for (const palabra of trozos) {
+    const plana = aplanarSede(palabra);
+    if (plana.length < 4) continue;
+    if (NO_ES_SEDE.has(plana)) continue;
+    if (RE_NOMBRE_TRANSPORTADORA.test(plana)) continue;
+    // La ciudad no es una sede: es el destino.
+    if (ciudadPlana && (plana === ciudadPlana || ciudadPlana.includes(plana) || plana.includes(ciudadPlana))) continue;
+    // Un número no nombra una sede.
+    if (/\d/.test(plana)) continue;
+    return palabra;
+  }
+  return "";
+}
+
+// ============================================================================
+// 🙋 ¿NOMBRA UNA REFERENCIA, O EXIGE ESA SEDE Y NINGUNA OTRA?
+//
+// 🔴 OTRA CORRECCIÓN A LO QUE YO HABÍA HECHO. Primero bloqueé cualquier pedido
+// que nombrara una sede. El dueño lo ajustó:
+//
+//   "No bloquees un pedido normal a oficina. Solo pide aclaración si el cliente
+//    exige recoger exclusivamente en una sede específica."
+//
+// Y tiene sentido: la mayoría nombra un barrio o un punto conocido como REFERENCIA
+// de su zona —"mándalo a Terranova, que me queda cerca"— y con eso el pedido sigue
+// normal. Frenarlo era convertir un dato útil en una traba.
+//
+// Lo que sí necesita aclaración es la exigencia: "solo ahí", "tiene que ser en
+// Terranova", "si no es ahí no me sirve". Eso no se lo podemos prometer.
+// ============================================================================
+// ⚠️ SIN `\b` pegado a letras acentuadas. En JavaScript `\b` se define sobre `\w`,
+// que es ASCII: "ú" no cuenta como letra, así que `\búnicamente` NUNCA coincide.
+// Me pasó con "únicamente" y con "si no es ahí" — los dos se escapaban.
+const RE_EXIGE_SEDE_UNICA =
+  /\bsolo\b|s[oó]lo\b|\bsolamente\b|[uú]nicamente|nada m[aá]s|exclusivamente|tiene que ser|debe ser|obligatoriamente|no me sirve otra|ninguna otra|no puede ser otra|si no es ah[ií]|si no es en|s[ií] o s[ií]/i;
+
+/**
+ * ¿El cliente EXIGE esa sede, o solo la nombró como referencia?
+ * @returns {boolean} true solo si la exige de forma excluyente
+ */
+function exigeSedeUnica(texto) {
+  return RE_EXIGE_SEDE_UNICA.test(String(texto == null ? "" : texto));
+}
+
 module.exports = {
+  sedeEspecificaEn,
+  exigeSedeUnica,
   revisar,
   revisarDireccionDePedido,
   avisoParaElDueno,
