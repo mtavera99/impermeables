@@ -1,0 +1,153 @@
+name: Verificar el despliegue
+
+# ══════════════════════════════════════════════════════════════════════════════
+# COMPRUEBA QUE EL BOT ARRANCÓ Y QUÉ VERSIÓN QUEDÓ CORRIENDO — SIN TOCAR CLIENTES.
+#
+# POR QUÉ EXISTE (26-sep): después de un despliegue hay que saber dos cosas
+# distintas, y `{ok:true}` solo contesta la primera:
+#   1. ¿el proceso está vivo?
+#   2. ¿está sirviendo el commit nuevo, o Render quedó con el anterior?
+#
+# Y hay que poder comprobarlo desde acá porque el entorno donde trabaja Kiro no
+# tiene salida a internet (el proxy devuelve 403), así que no puede abrir el bot.
+# Los runners de GitHub sí: el mismo truco de `mirar-el-panel.yml`.
+#
+# ══════════════════════════════════════════════════════════════════════════════
+# 🔒 TODO LO QUE HACE ES DE SOLO LECTURA. Ninguna petición manda un WhatsApp.
+#
+#   ✅ GET /            está vivo
+#   ✅ GET /health      versión, rama, arranque, disco, NOTA_COMERCIAL
+#   ✅ GET /panel       que el tablero se arme de verdad (lee pedidos)
+#   ✅ GET /seguimiento solo cuenta cuántos esperan cada paso
+#
+#   ⛔ NO se tocan, y el motivo de cada uno:
+#      /webhook            · es la entrada de mensajes reales
+#      /enviar-prueba      · manda un WhatsApp
+#      /probar             · manda un WhatsApp
+#      /seguimiento/correr · DISPARA los seguimientos a clientes
+#      /cierre             · manda el resumen al dueño
+#      /setup-waba         · NO es de solo lectura: hace POST a subscribed_apps
+#
+# 🔑 La URL nunca se imprime: lleva el token adentro. Solo se imprimen cuerpos de
+# respuesta, que no lo contienen.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_esperado:
+        description: "Los 7 primeros caracteres del commit que se desplegó (vacío = solo informar)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Comprobar arranque, versión y funcionamiento básico
+        env:
+          BOT_URL: ${{ secrets.BOT_URL }}
+          BOT_TOKEN: ${{ secrets.BOT_VERIFY_TOKEN }}
+          ESPERADO: ${{ inputs.commit_esperado }}
+        run: |
+          set -uo pipefail
+
+          if [ -z "${BOT_URL:-}" ]; then
+            echo "::error::Falta el secreto BOT_URL del repositorio."
+            exit 1
+          fi
+
+          fallos=0
+
+          # ── 1. ¿Está vivo? ───────────────────────────────────────────────
+          echo "── 1. ¿El bot responde?"
+          CODE=$(curl -s -o raiz.txt -w "%{http_code}" --max-time 60 "${BOT_URL}/" || echo "000")
+          echo "   GET /  → HTTP $CODE"
+          if [ "$CODE" = "200" ]; then
+            echo "   ✅ $(head -c 120 raiz.txt)"
+          else
+            echo "   🔴 el bot no contestó 200. Si es 000, puede estar despertando (plan gratis de Render)."
+            fallos=$((fallos + 1))
+          fi
+
+          # ── 2. ¿Qué versión quedó corriendo? ─────────────────────────────
+          echo
+          echo "── 2. ¿Qué versión está desplegada?"
+          CODE=$(curl -s -o salud.json -w "%{http_code}" --max-time 60 "${BOT_URL}/health" || echo "000")
+          echo "   GET /health  → HTTP $CODE"
+          cat salud.json; echo
+          COMMIT=$(node -e 'try{console.log(JSON.parse(require("fs").readFileSync("salud.json","utf8")).commit||"")}catch{console.log("")}')
+          NOTA=$(node -e 'try{console.log(JSON.parse(require("fs").readFileSync("salud.json","utf8")).nota_comercial||"")}catch{console.log("")}')
+
+          if [ -n "$ESPERADO" ]; then
+            if [ "$COMMIT" = "$ESPERADO" ]; then
+              echo "   ✅ está corriendo el commit esperado ($ESPERADO)"
+            else
+              echo "   🔴 se esperaba $ESPERADO y está corriendo '$COMMIT'"
+              echo "   → si dice 'desconocido', el despliegue es anterior a este /health."
+              fallos=$((fallos + 1))
+            fi
+          else
+            echo "   ℹ️  commit corriendo: ${COMMIT:-desconocido}"
+          fi
+
+          # ── 3. La nota comercial tiene que estar APAGADA ──────────────────
+          echo
+          echo "── 3. ¿NOTA_COMERCIAL está apagada?"
+          if [ "$NOTA" = "apagada" ]; then
+            echo "   ✅ apagada, como se acordó"
+          else
+            echo "   🔴 aparece como '$NOTA'. Tiene que estar apagada en esta entrega."
+            fallos=$((fallos + 1))
+          fi
+
+          # ── 4. ¿El tablero se arma de verdad? ─────────────────────────────
+          # Es la comprobación de funcionamiento real: /panel lee los pedidos del
+          # disco y los renderiza. Si eso funciona, store y panel están bien.
+          echo
+          echo "── 4. ¿El panel se arma? (lee pedidos, no envía nada)"
+          if [ -z "${BOT_TOKEN:-}" ]; then
+            echo "   ⚠️  sin BOT_VERIFY_TOKEN no se puede pedir el panel. Se omite."
+          else
+            URL="${BOT_URL}/panel?token=${BOT_TOKEN}"   # ⚠️ nunca se imprime
+            CODE=$(curl -s -o panel.html -w "%{http_code}" --max-time 120 "$URL" || echo "000")
+            echo "   GET /panel  → HTTP $CODE ($(wc -c < panel.html) bytes)"
+            if [ "$CODE" = "200" ] && grep -q "pendientes de despachar" panel.html; then
+              echo "   ✅ el tablero se armó y trae la tarjeta de pendientes"
+              # Señales de esta entrega, si hay pedidos que las disparen.
+              grep -q "revisar antes de despachar" panel.html \
+                && echo "   ℹ️  hay pedidos marcados para revisar (tarjeta nueva visible)" \
+                || echo "   ℹ️  ningún pedido marcado para revisar ahora mismo"
+            elif [ "$CODE" = "403" ]; then
+              echo "   🔴 403: el BOT_VERIFY_TOKEN del repo no coincide con PANEL_TOKEN de Render."
+              fallos=$((fallos + 1))
+            else
+              echo "   🔴 el panel no se armó."
+              head -c 400 panel.html; echo
+              fallos=$((fallos + 1))
+            fi
+          fi
+
+          # ── 5. Los contadores del seguimiento (solo cuenta) ──────────────
+          echo
+          echo "── 5. ¿Los contadores responden? (NO dispara seguimientos)"
+          if [ -n "${BOT_TOKEN:-}" ]; then
+            URL="${BOT_URL}/seguimiento?token=${BOT_TOKEN}"
+            CODE=$(curl -s -o seg.json -w "%{http_code}" --max-time 120 "$URL" || echo "000")
+            echo "   GET /seguimiento  → HTTP $CODE"
+            [ "$CODE" = "200" ] && head -c 500 seg.json && echo || { echo "   🔴 no respondió"; fallos=$((fallos + 1)); }
+          fi
+
+          echo
+          echo "═══════════════════════════════════════════════════════════"
+          if [ "$fallos" -eq 0 ]; then
+            echo "  🟢 Despliegue verificado. Nada se envió a ningún cliente."
+          else
+            echo "  🔴 $fallos comprobación(es) fallaron. Ver arriba."
+          fi
+          echo "═══════════════════════════════════════════════════════════"
+          exit $([ "$fallos" -eq 0 ] && echo 0 || echo 1)

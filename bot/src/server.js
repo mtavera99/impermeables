@@ -1364,7 +1364,37 @@ app.get("/extraer-datos", async (req, res) => {
 
 // Salud
 app.get("/", (_req, res) => res.send("BikerPro bot activo 🏍️"));
-app.get("/health", (_req, res) => res.json({ ok: true }));
+// ============================================================================
+// 🩺 /health — AHORA DICE QUÉ VERSIÓN ESTÁ CORRIENDO
+//
+// Antes devolvía `{ok:true}`, que confirma que el proceso está vivo pero NO qué
+// código quedó desplegado. Después de un despliegue eso es justo lo que hay que
+// saber: si Render tomó el commit nuevo o quedó sirviendo el anterior.
+//
+// Render publica `RENDER_GIT_COMMIT` solo; no hay que configurar nada.
+//
+// 🔒 No lleva token porque no expone nada sensible: el hash del commit, hace
+// cuánto arrancó y si el disco está montado. Ningún dato de cliente, ninguna
+// credencial. Y es de SOLO LECTURA: no manda mensajes ni toca pedidos.
+// ============================================================================
+const ARRANCO_EN = Date.now();
+app.get("/health", (_req, res) => {
+  const commit = String(process.env.RENDER_GIT_COMMIT || "");
+  let disco = null;
+  try {
+    disco = store.estadoDelDisco();
+  } catch {}
+  res.json({
+    ok: true,
+    commit: commit ? commit.slice(0, 7) : "desconocido",
+    commit_completo: commit || null,
+    rama: process.env.RENDER_GIT_BRANCH || null,
+    arrancado_hace_seg: Math.round((Date.now() - ARRANCO_EN) / 1000),
+    // Para poder confirmar que la nota comercial quedó APAGADA sin entrar a Render.
+    nota_comercial: String(process.env.NOTA_COMERCIAL ?? "0").trim() === "1" ? "ENCENDIDA" : "apagada",
+    disco: disco ? { configurado: disco.configurado, aparte: disco.discoAparte, arranques: disco.arranques } : null,
+  });
+});
 
 // ============================================================================
 // PROBAR EL BOT SIN WHATSAPP  —  GET /probar?token=...&msg=...
