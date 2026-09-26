@@ -1,244 +1,345 @@
-// Prueba de humo del tarifario. Corre con: node test-cotizacion.js
-// No necesita clave de IA: prueba SOLO la lógica de precios, que es la
-// que mueve plata. Si algo acá falla, no se despliega.
-const {
-  cotizar, bandaDe, zonaDificilDe, departamentosPosibles,
-  BANDAS, PROMO_2_TOTAL, PRECIO_PRODUCTO, fmt,
-} = require("./src/fletes");
+/**
+ * EL PRECIO LO CALCULA EL CÓDIGO, Y NADA LO PUEDE CAMBIAR DESPUÉS.
+ *
+ * DE DÓNDE SALE ESTA PRUEBA (26-sep). Tres cotizaciones mal dadas el 25-sep:
+ *
+ *   · Palmira  → dijo envío $23.100 y total $83.100. El tarifario da $22.100 y
+ *                $82.000 (banda C). Y $59.900 + $23.100 = $83.000, así que el
+ *                $83.100 no cierra ni con su propia suma.
+ *   · Cúcuta   → dijo $82.000 (1 ud) y $148.000 (2 uds). El tarifario da $83.000
+ *                y $140.000 (banda D). Lo que dijo son los valores de banda C.
+ *   · Gachancipá → ofreció $148.000 ANTES de conocer el destino.
+ *
+ * 🔴 LA CAUSA VERIFICADA: `cotizar()` no se llamaba en la conversación. El precio
+ * lo resolvía el modelo leyendo una tabla de 107 ciudades en 5 bandas dentro del
+ * guion. El tarifario existía, estaba probado y daba bien — y nadie lo consultaba.
+ *
+ * ⚠️ LO QUE ESTO NO DEMUESTRA: que los valores coincidan con otras bandas es
+ * CONSISTENTE con una confusión de filas, pero no prueba cómo el modelo eligió
+ * cada número. La corrección no depende de eso.
+ *
+ *   node test-cotizacion.js      (sin credenciales, sin red, sin IA)
+ */
 
-const META_MARGEN = 23244;
-const COSTO_PROD = 33000;
+const fs = require("fs");
+const DIR = "/tmp/prueba-cotizacion";
+fs.rmSync(DIR, { recursive: true, force: true });
+process.env.DATA_DIR = DIR;
+process.env.PANEL_TOKEN = "clave_de_prueba";
 
-// envío REAL medido (flete+seguro) en el export del 18-sep
-const ENVIO_1 = { A: 14906, B: 21038, C: 25055, D: 26287, E: 28697 };
-const ENVIO_2 = { A: 23947, B: 32597, C: 38784, D: 37832, E: 45214 };
+const c = require("./src/cotizacion");
+const f = require("./src/fletes");
+const store = require("./src/store");
 
-let fallas = 0;
-const ok = (cond, msg) => {
-  console.log(`  ${cond ? "✅" : "🔴"}  ${msg}`);
-  if (!cond) fallas++;
-};
-
-console.log("=".repeat(66));
-console.log("PRUEBA DEL TARIFARIO");
-console.log("=".repeat(66));
-
-console.log("\n### 1. Las bandas dejan el margen meta ($23.244/ud)\n");
-for (const b of ["A", "B", "C", "D", "E"]) {
-  const m1 = BANDAS[b].total - COSTO_PROD - ENVIO_1[b];
-  ok(m1 >= META_MARGEN,
-    `banda ${b} · 1 ud · cobra ${fmt(BANDAS[b].total)} → margen ${fmt(Math.round(m1))}`);
-}
-console.log("");
-// ⚠️ BANDAS QUE ESTÁN BAJO LA META A PROPÓSITO, POR DECISIÓN DEL DUEÑO.
-// No se baja la exigencia en silencio: cada excepción va acá con su razón, y
-// el límite que SÍ se sigue exigiendo es el del bloque 1-B (vender dos tiene
-// que dejar más que vender una). Si esta lista crece sin razón escrita, es que
-// se está erosionando el margen de a poquitos.
-const RAZON_COMBO_23SEP =
-  "23-sep: el combo se cotiza como $110.000 los dos + el envío real redondeado al " +
-  "millar abajo, por decisión del dueño. Antes el bot cotizaba dos unidades a precio " +
-  "lleno ($119.800) e inventaba el envío para que cuadrara; con los totales viejos era " +
-  "IMPOSIBLE mostrar los $110.000 sin inflar el flete. Cuesta ~$2.000/ud de margen " +
-  "antes de pauta, pero DESPUÉS de pauta el combo sigue dejando 4,5 a 7,2 veces más " +
-  "que una unidad sola (el bloque 1-B lo verifica), y banda D MEJORA de $18.084 a " +
-  "$21.584/ud. Ver el comentario de PROMO_2_TOTAL en fletes.js.";
-const BAJO_LA_META_A_PROPOSITO = {
-  A: RAZON_COMBO_23SEP, B: RAZON_COMBO_23SEP, C: RAZON_COMBO_23SEP,
-  D: RAZON_COMBO_23SEP, E: RAZON_COMBO_23SEP,
-};
-for (const b of ["A", "B", "C", "D", "E"]) {
-  const m2 = (PROMO_2_TOTAL[b] - 2 * COSTO_PROD - ENVIO_2[b]) / 2;
-  if (BAJO_LA_META_A_PROPOSITO[b]) {
-    console.log(
-      `  ℹ️  banda ${b} · 2 uds · cobra ${fmt(PROMO_2_TOTAL[b])} → margen ` +
-        `${fmt(Math.round(m2))}/ud (${fmt(Math.round(META_MARGEN - m2))} bajo la meta)\n` +
-        `      ${BAJO_LA_META_A_PROPOSITO[b]}`
-    );
-    continue;
+let ok = 0;
+let mal = 0;
+function chequear(nombre, condicion, detalle) {
+  if (condicion) {
+    console.log(`✅ ${nombre}`);
+    ok++;
+  } else {
+    console.log(`🔴 ${nombre}${detalle ? `\n     ${detalle}` : ""}`);
+    mal++;
   }
-  ok(m2 >= META_MARGEN,
-    `banda ${b} · 2 uds · cobra ${fmt(PROMO_2_TOTAL[b])} → margen ${fmt(Math.round(m2))}/ud`);
 }
 
-console.log("\n### 1-B. 🔒 El piso real: vender DOS tiene que dejar más que vender UNA\n");
-// Este es el guardián que reemplaza a la meta en las bandas con descuento. Un
-// precio de 2 unidades que deja menos que vender una sola es una pérdida
-// disfrazada de promoción, y no se ve mirando el margen por unidad.
-for (const b of ["A", "B", "C", "D", "E"]) {
-  const queda1 = BANDAS[b].total - COSTO_PROD - ENVIO_1[b];
-  const queda2 = PROMO_2_TOTAL[b] - 2 * COSTO_PROD - ENVIO_2[b];
-  ok(queda2 > queda1,
-    `banda ${b} · 2 uds dejan ${fmt(Math.round(queda2))} vs ${fmt(Math.round(queda1))} de 1 ud`);
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 1. REGRESIÓN: los tres casos del 25-sep ──");
+
+// Palmira: banda C reconocida
+const palmira = c.calcular("Palmira", "quiero uno para Palmira");
+chequear("Palmira cotiza", palmira.ok === true);
+chequear("total $82.000", palmira.total === 82000, `dio ${palmira.total}`);
+chequear("envío $22.100 (NO los $23.100 de banda D)", palmira.envio === 22100, `dio ${palmira.envio}`);
+chequear("producto + envío cierra exacto", palmira.producto + palmira.envio === palmira.total);
+chequear("y es tarifa reconocida", palmira.reconocida === true);
+
+// Cúcuta: banda D
+const cucuta1 = c.calcular("Cucuta", "uno para Cucuta");
+const cucuta2 = c.calcular("Cucuta", "dos conjuntos para Cucuta");
+chequear("Cúcuta 1 ud = $83.000 (no $82.000)", cucuta1.total === 83000, `dio ${cucuta1.total}`);
+chequear("Cúcuta 2 uds = $140.000 (no $148.000)", cucuta2.total === 140000, `dio ${cucuta2.total}`);
+chequear("detectó la cantidad 2", cucuta2.uds === 2);
+chequear("el combo cierra exacto", cucuta2.producto + cucuta2.envio === cucuta2.total);
+chequear(
+  "y calcula el ahorro contra dos sueltos",
+  cucuta2.ahorro === cucuta1.total * 2 - cucuta2.total,
+  `dio ${cucuta2.ahorro}`
+);
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 2. Gachancipá: tarifa PREDETERMINADA, no reconocida ──");
+
+// 🔑 No se le dice "techo de seguridad": no hay garantía de que ese valor cubra
+// el costo logístico de cualquier municipio. El Charco está en difícil acceso
+// justamente porque su flete real ($55.563) supera cualquier banda.
+const gacha = c.calcular("Gachancipa", "uno para Gachancipa");
+chequear("cotiza con la política vigente", gacha.ok === true && gacha.total === 85000);
+chequear("🔑 pero marcada como NO reconocida", gacha.reconocida === false);
+chequear("el destino lo dice", gacha.destino.estado === "predeterminada", gacha.destino.estado);
+const bloqueGacha = c.bloqueDeDatos(gacha);
+chequear("el bloque avisa que no está en el tarifario", /NO está en el tarifario/.test(bloqueGacha));
+chequear(
+  "y NO afirma que el costo esté verificado",
+  /no está verificado/.test(bloqueGacha) && !/techo de seguridad/i.test(bloqueGacha)
+);
+chequear("y pide no prometer plazos", /no prometas plazos/.test(bloqueGacha));
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 3. Lo que NO debe producir ningún número ──");
+
+const sinDestino = c.calcular("", "cuánto vale?");
+chequear("sin destino no cotiza", sinDestino.ok === false && sinDestino.motivo === "sin_destino");
+// ⚠️ Pero SÍ se puede decir el precio base: es lo que pidió el dueño.
+const bSin = c.bloqueDeDatos(sinDestino);
+chequear("⛔ prohíbe dar total y envío", /NO des ningún total/.test(bSin));
+chequear("✅ pero permite el precio base del producto", /SÍ podés decir el precio base/.test(bSin));
+chequear("y nombra los $59.900", /59\.900/.test(bSin));
+
+const ambiguo = c.calcular("Riosucio", "soy de Riosucio");
+chequear("ciudad ambigua no cotiza", ambiguo.ok === false && ambiguo.motivo === "ambiguo");
+chequear(
+  "y dice los departamentos posibles",
+  (ambiguo.destino.preguntarDepartamento || []).length >= 2,
+  JSON.stringify(ambiguo.destino.preguntarDepartamento)
+);
+chequear("el bloque prohíbe dar números", /NO des ningún número/.test(c.bloqueDeDatos(ambiguo)));
+
+const istmina = c.calcular("Istmina", "uno para Istmina");
+chequear("difícil acceso sin tarifa no cotiza", istmina.ok === false && istmina.motivo === "dificil_sin_tarifa");
+chequear("y manda escalar", /NINGÚN número/.test(c.bloqueDeDatos(istmina)));
+
+const mayoreo = c.calcular("Cali", "necesito 12 conjuntos para revender");
+chequear("12 unidades se escala", mayoreo.ok === false && mayoreo.motivo === "cantidad_escalada");
+chequear("y no cotiza", /NO cotices/.test(c.bloqueDeDatos(mayoreo)));
+
+const tado = c.calcular("Tado", "dos conjuntos para Tado");
+chequear("difícil acceso no lleva promo de 2", tado.ok === false && tado.motivo === "dificil_sin_promo");
+
+// 🔴 Un total nulo NUNCA puede convertirse en precio: fmt(null) devuelve "$0".
+chequear("fmt(null) sigue dando $0 — por eso el guard existe", f.fmt(null) === "$0");
+for (const caso of [ambiguo, istmina, sinDestino, mayoreo]) {
+  chequear(`el caso "${caso.motivo}" no expone ningún total`, caso.total === undefined || caso.total == null);
 }
 
-console.log("\n### 2. Llevar dos sigue siendo más barato que dos sueltos\n");
-for (const b of ["A", "B", "C", "D", "E"]) {
-  const ahorro = 2 * BANDAS[b].total - PROMO_2_TOTAL[b];
-  ok(ahorro > 0, `banda ${b} · ahorra ${fmt(ahorro)} llevando dos`);
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 4. Dos destinos en un mensaje: se pregunta, no se adivina ──");
+
+const dos = c.calcular("", "cuánto sale a Cali y cuánto a Pasto?");
+chequear("no cotiza con dos destinos", dos.ok === false && dos.motivo === "varios_destinos");
+chequear("y los lista", (dos.destino.candidatas || []).length >= 2, JSON.stringify(dos.destino.candidatas));
+chequear("el bloque pide elegir destino", /Preguntá cuál es el destino/.test(c.bloqueDeDatos(dos)));
+chequear(
+  "un solo destino NO se confunde con varios",
+  c.ciudadesEn("soy de Santa Marta").length === 1,
+  JSON.stringify(c.ciudadesEn("soy de Santa Marta"))
+);
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 5. 🔑 EL CANDADO: la respuesta se revisa antes de salir ──");
+
+const v = (texto, cot, ctx) => c.validarRespuesta(texto, cot, ctx || {});
+
+// Los tres importes mal dados el 25-sep tienen que quedar atrapados.
+chequear(
+  "🔑 $148.000 en una ciudad de banda D se detecta",
+  v("Te quedan los dos en $148.000", cucuta2).ok === false
+);
+chequear(
+  "🔑 $23.100 de envío en una ciudad de banda C se detecta",
+  v("El envío a Palmira son $23.100", palmira).ok === false
+);
+chequear(
+  "🔑 la suma que no cierra se detecta",
+  v("Son $59.900 + $23.100 = $83.100", palmira).problemas.some((p) => p.tipo === "suma_que_no_cierra"),
+  JSON.stringify(v("Son $59.900 + $23.100 = $83.100", palmira).problemas.map((p) => p.tipo))
+);
+chequear(
+  "y el mensaje correcto pasa",
+  v("Te queda en $82.000: $59.900 el conjunto + $22.100 de envío", palmira).ok === true,
+  JSON.stringify(v("Te queda en $82.000: $59.900 el conjunto + $22.100 de envío", palmira).problemas)
+);
+chequear("la línea que genera el código pasa su propia validación", v(c.lineaDePrecio(palmira), palmira).ok === true);
+chequear("y la del combo también", v(c.lineaDePrecio(cucuta2), cucuta2).ok === true);
+
+// Un total cuando no hay destino.
+chequear(
+  "un total sin destino se detecta",
+  v("Te queda en $85.000 con envío", sinDestino).problemas.some((p) => p.tipo === "total_sin_destino")
+);
+chequear("pero el precio base sin destino pasa", v("El conjunto vale $59.900 más el envío", sinDestino).ok === true);
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 6. Significado, no pertenencia: el rescate tiene condiciones ──");
+
+// 🔑 Un validador que solo revisa pertenencia dejaría pasar el precio de
+// negociación ofrecido de entrada — que es regalar plata a quien iba a comprar.
+chequear(
+  "🔑 el precio de negociación NO se autoriza sin objeción",
+  v(`Te lo dejo en ${f.fmt(cucuta2.rescate)}`, cucuta2, { objecionDePrecio: false }).ok === false,
+  `rescate=${cucuta2.rescate}`
+);
+chequear(
+  "y SÍ cuando el cliente ya se quejó del precio",
+  v(`Te lo dejo en ${f.fmt(cucuta2.rescate)}`, cucuta2, { objecionDePrecio: true }).ok === true
+);
+chequear(
+  "el rescate del combo es el aprobado de su banda",
+  cucuta2.rescate === f.PROMO_2_RESCATE[cucuta2.banda],
+  `${cucuta2.rescate} vs ${f.PROMO_2_RESCATE[cucuta2.banda]}`
+);
+chequear(
+  "en 1 unidad el máximo aprobado sigue siendo $3.000",
+  palmira.total - palmira.rescate === 3000,
+  `diferencia ${palmira.total - palmira.rescate}`
+);
+chequear("y no se habilitó ningún límite nuevo", c.TOPE_DESCUENTO_1_UNIDAD === 3000);
+
+// La detección de objeción.
+chequear("detecta 'está muy caro'", c.hayObjecionDePrecio([{ role: "user", content: "uy está muy caro" }]));
+chequear("detecta 'me das descuento'", c.hayObjecionDePrecio([{ role: "user", content: "me das descuento?" }]));
+chequear("no confunde una pregunta normal", !c.hayObjecionDePrecio([{ role: "user", content: "de qué talla hay?" }]));
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 7. Leer dinero sin confundirlo con direcciones ni teléfonos ──");
+
+const imp = (t) => c.extraerImportes(t).map((x) => x.valor);
+chequear('"$83.000"', imp("son $83.000").includes(83000));
+chequear('"83.000" sin signo', imp("queda en 83.000").includes(83000));
+chequear('"83 mil"', imp("son 83 mil").includes(83000));
+chequear('"83mil" pegado', imp("son 83mil").includes(83000));
+chequear('"$155.000" del combo', imp("los dos en $155.000").includes(155000));
+chequear(
+  "varios precios en una comparación",
+  imp("a Cali $82.000 y a Pasto $85.000").length === 2,
+  JSON.stringify(imp("a Cali $82.000 y a Pasto $85.000"))
+);
+// 🔴 Lo que NO es dinero. Un validador con falsas alarmas se apaga.
+chequear(
+  "un celular NO es dinero",
+  imp("mi celular es 3128716771").length === 0,
+  JSON.stringify(imp("mi celular es 3128716771"))
+);
+chequear(
+  "una dirección NO es dinero",
+  imp("Cr 20 12328 Barrio ciudadela").length === 0,
+  JSON.stringify(imp("Cr 20 12328 Barrio ciudadela"))
+);
+chequear(
+  "'Calle 34 #12-45' NO es dinero",
+  imp("Calle 34 #12-45 barrio La Granja").length === 0,
+  JSON.stringify(imp("Calle 34 #12-45 barrio La Granja"))
+);
+chequear("un año no es dinero", imp("desde 2026 trabajamos").length === 0);
+chequear("y una talla tampoco", imp("uso talla 2XL").length === 0);
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 8. El pedido no puede contradecir la cotización ──");
+
+const pedidoBien = { nombre: "Ana", ciudad: "Palmira", total: 82000 };
+chequear("un pedido que cuadra pasa", c.verificarPedido(pedidoBien, palmira).ok === true);
+
+const pedidoMal = { nombre: "Ana", ciudad: "Palmira", total: 83100 };
+const chMal = c.verificarPedido(pedidoMal, palmira);
+chequear("el $83.100 del caso real se detecta", chMal.ok === false);
+chequear("el problema es el total", chMal.problemas.some((p) => p.tipo === "total_distinto"));
+chequear("y dice cuál era el esperado", chMal.totalEsperado === 82000);
+
+const otraCiudad = { nombre: "Ana", ciudad: "Cucuta", total: 82000 };
+chequear(
+  "si el pedido va a otra ciudad se detecta",
+  c.verificarPedido(otraCiudad, palmira).problemas.some((p) => p.tipo === "ciudad_distinta")
+);
+
+chequear(
+  "sin cotización validada, el pedido se marca",
+  c.verificarPedido(pedidoBien, sinDestino).problemas.some((p) => p.tipo === "sin_cotizacion_validada")
+);
+chequear(
+  "un total en cero se detecta",
+  c.verificarPedido({ ciudad: "Palmira", total: 0 }, palmira).problemas.some((p) => p.tipo === "total_invalido")
+);
+
+// El rescate como total del pedido: solo con objeción.
+const pedidoRescate = { nombre: "Ana", ciudad: "Cucuta", total: cucuta2.rescate };
+chequear(
+  "un pedido al precio de negociación SIN objeción se marca",
+  c.verificarPedido(pedidoRescate, cucuta2, { objecionDePrecio: false }).ok === false
+);
+chequear(
+  "y CON objeción pasa",
+  c.verificarPedido(pedidoRescate, cucuta2, { objecionDePrecio: true }).ok === true
+);
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 9. La cotización se guarda, y las ofertas previas no se pisan ──");
+
+const TEL = "573001112233";
+store.guardarCotizacion(TEL, palmira);
+let guardada = store.leerCotizacion(TEL);
+chequear("se guarda estructurada", !!guardada && guardada.total === 82000);
+chequear("con la versión de la política", guardada.politica === c.POLITICA_VERSION);
+chequear("y con destino y cantidad", guardada.ciudad === "Palmira" && guardada.uds === 1);
+
+// Cambia de ciudad: la oferta nueva no borra la anterior.
+store.guardarCotizacion(TEL, cucuta2);
+const conv = store.getConv(TEL);
+chequear("la cotización vigente es la nueva", store.leerCotizacion(TEL).total === 140000);
+chequear(
+  "🔑 la anterior queda archivada, no pisada",
+  (conv.cotizacionesPrevias || []).some((x) => x.total === 82000),
+  JSON.stringify((conv.cotizacionesPrevias || []).map((x) => x.total))
+);
+chequear("y queda marcado que la oferta cambió", conv.cotizacionCambiada === true);
+
+// Sobrevive a un reinicio: el dueño pidió probar retomar una oferta después.
+delete require.cache[require.resolve("./src/store")];
+const store2 = require("./src/store");
+chequear(
+  "🔑 la cotización sobrevive al reinicio",
+  (store2.leerCotizacion(TEL) || {}).total === 140000,
+  "retomar una oferta después de un reinicio tiene que dar el mismo número"
+);
+
+// Cambiar de 1 a 2 unidades en la misma ciudad también es oferta nueva.
+store2.guardarCotizacion(TEL, c.calcular("Cucuta", "mejor uno solo"));
+chequear(
+  "pasar de 2 a 1 unidad cambia la oferta",
+  store2.leerCotizacion(TEL).uds === 1 && store2.leerCotizacion(TEL).total === 83000
+);
+chequear(
+  "y la de 2 queda archivada",
+  (store2.getConv(TEL).cotizacionesPrevias || []).some((x) => x.total === 140000)
+);
+
+// ───────────────────────────────────────────────────────────────────────────
+console.log("\n── 10. Todas las bandas cierran, y nada se rompió ──");
+
+let cierran = 0;
+const ciudades = ["Bogota", "Tunja", "Cali", "Monteria", "Sahagun", "Nilo", "Palmira", "Cucuta"];
+for (const ciudad of ciudades) {
+  for (const uds of [1, 2]) {
+    const q = c.calcular(ciudad, uds === 2 ? "dos conjuntos" : "uno");
+    if (!q.ok) continue;
+    const cierra = q.producto + q.envio === q.total;
+    // ⚠️ La referencia de honestidad NO es solo el promedio de la banda: una
+    // ciudad con flete medido propio puede estar por encima de su banda, y ahí el
+    // desglose tiene que seguir ESE número. Nilo es el caso: su flete de 2
+    // unidades es $36.000 contra $32.597 del promedio de banda B, y mostrar
+    // $36.000 es lo correcto — es el que el cliente puede verificar.
+    const refBanda = (uds === 2 ? f.ENVIO_REAL_2 : f.ENVIO_REAL_1)[q.banda];
+    const refCiudad = uds === 2 ? f.FLETE_2_OBSERVADO[f.normalizar(ciudad)] || 0 : 0;
+    const honesto = q.envio <= Math.max(refBanda, refCiudad);
+    const validaSola = c.validarRespuesta(c.lineaDePrecio(q), q).ok;
+    if (cierra && honesto && validaSola) cierran++;
+    else console.log(`     🔴 ${ciudad} x${uds}: cierra=${cierra} honesto=${honesto} valida=${validaSola}`);
+  }
 }
+chequear(
+  `las ${ciudades.length * 2} cotizaciones cierran, no inflan el envío y validan su propia línea`,
+  cierran === ciudades.length * 2,
+  `pasaron ${cierran}`
+);
 
-console.log("\n### 3. Las 7 preguntas del guion\n");
-
-const c1 = cotizar("Cali", 1);
-ok(c1.total === 82000, `"Para Cali" → ${fmt(c1.total)} (esperado $82.000)`);
-
-const c2 = cotizar("Medellin", 2);
-ok(c2.total === 148000, `"2 para Medellín" → ${fmt(c2.total)} (esperado $148.000 = $110.000 + $38.000)`);
-
-const c3 = cotizar("Bogota", 1);
-ok(c3.total === 73000, `"Para Bogotá" → ${fmt(c3.total)} (esperado $73.000)`);
-
-const c4 = cotizar("Bogota", 2);
-ok(c4.total === 133000, `"2 para Bogotá" → ${fmt(c4.total)} (esperado $133.000 = $110.000 + $23.000)`);
-
-const c5 = cotizar("Tunja", 1);
-ok(c5.total === 78000, `"Para Tunja" → ${fmt(c5.total)} (esperado $78.000)`);
-
-const amb = departamentosPosibles("Riosucio");
-ok(Array.isArray(amb) && amb.length > 1,
-  `"Riosucio" → ambigua, pide departamento (${amb ? amb.join("/") : "nada"})`);
-
-const gu = zonaDificilDe("Guapi");
-ok(gu && gu.total === null, `"Guapi" → difícil acceso sin dato, debe escalar`);
-
-console.log("\n### 4. Los destinos que ya nos costaron plata\n");
-
-const ch = zonaDificilDe("El Charco");
-ok(ch && ch.total === 115500, `El Charco → ${ch ? fmt(ch.total) : "?"} (no $59.900)`);
-
-const ta = zonaDificilDe("Tado");
-ok(ta && ta.total === 93000 && ta.sinPromo2 === true,
-  `Tadó → ${ta ? fmt(ta.total) : "?"} y sin promo de 2 (el flete se duplica)`);
-
-const pueblo = cotizar("Un Pueblo Que No Existe", 1);
-ok(pueblo.total === 85000,
-  `ciudad desconocida → ${fmt(pueblo.total)} (banda E, no un número bajo)`);
-
-// ============================================================================
-// 5. LOS NOMBRES REALES DEL EXPORT DEL AGENTE DE META (21-sep)
-//
-// El 47,6% de los pedidos del export traía una ciudad que cotizar() NO
-// reconocía y caía al default (banda E, $85.000). Estos son los nombres tal
-// como los escribieron clientes reales. Cada uno es plata:
-// una localidad de Bogotá cotizada como pueblo cobra $12.000 de más.
-// ============================================================================
-console.log("\n### 5. Nombres reales del export — localidades, barrios y departamentos\n");
-
-const casosExport = [
-  // Localidades de Bogotá → banda A ($73.000), NO banda E ($85.000)
-  ["Bogotá (Suba)", 73000, "localidad entre paréntesis"],
-  ["Bogotá - Fontibón", 73000, "localidad con guion"],
-  ["Bogotá - Usaquén - Codito", 73000, "localidad + barrio"],
-  ["Bosa", 73000, "localidad sola, sin decir Bogotá"],
-  ["Bogotá (Candelaria la Nueva)", 73000, "barrio que suena a otra ciudad"],
-  // Ciudad + departamento
-  ["Cartagena Bolívar", 82000, "ciudad + departamento"],
-  ["Ipiales Nariño", 83000, "ciudad + departamento de riesgo, pero tarifada"],
-  ["Neiva Huila", 82000, "ciudad + departamento"],
-  ["Yopal Casanare", 78000, "ciudad + departamento"],
-  ["Rionegro Antioquia", 83000, "ciudad + departamento"],
-  ["Villavicencio - meta", 78000, "departamento en minúscula"],
-  // Ciudad dentro de una cadena más larga
-  ["Madrid (Barrio San José)", 73000, "municipio + barrio"],
-  ["San Cristobal - Medellin", 82000, "corregimiento + ciudad"],
-  ["Barranquilla - Villa San Pedro etapa 3", 82000, "ciudad + urbanización"],
-  ["Buenaventura / Barrio Cascajal", 82000, "ciudad + barrio con barra"],
-];
-for (const [ciudad, esperado, nota] of casosExport) {
-  const q = cotizar(ciudad, 1);
-  ok(q.total === esperado,
-    `"${ciudad}" → ${q.total ? fmt(q.total) : "sin precio"} (esperado ${fmt(esperado)}) · ${nota}`);
-}
-
-// ============================================================================
-// 6. EL BUG DE MOSQUERA — el que se negaba a cotizar la sabana de Bogotá
-//
-// MOSQUERA estaba en BANDAS.A (Cundinamarca, sabana) y a la vez en
-// ZONA_DIFICIL_ACCESO (Nariño, fluvial). Difícil acceso se evalúa primero, así
-// que "Mosquera" devolvía banda F con escalar=true: el bot NO cotizaba un
-// municipio del área metropolitana de Bogotá, que es el 27% del volumen.
-// ============================================================================
-console.log("\n### 6. El bug de Mosquera (nombre en la sabana y en el Pacífico)\n");
-
-const mq = departamentosPosibles("Mosquera");
-ok(Array.isArray(mq) && mq.length === 2,
-  `"Mosquera" solo → pregunta el departamento (${mq ? mq.join("/") : "NO PREGUNTA"})`);
-
-const mqCun = cotizar("Mosquera, Cundinamarca", 1);
-ok(mqCun.total === 73000,
-  `"Mosquera, Cundinamarca" → ${mqCun.total ? fmt(mqCun.total) : "sin precio"} (esperado $73.000, sabana)`);
-
-const mqNar = cotizar("Mosquera, Nariño", 1);
-ok(mqNar.total === null && mqNar.escalar === true,
-  `"Mosquera, Nariño" → sin precio y escala (fluvial, no se adivina)`);
-
-// Y la ambigüedad que ya existía tiene que seguir funcionando igual
-const rioCal = cotizar("Riosucio, Caldas", 1);
-ok(rioCal.total === 85000,
-  `"Riosucio, Caldas" → ${rioCal.total ? fmt(rioCal.total) : "sin precio"} (esperado $85.000)`);
-
-const rioCho = cotizar("Riosucio, Chocó", 1);
-ok(rioCho.total === null,
-  `"Riosucio, Chocó" → sin precio (fluvial, se escala)`);
-
-console.log("\n### 7. Lo que NO se debe reconocer (no inventar tarifas)\n");
-
-// El Carmelo (Candelaria) es del Valle. "La Candelaria" es una localidad de
-// Bogotá: si el match de localidades fuera laxo, cotizaría $73.000 y perdería
-// $12.000 de envío. Debe caer al default, no a Bogotá.
-const carmelo = cotizar("El Carmelo (Candelaria)", 1);
-ok(carmelo.total === 85000,
-  `"El Carmelo (Candelaria)" → ${fmt(carmelo.total)} (banda E, NO Bogotá)`);
-
-// Municipios reales del export que todavía no están tarifados: deben caer al
-// default, nunca a un número inventado más bajo.
-for (const c of ["Apartadó, Antioquia", "La Ceja, Antioquia", "Floridablanca, Santander", "Pitalito, Huila"]) {
-  const q = cotizar(c, 1);
-  ok(q.total === 85000, `"${c}" → ${fmt(q.total)} (sin tarifa propia: default, no inventar)`);
-}
-
-// Difícil acceso escrito con departamento debe seguir escalando
-const istmina = cotizar("Istmina - Chocó", 1);
-ok(istmina.total === null && istmina.escalar === true,
-  `"Istmina - Chocó" → sin precio y escala (fluvial)`);
-
-console.log("\n### 8. La tabla que se le inyecta a la IA no se contradice\n");
-
-const { tablaFletesTexto } = require("./src/fletes");
-const tabla = tablaFletesTexto();
-ok(!/SIN precio:[^\n]*\bMOSQUERA\b/.test(tabla),
-  "MOSQUERA no aparece como difícil acceso (sería contradicción con banda A)");
-ok(/133\.000/.test(tabla) && /155\.000/.test(tabla) && /110\.000/.test(tabla),
-  "la tabla incluye los totales firmes de 2 unidades ($133.000 a $155.000)");
-ok(/MOSQUERA \(Cundinamarca/.test(tabla),
-  "MOSQUERA aparece en la lista de nombres ambiguos");
-
-// 🔴 REGRESIÓN MEDIDA EL 21-SEP contra el bot desplegado (probar-guion.js):
-// MOSQUERA era el 6º ejemplo de banda A, y la IA cotizó "Mosquera" a $73.000
-// leyéndolo de ahí en vez de preguntar el departamento. `cotizar()` lo
-// resolvía bien, pero la IA no llama a cotizar(): lee esta tabla.
-const lineaBandaA = tabla.split("\n")[0];
-ok(!/MOSQUERA/.test(lineaBandaA),
-  "ningún nombre ambiguo aparece como ejemplo de banda A (si aparece, la IA lo cotiza)");
-for (const ambigua of Object.keys(require("./src/fletes").CIUDADES_AMBIGUAS)) {
-  const enEjemplos = new RegExp(`\\(([^)]*\\b${ambigua}\\b[^)]*)\\):`).test(tabla);
-  ok(!enEjemplos, `"${ambigua}" no se ofrece como ejemplo de ninguna banda`);
-}
-
-// Los destinos con precio medido deben ir en su propia línea con el total.
-// Comprimidos en una sola ("TADO $93.000 · EL CHARCO $115.500") la IA no los
-// aplicaba: a "¿cuánto a Tadó?" respondía con el pitch del producto, sin precio.
-ok(/·\s*TADO:\s*el TOTAL es \$93\.000/.test(tabla),
-  "TADÓ va en su propia línea con el total explícito");
-ok(/·\s*EL CHARCO:\s*el TOTAL es \$115\.500/.test(tabla),
-  "EL CHARCO va en su propia línea con el total explícito");
-
-console.log("\n" + "=".repeat(66));
-if (fallas === 0) {
-  console.log("🟢 TODO PASA. El tarifario está listo para desplegar.");
-} else {
-  console.log(`🔴 ${fallas} FALLA(S). NO desplegar hasta arreglar.`);
-  process.exitCode = 1;
-}
-console.log("=".repeat(66));
+console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
+process.exit(mal === 0 ? 0 : 1);

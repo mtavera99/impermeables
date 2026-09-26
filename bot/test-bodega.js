@@ -222,12 +222,33 @@ chequear(
   `la banda E citada en prosa es la de la tabla (${fmt(PROMO_2_TOTAL.E)})`,
   porDefecto.includes(`${fmt(PROMO_2_TOTAL.E)} pueblos)`)
 );
+// ==========================================================================
+// ⚠️ ESTA COMPROBACIÓN CAMBIÓ DE OBJETO EL 26-SEP, Y A PROPÓSITO.
+//
+// Antes exigía que los totales de 2 unidades ESTUVIERAN EN EL GUION, porque el
+// modelo los leía de una tabla de 107 ciudades. Eso es justamente lo que se
+// corrigió: el 25-sep dio un combo de banda C en una ciudad de banda D.
+//
+// Ahora el total lo calcula `cotizacion.calcular()` y llega al modelo en el
+// bloque de precio del turno. Así que lo que hay que cuidar ya no es que el
+// número esté en el guion —no debe estar— sino que **llegue correcto por el
+// bloque, para una ciudad real de cada banda**.
+// ==========================================================================
+const cotizacionMod = require("./src/cotizacion");
+const CIUDAD_DE_BANDA = { A: "Bogota", B: "Tunja", C: "Cali", D: "Monteria", E: "Sahagun" };
 for (const [banda, total] of Object.entries(PROMO_2_TOTAL)) {
+  const cot = cotizacionMod.calcular(CIUDAD_DE_BANDA[banda], "dos conjuntos");
   chequear(
-    `el total de 2 unidades de la banda ${banda} (${fmt(total)}) está en el guion`,
-    porDefecto.includes(fmt(total))
+    `el total de 2 unidades de la banda ${banda} (${fmt(total)}) llega por el bloque de precio`,
+    cot.ok && cot.total === total && cotizacionMod.bloqueDeDatos(cot).includes(fmt(total)),
+    `${CIUDAD_DE_BANDA[banda]} dio ${cot.ok ? fmt(cot.total) : cot.motivo}`
   );
 }
+chequear(
+  "🔑 y la tabla de 107 ciudades ya NO está en el guion",
+  !/BOGOTA, SOACHA, ZIPAQUIRA/.test(porDefecto),
+  "el modelo no debe tener de dónde leer un total: lo recibe calculado"
+);
 chequear(
   "no quedó ningún total viejo de 2 unidades como número a cotizar",
   !/te salen los dos en \$1(37|58)\.000/.test(porDefecto)

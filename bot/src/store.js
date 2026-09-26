@@ -524,6 +524,48 @@ function reactivarPedido(fechaPedido) {
 // cliente vuelve a escribir después, el chat tiene que volver a la lista solo.
 // Un booleano lo dejaría enterrado para siempre.
 // ============================================================================
+// ============================================================================
+// 🧾 LA COTIZACIÓN VALIDADA DEL CHAT (26-sep)
+//
+// Se guarda la cotización ESTRUCTURADA —destino, cantidad, producto, envío,
+// total, negociación autorizada y versión de la política— para que:
+//
+//   · la confirmación se refiera a la oferta que el cliente REALMENTE recibió
+//   · el bloque ##ORDER## se pueda comparar contra ella
+//   · si el cliente cambia de ciudad o de cantidad, quede claro que hay una
+//     oferta nueva y que hace falta confirmarla otra vez
+//   · se sepa con qué reglas se cotizó, si mañana cambia un precio
+//
+// ⚠️ LAS OFERTAS ANTERIORES NO SE PISAN: se guardan en `cotizacionesPrevias`.
+// Cambiar una oferta ya prometida por detrás es peor que cotizar mal: el cliente
+// vio un número y nosotros mostraríamos otro.
+// ============================================================================
+function guardarCotizacion(phone, cot) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone] || { messages: [], paused: false };
+  const anterior = c.cotizacion || null;
+  // Solo se archiva si de verdad cambió la oferta (ciudad, cantidad o total).
+  if (
+    anterior &&
+    (anterior.ciudad !== cot.ciudad || anterior.uds !== cot.uds || anterior.total !== cot.total)
+  ) {
+    c.cotizacionesPrevias = (c.cotizacionesPrevias || []).concat([anterior]).slice(-5);
+    // La oferta cambió: lo que el cliente confirmó antes ya no aplica a esta.
+    c.cotizacionCambiada = true;
+  }
+  c.cotizacion = cot;
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+  return cot;
+}
+
+/** La última cotización validada del chat, o null. */
+function leerCotizacion(phone) {
+  const c = getConv(phone);
+  return (c && c.cotizacion) || null;
+}
+
 function marcarAtendido(phone, quien) {
   ensure();
   const all = readJSON(CONV_FILE, {});
@@ -1036,6 +1078,7 @@ function estadoDelDisco() {
 module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarAtendido, desmarcarAtendido,
+  guardarCotizacion, leerCotizacion,
   anotarFalloEntrega, fallosDeEntrega,
   guardarPlan, leerPlan, borrarPlan, limpiarPlanesGuardados,
   registrarArranque, estadoDelDisco,

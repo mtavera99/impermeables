@@ -5,6 +5,7 @@ const { respuestaDeArranque } = require("./primer-mensaje");
 const { revisarDireccionDePedido } = require("./direccion");
 const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
+const cotizacion = require("./cotizacion");
 
 // ============================================================================
 // PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
@@ -313,19 +314,76 @@ async function generateReply(phone, userText) {
     return { reply: arranque, order: null, handoff: false, media: [], pedidoRescatado: false };
   }
 
+  // ==========================================================================
+  // 🧾 EL PRECIO SE CALCULA EN CÓDIGO, NO LO RESUELVE EL MODELO (26-sep)
+  //
+  // Hasta hoy el guion llevaba una tabla de 107 ciudades en 5 bandas y el modelo
+  // leía la fila y sumaba. `cotizar()` —probado y correcto— no se llamaba nunca.
+  //
+  // Ahora: el código resuelve destino y cantidad, calcula, y le pasa al modelo
+  // los números ya validados. El modelo pone la explicación comercial.
+  // ==========================================================================
+  const ciudadDetectada = detectarCiudad(conv, userText);
+  const cot = cotizacion.calcular(ciudadDetectada, textoDelCliente(conv, userText));
+  if (cot.ok) store.guardarCotizacion(phone, cot);
+  const objecionDePrecio = cotizacion.hayObjecionDePrecio(conv.messages);
+  const contextoPrecio = { objecionDePrecio };
+
   let reply;
+  let validacion = null;
   if (!TIENE_IA) {
     reply =
       "¡Hola! 🏍️ Gracias por escribir a BikerPro. (Bot en modo prueba: falta configurar la API de IA). " +
       "El conjunto impermeable de 4 piezas cuesta $59.900 con pago contraentrega 📦";
   } else {
-    try {
-      reply = await callIA(buildSystemPrompt(), conv.messages);
-    } catch (e) {
-      console.error("Error IA:", e.message);
-      // Respaldo que NO reinicia la conversación (evita el saludo genérico a mitad de charla)
-      reply =
-        "Perdón, se me cruzó la señal un momento 🙏 ¿Me repites lo último, por favor? Con gusto sigo con tu pedido 🏍️";
+    // ========================================================================
+    // 🔑 ETAPA 5: SE REVISA EL MENSAJE ANTES DE QUE SALGA
+    //
+    // Sin esto, pasarle los números al modelo sigue siendo una instrucción — y
+    // este proyecto ya aprendió cinco veces que una instrucción no es un candado.
+    //
+    // ⚠️ SE VALIDA EL TEXTO LIMPIO, el que ve el cliente: el bloque ##ORDER##
+    // lleva el total adentro y validarlo ahí sería revisar el dato contra sí mismo.
+    //
+    // ⚠️ Y SI SE REGENERA, LO DE LA VUELTA ANTERIOR SE DESCARTA COMPLETO. El
+    // pedido se extrae DESPUÉS de aceptar una respuesta: así un intento fallido
+    // no puede guardar un pedido ni disparar un efecto duplicado.
+    // ========================================================================
+    const guion = buildSystemPrompt() + "\n\n" + cotizacion.bloqueDeDatos(cot, contextoPrecio);
+    const MAX_INTENTOS = 2;
+    for (let intento = 1; intento <= MAX_INTENTOS; intento++) {
+      let candidata;
+      try {
+        candidata = await callIA(guion, conv.messages);
+      } catch (e) {
+        console.error("Error IA:", e.message);
+        reply =
+          "Perdón, se me cruzó la señal un momento 🙏 ¿Me repites lo último, por favor? Con gusto sigo con tu pedido 🏍️";
+        validacion = null;
+        break;
+      }
+      // Se valida solo la parte visible: sin marcadores ni bloque de pedido.
+      const soloTexto = extractMedia(extractOrder(candidata.replace(/##HANDOFF##/g, "")).clean).clean;
+      validacion = cotizacion.validarRespuesta(soloTexto, cot, contextoPrecio);
+      reply = candidata;
+      if (validacion.ok) break;
+
+      console.warn(
+        `⚠️  Respuesta con importes no validados (intento ${intento}/${MAX_INTENTOS}) para ${phone}: ` +
+          validacion.problemas.map((p) => p.detalle).join(" · ")
+      );
+    }
+
+    // Si después del reintento sigue mal, NO sale un precio inventado.
+    if (validacion && !validacion.ok) {
+      if (cot.ok) {
+        reply = cotizacion.lineaDePrecio(cot);
+        console.warn(`🔧 Se reemplazó la respuesta por la línea de precio calculada para ${phone}.`);
+      } else {
+        reply =
+          "Dejame confirmarte bien el valor del envío a tu ciudad y te escribo en un momento 📦";
+        console.warn(`🔧 Sin cotización válida para ${phone}: se escala en vez de dar un número.`);
+      }
     }
   }
 
@@ -383,9 +441,40 @@ async function generateReply(phone, userText) {
       // los pedía y el modelo no siempre obedecía.
       const conTelefono = revisarTelefono(order, phone);
       const conDireccion = revisarDireccionDePedido({ ...conTelefono, telefono_chat: phone });
+
+      // ======================================================================
+      // 🧾 ETAPA 6: EL PEDIDO NO PUEDE CONTRADECIR LA COTIZACIÓN
+      //
+      // Si el total del bloque no es el validado —ni la negociación autorizada—
+      // el pedido NO se descarta y NO se confirma como si todo hubiera salido
+      // bien: se guarda marcado y fuera del flujo normal de despacho.
+      //
+      // 🔑 Borrarlo en silencio sería perder una venta real por un número mal
+      // escrito. Confirmarlo como bueno sería despachar con el recaudo mal.
+      // ======================================================================
+      const chequeoPrecio = cotizacion.verificarPedido(conDireccion, cot, contextoPrecio);
+      if (!chequeoPrecio.ok) {
+        console.warn(
+          `🔴 PEDIDO QUE NO CUADRA CON LA COTIZACIÓN (${phone}): ` +
+            chequeoPrecio.problemas.map((p) => p.detalle).join(" · ") +
+            ". SE GUARDA marcado para revisión, fuera del flujo de despacho."
+        );
+      }
+
       savedOrder = store.saveOrder({
         ...conDireccion,
         ...(conf.marcar ? { sin_confirmar: true, motivo_sin_confirmar: conf.motivo } : {}),
+        ...(chequeoPrecio.ok
+          ? {}
+          : {
+              precio_no_cuadra: true,
+              pendiente_revision: true,
+              motivo_precio: chequeoPrecio.problemas.map((p) => p.detalle).join(" · "),
+              total_esperado: chequeoPrecio.totalEsperado,
+            }),
+        ...(cot.ok
+          ? { cotizacion_politica: cot.politica, cotizacion_total: cot.total, cotizacion_banda: cot.banda }
+          : {}),
       });
       if (conf.marcar) {
         console.warn(
@@ -399,6 +488,46 @@ async function generateReply(phone, userText) {
 
   store.pushMsg(phone, "assistant", reply);
   return { reply, order: savedOrder, handoff, media, pedidoRescatado };
+}
+
+// ============================================================================
+// De dónde sale la ciudad para cotizar.
+//
+// Prioridad: lo que el cliente dijo EN ESTE TURNO manda sobre la cotización
+// guardada. Si cambió de ciudad, la oferta cambia — y `store.guardarCotizacion`
+// archiva la anterior en vez de pisarla.
+//
+// Si en este turno no nombró ninguna, se conserva la de la cotización vigente:
+// así "y cuánto sale si llevo dos" no pierde el destino que ya había dado.
+// ============================================================================
+function detectarCiudad(conv, userText) {
+  const enEsteTurno = cotizacion.ciudadesEn(userText || "");
+  if (enEsteTurno.length === 1) return enEsteTurno[0];
+  if (enEsteTurno.length > 1) return ""; // varios destinos: lo resuelve calcular()
+  const guardada = (conv && conv.cotizacion && conv.cotizacion.ciudad) || "";
+  if (guardada) return guardada;
+  // Última opción: buscarla en lo que el cliente dijo antes en el chat.
+  const delCliente = ((conv && conv.messages) || []).filter((m) => m.role === "user");
+  for (let i = delCliente.length - 1; i >= 0; i--) {
+    const c = cotizacion.ciudadesEn(String(delCliente[i].content || ""));
+    if (c.length === 1) return c[0];
+  }
+  return "";
+}
+
+/**
+ * El texto sobre el que se lee la CANTIDAD.
+ *
+ * Se usa el turno actual más el anterior del cliente: "quiero dos" y la ciudad
+ * suelen venir en mensajes distintos. No se usa todo el historial a propósito —
+ * un "dos" de hace diez mensajes no es el pedido de ahora.
+ */
+function textoDelCliente(conv, userText) {
+  const delCliente = ((conv && conv.messages) || [])
+    .filter((m) => m.role === "user")
+    .slice(-2)
+    .map((m) => String(m.content || ""));
+  return [...delCliente, String(userText || "")].join(" · ");
 }
 
 // Identificador de cliente con username (no es un teléfono).

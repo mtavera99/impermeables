@@ -86,9 +86,38 @@ chequear(
 console.log("\n── 3. En 2 unidades manda al precio de rescate ──");
 
 chequear("manda a la tabla de rescate", /2 UNIDADES — us[áa] el precio de rescate/i.test(guion));
+
+// ==========================================================================
+// ⚠️ CAMBIÓ DE OBJETO EL 26-SEP. Antes se exigía que el bloque de precios de
+// rescate estuviera EN EL GUION. Pero un precio de rescate escrito en el guion
+// está disponible en TODOS los turnos — incluido el primero, donde ofrecerlo es
+// regalar plata a quien iba a comprar igual.
+//
+// Ahora el monto lo entrega `cotizacion` SOLO cuando ya se cumplió la condición,
+// y el validador de respuestas bloquea el número si aparece antes.
+// ==========================================================================
+const cotMod = require("./src/cotizacion");
+const cotCali = cotMod.calcular("Cali", "dos conjuntos");
 chequear(
-  "el bloque de rescate existe en el guion",
-  /PRECIO DE RESCATE/.test(guion)
+  "🔑 el precio de rescate NO se le entrega al modelo si el cliente no objetó",
+  !cotMod.bloqueDeDatos(cotCali, { objecionDePrecio: false }).includes(
+    require("./src/fletes").fmt(cotCali.rescate)
+  ),
+  "estar en el guion lo hacía ofrecible de entrada"
+);
+chequear(
+  "y SÍ cuando ya se quejó del precio",
+  cotMod.bloqueDeDatos(cotCali, { objecionDePrecio: true }).includes(
+    require("./src/fletes").fmt(cotCali.rescate)
+  )
+);
+chequear(
+  "el monto es el aprobado de su banda, no uno nuevo",
+  cotCali.rescate === require("./src/fletes").PROMO_2_RESCATE[cotCali.banda]
+);
+chequear(
+  "una sola oferta, sin encadenar rebajas",
+  /UNA sola vez/.test(cotMod.bloqueDeDatos(cotCali, { objecionDePrecio: true }))
 );
 chequear(
   "y sigue condicionado a que el cliente ya objetó",
