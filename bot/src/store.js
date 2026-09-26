@@ -720,6 +720,41 @@ function saveOrder(order) {
     const orders = readJSON(ORDERS_FILE, []);
 
     const repetido = esPedidoDuplicado(orders, record);
+
+    // ======================================================================
+    // ✅ LA CONFIRMACIÓN QUE LLEGA DESPUÉS COMPLETA EL PEDIDO, NO CREA OTRO
+    //
+    // DE DÓNDE SALE (26-sep): un pedido seguía marcado `sin_confirmar` después
+    // de un "Sí" explícito del cliente.
+    //
+    // La secuencia era ésta: el bot muestra el cuadro y emite el bloque antes de
+    // que el cliente conteste → el pedido se guarda marcado `sin_confirmar`
+    // (candado del 23-sep, correcto). El cliente dice "Sí". El bot vuelve a
+    // emitir el bloque → el candado antiduplicados lo descarta, y hace bien.
+    //
+    // 🔴 PERO EL PRIMERO SE QUEDABA MARCADO PARA SIEMPRE. El dueño veía
+    // "🔴 SIN CONFIRMAR" en un pedido que el cliente sí había confirmado, y la
+    // regla del panel es no despachar esos sin leer el chat. O sea: una venta
+    // confirmada frenada por una marca vieja.
+    //
+    // Ahora, si llega un duplicado que YA viene confirmado y el original estaba
+    // marcado, se le levanta la marca al original en vez de descartar y olvidar.
+    // No se crea un pedido nuevo: se completa el que ya existe.
+    // ======================================================================
+    if (repetido && repetido.sin_confirmar && !record.sin_confirmar) {
+      const i = indiceDePedido(orders, repetido.id || repetido.fecha);
+      if (i !== -1) {
+        const { sin_confirmar, motivo_sin_confirmar, ...limpio } = orders[i];
+        orders[i] = { ...limpio, confirmado_despues: new Date().toISOString() };
+        writeJSON(ORDERS_FILE, orders);
+        console.log(
+          `✅ CONFIRMACIÓN POSTERIOR: el pedido de ${limpio.nombre || "?"} por $${limpio.total} ` +
+            "ya tenía el 'sí' del cliente. Se le quitó la marca de sin confirmar (no se duplicó)."
+        );
+        return { ...orders[i], duplicadoIgnorado: true, confirmadoDespues: true };
+      }
+    }
+
     if (repetido) {
       console.warn(
         `⏭️  PEDIDO DUPLICADO NO GUARDADO: ${record.nombre || "?"} (${record.celular || record.telefono_chat}) ` +

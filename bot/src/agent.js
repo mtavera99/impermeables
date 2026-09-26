@@ -5,6 +5,7 @@ const { respuestaDeArranque } = require("./primer-mensaje");
 const { revisarDireccionDePedido } = require("./direccion");
 const { revisarConfirmacion } = require("./confirmacion");
 const store = require("./store");
+const promesas = require("./promesas");
 
 // ============================================================================
 // PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
@@ -356,6 +357,30 @@ async function generateReply(phone, userText) {
 
   const mediaRes = extractMedia(reply);
   reply = mediaRes.clean;
+
+  // ==========================================================================
+  // 🚫 PROMESAS QUE EL BOT NO PUEDE RESPALDAR (26-sep)
+  //
+  // Cuatro casos reportados: afirmó haber actualizado un pedido, dijo conocer el
+  // estado del despacho, prometió despacho "hoy mismo", y garantizó cubrir una
+  // maleta sin saber sus medidas. Más un "¡Así es!" a "están en Cali", cuando la
+  // bodega está en Bogotá.
+  //
+  // 🔑 El cliente TOMA DECISIONES con eso: confirma creyendo que el teléfono
+  // quedó cambiado, o espera el paquete un día que nadie prometió. La novedad, la
+  // queja o la devolución las paga el negocio.
+  //
+  // ⚠️ NO se reescribe ni se borra la respuesta: un detector que deja al cliente
+  // sin contestación es peor. Se manda igual y el chat pasa a modo humano, para
+  // que el dueño lo vea y corrija antes de que el cliente actúe sobre eso.
+  // ==========================================================================
+  const chequeoPromesas = promesas.revisar(reply);
+  if (!chequeoPromesas.ok) {
+    console.warn(
+      `⚠️  PROMESA SIN RESPALDO de ${phone}: ${promesas.resumir(chequeoPromesas)}. ` +
+        "El mensaje sale igual, pero el chat pasa a modo humano para que lo revises."
+    );
+  }
   // Combina lo que pidió la IA (marcadores) con la detección por palabras clave del cliente
   const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
 
@@ -395,7 +420,9 @@ async function generateReply(phone, userText) {
       }
     }
   }
-  if (handoff) store.setPaused(phone, true);
+  // Una promesa sin respaldo también manda el chat a modo humano: el dueño tiene
+  // que poder corregirla antes de que el cliente actúe sobre ella.
+  if (handoff || !chequeoPromesas.ok) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
   return { reply, order: savedOrder, handoff, media, pedidoRescatado };
