@@ -542,37 +542,69 @@ function notaDeTurno(messages, userText, contexto = {}) {
 }
 
 // ============================================================================
-// 📏 EL TECHO MANDA SOBRE LA NOTA — y acá aparece una dependencia real
+// 🔘 EL INTERRUPTOR DE LA NOTA COMERCIAL —  NOTA_COMERCIAL=1  la prende
 //
-// 🔴 ESTO SE DESCUBRIÓ ARMANDO LA PRUEBA, no se sabía al empezar: el guion está
-// en ~8.989 tokens y el techo es 9.000. **Quedan 11 tokens: NO CABE NINGUNA
-// NOTA.** Ni la más corta.
+// 🔴 LO QUE CORRIGIÓ LA REVISIÓN (26-sep), y es una corrección de fondo: la
+// primera versión usaba el ESPACIO DISPONIBLE del prompt como mecanismo de
+// activación. Si la nota cabía bajo el techo, se mandaba; si no, no.
 //
-// El espacio existe recién cuando la tabla de fletes sale del guion y pasa a
-// código, que es justo lo que hace la entrega 1 (PR #163): ahí el guion baja a
-// ~7.989 y quedan más de 1.000 tokens de margen.
+// Eso está mal por tres razones, y ninguna es teórica:
 //
-// ⚠️ Por eso esto NO se resuelve con un interruptor que alguien tenga que
-// acordarse de prender. Se mide en cada turno: si la nota no cabe, no se manda.
-// Sin la entrega 1 el bot queda exactamente como está hoy; con ella, las notas
-// empiezan a salir solas. Ninguna de las dos entregas necesita a la otra para
-// mergearse, y el orden no importa.
+//   1. El comportamiento del bot quedaba atado a cuánto mide el guion. Alguien
+//      agrega dos párrafos al guion por otro motivo y las notas se apagan solas,
+//      en silencio, sin que nadie lo haya decidido.
+//   2. No se puede desactivar. Si la nota resulta contraproducente, no hay nada
+//      que apagar: habría que recortar el guion para que deje de caber.
+//   3. Y al revés: no se puede activar a voluntad para medirla.
+//
+// 🔑 Una mejora que se quiere MEDIR necesita poder prenderse y apagarse a
+// propósito. Si no, no hay con qué comparar.
+//
+// Ahora son dos cosas separadas, como debe ser:
+//   · el INTERRUPTOR decide si la nota se usa           → NOTA_COMERCIAL
+//   · el TECHO es una red de seguridad, no un interruptor → nunca desborda el prompt
+//
+// Se sigue la misma convención que SEGUIMIENTO_44H en seguimiento.js.
 // ============================================================================
 
 /**
- * Pega la nota al guion solo si cabe bajo el techo.
+ * ¿Está activa la nota comercial?
  *
- * @returns {{prompt:string, nota:string, cupo:boolean, tokens:number}}
+ * Apagada por defecto: es una mejora a medir, no una corrección de algo roto, y
+ * el dueño decide cuándo prenderla. Se lee en cada llamada (no al cargar el
+ * módulo) para que se pueda cambiar sin reiniciar y para poder probar las dos
+ * ramas.
+ */
+function notaActiva(contexto = {}) {
+  if (contexto.activa !== undefined) return Boolean(contexto.activa);
+  return String(process.env.NOTA_COMERCIAL ?? "0").trim().toLowerCase() === "1";
+}
+
+/**
+ * Pega la nota al guion, si está activada y si cabe.
+ *
+ * @returns {{prompt:string, nota:string, activa:boolean, cupo:boolean, tokens:number}}
  */
 function guionConNota(guion, messages, userText, contexto = {}) {
-  const nota = notaDeTurno(messages, userText, contexto);
-  if (!nota) return { prompt: guion, nota: "", cupo: true, tokens: tokensDe(guion) };
+  const activa = notaActiva(contexto);
+  if (!activa) {
+    // Apagada: el bot queda exactamente como sin este módulo. Ni se construye la
+    // nota, así que no cuesta nada.
+    return { prompt: guion, nota: "", activa: false, cupo: true, tokens: tokensDe(guion) };
+  }
 
+  const nota = notaDeTurno(messages, userText, contexto);
+  if (!nota) return { prompt: guion, nota: "", activa: true, cupo: true, tokens: tokensDe(guion) };
+
+  // 📏 RED DE SEGURIDAD, NO INTERRUPTOR. Con la entrega 1 mergeada el guion baja
+  // a ~7.555 tokens y la nota más cargada son ~150: sobra espacio. Esto existe
+  // para que un guion que crezca por otro motivo no desborde el prompt en
+  // silencio, y cuando salta LO DICE, para que se pueda arreglar.
   const tokens = tokensDe(guion + nota);
   if (tokens >= TECHO_TOKENS) {
-    return { prompt: guion, nota, cupo: false, tokens };
+    return { prompt: guion, nota, activa: true, cupo: false, tokens };
   }
-  return { prompt: guion + nota, nota, cupo: true, tokens };
+  return { prompt: guion + nota, nota, activa: true, cupo: true, tokens };
 }
 
 // ============================================================================

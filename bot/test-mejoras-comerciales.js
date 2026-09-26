@@ -444,46 +444,69 @@ const CARGADO = [
 }
 
 // ============================================================================
-console.log("\n── 6b. 🔴 El techo manda: si la nota no cabe, no se manda ──");
-// ============================================================================
-// Esto se descubrió armando la prueba y es el hallazgo más importante de esta
-// entrega: con el guion de HOY (8.989 tokens) no cabe ninguna nota. El espacio
-// aparece cuando la tabla de fletes sale del guion (entrega 1, PR #163).
+console.log("\n── 6b. 🔘 El interruptor es explícito, no el espacio del prompt ──");
+// 🔴 La revisión corrigió el diseño: usar el margen del prompt como mecanismo de
+// activación ataba el comportamiento del bot a cuánto mide el guion, y no dejaba
+// ni prenderla ni apagarla a propósito.
 {
-  const res = comercial.guionConNota(guion, CARGADO, CARGADO_TXT, { yaConocidos: { ciudad: "Bogotá" } });
+  const previo = process.env.NOTA_COMERCIAL;
+
+  // Apagada por defecto: es una mejora a medir, no el arreglo de algo roto.
+  delete process.env.NOTA_COMERCIAL;
+  const apagada = comercial.guionConNota(guion, CARGADO, CARGADO_TXT, { yaConocidos: { ciudad: "Bogotá" } });
   chequear(
-    `🔑 con el guion de hoy (${tokensGuion} tokens) la nota NO cabe y NO se manda`,
-    res.cupo === false && res.prompt === guion,
-    `cupo=${res.cupo}, tokens=${res.tokens}`
+    "🔘 sin la variable, la nota está APAGADA",
+    apagada.activa === false && apagada.nota === "" && apagada.prompt === guion,
+    `activa=${apagada.activa}, nota=${apagada.nota.length} chars`
+  );
+  chequear("y el guion sale intacto", apagada.prompt.length === guion.length);
+
+  process.env.NOTA_COMERCIAL = "0";
+  chequear("con 0 también está apagada", comercial.guionConNota(guion, CARGADO, CARGADO_TXT).activa === false);
+
+  // 🔑 Y se puede prender a voluntad, que es lo que permite medirla.
+  process.env.NOTA_COMERCIAL = "1";
+  const prendida = comercial.guionConNota(
+    guion.slice(0, 4000 * 4),
+    CARGADO,
+    CARGADO_TXT,
+    { yaConocidos: { ciudad: "Bogotá" } }
   );
   chequear(
-    "y el bot queda exactamente como está hoy: el guion sale intacto",
-    res.prompt.length === guion.length,
-    `el prompt cambió de ${guion.length} a ${res.prompt.length}`
+    "🔘 con NOTA_COMERCIAL=1 se prende",
+    prendida.activa === true && /PARA ESTE MENSAJE/.test(prendida.prompt),
+    `activa=${prendida.activa}`
   );
+  chequear("y sigue bajo el techo", prendida.tokens < comercial.TECHO_TOKENS, `${prendida.tokens} tokens`);
+
+  // 🔑 El interruptor manda sobre el espacio: prendida y con espacio, entra.
+  //    Prendida y SIN espacio, la red de seguridad avisa — pero eso NO es el
+  //    interruptor, es una protección.
+  const sinEspacio = comercial.guionConNota(guion, CARGADO, CARGADO_TXT, { yaConocidos: { ciudad: "Bogotá" } });
+  chequear(
+    "📏 la red de seguridad sigue existiendo: si no cabe, no desborda",
+    sinEspacio.activa === true && sinEspacio.cupo === false && sinEspacio.prompt === guion,
+    `activa=${sinEspacio.activa} cupo=${sinEspacio.cupo} tokens=${sinEspacio.tokens}`
+  );
+  chequear(
+    "🔑 y se distingue «apagada» de «no cupo»",
+    apagada.activa === false && sinEspacio.activa === true,
+    "son dos situaciones distintas y el log tiene que poder decir cuál es"
+  );
+
+  // El contexto puede forzarlo, para poder probar las dos ramas sin tocar el entorno.
+  chequear("se puede forzar por contexto", comercial.guionConNota(guion, [u("hola")], "hola", { activa: false }).activa === false);
+
+  if (previo === undefined) delete process.env.NOTA_COMERCIAL;
+  else process.env.NOTA_COMERCIAL = previo;
 }
+
 {
-  // Simula el guion que deja la entrega 1: ~7.989 tokens, mil de margen.
-  const guionCorto = guion.slice(0, 4000 * 4);
-  const res = comercial.guionConNota(guionCorto, CARGADO, CARGADO_TXT, { yaConocidos: { ciudad: "Bogotá" } });
-  chequear(
-    "✅ con margen suficiente la nota SÍ se pega",
-    res.cupo === true && res.prompt.length > guionCorto.length && /PARA ESTE MENSAJE/.test(res.prompt),
-    `cupo=${res.cupo}, tokens=${res.tokens}`
-  );
-  chequear(
-    "y el resultado sigue bajo el techo",
-    res.tokens < comercial.TECHO_TOKENS,
-    `quedó en ${res.tokens} tokens`
-  );
-}
-{
-  // Un turno sin nada que decir nunca gasta un token, tenga margen o no.
-  const res = comercial.guionConNota(guion, [u("hola")], "hola");
+  // Un turno sin nada que decir nunca gasta un token, prendida o apagada.
+  const res = comercial.guionConNota(guion, [u("hola")], "hola", { activa: true });
   chequear("un turno sin nota no gasta nada", res.nota === "" && res.prompt === guion);
 }
 
-// ============================================================================
 console.log("\n── 7. Lo que ya funciona no se marca ──");
 // ============================================================================
 // Si la revisión marcara respuestas buenas, el renglón del log deja de servir
@@ -524,6 +547,11 @@ console.log("\n── 8. Está enganchado, y NO pausa el chat ──");
 // ============================================================================
 const fuenteAgente = require("fs").readFileSync(`${__dirname}/src/agent.js`, "utf8");
 chequear("agent.js usa el módulo", /require\("\.\/comercial"\)/.test(fuenteAgente));
+chequear(
+  "🔘 y el interruptor está documentado donde se engancha",
+  /NOTA_COMERCIAL=1/.test(fuenteAgente),
+  "quien lea agent.js tiene que saber cómo prenderla"
+);
 chequear(
   "🔑 el prompt que se manda es el de guionConNota, no buildSystemPrompt() suelto",
   /callIA\(conNota\.prompt/.test(fuenteAgente) && !/callIA\(buildSystemPrompt\(\)/.test(fuenteAgente),

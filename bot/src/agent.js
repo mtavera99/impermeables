@@ -327,18 +327,21 @@ async function generateReply(phone, userText) {
     // datos, adaptar el cierre a lo que el cliente mostró, y no ofrecer los 2
     // conjuntos cuando estorba (difícil acceso, ya dijo que uno, venta cerrada).
     //
-    // 🔑 Va acá y NO dentro de buildSystemPrompt() por dos razones: el guion ya
-    // está en ~8.989 tokens contra un techo de 9.000, y porque una regla que solo
-    // aplica a veces no tiene por qué pagarse en todos los turnos.
+    // 🔑 Va acá y NO dentro de buildSystemPrompt() porque una regla que solo aplica
+    // a veces no tiene por qué pagarse en todos los turnos.
     //
-    // 📏 Si la nota no cabe bajo el techo, guionConNota NO la pega y el bot queda
-    // igual que hoy. El espacio aparece cuando la tabla de fletes sale del guion.
+    // 🔘 ARRANCA APAGADA. Se prende con NOTA_COMERCIAL=1. Es una mejora a medir,
+    // no una corrección de algo roto, así que el dueño decide cuándo activarla y
+    // puede apagarla sin desplegar nada. Ver comercial.js.
     // ========================================================================
     const conNota = comercial.guionConNota(buildSystemPrompt(), conv.messages, userText);
     if (conNota.nota && !conNota.cupo) {
-      console.log(
-        `📏 nota comercial omitida: el guion + la nota dan ${conNota.tokens} tokens y el techo es ` +
-          `${comercial.TECHO_TOKENS}. Entra sola cuando la tabla de fletes salga del guion.`
+      // 🔴 La red de seguridad saltó: la nota está prendida pero no cabe. Se avisa
+      // fuerte en vez de apagarla en silencio, porque si esto pasa hay que
+      // recortar el guion, no resignarse.
+      console.warn(
+        `🔴 NOTA COMERCIAL OMITIDA POR TAMAÑO: el guion + la nota dan ${conNota.tokens} tokens y el ` +
+          `techo es ${comercial.TECHO_TOKENS}. La nota está ACTIVA pero no cabe: hay que recortar el guion.`
       );
     }
     try {
