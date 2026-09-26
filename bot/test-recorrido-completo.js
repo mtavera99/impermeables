@@ -1230,6 +1230,212 @@ const datosBase = {
     chequear("20· y sin escalar", t3.revisionHumana === null, JSON.stringify(t3.revisionHumana));
   }
 
+  // ==========================================================================
+  console.log("\n── 21. 🧍 Un APELLIDO no cambia el destino (caso José Bello, 26-sep 13:12) ──");
+  // El cliente tenía su destino en San Onofre, Sucre, y mandó en un solo mensaje
+  // "José Bello, 3009990024, San Onofre, entrega en oficina". La cotización se pasó
+  // sola a Bello y el total bajó de $85.000 a $83.000; el pedido quedó con San
+  // Onofre y la cotización con Bello, así que quedó frenado.
+  //
+  // 🔎 El mecanismo: `ciudadesEn` busca nombres del tarifario en CUALQUIER parte del
+  // mensaje y es la primera prioridad. "Bello" está en el tarifario y "San Onofre"
+  // no, así que de ese mensaje salía una sola ciudad: el apellido.
+  // ==========================================================================
+  {
+    const tel = "573008880024";
+    const CUADRO_SO = (nombre, cel) =>
+      `Confirmemos tu pedido ✅\nNombre: ${nombre}\nCelular: ${cel}\nCiudad: San Onofre\n` +
+      `Dirección: oficina de Interrapidísimo\nColor de la franja: negro\nTalla: L\n` +
+      `Pago: contraentrega\nTOTAL a pagar al recibir: $85.000\n` +
+      `¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`;
+
+    await turno(tel, "hola, cuánto vale?", "¡Hola! 🏍️ El conjunto de 4 piezas. ¿Para qué ciudad sería el envío?");
+    const t2 = await turno(
+      tel,
+      "San Onofre, Sucre",
+      "Te queda en $85.000 en total puesto en San Onofre, y pagas al recibir 📦 Pásame nombre completo, dirección con barrio y celular"
+    );
+    const cotAntes = store.leerCotizacion(tel);
+    chequear("21· el destino queda establecido en San Onofre", cotAntes && /san onofre/i.test(cotAntes.ciudad), JSON.stringify(cotAntes && cotAntes.ciudad));
+    chequear("21· con su total de $85.000", cotAntes && cotAntes.total === 85000, `${cotAntes && cotAntes.total}`);
+    chequear("21· y el cliente lo ve", /\$85\.000/.test(t2.reply), `salió: ${t2.reply}`);
+
+    // 🔴 EL MENSAJE DEL CASO: nombre + celular + ciudad + oficina, todo junto.
+    const t3 = await turno(tel, "José Bello, 3009990024, San Onofre, entrega en oficina", CUADRO_SO("José Bello", "3009990024"));
+    const cotDespues = store.leerCotizacion(tel);
+    chequear(
+      "21· 🔑 el apellido «Bello» NO se convierte en el destino",
+      cotDespues && /san onofre/i.test(cotDespues.ciudad),
+      JSON.stringify(cotDespues && cotDespues.ciudad)
+    );
+    chequear("21· 🔑 y el total NO baja a $83.000", cotDespues && cotDespues.total === 85000, `${cotDespues && cotDespues.total}`);
+    chequear("21· el cuadro sale con su total de verdad", /\$85\.000/.test(t3.reply), `salió: ${t3.reply}`);
+    chequear("21· 🔑 y el cuadro NO sale sin monto", !/TOTAL[^$\n]{0,40}\n/.test(t3.reply), `salió: ${t3.reply}`);
+
+    // Talla y color tampoco lo mueven.
+    await turno(tel, "la talla L y color negro", "¡Perfecto! Talla L, franja negra ✅");
+    const cotTalla = store.leerCotizacion(tel);
+    chequear("21· talla y color no mueven el destino", cotTalla && /san onofre/i.test(cotTalla.ciudad), JSON.stringify(cotTalla && cotTalla.ciudad));
+
+    await turno(
+      tel,
+      "sí confirmo",
+      `¡Listo José! ${ORDER({
+        nombre: "José Bello", celular: "3009990024", ciudad: "San Onofre",
+        direccion: "OFICINA Interrapidísimo - San Onofre", color: "negro", talla: "L",
+        unidades: 1, pago: "contraentrega", total: 85000,
+      })}`
+    );
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("21· 🔑 el pedido queda con San Onofre", pedido && /san onofre/i.test(pedido.ciudad), JSON.stringify(pedido && pedido.ciudad));
+    chequear("21· con el total correcto", pedido && pedido.total === 85000, `${pedido && pedido.total}`);
+    chequear(
+      "21· 🔑 y SE PUEDE DESPACHAR: ya no hay ciudad_distinta",
+      pedido && store.listoParaDespachar(pedido) === true,
+      store.textoDeRevision(pedido)
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 22. 🚚 La TRANSPORTADORA no es un municipio (caso Yarumal, 26-sep 14:13) ──");
+  // El cliente aceptó el pedido y quedó bloqueado porque la cotización tenía
+  // "Interrapidísimo" como ciudad mientras el pedido decía Yarumal. Terminó
+  // esperando otra verificación del envío.
+  //
+  // ⚠️ Esta sí es una regresión de la entrega #168: aparece en f213031 y no en
+  // 2d382fc. "en Interrapidísimo" es preposición de lugar + nombre propio, que era
+  // justo la señal que se había empezado a aceptar.
+  // ==========================================================================
+  {
+    const tel = "573008880025";
+    const CUADRO_YA = `Confirmemos tu pedido ✅\nNombre: Eduardo Silva\nCelular: 3002223344\nCiudad: Yarumal\n` +
+      `Dirección: oficina de Interrapidísimo\nColor de la franja: azul\nTalla: XL\n` +
+      `Pago: contraentrega\nTOTAL a pagar al recibir: $82.000\n` +
+      `¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`;
+
+    await turno(tel, "buenas", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel, "Yarumal, Antioquia", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Yarumal. ¿Lo quieres a tu dirección o a oficina?");
+    const cotYa = store.leerCotizacion(tel);
+    chequear("22· el destino queda en Yarumal", cotYa && /yarumal/i.test(cotYa.ciudad), JSON.stringify(cotYa && cotYa.ciudad));
+
+    // 🔴 EL MENSAJE DEL CASO: elige la transportadora.
+    const t3 = await turno(tel, "en Interrapidísimo", "¡Claro! Te lo enviamos a oficina de Interrapidísimo en Yarumal 📦 ¿Me confirmas tu celular?");
+    store.setPaused(tel, false);
+    const cotTras = store.leerCotizacion(tel);
+    chequear(
+      "22· 🔑 «Interrapidísimo» NO se convierte en la ciudad",
+      cotTras && /yarumal/i.test(cotTras.ciudad),
+      JSON.stringify(cotTras && cotTras.ciudad)
+    );
+    chequear("22· y el total sigue siendo el de Yarumal", cotTras && cotTras.total === 82000, `${cotTras && cotTras.total}`);
+    chequear("22· sin derivar a un humano por esto", t3.revisionHumana === null, JSON.stringify(t3.revisionHumana));
+
+    await turno(tel, "3002223344", CUADRO_YA);
+    const cotCel = store.leerCotizacion(tel);
+    chequear("22· el celular tampoco mueve el destino", cotCel && /yarumal/i.test(cotCel.ciudad), JSON.stringify(cotCel && cotCel.ciudad));
+
+    await turno(
+      tel,
+      "sí confirmo",
+      `¡Listo Eduardo! ${ORDER({
+        nombre: "Eduardo Silva", celular: "3002223344", ciudad: "Yarumal",
+        direccion: "OFICINA Interrapidísimo - Yarumal", color: "azul", talla: "XL",
+        unidades: 1, pago: "contraentrega", total: 82000,
+      })}`
+    );
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("22· 🔑 el pedido queda con Yarumal", pedido && /yarumal/i.test(pedido.ciudad), JSON.stringify(pedido && pedido.ciudad));
+    chequear(
+      "22· 🔑 y SE PUEDE DESPACHAR: ya no queda esperando otra verificación",
+      pedido && store.listoParaDespachar(pedido) === true,
+      store.textoDeRevision(pedido)
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 23. 🔀 Un cambio REAL de destino sí se reconoce y se recalcula ──");
+  // La otra mitad de la regla: no se prohíbe Bello. Sigue siendo una ciudad válida
+  // cuando el cliente pide enviar allí. Si esto no funcionara, el arreglo de arriba
+  // habría cambiado un defecto por otro peor: no poder cambiar de ciudad.
+  // ==========================================================================
+  {
+    const tel = "573008880026";
+    await turno(tel, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel, "San Onofre, Sucre", "Te queda en $85.000 en total puesto en San Onofre 📦 Pásame nombre completo, dirección con barrio y celular");
+
+    const t = await turno(tel, "no, mejor envíalo a Bello", "Te queda en $83.000 en total: $59.900 el conjunto + $23.100 de envío a Bello 📦");
+    const cot = store.leerCotizacion(tel);
+    chequear("23· 🔑 el cambio explícito SÍ cambia el destino", cot && /bello/i.test(cot.ciudad), JSON.stringify(cot && cot.ciudad));
+    chequear("23· 🔑 y recalcula el total a $83.000", cot && cot.total === 83000, `${cot && cot.total}`);
+    chequear("23· el cliente recibe el total nuevo", /\$83\.000/.test(t.reply), `salió: ${t.reply}`);
+
+    // 🤔 Y la DUDA de verdad: el bot pidió el nombre y llegó «Bello» a secas.
+    const tel2 = "573008880027";
+    await turno(tel2, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel2, "San Onofre, Sucre", "Te queda en $85.000 en total puesto en San Onofre 📦 Pásame nombre completo, dirección con barrio y celular");
+    const t2 = await turno(tel2, "Bello", "¿Me confirmas la ciudad del envío?", "¿Me confirmas la ciudad del envío?");
+    const cot2 = store.leerCotizacion(tel2);
+    chequear(
+      "23· 🔑 ante la duda NO sobrescribe la ciudad en silencio",
+      cot2 && /san onofre/i.test(cot2.ciudad),
+      JSON.stringify(cot2 && cot2.ciudad)
+    );
+    chequear("23· y el total guardado sigue intacto", cot2 && cot2.total === 85000, `${cot2 && cot2.total}`);
+    chequear("23· 🔑 se le PREGUNTA en vez de adivinar", /ciudad/i.test(t2.reply), `salió: ${t2.reply}`);
+    chequear("23· sin escalar a un humano", t2.revisionHumana === null, JSON.stringify(t2.revisionHumana));
+  }
+
+  // ==========================================================================
+  console.log("\n── 24. 🧾 No se pide confirmar un resumen SIN TOTAL (caso 26-sep 13:16) ──");
+  // Al cliente le llegó el cuadro con sus datos, "TOTAL a pagar al recibir" sin
+  // ninguna cifra, y pidiéndole «SÍ CONFIRMO». Se le pidió confirmar un pedido sin
+  // decirle cuánto paga.
+  // ==========================================================================
+  {
+    // ── a. Con cotización válida: sale el total, no un cuadro mutilado ────────
+    const tel = "573008880028";
+    const CUADRO_SIN_TOTAL =
+      `Confirmemos tu pedido ✅\nNombre: Marta Ríos\nCelular: 3004445566\nCiudad: San Onofre\n` +
+      `Dirección: Cra 5 #4-3 barrio Centro\nColor de la franja: rojo\nTalla: M\n` +
+      `Pago: contraentrega\nTOTAL a pagar al recibir\n` +
+      `¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`;
+
+    await turno(tel, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel, "San Onofre, Sucre", "Te queda en $85.000 en total puesto en San Onofre 📦 Pásame nombre completo, dirección con barrio y celular");
+    const t = await turno(tel, "Marta Ríos, 3004445566, Cra 5 #4-3 barrio Centro", CUADRO_SIN_TOTAL, CUADRO_SIN_TOTAL);
+
+    chequear(
+      "24a· 🔑 el resumen sin monto NO sale pidiendo «SÍ CONFIRMO»",
+      !/S[IÍ]\s*CONFIRMO/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear("24a· 🔑 y lo que sale SÍ trae el total", /\$85\.000/.test(t.reply), `salió: ${t.reply}`);
+    chequear("24a· no se guardó ningún pedido de ese turno", store.todosLosPedidos().filter((p) => p.telefono_chat === tel).length === 0);
+    chequear("24a· y la cotización sigue sobre San Onofre", /san onofre/i.test(String((store.leerCotizacion(tel) || {}).ciudad)));
+
+    // ── b. Sin cotización válida: se aclara lo que falta ─────────────────────
+    const tel2 = "573008880029";
+    const CUADRO_SIN_CIUDAD =
+      `Confirmemos tu pedido ✅\nNombre: Pedro Nieto\nCelular: 3005556677\n` +
+      `Color de la franja: negro\nTalla: L\nPago: contraentrega\nTOTAL a pagar al recibir\n` +
+      `¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`;
+    const t2 = await turno(tel2, "Pedro Nieto, 3005556677, talla L negra", CUADRO_SIN_CIUDAD, CUADRO_SIN_CIUDAD);
+
+    chequear("24b· 🔑 tampoco pide «SÍ CONFIRMO» sin cotización", !/S[IÍ]\s*CONFIRMO/i.test(t2.reply), `salió: ${t2.reply}`);
+    chequear("24b· 🔑 y ACLARA lo que falta: la ciudad", /qu[eé] ciudad/i.test(t2.reply), `salió: ${t2.reply}`);
+    chequear("24b· sin inventar ningún total", !/\$8[0-9]\.000/.test(t2.reply), `salió: ${t2.reply}`);
+    chequear("24b· sin derivar a un humano", t2.revisionHumana === null, JSON.stringify(t2.revisionHumana));
+    chequear("24b· y sin guardar pedido", store.todosLosPedidos().filter((p) => p.telefono_chat === tel2).length === 0);
+
+    // ── c. 🔑 Y el cuadro CON su total sigue saliendo igual que siempre ───────
+    const tel3 = "573008880030";
+    await turno(tel3, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel3, "Cali", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali 📦 Pásame nombre completo, dirección con barrio y celular");
+    const t3 = await turno(tel3, "Ana Gómez, 3001234567, Cra 1 #2-3 barrio Centro, talla L roja", CUADRO(82000));
+    chequear("24c· 🔑 el cuadro con total SÍ sale y pide la confirmación", /S[IÍ]\s*CONFIRMO/i.test(t3.reply), `salió: ${t3.reply}`);
+    chequear("24c· con su monto", /\$82\.000/.test(t3.reply), `salió: ${t3.reply}`);
+  }
+
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   try {
     fs.rmSync(DIR, { recursive: true, force: true });

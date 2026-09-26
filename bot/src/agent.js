@@ -501,7 +501,49 @@ async function generateReply(phone, userText) {
         depurado.texto.length >= 20 &&
         cotizacion.validarRespuesta(depurado.texto, cot, contextoPrecio).ok;
 
-      if (seSalva) {
+      // ======================================================================
+      // 🔴 UN RESUMEN QUE PIDE CONFIRMAR NO PUEDE SALIR SIN EL TOTAL
+      //
+      // DEL CASO 26-SEP 13:16: al cliente le llegó el cuadro con sus datos, con
+      // "TOTAL a pagar al recibir" SIN cifra, y pidiéndole «SÍ CONFIRMO». El
+      // rescate por depuración le había arrancado el importe a la línea del total
+      // y el resto del cuadro volvía a validar, porque ya no quedaba ningún número
+      // que contradecir.
+      //
+      // 🔑 Acá se corta antes: si el mensaje pide confirmar y no hay cotización
+      // válida, se le dice QUÉ falta. Si la hay, se manda la línea de precio
+      // calculada, que sí trae el total. Lo que no puede pasar es pedirle a alguien
+      // que confirme un pedido sin decirle cuánto paga.
+      // ======================================================================
+      // ⚠️ Y NO alcanza con mirar si la depuración "se salva": probándolo salió que
+      // `depurarImportes` le quitaba al cuadro el encabezado y el «SÍ CONFIRMO»
+      // —porque son las partes que no validan— y dejaba pasar el resto: una lista
+      // de datos del cliente terminada en "TOTAL a pagar al recibir", sin monto y
+      // sin total en ninguna parte. Ya no pedía confirmar, pero seguía sin decirle
+      // cuánto paga.
+      //
+      // 🔑 Un cuadro no se arregla por pedazos. Si el mensaje pedía confirmar y lo
+      // depurado ya no pide confirmar —o sea, la depuración lo desarmó— se reemplaza
+      // completo. Solo se conserva la depuración cuando lo que queda SIGUE siendo un
+      // cuadro válido, que es el caso de un número suelto mal en otra frase.
+      const pediaConfirmar = cotizacion.pideConfirmacion(reply);
+      const laDepuracionLoDesarmo = !(seSalva && cotizacion.pideConfirmacion(depurado.texto));
+      if (pediaConfirmar && laDepuracionLoDesarmo) {
+        if (!cot.ok) {
+          reply = cotizacion.faltaParaConfirmar(cot);
+          console.warn(
+            `🧾 Se pedía confirmar sin cotización válida para ${phone} (${cot.motivo}): se aclara ` +
+              "lo que falta en vez de mandar el cuadro sin total."
+          );
+        } else {
+          reply =
+            `${lineaCalculada}\n\n¿Te parece bien y lo despacho? Confírmame y seguimos 🏍️`;
+          console.warn(
+            `🧾 El cuadro iba a salir sin el total para ${phone}: se reemplaza por la línea de ` +
+              "precio calculada, que sí lo trae."
+          );
+        }
+      } else if (seSalva) {
         reply = esperaUnPrecio ? `${depurado.texto}\n\n${lineaCalculada}` : depurado.texto;
         console.log(
           `✂️  RESPUESTA DEPURADA para ${phone}: se quitó ${JSON.stringify(depurado.quitadas)} y se ` +
