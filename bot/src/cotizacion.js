@@ -239,9 +239,120 @@ const RE_SOLO_DOS = /^\s*(2|dos)\s*$/i;
  * @param {number} [previa] la cantidad que ya venía de la conversación
  * @returns {{uds:number, escalar:boolean, explicita:boolean, heredada:boolean, motivo?:string}}
  */
+// ============================================================================
+// 🔴 "LA UNA TALLA NORMAL XL Y LA OTRA ES L" SON DOS CONJUNTOS (caso 26-sep)
+//
+// LO QUE PASÓ, y es el caso real que costó la venta: el cliente pidió DOS
+// impermeables enumerando sus tallas. `resolverCantidad` no reconoció ninguna
+// cantidad, dejó UNA unidad, y de ahí salió todo lo demás en cascada:
+//
+//   · el modelo cotizaba los dos ($148.000), el código tenía uno ($82.000),
+//     así que la etapa 5 le rechazaba la respuesta DOS VECES y salía la línea de
+//     precio de una unidad — cuatro veces, contra cuatro preguntas distintas
+//   · el pedido se guardó con talla "XL y L" y quedó bloqueado por incoherencia
+//
+// 🔑 Enumerar tallas ES declarar la cantidad. Y el cliente llegó por nota de voz,
+// así que la frase viene desordenada: hay que leer el patrón, no la sintaxis.
+//
+// ⛔ PERO HAY TRES COSAS QUE NO SON DOS UNIDADES, y confundirlas sería peor:
+//   1. "XL o L"  → está preguntando cuál le sirve. No se cotiza: se pregunta.
+//   2. "2XL"     → es UNA talla. Ya nos costó una vez contarla como dos.
+//   3. "no, mejor L" → es una corrección de la talla, no una segunda unidad.
+// ============================================================================
+
+const TALLA = "(?:xs|s|m|l|xl|2xl|3xl|xxl|xxxl)";
+
+// Dos tallas unidas por "y": "una XL y otra L", "XL y L", "una talla XL y la otra L".
+const RE_DOS_TALLAS_Y = new RegExp(
+  `\\b${TALLA}\\b[^.,;]{0,24}?\\by\\b[^.,;]{0,24}?\\b${TALLA}\\b`,
+  "i"
+);
+// Las mismas dos tallas, pero como ALTERNATIVA: "XL o L", "¿XL o L?".
+const RE_DOS_TALLAS_O = new RegExp(`\\b${TALLA}\\b[^.,;]{0,24}?\\bo\\b[^.,;]{0,24}?\\b${TALLA}\\b`, "i");
+// "una ... y la otra ...", con o sin tallas nombradas. Es la forma del caso real.
+const RE_UNA_Y_LA_OTRA =
+  /\b(una?|uno)\b[^.]{0,40}?\b(y|mas|más)\b[^.]{0,20}?\b(la |el )?otr[ao]\b|\bla otr[ao]\b[^.]{0,20}?\bes\b/i;
+// Corrección de talla: no agrega una unidad, cambia la que ya había.
+// ⚠️ SIN un "no" suelto. Lo tenía y volvía "no sé si XL o L" en una corrección,
+// que es justo lo contrario: ahí el cliente está preguntando, no corrigiendo.
+const RE_CORRIGE_TALLA =
+  /\b(no,? mejor|no es|mejor|cambi\w*|en vez de|mejor dicho|me equivoqu\w*)\b[^.]{0,20}?\b(talla|la)?\s*(xs|s|m|l|xl|2xl|3xl)\b/i;
+
+/**
+ * Las tallas distintas que el texto enumera, en orden y sin repetir.
+ * "una XL y otra L" → ["XL","L"] · "2XL" → ["2XL"] · "XL o L" → ["XL","L"]
+ */
+function tallasEnumeradas(texto) {
+  const t = String(texto == null ? "" : texto);
+  const hallazgos = [];
+  const re = new RegExp(`\\b${TALLA}\\b`, "gi");
+  let m;
+  while ((m = re.exec(t)) !== null) {
+    const talla = m[0].toUpperCase();
+    if (!hallazgos.includes(talla)) hallazgos.push(talla);
+  }
+  return hallazgos;
+}
+
+/**
+ * ¿El texto enumera DOS conjuntos por sus tallas?
+ *
+ * @returns {{dos:boolean, ambiguo:boolean, tallas:string[], motivo?:string}}
+ */
+function dosPorTallas(texto) {
+  const t = String(texto == null ? "" : texto);
+  const tallas = tallasEnumeradas(t);
+
+  // Una corrección manda sobre todo: "no, mejor L" no suma una unidad.
+  if (RE_CORRIGE_TALLA.test(t)) {
+    return { dos: false, ambiguo: false, tallas, motivo: "es una corrección de la talla" };
+  }
+
+  // ⚠️ "XL o L" se revisa ANTES que "XL y L": si están las dos conjunciones, la
+  // duda gana. Preguntar cuesta un mensaje; cotizar mal cuesta la venta.
+  if (tallas.length >= 2 && RE_DOS_TALLAS_O.test(t) && !RE_DOS_TALLAS_Y.test(t)) {
+    return {
+      dos: false,
+      ambiguo: true,
+      tallas,
+      motivo: `dijo "${tallas.join(" o ")}": no se sabe si quiere las dos o está preguntando cuál le sirve`,
+    };
+  }
+
+  if (tallas.length >= 2 && RE_DOS_TALLAS_Y.test(t)) {
+    return { dos: true, ambiguo: false, tallas };
+  }
+
+  // "una para mí y la otra para mi esposa": la CANTIDAD está clara aunque no haya
+  // dicho las tallas. Son dos; las tallas se preguntan después.
+  if (RE_UNA_Y_LA_OTRA.test(t)) {
+    return { dos: true, ambiguo: false, tallas };
+  }
+
+  return { dos: false, ambiguo: false, tallas };
+}
+
 function resolverCantidad(texto, previa) {
   const t = String(texto == null ? "" : texto);
   const heredable = Number.isFinite(Number(previa)) && Number(previa) >= 1 ? Number(previa) : 0;
+
+  // 🔑 Enumerar dos tallas es declarar dos unidades. Va antes que RE_UNO, porque
+  // "la UNA talla XL y la otra L" contiene un "una" que no es una cantidad.
+  const porTallas = dosPorTallas(t);
+  if (porTallas.ambiguo) {
+    return {
+      uds: 0,
+      escalar: false,
+      ambiguo: true,
+      explicita: true,
+      heredada: false,
+      motivo: porTallas.motivo,
+      tallas: porTallas.tallas,
+    };
+  }
+  if (porTallas.dos) {
+    return { uds: 2, escalar: false, explicita: true, heredada: false, tallas: porTallas.tallas };
+  }
 
   // 3+ se escala SIEMPRE: el flete de 6 o 12 unidades no está medido y cotizar a
   // ojo ya costó plata. Se revisa antes que el 2 para que "12 conjuntos" no se
@@ -511,6 +622,18 @@ function calcular(ciudad, texto, opciones = {}) {
   if (destino.estado === "dificil_sin_tarifa") {
     return { ok: false, motivo: "dificil_sin_tarifa", destino, uds: cantidad.uds };
   }
+  // 🔑 Cantidad ambigua: NO se cotiza. Un total equivocado acá es lo que disparó
+  // todo el caso del 26-sep. Preguntar cuesta un mensaje.
+  if (cantidad.ambiguo) {
+    return {
+      ok: false,
+      motivo: "cantidad_ambigua",
+      destino,
+      uds: 0,
+      detalle: cantidad.motivo,
+      tallas: cantidad.tallas || [],
+    };
+  }
   if (cantidad.escalar) {
     return { ok: false, motivo: "cantidad_escalada", destino, uds: 0, detalle: cantidad.motivo };
   }
@@ -699,6 +822,17 @@ function bloqueDeDatos(cot, contexto = {}) {
         `## PRECIO — DIFÍCIL ACCESO, SIN PROMO DE 2\n` +
         `En ${d.ciudad} el envío NO se comparte al llevar dos. ⛔ No ofrezcas la promo de 2 unidades.\n` +
         `Para una unidad el total confirmado es ${fmt(d.totalConfirmado)}.`
+      );
+    }
+    if (cot.motivo === "cantidad_ambigua") {
+      return (
+        `## PRECIO — NO ESTÁ CLARO CUÁNTOS CONJUNTOS QUIERE\n` +
+        `${cot.detalle || "la cantidad no quedó clara"}.\n` +
+        `⛔ NO des ningún total todavía: si cotizás uno y quería dos (o al revés), el pedido sale ` +
+        `con el recaudo mal.\n` +
+        `✅ Preguntale DIRECTO y corto cuántos conjuntos quiere` +
+        ((cot.tallas || []).length ? ` y confirmá las tallas (${cot.tallas.join(", ")})` : "") +
+        `. Podés recordarle que el conjunto vale ${fmt(fletes.PRECIO_PRODUCTO)} más el envío, sin dar el total.`
       );
     }
     if (cot.motivo === "cantidad_escalada") {
@@ -1315,8 +1449,18 @@ function verificarPedido(order, cot, contexto = {}) {
 // el chat pasa a manos del dueño.
 // ============================================================================
 
+// ⚠️ ESTE PATRÓN SE AMPLIÓ CON EL CASO DEL 26-SEP. No reconocía ninguna de las
+// dos frases con las que se le dio la venta por cerrada a un cliente cuyo pedido
+// estaba bloqueado:
+//
+//   "¡Excelente, Petronel! Todo listo. En cuanto la transportadora genere tu
+//    número de guía, te lo estaré enviando por aquí..."
+//   "Ya quedó registrado con franja verde... ¡Muchas gracias por tu compra!"
+//
+// Las dos le dicen al cliente que su compra está hecha. Ninguna usa las palabras
+// que el patrón buscaba.
 const RE_AFIRMA_CIERRE =
-  /\b(confirmad[oa]|ya (qued[oó]|est[aá] listo|lo despach|te lo despach)|lo despacho|te lo despacho|sale hoy|se despacha|pedido confirmado|queda confirmado|listo tu pedido|tu pedido qued|ya lo tengo listo|en camino)\b/i;
+  /\b(confirmad[oa]|ya (qued[oó]|est[aá] listo|lo despach|te lo despach)|lo despacho|te lo despacho|sale hoy|se despacha|pedido confirmado|queda confirmado|listo tu pedido|tu pedido qued|ya lo tengo listo|en camino|todo listo|ya (lo )?registr|qued[oó] registrado|gracias por tu compra|gracias por su compra|cuando la transportadora genere|genere tu (n[uú]mero de )?gu[ií]a|te (lo )?estar[eé] enviando)\b/i;
 
 /** ¿La respuesta le AFIRMA al cliente que la venta quedó cerrada? */
 function afirmaCierre(texto) {
@@ -1357,6 +1501,8 @@ module.exports = {
   resolverDestino,
   resolverConDepartamento,
   resolverCantidad,
+  dosPorTallas,
+  tallasEnumeradas,
   cantidadDelHilo,
   destinoDelHilo,
   ciudadPlausible,

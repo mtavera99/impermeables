@@ -93,6 +93,14 @@ function chequear(nombre, condicion, detalle) {
 
 const pesos = (n) => "$" + Number(n || 0).toLocaleString("es-CO");
 
+/** Un solo turno, devolviendo también lo que la IA recibió. Útil para mirar un
+ *  mensaje concreto en vez de toda la conversación. */
+async function turno(telefono, cliente, ...respuestasIA) {
+  ia.poner(...respuestasIA);
+  const r = await agent.generateReply(telefono, cliente);
+  return { ...r, prompts: ia.prompts.slice(), llamadas: ia.llamadas };
+}
+
 /** Corre una conversación entera y devuelve lo que quedó. */
 async function recorrer(telefono, turnos) {
   const respuestas = [];
@@ -663,6 +671,123 @@ const datosBase = {
       "12e· 🔑 pero al cambiar la cantidad, es OTRA oferta",
       despues.oferta_id !== unicos[0],
       `antes ${unicos[0]}, después ${despues.oferta_id}`
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 13. 🔴 EL CASO DEL 26-SEP, recorrido completo ──");
+  // Caso real (datos cambiados). El cliente pidió DOS conjuntos enumerando tallas,
+  // por notas de voz, y salió mal en cascada:
+  //   · la cantidad se leyó como UNA
+  //   · el modelo intentaba cotizar los dos → la etapa 5 lo rechazaba → salía la
+  //     línea de precio de UNA unidad, cuatro veces, contra preguntas distintas
+  //   · el pedido quedó bloqueado, y al cliente se le dio las gracias por su compra
+  // ==========================================================================
+  {
+    const tel = "573005550013";
+    const FRASE_TALLAS = "Exactamente, la una talla normal XL y la otra es L normal. Bueno, muchas gracias, me confirma.";
+
+    // 1) Ciudad → total de UNA (todavía no dijo cuántos)
+    let t = await turno(tel, "hola, cuánto vale?", "Son $59.900 el conjunto + envío. ¿Para qué ciudad sería?");
+    t = await turno(tel, "Jamundí", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Jamundí, y pagas todo junto al recibir 📦");
+    chequear("13· con una unidad, el total es el de una", store.leerCotizacion(tel).total === 82000, `${store.leerCotizacion(tel).total}`);
+
+    // 2) 🔑 Y ACÁ dice que son DOS, enumerando las tallas.
+    t = await turno(
+      tel,
+      FRASE_TALLAS,
+      // El modelo cotiza los dos, que ahora ES lo correcto.
+      "¡Listo! Los dos te quedan en $148.000 en total: $110.000 los dos conjuntos + $38.000 de envío a Jamundí. Pásame nombre completo, dirección con barrio y celular"
+    );
+    const cot = store.leerCotizacion(tel);
+    chequear("13· 🔑 la cantidad se reconoce: DOS conjuntos", cot.uds === 2, `uds=${cot.uds}`);
+    chequear("13· y el total pasa al de dos", cot.total === 148000, `${cot.total}`);
+    chequear(
+      "13· 🔑 la respuesta del modelo YA NO se rechaza",
+      /\$148\.000/.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "13· 🔑 y NO salió la línea de precio de una unidad",
+      !/^Te queda en \$82\.000/.test(t.reply.trim()),
+      `salió: ${t.reply}`
+    );
+
+    // 3) La oficina: no se asegura, y no se promete lo que hará la transportadora.
+    t = await turno(
+      tel,
+      "me lo manda a la oficina de Terranova que me queda más cerca",
+      "¡Excelente decisión! Te lo enviamos a la oficina de Interrapidísimo en Terranova, Jamundí. Ellos te enviarán un mensaje de texto cuando esté listo para reclamar."
+    );
+    chequear(
+      "13· 🔑 no asegura esa oficina como verificada",
+      !/oficina de Interrapidísimo en Terranova/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "13· y no promete lo que hará la transportadora",
+      !/ellos te enviar/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear(
+      "13· pero SÍ conserva que se puede enviar a oficina",
+      /oficina/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear("13· 🙋 y avisa para revisar el chat", t.revisionHumana !== null, JSON.stringify(t.revisionHumana));
+
+    // 4) El pedido, con la cantidad bien, queda DESPACHABLE.
+    const datos = {
+      nombre: "Petra Vargas", celular: "3005550013", ciudad: "Jamundí",
+      direccion: "OFICINA Interrapidísimo - Terranova", color: "verde",
+      talla: "XL y L", unidades: 2, pago: "contraentrega", total: 148000,
+    };
+    await turno(tel, "Petra Vargas, 3005550013", CUADRO(148000).replace("Ana Gómez", "Petra Vargas").replace("3001234567", "3005550013").replace("Cali", "Jamundí"));
+    t = await turno(tel, "sí confirmo", `¡Listo Petra! ${ORDER(datos)}`);
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("13· el pedido se guarda con 2 unidades", pedido && Number(pedido.unidades) === 2, `${pedido && pedido.unidades}`);
+    chequear("13· cobrando los dos", pedido && Number(pedido.total) === 148000, `${pedido && pedido.total}`);
+    chequear(
+      "13· 🚦 y AHORA sí queda listo para despachar",
+      pedido && store.listoParaDespachar(pedido),
+      store.textoDeRevision(pedido)
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 14. 🔁 El candado no deja al cliente atrapado ──");
+  // Lo que el cliente vivió: preguntó por las tallas y recibió un precio. Cuatro veces.
+  // ==========================================================================
+  {
+    const tel = "573005550014";
+    await turno(tel, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    await turno(tel, "Cali", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali. Pásame nombre completo, dirección con barrio y celular");
+
+    // El cliente pregunta por las TALLAS y el modelo contesta con un importe inválido.
+    const t1 = await turno(
+      tel,
+      "una preguntica, quiero que me explique cómo son las tallas",
+      "Las tallas van de S a 3XL y cada conjunto sale en $70.000.",
+      "Las tallas van de S a 3XL y cada conjunto sale en $70.000."
+    );
+    chequear(
+      "14· 🔑 preguntó por TALLAS y NO se le contesta con un precio",
+      !/\$82\.000/.test(t1.reply),
+      `salió: ${t1.reply}`
+    );
+    chequear("14· se le contesta algo, no silencio", t1.reply.trim().length > 30, JSON.stringify(t1.reply));
+    chequear("14· 🙋 y se escala para que un humano conteste", t1.revisionHumana !== null, JSON.stringify(t1.revisionHumana));
+
+    // Y si el turno siguiente vuelve a fallar, no se repite la misma línea.
+    const tel2 = "573005550015";
+    await turno(tel2, "hola", "¡Hola! ¿Para qué ciudad sería?");
+    const p1 = await turno(tel2, "Cali", "El envío a Cali es $82.000.", "El envío a Cali es $82.000.");
+    chequear("14· contestar la ciudad SÍ da el precio calculado", /\$82\.000/.test(p1.reply) && /de envío/.test(p1.reply), p1.reply);
+    const p2 = await turno(tel2, "y a Palmira?", "El envío a Palmira es $82.000.", "El envío a Palmira es $82.000.");
+    chequear(
+      "14· 🔑 pero NO se repite la misma línea dos turnos seguidos",
+      p2.reply.trim() !== p1.reply.trim(),
+      `las dos veces salió: ${p2.reply}`
     );
   }
 

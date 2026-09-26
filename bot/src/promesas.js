@@ -87,6 +87,34 @@ const REGLAS = [
     queHacerEnLugar: 'dar la recomendación que sí está medida: "pedí una talla más de la que usás".',
   },
   {
+    // 🔴 DEL CASO DEL 26-SEP: el cliente pidió recibirlo en "la oficina de
+    // Terranova" y el bot contestó *"Te lo enviamos a la oficina de Interrapidísimo
+    // en Terranova, Jamundí"*. No hay NADA en el sistema sobre esa oficina —se
+    // verificó: cero menciones en el repositorio— así que el bot confirmó como
+    // hecho algo que nadie comprobó. Si esa oficina no existe o no recibe envíos,
+    // el paquete se devuelve y el flete de ida y vuelta lo paga el negocio.
+    clave: "oficina_asegurada",
+    patron:
+      /\b(te lo (enviamos|mandamos|despachamos|dejamos)|lo (enviamos|mandamos) )[^.]{0,30}\b(a la |en la )?oficina\b|\bla oficina de \w+ en \w+|\boficina de (interrapidisimo|servientrega|coordinadora|envia|tcc|99 ?envios)\b/,
+    porQue:
+      "confirma una oficina concreta de la transportadora como si estuviera verificada. El bot no " +
+      "consulta la red de oficinas: no sabe si esa existe ni si recibe envíos.",
+    queHacerEnLugar:
+      "decir que sí se puede enviar a oficina y que se confirma con la transportadora cuál le queda " +
+      "más cerca, sin nombrarla como un hecho.",
+  },
+  {
+    // La otra mitad del mismo caso: *"Ellos te enviarán un mensaje de texto al
+    // número que me diste"*. El bot no controla lo que hace la transportadora.
+    clave: "promesa_de_la_transportadora",
+    patron:
+      /\b(ellos|la transportadora|interrapidisimo|servientrega|coordinadora)\b[^.]{0,40}\b(te (enviar[aá]n?|mandar[aá]n?|avisar[aá]n?|llamar[aá]n?|escribir[aá]n?)|te van a (avisar|llamar|escribir|enviar))\b|\bte (avisar[aá]n|llamar[aá]n) cuando\b/,
+    porQue:
+      "promete lo que va a hacer la transportadora. Eso no depende de nosotros y no se puede sostener.",
+    queHacerEnLugar:
+      "decir que en cuanto haya número de guía se lo pasamos por acá, que sí es algo que hacemos nosotros.",
+  },
+  {
     clave: "escasez_inventada",
     // "quedan pocos", "últimas unidades", "se agota hoy"
     patron:
@@ -183,6 +211,10 @@ const REEMPLAZOS = {
   ajuste_de_talla:
     "Te recomiendo pedir una talla más de la que usás normalmente, porque va encima de la ropa",
   escasez_inventada: "Hay disponibilidad, así que podés pedirlo con calma",
+  oficina_asegurada:
+    "Sí podemos enviarlo a oficina; déjame confirmar con la transportadora cuál es la que te queda más cerca",
+  promesa_de_la_transportadora:
+    "En cuanto tengamos el número de guía te lo paso por acá para que le hagas seguimiento",
   ubicacion_equivocada: "Nuestra bodega está en Bogotá",
 };
 

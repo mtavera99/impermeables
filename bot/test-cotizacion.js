@@ -669,5 +669,70 @@ console.log("\n── R7. 🔢 LA CANTIDAD EXPLÍCITA, DE PUNTA A PUNTA ──")
   chequear("y se marca como rescatado", r.rescatado === true);
 }
 
+console.log("\n── R8. 🔴 EL CASO DEL 26-SEP: dos tallas enumeradas son dos conjuntos ──");
+{
+  const REAL = "Exactamente, la una talla normal XL y la otra es L normal. Bueno, muchas gracias, me confirma.";
+  chequear("🔑 la frase real se lee como DOS unidades", c.resolverCantidad(REAL).uds === 2, JSON.stringify(c.resolverCantidad(REAL)));
+  chequear("   y queda como cantidad explícita", c.resolverCantidad(REAL).explicita === true);
+  chequear("   con las dos tallas leídas", JSON.stringify(c.resolverCantidad(REAL).tallas) === '["XL","L"]', JSON.stringify(c.resolverCantidad(REAL).tallas));
+  chequear(
+    "   así que cotiza el total de dos",
+    c.calcular("Jamundi", REAL).total === 148000,
+    `dio ${pesos(c.calcular("Jamundi", REAL).total)}`
+  );
+
+  const DOS = [["XL y L", 2], ["una XL y otra L", 2], ["quiero una talla XL y la otra en L", 2], ["una para mí y la otra para mi esposa", 2]];
+  for (const [t, esp] of DOS) chequear(`  dos: "${t}"`, c.resolverCantidad(t).uds === esp, JSON.stringify(c.resolverCantidad(t)));
+
+  // ⛔ Las tres cosas que NO son dos unidades.
+  chequear("🔴 «XL o L» es una PREGUNTA: no se cotiza, se pregunta", c.resolverCantidad("¿me sirve XL o L?").ambiguo === true);
+  chequear("   y el motivo lo explica", /no se sabe si quiere las dos/.test(String(c.resolverCantidad("¿me sirve XL o L?").motivo)));
+  chequear("🔴 «no sé si XL o L» también es ambiguo", c.resolverCantidad("no sé si XL o L").ambiguo === true, JSON.stringify(c.resolverCantidad("no sé si XL o L")));
+  for (const t of ["talla 2XL", "3XL", "quiero la 2XL"])
+    chequear(`🔴 "${t}" es UNA talla, no dos unidades`, c.resolverCantidad(t).uds === 1 && !c.resolverCantidad(t).ambiguo, JSON.stringify(c.resolverCantidad(t)));
+  for (const t of ["no, mejor L", "me equivoqué, cambia a XL", "no es esa talla, la L"])
+    chequear(`🔴 "${t}" es una CORRECCIÓN`, c.resolverCantidad(t).uds === 1 && !c.resolverCantidad(t).ambiguo, JSON.stringify(c.resolverCantidad(t)));
+  chequear("🔴 una dirección con dígitos no cambia la cantidad", c.resolverCantidad("Calle 1 #2-3, cel 3001234567").explicita === false);
+
+  // Ambigüedad → el bloque le dice al modelo que PREGUNTE, sin dar total.
+  const amb = c.calcular("Jamundi", "¿me sirve XL o L?");
+  chequear("🔑 con cantidad ambigua NO se cotiza", amb.ok === false && amb.motivo === "cantidad_ambigua", JSON.stringify({ ok: amb.ok, motivo: amb.motivo }));
+  const bloque = c.bloqueDeDatos(amb, {});
+  chequear("   y el bloque prohíbe dar el total", /NO des ningún total/.test(bloque), bloque);
+  chequear("   pero deja decir el precio base", /\$59\.900/.test(bloque), bloque);
+  chequear("   y pide confirmar cuántos", /cu[aá]ntos conjuntos/.test(bloque), bloque);
+}
+
+console.log("\n── R9. 🔴 No se anuncia una venta que está bloqueada ──");
+{
+  // Las dos frases reales con las que se le dio la compra por hecha.
+  const REALES = [
+    "¡Excelente, Petronel! Todo listo. En cuanto la transportadora genere tu número de guía, te lo estaré enviando por aquí.",
+    "¡Así es, Petronel! Ya quedó registrado con franja verde y para recoger en la oficina de Terranova. ¡Muchas gracias por tu compra con BikerPro!",
+  ];
+  for (const t of REALES) chequear(`🔑 se reconoce como cierre: "${t.slice(0, 46)}…"`, c.afirmaCierre(t) === true);
+  for (const t of ["Con gusto, ¿me confirmas la talla?", "Te queda en $82.000 en total, pagas al recibir 📦", "¿De qué color prefieres la franja?"])
+    chequear(`✅ y NO se marca lo que no es cierre: "${t.slice(0, 40)}…"`, c.afirmaCierre(t) === false);
+}
+
+console.log("\n── R10. 🔴 La alerta dice la causa REAL, no un total que sí coincide ──");
+{
+  const store = require("./src/store");
+  // El caso: total correcto, cantidad incoherente. Antes decía "debería ser $82.000"
+  // al lado de un pedido de $82.000.
+  const pedido = {
+    nombre: "X", celular: "3001234567", ciudad: "Jamundi", talla: "XL y L", total: 82000,
+    precio_no_cuadra: true, pendiente_revision: true, total_esperado: 82000,
+    motivo_precio: "el pedido es de 2 unidades (según las 2 tallas del pedido) y la cotización validada es de 1, por $82.000",
+  };
+  const texto = store.textoDeRevision(pedido);
+  chequear("🔑 el aviso nombra la cantidad", /unidades/.test(texto), texto);
+  chequear("🔑 y NO dice «debería ser $82.000» junto a un pedido de $82.000", !/debería ser \$82\.000/.test(texto), texto);
+  chequear("la etiqueta ya no habla solo del total", /el pedido no cuadra/.test(texto) || /unidades/.test(texto), texto);
+  // Y cuando el total SÍ difiere, el número esperado sigue apareciendo.
+  const otro = { ...pedido, total: 99000, total_esperado: 82000, motivo_precio: "" };
+  chequear("✅ si el total de verdad difiere, lo dice", /debería ser \$82\.000/.test(store.textoDeRevision(otro)), store.textoDeRevision(otro));
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

@@ -421,10 +421,18 @@ function render(aviso) {
         ? '<br><b style="color:#ff9aa4">🔴 no dijo un "sí" claro — leé el chat antes de despachar</b>'
         : ""
     }${
+      // ⚠️ "debería ser $X" SOLO si el total esperado es distinto al del pedido.
+      // En el caso del 26-sep los dos eran $82.000 y el aviso decía "debería ser
+      // $82.000" al lado de un pedido de $82.000: lo que no cuadraba era la
+      // cantidad. El motivo real va primero y en grande.
       p.precio_no_cuadra
-        ? `<br><b style="color:#ff9aa4">🔴 el total no cuadra con la cotización${
-            p.total_esperado ? ` — debería ser ${esc(fmtCOP(p.total_esperado))}` : ""
-          }${p.motivo_precio ? `<br><span style="opacity:.85">${esc(p.motivo_precio)}</span>` : ""}</b>`
+        ? `<br><b style="color:#ff9aa4">🔴 ${
+            p.motivo_precio ? esc(p.motivo_precio) : "el pedido no cuadra con la cotización"
+          }${
+            p.total_esperado && Number(p.total_esperado) !== Number(p.total)
+              ? ` — el total debería ser ${esc(fmtCOP(p.total_esperado))}`
+              : ""
+          }</b>`
         : ""
     }</div></td>
       <td data-label="Dirección">${esc(p.ciudad)}${
