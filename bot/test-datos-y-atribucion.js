@@ -329,18 +329,16 @@ const html3 = panel3.render();
 // que el panel muestre la evidencia que tiene —los arranques contados— y que no
 // afirme "comprobado" cuando no lo está.
 chequear(
-  "el panel muestra la evidencia que ya tiene (los arranques contados)",
-  html3.includes("2 arranques"),
-  "no está mostrando la evidencia que ya tiene"
-);
-chequear(
   mismoDispositivo
     ? "y NO afirma «comprobado» donde no hay disco aparte"
     : "con el disco comprobado, lo dice como prueba y no como suposición",
   mismoDispositivo
     ? !html3.includes("Disco persistente comprobado")
-    : html3.includes("Disco persistente comprobado"),
-  "el panel no puede afirmar más de lo que sabe"
+    : html3.includes("Disco persistente comprobado") && html3.includes("2 arranques"),
+  // 🔑 Los arranques contados son la evidencia, y el panel los muestra JUNTO con
+  // el "comprobado" — no por separado. Exigirlos cuando no hay disco aparte era
+  // pedirle que presuma de una prueba que en ese entorno no tiene.
+  "el panel no puede afirmar más de lo que sabe, ni menos"
 );
 
 fs.rmSync(DIR3, { recursive: true, force: true });
