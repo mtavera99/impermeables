@@ -1558,6 +1558,113 @@ const datosBase = {
     chequear("27· y el cliente lo ve", /\$83\.000/.test(t2.reply), `salió: ${t2.reply}`);
   }
 
+  // ==========================================================================
+  console.log("\n── 28. 🏷️ «Madrid» y «Madrid, Cundinamarca» son el MISMO destino (caso Diana) ──");
+  // Diana cerró: Madrid, 2 unidades 2XL, $133.000, y contestó "Si". El pedido quedó
+  // registrado y pendiente de despacho, pero marcado PRECIO NO CUADRA, y el bot le
+  // frenó el cierre mandándola a esperar una verificación que no hacía falta.
+  //
+  // 🔎 Nacía de una IGUALDAD DE CADENAS en `verificarPedido`:
+  //   normalizar("Madrid, Cundinamarca") = "MADRID CUNDINAMARCA" ≠ "MADRID"
+  // El modelo escribió el departamento en el pedido —la clienta lo había dicho así—
+  // y la cotización tenía el municipio pelado, que es como lo deja #171.
+  // ==========================================================================
+  {
+    const tel = "573008880035";
+    const CEL = "3009990035";
+    const CUADRO_MADRID =
+      `Confirmemos tu pedido ✅\nNombre: Diana Rueda\nCelular: ${CEL}\nCiudad: Madrid, Cundinamarca\n` +
+      `Dirección: Cra 4 #5-6 barrio Centro\nColor de la franja: negro\nTalla: 2XL\n` +
+      `Pago: contraentrega\nTOTAL a pagar al recibir: $133.000\n` +
+      `¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`;
+
+    await turno(tel, "hola, cuánto vale?", "¡Hola! 🏍️ Es el conjunto de 4 piezas. ¿Para qué ciudad sería el envío?");
+    await turno(tel, "Madrid Cundinamarca", "Te queda en $73.000 en total puesto en Madrid 📦 ¿Cuántos conjuntos querés?");
+    const cot1 = store.leerCotizacion(tel);
+    chequear("28· la cotización queda sobre Madrid, sin el departamento", cot1 && cot1.ciudad === "Madrid", JSON.stringify(cot1 && cot1.ciudad));
+
+    await turno(tel, "quiero 2 conjuntos, los dos en talla 2XL", "¡Listo! Los dos conjuntos te quedan en $133.000 en total, y pagas al recibir 📦 Pásame nombre completo, dirección con barrio y celular");
+    const cot2 = store.leerCotizacion(tel);
+    chequear("28· con 2 unidades", cot2 && cot2.uds === 2, `uds=${cot2 && cot2.uds}`);
+    chequear("28· y el total de Diana, $133.000", cot2 && cot2.total === 133000, `${cot2 && cot2.total}`);
+
+    await turno(tel, `Diana Rueda, ${CEL}, Cra 4 #5-6 barrio Centro, franja negra`, CUADRO_MADRID);
+
+    // 🔑 Y contesta "Si", como lo hizo ella.
+    const t = await turno(
+      tel,
+      "Si",
+      // ⚠️ La respuesta AFIRMA el cierre a propósito: es lo que hace que, si el
+      // pedido queda marcado, `afirmaCierre` la reemplace por `respuestaEnRevision`
+      // y el chat se pause. Sin eso, la comprobación del cierre no demostraría nada.
+      //
+      // ⚠️ Y NO dice "sale hoy": eso es una promesa de fecha sin respaldo, y la regla
+      // que la corrige —de una entrega anterior— pausaba el chat por su cuenta y
+      // ensuciaba lo que esta prueba quiere medir.
+      `¡Gracias por tu compra, Diana! Tu pedido quedó registrado ✅ ${ORDER({
+        nombre: "Diana Rueda", celular: CEL, ciudad: "Madrid, Cundinamarca",
+        direccion: "Cra 4 #5-6 barrio Centro", color: "negro", talla: "2XL",
+        unidades: 2, pago: "contraentrega", total: 133000,
+      })}`
+    );
+
+    const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("28· el pedido queda registrado", Boolean(pedido), "no se guardó");
+    chequear("28· con su total de $133.000", pedido && pedido.total === 133000, `${pedido && pedido.total}`);
+    chequear("28· y con las 2 unidades", pedido && Number(pedido.unidades) === 2, `${pedido && pedido.unidades}`);
+    chequear(
+      "28· 🔑 EL CASO: NO queda marcado como precio que no cuadra",
+      pedido && !pedido.precio_no_cuadra,
+      `motivo_precio=${pedido && pedido.motivo_precio}`
+    );
+    chequear(
+      "28· 🔑 y SE PUEDE DESPACHAR",
+      pedido && store.listoParaDespachar(pedido) === true,
+      store.textoDeRevision(pedido)
+    );
+    chequear(
+      "28· 🔑 el cierre sigue normal: no la manda a esperar una verificación",
+      !/confirmando el valor final|te escribo en un rato/i.test(t.reply),
+      `salió: ${t.reply}`
+    );
+    chequear("28· y el chat NO queda en pausa", !store.isPaused(tel));
+
+    // ── Y un cambio REAL de municipio sigue frenándose ────────────────────────
+    const tel2 = "573008880036";
+    const CEL2 = "3009990036";
+    await turno(tel2, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel2, "Madrid Cundinamarca", "Te queda en $73.000 en total puesto en Madrid 📦 Pásame nombre completo, dirección con barrio y celular");
+    await turno(
+      tel2,
+      `Lucía Peña, ${CEL2}, Cra 9 #8-7 barrio Centro, talla M negra`,
+      `Confirmemos tu pedido ✅\nNombre: Lucía Peña\nCelular: ${CEL2}\nCiudad: Madrid\n` +
+        `Dirección: Cra 9 #8-7 barrio Centro\nColor de la franja: negro\nTalla: M\n` +
+        `Pago: contraentrega\nTOTAL a pagar al recibir: $73.000\n` +
+        `¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`
+    );
+    // 🔴 El modelo escribe OTRO municipio en el pedido: eso sí tiene que frenarse.
+    await turno(
+      tel2,
+      "sí confirmo",
+      `¡Listo Lucía! ${ORDER({
+        nombre: "Lucía Peña", celular: CEL2, ciudad: "Mosquera",
+        direccion: "Cra 9 #8-7 barrio Centro", color: "negro", talla: "M",
+        unidades: 1, pago: "contraentrega", total: 73000,
+      })}`
+    );
+    const pedido2 = store.todosLosPedidos().filter((p) => p.telefono_chat === tel2)[0];
+    chequear(
+      "28· 🔑 un municipio REALMENTE distinto sigue frenándose",
+      pedido2 && pedido2.precio_no_cuadra === true,
+      `motivo_precio=${pedido2 && pedido2.motivo_precio}`
+    );
+    chequear(
+      "28· aunque tenga la misma banda y el mismo total",
+      pedido2 && store.listoParaDespachar(pedido2) === false,
+      "Madrid y Mosquera son las dos banda A: el flete coincide y el municipio no"
+    );
+  }
+
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   try {
     fs.rmSync(DIR, { recursive: true, force: true });

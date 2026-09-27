@@ -2126,6 +2126,109 @@ function unidadesDelPedido(order) {
   return { uds: 1, origen: "no lo dice", incierta: true };
 }
 
+// ============================================================================
+// 🔴 «MADRID» Y «MADRID, CUNDINAMARCA» SON EL MISMO DESTINO — caso Diana
+//
+// LO QUE PASÓ. Diana cerró: Madrid, 2 unidades 2XL, $133.000, y contestó "Si". El
+// pedido quedó registrado y pendiente de despacho, pero marcado PRECIO NO CUADRA, y
+// el bot le frenó el cierre y le mandó a esperar una verificación que no hacía falta.
+//
+// 🔎 DÓNDE NACÍA, reproducido:
+//
+//   fletes.normalizar("Madrid, Cundinamarca") → "MADRID CUNDINAMARCA"
+//   fletes.normalizar("Madrid")               → "MADRID"
+//   → distintas → ciudad_distinta → precio_no_cuadra → pendiente_revision
+//
+// Era una IGUALDAD DE CADENAS. El modelo escribió el departamento en el pedido
+// —porque la clienta lo había dicho así— y la cotización tenía el municipio pelado,
+// que es justamente como lo dejan `municipioEn` y el recorte de #171. Las dos
+// representaciones eran correctas y el sistema las leyó como destinos distintos.
+//
+// ⚠️ POR QUÉ NO SE ARREGLA COMPARANDO EL FLETE. Lo comprobé: `bandaDe("Madrid")` y
+// `bandaDe("Mosquera")` son las DOS banda A. Dos municipios distintos con el mismo
+// flete existen, así que "misma tarifa" no significa "mismo destino". La tarifa se
+// usa acá solo como comprobación EXTRA, nunca como criterio.
+//
+// 🔑 LA REGLA, semántica y no laxa. Son el mismo destino cuando:
+//   · el MUNICIPIO es el mismo, una vez separado el departamento; y
+//   · los departamentos no se contradicen (uno puede faltar); y
+//   · el nombre NO es de los que se repiten en varios departamentos —ahí el
+//     departamento ES el dato que decide el flete, y sin él no se puede afirmar
+//     nada: "La Unión" no es "La Unión Nariño"; y
+//   · la tarifa resuelve igual para las dos cadenas.
+//
+// Lo que sigue frenándose, igual que antes: municipio distinto, departamento que se
+// contradice, nombre ambiguo sin departamento, y cualquier cambio de flete.
+// ============================================================================
+
+/**
+ * Separa un destino en municipio y departamento, sobre el nombre normalizado.
+ * @returns {{municipio:string, depto:string}}
+ */
+function partesDelDestino(valor) {
+  const plano = fletes.normalizar(valor);
+  if (!plano) return { municipio: "", depto: "" };
+
+  const depto = departamentoEn(plano);
+  if (!depto) return { municipio: plano, depto: "" };
+  const deptoNorm = fletes.normalizar(depto);
+
+  // ⚠️ El departamento se recorta SOLO si va al final, que es como se escribe
+  // ("Madrid, Cundinamarca"). Si no, "Santander de Quilichao" —municipio del
+  // Cauca— perdería la mitad del nombre.
+  //
+  // ⚠️ Y nunca si no queda municipio: en "Bogotá" el nombre ES el del
+  // departamento, y el municipio es Bogotá.
+  if (plano.endsWith(deptoNorm)) {
+    const municipio = plano.slice(0, plano.length - deptoNorm.length).trim();
+    if (municipio) return { municipio, depto: deptoNorm };
+  }
+  return { municipio: plano, depto: deptoNorm };
+}
+
+/** ¿Las dos cadenas resuelven a la misma tarifa? Comprobación extra, no criterio. */
+function mismaTarifa(a, b) {
+  const da = resolverDestino(String(a == null ? "" : a));
+  const db = resolverDestino(String(b == null ? "" : b));
+  return (
+    da.estado === db.estado &&
+    String(da.banda || "") === String(db.banda || "") &&
+    String(da.totalConfirmado == null ? "" : da.totalConfirmado) ===
+      String(db.totalConfirmado == null ? "" : db.totalConfirmado)
+  );
+}
+
+/**
+ * ¿Las dos cadenas nombran el MISMO destino?
+ *
+ * Se usa para comparar la ciudad del pedido con la de la cotización. No es una
+ * comparación laxa: exige que el municipio coincida y que nada se contradiga.
+ */
+function mismoDestino(a, b) {
+  const A = fletes.normalizar(a);
+  const B = fletes.normalizar(b);
+  if (!A || !B) return A === B;
+  if (A === B) return true;
+
+  const pa = partesDelDestino(a);
+  const pb = partesDelDestino(b);
+  if (!pa.municipio || !pb.municipio) return false;
+
+  // Municipios distintos: es un cambio de destino de verdad.
+  if (pa.municipio !== pb.municipio) return false;
+
+  // Departamentos que se contradicen: "Mosquera Cundinamarca" no es
+  // "Mosquera Nariño", y entre las dos hay un abismo de flete.
+  if (pa.depto && pb.depto && pa.depto !== pb.depto) return false;
+
+  // 🛡️ Nombre repetido en varios departamentos y el departamento solo en un lado:
+  // no se puede afirmar que sea el mismo destino, porque el departamento es lo que
+  // decide la tarifa. Se sigue marcando, como antes.
+  if (fletes.departamentosPosibles(pa.municipio) && !(pa.depto && pb.depto)) return false;
+
+  return mismaTarifa(a, b);
+}
+
 /**
  * @returns {{ok:boolean, problemas:Array, totalEsperado:number|null}}
  */
@@ -2151,8 +2254,10 @@ function verificarPedido(order, cot, contexto = {}) {
 
   // La ciudad del pedido tiene que ser la de la cotización: si el cliente la
   // cambió, hay que re-cotizar, no despachar con el total viejo.
-  const mismaCiudad =
-    fletes.normalizar(String(order.ciudad || "")) === fletes.normalizar(String(cot.ciudad || ""));
+  //
+  // 🔑 Pero se compara el DESTINO, no la cadena. Ver `mismoDestino`: acá nacía el
+  // PRECIO NO CUADRA de Diana, con "Madrid" y "Madrid, Cundinamarca".
+  const mismaCiudad = mismoDestino(order.ciudad, cot.ciudad);
   if (!mismaCiudad) {
     problemas.push({
       tipo: "ciudad_distinta",
@@ -2285,6 +2390,8 @@ module.exports = {
   senalDeDestinoPara,
   pideConfirmacion,
   faltaParaConfirmar,
+  mismoDestino,
+  partesDelDestino,
   calcular,
   lineaDePrecio,
   bloqueDeDatos,

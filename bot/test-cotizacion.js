@@ -1486,5 +1486,147 @@ console.log("\n── R19. 🏷️ Nombre, municipio y departamento, distinguido
   chequear("y la transportadora sigue sin ser municipio", c.destinoDelHilo(conDestino("Yarumal", "¿A tu dirección o a oficina?"), "en Interrapidísimo").ciudad === "Yarumal");
 }
 
+console.log("\n── R20. 🏷️ Municipio y «Municipio, Departamento» son el MISMO destino ──");
+// CASO DIANA: Madrid, 2 unidades 2XL, $133.000, contestó "Si". El pedido quedó
+// registrado y pendiente de despacho pero marcado PRECIO NO CUADRA, y el bot le
+// frenó el cierre.
+//
+// 🔎 DÓNDE NACÍA, reproducido: `verificarPedido` comparaba con una IGUALDAD DE
+// CADENAS sobre `fletes.normalizar`:
+//
+//   normalizar("Madrid, Cundinamarca") → "MADRID CUNDINAMARCA"
+//   normalizar("Madrid")               → "MADRID"          → ciudad_distinta
+//
+// El modelo escribió el departamento en el pedido —la clienta lo había dicho así— y
+// la cotización tenía el municipio pelado, que es como lo deja el recorte de #171.
+// Las dos representaciones eran correctas.
+//
+// ⚠️ Y NO se arregla comparando el flete: `bandaDe("Madrid")` y `bandaDe("Mosquera")`
+// son las DOS banda A. Dos municipios distintos con el mismo flete existen.
+{
+  const a = (t) => ({ role: "assistant", content: t });
+
+  // ── 1. Las equivalencias reportadas ────────────────────────────────────────
+  const EQUIVALENTES = [
+    ["Madrid", "Madrid, Cundinamarca"],
+    ["Madrid, Cundinamarca", "Madrid"],
+    ["Madrid", "Madrid Cundinamarca"],
+    ["Moñitos", "Moñitos, Córdoba"],
+    ["Caucasia", "Caucasia, Antioquia"],
+    ["Santo Domingo", "Santo Domingo, Antioquia"],
+    // Y las de las entregas anteriores, que son el mismo patrón.
+    ["San Onofre", "San Onofre Sucre"],
+    ["Pitalito", "Pitalito Huila"],
+    ["Tadó", "Tadó Chocó"],
+  ];
+  for (const [x, y] of EQUIVALENTES) {
+    chequear(
+      `🔑 mismo destino: ${JSON.stringify(x)} ↔ ${JSON.stringify(y)}`,
+      c.mismoDestino(x, y) === true,
+      JSON.stringify([c.partesDelDestino(x), c.partesDelDestino(y)])
+    );
+  }
+
+  // ── 2. Lo que NO es el mismo destino ───────────────────────────────────────
+  const DISTINTOS = [
+    // Dos municipios realmente distintos.
+    ["Madrid", "Bello"],
+    ["Cali", "Palmira"],
+    ["San Onofre", "Bello"],
+    ["Bogotá", "Medellín"],
+    // ⚠️ El caso que demuestra que la tarifa NO sirve como criterio: Madrid y
+    // Mosquera son las DOS banda A, mismo flete, y son municipios distintos.
+    ["Madrid", "Mosquera"],
+    // Departamentos que se contradicen. Y acá el flete además es un abismo:
+    // Mosquera de Cundinamarca es banda A ($73.000) y el de Nariño no tiene tarifa.
+    ["Mosquera Cundinamarca", "Mosquera Nariño"],
+    ["Madrid Cundinamarca", "Madrid Antioquia"],
+    // 🛡️ Nombre repetido en varios departamentos con el departamento en un solo
+    // lado: el departamento ES lo que decide el flete, así que no se afirma nada.
+    ["La Unión", "La Unión Nariño"],
+    ["Santa Bárbara", "Santa Bárbara Antioquia"],
+    ["Mosquera", "Mosquera Cundinamarca"],
+  ];
+  for (const [x, y] of DISTINTOS) {
+    chequear(
+      `🔴 NO es el mismo destino: ${JSON.stringify(x)} vs ${JSON.stringify(y)}`,
+      c.mismoDestino(x, y) === false,
+      JSON.stringify([c.partesDelDestino(x), c.partesDelDestino(y)])
+    );
+  }
+
+  // ── 3. partesDelDestino no destroza nombres ────────────────────────────────
+  // "Santander de Quilichao" es un municipio del Cauca: si se recortara "Santander"
+  // por estar en el nombre, perdería la mitad. Y en "Bogotá" el nombre ES el del
+  // departamento, así que no hay nada que recortar.
+  chequear("«Santander de Quilichao» se conserva entero", c.partesDelDestino("Santander de Quilichao").municipio === "SANTANDER DE QUILICHAO");
+  chequear("«Bogotá» sigue siendo el municipio", c.partesDelDestino("Bogotá").municipio === "BOGOTA");
+  chequear("«Valledupar» no se confunde con Valle", c.partesDelDestino("Valledupar").depto === "");
+  chequear("«Cúcuta Norte de Santander» se separa bien", c.partesDelDestino("Cúcuta Norte de Santander").municipio === "CUCUTA");
+
+  // ── 4. EL CASO DE DIANA por verificarPedido ────────────────────────────────
+  const cotDiana = c.calcular("Madrid", "dos", { cantidad: { uds: 2 } });
+  chequear("la cotización de Diana da $133.000", cotDiana.total === 133000, `${cotDiana.total}`);
+  const pedidoDiana = {
+    nombre: "Diana Rueda", celular: "3009990035", ciudad: "Madrid, Cundinamarca",
+    talla: "2XL", unidades: 2, total: 133000, pago: "contraentrega",
+  };
+  const chkDiana = c.verificarPedido(pedidoDiana, cotDiana, {});
+  chequear(
+    "🔑 EL CASO: el pedido de Diana YA NO se marca",
+    chkDiana.ok === true,
+    JSON.stringify(chkDiana.problemas)
+  );
+  chequear(
+    "   y un municipio realmente distinto sí",
+    c.verificarPedido({ ...pedidoDiana, ciudad: "Mosquera" }, cotDiana, {}).problemas.some((p) => p.tipo === "ciudad_distinta")
+  );
+  chequear(
+    "   igual que un total cambiado",
+    c.verificarPedido({ ...pedidoDiana, total: 120000 }, cotDiana, {}).ok === false
+  );
+  chequear(
+    "   y una cantidad cambiada",
+    c.verificarPedido({ ...pedidoDiana, unidades: 1 }, cotDiana, {}).ok === false
+  );
+
+  // ── 5. 🛡️ LOS INVARIANTES DE #171 SIGUEN INTACTOS ─────────────────────────
+  // Esto es lo que no se puede relajar: la corrección de arriba toca la COMPARACIÓN
+  // del pedido contra la cotización, no la lectura del destino.
+  const PIDE_DATOS = "Pásame nombre completo, dirección con barrio y celular";
+  const conDestino = (ciudad, ultimoBot) => ({
+    messages: [a(ultimoBot || PIDE_DATOS)],
+    cotizacion: { ciudad, uds: 1, total: 85000 },
+  });
+
+  chequear(
+    "🛡️ #171 José: la frase real sigue dando San Onofre",
+    c.destinoDelHilo(conDestino("San Onofre"), "Pedro bello San onofre Sucre 3009990031 Nieto envía ala oficina").ciudad === "San Onofre",
+    JSON.stringify(c.destinoDelHilo(conDestino("San Onofre"), "Pedro bello San onofre Sucre 3009990031 Nieto envía ala oficina"))
+  );
+  chequear(
+    "🛡️ #171 el ambiguo sigue preguntando",
+    c.destinoDelHilo(conDestino("San Onofre"), "Pedro bello Sucre 3009990032 oficina").origen === "duda_entre_el_dato_y_el_destino"
+  );
+  chequear(
+    "   y no sobrescribe el destino",
+    c.destinoDelHilo(conDestino("San Onofre"), "Pedro bello Sucre 3009990032 oficina").ciudad === ""
+  );
+  chequear(
+    "🛡️ #171 el cambio auténtico a Bello Antioquia sigue recalculando",
+    c.destinoDelHilo(conDestino("San Onofre"), "Bello Antioquia").ciudad === "Bello" &&
+      c.calcular("Bello", "uno").total === 83000
+  );
+  chequear("🛡️ los apellidos siguen protegidos", c.destinoDelHilo(conDestino("San Onofre"), "Rosa Bello, talla L, franja negra").ciudad === "San Onofre");
+  chequear("🛡️ «para Palmira, no Cali» sigue preguntando", c.destinoDelHilo(conDestino("Cali"), "para Palmira, no Cali").origen === "varios_en_el_turno");
+  chequear("🛡️ Yarumal / Interrapidísimo sigue protegido", c.destinoDelHilo(conDestino("Yarumal", "¿A tu dirección o a oficina?"), "en Interrapidísimo").ciudad === "Yarumal");
+  chequear("🛡️ Pitalito en el saludo sigue funcionando", c.destinoDelHilo({ messages: [] }, "Hola buenos días, Pitalito Huila").ciudad === "Pitalito");
+  chequear("🛡️ el resumen sin total sigue sin validar", c.validarRespuesta("Confirmemos tu pedido ✅\nTOTAL a pagar al recibir\nRespóndeme «SÍ CONFIRMO»", cotDiana, {}).ok === false);
+  chequear(
+    "🛡️ y el pedido a otra ciudad de #170 sigue frenándose",
+    c.verificarPedido({ ciudad: "Medellín", total: 85000, unidades: 1 }, c.calcular("San Onofre", "uno", { cantidad: { uds: 1 } }), {}).problemas.some((p) => p.tipo === "ciudad_distinta")
+  );
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);
