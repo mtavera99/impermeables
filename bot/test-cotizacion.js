@@ -1628,5 +1628,148 @@ console.log("\n── R20. 🏷️ Municipio y «Municipio, Departamento» son e
   );
 }
 
+console.log("\n── R21. 🧩 El departamento se separa como SUFIJO, no buscándolo en toda la cadena ──");
+// 🔴 EL BORDE DE §R20. `partesDelDestino` decía "recortar solo si va al final", pero
+// empezaba por `departamentoEn(plano)`, que busca un departamento en CUALQUIER parte
+// de la cadena. Y hay municipios cuyo nombre CONTIENE un nombre de departamento:
+//
+//   partesDelDestino("Santander de Quilichao, Cauca")
+//     → elegía "SANTANDER" (está dentro del municipio), que no es sufijo
+//     → no recortaba nada → municipio "SANTANDER DE QUILICHAO CAUCA"
+//   mismoDestino("Santander de Quilichao", "Santander de Quilichao, Cauca") → false 🔴
+//
+// 🔎 Y reproduciéndolo salió una SEGUNDA familia: los municipios cuyo nombre TERMINA
+// en una palabra que es departamento quedaban partidos —"Puerto Boyacá" → "PUERTO",
+// "Puerto Santander" → "PUERTO"—.
+//
+// Arreglado en general, sin excepciones por nombre: sufijo completo con el más largo
+// ganando, y para comparar se usan las LECTURAS posibles en vez de elegir una.
+{
+  // ── 1. EL CASO, a los tres niveles ─────────────────────────────────────────
+  chequear(
+    "🔑 partesDelDestino(«Santander de Quilichao») conserva el municipio",
+    c.partesDelDestino("Santander de Quilichao").municipio === "SANTANDER DE QUILICHAO" &&
+      c.partesDelDestino("Santander de Quilichao").depto === "",
+    JSON.stringify(c.partesDelDestino("Santander de Quilichao"))
+  );
+  chequear(
+    "🔑 partesDelDestino(«Santander de Quilichao, Cauca») separa CAUCA",
+    c.partesDelDestino("Santander de Quilichao, Cauca").municipio === "SANTANDER DE QUILICHAO" &&
+      c.partesDelDestino("Santander de Quilichao, Cauca").depto === "CAUCA",
+    JSON.stringify(c.partesDelDestino("Santander de Quilichao, Cauca"))
+  );
+  chequear(
+    "🔑 EL CASO: mismoDestino(«Santander de Quilichao», «Santander de Quilichao, Cauca»)",
+    c.mismoDestino("Santander de Quilichao", "Santander de Quilichao, Cauca") === true,
+    JSON.stringify([c.partesDelDestino("Santander de Quilichao"), c.partesDelDestino("Santander de Quilichao, Cauca")])
+  );
+  // Y por el camino real: el pedido lo escribe el modelo con el departamento.
+  {
+    const cotSQ = c.calcular("Santander de Quilichao", "uno", { cantidad: { uds: 1 } });
+    const chk = c.verificarPedido(
+      { nombre: "Cliente", celular: "3009990041", ciudad: "Santander de Quilichao, Cauca", talla: "L", unidades: 1, total: cotSQ.total },
+      cotSQ,
+      {}
+    );
+    chequear("🔑 y el pedido con el departamento YA NO se marca", chk.ok === true, JSON.stringify(chk.problemas));
+  }
+
+  // ── 2. Las separaciones que tenían que mantenerse ──────────────────────────
+  for (const [s, mun, dep] of [
+    ["Cúcuta Norte de Santander", "CUCUTA", "NORTE DE SANTANDER"],
+    ["Madrid Cundinamarca", "MADRID", "CUNDINAMARCA"],
+    ["San Onofre Sucre", "SAN ONOFRE", "SUCRE"],
+    ["Santander de Quilichao", "SANTANDER DE QUILICHAO", ""],
+    ["Santander de Quilichao Cauca", "SANTANDER DE QUILICHAO", "CAUCA"],
+    ["Bogotá", "BOGOTA", ""],
+    ["Valledupar", "VALLEDUPAR", ""],
+  ]) {
+    const p = c.partesDelDestino(s);
+    chequear(
+      `  ${JSON.stringify(s)} → ${mun}${dep ? ` / ${dep}` : ""}`,
+      p.municipio === mun && p.depto === dep,
+      JSON.stringify(p)
+    );
+  }
+  chequear("🔑 el sufijo más largo gana: no se queda con «SANTANDER»", c.partesDelDestino("Cúcuta Norte de Santander").depto === "NORTE DE SANTANDER");
+  chequear("🔑 «Bogotá» no queda vacío", c.partesDelDestino("Bogotá").municipio === "BOGOTA");
+
+  // ── 3. Generalidad: municipios compuestos con palabra de departamento ──────
+  // Ninguno de estos está escrito en el código: si la solución fuera una excepción
+  // para Santander de Quilichao, todos estos fallarían.
+  const COMPUESTOS = [
+    ["Puerto Boyacá", "Puerto Boyacá, Boyacá"],               // termina en departamento
+    ["Puerto Santander", "Puerto Santander, Norte de Santander"], // y el sufijo largo gana
+    ["Valle del Guamuez", "Valle del Guamuez, Putumayo"],     // empieza por departamento
+    ["Puerto Nariño", "Puerto Nariño, Amazonas"],
+    ["Puerto Colombia", "Puerto Colombia, Atlántico"],
+    ["Santander de Quilichao", "Santander de Quilichao, Cauca"],
+  ];
+  for (const [m, d] of COMPUESTOS) {
+    chequear(
+      `🔑 compuesto: ${JSON.stringify(m)} ↔ ${JSON.stringify(d)}`,
+      c.mismoDestino(m, d) === true,
+      JSON.stringify([c.partesDelDestino(m), c.partesDelDestino(d)])
+    );
+  }
+
+  // ── 4. Y no se volvió laxo ─────────────────────────────────────────────────
+  for (const [x, y] of [
+    // Dos municipios que comparten la primera palabra y difieren en la segunda.
+    ["Puerto Boyacá", "Puerto Santander"],
+    ["Ciudad Bolívar", "Puerto Boyacá"],
+    ["Puerto Boyacá", "Boyacá"],
+    // Los de §R20, que siguen igual.
+    ["Madrid", "Mosquera"],
+    ["Mosquera Cundinamarca", "Mosquera Nariño"],
+    ["La Unión", "La Unión Nariño"],
+    ["Cali", "Palmira"],
+  ]) {
+    chequear(`🔴 NO es el mismo destino: ${JSON.stringify(x)} vs ${JSON.stringify(y)}`, c.mismoDestino(x, y) === false, JSON.stringify([c.partesDelDestino(x), c.partesDelDestino(y)]));
+  }
+
+  // 🔑 EL QUE DEMUESTRA QUE LA COMPROBACIÓN DE TARIFA NO ES DECORATIVA.
+  // "Ciudad Bolívar" está en el tarifario como LOCALIDAD DE BOGOTÁ (fletes.js:217,
+  // junto a La Candelaria y Sumapaz): banda A, $73.000. "Ciudad Bolívar, Antioquia"
+  // es el municipio de Antioquia: predeterminada, $85.000. Mismo nombre, dos
+  // destinos, y $12.000 de diferencia. Tienen que seguir siendo distintos.
+  chequear(
+    "🔑 «Ciudad Bolívar» (localidad) NO es «Ciudad Bolívar, Antioquia»",
+    c.mismoDestino("Ciudad Bolívar", "Ciudad Bolívar, Antioquia") === false,
+    "banda A $73.000 contra predeterminada $85.000"
+  );
+  chequear("   y el tarifario lo confirma", c.calcular("Ciudad Bolívar", "uno").total === 73000 && c.calcular("Ciudad Bolívar, Antioquia", "uno").total === 85000);
+
+  // ── 5. 🛡️ Los invariantes, otra vez, después de este cambio ───────────────
+  const a21 = (t) => ({ role: "assistant", content: t });
+  const conDestino21 = (ciudad, ultimoBot) => ({
+    messages: [a21(ultimoBot || "Pásame nombre completo, dirección con barrio y celular")],
+    cotizacion: { ciudad, uds: 1, total: 85000 },
+  });
+  chequear(
+    "🛡️ DIANA: Madrid ↔ Madrid, Cundinamarca siguen equivalentes",
+    c.mismoDestino("Madrid", "Madrid, Cundinamarca") === true
+  );
+  chequear(
+    "🛡️ #171 JOSÉ: la frase real sigue dando San Onofre",
+    c.destinoDelHilo(conDestino21("San Onofre"), "Pedro bello San onofre Sucre 3009990031 Nieto envía ala oficina").ciudad === "San Onofre"
+  );
+  chequear("🛡️ #171 San Onofre ↔ San Onofre Sucre siguen equivalentes", c.mismoDestino("San Onofre", "San Onofre Sucre") === true);
+  chequear(
+    "🛡️ #171 el ambiguo sigue preguntando sin sobrescribir",
+    c.destinoDelHilo(conDestino21("San Onofre"), "Pedro bello Sucre 3009990032 oficina").ciudad === "" &&
+      c.destinoDelHilo(conDestino21("San Onofre"), "Pedro bello Sucre 3009990032 oficina").origen === "duda_entre_el_dato_y_el_destino"
+  );
+  chequear(
+    "🛡️ #171 el cambio auténtico a Bello Antioquia sigue recalculando",
+    c.destinoDelHilo(conDestino21("San Onofre"), "Bello Antioquia").ciudad === "Bello" && c.calcular("Bello", "uno").total === 83000
+  );
+  chequear("🛡️ MOSQUERA Cundinamarca vs Nariño siguen distintos", c.mismoDestino("Mosquera Cundinamarca", "Mosquera Nariño") === false);
+  chequear("🛡️ Madrid vs Mosquera siguen distintos con la misma banda", c.mismoDestino("Madrid", "Mosquera") === false && c.calcular("Madrid", "uno").banda === c.calcular("Mosquera Cundinamarca", "uno").banda);
+  chequear("🛡️ los apellidos siguen protegidos", c.destinoDelHilo(conDestino21("San Onofre"), "Rosa Bello, talla L, franja negra").ciudad === "San Onofre");
+  chequear("🛡️ Yarumal / Interrapidísimo sigue protegido", c.destinoDelHilo(conDestino21("Yarumal", "¿A tu dirección o a oficina?"), "en Interrapidísimo").ciudad === "Yarumal");
+  chequear("🛡️ Pitalito sigue funcionando", c.destinoDelHilo({ messages: [] }, "Hola buenos días, Pitalito Huila").ciudad === "Pitalito");
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

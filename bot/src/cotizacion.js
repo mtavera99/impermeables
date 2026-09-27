@@ -2161,6 +2161,71 @@ function unidadesDelPedido(order) {
 // contradice, nombre ambiguo sin departamento, y cualquier cambio de flete.
 // ============================================================================
 
+// ============================================================================
+// 🔴 EL DEPARTAMENTO SE BUSCABA EN TODA LA CADENA, NO COMO SUFIJO
+//
+// La intención del código decía "recortar solo si va al final", pero empezaba por
+// `departamentoEn(plano)`, que busca un departamento en CUALQUIER parte. Y hay
+// municipios cuyo nombre CONTIENE el nombre de un departamento:
+//
+//   partesDelDestino("Santander de Quilichao, Cauca")
+//     → departamentoEn(...) elegía "SANTANDER" (está dentro del municipio)
+//     → "SANTANDER" no es sufijo, así que no se recortaba nada
+//     → municipio "SANTANDER DE QUILICHAO CAUCA", con el departamento pegado
+//   y contra "Santander de Quilichao" → mismoDestino = false  🔴
+//
+// 🔎 Y reproduciéndolo apareció una SEGUNDA familia, peor: los municipios cuyo
+// nombre TERMINA en una palabra que es departamento quedaban partidos en dos:
+//
+//   "Puerto Boyacá"    → municipio "PUERTO"    🔴
+//   "Ciudad Bolívar"   → municipio "CIUDAD"    🔴
+//   "Puerto Santander" → municipio "PUERTO"    🔴
+//
+// 🔑 LA SOLUCIÓN, general y sin excepciones, en dos piezas:
+//
+//   1. El departamento separable es el que es SUFIJO COMPLETO del destino, y gana
+//      el más largo: en "CUCUTA NORTE DE SANTANDER" el sufijo es
+//      "NORTE DE SANTANDER" y no "SANTANDER". Eso arregla la primera familia.
+//
+//   2. Para COMPARAR no se usa una sola lectura, sino las lecturas POSIBLES: la
+//      cadena entera y la cadena sin su sufijo de departamento. Dos destinos son el
+//      mismo si comparten una lectura. Eso arregla la segunda familia sin tener que
+//      saber si "Puerto" o "Puerto Boyacá" es el municipio:
+//
+//        "Puerto Boyacá"        → ["PUERTO BOYACA", "PUERTO"]
+//        "Puerto Boyacá Boyacá" → ["PUERTO BOYACA BOYACA", "PUERTO BOYACA"]
+//        comparten "PUERTO BOYACA" → mismo destino ✅
+//
+// ⚠️ `departamentoEn` NO se toca: la usan `municipioEn` y `senalDeDestinoPara`, que
+// son el corazón de #171. Acá solo se deja de usar para esta separación.
+// ============================================================================
+
+// Los departamentos normalizados, del más largo al más corto, para que gane el
+// sufijo más largo. Se deduplican porque la lista trae "cundinamarca" dos veces.
+const DEPTOS_POR_LARGO = [...new Set(DEPARTAMENTOS.map((d) => fletes.normalizar(d)))].sort(
+  (a, b) => b.length - a.length
+);
+
+/**
+ * El departamento que es SUFIJO COMPLETO del destino normalizado, o "".
+ *
+ * Gana el más largo. Y nunca se devuelve si dejaría el municipio vacío: en
+ * "Bogotá" el nombre ES el del departamento, y el municipio es Bogotá.
+ */
+function departamentoSufijoDe(plano) {
+  for (const d of DEPTOS_POR_LARGO) {
+    if (plano === d) return ""; // el destino ES el departamento: Bogotá
+    if (!plano.endsWith(d)) continue;
+    const corte = plano.length - d.length;
+    // Tiene que ser una palabra completa: sin esto "VALLEDUPAR" terminaría en
+    // "DUPAR"… y algo como "XCAUCA" pasaría por Cauca.
+    if (plano[corte - 1] !== " ") continue;
+    if (!plano.slice(0, corte).trim()) continue;
+    return d;
+  }
+  return "";
+}
+
 /**
  * Separa un destino en municipio y departamento, sobre el nombre normalizado.
  * @returns {{municipio:string, depto:string}}
@@ -2169,21 +2234,25 @@ function partesDelDestino(valor) {
   const plano = fletes.normalizar(valor);
   if (!plano) return { municipio: "", depto: "" };
 
-  const depto = departamentoEn(plano);
+  const depto = departamentoSufijoDe(plano);
   if (!depto) return { municipio: plano, depto: "" };
-  const deptoNorm = fletes.normalizar(depto);
+  return { municipio: plano.slice(0, plano.length - depto.length).trim(), depto };
+}
 
-  // ⚠️ El departamento se recorta SOLO si va al final, que es como se escribe
-  // ("Madrid, Cundinamarca"). Si no, "Santander de Quilichao" —municipio del
-  // Cauca— perdería la mitad del nombre.
-  //
-  // ⚠️ Y nunca si no queda municipio: en "Bogotá" el nombre ES el del
-  // departamento, y el municipio es Bogotá.
-  if (plano.endsWith(deptoNorm)) {
-    const municipio = plano.slice(0, plano.length - deptoNorm.length).trim();
-    if (municipio) return { municipio, depto: deptoNorm };
-  }
-  return { municipio: plano, depto: deptoNorm };
+/**
+ * Las lecturas posibles del municipio: la cadena entera y, si termina en un
+ * departamento, la cadena sin él.
+ *
+ * 🔑 Se devuelven LAS DOS a propósito. Con "Puerto Boyacá" no hay forma de saber si
+ * el municipio es "Puerto Boyacá" o "Puerto" en el departamento de Boyacá —haría
+ * falta la tabla de los 1.100 municipios—, así que no se elige: se comparan las
+ * lecturas y basta con que coincida una.
+ */
+function lecturasDelMunicipio(plano) {
+  const salida = [plano];
+  const depto = departamentoSufijoDe(plano);
+  if (depto) salida.push(plano.slice(0, plano.length - depto.length).trim());
+  return salida.filter(Boolean);
 }
 
 /** ¿Las dos cadenas resuelven a la misma tarifa? Comprobación extra, no criterio. */
@@ -2210,21 +2279,32 @@ function mismoDestino(a, b) {
   if (!A || !B) return A === B;
   if (A === B) return true;
 
-  const pa = partesDelDestino(a);
-  const pb = partesDelDestino(b);
-  if (!pa.municipio || !pb.municipio) return false;
-
-  // Municipios distintos: es un cambio de destino de verdad.
-  if (pa.municipio !== pb.municipio) return false;
+  // 🔑 Se comparan las LECTURAS posibles, no una sola. Ver `lecturasDelMunicipio`:
+  // es lo que hace que "Puerto Boyacá" y "Puerto Boyacá, Boyacá" se reconozcan sin
+  // tener que decidir si el municipio es "Puerto" o "Puerto Boyacá".
+  const la = lecturasDelMunicipio(A);
+  const lb = lecturasDelMunicipio(B);
+  const municipioComun = la.find((m) => lb.includes(m));
+  if (!municipioComun) return false; // municipios distintos: cambio de destino real
 
   // Departamentos que se contradicen: "Mosquera Cundinamarca" no es
   // "Mosquera Nariño", y entre las dos hay un abismo de flete.
-  if (pa.depto && pb.depto && pa.depto !== pb.depto) return false;
+  //
+  // ⚠️ El departamento se mide RELATIVO A LA LECTURA COMÚN, no con
+  // `departamentoSufijoDe` sobre cada cadena. Si no, en "Ciudad Bolívar" contra
+  // "Ciudad Bolívar, Antioquia" se tomaba "BOLIVAR" como departamento de la primera
+  // —cuando es parte del nombre del municipio— y se leía como una contradicción con
+  // "ANTIOQUIA". Lo que sobra DESPUÉS del municipio común es el departamento, y
+  // ambas lecturas son prefijos de su cadena, así que esto siempre está definido.
+  const deptoTras = (plano) => plano.slice(municipioComun.length).trim();
+  const da = deptoTras(A);
+  const db = deptoTras(B);
+  if (da && db && da !== db) return false;
 
   // 🛡️ Nombre repetido en varios departamentos y el departamento solo en un lado:
   // no se puede afirmar que sea el mismo destino, porque el departamento es lo que
   // decide la tarifa. Se sigue marcando, como antes.
-  if (fletes.departamentosPosibles(pa.municipio) && !(pa.depto && pb.depto)) return false;
+  if (fletes.departamentosPosibles(municipioComun) && !(da && db)) return false;
 
   return mismaTarifa(a, b);
 }
