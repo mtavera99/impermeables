@@ -735,11 +735,32 @@ app.post("/guias/revisar", express.raw({ type: "application/pdf", limit: "40mb" 
     listas: filas.filter((f) => f.enviar).length,
   });
 
+  // 🔑 LOS PEDIDOS A LOS QUE SE PUEDE ASIGNAR UNA GUÍA A MANO.
+  //
+  // Va UNA sola lista para todas las filas, no una por fila: son los mismos
+  // pedidos y repetirla 25 veces sería una respuesta enorme al celular.
+  //
+  // Se excluyen los que ya tienen guía anotada: si ya se despachó, no es
+  // candidato, y ofrecerlo invita a mandarle dos guías al mismo cliente.
+  const candidatos = pedidos
+    .filter((p) => !p.guia)
+    .slice(0, 60)
+    .map((p) => ({
+      id: String(p.id || p.fecha),
+      nombre: p.nombre || "(sin nombre)",
+      ciudad: p.ciudad || "",
+      // Solo los últimos 4 dígitos: alcanza para reconocerlo y no llena la
+      // pantalla del celular con teléfonos completos.
+      cel: String(p.celular || p.telefono_chat || "").slice(-4),
+      total: "$" + Number(p.total || 0).toLocaleString("es-CO"),
+    }));
+
   // ⚠️ Se devuelve TODO menos las hojas: los PDF se quedan en el servidor. No
   // hay razón para que el navegador reciba las etiquetas de todos los clientes.
   res.json({
     ok: true,
     id,
+    candidatos,
     filas: filas.map((f) => ({
       pagina: f.pagina,
       guia: f.guia,
@@ -753,8 +774,139 @@ app.post("/guias/revisar", express.raw({ type: "application/pdf", limit: "40mb" 
       senales: f.senales,
       motivo: f.motivo,
       enviar: f.enviar,
+      // Los 3 más parecidos, para ofrecerlos primero en el selector de asignar.
+      mejores: f.mejores || [],
+      // Si se le puede ofrecer al dueño elegir el cliente a mano. Es false en
+      // las guías repetidas y en las que ya salieron.
+      asignable: Boolean(f.asignable),
     })),
   });
+});
+
+// ============================================================================
+// MANDAR UNA HOJA A UN CLIENTE
+//
+// Extraído del bucle de /guias/enviar para que /guias/asignar mande EXACTAMENTE
+// igual: misma decisión de ventana de 24h, misma plantilla, mismo registro y
+// misma anotación de la guía en el pedido. Si fueran dos caminos distintos, uno
+// de los dos se iba a quedar atrás.
+//
+// `aMano` solo cambia lo que queda anotado: el envío es idéntico.
+// ============================================================================
+async function mandarHojaDeGuia(fila, pedido, { aMano = false, certeza = null } = {}) {
+  const to = guias.destinoDe(pedido);
+  if (!to) return { ok: false, error: "ese pedido no tiene a qué número escribirle" };
+
+  const caption = guias.textoParaCliente(pedido, fila.guia, fila.transportadora);
+
+  // La guía se despacha al día siguiente, así que para muchos clientes la
+  // ventana de 24h ya está cerrada y el documento libre lo rechaza Meta
+  // (131047). Con la ventana cerrada el PDF viaja dentro de la plantilla.
+  const conv = store.getConv(to);
+  const ultimo = (conv && conv.ultimoDelCliente) || 0;
+  const ventanaAbierta = ultimo > 0 && Date.now() - ultimo < 24 * 60 * 60 * 1000;
+
+  const envio = ventanaAbierta
+    ? await sendPdf(to, fila.hoja, guias.nombreArchivo(fila.guia), caption)
+    : await sendPdfPorPlantilla(to, fila.hoja, guias.nombreArchivo(fila.guia), PLANTILLA_GUIA, PLANTILLA_IDIOMA);
+
+  if (!envio.ok) {
+    const motivo = motivoDeEnvio(envio);
+    anotarEvento({ tipo: "guia-fallida", para: to, guia: fila.guia, error: motivo.slice(0, 180), aMano });
+    console.error(`🔴 Guía ${fila.guia} NO se envió a ${to}: ${motivo}`);
+    return { ok: false, error: motivo, telefono: to, nombre: pedido.nombre };
+  }
+
+  store.registrarGuiaEnviada({
+    guia: fila.guia,
+    telefono: to,
+    nombre: pedido.nombre,
+    certeza: certeza == null ? fila.certeza : certeza,
+    transportadora: fila.transportadora?.clave || null,
+    messageId: envio.messageId,
+    porPlantilla: Boolean(envio.porPlantilla),
+    // 🔑 Queda anotado que la eligió el dueño y no el pareo. Si mañana una guía
+    // llegó al cliente equivocado, esto dice si fue una decisión humana o del
+    // puntaje, que son dos problemas distintos.
+    aMano,
+  });
+  const refPedido = pedido.id || pedido.fecha;
+  if (refPedido) store.anotarGuiaEnPedido(refPedido, fila.guia);
+  store.pushMsg(to, "assistant", caption);
+  anotarEvento({ tipo: "guia-enviada", para: to, guia: fila.guia, certeza: fila.certeza, aMano });
+  console.log(
+    `📦 Guía ${fila.guia} enviada a ${pedido.nombre} (${to})` +
+      (aMano ? " [ASIGNADA A MANO por el dueño]" : `, certeza ${fila.certeza}`) +
+      (envio.porPlantilla ? ` [por plantilla ${PLANTILLA_GUIA}, su ventana estaba cerrada]` : " [mensaje libre]")
+  );
+  return { ok: true, telefono: to, nombre: pedido.nombre };
+}
+
+// ============================================================================
+// POST /guias/asignar — "esta guía es de este cliente, mandásela"
+//
+// 🔴 DE DÓNDE SALE (28-sep). El dueño, con 24 guías enviadas y una sola en rojo:
+// "solamente me sale un error con una... no sé por qué, como que no la reconoce.
+// ¿No hay forma de que yo pueda enviarla de forma individual? Porque en el chat
+// no me deja."
+//
+// Tenía razón en las dos cosas. No había NINGUNA salida: el panel no ofrece
+// asignar, y el cajón del chat solo manda texto, no archivos. Una guía que no
+// cruzaba el puntaje quedaba muerta y había que mandarla desde el WhatsApp
+// personal.
+//
+// 🔑 POR QUÉ ESTO NO DEBILITA EL CANDADO. El mínimo de 50 puntos existe para que
+// el BOT no adivine, porque una etiqueta lleva dirección y teléfono impresos y
+// mandársela al cliente equivocado le filtra datos a un desconocido. Pero el
+// dueño no está adivinando: él sabe de quién es el pedido. El candado sigue
+// intacto para lo automático; esto es una decisión humana, explícita, de una
+// guía a la vez, y queda anotada como tal.
+// ============================================================================
+app.post("/guias/asignar", async (req, res) => {
+  if (req.query.token !== PANEL_TOKEN && req.body?.token !== PANEL_TOKEN) return res.sendStatus(403);
+
+  const plan = PLANES_GUIAS.get(String(req.body?.id || ""));
+  if (!plan) {
+    return res.status(400).json({
+      ok: false,
+      error: `El pareo ya se usó o expiró (dura ${Math.round(PLAN_TTL_MS / 3600000)} horas). Subí el PDF otra vez.`,
+    });
+  }
+
+  const pagina = Number(req.body?.pagina);
+  const fila = plan.filas.find((f) => f.pagina === pagina);
+  if (!fila) return res.status(400).json({ ok: false, error: "Esa hoja no está en el pareo." });
+
+  const pedidoId = String(req.body?.pedidoId || "");
+  const pedido = store.todosLosPedidos().find((p) => String(p.id || p.fecha) === pedidoId);
+  if (!pedido) {
+    return res.status(400).json({
+      ok: false,
+      error: "No encontré ese pedido. Puede haberse anulado: recargá la pantalla.",
+    });
+  }
+
+  // El candado de "ya se envió" SÍ se respeta: asignar a mano no es reenviar.
+  const previa = store.guiaYaEnviada(fila.guia);
+  if (previa) {
+    return res.json({
+      ok: false,
+      error: `Esa guía ya se le había enviado a ${previa.nombre || "un cliente"} el ` +
+        new Date(previa.fecha).toLocaleString("es-CO", { timeZone: "America/Bogota" }) + ".",
+    });
+  }
+
+  anotarEvento({ tipo: "guia-asignada-a-mano", guia: fila.guia, pagina, pedido: pedido.nombre });
+
+  // certeza 0 a propósito: no la midió el puntaje, la eligió una persona.
+  const r = await mandarHojaDeGuia(fila, pedido, { aMano: true, certeza: 0 });
+  if (!r.ok) return res.json({ ok: false, error: r.error });
+
+  // La fila queda consumida para que un segundo clic no la mande otra vez.
+  fila.enviar = false;
+  fila.motivo = `ya se le envió a ${pedido.nombre} (la asignaste vos)`;
+
+  res.json({ ok: true, nombre: r.nombre, telefono: r.telefono, guia: fila.guia });
 });
 
 app.post("/guias/enviar", async (req, res) => {
@@ -764,7 +916,7 @@ app.post("/guias/enviar", async (req, res) => {
   if (!plan) {
     return res.status(400).json({
       ok: false,
-      error: "El pareo ya se usó o expiró (dura 30 minutos). Subí el PDF otra vez.",
+      error: `El pareo ya se usó o expiró (dura ${Math.round(PLAN_TTL_MS / 3600000)} horas). Subí el PDF otra vez.`,
     });
   }
   const pedidas = new Set((req.body?.paginas || []).map(Number));
@@ -791,67 +943,10 @@ app.post("/guias/enviar", async (req, res) => {
       continue;
     }
 
-    const to = guias.destinoDe(fila.pedido);
-    const caption = guias.textoParaCliente(fila.pedido, fila.guia, fila.transportadora);
-
-    // ========================================================================
-    // 🔴 LA GUÍA SE DESPACHA AL DÍA SIGUIENTE, ASÍ QUE LA VENTANA YA ESTÁ
-    //    CERRADA PARA MUCHOS CLIENTES.
-    //
-    // Un documento como mensaje libre solo pasa dentro de las 24h desde el
-    // último mensaje del cliente. Pasado eso Meta lo rechaza (131047) y el
-    // cliente se queda sin su guía — y el dueño creyendo que la mandó.
-    //
-    // Con la ventana cerrada el PDF viaja DENTRO de la plantilla aprobada
-    // (guia_de_envio), que lleva el documento en el encabezado. El cliente
-    // recibe el archivo igual, sin haber escrito antes.
-    // ========================================================================
-    const conv = store.getConv(to);
-    const ultimo = (conv && conv.ultimoDelCliente) || 0;
-    const ventanaAbierta = ultimo > 0 && Date.now() - ultimo < 24 * 60 * 60 * 1000;
-
-    const envio = ventanaAbierta
-      ? await sendPdf(to, fila.hoja, guias.nombreArchivo(fila.guia), caption)
-      : await sendPdfPorPlantilla(
-          to,
-          fila.hoja,
-          guias.nombreArchivo(fila.guia),
-          PLANTILLA_GUIA,
-          PLANTILLA_IDIOMA
-        );
-
-    if (envio.ok) {
-      store.registrarGuiaEnviada({
-        guia: fila.guia,
-        telefono: to,
-        nombre: fila.pedido.nombre,
-        certeza: fila.certeza,
-        transportadora: fila.transportadora?.clave || null,
-        messageId: envio.messageId,
-        // Queda anotado el camino: si mañana una guía no llegó, saber si salió
-        // por plantilla o como mensaje libre es la primera pista.
-        porPlantilla: Boolean(envio.porPlantilla),
-      });
-      // El número de guía queda pegado al pedido: así el CSV de despacho sale
-      // completo y se puede cruzar contra el export de la transportadora.
-      // 🔑 por id, no por fecha: dos pedidos del mismo milisegundo comparten fecha
-      // y la guia podia quedar pegada al pedido equivocado.
-      const refPedido = fila.pedido.id || fila.pedido.fecha;
-      if (refPedido) store.anotarGuiaEnPedido(refPedido, fila.guia);
-      // Queda en el historial del chat para que el bot no repita la información.
-      store.pushMsg(to, "assistant", caption);
-      anotarEvento({ tipo: "guia-enviada", para: to, guia: fila.guia, certeza: fila.certeza });
-      console.log(
-        `📦 Guía ${fila.guia} enviada a ${fila.pedido.nombre} (${to}), certeza ${fila.certeza}` +
-          (envio.porPlantilla ? ` [por plantilla ${PLANTILLA_GUIA}, su ventana estaba cerrada]` : " [mensaje libre]")
-      );
-      resultados.push({ ...base, nombre: fila.pedido.nombre, telefono: to, ok: true });
-    } else {
-      const motivo = motivoDeEnvio(envio);
-      anotarEvento({ tipo: "guia-fallida", para: to, guia: fila.guia, error: motivo.slice(0, 180) });
-      console.error(`🔴 Guía ${fila.guia} NO se envió a ${to}: ${motivo}`);
-      resultados.push({ ...base, nombre: fila.pedido.nombre, telefono: to, ok: false, error: motivo });
-    }
+    // El envío vive en mandarHojaDeGuia para que asignar a mano use exactamente
+    // el mismo camino: misma ventana de 24h, misma plantilla, mismo registro.
+    const r = await mandarHojaDeGuia(fila, fila.pedido);
+    resultados.push({ ...base, nombre: fila.pedido.nombre, telefono: r.telefono, ok: r.ok, error: r.error });
   }
 
   // El plan se consume: un segundo clic no puede reenviar lo mismo.
