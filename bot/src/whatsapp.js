@@ -57,18 +57,72 @@ function destinatario(id) {
 // igual que uno que funciona. Ahora devuelve el resultado.
 //
 // @returns {{ok:boolean, status:number, body:object, messageId?:string}}
-/** Un POST a /messages. Separado para poder reintentar con otro destinatario. */
+// ============================================================================
+// 🔁 ERRORES DE META QUE SON UN HIPO, NO UN PROBLEMA
+//
+// 🔴 DE DÓNDE SALE (28-sep). El dueño mandó 24 guías y una salió con
+// "(#2) Service temporarily unavailable". Ese error no tiene NADA que ver con el
+// cliente ni con el dato: es Meta que se cayó un segundo. El mensaje no se
+// procesó, así que volver a intentarlo es seguro.
+//
+// Y no había ningún reintento: un hipo de medio segundo dejaba a una clienta sin
+// su guía, y al dueño con una fila roja y nada que hacer salvo volver a subir
+// todo el PDF.
+//
+// Los códigos son los que Meta documenta como temporales:
+//   2       Service temporarily unavailable  (el de Alejandra)
+//   4       demasiadas llamadas
+//   80007   límite de velocidad
+//   130429  límite de velocidad de la Cloud API
+//   131000  "algo salió mal" genérico del lado de Meta
+//   131056  demasiados mensajes a ese mismo par en poco tiempo
+//
+// ⛔ LO QUE NO SE REINTENTA, A PROPÓSITO: 131047 (ventana de 24h cerrada), 100
+// (parámetro mal), 132001 (plantilla que no existe), 190 (token vencido). Esos
+// son problemas de verdad y reintentarlos solo gasta llamadas y esconde el
+// motivo real.
+// ============================================================================
+const CODIGOS_TEMPORALES = new Set([2, 4, 80007, 130429, 131000, 131056]);
+const HTTP_TEMPORALES = new Set([408, 429, 500, 502, 503, 504]);
+const ESPERAS_MS = [1500, 4000]; // dos reintentos, y se rinde
+
+function esTemporal(status, body) {
+  const code = body?.error?.code;
+  if (CODIGOS_TEMPORALES.has(code)) return true;
+  if (HTTP_TEMPORALES.has(status)) return true;
+  // status 0 es una excepción de red nuestra: no llegó a Meta.
+  if (status === 0) return true;
+  return false;
+}
+
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Un POST a /messages. Separado para poder reintentar con otro destinatario.
+ *
+ * 🔑 NO LANZA: si el socket se cae, devuelve status 0 igual que cualquier otro
+ * fallo. Eso es a propósito — mi primera versión del reintento tenía el try/catch
+ * POR FUERA del bucle, así que una excepción de red se saltaba los reintentos
+ * enteros. Y un socket colgado es justo el fallo transitorio más común: el caso
+ * que más falta reintentar era el único que no se reintentaba. Lo encontró
+ * test-meta-se-cayo.js, no yo.
+ */
 async function postMensaje(cuerpo) {
-  const res = await fetch(`${GRAPH}/${PHONE_ID}/messages`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ messaging_product: "whatsapp", ...cuerpo })
-  });
-  const body = await res.json().catch(() => ({}));
-  return { res, body };
+  try {
+    const res = await fetch(`${GRAPH}/${PHONE_ID}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ messaging_product: "whatsapp", ...cuerpo })
+    });
+    const body = await res.json().catch(() => ({}));
+    return { res, body };
+  } catch (e) {
+    // status 0 = no llegó a Meta. esTemporal() lo trata como reintentable.
+    return { res: { ok: false, status: 0 }, body: { error: e.message } };
+  }
 }
 
 async function sendPayload(payload) {
@@ -81,7 +135,7 @@ async function sendPayload(payload) {
   const { to: destino, ...resto } = payload;
   const bsuid = esBsuid(destino);
 
-  try {
+  {
     let { res, body } = await postMensaje({ ...destinatario(destino), ...resto });
 
     // 🛟 RED PARA EL CLIENTE CON USERNAME: si Meta rechaza `recipient` por un
@@ -102,14 +156,32 @@ async function sendPayload(payload) {
       body = segundo.body;
     }
 
+    // 🔁 REINTENTO CUANDO EL PROBLEMA ES DE META Y NO DEL MENSAJE.
+    // Ver CODIGOS_TEMPORALES arriba. Un "(#2) Service temporarily unavailable"
+    // dejaba a una clienta sin su guía por medio segundo de caída.
+    let intentos = 0;
+    while (!res.ok && esTemporal(res.status, body) && intentos < ESPERAS_MS.length) {
+      const espera = ESPERAS_MS[intentos];
+      intentos++;
+      console.warn(
+        `↻ Meta respondió algo temporal (${body?.error?.code || res.status}: ` +
+          `${body?.error?.message || "sin mensaje"}). Reintento ${intentos} de ` +
+          `${ESPERAS_MS.length} en ${espera}ms.`
+      );
+      await esperar(espera);
+      const otro = await postMensaje({ ...destinatario(destino), ...resto });
+      res = otro.res;
+      body = otro.body;
+    }
+    if (intentos && res.ok) {
+      console.log(`✅ Salió en el reintento ${intentos}: era un hipo de Meta, no un problema del mensaje.`);
+    }
+
     if (!res.ok) {
       console.error("Error enviando WhatsApp:", res.status, JSON.stringify(body));
-      return { ok: false, status: res.status, body };
+      return { ok: false, status: res.status, body, reintentos: intentos, temporal: esTemporal(res.status, body) };
     }
-    return { ok: true, status: res.status, body, messageId: body?.messages?.[0]?.id };
-  } catch (e) {
-    console.error("Excepción enviando WhatsApp:", e.message);
-    return { ok: false, status: 0, body: { error: e.message } };
+    return { ok: true, status: res.status, body, messageId: body?.messages?.[0]?.id, reintentos: intentos };
   }
 }
 
@@ -226,27 +298,45 @@ async function uploadMedia(buffer, mime, nombre) {
   if (!TOKEN || !PHONE_ID) {
     return { ok: false, status: 0, body: { error: "faltan WHATSAPP_TOKEN o WHATSAPP_PHONE_NUMBER_ID" } };
   }
-  try {
-    const form = new FormData();
-    form.append("messaging_product", "whatsapp");
-    form.append("type", mime);
-    form.append("file", new Blob([buffer], { type: mime }), nombre);
 
-    const res = await fetch(`${GRAPH}/${PHONE_ID}/media`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${TOKEN}` }, // el boundary lo pone fetch
-      body: form,
-    });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok || !body?.id) {
-      console.error("Error subiendo archivo a Meta:", res.status, JSON.stringify(body));
-      return { ok: false, status: res.status, body };
+  // 🔁 La subida también se reintenta si el problema es temporal: una guía tiene
+  // que subir el PDF antes de mandarlo, así que un hipo de Meta acá deja al
+  // cliente sin su guía igual que un hipo en el envío. Subir dos veces el mismo
+  // PDF no molesta a nadie: son media_id distintos y solo se usa el último.
+  let ultimo = { ok: false, status: 0, body: {} };
+  for (let intento = 0; intento <= ESPERAS_MS.length; intento++) {
+    if (intento > 0) {
+      console.warn(
+        `↻ La subida del archivo falló por algo temporal ` +
+          `(${ultimo.body?.error?.code || ultimo.status}). Reintento ${intento} de ${ESPERAS_MS.length}.`
+      );
+      await esperar(ESPERAS_MS[intento - 1]);
     }
-    return { ok: true, status: res.status, body, mediaId: body.id };
-  } catch (e) {
-    console.error("Excepción subiendo archivo:", e.message);
-    return { ok: false, status: 0, body: { error: e.message } };
+    try {
+      const form = new FormData();
+      form.append("messaging_product", "whatsapp");
+      form.append("type", mime);
+      form.append("file", new Blob([buffer], { type: mime }), nombre);
+
+      const res = await fetch(`${GRAPH}/${PHONE_ID}/media`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${TOKEN}` }, // el boundary lo pone fetch
+        body: form,
+      });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok && body?.id) {
+        if (intento) console.log(`✅ El archivo subió en el reintento ${intento}.`);
+        return { ok: true, status: res.status, body, mediaId: body.id, reintentos: intento };
+      }
+      ultimo = { ok: false, status: res.status, body };
+    } catch (e) {
+      ultimo = { ok: false, status: 0, body: { error: e.message } };
+    }
+    if (!esTemporal(ultimo.status, ultimo.body)) break; // no es un hipo: no insistir
   }
+
+  console.error("Error subiendo archivo a Meta:", ultimo.status, JSON.stringify(ultimo.body));
+  return { ...ultimo, temporal: esTemporal(ultimo.status, ultimo.body) };
 }
 
 /** Manda un documento ya subido, por su media_id. */
@@ -324,4 +414,5 @@ module.exports = {
   sendCatalog, sendProduct, sendProductList, catalogoActivo, CATALOG_ID,
   uploadMedia, sendDocumentById, sendPdf,
   esBsuid, destinatario,
+  esTemporal, CODIGOS_TEMPORALES, HTTP_TEMPORALES,
 };
