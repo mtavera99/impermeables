@@ -673,6 +673,24 @@ function motivoDeEnvio(envio) {
   if (code === 131047 || code === 470) {
     return "pasaron más de 24h desde su último mensaje: Meta no permite mandarle nada que no sea una plantilla aprobada";
   }
+  // 🔑 28-SEP: "(#2) Service temporarily unavailable" en la guía de Alejandra.
+  // Ese texto en inglés no le dice nada a nadie, y sobre todo no dice lo único
+  // que importa: que NO es un problema del cliente ni del dato, que el mensaje
+  // no salió, y que se puede reintentar. Ya se reintentó 2 veces solo antes de
+  // llegar acá, así que si igual falló, Meta está teniendo un rato malo.
+  if (envio.temporal || code === 2 || code === 131000) {
+    return (
+      "Meta se cayó un momento y no aceptó el envío (error " + (code || envio.status) + "). " +
+      "No es problema del cliente ni de sus datos: el mensaje NO salió y se puede reintentar. " +
+      "Ya lo intenté 3 veces seguidas."
+    );
+  }
+  if (code === 4 || code === 80007 || code === 130429 || code === 131056) {
+    return (
+      "Meta frenó el envío por mandar muchos mensajes muy rápido (error " + code + "). " +
+      "El mensaje NO salió. Esperá un minuto y reintentá."
+    );
+  }
   if (envio.etapa === "subida") {
     return "no se pudo subir el PDF a WhatsApp: " + (envio.body?.error?.message || "revisá el WHATSAPP_TOKEN");
   }
@@ -814,7 +832,9 @@ async function mandarHojaDeGuia(fila, pedido, { aMano = false, certeza = null } 
     const motivo = motivoDeEnvio(envio);
     anotarEvento({ tipo: "guia-fallida", para: to, guia: fila.guia, error: motivo.slice(0, 180), aMano });
     console.error(`🔴 Guía ${fila.guia} NO se envió a ${to}: ${motivo}`);
-    return { ok: false, error: motivo, telefono: to, nombre: pedido.nombre };
+    // `temporal` viaja hasta el panel: es lo que distingue "reintentá, fue un
+    // hipo de Meta" de "esto no se va a arreglar solo".
+    return { ok: false, error: motivo, telefono: to, nombre: pedido.nombre, temporal: Boolean(envio.temporal) };
   }
 
   store.registrarGuiaEnviada({
@@ -946,19 +966,52 @@ app.post("/guias/enviar", async (req, res) => {
     // El envío vive en mandarHojaDeGuia para que asignar a mano use exactamente
     // el mismo camino: misma ventana de 24h, misma plantilla, mismo registro.
     const r = await mandarHojaDeGuia(fila, fila.pedido);
-    resultados.push({ ...base, nombre: fila.pedido.nombre, telefono: r.telefono, ok: r.ok, error: r.error });
+    resultados.push({
+      ...base,
+      nombre: fila.pedido.nombre,
+      telefono: r.telefono,
+      ok: r.ok,
+      error: r.error,
+      temporal: Boolean(r.temporal),
+    });
   }
 
-  // El plan se consume: un segundo clic no puede reenviar lo mismo.
-  PLANES_GUIAS.delete(String(req.body.id));
-
   const enviadas = resultados.filter((r) => r.ok).length;
+  const fallaron = resultados.filter((r) => !r.ok);
+
+  // ==========================================================================
+  // 🔁 EL PLAN SE GUARDA SI ALGO FALLÓ, PARA PODER REINTENTAR SOLO ESO
+  //
+  // 🔴 DE DÓNDE SALE (28-sep). Una de 24 guías falló con "(#2) Service
+  // temporarily unavailable" —Meta caída medio segundo— y el plan se borraba
+  // igual. Para mandarle la guía a esa clienta había que volver a subir el PDF
+  // completo y rehacer todo el pareo por un hipo de la red.
+  //
+  // 🔑 Y REINTENTAR ES SEGURO SIN CANDADOS NUEVOS: las que sí salieron quedaron
+  // en registrarGuiaEnviada(), y el propio bucle las bloquea con
+  // store.guiaYaEnviada(). Así que aunque se reintente todo, solo se vuelve a
+  // intentar lo que no salió.
+  // ==========================================================================
+  if (fallaron.length === 0) {
+    PLANES_GUIAS.delete(String(req.body.id));
+  } else {
+    // Se renueva la vida del plan: el dueño va a reintentar ahora, no en 2 horas.
+    const guardado = PLANES_GUIAS.get(String(req.body.id));
+    if (guardado) guardado.creado = Date.now();
+    console.log(
+      `↻ ${fallaron.length} guía(s) no salieron: el pareo se guarda para reintentar sin subir el PDF de nuevo.`
+    );
+  }
+
   res.json({
     ok: true,
     intentadas: resultados.length,
     enviadas,
-    fallaron: resultados.length - enviadas,
+    fallaron: fallaron.length,
     resultados,
+    // Las hojas que se pueden reintentar, para que el panel ofrezca el botón.
+    reintentables: fallaron.map((r) => r.pagina),
+    hayTemporales: fallaron.some((r) => r.temporal),
   });
 });
 
