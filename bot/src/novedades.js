@@ -141,11 +141,46 @@ const TIPOS = [
   {
     clave: "rechazado",
     nombre: "El cliente lo rechazó",
-    señales: ["rehusado", "rechazado", "no lo quiso", "no acepta", "devolucion", "devolución", "reexpedicion"],
+    señales: [
+      "rehusado", "rechazado", "no lo quiso", "no acepta", "devolucion", "devolución", "reexpedicion",
+      // 🔴 AGREGADO 28-SEP con el archivo real: "Pedido cancelado" es el texto
+      // literal de 99 Envíos y caía en "No se reconoció el motivo".
+      "cancelado", "cancelada", "anulado",
+    ],
     // No se le escribe: si rechazó, un mensaje automático molesta. Va al dueño.
     mensaje: null,
   },
+  {
+    // 🔴 AGREGADO 28-SEP. "Telemercadeo" son 4 de las 26 novedades del archivo real
+    // y caían en "No se reconoció el motivo", que no le dice nada al dueño.
+    //
+    // ⛔ Y NO se le escribe al cliente. "Telemercadeo" significa que la
+    // transportadora pide que alguien LLAME para confirmar datos antes de volver a
+    // salir; no dice qué dato falta. Mandar un mensaje genérico acá sería inventar
+    // el motivo, que es justo lo que este módulo no hace. Se nombra bien para que
+    // el dueño sepa qué es y lo gestione.
+    clave: "telemercadeo",
+    nombre: "La transportadora pide confirmar los datos por teléfono",
+    señales: ["telemercadeo", "tele mercadeo", "confirmar datos", "verificar datos"],
+    mensaje: null,
+  },
 ];
+
+/**
+ * ¿Ese texto de dirección es en realidad una oficina de la transportadora?
+ *
+ * En el archivo de 99 Envíos, las novedades de "Reclame en oficina" traen la
+ * oficina en `direccion_destinatario`. Se exige que lo diga: "Oficina …",
+ * "Inter Rapidísimo …". Una dirección de casa no entra.
+ */
+function pareceOficina(texto) {
+  const t = String(texto || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  if (!t.trim()) return false;
+  return /\b(oficina|sucursal|agencia|inter\s?rapidisimo|interrapidisimo|servientrega|coordinadora|punto de retiro)\b/.test(t);
+}
 
 /** Clasifica el texto de una novedad. Nunca adivina: si no reconoce, lo dice. */
 function clasificar(texto) {
@@ -187,16 +222,57 @@ function parsear(texto) {
     // que se queda con el candidato que coincida con una guía que ya conocemos:
     // eso no es una suposición, es una coincidencia con nuestros datos.
     const noCelulares = candidatos.filter((n) => !esCelular(n));
-    const guia = (noCelulares.length ? noCelulares : candidatos)[0];
+    // 🔴 ANTES SE TOMABA EL PRIMERO, Y ERA EL NÚMERO EQUIVOCADO.
+    //
+    // Reproducido con la fila real del 28-sep: la línea traía 10104874 (número
+    // interno de 8 dígitos) y 240062099941 (la guía, 12 dígitos). "El primero que
+    // no parezca celular" se quedaba con el interno, así que la novedad no cruzaba
+    // con ningún pedido y salía "No encontré a quién corresponde esta guía".
+    //
+    // 🔑 Gana el MÁS LARGO: una guía de transportadora tiene más dígitos que un
+    // número de orden interno. Y quien decide de verdad sigue siendo revisar(),
+    // que prefiere el candidato que coincida con una guía que ya conocemos.
+    const porLargo = (noCelulares.length ? noCelulares : candidatos)
+      .slice()
+      .sort((a, b) => b.length - a.length);
+    const guia = porLargo[0];
     if (vistas.has(guia)) continue; // la misma guía dos veces no se procesa dos veces
     vistas.add(guia);
 
-    // El motivo es la línea sin los números, sin separadores de columna.
-    let motivo = limpia;
+    // 🔑 Los marcadores que pone el lector de Excel cuando reconoció las columnas.
+    // Traen la oficina y la fecha límite, que ANTES se tiraban a la basura y por
+    // eso cada novedad de oficina quedaba bloqueada pidiéndolas a mano.
+    const marca = (campo) => {
+      const m = limpia.match(new RegExp(`\\[\\[${campo}:\\s*([^\\]]+)\\]\\]`, "i"));
+      return m ? m[1].trim() : "";
+    };
+    const oficina = marca("oficina");
+    const plazo = marca("plazo");
+    const direccion = marca("direccion");
+
+    // 🔑 Si el lector de Excel reconoció la columna de la guía, manda esa y no se
+    // adivina nada. Con el archivo real, adivinar por largo elegía el teléfono
+    // 573043255345 (12 dígitos con indicativo) en vez de la guía 64532759599.
+    const marcada = marca("guia");
+    const guiaFinal = marcada || guia;
+    if (marcada && marcada !== guia) {
+      if (vistas.has(marcada)) continue;
+      vistas.add(marcada);
+    }
+
+    // El motivo es la línea sin los números, sin marcadores y sin separadores.
+    let motivo = limpia.replace(/\[\[[^\]]*\]\]/g, " ");
     for (const n of candidatos) motivo = motivo.replace(n, " ");
     motivo = motivo.replace(/[;,\t|]+/g, " ").replace(/\s+/g, " ").trim();
 
-    filas.push({ guia, candidatos, motivo });
+    filas.push({
+      guia: guiaFinal,
+      candidatos,
+      motivo,
+      ...(oficina ? { oficina } : {}),
+      ...(plazo ? { plazo } : {}),
+      ...(direccion ? { direccion } : {}),
+    });
   }
   return filas;
 }
@@ -392,8 +468,21 @@ function revisar(texto, opciones = {}) {
     // Sale de la novedad, y lo completa el dueño en el panel.
     if (tipo.clave === "oficina") {
       const datos = (opciones.datos && opciones.datos[n.guia]) || {};
-      const oficina = String(datos.oficina || "").trim();
-      const plazo = String(datos.plazo || "").trim();
+      // 🔑 Primero lo que completó el dueño en el panel, y si no lo tocó, lo que
+      // venía EN EL ARCHIVO. Antes solo existía la primera fuente, así que subir el
+      // Excel no servía de nada para las novedades de oficina: había que escribir a
+      // mano dos datos que el archivo ya traía.
+      //
+      // ⚠️ El orden importa: lo que el dueño escribe manda sobre el archivo. Si
+      // corrigió algo a mano es porque el archivo estaba mal.
+      // 🔑 Y TERCERA FUENTE: la dirección del destinatario. En el archivo real de
+      // 99 Envíos, cuando la novedad es "Reclame en oficina", la oficina de retiro
+      // viene escrita ahí — "Oficina Interrapidísimo Dagua", "Oficina principal
+      // Inter Rapidísimo"—. No es una suposición: es el campo que la
+      // transportadora llenó con la oficina.
+      const deLaDireccion = pareceOficina(n.direccion) ? String(n.direccion).trim() : "";
+      const oficina = String(datos.oficina || n.oficina || deLaDireccion || "").trim();
+      const plazo = String(datos.plazo || n.plazo || "").trim();
       if (!oficina || !plazo) {
         return {
           ...base,

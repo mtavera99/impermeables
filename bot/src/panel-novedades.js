@@ -312,8 +312,33 @@ document.getElementById("archivo").addEventListener("change", function (ev) {
       if (!d || d.ok === false) throw new Error((d && d.error) || "No se pudo leer el archivo.");
       document.getElementById("pegado").value = d.texto;
       msg.className = "cargarMsg ok";
+      // 🔑 Se le dice QUÉ columnas se reconocieron. Si 99 Envíos cambia los
+      // títulos, se ve acá en vez de descubrirse cuando las novedades de oficina
+      // queden bloqueadas sin explicación.
+      var detalle = "";
+      if (d.columnas && d.columnas.detectadas) {
+        var campos = Object.keys(d.columnas.detectadas).map(function (c) {
+          return c + "=" + d.columnas.detectadas[c].columna;
+        });
+        detalle = " Reconocí las columnas por su título (" + campos.join(", ") + ").";
+        if (d.conDatosDeOficina) {
+          detalle += " " + d.conDatosDeOficina +
+            " con oficina y fecha límite ya completas: esas no te las va a pedir.";
+        } else if (d.columnas.detectadas.plazo) {
+          detalle += " Encontré la columna de fecha límite.";
+        } else {
+          // El archivo de 99 Envíos NO trae fecha límite: solo updated_at, que es
+          // cuándo se registró la novedad. Se dice claro en vez de inventarla.
+          detalle += " El archivo no trae fecha límite (solo la fecha del registro)," +
+            " así que en las de oficina te va a pedir hasta cuándo tiene el cliente." +
+            " La oficina la saco de la dirección cuando la transportadora la puso ahí.";
+        }
+      } else {
+        detalle = " No reconocí el encabezado, así que leí cada fila completa como el motivo." +
+          " Las de oficina te las va a pedir a mano.";
+      }
       msg.textContent = "Leí " + d.cuantas + " novedad" + (d.cuantas === 1 ? "" : "es") +
-        " del archivo. Dale Revisar.";
+        " del archivo." + detalle + " Dale Revisar.";
     })
     .catch(function (e) {
       msg.className = "cargarMsg mal";

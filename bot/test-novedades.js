@@ -247,6 +247,109 @@ chequear("el JavaScript compila", compila === true, `error: ${compila}`);
 chequear("en móvil las filas se vuelven tarjetas", pantalla.includes("content:attr(data-label)"));
 chequear("el cuadro de texto no dispara el zoom de iOS", /textarea\{[^}]*font:1[6-9]px/.test(pantalla));
 
+console.log("\n── La guía correcta y los datos de oficina que vienen en el archivo ──");
+// 🔴 Dos defectos reproducidos el 28-sep con la fila real:
+//   1. la línea traía 10104874 (número interno, 8 dígitos) y 240062099941 (la
+//      guía, 12). Se elegía el primero que no pareciera celular — el interno — así
+//      que la novedad no cruzaba con ningún pedido.
+//   2. la oficina y la fecha límite venían en el archivo y se tiraban, así que
+//      TODA novedad de oficina quedaba bloqueada pidiéndolas a mano.
+{
+  const fila = "10104874\t240062099941\tTelemercadeo\timpermeable\tGustavo Calle 7\t3013335947\tBOGOTÁ\t1";
+  const r = novedades.parsear(fila)[0];
+  chequear("🔑 gana la guía larga, no el número interno", r.guia === "240062099941", `eligió ${r.guia} de ${JSON.stringify(r.candidatos)}`);
+  chequear("  y el celular sigue descartado", r.guia !== "3013335947");
+
+  // Los marcadores que pone el lector de Excel.
+  const conDatos =
+    "240062099942\tDEJADO EN OFICINA PARA RECLAMAR\tMaria Lopez\tYOPAL\t3001234567" +
+    "\t[[oficina: Interrapidisimo Yopal Centro]]\t[[plazo: 2026-10-05]]";
+  const f2 = novedades.parsear(conDatos)[0];
+  chequear("🔑 la oficina se lee del archivo", f2.oficina === "Interrapidisimo Yopal Centro", JSON.stringify(f2.oficina));
+  chequear("🔑 y la fecha límite también", f2.plazo === "2026-10-05", JSON.stringify(f2.plazo));
+  chequear("los marcadores NO quedan dentro del motivo", !/\[\[/.test(f2.motivo), f2.motivo);
+  chequear("y el motivo sigue clasificando como oficina", novedades.clasificar(f2.motivo).clave === "oficina", novedades.clasificar(f2.motivo).clave);
+
+  // 🔑 Con esos datos, la novedad de oficina YA NO queda bloqueada.
+  const tel = "573009995001";
+  store.saveOrder({
+    nombre: "Maria Lopez", celular: "3001234567", ciudad: "Yopal", direccion: "Calle 5 #4-3",
+    color: "negro", talla: "L", unidades: 1, pago: "contraentrega", total: 85000,
+    telefono_chat: tel, guia: "240062099942",
+  });
+  const plan = novedades.revisar(conDatos, { ahora: Date.now() });
+  const f = plan.filas[0];
+  chequear("🔑 EL CASO: la novedad de oficina ya NO pide datos a mano", f.enviar === true, `motivo: ${f.motivoNoEnvio}`);
+  chequear("  con la plantilla de oficina", f.plantilla === novedades.PLANTILLAS.oficina, String(f.plantilla));
+  chequear("  y los parámetros que salieron del archivo", JSON.stringify(f.parametros) === JSON.stringify(["Interrapidisimo Yopal Centro", "2026-10-05"]), JSON.stringify(f.parametros));
+  chequear("  el texto que verá el cliente trae la oficina", /Interrapidisimo Yopal Centro/.test(f.texto), f.texto);
+  chequear("  y la fecha", /2026-10-05/.test(f.texto), f.texto);
+
+  // ⛔ Y si el archivo NO trae esos datos, se sigue bloqueando: no se inventan.
+  const sinDatos = "240062099942\tDEJADO EN OFICINA PARA RECLAMAR\tMaria Lopez\tYOPAL";
+  const f3 = novedades.revisar(sinDatos, { ahora: Date.now() }).filas[0];
+  chequear("🔑 sin los datos en el archivo, se sigue pidiendo", f3.enviar === false && /Falta completar/.test(f3.motivoNoEnvio || ""), JSON.stringify(f3.motivoNoEnvio));
+
+  // ⚠️ Y lo que el dueño escribe a mano manda sobre el archivo.
+  const f4 = novedades.revisar(conDatos, {
+    ahora: Date.now(),
+    datos: { "240062099942": { oficina: "Interrapidisimo Centro Comercial Unicentro", plazo: "2026-10-09" } },
+  }).filas[0];
+  chequear("🔑 lo que corrige el dueño gana sobre el archivo", /Unicentro/.test(f4.texto) && /2026-10-09/.test(f4.texto), f4.texto);
+}
+
+console.log("\n── Los tipos y la oficina del archivo REAL ──");
+{
+  // Los textos LITERALES de tipo_novedad del Novedades-2026-09-28.
+  for (const [texto, esperado] of [
+    ["Reclame en oficina", "oficina"],
+    ["Intento de entrega", "ausente"],
+    ["No se localiza dirección del destinatario", "direccion"],
+    ["Reclamo en oficina informado WhatsApp - Recordatorio 24h", "oficina"],
+    ["Reclamo en oficina informado WhatsApp - Recordatorio 48h", "oficina"],
+    ["Reclamo en oficina informado WhatsApp - Recordatorio 7 días", "oficina"],
+    // 🔴 Estos dos caían en "No se reconoció el motivo" con el archivo real.
+    ["Telemercadeo", "telemercadeo"],
+    ["Pedido cancelado", "rechazado"],
+  ]) {
+    chequear(`🔑 "${texto}" → ${esperado}`, novedades.clasificar(texto).clave === esperado, novedades.clasificar(texto).clave);
+  }
+  chequear("a Telemercadeo NO se le manda mensaje automático", novedades.clasificar("Telemercadeo").mensaje == null);
+  chequear("ni a Pedido cancelado", novedades.clasificar("Pedido cancelado").mensaje == null);
+
+  // 🔑 La oficina sale de direccion_destinatario, que es donde la pone 99 Envíos.
+  const tel = "573009995002";
+  store.saveOrder({
+    nombre: "Tito Ramirez", celular: "3172168002", ciudad: "Dagua", direccion: "Oficina",
+    color: "negro", talla: "L", unidades: 1, pago: "contraentrega", total: 85000,
+    telefono_chat: tel, guia: "240062025925",
+  });
+  const linea =
+    "[[guia: 240062025925]]\t240062025925\tReclame en oficina\tTito\tDAGUA/DAGUA\t3172168002" +
+    "\t[[direccion: Oficina Interrapidísimo Dagua]]";
+  const f = novedades.parsear(linea)[0];
+  chequear("🔑 la guía marcada manda sobre cualquier otro número", f.guia === "240062025925", f.guia);
+  chequear("la dirección se lee del marcador", f.direccion === "Oficina Interrapidísimo Dagua", JSON.stringify(f.direccion));
+
+  const plan = novedades.revisar(linea, { ahora: Date.now() });
+  const fila = plan.filas[0];
+  // ⚠️ El archivo NO trae fecha límite, así que la novedad de oficina SIGUE
+  // pidiéndola: eso no se inventa. Pero la oficina ya viene resuelta.
+  chequear(
+    "🔑 sigue pidiendo la fecha límite, que el archivo no trae",
+    fila.enviar === false && /Falta completar/.test(fila.motivoNoEnvio || ""),
+    JSON.stringify(fila.motivoNoEnvio)
+  );
+  const conPlazo = novedades.revisar(linea, { ahora: Date.now(), datos: { "240062025925": { plazo: "2026-10-05" } } }).filas[0];
+  chequear("🔑 y con SOLO la fecha ya se puede enviar: la oficina salió del archivo", conPlazo.enviar === true, JSON.stringify(conPlazo.motivoNoEnvio));
+  chequear("  con la oficina que traía la dirección", /Oficina Interrapidísimo Dagua/.test(conPlazo.texto), conPlazo.texto);
+
+  // ⛔ Y una dirección de casa NO se toma por oficina.
+  const casa = "[[guia: 240062099927]]\t240062099927\tReclame en oficina\tPatricia\tLA VEGA\t3125154335\t[[direccion: Calle 8A No364 Barrio Las Palmas]]";
+  const fc = novedades.revisar(casa, { ahora: Date.now(), datos: { "240062099927": { plazo: "2026-10-05" } } }).filas[0];
+  chequear("🔑 una dirección de casa no se usa como oficina", !/Calle 8A/.test(String(fc.texto || "")), String(fc.texto || fc.motivoNoEnvio));
+}
+
 fs.rmSync(DIR, { recursive: true, force: true });
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

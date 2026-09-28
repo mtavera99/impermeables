@@ -307,5 +307,100 @@ chequear(
   JSON.stringify(x.aLineas([["a"], ["", ""], ["b"]]))
 );
 
+console.log("\n── Las columnas se leen por su TÍTULO, no por su posición ──");
+// 🔴 DE DÓNDE SALE (28-sep, con el archivo real en pantalla): el Excel se aplanaba
+// a texto y se perdía la estructura. La oficina y la fecha límite estaban en sus
+// columnas y se tiraban, así que cada novedad de oficina quedaba bloqueada
+// pidiéndole al dueño dos datos que el archivo ya traía.
+{
+  const ENCABEZADO = ["Número de Guía", "Novedad", "Destinatario", "Ciudad", "Celular", "Oficina", "Fecha límite"];
+  const filas = [
+    ENCABEZADO,
+    ["240062099941", "No se localiza dirección del destinatario", "Gustavo Perez", "BOGOTA", "3013335947", "", ""],
+    ["240062099942", "DEJADO EN OFICINA PARA RECLAMAR", "Maria Lopez", "YOPAL", "3001234567", "Interrapidisimo Yopal Centro", "2026-10-05"],
+  ];
+  const mapa = x.detectarColumnas(filas);
+  chequear("🔑 se detecta la fila de encabezado", mapa && mapa.fila === 0, JSON.stringify(mapa));
+  for (const [campo, letra] of [["guia", "A"], ["motivo", "B"], ["nombre", "C"], ["ciudad", "D"], ["celular", "E"], ["oficina", "F"], ["plazo", "G"]]) {
+    chequear(`  ${campo} → columna ${letra}`, mapa && x.letraDeColumna(mapa.indices[campo]) === letra, JSON.stringify(mapa && mapa.indices));
+  }
+
+  const texto = x.aLineasConColumnas(filas, mapa);
+  const lineas = texto.split("\n");
+  chequear("la fila de encabezado NO sale como novedad", lineas.length === 2, `salieron ${lineas.length}`);
+  chequear("🔑 la oficina queda marcada en la línea", /\[\[oficina: Interrapidisimo Yopal Centro\]\]/.test(texto), texto);
+  chequear("🔑 y la fecha límite también", /\[\[plazo: 2026-10-05\]\]/.test(texto), texto);
+  // ⚠️ El marcador de la guía SÍ va siempre (es lo que evita volver a adivinarla).
+  // Lo que no puede aparecer es un marcador de oficina o plazo inventado.
+  chequear("la fila sin oficina no inventa esos marcadores", !/\[\[(oficina|plazo):/.test(lineas[0]), lineas[0]);
+  chequear(
+    "el motivo va antes del nombre y la ciudad",
+    /\t240062099941\tNo se localiza dirección del destinatario\tGustavo Perez/.test(lineas[0]),
+    lineas[0]
+  );
+
+  // 🔑 Y si el orden de las columnas cambia, se sigue leyendo bien: es lo que no
+  // podemos controlar desde acá.
+  const alRevés = [
+    ["Fecha límite", "Oficina", "Celular", "Ciudad", "Destinatario", "Novedad", "Guía"],
+    ["2026-10-05", "Interrapidisimo Yopal Centro", "3001234567", "YOPAL", "Maria Lopez", "DEJADO EN OFICINA PARA RECLAMAR", "240062099942"],
+  ];
+  const m2 = x.detectarColumnas(alRevés);
+  chequear("🔑 con las columnas en otro orden también", m2 && x.letraDeColumna(m2.indices.guia) === "G" && x.letraDeColumna(m2.indices.oficina) === "B", JSON.stringify(m2 && m2.indices));
+
+  // ⛔ Sin encabezado reconocible NO se inventa nada: se cae al método de antes.
+  chequear("sin encabezado devuelve null", x.detectarColumnas([["10104874", "240062099941", "algo"]]) === null);
+  chequear(
+    "  y aLineas sigue funcionando como antes",
+    x.aLineas([["10104874", "240062099941", "no se localiza direccion"]]) === "10104874\t240062099941\tno se localiza direccion"
+  );
+  // Una fila con un solo acierto no es un encabezado.
+  chequear("una fila con solo la guía no se toma por encabezado", x.detectarColumnas([["Guía"], ["240062099941"]]) === null);
+}
+
+console.log("\n── EL ARCHIVO REAL de 99 Envíos (Novedades-2026-09-28) ──");
+// 🔴 ESTA PRUEBA EXISTE PORQUE MI PRIMERA VERSIÓN ROMPÍA EL ARCHIVO DE VERDAD.
+//
+// La hoja trae DOS columnas que matchean "novedad":
+//   C = novedad_sucursal  → VACÍA en las 26 filas
+//   D = tipo_novedad      → el motivo de verdad
+//
+// Quedándose con la primera coincidencia, el motivo salía de la columna vacía y
+// las 26 novedades quedaban "desconocida": no se enviaba NINGUNA. Y "sucursal"
+// hacía lo mismo con la oficina.
+{
+  const ENC = [
+    "id", "numero_preenvio", "novedad_sucursal", "tipo_novedad", "dice_contener",
+    "nombre_destinatario", "direccion_destinatario", "telefono_destinatario",
+    "ciudad_destinatario", "correo_destinatario", "numero_documento_destinatario",
+    "id_transportadora", "updated_at",
+  ];
+  const FILAS = [
+    ENC,
+    ["10106377", "240062099926", "", "Reclame en oficina", "impermeable", "Eliceo", "Oficina Interrapidísimo", "3138449747", "VILLAGARZÓN/VILLAGARZÓN", "", "", "1", "2026-09-28T17:12:50.000000Z"],
+    ["10104871", "240062099927", "", "Intento de entrega", "impermeable", "Patricia", "Calle 8A No364 Barrio Las Palmas", "3125154335", "LA VEGA/LA VEGA", "", "", "1", "2026-09-28T04:58:00.000000Z"],
+    ["10103391", "240062025925", "", "Reclame en oficina", "impermeable", "Tito", "Oficina Interrapidísimo Dagua", "3172168002", "DAGUA/DAGUA", "", "", "1", "2026-09-28T04:56:49.000000Z"],
+    ["10052907", "64532759599", "", "Pedido cancelado", "Conjunto tradicional 4 piezas", "Dailer", "MZ 74 lote 156", "573043255345", "CARTAGENA DE INDIAS/CARTAGENA", "", "", "4", "2026-09-24T15:32:29.000000Z"],
+  ];
+  const mapa = x.detectarColumnas(FILAS);
+  chequear("🔑 el motivo sale de tipo_novedad (D), NO de la columna vacía", mapa && mapa.indices.motivo === 3, `dio ${mapa && x.letraDeColumna(mapa.indices.motivo)}`);
+  chequear("🔑 y la columna vacía novedad_sucursal NO se elige para nada", mapa && !Object.values(mapa.indices).includes(2), JSON.stringify(mapa && mapa.indices));
+  chequear("la guía sale de numero_preenvio (B)", mapa && mapa.indices.guia === 1);
+  chequear("la dirección sale de direccion_destinatario (G)", mapa && mapa.indices.direccion === 6);
+  chequear("el nombre de nombre_destinatario (F)", mapa && mapa.indices.nombre === 5);
+  chequear("el celular de telefono_destinatario (H)", mapa && mapa.indices.celular === 7);
+  chequear("la ciudad de ciudad_destinatario (I)", mapa && mapa.indices.ciudad === 8);
+  chequear(
+    "🔑 y NO se inventa una columna de plazo: el archivo no la tiene",
+    mapa && mapa.indices.plazo === undefined,
+    `dio ${mapa && mapa.indices.plazo}`
+  );
+  chequear("updated_at no se confunde con una fecha límite", mapa && mapa.indices.plazo !== 12);
+
+  const texto = x.aLineasConColumnas(FILAS, mapa);
+  chequear("🔑 la guía va marcada, para no volver a adivinarla", /\[\[guia: 240062099926\]\]/.test(texto), texto.split("\n")[0]);
+  chequear("y la dirección también", /\[\[direccion: Oficina Interrapidísimo\]\]/.test(texto));
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);
