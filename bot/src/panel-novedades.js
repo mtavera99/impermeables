@@ -120,9 +120,10 @@ function render(opciones = {}) {
     ℹ️ <b>Cada novedad usa su propia plantilla</b>, así el cliente lee lo que le pasó sin tener
     que preguntar:<br>
     <code>novedad_direccion</code> · <code>novedad_ausente</code> · <code>novedad_oficina</code><br>
-    A quien escribió en las últimas 24 h se le manda un mensaje normal, más completo.
-    <b>La de oficina te va a pedir en qué oficina está y hasta cuándo tiene</b> — esos datos salen
-    de la novedad, el bot no los puede inventar.
+    A quien escribió en las últimas 24 h se le manda un mensaje normal, más completo.<br>
+    <b>En las de oficina:</b> la oficina la saco del archivo cuando la transportadora la puso ahí.
+    La <b>fecha límite</b> el archivo no la trae, así que la escribís <b>una sola vez</b> arriba de
+    la tabla y se le aplica a todas. Esos dos datos no se pueden inventar.
   </div>
 
   <div class="caja">
@@ -152,6 +153,25 @@ function render(opciones = {}) {
 
   <div id="zona" style="display:none">
     <h2>A quién le va a llegar</h2>
+    <!-- 📅 UNA FECHA PARA TODAS.
+         POR QUÉ: el Excel de 99 Envíos NO trae la fecha límite (solo trae cuándo
+         se registró la novedad), así que ese dato lo pone el dueño. Pero la
+         transportadora da el mismo plazo para todas las del mismo día, y
+         escribir la misma fecha en 7 filas distintas desde el celular es
+         justamente la clase de cosa que se hace mal o se abandona a la mitad. -->
+    <div id="paraTodas" class="caja" style="display:none">
+      <div style="font-weight:600;margin-bottom:6px">📅 ¿Hasta cuándo tienen para reclamarlo?</div>
+      <input id="plazoParaTodas" placeholder="ej: el 3 de octubre"
+             style="background:#0f1319;border:1px solid #39424f;border-radius:10px;padding:10px;
+                    color:#e7e9ee;font-size:16px;min-height:44px;width:100%">
+      <div class="sub" style="margin-top:6px">
+        Se le pone a <b>todas</b> las de oficina que no tengan una fecha propia escrita abajo.
+        El Excel de 99 Envíos no trae este dato, así que lo ponés vos.
+      </div>
+      <div class="acciones" style="margin-top:10px">
+        <button class="btn azul" id="btnAplicarPlazo">📅 Aplicar y revisar otra vez</button>
+      </div>
+    </div>
     <table id="tabla">
       <thead><tr>
         <th style="width:30px"></th><th>Guía</th><th>Cliente</th><th>Novedad</th>
@@ -175,13 +195,47 @@ function mostrar(clase, texto) {
   res.style.display = "block";
 }
 
+// ---------------------------------------------------------------------------
+// 🛡️ QUE NINGÚN BOTÓN SE MUERA EN SILENCIO
+//
+// 🔴 LA RAZÓN, Y ES LA PARTE CARA DEL ERROR DEL 25-SEP: el botón Enviar llamaba
+// a una función que no existía. Eso revienta ANTES de crear la promesa, así que
+// el .catch y el .finally de más abajo no corrían: el botón quedaba
+// deshabilitado, la pantalla clavada en "Enviando...", y CERO señales de que
+// algo se rompió. Duró 3 días porque el fallo no se veía.
+//
+// Con esto, cualquier error al tocar un botón sale en pantalla y el botón
+// vuelve a andar. No arregla el error de fondo, pero lo hace VISIBLE el primer
+// día en vez de al tercero.
+// ---------------------------------------------------------------------------
+function alTocar(id, fn) {
+  var btn = document.getElementById(id);
+  btn.addEventListener("click", function () {
+    try {
+      fn.call(btn);
+    } catch (e) {
+      mostrar("mal", "🔴 Se rompió la pantalla al procesar el clic: " + e.message +
+        " No se envió nada. Contame este mensaje tal cual y lo arreglo.");
+      btn.disabled = false;
+    }
+  });
+}
+
 // Junta lo que el dueño escribió en los campos de oficina/plazo, por guía.
 function datosCompletados() {
   var datos = {};
+  // 📅 La fecha que puso una sola vez para todas. La de cada fila manda sobre
+  // ésta: si escribió una distinta abajo es porque esa tiene otro plazo.
+  var campoGeneral = document.getElementById("plazoParaTodas");
+  var plazoGeneral = campoGeneral ? campoGeneral.value.trim() : "";
+
   document.querySelectorAll("input.dato").forEach(function (i) {
     var g = i.getAttribute("data-guia");
+    var campo = i.getAttribute("data-campo");
     if (!datos[g]) datos[g] = {};
-    datos[g][i.getAttribute("data-campo")] = i.value.trim();
+    var valor = i.value.trim();
+    if (!valor && campo === "plazo" && plazoGeneral) valor = plazoGeneral;
+    datos[g][campo] = valor;
   });
   return datos;
 }
@@ -265,6 +319,9 @@ function revisar(btn) {
       });
       document.getElementById("zona").style.display = "block";
       var faltanDatos = d.filas.filter(function (f) { return f.pidoDatos; }).length;
+      // El campo de "una fecha para todas" solo aparece si hay algo que la
+      // necesite. Si no falta nada, estorba.
+      document.getElementById("paraTodas").style.display = faltanDatos ? "block" : "none";
       mostrar(
         d.bloqueadas ? "info" : "ok",
         "Se leyeron " + d.filas.length + " novedad(es): " + d.listas + " lista(s) para avisar" +
@@ -279,7 +336,23 @@ function revisar(btn) {
     .finally(function () { btn.disabled = false; });
 }
 
-document.getElementById("btnRevisar").addEventListener("click", function () { revisar(this); });
+alTocar("btnRevisar", function () { revisar(this); });
+
+// 📅 Aplicar la fecha de todas y volver a revisar.
+//
+// 🔑 POR QUÉ ES UN BOTÓN Y NO SOLO UN CAMPO: una fila bloqueada NO tiene casilla
+// para marcar. Así que escribir la fecha y darle Enviar no alcanzaría — esas
+// filas no están marcadas y el envío las saltaría. Hay que volver a revisar para
+// que aparezcan las casillas. El botón lo hace en un toque en vez de dejarlo
+// como algo que el dueño tiene que adivinar.
+alTocar("btnAplicarPlazo", function () {
+  var campo = document.getElementById("plazoParaTodas");
+  if (!campo.value.trim()) {
+    mostrar("mal", "Escribí primero hasta cuándo tienen para reclamarlo.");
+    return;
+  }
+  revisar(this);
+});
 
 // ============================================================================
 // 📄 CARGAR EL ARCHIVO
@@ -351,8 +424,8 @@ document.getElementById("archivo").addEventListener("change", function (ev) {
     });
 });
 
-document.getElementById("btnEnviar").addEventListener("click", function () {
-  if (!PLAN) return;
+alTocar("btnEnviar", function () {
+  if (!PLAN) { mostrar("mal", "Dale primero a Revisar."); return; }
   var marcados = [].slice.call(document.querySelectorAll("#tabla input[type=checkbox]:checked"))
     .map(function (c) { return Number(c.getAttribute("data-i")); });
   if (marcados.length === 0) { mostrar("mal", "No hay ninguna marcada."); return; }
@@ -367,7 +440,21 @@ document.getElementById("btnEnviar").addEventListener("click", function () {
     // que completarlos y darle "Revisar otra vez" para que contaran, y eso no
     // es obvio — los campos están ahí mismo, en la fila, así que lo natural es
     // llenarlos y darle Enviar. El dueño lo hizo así y esa novedad no salió.
-    body: JSON.stringify({ token: TOKEN, id: PLAN.id, indices: marcados, datos: juntarDatos() })
+    //
+    // 🔴 28-SEP: ACÁ DECÍA juntarDatos(), UNA FUNCIÓN QUE NO EXISTE.
+    //
+    // La función se llama datosCompletados(). El 25-sep escribí la llamada con
+    // otro nombre y desde ese día ESTE BOTÓN NO ENVIÓ NI UN MENSAJE: el navegador
+    // lanzaba ReferenceError al construir el cuerpo del pedido, o sea ANTES de
+    // llamar al servidor. Y como reventaba antes de que existiera la promesa, ni
+    // el .catch que avisa "No salió" ni el .finally que revive el botón corrían:
+    // la pantalla se quedaba clavada en "Enviando 4 mensaje(s)..." para siempre.
+    //
+    // Yo leí esa pantalla como "se enviaron 4". Era lo contrario: no se envió
+    // ninguno, nunca. Tres días y tres reportes del dueño ("sigue saliendo
+    // igual") costó encontrarlo, porque ninguna de las 36 baterías ejecuta el
+    // JavaScript que corre en el celular. Ahora sí: test-javascript-de-los-paneles.js.
+    body: JSON.stringify({ token: TOKEN, id: PLAN.id, indices: marcados, datos: datosCompletados() })
   })
     .then(function (r) {
       if (r.status === 403) throw new Error("la clave del panel no coincide.");

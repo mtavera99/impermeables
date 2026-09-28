@@ -226,8 +226,12 @@ chequear(
     pantalla.includes("novedad_oficina")
 );
 chequear(
-  "y avisa que la de oficina va a pedir los datos",
-  /en qué oficina está y hasta cuándo/i.test(pantalla)
+  "y explica de dónde sale la oficina y de dónde la fecha límite",
+  /la oficina la saco del archivo/i.test(pantalla) && /fecha límite/i.test(pantalla)
+);
+chequear(
+  "🔑 dice que la fecha límite se escribe UNA sola vez para todas",
+  /una sola vez/i.test(pantalla) && pantalla.includes('id="plazoParaTodas"')
 );
 chequear(
   "los campos para completar la oficina existen en el JS",
@@ -243,7 +247,12 @@ try {
 } catch (e) {
   compila = e.message;
 }
-chequear("el JavaScript compila", compila === true, `error: ${compila}`);
+// ⚠️ OJO CON ESTA PRUEBA: compilar NO es ejecutar. Durante 3 días el botón
+// "Enviar" llamó a una función que no existe y esta prueba pasó igual, porque
+// `new Function` solo revisa la sintaxis: un nombre que no existe recién explota
+// cuando se toca el botón. Quien de verdad ejecuta el JavaScript del panel es
+// test-javascript-de-los-paneles.js. Esta se queda como red mínima.
+chequear("el JavaScript compila (sintaxis; no prueba que funcione)", compila === true, `error: ${compila}`);
 chequear("en móvil las filas se vuelven tarjetas", pantalla.includes("content:attr(data-label)"));
 chequear("el cuadro de texto no dispara el zoom de iOS", /textarea\{[^}]*font:1[6-9]px/.test(pantalla));
 
