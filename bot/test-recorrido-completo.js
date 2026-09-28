@@ -1665,6 +1665,246 @@ const datosBase = {
     );
   }
 
+  // ==========================================================================
+  console.log("\n── 29. 🧮 DIANA: preguntar por dos da el precio de DOS, ya en la primera ──");
+  // Diana escribió "Si se piden 2 cuánto seria el costo" y el bot le contestó
+  // $73.000 —el total de UNA— y después tuvo que corregirse hasta $133.000.
+  // Reproducido: `cantidadDelHilo` no reconocía "se piden 2".
+  // ==========================================================================
+  {
+    const tel = "573008880040";
+    await turno(tel, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel, "Madrid Cundinamarca", "Te queda en $73.000 en total puesto en Madrid 📦");
+    const t = await turno(tel, "Si se piden 2 cuánto seria el costo", "Los dos te quedan en $133.000 en total, puestos en Madrid y pagas al recibir 📦");
+    const cot = store.leerCotizacion(tel);
+    chequear("29· 🔑 la cotización del turno es de DOS", cot && cot.uds === 2, `uds=${cot && cot.uds}`);
+    chequear("29· con su total de $133.000", cot && cot.total === 133000, `${cot && cot.total}`);
+    chequear("29· 🔑 y el cliente ve $133.000, no $73.000", /\$133\.000/.test(t.reply) && !/\$73\.000/.test(t.reply), `salió: ${t.reply}`);
+    // 🔑 Y el candado: con 2 unidades el total de 1 NO se puede decir.
+    chequear(
+      "29· 🔑 el total de UNA unidad ya no se puede presentar como total",
+      cotizacion.validarRespuesta("Te queda en $73.000 en total", cot, {}).ok === false
+    );
+    // Otras formas de preguntar por dos.
+    for (const [i, frase] of ["si pido 2 cuanto sale", "cuánto por dos", "cuánto valen dos"].entries()) {
+      const tel2 = `5730088804${41 + i}`;
+      await turno(tel2, "hola", "¡Hola! ¿Para qué ciudad sería el envío?");
+      await turno(tel2, "Madrid", "Te queda en $73.000 en total puesto en Madrid 📦");
+      await turno(tel2, frase, "Los dos te quedan en $133.000 en total 📦");
+      const c2 = store.leerCotizacion(tel2);
+      chequear(`29· «${frase}» → cotización de dos`, c2 && c2.uds === 2 && c2.total === 133000, `${c2 && c2.uds}/${c2 && c2.total}`);
+    }
+  }
+
+  // ==========================================================================
+  console.log("\n── 30. 🔁 JOHANA: 1 confirmada → pregunta la promo → modificación limpia ──");
+  // Johana, con una compra de $83.000, preguntó por dos y el bot pasó por
+  // $83.000 → $140.000 → "tienes razón, son $110.000" → $140.000 otra vez.
+  // Acá se comprueba que hay UNA cotización vigente por turno y que aceptar la
+  // modificación no crea un pedido fantasma: reemplaza al anterior, vinculado.
+  // ==========================================================================
+  {
+    const tel = "573008880050";
+    const CEL = "3009990050";
+    await turno(tel, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel, "Cali", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali 📦 Pásame nombre completo, dirección con barrio y celular");
+    await turno(tel, `Johana Ruiz, ${CEL}, Cra 8 #9-10 barrio Centro, talla M negra`, CUADRO(82000).replace("Ana Gómez", "Johana Ruiz").replace("3001234567", CEL));
+    await turno(tel, "sí confirmo", `¡Listo Johana! ${ORDER({ nombre: "Johana Ruiz", celular: CEL, ciudad: "Cali", direccion: "Cra 8 #9-10 barrio Centro", color: "negro", talla: "M", unidades: 1, pago: "contraentrega", total: 82000 })}`);
+    chequear("30· queda 1 pedido confirmado de $82.000", store.todosLosPedidos().filter((p) => p.telefono_chat === tel).length === 1);
+
+    // Pregunta por la promo de dos.
+    const t = await turno(tel, "y si llevo dos cuánto me sale?", "Los dos te quedan en $148.000 en total, puestos en Cali 📦");
+    const cot2 = store.leerCotizacion(tel);
+    chequear("30· 🔑 la cotización pasa a DOS con su total", cot2 && cot2.uds === 2 && cot2.total === 148000, `${cot2 && cot2.uds}/${cot2 && cot2.total}`);
+    chequear("30· 🔑 y NO vuelve a salir el total de una", !/\$82\.000/.test(t.reply), `salió: ${t.reply}`);
+    chequear("30· ni un total inventado de otra banda", !/\$140\.000|\$155\.000/.test(t.reply), `salió: ${t.reply}`);
+
+    // Acepta: se le muestra el resumen nuevo y confirma.
+    await turno(tel, "listo, los dos entonces", CUADRO(148000).replace("Ana Gómez", "Johana Ruiz").replace("3001234567", CEL).replace("Talla: L", "Talla: M y M"));
+    await turno(tel, "sí confirmo", `¡Listo Johana! ${ORDER({ nombre: "Johana Ruiz", celular: CEL, ciudad: "Cali", direccion: "Cra 8 #9-10 barrio Centro", color: "negro", talla: "M y M", unidades: 2, pago: "contraentrega", total: 148000 })}`);
+    const pedidos = store.todosLosPedidos().filter((p) => p.telefono_chat === tel);
+    const deDos = pedidos.find((p) => Number(p.total) === 148000);
+    chequear("30· 🔑 la modificación confirmada existe", Boolean(deDos), `hay ${pedidos.length} pedidos`);
+    chequear("30· 🔑 y queda VINCULADA al pedido anterior", deDos && Boolean(deDos.modifica_a), `modifica_a=${deDos && deDos.modifica_a}`);
+    chequear(
+      "30· 🔑 no queda marcada como duplicado misterioso",
+      deDos && deDos.posible_duplicado !== true,
+      store.textoDeRevision(deDos)
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 31. 🎯 JORGE: rechaza los dos → se ofrece el rescate UNA vez → queda 1 ──");
+  // Jorge tenía 1 unidad confirmada en Cali. Preguntó por la promo, vio el total y
+  // contestó "Pensé que era un solo envio doble no entonces si haci como estamos
+  // solo 1". El bot aceptó la caída en el acto —el rescate nunca se ofreció— y
+  // además apareció un pedido fantasma de 2 unidades por $155.000.
+  // ==========================================================================
+  {
+    const tel = "573008880060";
+    const CEL = "3009990060";
+    await turno(tel, "hola", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+    await turno(tel, "Cali", "Te queda en $82.000 en total: $59.900 el conjunto + $22.100 de envío a Cali 📦 Pásame nombre completo, dirección con barrio y celular");
+    await turno(tel, `Jorge Ayala, ${CEL}, Cra 7 #8-9 barrio Centro, talla L negra`, CUADRO(82000).replace("Ana Gómez", "Jorge Ayala").replace("3001234567", CEL));
+    await turno(tel, "sí confirmo", `¡Listo Jorge! ${ORDER({ nombre: "Jorge Ayala", celular: CEL, ciudad: "Cali", direccion: "Cra 7 #8-9 barrio Centro", color: "negro", talla: "L", unidades: 1, pago: "contraentrega", total: 82000 })}`);
+    const original = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    chequear("31· queda 1 pedido confirmado de $82.000", Boolean(original) && Number(original.total) === 82000);
+
+    // Pregunta por la promoción de dos.
+    await turno(tel, "quiero pedir la promoción de 2 en 110 mil uno L otro M", "Los dos te quedan en $148.000 en total, puestos en Cali y pagas al recibir 📦");
+    chequear("31· la cotización pasa a dos ($148.000 en Cali)", (store.leerCotizacion(tel) || {}).total === 148000);
+
+    // 🔴 EL TURNO DEL CASO: retrocede a una por el envío.
+    const t = await turno(
+      tel,
+      "Pensé que era un solo envio doble no entonces si haci como estamos solo 1",
+      "Entiendo 🙌 Antes de dejarlo en uno: los dos te quedan en $138.000 en total, puestos en Cali y pagas al recibir 📦 ¿Te sirve así?"
+    );
+    chequear("31· 🔑 se OFRECE el rescate del combo ($138.000)", /\$138\.000/.test(t.reply), `salió: ${t.reply}`);
+    chequear("31· 🔑 y NO se acepta perder la segunda unidad en el acto", !/listo, uno entonces/i.test(t.reply), `salió: ${t.reply}`);
+    chequear(
+      "31· 🔑 NO apareció ningún pedido de 2 unidades",
+      store.todosLosPedidos().filter((p) => p.telefono_chat === tel && Number(p.total) === 155000).length === 0
+    );
+
+    // Rechaza el rescate: se cierra con una y no se insiste.
+    const t2 = await turno(tel, "no, así está bien, solo uno", "¡Listo Jorge! Queda tu conjunto en $82.000 en total, puesto en Cali 📦");
+    chequear("31· 🔑 si rechaza, se cierra con UNA unidad", /\$82\.000/.test(t2.reply), `salió: ${t2.reply}`);
+    chequear("31· 🔑 y NO se vuelve a ofrecer el rescate", !/\$138\.000/.test(t2.reply), `salió: ${t2.reply}`);
+
+    const finales = store.todosLosPedidos().filter((p) => p.telefono_chat === tel);
+    chequear("31· 🔑 queda SOLO el pedido original de 1 unidad", finales.length === 1, `hay ${finales.length}: ${finales.map((p) => p.total).join(", ")}`);
+    chequear("31· con su total intacto", finales[0] && Number(finales[0].total) === 82000, `${finales[0] && finales[0].total}`);
+    chequear("31· 🔑 y NUNCA hubo un pedido fantasma de $155.000", !finales.some((p) => Number(p.total) === 155000));
+  }
+
+  // ==========================================================================
+  console.log("\n── 32-34. 📦 HEBER: posventa, equivalencia de talla y compra adicional ──");
+  // Heber confirmó el 25: 2 unidades XL, rojo + blanco, San Martín (Cesar),
+  // $155.000. El 27 escribió solo "si mandaron el pedido gracias" y apareció otro
+  // pedido por los mismos $155.000. Causa: RE_SI leyó el "si" condicional como el
+  // "sí" de confirmar.
+  // ==========================================================================
+  {
+    const tel = "573008880070";
+    const CEL = "3009990070";
+    const pedidoDeHeber = {
+      nombre: "Heber Rojas", celular: CEL, ciudad: "San Martín, Cesar",
+      direccion: "Cra 2 #3-4 barrio Centro", color: "rojo blanco", talla: "XL",
+      unidades: 2, pago: "contraentrega", total: 155000, telefono_chat: tel,
+    };
+    store.saveOrder({ ...pedidoDeHeber });
+    chequear("32· parte de 1 pedido confirmado", store.todosLosPedidos().filter((p) => p.telefono_chat === tel).length === 1);
+
+    // 🔴 EL MENSAJE DEL CASO.
+    const t = await turno(tel, "si mandaron el pedido gracias", `Claro que sí 🙌 ${ORDER(pedidoDeHeber)}`);
+    const tras = store.todosLosPedidos().filter((p) => p.telefono_chat === tel);
+    chequear("32· 🔑 EL CASO: sigue habiendo UN solo pedido", tras.length === 1, `hay ${tras.length}`);
+    chequear("32· 🔑 aunque el modelo emitió otro ##ORDER##", tras.length === 1);
+    chequear("32· 🔑 y NO se afirma que está con la transportadora", !/en manos de la transportadora|va en camino|sale hoy/i.test(t.reply), `salió: ${t.reply}`);
+    chequear("32· se dice que todavía no hay guía", /gu[ií]a/i.test(t.reply), `salió: ${t.reply}`);
+    chequear("32· el chat NO queda en pausa", !store.isPaused(tel));
+
+    // 33. La talla escrita de otra forma: el candado la entiende.
+    // ⚠️ Se usa el pedido GUARDADO, no el objeto literal: `esPedidoDuplicado` mide
+    // una ventana de tiempo y necesita la `fecha` que pone `saveOrder`.
+    const guardadoDeHeber = store.todosLosPedidos().filter((p) => p.telefono_chat === tel)[0];
+    const otraForma = (talla) => ({ ...guardadoDeHeber, talla, id: undefined, fecha: new Date().toISOString() });
+    chequear(
+      "33· 🔑 «XL» y «XL y XL» con 2 unidades son el mismo pedido",
+      store.esPedidoDuplicado([guardadoDeHeber], otraForma("XL y XL")) !== null
+    );
+    chequear(
+      "33· y «2 unidades XL» también",
+      store.esPedidoDuplicado([guardadoDeHeber], otraForma("2 unidades XL")) !== null
+    );
+    chequear(
+      "33· 🔑 pero «L y M» NO es el mismo pedido",
+      store.esPedidoDuplicado([guardadoDeHeber], otraForma("L y M")) === null
+    );
+
+    // 34. Y una compra adicional explícita SÍ puede existir.
+    // ⚠️ Con un CUADRO de verdad: sin cuadro el candado de confirmación no guarda
+    // nada, y eso está bien —lo comprobé cuando mi guion no lo mandaba—.
+    const t3 = await turno(
+      tel,
+      "quiero otros dos para mi hermano",
+      `Confirmemos tu pedido ✅\nNombre: Heber Rojas\nCelular: ${CEL}\nCiudad: San Martín, Cesar\n` +
+        `Dirección: Cra 2 #3-4 barrio Centro\nColor de la franja: rojo blanco\nTalla: XL y XL\n` +
+        `Pago: contraentrega\nTOTAL a pagar al recibir: $155.000\n` +
+        `¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`
+    );
+    chequear("34· 🔑 una compra adicional NO se bloquea", !/ya está registrado|en fila para despacho/i.test(t3.reply), `salió: ${t3.reply}`);
+    await turno(tel, "sí confirmo", `¡Listo Heber! ${ORDER({ ...pedidoDeHeber, talla: "XL y XL" })}`);
+    const conAdicional = store.todosLosPedidos().filter((p) => p.telefono_chat === tel);
+    chequear("34· 🔑 y puede crear un SEGUNDO pedido", conAdicional.length === 2, `hay ${conAdicional.length}`);
+    // ⚠️ Se busca por la talla que lo distingue, no por posición: `todosLosPedidos`
+    // no garantiza el orden y eso hacía fallar la prueba sin haber nada roto.
+    const adicional = conAdicional.find((p) => String(p.talla) === "XL y XL");
+    chequear("34· marcado como compra adicional", adicional && adicional.compra_adicional === true, JSON.stringify(adicional && adicional.compra_adicional));
+    chequear(
+      "34· 🔑 y NO marcado como duplicado sospechoso",
+      adicional && adicional.posible_duplicado !== true,
+      store.textoDeRevision(adicional)
+    );
+  }
+
+  // ==========================================================================
+  console.log("\n── 35-38. 🏷️ Los cuatro falsos PRECIO NO CUADRA de destino ──");
+  // ==========================================================================
+  {
+    const casos = [
+      { n: "35· HUMBERTO", tel: "573008880080", cel: "3009990080", dice: "santabara de pinto", bot: "Santa Bárbara de Pinto", pedido: "Santa Bárbara de Pinto", nombre: "Humberto Sinning" },
+      { n: "36· LENIN", tel: "573008880081", cel: "3009990081", dice: "turbana Bolivar", bot: "Turbana", pedido: "Turbana, Bolívar", nombre: "Lenin Gómez Martínez", datos: "Lenin Gómez Martínez Turbana Bolivar" },
+      { n: "37· HENRRY", tel: "573008880082", cel: "3009990082", dice: "San Pelayo, Córdoba", bot: "San Pelayo", pedido: "San Pelayo, Córdoba", nombre: "Henrry Mendoza", datos: "Henrry Mendoza San pelayo Córdoba" },
+      { n: "38· JHON", tel: "573008880083", cel: "3009990083", dice: "Arjona, Bolívar", bot: "Arjona", pedido: "Sincerín, Arjona", nombre: "Jhon Erick", extra: "Yo vivo en sincerin", extraBot: "Sincerín es corregimiento de Arjona, así que el envío a Sincerín, Arjona te queda en $85.000 en total 📦" },
+    ];
+    for (const c of casos) {
+      await turno(c.tel, "hola, cuánto vale?", "¡Hola! 🏍️ ¿Para qué ciudad sería el envío?");
+      await turno(c.tel, c.dice, `Te queda en $85.000 en total puesto en ${c.bot}, y pagas al recibir 📦 Pásame nombre completo, dirección con barrio y celular`);
+      if (c.extra) await turno(c.tel, c.extra, c.extraBot);
+      const datos = `${c.datos || c.nombre} ${c.cel} Cra 1 #2-3 barrio Centro talla L negra`;
+      await turno(
+        c.tel,
+        datos,
+        `Confirmemos tu pedido ✅\nNombre: ${c.nombre}\nCelular: ${c.cel}\nCiudad: ${c.pedido}\n` +
+          `Dirección: Cra 1 #2-3 barrio Centro\nColor de la franja: negro\nTalla: L\nPago: contraentrega\n` +
+          `TOTAL a pagar al recibir: $85.000\n¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`
+      );
+      const cot = store.leerCotizacion(c.tel);
+      chequear(`${c.n}: la cotización NO se contamina`, cot && !/\d/.test(cot.ciudad) && cot.ciudad.split(/\s+/).length <= 4, JSON.stringify(cot && cot.ciudad));
+      chequear(`${c.n}: y el nombre no está en la ciudad`, cot && !new RegExp(c.nombre.split(" ")[0], "i").test(cot.ciudad), JSON.stringify(cot && cot.ciudad));
+      chequear(`${c.n}: con su total de $85.000`, cot && cot.total === 85000, `${cot && cot.total}`);
+
+      await turno(c.tel, "Si", `¡Gracias por tu compra, ${c.nombre.split(" ")[0]}! Tu pedido quedó registrado ✅ ${ORDER({ nombre: c.nombre, celular: c.cel, ciudad: c.pedido, direccion: "Cra 1 #2-3 barrio Centro", color: "negro", talla: "L", unidades: 1, pago: "contraentrega", total: 85000 })}`);
+      const pedido = store.todosLosPedidos().filter((p) => p.telefono_chat === c.tel)[0];
+      chequear(`${c.n}: 🔑 el pedido NO queda en PRECIO NO CUADRA`, pedido && !pedido.precio_no_cuadra, `motivo=${pedido && pedido.motivo_precio}`);
+      chequear(`${c.n}: 🔑 y SE PUEDE DESPACHAR`, pedido && store.listoParaDespachar(pedido) === true, store.textoDeRevision(pedido));
+    }
+  }
+
+  // ==========================================================================
+  console.log("\n── 39-40. 📍 Posventa: el estado logístico REAL ──");
+  // ==========================================================================
+  {
+    // 39. Sin guía: no se puede decir que está con la transportadora.
+    const tel = "573008880090";
+    store.saveOrder({ nombre: "Rosa Lara", celular: "3009990090", ciudad: "Cali", direccion: "Cra 1 #2-3", color: "negro", talla: "L", unidades: 1, pago: "contraentrega", total: 82000, telefono_chat: tel });
+    const t = await turno(tel, "ya lo despacharon?", "Tu pedido ya fue procesado y está en manos de la transportadora, va en camino 🚚");
+    chequear("39· 🔑 NO se afirma que está con la transportadora", !/en manos de la transportadora/i.test(t.reply), `salió: ${t.reply}`);
+    chequear("39· 🔑 ni que va en camino", !/va en camino/i.test(t.reply), `salió: ${t.reply}`);
+    chequear("39· se dice el estado real: en fila para despacho", /fila para despacho|registrado/i.test(t.reply), `salió: ${t.reply}`);
+    chequear("39· y que todavía no hay guía", /todav[ií]a no tengo el n[uú]mero de gu[ií]a/i.test(t.reply), `salió: ${t.reply}`);
+
+    // 40. Con guía real: sí se puede decir que fue despachado.
+    const tel2 = "573008880091";
+    const guardado = store.saveOrder({ nombre: "Omar Cifuentes", celular: "3009990091", ciudad: "Cali", direccion: "Cra 4 #5-6", color: "negro", talla: "L", unidades: 1, pago: "contraentrega", total: 82000, telefono_chat: tel2 });
+    store.anotarGuiaEnPedido(guardado.fecha, "999888777");
+    const t2 = await turno(tel2, "ya lo mandaron?", "Déjame revisar 🙌");
+    chequear("40· 🔑 con guía SÍ se dice que está despachado", /despachado/i.test(t2.reply), `salió: ${t2.reply}`);
+    chequear("40· y se le da el número de guía", /999888777/.test(t2.reply), `salió: ${t2.reply}`);
+  }
+
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   try {
     fs.rmSync(DIR, { recursive: true, force: true });

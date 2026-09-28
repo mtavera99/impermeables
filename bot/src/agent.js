@@ -8,6 +8,7 @@ const store = require("./store");
 const cotizacion = require("./cotizacion");
 const promesas = require("./promesas");
 const comercial = require("./comercial");
+const posventa = require("./posventa");
 
 // ============================================================================
 // PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
@@ -335,14 +336,77 @@ async function generateReply(phone, userText) {
   // unidad. Las dos funciones viven en cotizacion.js para que las pruebas
   // recorran exactamente este camino y no una versión de laboratorio.
   const previa = store.leerCotizacion(phone);
-  const destino = cotizacion.destinoDelHilo(conv, userText);
+  let destino = cotizacion.destinoDelHilo(conv, userText);
   const cantidad = cotizacion.cantidadDelHilo(conv, userText, previa && previa.uds);
-  let cot = cotizacion.calcular(destino.ciudad, userText, { cantidad });
+  // ==========================================================================
+  // 🔴 A QUIEN YA COMPRÓ NO SE LE VUELVE A PEDIR LA CIUDAD
+  //
+  // Lo encontré probando la compra adicional de Heber: pidió "quiero otros dos para
+  // mi hermano" y el sistema no tenía destino —su ciudad estaba en el PEDIDO de dos
+  // días antes, no en los mensajes recientes—, así que no se podía cotizar y la
+  // venta adicional no se podía cerrar.
+  //
+  // 🔑 El pedido confirmado anterior es evidencia de su destino, y de las más
+  // fuertes que hay: ya se le despachó ahí. Volver a preguntarle la ciudad es
+  // empezar la venta de cero con quien ya es cliente.
+  //
+  // ⚠️ Solo cuando NO hay destino (`no_hay`). Si la lectura es ambigua —varias
+  // ciudades, o duda entre el dato y el destino— se sigue preguntando: ahí el
+  // pedido viejo no resuelve nada.
+  // ==========================================================================
+  if (!destino.ciudad && destino.origen === "no_hay") {
+    const conCiudad = store
+      .todosLosPedidos()
+      .filter((p) => p && p.telefono_chat === phone && !p.anulado && !p.sin_confirmar && p.ciudad);
+    const ultimo = conCiudad[conCiudad.length - 1];
+    if (ultimo) {
+      destino = { ciudad: String(ultimo.ciudad), varias: [], origen: "ciudad_de_su_pedido_anterior" };
+      console.log(
+        `🏠 ${phone} ya había comprado: se usa la ciudad de su pedido anterior ` +
+          `("${ultimo.ciudad}") en vez de volver a preguntársela.`
+      );
+    }
+  }
+
+  // 🎯 Si el cliente retrocedió de dos a una por precio, la cotización conserva el
+  // combo de dos al precio autorizado para poder ofrecerlo UNA vez. Ver el caso
+  // Jorge en `comboDeRescateDe`.
+  const retrocedio = cotizacion.retrocedioDeDosAUno(previa && previa.uds, userText);
+  let cot = cotizacion.calcular(destino.ciudad, userText, {
+    cantidad,
+    ofrecerComboDeRescate: retrocedio,
+  });
   // 🏷️ La cotización guardada es la que trae `oferta_id`: un identificador que
   // PERSISTE mientras las condiciones no cambien, en vez de nacer en cada mensaje.
   if (cot.ok) cot = store.guardarCotizacion(phone, cot);
-  const objecionDePrecio = cotizacion.hayObjecionDePrecio(conv.messages);
-  const contextoPrecio = { objecionDePrecio };
+  // 🔑 La objeción de precio ahora también se detecta por CONTEXTO: si el cliente
+  // venía por dos y retrocedió a una después de ver el total, eso es una objeción
+  // aunque no use ninguna palabra de la lista. Es el caso de Jorge (27-sep), donde
+  // el rescate del combo existía y nunca se ofreció. Ver `retrocedioDeDosAUno`.
+  const objecionDePrecio = cotizacion.hayObjecionDePrecio(conv.messages, {
+    previaUds: previa && previa.uds,
+    userText,
+  });
+  // ⚠️ `messages` viaja en el contexto porque `verificarPedido` necesita el hilo
+  // para resolver el destino cuando la conversación ya estableció que dos
+  // escrituras son el mismo sitio (typo corregido, corregimiento). Ver
+  // `elHiloResolvioElDestino`.
+  // ⚠️ UNA SOLA VEZ: si el bot ya dijo ese número en el hilo, el rescate deja de
+  // estar autorizado. El dueño lo pidió explícito: no se regatea en bucle.
+  const rescateYaOfrecido =
+    Boolean(cot.comboDeRescate) &&
+    cotizacion.yaSeOfrecioElRescate(conv.messages, cot.comboDeRescate.rescate);
+  const contextoPrecio = {
+    objecionDePrecio,
+    messages: conv.messages,
+    rescateYaOfrecido,
+  };
+  if (cot.comboDeRescate && objecionDePrecio && !rescateYaOfrecido) {
+    console.log(
+      `🎯 RESCATE DEL COMBO autorizado para ${phone}: venía por 2, volvió a 1 por precio. ` +
+        `Se ofrece UNA vez los dos por $${cot.comboDeRescate.rescate} en ${cot.ciudad}.`
+    );
+  }
 
   let reply;
   let validacion = null;
@@ -630,10 +694,52 @@ async function generateReply(phone, userText) {
 
   const orderRes = extractOrder(reply);
   reply = orderRes.clean;
-  const order = orderRes.order;
+  let order = orderRes.order;
   // true = el bloque venía cortado y se reconstruyó campo por campo. Puede
   // faltarle algo, así que el aviso al dueño tiene que decirlo.
   const pedidoRescatado = orderRes.rescatado;
+
+  // ==========================================================================
+  // 📦 ¿QUÉ ESTÁ HACIENDO EL CLIENTE EN ESTE TURNO?
+  //
+  // Del caso Heber: con un pedido confirmado, "si mandaron el pedido gracias" se
+  // leyó como una confirmación de compra y nació un segundo pedido. Acá se decide
+  // primero la INTENCIÓN, y más abajo esa decisión frena el pedido.
+  //
+  // ⚠️ `botPidioConfirmacion` mira el último mensaje del bot ANTES de este turno:
+  // si el bot acaba de mandar un cuadro, un "listo" contesta ese cuadro y el turno
+  // NO es posventa. Sin esto, una compra adicional no se podría confirmar nunca.
+  // ==========================================================================
+  const pedidosDelCliente = store
+    .todosLosPedidos()
+    .filter((p) => p && p.telefono_chat === phone && !p.anulado && !p.sin_confirmar);
+  const ultimaDelBotAntes =
+    [...conv.messages].reverse().find((m) => m && m.role === "assistant")?.content || "";
+  const intencion = posventa.intencionDelTurno(userText, {
+    tienePedidoConfirmado: pedidosDelCliente.length > 0,
+    botPidioConfirmacion: cotizacion.pideConfirmacion(ultimaDelBotAntes),
+  });
+
+  // ==========================================================================
+  // 🔴 EL ESTADO LOGÍSTICO NO SE INVENTA (caso Heber)
+  //
+  // El bot le contestó "tu pedido ya fue procesado y está en manos de la
+  // transportadora" cuando NO había ninguna guía registrada. Eso no se puede
+  // afirmar por intuición: o hay guía, o no la hay.
+  //
+  // 🔑 En un turno de posventa la respuesta la escribe el CÓDIGO con el estado real
+  // del pedido. Es la única forma de garantizar que no se invente una guía ni una
+  // fecha, porque el modelo ya lo hizo una vez.
+  // ==========================================================================
+  if (intencion.intencion === "posventa" && pedidosDelCliente.length > 0) {
+    const elMasNuevo = pedidosDelCliente[pedidosDelCliente.length - 1];
+    const estado = posventa.estadoDelPedido(elMasNuevo);
+    reply = posventa.respuestaDeEstado(elMasNuevo);
+    console.log(
+      `📦 POSVENTA de ${phone}: se responde con el estado REAL del pedido (${estado.clave}` +
+        `${estado.guia ? `, guía ${estado.guia}` : ", sin guía"}), no con lo que escribió el modelo.`
+    );
+  }
 
   const mediaRes = extractMedia(reply);
   reply = mediaRes.clean;
@@ -751,8 +857,91 @@ async function generateReply(phone, userText) {
     //
     // Va ANTES de los otros candados porque si no hay venta, lo demás no importa.
     // ========================================================================
-    const conf = revisarConfirmacion(order, store.getConv(phone).messages, reply);
-    if (!conf.guardar) {
+    // ========================================================================
+    // 🔴 CANDADO DE POSVENTA — PREGUNTAR POR UN PEDIDO NO ES COMPRAR OTRO
+    //
+    // Caso Heber (27-sep): con un pedido confirmado dos días antes, escribió "si
+    // mandaron el pedido gracias" y apareció otro pedido por los mismos $155.000.
+    //
+    // 🔑 Va ANTES que todo lo demás: si el turno es posventa, de acá no puede
+    // nacer una venta, aunque el modelo haya emitido el bloque. Ver posventa.js.
+    //
+    // ⚠️ Y NO bloquea una compra real: `intencionDelTurno` devuelve
+    // `compra_adicional` en cuanto el cliente lo pide explícitamente, y si el bot
+    // acaba de mandar un cuadro el turno se trata como normal para que la segunda
+    // compra se pueda confirmar.
+    // ========================================================================
+    if (intencion.intencion === "posventa") {
+      console.warn(
+        `📦 POSVENTA de ${phone} (${intencion.motivo}): se DESCARTA el pedido que emitió el ` +
+          `modelo ($${order.total || "?"}). Ya tiene un pedido confirmado; esto no es una venta nueva.`
+      );
+      order = null;
+    }
+
+    const conf = order ? revisarConfirmacion(order, store.getConv(phone).messages, reply) : null;
+
+    // ========================================================================
+    // 🔴 MODIFICAR UN PEDIDO CONFIRMADO NO CREA UN PEDIDO FANTASMA
+    //
+    // Caso Jorge (27-sep). Tenía 1 unidad confirmada en Cali ($82.000). Preguntó
+    // por la promo de dos, el bot cotizó $155.000, y él contestó:
+    //
+    //   "Pensé que era un solo envio doble no entonces si haci como estamos solo 1"
+    //
+    // O sea: RECHAZÓ el cambio y se quedó con su pedido de una. Igual apareció un
+    // segundo registro de 2 unidades por $155.000, sin ciudad ni datos completos.
+    //
+    // 🔎 CAUSA: esa frase no la clasifica ni como "sí" ni como "no", así que queda
+    // en `no-se-sabe` → `guardar:true, marcar:true`. El pedido se guardaba marcado,
+    // y eso es justamente el fantasma.
+    //
+    // 🔑 REGLA TRANSACCIONAL: si ya hay un pedido confirmado y llega uno que cambia
+    // la cantidad o el total, eso es una MODIFICACIÓN. Una modificación no existe
+    // hasta que el cliente vea el resumen nuevo y lo confirme. Sin ese "sí":
+    //   · no se guarda nada, y
+    //   · el pedido original queda exactamente como estaba.
+    //
+    // ⚠️ Con el "sí" sí se guarda, y queda VINCULADA al pedido que reemplaza
+    // (`modifica_a`), para que no parezca un duplicado misterioso.
+    //
+    // ⚠️ Y esto no toca la compra ADICIONAL: si el cliente la pidió explícitamente,
+    // `intencion` ya dijo `compra_adicional` y son dos pedidos distintos.
+    // ========================================================================
+    const confirmadoPrevio = pedidosDelCliente[pedidosDelCliente.length - 1] || null;
+    let modificaA = "";
+    if (order && confirmadoPrevio && intencion.intencion !== "compra_adicional") {
+      const cambiaLaOferta =
+        Number(order.total) !== Number(confirmadoPrevio.total) ||
+        cotizacion.unidadesDelPedido(order).uds !==
+          cotizacion.unidadesDelPedido(confirmadoPrevio).uds;
+      if (cambiaLaOferta) {
+        // ⚠️ El estado confirmado se llama "confirmado", no "si". Lo comprobé al
+        // revés: con la comparación equivocada, la modificación de Johana —que ella
+        // SÍ había confirmado sobre el cuadro nuevo— se descartaba. Se usa además
+        // `guardar && !marcar`, que es la condición real de "el candado está
+        // satisfecho", para no depender de una cadena.
+        if (conf.estado === "confirmado" || (conf.guardar && !conf.marcar)) {
+          modificaA = String(confirmadoPrevio.id || confirmadoPrevio.fecha || "");
+          console.log(
+            `🔁 MODIFICACIÓN CONFIRMADA de ${phone}: ${confirmadoPrevio.total} → ${order.total}. ` +
+              `Queda vinculada al pedido anterior (${modificaA}).`
+          );
+        } else {
+          console.warn(
+            `🚫 MODIFICACIÓN NO CONFIRMADA de ${phone}: el modelo emitió un pedido de ` +
+              `$${order.total} (${cotizacion.unidadesDelPedido(order).uds} uds) contra uno ya ` +
+              `confirmado de $${confirmadoPrevio.total}, y el cliente NO lo confirmó ` +
+              `(${conf.estado}). NO se guarda: el pedido original se conserva igual.`
+          );
+          order = null;
+        }
+      }
+    }
+
+    if (!order) {
+      // ya se avisó arriba: posventa o modificación sin confirmar
+    } else if (!conf.guardar) {
       console.warn(
         `⏭️  PEDIDO NO GUARDADO (${conf.estado}) de ${phone}: ${conf.motivo}. ` +
           `Cliente: ${order.nombre || "?"} · ${order.ciudad || "?"} · $${order.total || "?"}`
@@ -835,6 +1024,13 @@ async function generateReply(phone, userText) {
       };
       savedOrder = store.saveOrder({
         ...conDireccion,
+        ...(modificaA ? { modifica_a: modificaA } : {}),
+        // ⚠️ Se mira la conversación reciente y no solo este turno: el cliente pide
+        // "quiero otros dos para mi hermano" en un turno y confirma en el siguiente.
+        ...(intencion.intencion === "compra_adicional" ||
+        posventa.pidioOtraCompraReciente(conv.messages)
+          ? { compra_adicional: true }
+          : {}),
         ...(conf.marcar ? { sin_confirmar: true, motivo_sin_confirmar: conf.motivo } : {}),
         ...(chequeoPrecio.ok
           ? {}

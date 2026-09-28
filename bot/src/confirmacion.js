@@ -45,6 +45,8 @@ function limpiar(s) {
 }
 
 // El encabezado del cuadro de confirmación que manda el bot.
+const posventa = require("./posventa");
+
 const RE_CUADRO = /confirmemos tu pedido/i;
 
 // ── Un NO claro ────────────────────────────────────────────────────────────
@@ -126,11 +128,34 @@ function estadoDeConfirmacion(messages) {
 const RE_NO_ADENTRO = /\b(?:no confirmo|no gracias|no quiero|no lo quiero|cancela|cancelalo|cancelar)\b/;
 const RE_SI_ADENTRO = /\b(?:si confirmo|confirmo|confirmado|hagale|hagalo|mandalo|despachalo|lo quiero)\b/;
 
+// ============================================================================
+// 🔴 EL "SI" CONDICIONAL NO ES EL "SÍ" DE CONFIRMAR — caso Heber (27-sep)
+//
+// LO QUE PASÓ: Heber, con un pedido confirmado dos días antes, escribió
+//
+//     "si mandaron el pedido gracias"
+//
+// y `RE_SI` dio **true**: está anclado al principio y empieza por `si\b`. En
+// español el "si" sin tilde es condicional y el "sí" con tilde es la afirmación,
+// pero `limpiar()` quita las tildes antes de comparar, así que las dos llegan
+// iguales. La pregunta entró como un "sí, confirmo" y el candado la dejó pasar:
+// de ahí salió un segundo pedido por los mismos $155.000.
+//
+// 🔑 EL ORDEN DE ABAJO ES EL ARREGLO. Una pregunta por el ESTADO del pedido no
+// puede clasificarse como un sí. Pero la comprobación va DESPUÉS de las
+// afirmaciones inconfundibles, porque "sí, confirmo mi pedido" contiene "mi
+// pedido" y sin ese orden se habría tirado una venta real.
+// ============================================================================
+
 /** "no" | "si" | null si no se puede decidir con este mensaje. */
 function clasificar(t) {
   if (!t) return null;
   if (RE_NO.test(t) || RE_NO_ADENTRO.test(t)) return "no";
-  if (RE_SI.test(t) || RE_SI_ADENTRO.test(t)) return "si";
+  // 1º las afirmaciones inconfundibles, en cualquier parte del mensaje.
+  if (RE_SI_ADENTRO.test(t)) return "si";
+  // 2º si está preguntando por el estado de su pedido, no está confirmando nada.
+  if (posventa.esPreguntaDeEstado(t)) return null;
+  if (RE_SI.test(t)) return "si";
   return null;
 }
 

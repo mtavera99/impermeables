@@ -1771,5 +1771,145 @@ console.log("\n── R21. 🧩 El departamento se separa como SUFIJO, no buscá
   chequear("🛡️ Pitalito sigue funcionando", c.destinoDelHilo({ messages: [] }, "Hola buenos días, Pitalito Huila").ciudad === "Pitalito");
 }
 
+console.log("\n── R22. 🧾 Entrega del 28-sep: posventa, rescate del combo y destino con evidencia ──");
+{
+  const a = (t) => ({ role: "assistant", content: t });
+  const u = (t) => ({ role: "user", content: t });
+  const PIDE_DATOS = "Pásame nombre completo, dirección con barrio y celular";
+  const conDestino = (ciudad, bot) => ({
+    messages: [a(bot || PIDE_DATOS)],
+    cotizacion: { ciudad, uds: 1, total: 85000 },
+  });
+
+  // ── 22. Con DOS unidades, el total de UNA no se puede presentar ────────────
+  {
+    const cot2 = c.calcular("Madrid", "dos", { cantidad: { uds: 2 } });
+    chequear("22· la cotización de dos en Madrid es $133.000", cot2.total === 133000);
+    chequear(
+      "22· 🔑 el total de UNA unidad NO valida como total",
+      c.validarRespuesta("Te queda en $73.000 en total", cot2, {}).ok === false
+    );
+    chequear(
+      "22· ni en Cali ($82.000 con cotización de dos)",
+      c.validarRespuesta("Te queda en $82.000 en total", c.calcular("Cali", "dos", { cantidad: { uds: 2 } }), {}).ok === false
+    );
+    chequear("22· y el total de dos sí", c.validarRespuesta("Los dos te quedan en $133.000 en total", cot2, {}).ok === true);
+  }
+
+  // ── 23-26. El rescate del combo ───────────────────────────────────────────
+  {
+    const cotCali = c.calcular("Cali", "solo 1", { cantidad: { uds: 1 }, ofrecerComboDeRescate: true });
+    chequear("23· el combo de rescate de Cali es $138.000", cotCali.comboDeRescate && cotCali.comboDeRescate.rescate === 138000, JSON.stringify(cotCali.comboDeRescate));
+    chequear(
+      "23· 🔑 con objeción explícita, el rescate está autorizado",
+      c.validarRespuesta("Los dos te quedan en $138.000 en total", cotCali, { objecionDePrecio: true }).ok === true
+    );
+    chequear(
+      "25· 🔑 SIN objeción NO se regala el rescate",
+      c.validarRespuesta("Los dos te quedan en $138.000 en total", cotCali, { objecionDePrecio: false }).ok === false
+    );
+    chequear(
+      "26· 🔑 y si YA se ofreció, no se vuelve a autorizar",
+      c.validarRespuesta("Los dos te quedan en $138.000 en total", cotCali, { objecionDePrecio: true, rescateYaOfrecido: true }).ok === false
+    );
+    chequear(
+      "26· un tercer precio inventado nunca",
+      c.validarRespuesta("Los dos te quedan en $130.000 en total", cotCali, { objecionDePrecio: true }).ok === false
+    );
+    chequear(
+      "24· 🔑 el retroceso 2→1 cuenta como objeción",
+      c.hayObjecionDePrecio([u("entonces mejor uno")], { previaUds: 2, userText: "entonces mejor uno" }) === true
+    );
+    chequear(
+      "25· 🔑 aceptar el precio de lista NO es objeción",
+      c.hayObjecionDePrecio([u("listo, los dos")], { previaUds: 2, userText: "listo, los dos" }) === false
+    );
+    chequear(
+      "24· y sin venir de dos, pedir una no es objeción",
+      c.hayObjecionDePrecio([u("solo uno")], { previaUds: 1, userText: "solo uno" }) === false
+    );
+    // Banda E usa el valor decidido por el dueño el 28-sep.
+    const cotE = c.calcular("San Martín", "solo 1", { cantidad: { uds: 1 }, ofrecerComboDeRescate: true });
+    chequear("23· banda E ofrece $140.000, no $145.000 ni $135.000", cotE.comboDeRescate && cotE.comboDeRescate.rescate === 140000, JSON.stringify(cotE.comboDeRescate));
+    chequear("23· el bloque de datos vende el TOTAL, no el desglose", /140\.000 TOTAL/.test(c.bloqueDeDatos(cotE, { objecionDePrecio: true })));
+    chequear("23· y dice que es UNA sola vez", /UNA SOLA VEZ/i.test(c.bloqueDeDatos(cotE, { objecionDePrecio: true })));
+  }
+
+  // ── 11-13. Las equivalencias de destino siguen ────────────────────────────
+  for (const [x, y] of [
+    ["Caucasia", "Caucasia, Antioquia"],
+    ["Madrid", "Madrid, Cundinamarca"],
+    ["Santander de Quilichao", "Santander de Quilichao, Cauca"],
+    ["Moñitos", "Moñitos, Córdoba"],
+  ]) {
+    chequear(`${x} ↔ ${y}`, c.mismoDestino(x, y) === true);
+  }
+
+  // ── 14-15. Y lo que NO es el mismo destino ────────────────────────────────
+  chequear("14· Mosquera Cundinamarca ≠ Mosquera Nariño", c.mismoDestino("Mosquera Cundinamarca", "Mosquera Nariño") === false);
+  chequear("15· Ciudad Bolívar (Bogotá) ≠ Ciudad Bolívar, Antioquia", c.mismoDestino("Ciudad Bolívar", "Ciudad Bolívar, Antioquia") === false);
+  chequear("   dos municipios distintos con la misma banda", c.mismoDestino("Madrid", "Mosquera") === false);
+
+  // ── 16-18. Los invariantes de #171 ────────────────────────────────────────
+  chequear(
+    "16· 🛡️ José: la frase real sigue dando San Onofre",
+    c.destinoDelHilo(conDestino("San Onofre"), "Pedro bello San onofre Sucre 3009990031 Nieto envía ala oficina").ciudad === "San Onofre"
+  );
+  chequear(
+    "17· 🛡️ «Pedro bello Sucre…» sigue preguntando",
+    c.destinoDelHilo(conDestino("San Onofre"), "Pedro bello Sucre 3009990032 oficina").origen === "duda_entre_el_dato_y_el_destino"
+  );
+  chequear(
+    "18· 🛡️ el cambio auténtico a Bello Antioquia sigue recalculando",
+    c.destinoDelHilo(conDestino("San Onofre"), "Bello Antioquia").ciudad === "Bello" && c.calcular("Bello", "uno").total === 83000
+  );
+
+  // ── 19. Difícil acceso sigue protegido ────────────────────────────────────
+  chequear("19· Tadó sigue con su total confirmado y sin promo de 2", c.calcular("Tadó", "uno", { cantidad: { uds: 1 } }).total === 93000);
+  chequear("19· y con dos no se cotiza", c.calcular("Tadó", "dos", { cantidad: { uds: 2 } }).motivo === "dificil_sin_promo");
+  chequear("19· un destino sin tarifa medida se sigue escalando", c.calcular("Mosquera Nariño", "uno", { cantidad: { uds: 1 } }).motivo === "dificil_sin_tarifa");
+
+  // ── A. El hilo resolvió el destino: los cuatro casos y sus límites ────────
+  {
+    const msgsH = [u("santabara de pinto"), a("Te queda en $85.000 en total puesto en Santa Bárbara de Pinto 📦")];
+    chequear(
+      "A1· 🔑 Humberto: el typo que el bot corrigió es el mismo destino",
+      c.elHiloResolvioElDestino(msgsH, "Santa Bárbara de Pinto", "santabara de pinto") === true
+    );
+    const msgsJ = [u("Yo vivo en sincerin"), a("Sincerín es corregimiento de Arjona, el envío a Sincerín, Arjona queda en $85.000")];
+    chequear(
+      "A4· 🔑 Jhon: el corregimiento que el bot explicó también",
+      c.elHiloResolvioElDestino(msgsJ, "Sincerín, Arjona", "Arjona") === true
+    );
+    chequear(
+      "A· 🔴 pero NO sin que el bot lo haya nombrado",
+      c.elHiloResolvioElDestino([u("Sincerín, Arjona")], "Sincerín, Arjona", "Arjona") === false
+    );
+    chequear(
+      "A· 🔴 ni entre ciudades que no comparten nada (Cali/Medellín, misma banda)",
+      c.elHiloResolvioElDestino([a("puesto en Medellín")], "Medellín", "Cali") === false
+    );
+    chequear(
+      "A· 🔴 ni cuando la tarifa cambia (Mosquera)",
+      c.elHiloResolvioElDestino([a("puesto en Mosquera Nariño")], "Mosquera Nariño", "Mosquera Cundinamarca") === false
+    );
+    chequear(
+      "A2· 🔑 Lenin: el nombre no contamina el municipio",
+      c.destinoDelHilo(
+        { messages: [a("¿Para qué ciudad sería?"), u("turbana Bolivar"), a("Te queda en $85.000 puesto en Turbana. " + PIDE_DATOS)], cotizacion: { ciudad: "turbana", uds: 1, total: 85000 } },
+        "Lenin Gómez Martínez Turbana Bolivar 3001234567"
+      ).ciudad === "turbana"
+    );
+  }
+
+  // ── F. Preguntar por dos ──────────────────────────────────────────────────
+  for (const t of ["Si se piden 2 cuánto seria el costo", "si pido 2 cuanto sale", "cuánto por dos", "cuánto valen dos", "quiero otros dos para mi hermano", "quiero dos más"]) {
+    chequear(`F· ${JSON.stringify(t)} → 2 unidades`, c.cantidadDelHilo({ messages: [] }, t, 1).uds === 2);
+  }
+  chequear("F· pero una dirección con un 2 NO", c.cantidadDelHilo({ messages: [] }, "Cra 2 #3-4 barrio Centro", 1).uds === 1);
+  chequear("F· ni «cuánto cuesta» a secas", c.cantidadDelHilo({ messages: [] }, "cuánto cuesta", 1).uds === 1);
+  chequear("F· y «entonces una pregunta» no baja un pedido de dos", c.cantidadDelHilo({ messages: [] }, "entonces una pregunta", 2).uds === 2);
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);
