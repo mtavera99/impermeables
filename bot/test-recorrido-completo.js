@@ -1824,23 +1824,38 @@ const datosBase = {
     );
 
     // 34. Y una compra adicional explícita SÍ puede existir.
-    // ⚠️ Con un CUADRO de verdad: sin cuadro el candado de confirmación no guarda
-    // nada, y eso está bien —lo comprobé cuando mi guion no lo mandaba—.
+    //
+    // ⚠️ Y NO hereda la ciudad del pedido anterior: el hermano puede vivir en otra
+    // parte. Lo comprobé al revés —con la guarda mirando solo el turno actual, la
+    // ciudad se heredaba en el turno del "sí confirmo"—. Así que primero se le
+    // pregunta a dónde va ESTE envío.
     const t3 = await turno(
       tel,
       "quiero otros dos para mi hermano",
-      `Confirmemos tu pedido ✅\nNombre: Heber Rojas\nCelular: ${CEL}\nCiudad: San Martín, Cesar\n` +
-        `Dirección: Cra 2 #3-4 barrio Centro\nColor de la franja: rojo blanco\nTalla: XL y XL\n` +
-        `Pago: contraentrega\nTOTAL a pagar al recibir: $155.000\n` +
+      "¡Con gusto! 🙌 ¿Para qué ciudad sería este envío?",
+      "¡Con gusto! 🙌 ¿Para qué ciudad sería este envío?"
+    );
+    chequear("34· 🔑 NO hereda la ciudad del pedido anterior", !/San Mart[ií]n/i.test(t3.reply), `salió: ${t3.reply}`);
+    chequear("34· 🔑 y pregunta a dónde va este envío", /qu[eé] ciudad/i.test(t3.reply), `salió: ${t3.reply}`);
+
+    // El cliente da la ciudad del hermano, que es OTRA.
+    await turno(tel, "a Cali, donde vive él", "Los dos te quedan en $148.000 en total, puestos en Cali 📦 Pásame la dirección");
+    await turno(
+      tel,
+      "Cra 9 #10-11 barrio Centro",
+      `Confirmemos tu pedido ✅\nNombre: Heber Rojas\nCelular: ${CEL}\nCiudad: Cali\n` +
+        `Dirección: Cra 9 #10-11 barrio Centro\nColor de la franja: rojo blanco\nTalla: XL y XL\n` +
+        `Pago: contraentrega\nTOTAL a pagar al recibir: $148.000\n` +
         `¿Está todo bien? Respóndeme «SÍ CONFIRMO» y lo despacho 🏍️`
     );
     chequear("34· 🔑 una compra adicional NO se bloquea", !/ya está registrado|en fila para despacho/i.test(t3.reply), `salió: ${t3.reply}`);
-    await turno(tel, "sí confirmo", `¡Listo Heber! ${ORDER({ ...pedidoDeHeber, talla: "XL y XL" })}`);
+    await turno(tel, "sí confirmo", `¡Listo Heber! ${ORDER({ ...pedidoDeHeber, ciudad: "Cali", direccion: "Cra 9 #10-11 barrio Centro", talla: "XL y XL", total: 148000 })}`);
     const conAdicional = store.todosLosPedidos().filter((p) => p.telefono_chat === tel);
     chequear("34· 🔑 y puede crear un SEGUNDO pedido", conAdicional.length === 2, `hay ${conAdicional.length}`);
     // ⚠️ Se busca por la talla que lo distingue, no por posición: `todosLosPedidos`
     // no garantiza el orden y eso hacía fallar la prueba sin haber nada roto.
     const adicional = conAdicional.find((p) => String(p.talla) === "XL y XL");
+    chequear("34· 🔑 y va a la ciudad del hermano, no a la heredada", adicional && /cali/i.test(adicional.ciudad), JSON.stringify(adicional && adicional.ciudad));
     chequear("34· marcado como compra adicional", adicional && adicional.compra_adicional === true, JSON.stringify(adicional && adicional.compra_adicional));
     chequear(
       "34· 🔑 y NO marcado como duplicado sospechoso",

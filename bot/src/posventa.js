@@ -66,10 +66,49 @@ const RE_PREGUNTA_ESTADO = new RegExp(
     "\\b(va|viene)\\s+en camino\\b",
     // el pedido, en general
     "\\b(que paso|que ha pasado|novedad|noticias)\\b.{0,20}\\b(pedido|envio|paquete)\\b",
-    "\\b(mi|el)\\s+(pedido|envio|paquete)\\b",
     "\\b(sigo|estoy)\\s+esperando\\b",
   ].join("|")
 );
+
+// ============================================================================
+// 🔴 «MI PEDIDO» NO ES UNA PREGUNTA DE ESTADO
+//
+// Acá había una alternativa `\b(mi|el)\s+(pedido|envio|paquete)\b` que capturaba
+// cualquier frase que nombrara el pedido. Reproducido: las cinco caían en posventa
+// y se les contestaba con el estado del envío.
+//
+//   "quiero cambiar mi pedido a talla XL"       → respuesta de tracking 🔴
+//   "quiero corregir la dirección de mi pedido" → respuesta de tracking 🔴
+//   "mi pedido lo quiero con franja roja"       → respuesta de tracking 🔴
+//   "quiero cambiar la ciudad de mi pedido"     → respuesta de tracking 🔴
+//   "quiero cancelar mi pedido"                 → respuesta de tracking 🔴
+//
+// 🔑 Nombrar el pedido no dice qué quiere hacer con él. Lo que decide es el VERBO:
+// preguntar dónde está es posventa; cambiar algo es una modificación; cancelar es
+// otra cosa. Así que "mi pedido" solo cuenta como consulta de estado si viene con
+// una palabra de estado, y nunca si viene con una de cambio.
+// ============================================================================
+
+// Querer CAMBIAR algo del pedido. Esto gana sobre cualquier lectura de estado.
+const RE_QUIERE_MODIFICAR = new RegExp(
+  [
+    "\\b(cambiar|cambiale|cambia|corregir|corrige|corrijo|modificar|modifica|arreglar|ajustar|actualizar)\\b",
+    "\\b(en vez de|en lugar de|mejor que sea|que sea mejor|equivoque|equivoco|esta mal|estaba mal)\\b",
+    "\\b(agregar|agregale|quitar|quitale|sumar|restar)\\b.{0,20}\\b(talla|color|unidad|conjunto)\\b",
+    // "mi pedido lo quiero con franja roja" — el pedido + un atributo deseado.
+    "\\b(mi|el|ese|este)\\s+(pedido|envio|paquete)\\b.{0,30}\\b(lo quiero|la quiero|con|en)\\s+\\b(talla|color|franja|rojo|roja|azul|negro|negra|verde|blanco|blanca|amarillo|naranja|gris|xs|s|m|l|xl|2xl|3xl)\\b",
+  ].join("|")
+);
+
+// Querer CANCELAR. Tampoco es una consulta de estado.
+const RE_QUIERE_CANCELAR =
+  /\b(cancelar|cancela|cancelalo|cancelen|anular|anula|anulen|devolver|devolucion|ya no lo quiero|ya no quiero|no lo quiero|desistir)\b/;
+
+// Y "mi pedido" SÍ cuenta como consulta cuando viene con una palabra de estado.
+const RE_PEDIDO_CON_ESTADO =
+  /\b(mi|el|ese|este)\s+(pedido|envio|paquete)\b/;
+const RE_PALABRA_DE_ESTADO =
+  /\b(donde|dónde|cuando|cuándo|llega|llegara|estado|gu[ií]a|guia|rastreo|seguimiento|mandaron|enviaron|despacharon|despacho|camino|demora|falta|salio|sali[oó]|recibo|entregan|ya)\b/;
 
 // ── 2. Cortesías que no piden nada nuevo ────────────────────────────────────
 // ⚠️ Corta a propósito: solo el mensaje ENTERO. "gracias, quiero otro" no entra.
@@ -85,16 +124,68 @@ const RE_OTRA_COMPRA = new RegExp(
     "\\b(otro|otra|otros|otras)\\s+(conjunto|impermeable|traje|kit|juego|pedido|par)\\b",
     "\\b(quiero|voy a|me gustaria)\\s+(comprar|pedir|llevar|encargar)\\b.{0,24}\\b(otro|otra|otros|mas|adicional|de nuevo|nuevamente)\\b",
     "\\b(uno|una|dos|otro|otra)\\s+(mas|adicional)\\b",
-    "\\bpara\\s+(mi|un|una)\\s+(esposa|esposo|hermano|hermana|hijo|hija|mama|papa|amigo|amiga|primo|prima|socio|compa|vecino)\\b",
+    // 🔴 ACÁ ESTABA "para mi hermano" A SECAS, y alcanzaba por sí solo.
+    // Reproducido: "ese pedido es para mi hermano" y "el impermeable es para mi
+    // hermano" entraban como compra_adicional — que además queda EXENTA del
+    // anti-duplicados, así que era el peor lugar para equivocarse.
+    //
+    // 🔑 Un destinatario no es una intención de comprar. El pariente solo cuenta si
+    // viene con una señal real de ADICIÓN: "otro para mi hermano", "uno más para mi
+    // esposa". Lo que quedó fuera —"lo puede recibir mi hermano", "la dirección es
+    // de mi hermano"— es contexto de entrega, no una venta nueva.
+    "\\b(otro|otra|otros|otras|uno mas|una mas|dos mas|adicional)\\b\\s*(?:conjunto|impermeable|traje|kit|juego|pedido|par)?\\s*\\bpara\\s+(mi|un|una|el|la)\\b",
     "\\b(hacer|haria|hago)\\s+otro\\s+pedido\\b",
     "\\bpedido\\s+(nuevo|adicional)\\b",
     "\\bcomprar\\s+(otro|otra|otros|mas)\\b",
   ].join("|")
 );
 
+/** ¿Quiere cambiar algo de su pedido? */
+function quiereModificar(texto) {
+  return RE_QUIERE_MODIFICAR.test(plano(texto));
+}
+
+/** ¿Quiere cancelar? */
+function quiereCancelar(texto) {
+  return RE_QUIERE_CANCELAR.test(plano(texto));
+}
+
 /** ¿Está preguntando por el estado de su pedido? */
 function esPreguntaDeEstado(texto) {
-  return RE_PREGUNTA_ESTADO.test(plano(texto));
+  const t = plano(texto);
+  // Cambiar o cancelar nunca es consultar el estado, aunque nombre el pedido.
+  if (RE_QUIERE_MODIFICAR.test(t) || RE_QUIERE_CANCELAR.test(t)) return false;
+  if (RE_PREGUNTA_ESTADO.test(t)) return true;
+  // "mi pedido" solo cuenta con una palabra de estado al lado.
+  return RE_PEDIDO_CON_ESTADO.test(t) && RE_PALABRA_DE_ESTADO.test(t);
+}
+
+/**
+ * ¿El mensaje nombra a OTRO destinatario?
+ *
+ * 🔑 Se usa para no heredar la ciudad del pedido anterior: que el comprador viva en
+ * San Martín no dice nada de dónde vive su hermano.
+ */
+const RE_OTRO_DESTINATARIO =
+  /\b(?:para|de|a)\s+(?:mi|el|la|un|una)\s+(esposa|esposo|hermano|hermana|hijo|hija|mama|papa|mam[aá]|pap[aá]|abuelo|abuela|amigo|amiga|primo|prima|socio|compa|vecino|vecina|cu[nñ]ado|cu[nñ]ada|sobrino|sobrina|suegra|suegro|jefe|novio|novia)\b/;
+function mencionaOtroDestinatario(texto) {
+  return RE_OTRO_DESTINATARIO.test(plano(texto));
+}
+
+/**
+ * ¿Nombró a otro destinatario en los últimos turnos?
+ *
+ * 🔑 Hay que mirar hacia atrás, y lo descubrí probándolo: el cliente dice "quiero
+ * otros dos para mi hermano" en un turno y el pedido se crea recién en el turno del
+ * "sí confirmo", donde ya no hay ninguna palabra sobre el hermano. Con la guarda
+ * mirando solo el turno actual, la ciudad del pedido viejo se heredaba igual y la
+ * compra adicional salía despachada a una ciudad prestada.
+ */
+function mencionoOtroDestinatarioReciente(messages, cuantos = 6) {
+  return (messages || [])
+    .filter((m) => m && m.role === "user")
+    .slice(-cuantos)
+    .some((m) => mencionaOtroDestinatario(m.content));
 }
 
 /** ¿El mensaje es solo una cortesía, sin pedir nada? */
@@ -143,6 +234,14 @@ function intencionDelTurno(texto, ctx = {}) {
   if (!ctx.tienePedidoConfirmado) return { intencion: "normal", motivo: "no hay pedido confirmado" };
   if (ctx.botPidioConfirmacion) {
     return { intencion: "normal", motivo: "el bot acaba de pedir una confirmación" };
+  }
+  // 🔑 Cambiar o cancelar van ANTES que la consulta de estado: nombran el pedido,
+  // pero no están preguntando dónde está.
+  if (quiereCancelar(texto)) {
+    return { intencion: "cancelacion", motivo: "quiere cancelar su pedido" };
+  }
+  if (quiereModificar(texto)) {
+    return { intencion: "modificacion", motivo: "quiere cambiar algo de su pedido" };
   }
   if (esPreguntaDeEstado(texto)) {
     return { intencion: "posventa", motivo: "pregunta por el estado de su pedido" };
@@ -238,6 +337,10 @@ module.exports = {
   RE_SOLO_CORTESIA,
   RE_OTRA_COMPRA,
   esPreguntaDeEstado,
+  quiereModificar,
+  quiereCancelar,
+  mencionaOtroDestinatario,
+  mencionoOtroDestinatarioReciente,
   esSoloCortesia,
   pideOtraCompra,
   pidioOtraCompraReciente,

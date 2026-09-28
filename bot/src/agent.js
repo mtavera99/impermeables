@@ -346,24 +346,41 @@ async function generateReply(phone, userText) {
   // días antes, no en los mensajes recientes—, así que no se podía cotizar y la
   // venta adicional no se podía cerrar.
   //
-  // 🔑 El pedido confirmado anterior es evidencia de su destino, y de las más
-  // fuertes que hay: ya se le despachó ahí. Volver a preguntarle la ciudad es
-  // empezar la venta de cero con quien ya es cliente.
+  // 🔑 El pedido confirmado anterior sirve como CONTEXTO del destino: es donde el
+  // cliente pidió que le llegara la vez pasada. Volver a preguntarle la ciudad a
+  // quien ya compró es empezar la venta de cero.
+  //
+  // ⚠️ CORRECCIÓN A LO QUE DECÍA ESTE COMENTARIO. Antes afirmaba que era "evidencia
+  // fuerte porque ya se le despachó ahí", y eso el código NO lo garantiza: el filtro
+  // toma pedidos confirmados sin exigir guía ni despacho. Puede no haberse
+  // despachado nunca. Es un default razonable, no una entrega comprobada.
+  //
+  // ⚠️ Y NO se hereda cuando el turno nombra a OTRO destinatario. Que el comprador
+  // viva en San Martín no dice nada de dónde vive su hermano, y heredar la ciudad
+  // ahí sería despachar una compra adicional a una ciudad prestada. En ese caso se
+  // deja sin destino y el bot pregunta —que desde #168 es preguntar, no escalar—.
   //
   // ⚠️ Solo cuando NO hay destino (`no_hay`). Si la lectura es ambigua —varias
-  // ciudades, o duda entre el dato y el destino— se sigue preguntando: ahí el
-  // pedido viejo no resuelve nada.
+  // ciudades, o duda entre el dato y el destino— se sigue preguntando.
   // ==========================================================================
   if (!destino.ciudad && destino.origen === "no_hay") {
+    const paraOtro =
+      posventa.mencionaOtroDestinatario(userText) ||
+      posventa.mencionoOtroDestinatarioReciente(conv.messages);
     const conCiudad = store
       .todosLosPedidos()
       .filter((p) => p && p.telefono_chat === phone && !p.anulado && !p.sin_confirmar && p.ciudad);
     const ultimo = conCiudad[conCiudad.length - 1];
-    if (ultimo) {
+    if (ultimo && !paraOtro) {
       destino = { ciudad: String(ultimo.ciudad), varias: [], origen: "ciudad_de_su_pedido_anterior" };
       console.log(
         `🏠 ${phone} ya había comprado: se usa la ciudad de su pedido anterior ` +
-          `("${ultimo.ciudad}") en vez de volver a preguntársela.`
+          `("${ultimo.ciudad}") como destino de contexto en vez de volver a preguntársela.`
+      );
+    } else if (ultimo && paraOtro) {
+      console.log(
+        `🙋 ${phone} nombra a otro destinatario: NO se hereda la ciudad de su pedido ` +
+          `anterior ("${ultimo.ciudad}"). Se le pregunta a dónde va este envío.`
       );
     }
   }

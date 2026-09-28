@@ -2507,6 +2507,59 @@ function mismoDestino(a, b) {
 const RE_BOT_HABLA_DEL_DESTINO =
   /\b(puesto en|puestos en|env[ií]o a|envi[ao]mos a|enviarlo a|para|en)\b|\b(corregimiento|pertenece|queda en|jurisdicci[oó]n|municipio de)\b/i;
 
+// ============================================================================
+// 🔴 COMPARTIR UNA PALABRA NO ES SER EL MISMO MUNICIPIO
+//
+// 🔎 REPRODUCIDO en la revisión de #173, y era grave:
+//
+//   cotización: Santa Rosa de Cabal   ·   pedido: Santa Rosa de Osos
+//   elHiloResolvioElDestino(...) → true
+//   verificarPedido(...)          → []   sin ningún problema  🔴
+//
+// Las dos están en banda E, cuestan lo mismo y comparten SANTA y ROSA. El criterio
+// de "comparten al menos una palabra significativa" las daba por el mismo sitio, o
+// sea que un paquete podía despacharse a otro municipio sin que nada lo marcara.
+// Igual con "San Pedro de los Milagros" vs "San Pedro de Urabá" y "Puerto Colombia"
+// vs "Puerto Boyacá".
+//
+// 🔑 EL CRITERIO GENERAL, en dos ramas, cada una con su evidencia. Ya no basta con
+// compartir vocabulario: lo que DIFERENCIA a las dos cadenas tiene que estar
+// explicado.
+//
+//   RAMA 1 — CONTENCIÓN CON RELACIÓN DECLARADA.
+//   Los nombres significativos de un lado están contenidos en el otro, y el bot
+//   dijo explícitamente la relación ("Sincerín es CORREGIMIENTO de Arjona"). Eso
+//   cubre el caso de Jhon. No cubre "Santa Rosa de Osos" contra "Santa Rosa",
+//   porque el bot nunca va a decir que Osos es corregimiento de Santa Rosa.
+//
+//   RAMA 2 — LA DIFERENCIA ES LA MISMA PALABRA MAL ESCRITA.
+//   Todo lo compartido coincide, y lo que sobra de cada lado es una variante de
+//   escritura acotada: mismo arranque de al menos 4 letras y longitudes parecidas.
+//   Eso cubre "santabara de pinto" contra "Santa Bárbara de Pinto"
+//   (SANTABARA / SANTABARBARA: arrancan igual en 8 letras). Y NO cubre OSOS contra
+//   CABAL, que no comparten ni una letra inicial.
+//
+// ⚠️ NO es fuzzy matching global: la comparación de escritura se aplica SOLO al
+// residuo, después de exigir que todo lo demás coincida, y sigue dentro de las
+// condiciones de tarifa, ambigüedad y evidencia del bot.
+// ============================================================================
+
+// El bot declarando que un lugar PERTENECE a otro.
+const RE_RELACION_DECLARADA =
+  /\b(corregimiento|vereda|pertenece|queda en|jurisdicci[oó]n|municipio de|zona rural de|area rural de)\b/i;
+
+/** ¿`corta` es una variante de escritura acotada de `larga`? */
+function esVarianteDeEscritura(a, b) {
+  const [corta, larga] = a.length <= b.length ? [a, b] : [b, a];
+  if (!corta || !larga) return false;
+  // Longitudes parecidas: la corta al menos el 70% de la larga.
+  if (corta.length / larga.length < 0.7) return false;
+  // Y el mismo arranque, de al menos 4 letras.
+  let i = 0;
+  while (i < corta.length && corta[i] === larga[i]) i++;
+  return i >= 4;
+}
+
 /** Las palabras significativas de un destino: ["SINCERIN","ARJONA"]. */
 function palabrasDelDestino(valor) {
   return fletes
@@ -2537,20 +2590,37 @@ function elHiloResolvioElDestino(messages, delPedido, deLaCotizacion) {
     return false;
   }
 
-  // 3. vocabulario compartido.
+  // 3. 🔑 La DIFERENCIA entre las dos cadenas tiene que estar explicada.
   const wa = palabrasDelDestino(a);
   const wb = palabrasDelDestino(b);
   if (!wa.length || !wb.length) return false;
-  if (!wa.some((w) => wb.includes(w))) return false;
 
-  // 4. el bot nombró el destino del pedido, hablando de a dónde va.
-  const buscadas = wa;
+  const soloEnA = wa.filter((w) => !wb.includes(w));
+  const soloEnB = wb.filter((w) => !wa.includes(w));
+  const compartidas = wa.filter((w) => wb.includes(w));
+  if (!compartidas.length) return false;
+
+  // RAMA 1 — contención: un lado está entero dentro del otro.
+  const hayContencion = soloEnA.length === 0 || soloEnB.length === 0;
+  // RAMA 2 — el residuo de cada lado es la misma palabra mal escrita.
+  const esElMismoNombreMalEscrito =
+    soloEnA.length > 0 &&
+    soloEnB.length > 0 &&
+    esVarianteDeEscritura(soloEnA.join(""), soloEnB.join(""));
+
+  if (!hayContencion && !esElMismoNombreMalEscrito) return false;
+
+  // 4. el bot nombró el destino del pedido, hablando de a dónde va. Y si la
+  // evidencia es una CONTENCIÓN, además tiene que haber declarado la relación:
+  // que un nombre contenga al otro no dice que uno pertenezca al otro.
+  const exigeRelacion = hayContencion && !esElMismoNombreMalEscrito;
   return (messages || []).some((m) => {
     if (!m || m.role !== "assistant") return false;
     const texto = String(m.content || "");
     if (!RE_BOT_HABLA_DEL_DESTINO.test(texto)) return false;
+    if (exigeRelacion && !RE_RELACION_DECLARADA.test(texto)) return false;
     const plano = fletes.normalizar(texto);
-    return buscadas.every((w) => plano.includes(w));
+    return wa.every((w) => plano.includes(w));
   });
 }
 

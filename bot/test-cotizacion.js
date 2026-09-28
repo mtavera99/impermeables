@@ -1911,5 +1911,117 @@ console.log("\n── R22. 🧾 Entrega del 28-sep: posventa, rescate del combo 
   chequear("F· y «entonces una pregunta» no baja un pedido de dos", c.cantidadDelHilo({ messages: [] }, "entonces una pregunta", 2).uds === 2);
 }
 
+console.log("\n── R23. 🔍 Los cuatro bordes de la revisión de #173 ──");
+{
+  const posventa = require("./src/posventa");
+  const a = (t) => ({ role: "assistant", content: t });
+  const ctx = { tienePedidoConfirmado: true, botPidioConfirmacion: false };
+  const I = (t) => posventa.intencionDelTurno(t, ctx).intencion;
+
+  // ── 1. «mi pedido» no es una pregunta de estado ────────────────────────────
+  // Reproducido: las cinco caían en posventa y se contestaban con tracking.
+  for (const [t, esp] of [
+    ["quiero cambiar mi pedido a talla XL", "modificacion"],
+    ["quiero corregir la dirección de mi pedido", "modificacion"],
+    ["mi pedido lo quiero con franja roja", "modificacion"],
+    ["quiero cambiar la ciudad de mi pedido", "modificacion"],
+    ["quiero cancelar mi pedido", "cancelacion"],
+  ]) {
+    chequear(`1· ${JSON.stringify(t)} → ${esp}`, I(t) === esp, `dio ${I(t)}`);
+  }
+  chequear("1· 🔑 y ninguna se contesta con tracking", I("quiero cambiar mi pedido a talla XL") !== "posventa");
+  // Y las consultas de estado siguen siendo posventa.
+  for (const t of ["si mandaron el pedido gracias", "dónde va mi pedido", "cuándo llega mi pedido", "tiene guía mi pedido", "gracias", "ya lo enviaron?", "estoy esperando"]) {
+    chequear(`1· sigue posventa: ${JSON.stringify(t)}`, I(t) === "posventa", `dio ${I(t)}`);
+  }
+
+  // ── 2. Un destinatario no es una intención de compra ───────────────────────
+  for (const t of ["ese pedido es para mi hermano", "lo puede recibir mi hermano", "la dirección es de mi hermano", "mi hermano es quien recibe", "el impermeable es para mi hermano"]) {
+    chequear(`2· 🔑 NO es compra adicional: ${JSON.stringify(t)}`, I(t) !== "compra_adicional", `dio ${I(t)}`);
+  }
+  for (const t of ["quiero otro para mi hermano", "deme otro para mi esposa", "quiero otros dos para mi hermano", "quiero comprar otro para mi hijo", "agrégueme uno más para mi esposa", "quiero otro", "deme uno más"]) {
+    chequear(`2· 🔑 SÍ es compra adicional: ${JSON.stringify(t)}`, I(t) === "compra_adicional", `dio ${I(t)}`);
+  }
+
+  // ── 3. Colisiones reales de nombre: NO son el mismo destino ────────────────
+  // 🔴 Reproducido con el criterio anterior: Santa Rosa de Osos contra Santa Rosa
+  // de Cabal daba `true` y `verificarPedido` no marcaba NADA. Las dos están en
+  // banda E, cuestan lo mismo y comparten SANTA y ROSA.
+  const COLISIONES = [
+    ["Santa Rosa de Osos", "Santa Rosa de Cabal"],
+    ["San Pedro de los Milagros", "San Pedro de Urabá"],
+    ["Puerto Colombia", "Puerto Boyacá"],
+    ["El Carmen de Bolívar", "El Carmen de Atrato"],
+    ["Santa Rosa de Osos", "Santa Rosa"],
+    ["Medellín", "Cali"],
+  ];
+  for (const [pedido, cotizada] of COLISIONES) {
+    chequear(
+      `3· 🔑 ${pedido} ≠ ${cotizada}`,
+      c.elHiloResolvioElDestino([a(`puesto en ${pedido} 📦`)], pedido, cotizada) === false
+    );
+    chequear(`3·   y mismoDestino tampoco`, c.mismoDestino(pedido, cotizada) === false);
+  }
+  chequear(
+    "3· 🔑 misma banda y mismo total NO alcanzan (Cabal y Osos son las dos E a $85.000)",
+    c.calcular("Santa Rosa de Cabal", "uno", { cantidad: { uds: 1 } }).total ===
+      c.calcular("Santa Rosa de Osos", "uno", { cantidad: { uds: 1 } }).total &&
+      c.mismoDestino("Santa Rosa de Cabal", "Santa Rosa de Osos") === false
+  );
+  {
+    const cotC = c.calcular("Santa Rosa de Cabal", "uno", { cantidad: { uds: 1 } });
+    chequear(
+      "3· 🔑 y verificarPedido lo marca",
+      c.verificarPedido({ ciudad: "Santa Rosa de Osos", total: cotC.total, unidades: 1 }, cotC, { messages: [a("puesto en Santa Rosa de Osos")] })
+        .problemas.some((p) => p.tipo === "ciudad_distinta")
+    );
+  }
+  // Y los casos reales que #173 necesita siguen resueltos.
+  chequear(
+    "3· ✅ Humberto: el typo que el bot corrigió",
+    c.elHiloResolvioElDestino([a("Te queda en $85.000 puesto en Santa Bárbara de Pinto")], "Santa Bárbara de Pinto", "santabara de pinto") === true
+  );
+  chequear(
+    "3· ✅ Jhon: el corregimiento que el bot DECLARÓ",
+    c.elHiloResolvioElDestino([a("Sincerín es corregimiento de Arjona, el envío a Sincerín, Arjona queda en $85.000")], "Sincerín, Arjona", "Arjona") === true
+  );
+  chequear(
+    "3· 🔑 pero sin declarar la relación, NO",
+    c.elHiloResolvioElDestino([a("puesto en Sincerín, Arjona")], "Sincerín, Arjona", "Arjona") === false
+  );
+  chequear("3· ✅ Madrid ↔ Madrid, Cundinamarca", c.mismoDestino("Madrid", "Madrid, Cundinamarca") === true);
+  chequear("3· ✅ Santander de Quilichao ↔ Cauca", c.mismoDestino("Santander de Quilichao", "Santander de Quilichao, Cauca") === true);
+  chequear("3· ✅ Mosquera Cundinamarca ≠ Nariño", c.mismoDestino("Mosquera Cundinamarca", "Mosquera Nariño") === false);
+  chequear("3· ✅ Ciudad Bolívar ≠ Ciudad Bolívar, Antioquia", c.mismoDestino("Ciudad Bolívar", "Ciudad Bolívar, Antioquia") === false);
+
+  // ── 4. La ciudad del pedido anterior es contexto, no destino confirmado ────
+  for (const [t, hereda] of [
+    ["quiero otros dos iguales", true],
+    ["quiero otros dos para mi hermano", false],
+    ["quiero otro pero esta vez es para mi hermano", false],
+    ["quiero otro para Bogotá", true],
+    ["quiero otro, ahora vivo en Medellín", true],
+  ]) {
+    const paraOtro = posventa.mencionaOtroDestinatario(t);
+    chequear(
+      `4· ${JSON.stringify(t)} → ${hereda ? "puede heredar" : "NO hereda"}`,
+      paraOtro === !hereda,
+      `mencionaOtroDestinatario=${paraOtro}`
+    );
+  }
+  chequear(
+    "4· 🔑 y se mira la conversación reciente, no solo el turno",
+    posventa.mencionoOtroDestinatarioReciente([
+      { role: "user", content: "quiero otros dos para mi hermano" },
+      { role: "assistant", content: "¿Para qué ciudad?" },
+      { role: "user", content: "sí confirmo" },
+    ]) === true
+  );
+  chequear(
+    "4·   pero no inventa un destinatario donde no lo hay",
+    posventa.mencionoOtroDestinatarioReciente([{ role: "user", content: "quiero otros dos iguales" }]) === false
+  );
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);
