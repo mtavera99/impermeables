@@ -257,6 +257,146 @@ function leerCsv(texto) {
   return filas;
 }
 
+// ============================================================================
+// 🔴 LAS COLUMNAS SE PERDÍAN, Y CON ELLAS LA OFICINA Y EL PLAZO
+//
+// LO QUE PASABA (28-sep, reportado con el archivo real en pantalla). El Excel se
+// aplanaba a texto y `novedades.parsear` leía cada línea como un chorizo: sacaba
+// un número de guía y tomaba TODO el resto como "el motivo". Dos consecuencias:
+//
+//   1. La guía elegida era el número equivocado. En la fila real había
+//      10104874 (número interno, 8 dígitos) y 240062099941 (la guía, 12), y se
+//      quedaba con el primero que no pareciera celular — el interno.
+//
+//   2. La oficina y la fecha límite ESTÁN en el archivo, en sus propias
+//      columnas, y se tiraban a la basura. Por eso cada novedad de oficina
+//      quedaba bloqueada pidiéndole al dueño que escribiera a mano dos datos que
+//      ya venían en el archivo que acababa de subir.
+//
+// 🔑 AHORA SE LEE EL ENCABEZADO. Las columnas se ubican por su NOMBRE, no por su
+// posición: así sirve aunque 99 Envíos reordene o agregue columnas, que es
+// exactamente lo que no se puede controlar desde acá.
+//
+// ⚠️ Y si el encabezado no se reconoce, NO se inventa nada: se cae al
+// comportamiento de antes (línea completa como motivo) y el panel muestra qué
+// columnas detectó, para que el dueño vea si acertó en vez de enterarse cuando un
+// cliente reciba algo raro.
+// ============================================================================
+
+// Cada campo con las formas en que lo puede titular la transportadora. Se compara
+// sin tildes y en minúscula.
+const COLUMNAS_CONOCIDAS = [
+  ["guia", /\b(guia|guias|no de guia|numero de guia|n de guia|tracking|remesa|preenvio|pre envio)\b/],
+  ["motivo", /\b(novedad|novedades|motivo|causal|observacion|observaciones|detalle|comentario|descripcion|gestion|solucion)\b/],
+  ["oficina", /\b(oficina|sucursal|agencia|punto|bodega|centro|lugar de retiro|punto de retiro)\b/],
+  ["plazo", /\b(fecha limite|fecha maxima|limite|vence|vencimiento|plazo|hasta|fecha de vencimiento|dias restantes)\b/],
+  ["nombre", /\b(destinatario|nombre|nombres|cliente|recibe)\b/],
+  ["ciudad", /\b(ciudad|destino|municipio|ciudad destino)\b/],
+  ["celular", /\b(celular|telefono|movil|contacto|whatsapp)\b/],
+];
+
+const aplanarEncabezado = (s) =>
+  String(s == null ? "" : s)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+/**
+ * Busca la fila de encabezado y devuelve qué columna es cada campo.
+ *
+ * Se mira solo entre las primeras filas: 99 Envíos a veces pone un título o una
+ * fila vacía antes de los encabezados.
+ *
+ * @returns {{fila:number, indices:Object<string,number>, titulos:Object<string,string>}|null}
+ */
+function detectarColumnas(filas) {
+  const cuantas = Math.min(8, (filas || []).length);
+  let mejor = null;
+
+  for (let i = 0; i < cuantas; i++) {
+    const celdas = (filas[i] || []).map(aplanarEncabezado);
+    if (!celdas.some(Boolean)) continue;
+
+    const indices = {};
+    const titulos = {};
+    for (const [campo, patron] of COLUMNAS_CONOCIDAS) {
+      for (let j = 0; j < celdas.length; j++) {
+        if (indices[campo] !== undefined) continue;
+        if (celdas[j] && patron.test(celdas[j])) {
+          indices[campo] = j;
+          titulos[campo] = String((filas[i] || [])[j] || "").trim();
+        }
+      }
+    }
+    const cuantosCampos = Object.keys(indices).length;
+    // Se exige la GUÍA más al menos otro campo: una fila con un solo acierto
+    // suele ser un dato, no un encabezado.
+    if (indices.guia === undefined || cuantosCampos < 2) continue;
+    if (!mejor || cuantosCampos > mejor.cuantos) {
+      mejor = { fila: i, indices, titulos, cuantos: cuantosCampos };
+    }
+  }
+  return mejor ? { fila: mejor.fila, indices: mejor.indices, titulos: mejor.titulos } : null;
+}
+
+/** "A" para 0, "B" para 1… solo para mostrárselo al dueño en el panel. */
+function letraDeColumna(i) {
+  let n = Number(i) + 1;
+  let s = "";
+  while (n > 0) {
+    const r = (n - 1) % 26;
+    s = String.fromCharCode(65 + r) + s;
+    n = Math.floor((n - r) / 26);
+  }
+  return s;
+}
+
+/**
+ * Convierte las filas en líneas usando el encabezado detectado.
+ *
+ * 🔑 La oficina y el plazo se marcan explícitamente con `[[oficina: …]]` y
+ * `[[plazo: …]]`. Dos razones:
+ *   · `novedades.parsear` los lee sin tener que conocer el formato del archivo;
+ *   · y quedan VISIBLES en el texto que el dueño revisa antes de enviar, así ve
+ *     qué se detectó en vez de confiar en que salió bien.
+ *
+ * El motivo se pone primero para que la clasificación no tenga que competir con
+ * la dirección y el nombre, que es lo que hacía que "no se localiza dirección"
+ * quedara enterrado entre veinte palabras.
+ */
+function aLineasConColumnas(filas, mapa) {
+  const { fila: filaEncabezado, indices } = mapa;
+  const salida = [];
+
+  for (let i = filaEncabezado + 1; i < filas.length; i++) {
+    const f = filas[i] || [];
+    const celda = (campo) => {
+      const j = indices[campo];
+      return j === undefined ? "" : String(f[j] == null ? "" : f[j]).trim();
+    };
+
+    const guia = celda("guia");
+    if (!guia) continue;
+
+    const partes = [guia];
+    for (const campo of ["motivo", "nombre", "ciudad", "celular"]) {
+      const v = celda(campo);
+      if (v) partes.push(v);
+    }
+    const oficina = celda("oficina");
+    const plazo = celda("plazo");
+    if (oficina) partes.push(`[[oficina: ${oficina}]]`);
+    if (plazo) partes.push(`[[plazo: ${plazo}]]`);
+
+    const linea = partes.join("\t").trim();
+    if (linea) salida.push(linea);
+  }
+  return salida.join("\n");
+}
+
 /**
  * Convierte las filas en el texto por líneas que espera `novedades.parsear`.
  *
@@ -272,23 +412,64 @@ function aLineas(filas) {
     .join("\n");
 }
 
-/** Detecta el formato por el contenido y devuelve el texto por líneas. */
+/**
+ * Detecta el formato por el contenido y devuelve el texto por líneas.
+ *
+ * @returns {{texto:string, formato:string, columnas:object|null}}
+ *   `columnas` describe qué se detectó, para mostrárselo al dueño. Si es null, el
+ *   encabezado no se reconoció y se leyó con el método viejo.
+ */
 function aTextoDeNovedades(buffer, nombre) {
   const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer || "");
   const esZip = buf.length > 4 && buf.readUInt32LE(0) === FIRMA_LOCAL;
-  if (esZip) return { texto: aLineas(leerXlsx(buf)), formato: "xlsx" };
-  // No es ZIP: se trata como texto. Cubre CSV y también el caso de pegar la tabla.
-  const texto = buf.toString("utf8");
-  if (/^\s*</.test(texto)) {
-    throw new Error("Ese archivo parece XML o HTML, no una tabla. Exportalo como .xlsx o .csv.");
+
+  let filas;
+  let formato;
+  if (esZip) {
+    filas = leerXlsx(buf);
+    formato = "xlsx";
+  } else {
+    const texto = buf.toString("utf8");
+    if (/^\s*</.test(texto)) {
+      throw new Error("Ese archivo parece XML o HTML, no una tabla. Exportalo como .xlsx o .csv.");
+    }
+    filas = leerCsv(texto);
+    formato = "csv";
   }
-  return { texto: aLineas(leerCsv(texto)), formato: "csv" };
+
+  // 🔑 Primero se intenta con el encabezado. Si no se reconoce, se cae al método
+  // de antes: nunca se queda sin leer el archivo por no encontrar los títulos.
+  const mapa = detectarColumnas(filas);
+  if (mapa) {
+    const texto = aLineasConColumnas(filas, mapa);
+    if (texto.trim()) {
+      return {
+        texto,
+        formato,
+        columnas: {
+          filaEncabezado: mapa.fila + 1,
+          detectadas: Object.fromEntries(
+            Object.entries(mapa.indices).map(([campo, i]) => [
+              campo,
+              { columna: letraDeColumna(i), titulo: mapa.titulos[campo] || "" },
+            ])
+          ),
+          faltantes: COLUMNAS_CONOCIDAS.map(([c]) => c).filter((c) => mapa.indices[c] === undefined),
+        },
+      };
+    }
+  }
+
+  return { texto: aLineas(filas), formato, columnas: null };
 }
 
 module.exports = {
   leerXlsx,
   leerCsv,
   aLineas,
+  aLineasConColumnas,
+  detectarColumnas,
+  letraDeColumna,
   aTextoDeNovedades,
   // Se exportan para poder probar las piezas por separado.
   abrirZip,

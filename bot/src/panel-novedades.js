@@ -312,8 +312,28 @@ document.getElementById("archivo").addEventListener("change", function (ev) {
       if (!d || d.ok === false) throw new Error((d && d.error) || "No se pudo leer el archivo.");
       document.getElementById("pegado").value = d.texto;
       msg.className = "cargarMsg ok";
+      // 🔑 Se le dice QUÉ columnas se reconocieron. Si 99 Envíos cambia los
+      // títulos, se ve acá en vez de descubrirse cuando las novedades de oficina
+      // queden bloqueadas sin explicación.
+      var detalle = "";
+      if (d.columnas && d.columnas.detectadas) {
+        var campos = Object.keys(d.columnas.detectadas).map(function (c) {
+          return c + "=" + d.columnas.detectadas[c].columna;
+        });
+        detalle = " Reconocí las columnas por su título (" + campos.join(", ") + ").";
+        if (d.columnas.detectadas.oficina && d.columnas.detectadas.plazo) {
+          detalle += " " + (d.conDatosDeOficina || 0) +
+            " con oficina y fecha límite ya completas: esas no te las va a pedir.";
+        } else {
+          detalle += " No encontré columna de oficina ni de fecha límite, así que las de" +
+            " oficina te las va a pedir a mano.";
+        }
+      } else {
+        detalle = " No reconocí el encabezado, así que leí cada fila completa como el motivo." +
+          " Las de oficina te las va a pedir a mano.";
+      }
       msg.textContent = "Leí " + d.cuantas + " novedad" + (d.cuantas === 1 ? "" : "es") +
-        " del archivo. Dale Revisar.";
+        " del archivo." + detalle + " Dale Revisar.";
     })
     .catch(function (e) {
       msg.className = "cargarMsg mal";

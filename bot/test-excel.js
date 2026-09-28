@@ -307,5 +307,50 @@ chequear(
   JSON.stringify(x.aLineas([["a"], ["", ""], ["b"]]))
 );
 
+console.log("\n── Las columnas se leen por su TÍTULO, no por su posición ──");
+// 🔴 DE DÓNDE SALE (28-sep, con el archivo real en pantalla): el Excel se aplanaba
+// a texto y se perdía la estructura. La oficina y la fecha límite estaban en sus
+// columnas y se tiraban, así que cada novedad de oficina quedaba bloqueada
+// pidiéndole al dueño dos datos que el archivo ya traía.
+{
+  const ENCABEZADO = ["Número de Guía", "Novedad", "Destinatario", "Ciudad", "Celular", "Oficina", "Fecha límite"];
+  const filas = [
+    ENCABEZADO,
+    ["240062099941", "No se localiza dirección del destinatario", "Gustavo Perez", "BOGOTA", "3013335947", "", ""],
+    ["240062099942", "DEJADO EN OFICINA PARA RECLAMAR", "Maria Lopez", "YOPAL", "3001234567", "Interrapidisimo Yopal Centro", "2026-10-05"],
+  ];
+  const mapa = x.detectarColumnas(filas);
+  chequear("🔑 se detecta la fila de encabezado", mapa && mapa.fila === 0, JSON.stringify(mapa));
+  for (const [campo, letra] of [["guia", "A"], ["motivo", "B"], ["nombre", "C"], ["ciudad", "D"], ["celular", "E"], ["oficina", "F"], ["plazo", "G"]]) {
+    chequear(`  ${campo} → columna ${letra}`, mapa && x.letraDeColumna(mapa.indices[campo]) === letra, JSON.stringify(mapa && mapa.indices));
+  }
+
+  const texto = x.aLineasConColumnas(filas, mapa);
+  const lineas = texto.split("\n");
+  chequear("la fila de encabezado NO sale como novedad", lineas.length === 2, `salieron ${lineas.length}`);
+  chequear("🔑 la oficina queda marcada en la línea", /\[\[oficina: Interrapidisimo Yopal Centro\]\]/.test(texto), texto);
+  chequear("🔑 y la fecha límite también", /\[\[plazo: 2026-10-05\]\]/.test(texto), texto);
+  chequear("la fila sin oficina no inventa marcadores", !/\[\[/.test(lineas[0]), lineas[0]);
+  chequear("el motivo va primero, antes del nombre y la dirección", /^240062099941\tNo se localiza/.test(lineas[0]), lineas[0]);
+
+  // 🔑 Y si el orden de las columnas cambia, se sigue leyendo bien: es lo que no
+  // podemos controlar desde acá.
+  const alRevés = [
+    ["Fecha límite", "Oficina", "Celular", "Ciudad", "Destinatario", "Novedad", "Guía"],
+    ["2026-10-05", "Interrapidisimo Yopal Centro", "3001234567", "YOPAL", "Maria Lopez", "DEJADO EN OFICINA PARA RECLAMAR", "240062099942"],
+  ];
+  const m2 = x.detectarColumnas(alRevés);
+  chequear("🔑 con las columnas en otro orden también", m2 && x.letraDeColumna(m2.indices.guia) === "G" && x.letraDeColumna(m2.indices.oficina) === "B", JSON.stringify(m2 && m2.indices));
+
+  // ⛔ Sin encabezado reconocible NO se inventa nada: se cae al método de antes.
+  chequear("sin encabezado devuelve null", x.detectarColumnas([["10104874", "240062099941", "algo"]]) === null);
+  chequear(
+    "  y aLineas sigue funcionando como antes",
+    x.aLineas([["10104874", "240062099941", "no se localiza direccion"]]) === "10104874\t240062099941\tno se localiza direccion"
+  );
+  // Una fila con un solo acierto no es un encabezado.
+  chequear("una fila con solo la guía no se toma por encabezado", x.detectarColumnas([["Guía"], ["240062099941"]]) === null);
+}
+
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

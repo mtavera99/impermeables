@@ -187,16 +187,39 @@ function parsear(texto) {
     // que se queda con el candidato que coincida con una guía que ya conocemos:
     // eso no es una suposición, es una coincidencia con nuestros datos.
     const noCelulares = candidatos.filter((n) => !esCelular(n));
-    const guia = (noCelulares.length ? noCelulares : candidatos)[0];
+    // 🔴 ANTES SE TOMABA EL PRIMERO, Y ERA EL NÚMERO EQUIVOCADO.
+    //
+    // Reproducido con la fila real del 28-sep: la línea traía 10104874 (número
+    // interno de 8 dígitos) y 240062099941 (la guía, 12 dígitos). "El primero que
+    // no parezca celular" se quedaba con el interno, así que la novedad no cruzaba
+    // con ningún pedido y salía "No encontré a quién corresponde esta guía".
+    //
+    // 🔑 Gana el MÁS LARGO: una guía de transportadora tiene más dígitos que un
+    // número de orden interno. Y quien decide de verdad sigue siendo revisar(),
+    // que prefiere el candidato que coincida con una guía que ya conocemos.
+    const porLargo = (noCelulares.length ? noCelulares : candidatos)
+      .slice()
+      .sort((a, b) => b.length - a.length);
+    const guia = porLargo[0];
     if (vistas.has(guia)) continue; // la misma guía dos veces no se procesa dos veces
     vistas.add(guia);
 
-    // El motivo es la línea sin los números, sin separadores de columna.
-    let motivo = limpia;
+    // 🔑 Los marcadores que pone el lector de Excel cuando reconoció las columnas.
+    // Traen la oficina y la fecha límite, que ANTES se tiraban a la basura y por
+    // eso cada novedad de oficina quedaba bloqueada pidiéndolas a mano.
+    const marca = (campo) => {
+      const m = limpia.match(new RegExp(`\\[\\[${campo}:\\s*([^\\]]+)\\]\\]`, "i"));
+      return m ? m[1].trim() : "";
+    };
+    const oficina = marca("oficina");
+    const plazo = marca("plazo");
+
+    // El motivo es la línea sin los números, sin marcadores y sin separadores.
+    let motivo = limpia.replace(/\[\[[^\]]*\]\]/g, " ");
     for (const n of candidatos) motivo = motivo.replace(n, " ");
     motivo = motivo.replace(/[;,\t|]+/g, " ").replace(/\s+/g, " ").trim();
 
-    filas.push({ guia, candidatos, motivo });
+    filas.push({ guia, candidatos, motivo, ...(oficina ? { oficina } : {}), ...(plazo ? { plazo } : {}) });
   }
   return filas;
 }
@@ -392,8 +415,15 @@ function revisar(texto, opciones = {}) {
     // Sale de la novedad, y lo completa el dueño en el panel.
     if (tipo.clave === "oficina") {
       const datos = (opciones.datos && opciones.datos[n.guia]) || {};
-      const oficina = String(datos.oficina || "").trim();
-      const plazo = String(datos.plazo || "").trim();
+      // 🔑 Primero lo que completó el dueño en el panel, y si no lo tocó, lo que
+      // venía EN EL ARCHIVO. Antes solo existía la primera fuente, así que subir el
+      // Excel no servía de nada para las novedades de oficina: había que escribir a
+      // mano dos datos que el archivo ya traía.
+      //
+      // ⚠️ El orden importa: lo que el dueño escribe manda sobre el archivo. Si
+      // corrigió algo a mano es porque el archivo estaba mal.
+      const oficina = String(datos.oficina || n.oficina || "").trim();
+      const plazo = String(datos.plazo || n.plazo || "").trim();
       if (!oficina || !plazo) {
         return {
           ...base,

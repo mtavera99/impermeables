@@ -452,7 +452,7 @@ app.post(
       return res.status(400).json({ ok: false, error: "El archivo llegó vacío." });
     }
     try {
-      const { texto, formato } = excel.aTextoDeNovedades(buf, String(req.query.nombre || ""));
+      const { texto, formato, columnas } = excel.aTextoDeNovedades(buf, String(req.query.nombre || ""));
       const filas = novedades.parsear(texto);
       if (!filas.length) {
         return res.status(400).json({
@@ -462,8 +462,18 @@ app.post(
             "Revisá que sea el listado de novedades y que traiga la columna de la guía.",
         });
       }
-      anotarEvento({ tipo: "novedades-archivo", formato, filas: filas.length });
-      res.json({ ok: true, texto, formato, cuantas: filas.length });
+      // 🔑 `columnas` y `conDatosDeOficina` se devuelven para MOSTRARLE al dueño qué
+      // se detectó. Si el encabezado del archivo cambia, se ve en la pantalla en vez
+      // de descubrirse cuando una novedad de oficina queda bloqueada sin motivo.
+      const conDatosDeOficina = filas.filter((f) => f.oficina && f.plazo).length;
+      anotarEvento({
+        tipo: "novedades-archivo",
+        formato,
+        filas: filas.length,
+        columnas: columnas ? Object.keys(columnas.detectadas).join(",") : "sin-encabezado",
+        conDatosDeOficina,
+      });
+      res.json({ ok: true, texto, formato, cuantas: filas.length, columnas, conDatosDeOficina });
     } catch (e) {
       res.status(400).json({ ok: false, error: e.message });
     }
