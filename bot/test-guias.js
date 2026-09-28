@@ -124,7 +124,16 @@ const ETIQUETAS = [
       "CIUDAD: MEDELLIN  DEPTO: ANTIOQUIA",
       "TELEFONO: 3151112222",
     ],
-    espera: { enviar: false, motivoContiene: "no corresponde" },
+    // El motivo cambió el 28-sep: antes decía "no corresponde a ningún pedido
+    // (mejor coincidencia 45 de 50 necesarios)" y el dueño no tenía con eso cómo
+    // saber de quién se sospechaba ni qué dato arreglar. Ahora nombra al más
+    // parecido y dice qué señal faltó.
+    // El motivo cambió el 28-sep: antes decía "no corresponde a ningún pedido
+    // (mejor coincidencia 45 de 50 necesarios)" y el dueño no tenía con eso cómo
+    // saber de quién se sospechaba ni qué dato arreglar. Ahora, si hay un
+    // parecido lo nombra y dice qué señal faltó; y si NO se parece a nadie —como
+    // acá, 0 puntos— lo dice sin inventar un candidato.
+    espera: { enviar: false, motivoContiene: "no se parece a ningún pedido" },
   },
   {
     caso: "la MISMA guía repetida en el PDF (el dueño imprimió dos veces)",
