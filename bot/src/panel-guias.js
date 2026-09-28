@@ -216,6 +216,13 @@ function render() {
       <thead><tr><th>Guía</th><th>Cliente</th><th>Estado</th></tr></thead>
       <tbody></tbody>
     </table>
+    <!-- 🔁 Reintentar sin subir el PDF de nuevo. Antes el pareo se borraba al
+         enviar, así que una sola guía caída por un hipo de Meta obligaba a
+         repetir todo el proceso. -->
+    <div class="acciones" id="zonaReintentar" style="display:none">
+      <button class="btn azul" id="btnReintentar">↻ Reintentar las que no salieron</button>
+      <span class="cargando" id="estadoReintentar"></span>
+    </div>
   </div>
 
   <h2>Guías ya enviadas</h2>
@@ -459,6 +466,87 @@ document.getElementById("tablaPareo").addEventListener("click", function (ev) {
     });
 });
 
+// Las hojas que no salieron y se pueden reintentar sin subir el PDF otra vez.
+var REINTENTABLES = [];
+
+function pintarReporte(d) {
+  var tb = document.querySelector("#tablaReporte tbody");
+  tb.innerHTML = "";
+  d.resultados.forEach(function (r) {
+    var tr = document.createElement("tr");
+    if (!r.ok) tr.className = "no";
+    tr.innerHTML =
+      '<td data-label="Guía"><code>' + (r.guia || "?") + "</code></td>" +
+      '<td data-label="Cliente">' + (r.nombre || "") + '<span class="sub">+' + (r.telefono || "") + "</span></td>" +
+      '<td data-label="Estado">' + (r.ok ? "✅ enviada" : '<span class="motivo">🔴 ' + (r.error || "falló") + "</span>") + "</td>";
+    tb.appendChild(tr);
+  });
+  document.getElementById("zonaReporte").style.display = "block";
+
+  REINTENTABLES = d.reintentables || [];
+  // 🔁 El botón solo aparece si de verdad hay algo que reintentar Y el pareo
+  // sigue vivo en el servidor. Un botón que no va a funcionar es peor que
+  // ninguno.
+  var puede = REINTENTABLES.length > 0 && plan;
+  document.getElementById("zonaReintentar").style.display = puede ? "flex" : "none";
+
+  mostrar(
+    d.fallaron ? "info" : "ok",
+    "Enviadas " + d.enviadas + " de " + d.intentadas + "." +
+      (d.fallaron
+        ? " " + d.fallaron + " no salieron: mirá el motivo abajo." +
+          (d.hayTemporales
+            ? " Alguna falló porque Meta se cayó un momento, no por los datos del cliente: " +
+              "dale «Reintentar» y lo más probable es que salga."
+            : "") +
+          " No hace falta subir el PDF de nuevo."
+        : "")
+  );
+
+  if (!d.fallaron) {
+    // Todas salieron: el pareo ya se consumió en el servidor.
+    document.getElementById("zonaPareo").style.display = "none";
+    plan = null;
+  } else {
+    // Quedan pendientes: se esconde la tabla de pareo para no dar lugar a un
+    // segundo envío masivo, pero el plan se conserva para el reintento.
+    document.getElementById("zonaPareo").style.display = "none";
+  }
+}
+
+// ── REINTENTAR LAS QUE NO SALIERON ──────────────────────────────────────────
+// 🔑 Reintentar es seguro: las que sí salieron quedaron registradas y el
+// servidor las bloquea solo. Así que esto solo vuelve a intentar lo que falta.
+document.getElementById("btnReintentar").addEventListener("click", function () {
+  if (!plan || !REINTENTABLES.length) {
+    mostrar("mal", "Ya no hay nada para reintentar. Si falta alguna, subí el PDF de nuevo.");
+    return;
+  }
+  var btn = this;
+  btn.disabled = true;
+  document.getElementById("estadoReintentar").textContent = "Reintentando...";
+
+  fetch("/guias/enviar?token=" + encodeURIComponent(TOKEN), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: plan.id, paginas: REINTENTABLES })
+  })
+    .then(function (r) {
+      if (r.status === 403) throw new Error("la clave del panel no coincide. Abrí el panel de nuevo.");
+      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
+      return r.json();
+    })
+    .then(function (d) {
+      if (!d.ok) { mostrar("mal", "🔴 " + (d.error || "No se pudo reintentar.")); return; }
+      pintarReporte(d);
+    })
+    .catch(function (e) { mostrar("mal", "🔴 " + e.message); })
+    .finally(function () {
+      btn.disabled = false;
+      document.getElementById("estadoReintentar").textContent = "";
+    });
+});
+
 // ── PASO 2: ENVIAR ──────────────────────────────────────────────────────────
 btnEnviar.addEventListener("click", function () {
   if (!plan) return;
@@ -483,24 +571,7 @@ btnEnviar.addEventListener("click", function () {
     })
     .then(function (d) {
       if (!d.ok) { mostrar("mal", "🔴 " + (d.error || "No se pudo enviar.")); return; }
-      var tb = document.querySelector("#tablaReporte tbody");
-      tb.innerHTML = "";
-      d.resultados.forEach(function (r) {
-        var tr = document.createElement("tr");
-        if (!r.ok) tr.className = "no";
-        tr.innerHTML =
-          '<td data-label="Guía"><code>' + (r.guia || "?") + "</code></td>" +
-          '<td data-label="Cliente">' + (r.nombre || "") + '<span class="sub">+' + (r.telefono || "") + "</span></td>" +
-          '<td data-label="Estado">' + (r.ok ? "✅ enviada" : '<span class="motivo">🔴 ' + (r.error || "falló") + "</span>") + "</td>";
-        tb.appendChild(tr);
-      });
-      document.getElementById("zonaReporte").style.display = "block";
-      mostrar(d.fallaron ? "info" : "ok",
-        "Enviadas " + d.enviadas + " de " + d.intentadas + "." +
-        (d.fallaron ? " " + d.fallaron + " fallaron: mirá el motivo abajo." : ""));
-      // El pareo ya se consumió: evita que se reenvíe con otro clic.
-      document.getElementById("zonaPareo").style.display = "none";
-      plan = null;
+      pintarReporte(d);
     })
     .catch(function (e) { mostrar("mal", "🔴 " + e.message); })
     .finally(function () {
