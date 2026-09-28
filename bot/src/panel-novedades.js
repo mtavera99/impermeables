@@ -321,12 +321,17 @@ document.getElementById("archivo").addEventListener("change", function (ev) {
           return c + "=" + d.columnas.detectadas[c].columna;
         });
         detalle = " Reconocí las columnas por su título (" + campos.join(", ") + ").";
-        if (d.columnas.detectadas.oficina && d.columnas.detectadas.plazo) {
-          detalle += " " + (d.conDatosDeOficina || 0) +
+        if (d.conDatosDeOficina) {
+          detalle += " " + d.conDatosDeOficina +
             " con oficina y fecha límite ya completas: esas no te las va a pedir.";
+        } else if (d.columnas.detectadas.plazo) {
+          detalle += " Encontré la columna de fecha límite.";
         } else {
-          detalle += " No encontré columna de oficina ni de fecha límite, así que las de" +
-            " oficina te las va a pedir a mano.";
+          // El archivo de 99 Envíos NO trae fecha límite: solo updated_at, que es
+          // cuándo se registró la novedad. Se dice claro en vez de inventarla.
+          detalle += " El archivo no trae fecha límite (solo la fecha del registro)," +
+            " así que en las de oficina te va a pedir hasta cuándo tiene el cliente." +
+            " La oficina la saco de la dirección cuando la transportadora la puso ahí.";
         }
       } else {
         detalle = " No reconocí el encabezado, así que leí cada fila completa como el motivo." +

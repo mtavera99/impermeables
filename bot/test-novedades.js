@@ -298,6 +298,58 @@ console.log("\n── La guía correcta y los datos de oficina que vienen en el 
   chequear("🔑 lo que corrige el dueño gana sobre el archivo", /Unicentro/.test(f4.texto) && /2026-10-09/.test(f4.texto), f4.texto);
 }
 
+console.log("\n── Los tipos y la oficina del archivo REAL ──");
+{
+  // Los textos LITERALES de tipo_novedad del Novedades-2026-09-28.
+  for (const [texto, esperado] of [
+    ["Reclame en oficina", "oficina"],
+    ["Intento de entrega", "ausente"],
+    ["No se localiza dirección del destinatario", "direccion"],
+    ["Reclamo en oficina informado WhatsApp - Recordatorio 24h", "oficina"],
+    ["Reclamo en oficina informado WhatsApp - Recordatorio 48h", "oficina"],
+    ["Reclamo en oficina informado WhatsApp - Recordatorio 7 días", "oficina"],
+    // 🔴 Estos dos caían en "No se reconoció el motivo" con el archivo real.
+    ["Telemercadeo", "telemercadeo"],
+    ["Pedido cancelado", "rechazado"],
+  ]) {
+    chequear(`🔑 "${texto}" → ${esperado}`, novedades.clasificar(texto).clave === esperado, novedades.clasificar(texto).clave);
+  }
+  chequear("a Telemercadeo NO se le manda mensaje automático", novedades.clasificar("Telemercadeo").mensaje == null);
+  chequear("ni a Pedido cancelado", novedades.clasificar("Pedido cancelado").mensaje == null);
+
+  // 🔑 La oficina sale de direccion_destinatario, que es donde la pone 99 Envíos.
+  const tel = "573009995002";
+  store.saveOrder({
+    nombre: "Tito Ramirez", celular: "3172168002", ciudad: "Dagua", direccion: "Oficina",
+    color: "negro", talla: "L", unidades: 1, pago: "contraentrega", total: 85000,
+    telefono_chat: tel, guia: "240062025925",
+  });
+  const linea =
+    "[[guia: 240062025925]]\t240062025925\tReclame en oficina\tTito\tDAGUA/DAGUA\t3172168002" +
+    "\t[[direccion: Oficina Interrapidísimo Dagua]]";
+  const f = novedades.parsear(linea)[0];
+  chequear("🔑 la guía marcada manda sobre cualquier otro número", f.guia === "240062025925", f.guia);
+  chequear("la dirección se lee del marcador", f.direccion === "Oficina Interrapidísimo Dagua", JSON.stringify(f.direccion));
+
+  const plan = novedades.revisar(linea, { ahora: Date.now() });
+  const fila = plan.filas[0];
+  // ⚠️ El archivo NO trae fecha límite, así que la novedad de oficina SIGUE
+  // pidiéndola: eso no se inventa. Pero la oficina ya viene resuelta.
+  chequear(
+    "🔑 sigue pidiendo la fecha límite, que el archivo no trae",
+    fila.enviar === false && /Falta completar/.test(fila.motivoNoEnvio || ""),
+    JSON.stringify(fila.motivoNoEnvio)
+  );
+  const conPlazo = novedades.revisar(linea, { ahora: Date.now(), datos: { "240062025925": { plazo: "2026-10-05" } } }).filas[0];
+  chequear("🔑 y con SOLO la fecha ya se puede enviar: la oficina salió del archivo", conPlazo.enviar === true, JSON.stringify(conPlazo.motivoNoEnvio));
+  chequear("  con la oficina que traía la dirección", /Oficina Interrapidísimo Dagua/.test(conPlazo.texto), conPlazo.texto);
+
+  // ⛔ Y una dirección de casa NO se toma por oficina.
+  const casa = "[[guia: 240062099927]]\t240062099927\tReclame en oficina\tPatricia\tLA VEGA\t3125154335\t[[direccion: Calle 8A No364 Barrio Las Palmas]]";
+  const fc = novedades.revisar(casa, { ahora: Date.now(), datos: { "240062099927": { plazo: "2026-10-05" } } }).filas[0];
+  chequear("🔑 una dirección de casa no se usa como oficina", !/Calle 8A/.test(String(fc.texto || "")), String(fc.texto || fc.motivoNoEnvio));
+}
+
 fs.rmSync(DIR, { recursive: true, force: true });
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

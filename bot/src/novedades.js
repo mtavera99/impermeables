@@ -141,11 +141,46 @@ const TIPOS = [
   {
     clave: "rechazado",
     nombre: "El cliente lo rechazó",
-    señales: ["rehusado", "rechazado", "no lo quiso", "no acepta", "devolucion", "devolución", "reexpedicion"],
+    señales: [
+      "rehusado", "rechazado", "no lo quiso", "no acepta", "devolucion", "devolución", "reexpedicion",
+      // 🔴 AGREGADO 28-SEP con el archivo real: "Pedido cancelado" es el texto
+      // literal de 99 Envíos y caía en "No se reconoció el motivo".
+      "cancelado", "cancelada", "anulado",
+    ],
     // No se le escribe: si rechazó, un mensaje automático molesta. Va al dueño.
     mensaje: null,
   },
+  {
+    // 🔴 AGREGADO 28-SEP. "Telemercadeo" son 4 de las 26 novedades del archivo real
+    // y caían en "No se reconoció el motivo", que no le dice nada al dueño.
+    //
+    // ⛔ Y NO se le escribe al cliente. "Telemercadeo" significa que la
+    // transportadora pide que alguien LLAME para confirmar datos antes de volver a
+    // salir; no dice qué dato falta. Mandar un mensaje genérico acá sería inventar
+    // el motivo, que es justo lo que este módulo no hace. Se nombra bien para que
+    // el dueño sepa qué es y lo gestione.
+    clave: "telemercadeo",
+    nombre: "La transportadora pide confirmar los datos por teléfono",
+    señales: ["telemercadeo", "tele mercadeo", "confirmar datos", "verificar datos"],
+    mensaje: null,
+  },
 ];
+
+/**
+ * ¿Ese texto de dirección es en realidad una oficina de la transportadora?
+ *
+ * En el archivo de 99 Envíos, las novedades de "Reclame en oficina" traen la
+ * oficina en `direccion_destinatario`. Se exige que lo diga: "Oficina …",
+ * "Inter Rapidísimo …". Una dirección de casa no entra.
+ */
+function pareceOficina(texto) {
+  const t = String(texto || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  if (!t.trim()) return false;
+  return /\b(oficina|sucursal|agencia|inter\s?rapidisimo|interrapidisimo|servientrega|coordinadora|punto de retiro)\b/.test(t);
+}
 
 /** Clasifica el texto de una novedad. Nunca adivina: si no reconoce, lo dice. */
 function clasificar(texto) {
@@ -213,13 +248,31 @@ function parsear(texto) {
     };
     const oficina = marca("oficina");
     const plazo = marca("plazo");
+    const direccion = marca("direccion");
+
+    // 🔑 Si el lector de Excel reconoció la columna de la guía, manda esa y no se
+    // adivina nada. Con el archivo real, adivinar por largo elegía el teléfono
+    // 573043255345 (12 dígitos con indicativo) en vez de la guía 64532759599.
+    const marcada = marca("guia");
+    const guiaFinal = marcada || guia;
+    if (marcada && marcada !== guia) {
+      if (vistas.has(marcada)) continue;
+      vistas.add(marcada);
+    }
 
     // El motivo es la línea sin los números, sin marcadores y sin separadores.
     let motivo = limpia.replace(/\[\[[^\]]*\]\]/g, " ");
     for (const n of candidatos) motivo = motivo.replace(n, " ");
     motivo = motivo.replace(/[;,\t|]+/g, " ").replace(/\s+/g, " ").trim();
 
-    filas.push({ guia, candidatos, motivo, ...(oficina ? { oficina } : {}), ...(plazo ? { plazo } : {}) });
+    filas.push({
+      guia: guiaFinal,
+      candidatos,
+      motivo,
+      ...(oficina ? { oficina } : {}),
+      ...(plazo ? { plazo } : {}),
+      ...(direccion ? { direccion } : {}),
+    });
   }
   return filas;
 }
@@ -422,7 +475,13 @@ function revisar(texto, opciones = {}) {
       //
       // ⚠️ El orden importa: lo que el dueño escribe manda sobre el archivo. Si
       // corrigió algo a mano es porque el archivo estaba mal.
-      const oficina = String(datos.oficina || n.oficina || "").trim();
+      // 🔑 Y TERCERA FUENTE: la dirección del destinatario. En el archivo real de
+      // 99 Envíos, cuando la novedad es "Reclame en oficina", la oficina de retiro
+      // viene escrita ahí — "Oficina Interrapidísimo Dagua", "Oficina principal
+      // Inter Rapidísimo"—. No es una suposición: es el campo que la
+      // transportadora llenó con la oficina.
+      const deLaDireccion = pareceOficina(n.direccion) ? String(n.direccion).trim() : "";
+      const oficina = String(datos.oficina || n.oficina || deLaDireccion || "").trim();
       const plazo = String(datos.plazo || n.plazo || "").trim();
       if (!oficina || !plazo) {
         return {
