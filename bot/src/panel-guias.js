@@ -95,6 +95,19 @@ function render() {
   .cert{font-weight:700}
   .cert.alta{color:#3ddc84}.cert.media{color:#ffc857}.cert.baja{color:#ff6b6b}
   .motivo{color:#ff9f9f;font-size:12px}
+  /* 🔧 Asignar a mano una guía que el pareo no pudo resolver.
+     16px en el select: menos que eso hace que iOS agrande la página sola al
+     tocarlo, y el dueño trabaja desde el celular. */
+  .asignar{margin-top:8px;display:flex;flex-direction:column;gap:6px;text-align:left}
+  .asignar select{width:100%;background:#0f1319;border:1px solid #39424f;border-radius:10px;
+    padding:10px;color:#e7e9ee;font-size:16px;min-height:44px;max-width:100%}
+  .asignar select:focus{outline:none;border-color:#3b82f6}
+  .asignar .btnAsignar{background:#1d4ed8;border:1px solid #2563eb;color:#fff;font-weight:700;
+    border-radius:10px;padding:10px 12px;font-size:14px;min-height:44px;cursor:pointer}
+  .asignar .btnAsignar:disabled{opacity:.5;cursor:not-allowed}
+  .asignarMsg{font-size:12px;color:#8b93a4}
+  .asignarMsg.ok{color:#8ff0b5}
+  .asignarMsg.mal{color:#ff9aa4}
   .vacio{color:#8b93a4;text-align:center;padding:18px}
   .res{padding:12px 14px;border-radius:8px;margin:0 0 14px;font-size:14px;display:none}
   .res.ok{background:#12291c;border:1px solid #1f6b3f;color:#9be8b8}
@@ -216,6 +229,9 @@ function render() {
 <script>
 var TOKEN = ${JSON.stringify(tk)};
 var plan = null;
+// Los pedidos a los que se le puede asignar una guía a mano. Llegan una sola vez
+// con el pareo, no una copia por fila.
+var CANDIDATOS = [];
 
 var archivo = document.getElementById("archivo");
 var btnRevisar = document.getElementById("btnRevisar");
@@ -277,7 +293,66 @@ btnRevisar.addEventListener("click", function () {
 
 function claseCert(c) { return c >= 90 ? "alta" : c >= 70 ? "media" : "baja"; }
 
+function escapar(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// ---------------------------------------------------------------------------
+// 🔧 "ESTA GUÍA ES DE ESTE CLIENTE"
+//
+// 🔴 POR QUÉ (28-sep). De 24 guías, una quedó en rojo y NO había ninguna forma
+// de mandarla: el panel no ofrecía asignarla y el chat solo manda texto, no
+// archivos. El dueño: "¿no hay forma de que yo pueda enviarla de forma
+// individual? porque en el chat no me deja".
+//
+// El candado de 50 puntos sigue igual para lo automático: existe para que el
+// BOT no adivine, porque la etiqueta lleva dirección y teléfono impresos. Pero
+// el dueño no adivina — él sabe de quién es el pedido. Una guía a la vez, con
+// confirmación, y queda anotado que la eligió una persona.
+//
+// Los 3 más parecidos van primero y con su puntaje, porque casi siempre el
+// primero es el correcto: lo que falló fue un dato, no la identidad.
+// ---------------------------------------------------------------------------
+function cajonDeAsignar(f) {
+  // El servidor decide si se puede asignar: es false en las guías repetidas
+  // dentro del mismo PDF y en las que ya se enviaron antes.
+  if (!f.asignable) return "";
+  var mejores = f.mejores || [];
+  var idsMejores = mejores.map(function (m) { return m.pedidoId; });
+  var puntosDe = {};
+  mejores.forEach(function (m) { puntosDe[m.pedidoId] = m.puntos; });
+
+  var comoTexto = function (c) {
+    return escapar(c.nombre) + (c.ciudad ? " · " + escapar(c.ciudad) : "") +
+      (c.cel ? " · ...." + escapar(c.cel) : "") + " · " + escapar(c.total);
+  };
+
+  var opciones = '<option value="">— elegí el cliente —</option>';
+  // Primero los parecidos, con su puntaje, para que se vea por qué se sugieren.
+  CANDIDATOS.filter(function (c) { return idsMejores.indexOf(c.id) !== -1; })
+    .sort(function (a, b) { return puntosDe[b.id] - puntosDe[a.id]; })
+    .forEach(function (c) {
+      opciones += '<option value="' + escapar(c.id) + '">★ ' + comoTexto(c) +
+        "  (" + puntosDe[c.id] + " pts)</option>";
+    });
+  var resto = CANDIDATOS.filter(function (c) { return idsMejores.indexOf(c.id) === -1; });
+  if (resto.length) {
+    opciones += '<optgroup label="Los demás pedidos sin guía">';
+    resto.forEach(function (c) { opciones += '<option value="' + escapar(c.id) + '">' + comoTexto(c) + "</option>"; });
+    opciones += "</optgroup>";
+  }
+
+  return '<div class="asignar">' +
+    '<select class="selPedido" data-pagina="' + f.pagina + '">' + opciones + "</select>" +
+    '<button type="button" class="btnAsignar" data-pagina="' + f.pagina + '">' +
+      "📲 Es este cliente, mandale la guía</button>" +
+    '<div class="asignarMsg"></div>' +
+    "</div>";
+}
+
 function pintarPareo(d) {
+  CANDIDATOS = d.candidatos || [];
   var tb = document.querySelector("#tablaPareo tbody");
   tb.innerHTML = "";
   d.filas.forEach(function (f) {
@@ -291,7 +366,7 @@ function pintarPareo(d) {
       '<span class="sub">' + [f.etiqueta.ciudad, (f.etiqueta.telefonos || []).join(" / ")].filter(Boolean).join(" · ") + "</span>";
     var destino = f.pedido
       ? "<b>" + f.pedido.nombre + "</b><span class=\\"sub\\">→ manda a +" + f.destino + " · " + f.pedido.total + "</span>"
-      : '<span class="motivo">' + (f.motivo || "sin determinar") + "</span>";
+      : '<span class="motivo">' + (f.motivo || "sin determinar") + "</span>" + cajonDeAsignar(f);
     var cert = f.enviar
       ? '<span class="cert ' + claseCert(f.certeza) + '">' + f.certeza + "</span>"
       : "—";
@@ -319,11 +394,70 @@ function pintarPareo(d) {
   mostrar(
     fuera ? "info" : "ok",
     "Se leyeron " + d.filas.length + " hoja(s): " + listas + " lista(s) para enviar" +
-      (fuera ? " y " + fuera + " que NO se van a enviar (mirá el motivo en la tabla)." : ".") +
+      (fuera
+        ? " y " + fuera + " que NO se envían solas (mirá el motivo en la tabla). " +
+          "Si sabés de quién es alguna, elegí el cliente ahí mismo y mandásela."
+        : ".") +
       " Todavía no se envió nada."
   );
   btnEnviar.disabled = listas === 0;
 }
+
+// ── ASIGNAR A MANO ──────────────────────────────────────────────────────────
+// Un solo oyente en la tabla y no uno por botón: las filas se crean y se
+// destruyen cada vez que se revisa, y los oyentes por botón se perdían.
+document.getElementById("tablaPareo").addEventListener("click", function (ev) {
+  var btn = ev.target.closest ? ev.target.closest(".btnAsignar") : null;
+  if (!btn) return;
+
+  var caja = btn.closest(".asignar");
+  var msg = caja.querySelector(".asignarMsg");
+  var sel = caja.querySelector(".selPedido");
+  var pagina = Number(btn.getAttribute("data-pagina"));
+
+  if (!plan) { msg.className = "asignarMsg mal"; msg.textContent = "Subí el PDF y dale Revisar primero."; return; }
+  if (!sel.value) { msg.className = "asignarMsg mal"; msg.textContent = "Elegí primero de qué cliente es."; return; }
+
+  var quien = sel.options[sel.selectedIndex].textContent.replace(/^★ /, "");
+  // 🔒 Confirmación con el nombre adentro: la etiqueta lleva la dirección y el
+  // teléfono impresos, así que mandarla al cliente equivocado le filtra datos a
+  // un desconocido y no se puede deshacer.
+  if (!confirm("Se le va a mandar la guía de la hoja " + pagina + " a:\\n\\n" + quien +
+               "\\n\\n¿Es esa persona?")) return;
+
+  btn.disabled = true;
+  msg.className = "asignarMsg";
+  msg.textContent = "Enviando...";
+
+  fetch("/guias/asignar?token=" + encodeURIComponent(TOKEN), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: plan.id, pagina: pagina, pedidoId: sel.value })
+  })
+    .then(function (r) {
+      if (r.status === 403) throw new Error("la clave del panel no coincide. Abrí el panel de nuevo.");
+      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
+      return r.json();
+    })
+    .then(function (d) {
+      if (!d.ok) {
+        msg.className = "asignarMsg mal";
+        msg.textContent = "🔴 " + (d.error || "no se pudo enviar");
+        btn.disabled = false;
+        return;
+      }
+      msg.className = "asignarMsg ok";
+      msg.textContent = "✅ Enviada a " + d.nombre + " (+" + d.telefono + ").";
+      sel.disabled = true;
+      // El botón queda deshabilitado: la guía ya salió y el servidor la bloquea
+      // igual si se insiste.
+    })
+    .catch(function (e) {
+      msg.className = "asignarMsg mal";
+      msg.textContent = "🔴 " + e.message;
+      btn.disabled = false;
+    });
+});
 
 // ── PASO 2: ENVIAR ──────────────────────────────────────────────────────────
 btnEnviar.addEventListener("click", function () {

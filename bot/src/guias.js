@@ -104,6 +104,34 @@ function palabrasNombre(nombre) {
     .filter((p) => p.length >= 3 && !RUIDO.has(p));
 }
 
+/**
+ * Las palabras con las que se puede reconocer un municipio.
+ *
+ * 🔴 28-SEP, Y ESTO DEJÓ UNA GUÍA SIN ENVIAR. Antes se usaba SOLO la primera
+ * palabra de la ciudad, y solo si tenía 4 letras o más:
+ *
+ *     const ciudadPedido = normalizar(pedido.ciudad).split(" ")[0];
+ *     if (ciudadPedido && ciudadPedido.length >= 4)
+ *
+ * En "La Playa" la primera palabra es "LA": 2 letras. La ciudad NO se comparaba
+ * nunca y se perdían sus 10 puntos. Reproducido con 8 municipios reales —La
+ * Playa, El Cerrito, La Dorada, Los Patios, La Unión, El Bagre, San Gil, La
+ * Virginia—: los 8 se quedaban en 45 puntos, justo abajo del mínimo de 50, que
+ * es EXACTAMENTE el número que reportó el dueño.
+ *
+ * Colombia tiene decenas de municipios así. Ahora se miran todas las palabras
+ * del nombre y alcanza con que una coincida.
+ *
+ * ⚠️ Se aceptan palabras de 3 letras (para "San GIL", "La CEJA") pero se buscan
+ * con límite de palabra exacto. La ciudad vale 10 puntos y por sí sola nunca
+ * llega al mínimo de 50, así que un acierto de casualidad no manda nada.
+ */
+function palabrasCiudad(ciudad) {
+  return normalizar(ciudad)
+    .split(/[\s,]+/)
+    .filter((p) => p.length >= 3 && !RUIDO.has(p));
+}
+
 // ============================================================================
 // LEER EL PDF
 // ============================================================================
@@ -199,10 +227,31 @@ function extraerCampos(lineas, opciones = {}) {
   // --- Teléfonos del destinatario ---
   // Todos los celulares colombianos de la etiqueta MENOS el del remitente
   // (BikerPro va impreso como remitente y es un 10 dígitos igual que el resto).
+  //
+  // 🔴 28-SEP: ANTES SOLO SE BUSCABA /\b(3\d{9})\b/, Y ESO PIERDE EL TELÉFONO EN
+  // TRES FORMATOS QUE LAS TRANSPORTADORAS IMPRIMEN TODO EL TIEMPO.
+  //
+  // Reproducido, las tres se quedaban sin teléfono:
+  //   "315 555 1234"   normalizar() CONSERVA los espacios, así que no matchea
+  //   "315-555-1234"   y también conserva los guiones
+  //   "573155551234"   el \b de adelante lo rompe el "57" pegado
+  //
+  // Y un teléfono vale 50 puntos: es la señal que por sí sola alcanza el mínimo.
+  // Perderlo es la diferencia entre enviar la guía y dejar al cliente esperando.
   const telefonos = new Set();
-  for (const m of plano.matchAll(/\b(3\d{9})\b/g)) {
-    const t = tel10(m[1]);
-    if (t && t !== telefonoRemitente) telefonos.add(t);
+  const agregarTel = (crudo) => {
+    const t = tel10(crudo);
+    // 10 dígitos que empiezan en 3: un celular colombiano. Nada más entra.
+    if (!/^3\d{9}$/.test(t)) return;
+    if (t === telefonoRemitente) return;
+    telefonos.add(t);
+  };
+  // 1) Pegado, con o sin indicativo: 3155551234 · 573155551234 · 5713155551234
+  for (const m of plano.matchAll(/\b(?:57)?(3\d{9})\b/g)) agregarTel(m[1]);
+  // 2) Partido con espacios o guiones, en los cortes que se ven en las etiquetas:
+  //    315 555 1234 · 315-555-1234 · 3155 551234 · 315 5551234
+  for (const m of plano.matchAll(/(?:^|[^0-9])(?:57[\s-]?)?(3\d{2}[\s-]\d{3}[\s-]?\d{4}|3\d{2}[\s-]\d{7}|3\d{3}[\s-]\d{6})(?![0-9])/g)) {
+    agregarTel(m[1]);
   }
 
   // --- Nombre del destinatario ---
@@ -303,10 +352,17 @@ function puntuar(campos, pedido) {
   // --- Ciudad (10) ---
   // Vale poco a propósito: Bogotá es ~30% de los pedidos, así que coincidir en
   // ciudad casi no informa. Sirve de desempate, no de prueba.
-  const ciudadPedido = normalizar(pedido.ciudad).split(" ")[0];
-  if (ciudadPedido && ciudadPedido.length >= 4) {
-    const donde = campos.ciudad ? normalizar(campos.ciudad) : campos.plano;
-    if (donde.includes(ciudadPedido)) {
+  //
+  // 🔑 TODAS las palabras del municipio, no solo la primera: ver palabrasCiudad.
+  // Con solo la primera, "La Playa" no se comparaba nunca porque "LA" tiene 2
+  // letras, y eso dejó la guía de un cliente real en 45 de 50.
+  const palabrasDeCiudad = palabrasCiudad(pedido.ciudad);
+  if (palabrasDeCiudad.length) {
+    // Se busca en el rótulo de ciudad si existe, y también en toda la etiqueta:
+    // hay formatos donde el municipio va pegado al departamento o a la oficina.
+    const donde = campos.ciudad ? normalizar(campos.ciudad) + " " + campos.plano : campos.plano;
+    const cual = palabrasDeCiudad.find((p) => new RegExp(`\\b${p}\\b`).test(donde));
+    if (cual) {
       puntos += PESOS.ciudad;
       senales.push("ciudad");
     }
@@ -316,8 +372,55 @@ function puntuar(campos, pedido) {
 }
 
 /**
+ * Explica QUÉ señal faltó para llegar al mínimo.
+ *
+ * 🔴 POR QUÉ EXISTE (28-sep). El mensaje era "no corresponde a ningún pedido
+ * (mejor coincidencia 45 de 50 necesarios)". El dueño lo leyó y preguntó, con
+ * razón: "no sé por qué, como que no la reconoce". Ese texto no dice CONTRA
+ * QUIÉN casi coincidió ni QUÉ le faltó, así que no hay nada que hacer con él.
+ *
+ * Ahora dice las dos cosas, y con eso se arregla el dato en el pedido y la
+ * próxima vez cruza solo.
+ */
+function porQueNoAlcanzo(campos, mejor) {
+  if (!mejor || !mejor.pedido) return "";
+  const p = mejor.pedido;
+  const faltas = [];
+  const tiene = (s) => (mejor.senales || []).some((x) => x.startsWith(s));
+
+  if (!tiene("celular del pedido") && !tiene("número de WhatsApp")) {
+    const suyos = [tel10(p.celular), esBsuid(p.telefono_chat) ? "" : tel10(p.telefono_chat)]
+      .filter(Boolean)
+      .filter((v, i, a) => a.indexOf(v) === i);
+    faltas.push(
+      campos.telefonos.length
+        ? `el teléfono de la etiqueta (${campos.telefonos.join(", ")}) no es el del pedido (${suyos.join(" ni ") || "el pedido no tiene teléfono"})`
+        : "en la etiqueta no se pudo leer ningún celular"
+    );
+  }
+  if (!tiene("nombre")) faltas.push("el nombre del pedido no aparece en la etiqueta");
+  else if (tiene("nombre parcial")) faltas.push("el nombre coincide solo en parte");
+
+  if (!tiene("dirección")) {
+    faltas.push(
+      numerosDireccion(p.direccion).size
+        ? "los números de la dirección no coinciden"
+        : "el pedido no tiene dirección guardada (normal si va a una oficina)"
+    );
+  }
+  if (!tiene("ciudad")) {
+    faltas.push(
+      palabrasCiudad(p.ciudad).length
+        ? `la ciudad del pedido (${p.ciudad}) no aparece en la etiqueta`
+        : "el pedido no tiene ciudad guardada"
+    );
+  }
+  return faltas.length ? ". Le faltó: " + faltas.join("; ") : "";
+}
+
+/**
  * Elige el pedido de esta etiqueta, o explica por qué no se puede.
- * @returns {{pedido:object|null, certeza:number, senales:string[], motivo:string|null, segundo:number}}
+ * @returns {{pedido:object|null, certeza:number, senales:string[], motivo:string|null, segundo:number, mejores:Array}}
  */
 function emparejar(campos, pedidos) {
   const puntajes = pedidos
@@ -327,15 +430,34 @@ function emparejar(campos, pedidos) {
   const mejor = puntajes[0];
   const segundo = puntajes[1]?.puntos || 0;
 
+  // Los 3 más parecidos, para que el panel pueda ofrecerlos y el dueño elija a
+  // mano cuando el pareo automático no alcanza. Sin esto, una guía que no cruza
+  // no tiene ninguna salida: es lo que le pasó con la de Henry Mendoza.
+  const mejores = puntajes
+    .filter((p) => p.puntos > 0)
+    .slice(0, 3)
+    .map((p) => ({ pedidoId: p.pedido.id || p.pedido.fecha, puntos: p.puntos, senales: p.senales }));
+
   if (!mejor || mejor.puntos < MINIMO) {
     return {
       pedido: null,
       certeza: mejor ? Math.min(100, mejor.puntos) : 0,
       senales: mejor?.senales || [],
       segundo,
-      motivo: pedidos.length
-        ? `no corresponde a ningún pedido (mejor coincidencia ${mejor ? mejor.puntos : 0} de ${MINIMO} necesarios)`
-        : "no hay pedidos guardados contra los que comparar",
+      mejores,
+      motivo: !pedidos.length
+        ? "no hay pedidos guardados contra los que comparar"
+        : // 🔑 Con 0 puntos NO se nombra a nadie. Decir "el más parecido es Jorge"
+          // cuando Jorge no coincide en nada es peor que no decir nada: manda al
+          // dueño a mirar un pedido que no tiene relación con esta etiqueta.
+          !mejor || mejor.puntos === 0
+          ? "Esta etiqueta no se parece a ningún pedido guardado: ni el nombre, ni el " +
+            "teléfono, ni la ciudad. Puede ser un despacho que no pasó por el bot. " +
+            "Si sabés de quién es, asignala abajo."
+          : `El más parecido es ${mejor.pedido?.nombre || "?"} con ${mejor.puntos} de ` +
+            `${MINIMO} puntos, así que no se envía solo` +
+            porQueNoAlcanzo(campos, mejor) +
+            ". Si sabés de quién es, asignala abajo.",
     };
   }
 
@@ -365,9 +487,11 @@ function emparejar(campos, pedidos) {
       certeza: Math.min(100, mejor.puntos),
       senales: mejor.senales,
       segundo,
+      mejores,
       motivo:
         `empate entre ${empatados} (${mejor.puntos} vs ${segundo}). ` +
-        "No se envía: mandarle a un cliente la dirección y el teléfono de otro es filtrar datos personales.",
+        "No se envía solo: mandarle a un cliente la dirección y el teléfono de otro es filtrar " +
+        "datos personales. Si sabés cuál es, asignala abajo.",
     };
   }
 
@@ -376,6 +500,7 @@ function emparejar(campos, pedidos) {
     certeza: Math.min(100, mejor.puntos),
     senales: mejor.senales,
     segundo,
+    mejores,
     motivo: null,
   };
 }
@@ -423,6 +548,9 @@ async function procesarPDF(buffer, pedidos, opciones = {}) {
     // etiqueta). Mismo patrón que los pedidos duplicados del 22-sep.
     if (campos.guia && guiasVistas.has(campos.guia)) {
       fila.motivo = `la guía ${campos.guia} ya venía en la página ${guiasVistas.get(campos.guia)} de este mismo PDF`;
+      // ⛔ No se ofrece asignarla a mano: es la MISMA guía de otra hoja, así que
+      // asignarla sería mandarle dos veces lo mismo a alguien.
+      fila.asignable = false;
       filas.push(fila);
       continue;
     }
@@ -431,8 +559,12 @@ async function procesarPDF(buffer, pedidos, opciones = {}) {
     // Guía ya avisada en una corrida anterior: no se repite el mensaje.
     const previa = campos.guia && opciones.yaEnviada ? opciones.yaEnviada(campos.guia) : null;
     if (previa) {
-      fila.motivo = `ya se le envió el ${new Date(previa.fecha).toLocaleString("es-CO", { timeZone: "America/Bogota" })}`;
+      fila.motivo =
+        `ya se le envió a ${previa.nombre || "un cliente"} el ` +
+        new Date(previa.fecha).toLocaleString("es-CO", { timeZone: "America/Bogota" });
       fila.yaEnviada = previa;
+      // ⛔ Tampoco: ya salió. Reenviarla confunde al cliente.
+      fila.asignable = false;
       filas.push(fila);
       continue;
     }
@@ -443,6 +575,12 @@ async function procesarPDF(buffer, pedidos, opciones = {}) {
     fila.senales = r.senales;
     fila.motivo = r.motivo;
     fila.enviar = Boolean(r.pedido);
+    // Los más parecidos viajan al panel para poder asignar a mano cuando el
+    // puntaje no alcanza.
+    fila.mejores = r.mejores || [];
+    // Se puede asignar a mano solo si NO se pudo parear sola. Las que ya tienen
+    // dueño no necesitan que nadie elija.
+    fila.asignable = !fila.enviar;
     filas.push(fila);
   }
 
@@ -544,8 +682,8 @@ function nombreArchivo(guia) {
 
 module.exports = {
   PESOS, MINIMO, MARGEN, TRANSPORTADORAS,
-  normalizar, tel10, numerosDireccion, palabrasNombre,
-  lineasPorPagina, partirHojas, extraerCampos,
+  normalizar, tel10, numerosDireccion, palabrasNombre, palabrasCiudad,
+  porQueNoAlcanzo, lineasPorPagina, partirHojas, extraerCampos,
   puntuar, emparejar, procesarPDF, destinoDe,
   transportadoraDe, textoParaCliente, nombreArchivo,
 };
