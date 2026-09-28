@@ -2,6 +2,7 @@
 // Guarda conversaciones, pedidos y estado de "pausa" (cuando un humano toma el chat).
 const fs = require("fs");
 const path = require("path");
+const cotizacion = require("./cotizacion");
 
 // ============================================================================
 // 🔴 DÓNDE SE GUARDAN LOS DATOS — LO MÁS IMPORTANTE DE ESTE ARCHIVO
@@ -867,8 +868,65 @@ function pedidosDelMismoCliente(orders, nuevo) {
     .reverse();
 }
 
-const mismoPedido = (a, b) =>
-  Number(a.total) === Number(b.total) && String(a.talla || "") === String(b.talla || "");
+// ============================================================================
+// 🔴 «XL» Y «XL Y XL» SON EL MISMO PEDIDO — caso Heber (27-sep)
+//
+// LO QUE HABÍA: `mismoPedido` comparaba el total (numérico) y la talla como
+// CADENA CRUDA. Eso significa que el mismo pedido escrito de otra forma no se
+// reconocía como duplicado:
+//
+//   {total:155000, talla:"XL", unidades:2}         (del 25)
+//   {total:155000, talla:"XL y XL", unidades:2}    (del 27)
+//   String("XL") === String("XL y XL")  →  false   →  se guardaba otro pedido
+//
+// 🔑 Se compara por SIGNIFICADO, usando lo que ya existe en cotizacion.js:
+// `unidadesDelPedido` y `tallasDelPedido` normalizan desde antes, y `mismoDestino`
+// resuelve municipio/departamento. Acá solo se juntan.
+//
+// ⚠️ Y esto NO puede volverse un candado que mate una compra real. Este predicado
+// solo se usa desde `esPedidoDuplicado`, que además exige mismo cliente y una
+// ventana de tiempo corta. Una segunda compra explícita se atiende por otro camino
+// (posventa.pideOtraCompra), no anulando esta comparación.
+// ============================================================================
+
+/** Las tallas del pedido como multiconjunto normalizado: ["L","XL"] → "l|xl". */
+const firmaDeTallas = (o) => {
+  const tallas = cotizacion.tallasDelPedido(o) || [];
+  return tallas
+    .map((t) => String(t).toLowerCase().replace(/[^a-z0-9]/g, ""))
+    .sort()
+    .join("|");
+};
+
+// ⚠️ EL COLOR Y LA CIUDAD NO ENTRAN ACÁ, y lo comprobé al revés: al meterlos, la
+// prueba "el pedido anterior YA estaba confirmado" empezó a crear DOS registros
+// cuando el cliente mandaba el mismo pedido con el color corregido. Un color
+// distinto es una CORRECCIÓN del mismo pedido, no una compra nueva, y de eso ya se
+// encarga `diferenciasEntre` sobre CAMPOS_DEL_PRODUCTO — que además lo deja
+// marcado en vez de sobrescribirlo en silencio.
+//
+// Lo que rompió el caso Heber fue solo la TALLA comparada como cadena cruda, así
+// que el arreglo se queda ahí: total + unidades + tallas por significado.
+const mismoPedido = (a, b) => {
+  if (Number(a.total) !== Number(b.total)) return false;
+
+  // Unidades por significado: el campo, la talla enumerada o el texto del producto.
+  if (cotizacion.unidadesDelPedido(a).uds !== cotizacion.unidadesDelPedido(b).uds) return false;
+
+  // Tallas como multiconjunto: "XL" vs "XL y XL" con 2 unidades es lo mismo si el
+  // conjunto de tallas coincide o si uno de los dos no las detalla.
+  const ta = firmaDeTallas(a);
+  const tb = firmaDeTallas(b);
+  if (ta && tb && ta !== tb) {
+    // ⚠️ Excepción medida: una talla repetida y la misma talla dicha una sola vez
+    // para dos unidades son la misma cosa ("XL" con unidades:2 ≡ "XL y XL").
+    const unicasA = [...new Set(ta.split("|"))].join("|");
+    const unicasB = [...new Set(tb.split("|"))].join("|");
+    if (unicasA !== unicasB) return false;
+  }
+
+  return true;
+};
 
 /**
  * El pedido previo del MISMO cliente que quedó esperando el "sí", dentro de la
@@ -943,6 +1001,63 @@ const CAMPOS_DE_IDENTIDAD = ["nombre", "celular"];
 // aun así, solo con una corrección identificable de por medio.
 const CAMPOS_DE_ENTREGA = ["direccion", "pago"];
 
+// ============================================================================
+// 🧽 LO COSMÉTICO NO ES UNA DIFERENCIA
+//
+// 🔴 DEL FIN DE SEMANA 25-27: demasiados pedidos válidos obligaron al dueño a
+// entrar al chat para descubrir que no había ningún problema. Varias de esas
+// marcas salían de comparar cadenas crudas con `toLowerCase()`:
+//
+//   "casa naranja"        vs "casa color naranja"      → se leía como cambio
+//   "Cra 5 # 4-3"         vs "cra 5 #4-3"              → idem
+//   "Santa Bárbara"       vs "santa barbara"           → idem
+//   "XL"                  vs "XL y XL" (2 unidades)    → idem
+//
+// 🔑 Se compara por SIGNIFICADO campo por campo. Lo que NO cambia: una dirección
+// de verdad distinta, otra ciudad, otra cantidad o otro total siguen siendo
+// diferencias, y siguen marcando el pedido.
+// ============================================================================
+
+// Ruido que no cambia el significado de una dirección ni de un color.
+const PALABRAS_DE_RELLENO = new Set(["color", "de", "del", "la", "el", "los", "las", "un", "una", "y"]);
+
+const aplanarTexto = (v) =>
+  String(v == null ? "" : v)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .split(" ")
+    .filter((w) => w && !PALABRAS_DE_RELLENO.has(w))
+    .join(" ")
+    .trim();
+
+/** ¿Los dos valores de ESTE campo significan lo mismo? */
+function mismoValorDeCampo(campo, a, b) {
+  if (campo === "total" || campo === "unidades") {
+    return Number(a || 0) === Number(b || 0);
+  }
+  if (campo === "ciudad") {
+    return cotizacion.mismoDestino(String(a || ""), String(b || ""));
+  }
+  if (campo === "talla") {
+    const f = (v) =>
+      cotizacion
+        .tallasDelPedido({ talla: v })
+        .map((t) => String(t).toLowerCase().replace(/[^a-z0-9]/g, ""))
+        .sort()
+        .join("|");
+    const fa = f(a);
+    const fb = f(b);
+    if (fa && fb && fa === fb) return true;
+    // "XL" y "XL y XL" son la misma talla repetida.
+    const unicas = (s) => [...new Set(s.split("|"))].join("|");
+    if (fa && fb && unicas(fa) === unicas(fb)) return true;
+    return aplanarTexto(a) === aplanarTexto(b);
+  }
+  return aplanarTexto(a) === aplanarTexto(b);
+}
+
 /** Las diferencias entre dos pedidos, separadas por lo que significan. */
 function diferenciasEntre(viejo, nuevo, campos) {
   const fuera = [];
@@ -950,7 +1065,7 @@ function diferenciasEntre(viejo, nuevo, campos) {
     const a = String(nuevo[campo] == null ? "" : nuevo[campo]).trim();
     const b = String(viejo[campo] == null ? "" : viejo[campo]).trim();
     if (!a) continue; // vacío no corrige ni contradice nada
-    if (a.toLowerCase() === b.toLowerCase()) continue;
+    if (mismoValorDeCampo(campo, a, b)) continue;
     fuera.push({ campo, viejo: b, nuevo: a });
   }
   return fuera;
@@ -1059,7 +1174,29 @@ function saveOrder(order, contexto = {}) {
     ensure();
     const orders = readJSON(ORDERS_FILE, []);
 
-    const repetido = esPedidoDuplicado(orders, record);
+    // ======================================================================
+    // 🔴 EL ANTI-DUPLICADOS NO PUEDE COMERSE UNA SEGUNDA COMPRA REAL
+    //
+    // Lo encontré probando el caso Heber: cuando pidió "quiero otros dos para mi
+    // hermano" —mismo producto, misma ciudad, mismo total—, `esPedidoDuplicado` lo
+    // leyó como el modelo reemitiendo el mismo bloque y lo ignoró. O sea que la
+    // mejora de la equivalencia semántica de tallas, sola, habría cambiado un
+    // pedido fantasma por una venta perdida.
+    //
+    // 🔑 `compra_adicional` lo pone el agente solo cuando el cliente lo pidió con
+    // palabras y ya pasó el candado de confirmación. Eso es decisión del cliente,
+    // no una coincidencia de campos, así que el anti-duplicados no aplica.
+    //
+    // ⚠️ El anti-duplicados NO se retira para nada más: el bloque reemitido por el
+    // modelo, que es para lo que existe, se sigue ignorando igual.
+    // ======================================================================
+    const repetido = record.compra_adicional === true ? null : esPedidoDuplicado(orders, record);
+    if (record.compra_adicional === true) {
+      console.log(
+        `🛒 COMPRA ADICIONAL de ${record.nombre || "?"}: el cliente pidió otro pedido ` +
+          `explícitamente, así que NO se aplica el anti-duplicados.`
+      );
+    }
 
     // ======================================================================
     // ✅ LA CONFIRMACIÓN QUE LLEGA DESPUÉS COMPLETA EL PEDIDO, NO CREA OTRO
@@ -1339,10 +1476,37 @@ function saveOrder(order, contexto = {}) {
       return { ...repetido, duplicadoIgnorado: true };
     }
 
+    // ========================================================================
     // Compró antes, pero este pedido es distinto. Puede ser real: se guarda,
     // marcado, para que el dueño lo confirme antes de despachar.
+    //
+    // 🔴 PERO NO TODO CLIENTE REPETIDO ES SOSPECHOSO. Esta marca es la que más
+    // falsos positivos generó el fin de semana del 25-27: mandaba al dueño a
+    // entrar al chat para descubrir que no había ningún problema.
+    //
+    // 🔑 Dos casos quedan fuera, y los dos son inequívocos porque alguien ya los
+    // decidió explícitamente aguas arriba:
+    //
+    //   · `modifica_a` → es una MODIFICACIÓN que el cliente confirmó. El pedido
+    //     anterior es el que está reemplazando, no un duplicado misterioso.
+    //   · `compra_adicional` → el cliente pidió otra compra con palabras
+    //     ("quiero otros dos para mi hermano"). Eso es una venta nueva, y
+    //     marcarla como sospechosa es castigar al mejor cliente.
+    //
+    // ⚠️ Lo que NO cambia: cualquier otro pedido distinto de un cliente que ya
+    // compró sigue marcándose. El anti-duplicados no se retira.
+    // ========================================================================
     const previo = pedidoSospechoso(orders, record);
-    if (previo) {
+    const decididoAdrede = Boolean(record.modifica_a) || record.compra_adicional === true;
+    if (previo && decididoAdrede) {
+      console.log(
+        `🔁 Cliente repetido NO marcado como sospechoso (${record.nombre || "?"}): ` +
+          (record.modifica_a
+            ? `es una modificación confirmada del pedido ${record.modifica_a}.`
+            : "el cliente pidió explícitamente otra compra.")
+      );
+    }
+    if (previo && !decididoAdrede) {
       record.posible_duplicado = true;
       record.pedido_previo_fecha = previo.fecha;
       record.pedido_previo_total = previo.total;
@@ -1662,6 +1826,8 @@ module.exports = {
   // Se exportan para poder probar el candado antiduplicados sin tocar el disco:
   // es el que decide si una venta es real, y de eso dependen el CPA y el cierre.
   esPedidoDuplicado,
+  mismoValorDeCampo,
+  mismoPedido,
   pedidoSospechoso,
   VENTANA_PEDIDO_DUPLICADO_MS,
   guiaYaEnviada, registrarGuiaEnviada, todasLasGuiasEnviadas, anotarGuiaEnPedido,

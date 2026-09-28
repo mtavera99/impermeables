@@ -503,7 +503,52 @@ const PROMO_2_TOTAL = { A: 133000, B: 142000, C: 148000, D: 140000, E: 155000 };
 // Después de pauta dejan entre $13.053 y $13.786 — consistente en todas las
 // bandas, y siempre por encima de lo que deja una unidad a precio lleno
 // ($3.303 a $5.094). Hay pruebas que lo verifican banda por banda.
-const PROMO_2_RESCATE = { A: 123000, B: 132000, C: 138000, D: 137000, E: 145000 };
+//
+// ============================================================================
+// 💰 REVISIÓN 28-SEP — SOLO BAJA LA BANDA E, DE $145.000 A $140.000
+//
+// El caso de Jorge (27-sep) abrió la pregunta de si estos rescates estaban mal
+// calibrados. Se recalculó banda por banda con los costos del propio repositorio:
+//
+//   COSTO_PRODUCTO = $33.000/ud  (analisis/bajar-a-137-22sep.py:18, "costo
+//   $33.000/ud (0-AE, 8-sep)"). Se validó: reproduce EXACTAMENTE los $23.713 y
+//   $36.168 que esta misma tabla publica para banda D.
+//
+// La pauta se paga UNA sola vez y es idéntica vendiendo una o dos, así que se
+// cancela en la comparación: se compara contribución ANTES de pauta.
+//
+//   contribución(1 ud)  = total1 − ENVIO_REAL_1 − 33.000
+//   contribución(2 uds) = total2 − ENVIO_REAL_2 − 66.000
+//   PISO = el total de 2 donde cerrar dos deja lo MISMO que vender una
+//
+// banda │ contrib 1ud │ rescate │ contrib rescate │  PISO   │ sobre el piso
+// ──────┼─────────────┼─────────┼─────────────────┼─────────┼──────────────
+//   A   │   25.094    │ 123.000 │     33.053      │ 115.041 │    +7.959
+//   B   │   23.962    │ 132.000 │     33.403      │ 122.559 │    +9.441
+//   C   │   23.945    │ 138.000 │     33.216      │ 128.729 │    +9.271
+//   D   │   23.713    │ 137.000 │     33.168      │ 127.545 │    +9.455
+//   E   │   23.303    │ 140.000 │     28.786      │ 134.517 │    +5.483
+//
+// 🔑 CONCLUSIÓN: los rescates de A, B, C y D ya eran buenos —cada uno deja entre
+// $7.959 y $9.455 MÁS que vender una sola unidad— así que NO se tocan. No se
+// bajan "por revisar".
+//
+// ⚠️ Y $135.000 nacional en banda E se descartó con números: el piso de E es
+// $134.517, así que a $135.000 cerrar dos aportaría $483 más que vender una. Es
+// un colchón demasiado fino para un precio automatizado, que tiene que absorber
+// novedades, devoluciones y costos que este cálculo no captura.
+//
+// Decisión del dueño (28-sep): banda E baja a $140.000. Sigue siendo mucho más
+// agresivo que los $155.000 de lista y conserva +$5.483 sobre vender una sola.
+//
+// ⚠️ Con COSTO_PRODUCTO = $34.000 (el valor que usa analisis/chequeo-escalon1.py)
+// cada piso sube exactamente $1.000, así que la decisión no cambia.
+// ============================================================================
+const PROMO_2_RESCATE = { A: 123000, B: 132000, C: 138000, D: 137000, E: 140000 };
+
+// El costo unitario con el que se calcularon los pisos de arriba. Vive acá para
+// que las pruebas puedan comprobar el margen sin volver a copiar el número.
+const COSTO_PRODUCTO = 33000;
 
 // ============================================================================
 // 🔴 EL ENVÍO QUE SE LE MUESTRA AL CLIENTE (agregado 22-sep por una venta perdida)
@@ -1079,6 +1124,7 @@ module.exports = {
   ENVIO_REAL_1,
   ENVIO_REAL_2,
   PROMO_2_RESCATE,
+  COSTO_PRODUCTO,
   desgloseDe,
   rescateDe,
   FLETE_2_OBSERVADO,

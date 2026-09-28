@@ -204,18 +204,65 @@ chequear(
   "y dice que lo que hay que arreglar es el precio de lista",
   /el problema es el precio de LISTA, no la falta de descuento/i.test(fuente)
 );
-// 23-sep: con el combo a $110.000 + envío, banda D ya NO es la más delgada —
-// era la única desalineada y este cambio la alinea. Ahora las cinco quedan
-// parejas, que es justo lo que se quería.
+// ============================================================================
+// 🔄 28-SEP: LA "PAREJA ENTRE BANDAS" YA NO ES LA POLÍTICA
+//
+// Hasta el 23-sep el criterio era que las cinco bandas quedaran parejas al
+// rescate (todas −$10.000 salvo D). Esta prueba comprobaba justamente eso.
+//
+// El 28-sep el dueño decidió bajar SOLO la banda E, de $145.000 a $140.000, y
+// dejar A-D como estaban. Eso rompe la paridad a propósito: la contribución de E
+// al rescate queda ~$4.600 por debajo de las otras, porque E tiene el flete más
+// alto y el precio de lista más alto.
+//
+// 🔑 Así que la comprobación de paridad se REEMPLAZA por la que de verdad protege
+// la plata, y que además es la regla que el dueño fijó: cerrar DOS al precio de
+// rescate tiene que dejar MÁS contribución que vender UNA a precio de lista. Ese
+// es el piso económico, y es lo que impide que un rescate se coma la venta.
+//
+// ⚠️ La pauta NO entra en esta comparación: se paga una sola vez y es la misma
+// vendiendo una o dos, así que se cancela. Meterla escondería el margen real.
+// ============================================================================
 {
-  const q = (x) => f.PROMO_2_RESCATE[x] - 2 * COSTO_UD - f.ENVIO_REAL_2[x] - PAUTA;
-  const valores = BANDAS.map(q);
-  const spread = Math.max(...valores) - Math.min(...valores);
-  chequear(
-    `las 5 bandas quedan parejas al rescate (se diferencian ${pesos(spread)})`,
-    spread < 2000,
-    `valores: ${BANDAS.map((b) => b + " " + pesos(q(b))).join(", ")}`
-  );
+  const contrib1 = (x) => f.BANDAS[x].total - f.ENVIO_REAL_1[x] - COSTO_UD;
+  const contrib2 = (x, total) => total - f.ENVIO_REAL_2[x] - 2 * COSTO_UD;
+
+  for (const b of BANDAS) {
+    const c1 = contrib1(b);
+    const cr = contrib2(b, f.PROMO_2_RESCATE[b]);
+    chequear(
+      `banda ${b}: el rescate (${pesos(f.PROMO_2_RESCATE[b])}) deja más que vender una (${pesos(cr - c1)} más)`,
+      cr > c1,
+      `contrib 1 ud ${pesos(c1)} vs contrib rescate ${pesos(cr)}`
+    );
+    // Y el precio de lista, obviamente, tiene que dejar todavía más.
+    chequear(
+      `  banda ${b}: la lista (${pesos(f.PROMO_2_TOTAL[b])}) deja más que el rescate`,
+      contrib2(b, f.PROMO_2_TOTAL[b]) > cr
+    );
+  }
+
+  // 🔑 El valor exacto que se decidió, y por qué no fue $135.000.
+  chequear("banda E quedó en $140.000", f.PROMO_2_RESCATE.E === 140000, `${f.PROMO_2_RESCATE.E}`);
+  chequear("A, B, C y D NO se movieron", f.PROMO_2_RESCATE.A === 123000 && f.PROMO_2_RESCATE.B === 132000 && f.PROMO_2_RESCATE.C === 138000 && f.PROMO_2_RESCATE.D === 137000);
+  {
+    // El piso de E: el total de 2 uds donde cerrar dos empata con vender una.
+    const piso = contrib1("E") + f.ENVIO_REAL_2.E + 2 * COSTO_UD;
+    chequear(`el piso de banda E es ${pesos(piso)}`, piso > 134000 && piso < 135000, `${piso}`);
+    chequear(
+      "🔑 $135.000 habría quedado a menos de $1.000 del piso (por eso se descartó)",
+      135000 - piso < 1000 && 135000 - piso > 0,
+      `$135.000 − piso = ${pesos(135000 - piso)}`
+    );
+    chequear(
+      "y $140.000 deja un colchón de más de $5.000 sobre vender una",
+      contrib2("E", 140000) - contrib1("E") > 5000,
+      `${pesos(contrib2("E", 140000) - contrib1("E"))}`
+    );
+  }
+  // El código tiene que explicar la decisión, no solo traer el número.
+  chequear("el código documenta la revisión del 28-sep", /SOLO BAJA LA BANDA E/i.test(fuente));
+  chequear("   y por qué se descartó $135.000", /135\.000 nacional en banda E se descart/i.test(fuente));
 }
 
 console.log("\n── 8. Queda avisado que el piso se mueve con el cierre ──");

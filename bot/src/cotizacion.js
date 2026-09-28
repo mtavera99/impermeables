@@ -220,8 +220,12 @@ function resolverDestino(ciudad) {
 // "dos" pegado a un sustantivo, o como respuesta suelta, o después de un verbo
 // de querer. Antes solo existía la primera forma, así que "quiero 2" y un "dos"
 // suelto —la respuesta más natural a "¿uno o dos?"— se leían como UNA unidad.
+// ⚠️ "otros dos" y "dos más" se agregaron el 28-sep probando el caso Heber: pidió
+// "quiero otros dos para mi hermano" y la cantidad quedaba en UNA, así que el cuadro
+// de $155.000 no cuadraba con una cotización de $85.000 y la venta adicional no se
+// podía cerrar. Una compra adicional también tiene que contar bien las unidades.
 const RE_DOS =
-  /\b(2|dos)\s*(conjuntos?|impermeables?|unidades?|trajes?|kits?|pares?|juegos?|pintas?|equipos?|ternos?)\b|\bcombo\b|\bpromo(?:ci[oó]n)?\s*(?:de\s*)?(?:2|dos)\b|\b(quiero|llevo|me llevo|dame|deme|necesito|ser[ií]an?|son|van|pongame|p[oó]ngame|mande|env[ií]eme)\s*(?:los\s*)?(2|dos)\b|\b(los|las)\s+dos\b|\bambos\b|\bel combo de (2|dos)\b/i;
+  /\b(2|dos)\s*(conjuntos?|impermeables?|unidades?|trajes?|kits?|pares?|juegos?|pintas?|equipos?|ternos?)\b|\bcombo\b|\bpromo(?:ci[oó]n)?\s*(?:de\s*)?(?:2|dos)\b|\b(quiero|llevo|me llevo|dame|deme|necesito|ser[ií]an?|son|van|pongame|p[oó]ngame|mande|env[ií]eme)\s*(?:los\s*|otros\s*|otras\s*)?(2|dos)\b|\b(los|las|otros|otras)\s+(2|dos)\b|\b(2|dos)\s+m[aá]s\b|\bambos\b|\bel combo de (2|dos)\b/i;
 
 const RE_TRES_O_MAS =
   /\b([3-9]|1\d+|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|veinte)\s*(conjuntos?|impermeables?|unidades?|trajes?|kits?|juegos?|pintas?|equipos?|ternos?)\b|\b(al por mayor|por mayor|mayorista|docena|docenas)\b/i;
@@ -229,10 +233,51 @@ const RE_TRES_O_MAS =
 // 🔑 UNA unidad, dicho de verdad. NO alcanza con que aparezca un "1" suelto: una
 // dirección ("Calle 1 #2-3") o un celular traen dígitos, y si eso contara como
 // "pidió una", una dirección borraría el pedido de dos que el cliente ya hizo.
+// ⚠️ Las dos últimas formas se agregaron el 28-sep por el caso de Jorge: "mejor me
+// quedo con uno" y "no entonces uno" no los reconocía ninguna, así que el retroceso
+// de dos a una no se veía y el rescate del combo no se ofrecía.
+//
+// ⚠️ "entonces/pues/así + uno" se exige AL FINAL de la frase o antes de un signo:
+// sin eso, "entonces una pregunta" o "entonces una cosa" contarían como pedir una
+// unidad, y eso sí rompería un pedido de dos.
 const RE_UNO =
-  /\b(1|un|uno|una)\s*(conjunto|impermeable|unidad|traje|kit|juego|pinta|equipo|terno)\b|\b(solo|solamente|nada m[aá]s|[uú]nicamente|apenas)\s*(1|un|uno|una)\b|\b(1|uno|una)\s*(solo|sola|nada m[aá]s)\b|\bmejor (1|uno|una)\b|\bcon (1|uno|una) (basta|me basta|est[aá] bien)\b/i;
+  /\b(1|un|uno|una)\s*(conjunto|impermeable|unidad|traje|kit|juego|pinta|equipo|terno)\b|\b(solo|solamente|nada m[aá]s|[uú]nicamente|apenas)\s*(1|un|uno|una)\b|\b(1|uno|una)\s*(solo|sola|nada m[aá]s)\b|\bmejor (1|uno|una)\b|\bcon (1|uno|una) (basta|me basta|est[aá] bien)\b|\b(?:me quedo con|quedemos en|dejemos en|d[eé]jalo en|dejalo en)\s+(1|uno|una)\b|\b(?:entonces|pues|as[ií])\s+(?:mejor\s+)?(1|uno|una)\s*(?:$|[.,;!?])/i;
 const RE_SOLO_UN_NUMERO = /^\s*(1|uno|una)\s*$/i;
 const RE_SOLO_DOS = /^\s*(2|dos)\s*$/i;
+
+// ============================================================================
+// 🔴 PREGUNTAR POR DOS ES PEDIR EL PRECIO DE DOS — casos Diana y Johana (27-sep)
+//
+// LO QUE PASÓ. Diana escribió **"Si se piden 2 cuánto seria el costo"** y el bot le
+// contestó **$73.000**, que es el total de UNA unidad. Después tuvo que corregirse
+// hasta $133.000. Johana, con una compra de $83.000 ya hecha, preguntó por dos y
+// recibió $83.000 → $140.000 → "tienes razón, son $110.000" → $140.000 otra vez.
+//
+// 🔎 REPRODUCIDO: `cantidadDelHilo("Si se piden 2 cuánto seria el costo")` → uds 1.
+// `RE_DOS` pedía o un sustantivo detrás del número ("2 conjuntos") o un verbo de
+// una lista corta —quiero, llevo, dame…— y "se piden" no estaba. Lo mismo con
+// "si pido 2 cuanto sale" y "cuánto por dos".
+//
+// 🔑 Si el cliente pregunta el precio de DOS, la cotización del turno tiene que ser
+// de dos. Si no, el código tiene una cantidad y el modelo otra, y de ahí salen los
+// números contradictorios que destruyen la confianza.
+// ============================================================================
+
+// "si pido 2", "si se piden 2", "si llevo dos", "si compro 2", "si saco dos"
+const RE_CONDICIONAL_DOS =
+  /\bsi\s+(?:se\s+)?(?:pido|pide|piden|pedir[ií]a|llevo|lleva|llevan|llevar[ií]a|compro|compra|compran|comprar[ií]a|saco|encargo)\s+(?:los\s+)?(?:2|dos)\b/i;
+
+// "cuánto por dos", "cuánto valen dos", "precio de dos", "cuánto serían 2",
+// "cuánto sale llevando dos". Se exige la palabra de precio cerca, para que una
+// dirección ("Cra 2") no pueda disparar esto.
+const RE_PRECIO_DE_DOS =
+  /\b(?:cu[aá]nto|precio|valor|costo|coste|total)\b[^.?!\n]{0,28}?\b(?:por|de|ser[ií]an?|salen?|valen?|cuestan?|quedan?|llevando|comprando|con)\s+(?:los\s+)?(?:2|dos)\b/i;
+
+/** ¿El cliente está preguntando el precio de DOS unidades? */
+function preguntaPorDos(texto) {
+  const t = String(texto == null ? "" : texto);
+  return RE_CONDICIONAL_DOS.test(t) || RE_PRECIO_DE_DOS.test(t);
+}
 
 /**
  * @param {string} texto    lo que dijo el cliente (este turno o la ventana)
@@ -396,7 +441,9 @@ function resolverCantidad(texto, previa) {
   if (RE_UNO.test(t) || RE_SOLO_UN_NUMERO.test(t)) {
     return { uds: 1, escalar: false, explicita: true, heredada: false };
   }
-  if (RE_DOS.test(t) || RE_SOLO_DOS.test(t)) {
+  // ⚠️ `preguntaPorDos` va DESPUÉS de RE_UNO a propósito: si el cliente dice
+  // "solo uno, ¿y cuánto por dos?" manda lo que declaró, no la pregunta.
+  if (RE_DOS.test(t) || RE_SOLO_DOS.test(t) || preguntaPorDos(t)) {
     return { uds: 2, escalar: false, explicita: true, heredada: false };
   }
 
@@ -1005,6 +1052,45 @@ function destinoDelHilo(conv, userText) {
   const establecido = (conv && conv.cotizacion && conv.cotizacion.ciudad) || "";
   const enEsteTurno = ciudadesEn(userText || "");
 
+  // ==========================================================================
+  // 🔴 EL NOMBRE DEL CLIENTE NO PUEDE CONTAMINAR EL MUNICIPIO
+  //
+  // Casos Lenin y Henrry (27-sep). El bot preguntó la ciudad, y el cliente contestó
+  // con TODO junto:
+  //
+  //   "Lenin Gómez Martínez Turbana Bolivar"  → municipioEn → "Lenin Gómez Martínez Turbana"
+  //   "Henrry Mendoza San pelayo Córdoba …"   → municipioEn → "Henrry Mendoza San pelayo"
+  //
+  // 🔎 CAUSA: `ciudadPlausible` admite hasta 4 palabras y no tiene forma de saber
+  // que las primeras son un nombre de persona. Al quitar el departamento quedaban
+  // exactamente 4 y las aceptaba enteras. Después el pedido decía "Turbana" y la
+  // cotización "Lenin Gómez Martínez Turbana" → ciudad_distinta.
+  //
+  // 🔑 LA EVIDENCIA QUE SÍ SIRVE: los dos habían dado su ciudad ANTES. Si el
+  // cliente vuelve a escribirla dentro del mensaje de datos, ese destino ya estaba
+  // establecido y no hay nada que decidir. La regla de #171 ya hacía esto, pero solo
+  // cuando la ciudad estaba en el tarifario —y Turbana, San Pelayo y compañía no
+  // están—, así que nunca llegaba a correr.
+  //
+  // ⚠️ Solo aplica en mensajes de DATOS y sin marca de corrección: un cambio real de
+  // ciudad sigue cambiando el destino.
+  // ==========================================================================
+  // ⚠️ Con la MISMA guarda que la regla de #171: si el mensaje nombra OTRA ciudad
+  // como destino, acá no se decide nada. Sin esto, "para Palmira, no Cali" se
+  // quedaba con Cali en vez de preguntar — lo comprobé rompiendo esa prueba.
+  const otraNombradaComoDestino = enEsteTurno.some(
+    (x) => fletes.normalizar(x) !== fletes.normalizar(establecido) && senalDeDestinoPara(userText, x)
+  );
+  if (
+    establecido &&
+    !otraNombradaComoDestino &&
+    mencionaLaCiudad(userText, establecido) &&
+    esMensajeDeDatos(userText, messages) &&
+    !RE_CORRIGE_DESTINO.test(String(userText || ""))
+  ) {
+    return { ciudad: establecido, varias: [], origen: "el_cliente_repitio_su_destino" };
+  }
+
   if (enEsteTurno.length) {
     // ======================================================================
     // 🔑 SEGUNDA RED: EL CLIENTE REPITIÓ SU PROPIO DESTINO
@@ -1198,6 +1284,48 @@ function cantidadDelHilo(conv, userText, previa) {
   return resolverCantidad("", previa);
 }
 
+// ============================================================================
+// 🔴 PARA OFRECER EL COMBO HAY QUE SEGUIR SABIENDO CUÁNTO VALE
+//
+// Esto es lo que faltaba para que el rescate de Jorge pudiera existir. Cuando el
+// cliente retrocede de dos a una, `cantidadDelHilo` pasa a 1 unidad — correcto — y
+// con eso la cotización PIERDE el rescate del combo, que solo existe con uds === 2.
+//
+// O sea: justo en el turno donde hay que ofrecer los dos a precio de rescate, el
+// código ya no tiene ese número. Por eso el rescate no se ofrecía nunca, ni siquiera
+// cuando la objeción se detectaba.
+//
+// 🔑 `comboDeRescate` conserva el total de DOS al precio autorizado de la banda,
+// aunque la cotización vigente sea de una. No cambia el precio de la venta actual:
+// es el número que el bot puede ofrecer una vez.
+// ============================================================================
+
+/** El combo de 2 al precio de rescate para esta ciudad, o null. */
+function comboDeRescateDe(ciudad) {
+  const q = fletes.cotizar(ciudad, 2);
+  if (!q || !q.rescate || !Number.isFinite(Number(q.rescate))) return null;
+  return { uds: 2, total: Number(q.total), rescate: Number(q.rescate) };
+}
+
+/**
+ * ¿Ya se le ofreció este monto de rescate en el hilo?
+ *
+ * 🔑 El dueño lo pidió explícito: UNA sola vez. Si el bot ya dijo el número, no se
+ * vuelve a autorizar — no se regatea en bucle.
+ */
+function yaSeOfrecioElRescate(messages, monto) {
+  const n = Number(monto);
+  if (!Number.isFinite(n) || n <= 0) return false;
+  const conPunto = n.toLocaleString("es-CO");
+  const sinPunto = String(n);
+  return (messages || []).some(
+    (m) =>
+      m &&
+      m.role === "assistant" &&
+      (String(m.content || "").includes(conPunto) || String(m.content || "").includes(sinPunto))
+  );
+}
+
 function calcular(ciudad, texto, opciones = {}) {
   // Si en el texto del turno hay más de un destino reconocible, no se cotiza: se
   // pregunta cuál es. Elegir una sería adivinar sobre el número que se cobra.
@@ -1329,6 +1457,10 @@ function calcular(ciudad, texto, opciones = {}) {
     // unidad el tope aprobado es $3.000 y se calcula aparte: no hay "precio de
     // rescate" de una unidad en la política vigente.
     rescate: uds === 2 ? q.rescate || null : q.total - TOPE_DESCUENTO_1_UNIDAD,
+    // 🔑 El combo de DOS al precio autorizado, conservado incluso con una unidad
+    // vigente. Solo se adjunta cuando quien llama lo pide, que es cuando el cliente
+    // retrocedió de dos a una por precio. Ver `comboDeRescateDe`.
+    comboDeRescate: opciones.ofrecerComboDeRescate && uds === 1 ? comboDeRescateDe(destino.ciudad) : null,
     politica: POLITICA_VERSION,
     creado: Date.now(),
     firma: `${POLITICA_VERSION}|${fletes.normalizar(String(destino.ciudad || ""))}|${uds}|${q.total}`,
@@ -1495,6 +1627,26 @@ function bloqueDeDatos(cot, contexto = {}) {
         `${fmt(cot.rescate)} como precio final, condicionado a cerrar ahora. ` +
         `No negocies un tercer precio ni encadenes rebajas.`
       : `⛔ NO ofrezcas ni menciones ningún descuento: el cliente no se ha quejado del precio.`) +
+    // ========================================================================
+    // 🔑 EL RESCATE DEL COMBO — caso Jorge. El cliente venía por DOS, vio el total
+    // y retrocedió a UNA por el flete. Antes de aceptar perder la segunda unidad se
+    // ofrece el combo al precio autorizado, UNA sola vez.
+    //
+    // ⚠️ Se vende el TOTAL, no "$110.000 + envío": el cliente compra un total, y
+    // abrir con el desglose es justo lo que le hizo ver el envío duplicado. Si
+    // pregunta el desglose, se le da completo y honesto.
+    // ========================================================================
+    (contexto.objecionDePrecio && cot.comboDeRescate && !contexto.rescateYaOfrecido
+      ? `\n\n🎯 RESCATE DEL COMBO — UNA SOLA VEZ, Y AHORA ES EL MOMENTO\n` +
+        `El cliente venía por DOS y está volviendo a UNA por el precio del envío.\n` +
+        `✅ Antes de aceptar que se quede con una, ofrecele LOS DOS por ` +
+        `${fmt(cot.comboDeRescate.rescate)} TOTAL puestos en ${cot.ciudad}, contraentrega.\n` +
+        `✅ Decilo como TOTAL FINAL ("los dos te quedan en ${fmt(cot.comboDeRescate.rescate)} en total"), ` +
+        `no como "${fmt(fletes.PROMO_2_UNIDADES)} + envío".\n` +
+        `✅ Es un esfuerzo final para cerrar los dos, condicionado a cerrar ahora.\n` +
+        `⛔ Si lo rechaza, NO insistas: cerrá la unidad que quiere sin volver a mencionarlo.\n` +
+        `⛔ NO ofrezcas un tercer precio ni combines este con otro descuento.`
+      : "") +
     aviso
   );
 }
@@ -1586,6 +1738,12 @@ function importesAutorizados(cot, contexto = {}) {
     // la política vigente, y acá es donde se hace cumplir.
     if (contexto.objecionDePrecio && cot.rescate) {
       poner(cot.rescate, "precio de negociación autorizado");
+    }
+    // 🔑 El combo de DOS al precio de rescate, para el turno donde el cliente
+    // retrocedió a una por precio. Solo con objeción, y solo si NO se ofreció ya:
+    // el dueño lo pidió explícito, una sola vez y sin regatear en bucle.
+    if (contexto.objecionDePrecio && cot.comboDeRescate && !contexto.rescateYaOfrecido) {
+      poner(cot.comboDeRescate.rescate, "los DOS al precio de rescate autorizado");
     }
   } else if (cot && cot.motivo === "dificil_con_tarifa" && cot.destino) {
     poner(cot.destino.totalConfirmado, "total confirmado de difícil acceso");
@@ -1760,6 +1918,11 @@ function valoresPorRol(cot, contexto = {}) {
     mapa.get("descuento").add(Number(cot.rescate));
     // Un precio de negociación también se dice como total ("te queda en X").
     mapa.get("total").add(Number(cot.rescate));
+  }
+  // 🔑 Los DOS al precio de rescate se dicen como TOTAL: "los dos te quedan en X".
+  if (contexto.objecionDePrecio && cot.comboDeRescate && !contexto.rescateYaOfrecido) {
+    mapa.get("total").add(Number(cot.comboDeRescate.rescate));
+    mapa.get("descuento").add(Number(cot.comboDeRescate.rescate));
   }
   return mapa;
 }
@@ -2309,6 +2472,158 @@ function mismoDestino(a, b) {
   return mismaTarifa(a, b);
 }
 
+// ============================================================================
+// 🔴 CUANDO EL HILO YA RESOLVIÓ QUE SON EL MISMO SITIO — casos Humberto y Jhon
+//
+// HUMBERTO (27-sep): escribió **"santabara de pinto"**. El sistema lo entendió y le
+// cotizó $85.000, él dio todos sus datos y contestó "Si". El pedido salió con
+// **"Santa Bárbara de Pinto"** y la cotización tenía el texto crudo del cliente, así
+// que `mismoDestino` dijo que no y quedó en PRECIO NO CUADRA.
+//
+// JHON (27-sep): cotizó **Arjona**, después aclaró "Yo vivo en sincerin", y el bot
+// contestó —correctamente— que Sincerín es corregimiento de Arjona, manteniendo los
+// $85.000. El pedido quedó como **"Sincerín, Arjona"** y se frenó igual.
+//
+// 🔑 LA EVIDENCIA ES EL HILO, no el parecido de las cadenas. Se aceptan como el
+// mismo destino solo si se cumplen LAS CUATRO:
+//
+//   1. la tarifa resuelve IGUAL para las dos cadenas (mismo estado, banda y total);
+//   2. ninguno de los dos municipios es de los que se repiten en varios
+//      departamentos —ahí el departamento decide el flete y no se adivina—;
+//   3. comparten al menos una palabra significativa: "Sincerín, Arjona" y "Arjona"
+//      comparten *arjona*; "santabara de pinto" y "Santa Bárbara de Pinto"
+//      comparten *pinto*. Cali y Medellín no comparten nada, así que jamás entran
+//      —aunque las dos sean banda C con el mismo total—;
+//   4. y el BOT nombró ese destino en el hilo, en una frase donde estaba diciendo
+//      a dónde va el paquete. Los mensajes del bot pasan por la validación de
+//      precio, así que no son texto arbitrario.
+//
+// ⚠️ ESTO NO ES FUZZY MATCHING. No hay distancia de edición ni umbral de parecido:
+// hay una condición de tarifa, una de vocabulario compartido y una de evidencia
+// explícita en la conversación. Sin las cuatro, el pedido se sigue frenando.
+// ============================================================================
+
+// El bot diciendo a dónde va el paquete. No alcanza con que mencione la ciudad.
+const RE_BOT_HABLA_DEL_DESTINO =
+  /\b(puesto en|puestos en|env[ií]o a|envi[ao]mos a|enviarlo a|para|en)\b|\b(corregimiento|pertenece|queda en|jurisdicci[oó]n|municipio de)\b/i;
+
+// ============================================================================
+// 🔴 COMPARTIR UNA PALABRA NO ES SER EL MISMO MUNICIPIO
+//
+// 🔎 REPRODUCIDO en la revisión de #173, y era grave:
+//
+//   cotización: Santa Rosa de Cabal   ·   pedido: Santa Rosa de Osos
+//   elHiloResolvioElDestino(...) → true
+//   verificarPedido(...)          → []   sin ningún problema  🔴
+//
+// Las dos están en banda E, cuestan lo mismo y comparten SANTA y ROSA. El criterio
+// de "comparten al menos una palabra significativa" las daba por el mismo sitio, o
+// sea que un paquete podía despacharse a otro municipio sin que nada lo marcara.
+// Igual con "San Pedro de los Milagros" vs "San Pedro de Urabá" y "Puerto Colombia"
+// vs "Puerto Boyacá".
+//
+// 🔑 EL CRITERIO GENERAL, en dos ramas, cada una con su evidencia. Ya no basta con
+// compartir vocabulario: lo que DIFERENCIA a las dos cadenas tiene que estar
+// explicado.
+//
+//   RAMA 1 — CONTENCIÓN CON RELACIÓN DECLARADA.
+//   Los nombres significativos de un lado están contenidos en el otro, y el bot
+//   dijo explícitamente la relación ("Sincerín es CORREGIMIENTO de Arjona"). Eso
+//   cubre el caso de Jhon. No cubre "Santa Rosa de Osos" contra "Santa Rosa",
+//   porque el bot nunca va a decir que Osos es corregimiento de Santa Rosa.
+//
+//   RAMA 2 — LA DIFERENCIA ES LA MISMA PALABRA MAL ESCRITA.
+//   Todo lo compartido coincide, y lo que sobra de cada lado es una variante de
+//   escritura acotada: mismo arranque de al menos 4 letras y longitudes parecidas.
+//   Eso cubre "santabara de pinto" contra "Santa Bárbara de Pinto"
+//   (SANTABARA / SANTABARBARA: arrancan igual en 8 letras). Y NO cubre OSOS contra
+//   CABAL, que no comparten ni una letra inicial.
+//
+// ⚠️ NO es fuzzy matching global: la comparación de escritura se aplica SOLO al
+// residuo, después de exigir que todo lo demás coincida, y sigue dentro de las
+// condiciones de tarifa, ambigüedad y evidencia del bot.
+// ============================================================================
+
+// El bot declarando que un lugar PERTENECE a otro.
+const RE_RELACION_DECLARADA =
+  /\b(corregimiento|vereda|pertenece|queda en|jurisdicci[oó]n|municipio de|zona rural de|area rural de)\b/i;
+
+/** ¿`corta` es una variante de escritura acotada de `larga`? */
+function esVarianteDeEscritura(a, b) {
+  const [corta, larga] = a.length <= b.length ? [a, b] : [b, a];
+  if (!corta || !larga) return false;
+  // Longitudes parecidas: la corta al menos el 70% de la larga.
+  if (corta.length / larga.length < 0.7) return false;
+  // Y el mismo arranque, de al menos 4 letras.
+  let i = 0;
+  while (i < corta.length && corta[i] === larga[i]) i++;
+  return i >= 4;
+}
+
+/** Las palabras significativas de un destino: ["SINCERIN","ARJONA"]. */
+function palabrasDelDestino(valor) {
+  return fletes
+    .normalizar(valor)
+    .split(/\s+/)
+    .filter((w) => w.length >= 4 && !["DEPTO", "DEPARTAMENTO"].includes(w));
+}
+
+/**
+ * ¿El hilo ya estableció que estas dos cadenas son el mismo destino?
+ *
+ * @param {Array} messages   la conversación
+ * @param {string} delPedido la ciudad que trae el pedido
+ * @param {string} deLaCotizacion la ciudad de la cotización vigente
+ */
+function elHiloResolvioElDestino(messages, delPedido, deLaCotizacion) {
+  const a = String(delPedido || "");
+  const b = String(deLaCotizacion || "");
+  if (!a || !b) return false;
+
+  // 1. misma tarifa.
+  if (!mismaTarifa(a, b)) return false;
+
+  // 2. nada ambiguo de por medio.
+  const pa = partesDelDestino(a);
+  const pb = partesDelDestino(b);
+  if (fletes.departamentosPosibles(pa.municipio) || fletes.departamentosPosibles(pb.municipio)) {
+    return false;
+  }
+
+  // 3. 🔑 La DIFERENCIA entre las dos cadenas tiene que estar explicada.
+  const wa = palabrasDelDestino(a);
+  const wb = palabrasDelDestino(b);
+  if (!wa.length || !wb.length) return false;
+
+  const soloEnA = wa.filter((w) => !wb.includes(w));
+  const soloEnB = wb.filter((w) => !wa.includes(w));
+  const compartidas = wa.filter((w) => wb.includes(w));
+  if (!compartidas.length) return false;
+
+  // RAMA 1 — contención: un lado está entero dentro del otro.
+  const hayContencion = soloEnA.length === 0 || soloEnB.length === 0;
+  // RAMA 2 — el residuo de cada lado es la misma palabra mal escrita.
+  const esElMismoNombreMalEscrito =
+    soloEnA.length > 0 &&
+    soloEnB.length > 0 &&
+    esVarianteDeEscritura(soloEnA.join(""), soloEnB.join(""));
+
+  if (!hayContencion && !esElMismoNombreMalEscrito) return false;
+
+  // 4. el bot nombró el destino del pedido, hablando de a dónde va. Y si la
+  // evidencia es una CONTENCIÓN, además tiene que haber declarado la relación:
+  // que un nombre contenga al otro no dice que uno pertenezca al otro.
+  const exigeRelacion = hayContencion && !esElMismoNombreMalEscrito;
+  return (messages || []).some((m) => {
+    if (!m || m.role !== "assistant") return false;
+    const texto = String(m.content || "");
+    if (!RE_BOT_HABLA_DEL_DESTINO.test(texto)) return false;
+    if (exigeRelacion && !RE_RELACION_DECLARADA.test(texto)) return false;
+    const plano = fletes.normalizar(texto);
+    return wa.every((w) => plano.includes(w));
+  });
+}
+
 /**
  * @returns {{ok:boolean, problemas:Array, totalEsperado:number|null}}
  */
@@ -2337,7 +2652,13 @@ function verificarPedido(order, cot, contexto = {}) {
   //
   // 🔑 Pero se compara el DESTINO, no la cadena. Ver `mismoDestino`: acá nacía el
   // PRECIO NO CUADRA de Diana, con "Madrid" y "Madrid, Cundinamarca".
-  const mismaCiudad = mismoDestino(order.ciudad, cot.ciudad);
+  // 🔑 Y si no coinciden como cadenas, se mira si el HILO ya resolvió que son el
+  // mismo sitio (typo que el bot corrigió, corregimiento que el bot explicó). Ver
+  // `elHiloResolvioElDestino`: exige misma tarifa, vocabulario compartido y que el
+  // bot lo haya nombrado como destino.
+  const mismaCiudad =
+    mismoDestino(order.ciudad, cot.ciudad) ||
+    elHiloResolvioElDestino(contexto.messages, order.ciudad, cot.ciudad);
   if (!mismaCiudad) {
     problemas.push({
       tipo: "ciudad_distinta",
@@ -2446,10 +2767,70 @@ function respuestaEnRevision(order) {
 const RE_OBJECION_PRECIO =
   /\b(muy caro|est[aá] caro|car[oa]s?|car[ií]simo|descuento|rebaja|m[aá]s barato|no tengo tanto|no me alcanza|mejor precio|[uú]ltimo precio|se puede menos|me lo deja|baja[rs]?|econ[oó]mico)\b/i;
 
-function hayObjecionDePrecio(mensajes) {
-  return (mensajes || [])
-    .filter((m) => m.role === "user")
-    .some((m) => RE_OBJECION_PRECIO.test(String(m.content || "")));
+// ============================================================================
+// 🔴 EL RESCATE DEL COMBO NUNCA SE DISPARÓ — caso Jorge (27-sep)
+//
+// LO QUE PASÓ. Jorge tenía 1 unidad confirmada en Cali ($82.000), preguntó por la
+// promo de dos, el bot cotizó $110.000 + $45.000 = $155.000, y él contestó:
+//
+//   "Pensé que era un solo envio doble no entonces si haci como estamos solo 1"
+//
+// El bot aceptó la caída de 2 a 1 en el acto. El rescate del combo existía, estaba
+// autorizado y era rentable — y no se ofreció.
+//
+// 🔎 REPRODUCIDO: `hayObjecionDePrecio` no reconocía 10 de 12 frases de este tipo,
+// incluida la de Jorge. El patrón solo veía variantes literales de "caro".
+//
+// 🔑 Y NO se arregla enumerando frases. Lo que delata la objeción es el CONTEXTO:
+// el cliente venía por dos, vio el total, y retrocedió a una. Eso se detecta con
+// la estructura del hilo, que es determinista, y no con un diccionario que siempre
+// va a estar incompleto. Las frases sueltas ("está mucho el envío", "pensé que era
+// un solo envío") se agregan como refuerzo, no como mecanismo principal.
+// ============================================================================
+
+// Quejas sobre el ENVÍO, que es lo que rompe el combo: el cliente no discute el
+// producto, discute que el flete se le duplique.
+const RE_QUEJA_DE_FLETE =
+  /\b(un\s+solo\s+env[ií]o|un\s+env[ií]o\s+solo|doble\s+env[ií]o|dos\s+env[ií]os|mucho\s+el\s+env[ií]o|el\s+env[ií]o\s+est[aá]\s+mucho|est[aá]\s+mucho|se\s+(?:me\s+)?sube|sale\s+m[aá]s\s+barato|m[aá]s\s+barato\s+llevando|salen?\s+muy\s+car|se\s+va\s+mucho|mucho\s+m[aá]s\s+caro)\b/i;
+
+/**
+ * ¿El cliente está abandonando el combo de dos POR PRECIO?
+ *
+ * 🔑 Señal estructural, no de vocabulario: venía en dos y este turno vuelve a uno.
+ * Da igual con qué palabras lo diga.
+ *
+ * @param {number} previa  las unidades que ya tenía la cotización vigente
+ * @param {string} userText lo que dijo en este turno
+ */
+function retrocedioDeDosAUno(previa, userText) {
+  if (Number(previa) < 2) return false;
+  const ahora = resolverCantidad(userText || "", previa);
+  return ahora.explicita === true && ahora.uds === 1;
+}
+
+/**
+ * ¿Hay una objeción de precio en el hilo?
+ *
+ * @param {Array} mensajes
+ * @param {{previaUds?:number, userText?:string}} [opciones]
+ *   Con `previaUds` y `userText` se detecta además el retroceso de dos a una,
+ *   que es una objeción de precio aunque el cliente no use ninguna palabra de la
+ *   lista. Ver `retrocedioDeDosAUno`.
+ */
+function hayObjecionDePrecio(mensajes, opciones = {}) {
+  const delCliente = (mensajes || []).filter((m) => m && m.role === "user");
+  const porPalabras = delCliente.some(
+    (m) =>
+      RE_OBJECION_PRECIO.test(String(m.content || "")) ||
+      RE_QUEJA_DE_FLETE.test(String(m.content || ""))
+  );
+  if (porPalabras) return true;
+
+  // 🔑 La señal estructural: venía por dos y retrocedió a una.
+  if (opciones && opciones.userText !== undefined) {
+    if (retrocedioDeDosAUno(opciones.previaUds, opciones.userText)) return true;
+  }
+  return false;
 }
 
 module.exports = {
@@ -2468,10 +2849,15 @@ module.exports = {
   botPidioCiudad,
   esMensajeDeDatos,
   senalDeDestinoPara,
+  preguntaPorDos,
+  retrocedioDeDosAUno,
+  comboDeRescateDe,
+  yaSeOfrecioElRescate,
   pideConfirmacion,
   faltaParaConfirmar,
   mismoDestino,
   partesDelDestino,
+  elHiloResolvioElDestino,
   calcular,
   lineaDePrecio,
   bloqueDeDatos,
