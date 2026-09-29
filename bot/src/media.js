@@ -92,6 +92,123 @@ const MEDIA = {
     url: process.env.MEDIA_VIDEO || "",
     caption: "💧 Míralo en acción.",
   },
+
+  // ==========================================================================
+  // 🎧 INTERCOMUNICADOR V10 2X
+  //
+  // 🔴 POR QUÉ ESTO ERA URGENTE (28-sep, campaña ya encendida). Lo reproduje: un
+  // cliente que venía del anuncio del intercomunicador escribía "¿me manda
+  // fotos?" y recibía **la foto del conjunto impermeable**, con el caption del
+  // impermeable ("4 piezas, chaqueta con capota, pantalón, zapatones…").
+  //
+  // La causa: `detectMediaIntent` no sabía de productos. Su última regla es "si
+  // pidió ver algo y no reconocí qué, mandá la foto del producto", y "el
+  // producto" era siempre el impermeable.
+  //
+  // 🔑 Y LO IMPORTANTE: mientras no haya archivos de verdad, estas entradas NO se
+  // ofrecen. Ver `disponible()` más abajo. Es mejor que el bot diga "te la
+  // comparto enseguida" que mandar la foto de otro producto: lo segundo confunde
+  // al cliente y hace que desconfíe de todo lo demás que le dijimos.
+  // ==========================================================================
+  v10: {
+    type: "image",
+    url: process.env.MEDIA_V10 || `${BASE}/v10-producto.jpg`,
+    archivo: "v10-producto.jpg",
+    caption:
+      "🎧 El intercomunicador V10 2X. Se monta en el casco y te sirve para hablar de casco a casco " +
+      "con tu acompañante, escuchar música, las indicaciones del GPS y contestar llamadas.",
+  },
+  v10_puesto: {
+    type: "image",
+    url: process.env.MEDIA_V10_PUESTO || `${BASE}/v10-puesto.jpg`,
+    archivo: "v10-puesto.jpg",
+    caption: "🪖 Así queda montado en el casco 🏍️",
+  },
+  v10_combo: {
+    type: "image",
+    url: process.env.MEDIA_V10_COMBO || `${BASE}/v10-combo.jpg`,
+    archivo: "v10-combo.jpg",
+    caption: "🎧🎧 El combo de 2, que es el de la promoción: uno para ti y uno para tu acompañante.",
+  },
+  v10_contenido: {
+    type: "image",
+    url: process.env.MEDIA_V10_CONTENIDO || `${BASE}/v10-contenido.jpg`,
+    archivo: "v10-contenido.jpg",
+    caption: "📦 Esto es lo que viene en la caja.",
+  },
 };
 
-module.exports = { MEDIA };
+// ============================================================================
+// 📸 ¿ESTA FOTO EXISTE DE VERDAD?
+//
+// 🔴 DE DÓNDE SALE LA NECESIDAD. El 21-sep TODAS las fotos daban 404 durante un
+// rato: el BASE apuntaba a la carpeta del repo y GitHub Pages publica desde
+// `docs/`. Un cliente pedía "Tienes fotos" y Meta respondía
+// `code 131053 · Media upload error · http code 404`. El cliente no recibía nada
+// y nadie se enteraba.
+//
+// 🔑 Para las fotos nuevas eso no puede volver a pasar, así que se comprueba que
+// el ARCHIVO EXISTA en `docs/img/` antes de ofrecer la foto. Como GitHub Pages
+// publica esa carpeta tal cual, si el archivo está en el repo la URL funciona.
+//
+// Y si la foto no está todavía, la clave simplemente no se ofrece: el bot no
+// manda nada en vez de mandar la de otro producto. Es exactamente el caso de hoy
+// —la campaña arrancó antes de que estén las fotos— y así el error más caro
+// (mandarle un impermeable a quien pregunta por un intercomunicador) no puede
+// ocurrir.
+//
+// ⚠️ Una URL puesta por variable de entorno se acepta sin comprobar: si alguien
+// la configuró a mano, es porque sabe dónde está la imagen (puede estar en otro
+// servidor). Lo que se comprueba es el archivo del repo.
+// ============================================================================
+const fs = require("fs");
+const path = require("path");
+
+// docs/img visto desde bot/src → ../../docs/img
+const CARPETA_IMG = path.join(__dirname, "..", "..", "docs", "img");
+
+const cacheDisponible = new Map();
+
+function disponible(clave) {
+  const m = MEDIA[clave];
+  if (!m) return false;
+  if (!m.url) return false; // el video sin configurar, por ejemplo
+
+  // Sin nombre de archivo declarado = foto vieja, ya comprobada en producción.
+  // No se toca: cambiarles el comportamiento sería arriesgar lo que funciona.
+  if (!m.archivo) return true;
+
+  // Si la URL vino de una variable de entorno, se confía.
+  const envs = ["MEDIA_V10", "MEDIA_V10_PUESTO", "MEDIA_V10_COMBO", "MEDIA_V10_CONTENIDO"];
+  if (envs.some((e) => process.env[e] && m.url === process.env[e])) return true;
+
+  if (cacheDisponible.has(clave)) return cacheDisponible.get(clave);
+  let existe = false;
+  try {
+    existe = fs.existsSync(path.join(CARPETA_IMG, m.archivo));
+  } catch {
+    existe = false;
+  }
+  cacheDisponible.set(clave, existe);
+  if (!existe) {
+    console.warn(
+      `📸 Falta la foto "${m.archivo}" en docs/img/, así que la clave "${clave}" NO se va a ofrecer. ` +
+        `Subí el archivo con ese nombre exacto (o configurá la URL por variable de entorno) y aparece sola.`
+    );
+  }
+  return existe;
+}
+
+/** Filtra una lista de claves dejando solo las que tienen foto de verdad. */
+function soloDisponibles(claves) {
+  return (claves || []).filter((k) => disponible(k));
+}
+
+/** Las fotos que faltan, para poder avisarlo en el panel o en un log. */
+function fotosFaltantes() {
+  return Object.entries(MEDIA)
+    .filter(([clave, m]) => m.archivo && !disponible(clave))
+    .map(([clave, m]) => ({ clave, archivo: m.archivo }));
+}
+
+module.exports = { MEDIA, disponible, soloDisponibles, fotosFaltantes, CARPETA_IMG };
