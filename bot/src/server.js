@@ -746,6 +746,17 @@ function motivoDeEnvio(envio) {
       "Pasa cuando se manda mucho a gente que no responde. No se arregla reintentando ya."
     );
   }
+  // 🌎 29-SEP: apareció un 130497 contra el número 559184366754. El 55 de adelante
+  // es Brasil: es un celular colombiano mal cargado (o pegado con un dígito de
+  // más), no un cliente brasileño. El texto de Meta —"restricted from messaging
+  // users in this country"— suena a una sanción de la cuenta y no lo es.
+  if (code === 130497) {
+    return (
+      "El número quedó apuntando a otro país, así que Meta no deja mandarle nada " +
+      "(error 130497). Casi siempre es un celular mal cargado: revisá que sean 10 " +
+      "dígitos empezando por 3, con el 57 de Colombia adelante y nada más."
+    );
+  }
   if (envio.etapa === "subida") {
     return "no se pudo subir el PDF a WhatsApp: " + (envio.body?.error?.message || "revisá el WHATSAPP_TOKEN");
   }

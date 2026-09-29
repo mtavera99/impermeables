@@ -128,8 +128,14 @@ console.log("\n── 3. El botón Enviar de novedades de verdad llama al servid
 
 const panelNovedades = require("./src/panel-novedades");
 
+/** Todo el texto que quedó dentro de un nodo, hijos incluidos. */
+function textoDe(n) {
+  if (!n) return "";
+  return String(n.textContent || "") + (n.hijos || []).map(textoDe).join(" ");
+}
+
 /** Arma un DOM mínimo y ejecuta el script del panel. Devuelve el contexto. */
-function abrirPanelDeNovedades() {
+function abrirPanelDeNovedades(respuesta) {
   const html = panelNovedades.render({ hayPlantilla: true });
   const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 
@@ -147,20 +153,27 @@ function abrirPanelDeNovedades() {
       innerHTML: "",
       style: {},
       files: [],
+      // 🔑 appendChild ERA UN NO-OP, y por eso esta batería no podía ver nada de
+      // lo que un panel pinta armando nodos. Justo lo que hacía falta para probar
+      // que el motivo de cada novedad fallida sale en pantalla. Ahora se guardan.
+      hijos: [],
       addEventListener(ev, fn) {
         listeners[id + ":" + ev] = fn;
       },
       getAttribute(a) {
         return (extra.attrs || {})[a] || null;
       },
-      appendChild() {},
+      appendChild(h) {
+        this.hijos.push(h);
+        return h;
+      },
       querySelectorAll: () => [],
       ...extra,
     };
   }
 
   const nodos = {};
-  for (const id of ["res", "pegado", "btnRevisar", "btnEnviar", "zona", "tabla", "archivo", "archivoMsg"]) {
+  for (const id of ["res", "detalle", "pegado", "btnRevisar", "btnEnviar", "zona", "tabla", "archivo", "archivoMsg"]) {
     nodos[id] = nodo(id);
   }
 
@@ -198,7 +211,8 @@ function abrirPanelDeNovedades() {
       return Promise.resolve({
         ok: true,
         status: 200,
-        json: () => Promise.resolve({ ok: true, enviados: 1, intentados: 1, fallaron: 0 }),
+        json: () =>
+          Promise.resolve(respuesta || { ok: true, enviados: 1, intentados: 1, fallaron: 0 }),
       });
     },
   };
@@ -437,6 +451,205 @@ console.log("\n── 5. El botón Revisar sigue andando ──");
   );
 }
 
-fs.rmSync(DIR, { recursive: true, force: true });
-console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
-process.exit(mal === 0 ? 0 : 1);
+// ===========================================================================
+// 🔴 6. EL MOTIVO DE CADA NOVEDAD QUE NO SALIÓ SE VE EN PANTALLA
+//
+// DE DÓNDE SALE: 29-sep, "Volvió este error al enviar novedades" y una pantalla
+// que decía "Enviados 0 de 5. 5 fallaron." Y nada más.
+//
+// 🔑 EL SERVIDOR SIEMPRE MANDÓ EL MOTIVO DE CADA UNA en `resultados[].error`, ya
+// escrito en castellano y accionable. Esta pantalla los descartaba: leía
+// enviados/intentados/fallaron y tiraba `resultados`. Así que el dueño no tenía
+// cómo saber si Meta había rechazado los mensajes o si las filas nunca se
+// habían intentado mandar —que son problemas opuestos— y yo tampoco.
+//
+// El envío no estaba roto: estaba MUDO. Esta batería es la que impide que vuelva
+// a estarlo.
+// ===========================================================================
+(async () => {
+  console.log("\n── 6. El motivo de cada novedad que no salió se ve en pantalla ──");
+
+  /** Toca Enviar y espera a que la respuesta del servidor se haya pintado. */
+  async function enviarY(respuesta, filas) {
+    const p = abrirPanelDeNovedades(respuesta);
+    p.contexto.PLAN = { id: "plan-1", filas: filas || [{ guia: "240062099941", enviar: true }] };
+    p.listeners["btnEnviar:click"].call(p.nodos.btnEnviar);
+    // El pintado pasa en el .then del fetch: hay que dejar correr los microtasks.
+    await new Promise((r) => setTimeout(r, 0));
+    return p;
+  }
+
+  // Los cinco motivos son los de verdad: cuatro los decide nuestro código antes
+  // de llamar a Meta, y el quinto es una traducción de un error de Meta.
+  const cincoFallos = {
+    ok: true,
+    intentados: 5,
+    enviados: 0,
+    fallaron: 5,
+    resultados: [
+      {
+        guia: "240062099941",
+        nombre: "Henry Mendoza",
+        ok: false,
+        error: "Falta completar en qué oficina está y hasta cuándo tiene para reclamarlo.",
+      },
+      {
+        guia: "240062025925",
+        nombre: "Alejandra Rios",
+        ok: false,
+        error: "No encontré a quién corresponde esta guía.",
+      },
+      {
+        guia: "240062099927",
+        nombre: "",
+        ok: false,
+        error: "Hace más de 24h que no escribe y este tipo de novedad no tiene plantilla configurada",
+      },
+      {
+        guia: "240062298845",
+        nombre: "Luz Gomez",
+        ok: false,
+        error: "La plantilla no existe en Meta con ese nombre o ese idioma (error 132001).",
+      },
+      {
+        guia: "240062298846",
+        nombre: "Carlos Pérez",
+        ok: false,
+        error: "El número quedó apuntando a otro país (error 130497).",
+      },
+    ],
+  };
+
+  {
+    const p = await enviarY(cincoFallos);
+    const texto = textoDe(p.nodos.detalle);
+
+    chequear(
+      "🔑 con 0 de 5 enviados, los CINCO motivos salen en pantalla (antes: ninguno)",
+      cincoFallos.resultados.every((r) => texto.indexOf(r.error) !== -1),
+      `pantalla: ${JSON.stringify(texto)}`
+    );
+    chequear(
+      "  y cada uno con su guía, que es con lo que se busca en 99 Envíos",
+      cincoFallos.resultados.every((r) => texto.indexOf(r.guia) !== -1),
+      `pantalla: ${JSON.stringify(texto)}`
+    );
+    chequear(
+      "  el que no tiene nombre no sale en blanco",
+      texto.indexOf("sin nombre") !== -1,
+      `pantalla: ${JSON.stringify(texto)}`
+    );
+    chequear(
+      "🔑 el resumen manda a leer el motivo (sin eso no se sabe que hay más abajo)",
+      /mirá abajo el motivo/i.test(p.nodos.res.textContent),
+      JSON.stringify(p.nodos.res.textContent)
+    );
+    chequear(
+      "  y el detalle se muestra, no queda escondido",
+      p.nodos.detalle.style.display === "block",
+      JSON.stringify(p.nodos.detalle.style.display)
+    );
+    chequear(
+      "  las cinco filas están marcadas como fallidas",
+      p.nodos.detalle.hijos.filter((h) => /\bmal\b/.test(h.className)).length === 5,
+      JSON.stringify(p.nodos.detalle.hijos.map((h) => h.className))
+    );
+  }
+
+  {
+    // Mezcla: lo que falló va ARRIBA, porque es lo único que hay que accionar.
+    const p = await enviarY({
+      ok: true,
+      intentados: 2,
+      enviados: 1,
+      fallaron: 1,
+      resultados: [
+        { guia: "111111111111", nombre: "Sí Salió", ok: true },
+        { guia: "222222222222", nombre: "No Salió", ok: false, error: "motivo de prueba" },
+      ],
+    });
+    const texto = textoDe(p.nodos.detalle);
+    chequear(
+      "con una sí y una no, se ven las dos",
+      texto.indexOf("Sí Salió") !== -1 && texto.indexOf("No Salió") !== -1,
+      JSON.stringify(texto)
+    );
+    chequear(
+      "🔑 la que falló va primero: es lo único que hay que hacer",
+      texto.indexOf("No Salió") < texto.indexOf("Sí Salió"),
+      JSON.stringify(texto)
+    );
+    chequear(
+      "y con una sola dice «falló», no «fallaron»",
+      /1 falló/.test(p.nodos.res.textContent),
+      JSON.stringify(p.nodos.res.textContent)
+    );
+  }
+
+  {
+    // Todo bien: no hay nada que accionar, pero se confirma qué salió.
+    const p = await enviarY({
+      ok: true,
+      intentados: 1,
+      enviados: 1,
+      fallaron: 0,
+      resultados: [{ guia: "333333333333", nombre: "Marta", ok: true }],
+    });
+    chequear(
+      "cuando salen todas, el resumen no habla de motivos",
+      !/motivo/i.test(p.nodos.res.textContent),
+      JSON.stringify(p.nodos.res.textContent)
+    );
+    chequear(
+      "  pero igual confirma a quién le llegó",
+      textoDe(p.nodos.detalle).indexOf("Marta") !== -1,
+      JSON.stringify(textoDe(p.nodos.detalle))
+    );
+  }
+
+  {
+    // ⛔ El motivo viene de Meta y de datos del cliente. Se pinta como TEXTO.
+    // Si se armara con innerHTML, un nombre con "<" rompería la pantalla —y la
+    // pantalla que muestra los errores es la última que puede romperse.
+    const p = await enviarY({
+      ok: true,
+      intentados: 1,
+      enviados: 0,
+      fallaron: 1,
+      resultados: [
+        { guia: "444444444444", nombre: "<b>Ana</b>", ok: false, error: "falló <script>x</script>" },
+      ],
+    });
+    const texto = textoDe(p.nodos.detalle);
+    chequear(
+      "⛔ el motivo se pinta como texto, no como HTML",
+      texto.indexOf("<b>Ana</b>") !== -1 && texto.indexOf("<script>x</script>") !== -1,
+      JSON.stringify(texto)
+    );
+    chequear(
+      "  y nada se escribió con innerHTML",
+      !p.nodos.detalle.innerHTML,
+      JSON.stringify(p.nodos.detalle.innerHTML)
+    );
+  }
+
+  {
+    // Un servidor viejo (o un despliegue a medias) puede no mandar `resultados`.
+    // Eso no puede reventar la pantalla.
+    const p = await enviarY({ ok: true, intentados: 5, enviados: 0, fallaron: 5 });
+    chequear(
+      "si el servidor no manda los motivos, la pantalla no revienta",
+      /Enviados 0 de 5/.test(p.nodos.res.textContent),
+      JSON.stringify(p.nodos.res.textContent)
+    );
+    chequear(
+      "  y el detalle queda escondido en vez de vacío",
+      p.nodos.detalle.style.display === "none",
+      JSON.stringify(p.nodos.detalle.style.display)
+    );
+  }
+
+  fs.rmSync(DIR, { recursive: true, force: true });
+  console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
+  process.exit(mal === 0 ? 0 : 1);
+})();
