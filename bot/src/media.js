@@ -112,36 +112,36 @@ const MEDIA = {
   // ==========================================================================
   v10: {
     type: "image",
-    url: process.env.MEDIA_V10 || `${BASE}/v10-producto.jpg`,
-    archivo: "v10-producto.jpg",
+    base: "v10-producto",
+    env: "MEDIA_V10",
     caption:
       "🎧 El intercomunicador V10 2X. Se monta en el casco y te sirve para hablar de casco a casco " +
       "con tu acompañante, escuchar música, las indicaciones del GPS y contestar llamadas.",
   },
   v10_puesto: {
     type: "image",
-    url: process.env.MEDIA_V10_PUESTO || `${BASE}/v10-puesto.jpg`,
-    archivo: "v10-puesto.jpg",
+    base: "v10-puesto",
+    env: "MEDIA_V10_PUESTO",
     caption: "🪖 Así queda montado en el casco 🏍️",
   },
   v10_combo: {
     type: "image",
-    url: process.env.MEDIA_V10_COMBO || `${BASE}/v10-combo.jpg`,
-    archivo: "v10-combo.jpg",
+    base: "v10-combo",
+    env: "MEDIA_V10_COMBO",
     caption: "🎧🎧 El combo de 2, que es el de la promoción: uno para ti y uno para tu acompañante.",
   },
   v10_contenido: {
     type: "image",
-    url: process.env.MEDIA_V10_CONTENIDO || `${BASE}/v10-contenido.jpg`,
-    archivo: "v10-contenido.jpg",
+    base: "v10-contenido",
+    env: "MEDIA_V10_CONTENIDO",
     caption: "📦 Esto es lo que viene en la caja.",
   },
   // La caja cerrada. Sirve cuando preguntan por el modelo o si es original: se ve
   // el nombre del producto impreso. Es una de las cuatro fotos que mandó el dueño.
   v10_caja: {
     type: "image",
-    url: process.env.MEDIA_V10_CAJA || `${BASE}/v10-caja.jpg`,
-    archivo: "v10-caja.jpg",
+    base: "v10-caja",
+    env: "MEDIA_V10_CAJA",
     caption: "📦 Así viene presentado, es el modelo V10 2X.",
   },
 };
@@ -175,36 +175,105 @@ const path = require("path");
 // docs/img visto desde bot/src → ../../docs/img
 const CARPETA_IMG = path.join(__dirname, "..", "..", "docs", "img");
 
-const cacheDisponible = new Map();
+// ----------------------------------------------------------------------------
+// 🔴 LA EXTENSIÓN DEL ARCHIVO NO PUEDE ROMPER EL ENVÍO (29-sep)
+//
+// LO QUE PASÓ. El dueño subió las 5 fotos del intercomunicador renombrándolas
+// como le pedí, y llegaron así:
+//
+//     v10-producto.jpg.PNG      ← extensión doble
+//     v10-combo.jpg.png
+//     v10-puesto.jpg.PNG
+//
+// Al renombrar en el Finder, el sistema conserva la extensión original y queda
+// pegada al nombre nuevo. El bot buscaba `v10-producto.jpg` EXACTO, no lo
+// encontraba, y no ofrecía ninguna foto. Las fotos estaban en el repo y el bot
+// seguía diciendo "no tengo la foto a mano".
+//
+// 🔑 Y ESTO VA A VOLVER A PASAR. El dueño no es técnico y no tiene por qué pelear
+// con extensiones: ".PNG" en mayúscula, ".jpeg" en vez de ".jpg", una extensión
+// doble. Así que el catálogo declara el nombre SIN extensión y acá se busca el
+// archivo que empiece con ese nombre y sea una imagen. El que esté, sirve.
+//
+// La URL se arma con el nombre REAL encontrado, que es lo que importa: si el
+// archivo se llama `v10-puesto.png`, la URL tiene que decir `.png` o Meta recibe
+// un 404 — el error del 21-sep, cuando todas las fotos fallaban en silencio.
+// ----------------------------------------------------------------------------
+const EXTENSIONES_DE_IMAGEN = [".jpg", ".jpeg", ".png", ".webp"];
+
+const cacheArchivo = new Map();
+
+/** El archivo real que corresponde a un nombre base, o null si no hay ninguno. */
+function archivoReal(nombreBase) {
+  if (!nombreBase) return null;
+  if (cacheArchivo.has(nombreBase)) return cacheArchivo.get(nombreBase);
+
+  let hallado = null;
+  try {
+    const archivos = fs.readdirSync(CARPETA_IMG);
+    const base = String(nombreBase).toLowerCase();
+    // Se prefiere la coincidencia exacta con una extensión limpia; si no hay, se
+    // acepta cualquier cosa que empiece con el nombre base y termine en imagen
+    // (ahí entran las extensiones dobles tipo "v10-puesto.jpg.PNG").
+    hallado =
+      archivos.find((a) => {
+        const l = a.toLowerCase();
+        return EXTENSIONES_DE_IMAGEN.some((e) => l === base + e);
+      }) ||
+      archivos.find((a) => {
+        const l = a.toLowerCase();
+        return l.startsWith(base + ".") && EXTENSIONES_DE_IMAGEN.some((e) => l.endsWith(e));
+      }) ||
+      null;
+  } catch {
+    hallado = null;
+  }
+
+  cacheArchivo.set(nombreBase, hallado);
+  return hallado;
+}
 
 function disponible(clave) {
   const m = MEDIA[clave];
   if (!m) return false;
-  if (!m.url) return false; // el video sin configurar, por ejemplo
 
-  // Sin nombre de archivo declarado = foto vieja, ya comprobada en producción.
-  // No se toca: cambiarles el comportamiento sería arriesgar lo que funciona.
-  if (!m.archivo) return true;
+  // Si hay URL puesta a mano por variable de entorno, se confía: quien la
+  // configuró sabe dónde está la imagen y puede estar en otro servidor.
+  if (m.env && process.env[m.env]) return true;
 
-  // Si la URL vino de una variable de entorno, se confía.
-  const envs = ["MEDIA_V10", "MEDIA_V10_PUESTO", "MEDIA_V10_COMBO", "MEDIA_V10_CONTENIDO"];
-  if (envs.some((e) => process.env[e] && m.url === process.env[e])) return true;
+  // Sin nombre base declarado = foto vieja del impermeable, ya comprobada en
+  // producción. No se toca: cambiarles el comportamiento sería arriesgar lo que
+  // funciona.
+  if (!m.base) return Boolean(m.url);
 
-  if (cacheDisponible.has(clave)) return cacheDisponible.get(clave);
-  let existe = false;
-  try {
-    existe = fs.existsSync(path.join(CARPETA_IMG, m.archivo));
-  } catch {
-    existe = false;
-  }
-  cacheDisponible.set(clave, existe);
-  if (!existe) {
+  const archivo = archivoReal(m.base);
+  if (!archivo) {
     console.warn(
-      `📸 Falta la foto "${m.archivo}" en docs/img/, así que la clave "${clave}" NO se va a ofrecer. ` +
-        `Subí el archivo con ese nombre exacto (o configurá la URL por variable de entorno) y aparece sola.`
+      `📸 No hay ninguna foto "${m.base}.*" en docs/img/, así que "${clave}" NO se va a ofrecer. ` +
+        `Subí el archivo (cualquier extensión de imagen sirve) y aparece sola.`
     );
+    return false;
   }
-  return existe;
+  return true;
+}
+
+/**
+ * La foto lista para enviar: type, url REAL y caption.
+ *
+ * 🔑 Es el único lugar donde se decide la URL. Sin esto, cada quien armaba la
+ * suya y una diferencia de extensión se convertía en un 404 silencioso.
+ */
+function resolver(clave) {
+  const m = MEDIA[clave];
+  if (!m) return null;
+  if (m.env && process.env[m.env]) {
+    return { type: m.type, url: process.env[m.env], caption: m.caption };
+  }
+  if (!m.base) return m.url ? { type: m.type, url: m.url, caption: m.caption } : null;
+
+  const archivo = archivoReal(m.base);
+  if (!archivo) return null;
+  return { type: m.type, url: `${BASE}/${archivo}`, caption: m.caption };
 }
 
 /** Filtra una lista de claves dejando solo las que tienen foto de verdad. */
@@ -215,8 +284,23 @@ function soloDisponibles(claves) {
 /** Las fotos que faltan, para poder avisarlo en el panel o en un log. */
 function fotosFaltantes() {
   return Object.entries(MEDIA)
-    .filter(([clave, m]) => m.archivo && !disponible(clave))
-    .map(([clave, m]) => ({ clave, archivo: m.archivo }));
+    .filter(([clave, m]) => m.base && !disponible(clave))
+    .map(([clave, m]) => ({ clave, base: m.base }));
 }
 
-module.exports = { MEDIA, disponible, soloDisponibles, fotosFaltantes, CARPETA_IMG };
+/** Se usa en las pruebas, que crean y borran archivos. */
+function olvidarCache() {
+  cacheArchivo.clear();
+}
+
+module.exports = {
+  MEDIA,
+  disponible,
+  resolver,
+  soloDisponibles,
+  fotosFaltantes,
+  archivoReal,
+  olvidarCache,
+  CARPETA_IMG,
+  EXTENSIONES_DE_IMAGEN,
+};
