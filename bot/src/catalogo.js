@@ -233,16 +233,111 @@ const PRODUCTOS = {
     // pregunta si es IP67 o si aguanta sumergido, eso sigue SIN confirmar — ver
     // `sinDatoConfirmado`, donde quedaron esas palabras a propósito.
     // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // FICHA TÉCNICA AUTORIZADA POR EL DUEÑO (29-sep)
+    //
+    // Cada dato viene con la respuesta ya escrita. El bot puede adaptarla al tono
+    // de la conversación, pero los NÚMEROS no se tocan.
+    //
+    // ⚠️ Y TODOS LLEVAN "APROXIMADAMENTE" A PROPÓSITO. El dueño lo pidió explícito:
+    // "no decir 500 metros garantizados". Un alcance o una autonomía son cifras que
+    // dependen del uso y del entorno; presentarlas como garantía es prometer algo
+    // que la realidad desmiente el primer día de lluvia con edificios en medio, y
+    // eso vuelve como rechazo en la puerta.
+    // ------------------------------------------------------------------------
     datosConfirmados: {
       garantia: {
-        pregunta: ["garantia", "garantía", "garantizado"],
-        respuesta: "Sí, tiene 1 mes de garantía 👍",
+        pregunta: ["garantia", "garantía", "garantizado", "garantizan"],
+        respuesta:
+          "Sí 👍 Tu V10 2X tiene 1 mes de garantía por defectos de funcionamiento. " +
+          "Si te presenta algún inconveniente en ese tiempo, nos escribís y revisamos el caso.",
       },
       agua: {
-        pregunta: ["resistente al agua", "resiste el agua", "se moja", "moja", "lluvia", "llueve", "agua"],
+        // 🔑 "ip67"/"ip68"/"certificación" entran acá y NO en la lista de dudas: si
+        // preguntan por una certificación que no es la nuestra, lo honesto es decir
+        // la que SÍ tiene (IPX6), no contestar "no sé". La respuesta ya aclara que
+        // no se sumerja, así que no promete de más.
+        // ⚠️ "resistent" va como RAÍZ y no como palabra completa: el cliente escribe
+        // tanto "¿es resistente al agua?" como "¿son resistentes al agua?", y con la
+        // forma singular el plural se caía. Lo cazó la prueba.
+        pregunta: [
+          "resistent", "resiste el agua", "se moja", "moja", "mojar",
+          "lluvia", "llueve", "impermeable?",
+          "ipx", "ip6", "ip67", "ip68", "certificacion", "certificación",
+        ],
         respuesta:
-          "Sí, resiste el agua sin problema: están hechos para usarlos en la moto y " +
-          "andar bajo la lluvia 🌧️",
+          "Sí 👍 Tiene protección IPX6, así que está diseñado para resistir lluvia y " +
+          "salpicaduras en tus recorridos 🌧️🏍️ Lo que no recomendamos es sumergirlo en agua.",
+      },
+      alcance: {
+        pregunta: ["alcance", "metros", "distancia", "rango", "que tan lejos", "qué tan lejos"],
+        respuesta:
+          "El intercom de casco a casco alcanza aproximadamente 300 a 500 metros en " +
+          "condiciones favorables 🏍️↔️🏍️ La distancia puede variar por obstáculos, " +
+          "edificios o interferencias.",
+      },
+      bateria: {
+        pregunta: [
+          "bateria", "batería", "autonomia", "autonomía", "mah",
+          "cuanto dura", "cuánto dura", "cuantas horas", "cuántas horas", "horas dura",
+          "carga", "cargar", "cuanto se demora en cargar", "type-c", "type c",
+        ],
+        respuesta:
+          "Tiene batería recargable de aproximadamente 1.500 mAh 🔋, con una autonomía de " +
+          "referencia de alrededor de 32 horas según el uso. Se carga por USB Type-C y una " +
+          "carga completa toma unas 2,5 horas.",
+      },
+      standby: {
+        pregunta: ["standby", "stand by", "en espera", "reposo", "apagado dura"],
+        respuesta:
+          "En espera puede alcanzar aproximadamente 720 horas, aunque varía según el uso " +
+          "y las condiciones.",
+      },
+      bluetooth: {
+        pregunta: ["bluetooth", "conectividad", "version", "versión"],
+        respuesta:
+          "Se conecta por Bluetooth 5.3 📱 Sirve para llamadas, música y las indicaciones " +
+          "del GPS.",
+      },
+      celular: {
+        pregunta: ["android", "iphone", "ios", "celular", "telefono", "teléfono", "compatible con mi"],
+        respuesta:
+          "Sí 👍 Se conecta por Bluetooth 5.3 al celular y funciona con Android y iPhone. " +
+          "Lo podés usar para llamadas, música e indicaciones del GPS.",
+      },
+      cascos: {
+        pregunta: ["casco abierto", "integral", "modular", "abatible", "cross", "jet", "tipo de casco", "sirve para mi casco", "que cascos"],
+        respuesta:
+          "Sí 👍 Se puede instalar en casco abierto, y también en integral, modular, cross " +
+          "y tipo jet. Lo importante es ubicar bien los parlantes y el micrófono para que " +
+          "quede cómodo y se escuche bien.",
+      },
+      instalacion: {
+        pregunta: ["instala", "instalación", "instalacion", "se pone", "se monta", "difícil de poner", "dificil de poner"],
+        respuesta:
+          "Sí 👍 Es fácil de instalar. La unidad se fija al casco y los parlantes y el " +
+          "micrófono van por dentro. No hay que hacerle modificaciones al casco.",
+      },
+      emparejar: {
+        pregunta: ["empareja", "emparejar", "vincular", "conectar entre", "hablar entre", "casco a casco", "entre los dos"],
+        respuesta:
+          "Sí 👍 Los dos V10 2X se emparejan entre sí para hablar de casco a casco. Una vez " +
+          "vinculados, el piloto y el acompañante —o dos motociclistas— se comunican en ruta.",
+      },
+      ruido: {
+        pregunta: ["ruido", "se escucha bien", "viento", "cancelacion", "cancelación"],
+        respuesta:
+          "Tiene reducción inteligente de ruido, así que la voz se escucha clara mientras " +
+          "vas andando 🎧",
+      },
+      especificaciones: {
+        pregunta: ["especificacion", "especificación", "caracteristica", "característica", "ficha tecnica", "ficha técnica", "que trae", "qué trae", "como funciona", "cómo funciona"],
+        respuesta:
+          "Claro 👍 El V10 2X tiene Bluetooth 5.3, comunicación casco a casco entre 2 " +
+          "usuarios, alcance aproximado de 300 a 500 metros, batería de unos 1.500 mAh, " +
+          "protección IPX6, reducción inteligente de ruido y carga Type-C.\n\n" +
+          "También lo usás para música 🎵, llamadas 📞 e indicaciones del GPS 📍 Es compatible " +
+          "con Android y iPhone, y con distintos tipos de casco.",
       },
     },
 
@@ -263,27 +358,35 @@ const PRODUCTOS = {
     // una certificación IP, que es un número medido en laboratorio. Decir "es IP67"
     // sin que nadie lo haya verificado es exactamente la clase de promesa que
     // termina en una devolución con motivo.
+    // ⚠️ 29-SEP, SEGUNDA TANDA: el dueño autorizó la ficha técnica completa
+    // —Bluetooth 5.3, alcance, batería, IPX6, cascos, instalación, emparejamiento,
+    // reducción de ruido, compatibilidad con Android/iPhone—. Todo eso SALIÓ de esta
+    // lista y pasó a `datosConfirmados` con su respuesta ya escrita.
+    //
+    // ⛔ LO QUE QUEDA ES LA LÍNEA QUE EL DUEÑO PIDIÓ NO CRUZAR:
+    //
+    //   · SUMERGIRLO. IPX6 es resistencia a chorros y lluvia, NO inmersión. El
+    //     dueño fue textual: "NO decir que puede sumergirse" y "NO convertir IPX6
+    //     en una garantía contra cualquier daño por agua". La lluvia se responde;
+    //     meterlo al agua, no.
+    //   · CUÁNTOS DISPOSITIVOS a la vez. La ficha dice intercom entre 2 usuarios
+    //     —eso sí está en `datosConfirmados`—; cuántos aparatos soporta conectados
+    //     en simultáneo es otra cosa y no está medida.
+    //   · Marca y potencia en vatios: no vienen en la ficha.
+    //
+    // ⚠️ Y ACÁ HAY QUE SER PRECISO, NO AMPLIO. Una versión anterior puso "al agua"
+    // suelto y se comió "¿es resistente AL AGUA?" —justo la pregunta más frecuente
+    // del producto y justo lo que el dueño SÍ confirmó—. Van los verbos de
+    // sumergir, no la palabra "agua" a secas.
     sinDatoConfirmado: [
-      "alcance", "metros", "distancia", "rango",
-      "bateria", "batería", "autonomia", "autonomía", "duracion", "duración",
-      "cuanto dura", "cuánto dura", "horas",
-      "bluetooth", "version", "versión",
-      // 🔑 Las formas de preguntar por SUMERGIRLO, que no es lo mismo que la lluvia.
-      // "¿se puede meter al agua?" es exactamente esa pregunta dicha en colombiano,
-      // y la primera versión de esto contestaba que sí resiste — lo cazó la prueba.
-      // ⚠️ Y ACÁ HAY QUE SER PRECISO, NO AMPLIO. Mi primera versión puso "al agua"
-      // suelto y se comió "¿es resistente AL AGUA?", que es justo lo que el dueño
-      // SÍ confirmó: el bot dejó de responder la pregunta más frecuente del
-      // producto. Lo cazó la prueba. Van los verbos de sumergir, no la palabra
-      // "agua" a secas.
-      "sumergible", "sumergir", "ip67", "ip65", "ipx",
+      "sumergible", "sumergir", "sumerge", "inmersion", "inmersión",
       "meter al agua", "meterlo al agua", "meter en agua", "meterlo en agua",
       "bajo el agua", "dentro del agua", "hundir", "hundirlo",
-      "lavar", "lavarlo", "piscina", "nadar",
-      "certificacion", "certificación", "homologado",
-      "cuantos se conectan", "cuántos se conectan", "cuantos dispositivos",
-      "cuántos dispositivos", "compatible", "compatibilidad",
-      "marca", "watts", "vatios", "parlante",
+      "lavar", "lavarlo", "piscina", "nadar", "al rio", "al río", "al mar",
+      "cuantos dispositivos", "cuántos dispositivos", "cuantos aparatos",
+      "cuántos aparatos", "cuantos se conectan", "cuántos se conectan",
+      "watts", "vatios", "potencia del parlante",
+      "que marca", "qué marca", "homologado", "certificado por",
     ],
 
     envioIncluido: false,
@@ -333,7 +436,14 @@ function aplanar(s) {
 // ----------------------------------------------------------------------------
 const SENALES_V10 = [
   // Alta confianza: nombran el producto y no se parecen a nada más del catálogo.
-  { re: /\binterco/, confianza: "alta", senal: "dijo intercomunicador" },
+  // 🔑 `interc[ou]` y no `interco`: el typo real que escribió un cliente el 29-sep
+  // fue "intercumunicadores", con U. Con la raíz anterior no se detectaba y la frase
+  // "Necesito son los intercumunicadores" terminó tomada como su ciudad de envío.
+  //
+  // ⚠️ Y la clase de caracteres está cerrada a [ou] a propósito, no abierta: así
+  // quedan afuera las palabras del español que empiezan igual y no tienen nada que
+  // ver — "intercambio" (interca), "intercalar" (interca), "intercesión" (interce).
+  { re: /\binterc[ou]/, confianza: "alta", senal: "dijo intercomunicador" },
   { re: /\bv\s*-?\s*10\b/, confianza: "alta", senal: "dijo V10" },
   { re: /\bv10\b/, confianza: "alta", senal: "dijo V10" },
   // "de casco a casco" es exactamente el beneficio del producto.
@@ -395,17 +505,57 @@ function productoEn(texto) {
  * @returns {{producto:string, porQue:string, explicito:boolean}}
  */
 function productoDelHilo(conv, userText, opciones = {}) {
-  // 1. Este turno.
+  // ==========================================================================
+  // 1. LO QUE EL CLIENTE DICE EN ESTE TURNO. Gana siempre.
+  //
+  // Es el mecanismo del cambio de producto en las dos direcciones: un cliente que
+  // vino del anuncio del V10 y pregunta "¿y los impermeables cuánto cuestan?"
+  // tiene que irse al impermeable, aunque el referral diga V10.
+  // ==========================================================================
   const ahora = productoEn(userText);
   if (ahora) {
     return { producto: ahora.producto, porQue: ahora.senal, explicito: true };
   }
 
-  // 2. La conversación reciente, del mensaje más nuevo al más viejo.
+  // ==========================================================================
+  // 2. EL PRODUCTO ACTIVO DE LA CONVERSACIÓN, si quedó fijado con señal fuerte.
+  //
+  // 🔴 POR QUÉ HACE FALTA PERSISTIRLO Y NO ALCANZA CON RELEER EL HILO (29-sep):
+  // el historial se rota —solo se guardan los últimos mensajes— así que en una
+  // conversación larga el turno donde se nombró el producto se cae del hilo y la
+  // conversación vuelve al impermeable sin que nadie lo haya pedido. El cliente ve
+  // que el bot "se olvidó" de qué estaba vendiendo.
+  //
+  // Se fija cuando hay señal fuerte (lo dijo el cliente, o vino del anuncio) y
+  // vive en la conversación, así que sobrevive a la rotación del historial.
+  // ==========================================================================
+  if (conv && conv.productoActivo && PRODUCTOS[conv.productoActivo]) {
+    return {
+      producto: conv.productoActivo,
+      porQue: "es el producto de esta conversación",
+      explicito: false,
+    };
+  }
+
+  // ==========================================================================
+  // 3. EL ANUNCIO POR EL QUE ENTRÓ.
+  //
+  // 🔑 Va ANTES de las heurísticas de texto, y esto cambió el 29-sep: antes iba
+  // después de releer el hilo, y el hilo podía estar contaminado por el arranque
+  // del impermeable que el propio bot había mandado por no saber el producto.
+  // O sea que el bot se convencía a sí mismo del producto equivocado.
+  // ==========================================================================
+  if (opciones.producto && PRODUCTOS[opciones.producto]) {
+    return { producto: opciones.producto, porQue: "el anuncio por el que entró", explicito: false };
+  }
+
+  // ==========================================================================
+  // 4. HEURÍSTICA: releer la conversación reciente.
   //
   // Se miran también los mensajes DEL BOT: si el bot ya está hablando del V10, el
   // hilo es del V10 aunque el cliente no lo haya vuelto a nombrar. Es el caso
   // "Info de los intercomunicadores" -> "¿y uno?".
+  // ==========================================================================
   const mensajes = (conv && conv.messages) || [];
   const VENTANA = 12; // suficiente para un ida y vuelta largo sin arrastrar de ayer
   for (let i = mensajes.length - 1; i >= Math.max(0, mensajes.length - VENTANA); i--) {
@@ -421,12 +571,7 @@ function productoDelHilo(conv, userText, opciones = {}) {
     }
   }
 
-  // 3. El anuncio de origen.
-  if (opciones.producto && PRODUCTOS[opciones.producto]) {
-    return { producto: opciones.producto, porQue: "el anuncio por el que entró", explicito: false };
-  }
-
-  // 4. Lo de siempre.
+  // 5. Lo de siempre.
   return { producto: PRODUCTO_POR_DEFECTO, porQue: "no hay señal de producto", explicito: false };
 }
 
@@ -440,14 +585,27 @@ function productoDelHilo(conv, userText, opciones = {}) {
  */
 function productoDelAnuncio(atribucion) {
   if (!atribucion) return null;
+
+  // 1. La lista de ids configurada a mano. Es la señal más fuerte cuando existe,
+  //    porque la puso una persona mirando la campaña.
   const ids = String(process.env.ANUNCIOS_V10 || "")
     .split(/[\s,]+/)
     .filter(Boolean);
   const id = String(atribucion.source_id || atribucion.anuncio_id || "");
   if (id && ids.includes(id)) return "intercom_v10_2x";
 
-  // Y como respaldo, el texto del anuncio: el título suele nombrar el producto.
-  const texto = [atribucion.source_url, atribucion.titulo, atribucion.body].filter(Boolean).join(" ");
+  // 2. El TÍTULO y el TEXTO del anuncio, que Meta manda en el referral.
+  //
+  // 🔑 ESTA ES LA QUE ARREGLA LA FUGA DEL 29-SEP: un cliente del anuncio del
+  // intercomunicador que escribe solo "Hola" no da ninguna pista en el texto, y
+  // adivinar por adivinar sería peor. Pero el anuncio del que vino sí lo dice.
+  //
+  // Funciona sin configurar nada, que es lo que importa: cada campaña nueva del
+  // V10 queda cubierta el día que se prende, sin esperar un despliegue ni que
+  // alguien se acuerde de agregar el id a una variable de entorno.
+  const texto = [atribucion.titulo, atribucion.body, atribucion.source_url]
+    .filter(Boolean)
+    .join(" ");
   const hallado = texto ? productoEn(texto) : null;
   return hallado ? hallado.producto : null;
 }

@@ -799,8 +799,95 @@ function hayPreposicionDeLugar(texto) {
  *
  * @returns {{ciudad:string, depto:string}|null}
  */
+// ============================================================================
+// ⛔ LO QUE NO ES UN DESTINO, POR MUCHO QUE EL BOT ACABE DE PREGUNTAR LA CIUDAD
+//
+// 🔴 BUG REAL DE PRODUCCIÓN (29-sep), reproducido antes de tocar nada:
+//
+//     bot:     "...¿Para qué ciudad o municipio sería?"
+//     cliente: "Pero en la publicación muestra intercomunicadores"
+//     →  ciudad = "la publicación muestra intercomunicadores"
+//     →  banda E (la más cara del país)  →  total $125.000
+//
+// O sea: el cliente estaba CORRIGIENDO el producto y el bot lo leyó como su
+// dirección de envío, le asignó la tarifa más caras de Colombia y le cotizó sobre
+// eso. Un cliente de Bogotá habría visto $125.000 en vez de $113.000.
+//
+// 🔑 LA CAUSA, Y POR QUÉ NO ES UN BUG DE `municipioEn` SOLAMENTE. Cuando el bot
+// acaba de preguntar la ciudad, el código asume que el mensaje siguiente ES la
+// ciudad, y `municipioEn` saca de ahí el primer nombre propio que encuentre. Esa
+// suposición es buena —la mayoría de las veces el cliente contesta lo que se le
+// pregunta— pero no puede ser ciega: el cliente también corrige, pregunta,
+// objeta o cambia de producto en ese turno.
+//
+// Así que esto NO cambia cómo se leen las ciudades. Solo pone un filtro delante:
+// si la frase es evidentemente OTRA cosa, no se adivina un municipio con ella.
+//
+// ⚠️ Y ES DELIBERADAMENTE ESTRECHO. Cada patrón describe una intención, no una
+// palabra suelta, para no rechazar un destino de verdad. "Para Medellín, quiero el
+// combo" tiene señal de cantidad Y una ciudad real: la ciudad gana, porque
+// `ciudadesEn` la reconoce antes de llegar acá.
+// ============================================================================
+const RE_NO_ES_DESTINO = [
+  // Corrige o señala el producto: es el caso exacto del bug.
+  /\b(?:en\s+la\s+)?(?:publicaci[oó]n|publicidad|anuncio|foto|imagen|video)\b/i,
+  /\bmuestra\b|\bsale[ns]?\b.*\bfoto\b/i,
+  // Pregunta por una característica o el precio.
+  /\b(?:garant[ií]a|bater[ií]a|alcance|bluetooth|sumergib|resistent|instala|empareja|compatib|especificacion|caracter[ií]stica)/i,
+  /\b(?:cu[aá]nto|cu[aá]ntos|cu[aá]l|qu[eé]\s+tal|c[oó]mo\s+(?:funciona|se\s+instala|es))\b/i,
+  // Habla de cantidad, no de lugar.
+  /\b(?:mejor|solo|solamente|[uú]nicamente)\s+(?:uno|una|dos|1|2)\b/i,
+  /\bel\s+combo\b|\blos\s+dos\b|\blas\s+dos\b/i,
+  // Objeción de precio.
+  /\b(?:muy\s+caro|est[aá]\s+caro|descuento|rebaja|m[aá]s\s+barato)\b/i,
+];
+
+/**
+ * ¿El sentido principal de esta frase es algo distinto de decir un destino?
+ *
+ * Se usa como guarda ANTES de adivinar un municipio con texto libre. No decide
+ * dónde despachar: solo evita que una frase que claramente habla de otra cosa se
+ * convierta en una dirección de envío.
+ */
+function noEsUnDestino(texto) {
+  const crudo = String(texto == null ? "" : texto);
+  if (!crudo.trim()) return false;
+
+  // ==========================================================================
+  // 🔴 PRIMERO: SI EL TEXTO TRAE UNA SEÑAL DE LUGAR, NO SE DESCARTA NADA.
+  //
+  // Esto lo encontró la regresión de test-cotizacion.js, y era un daño real al
+  // negocio que funciona: mi primera versión descartaba la frase entera si nombraba
+  // un producto, así que
+  //
+  //     "quiero dos impermeables para Pitalito Huila"
+  //
+  // perdía Pitalito. O sea que por arreglar el V10 rompí la lectura de ciudad de
+  // los impermeables, que es el flujo que paga las cuentas.
+  //
+  // 🔑 Nombrar un producto Y decir a dónde va no son cosas incompatibles: la gente
+  // escribe las dos en el mismo mensaje todo el tiempo. Lo que hay que descartar es
+  // la frase que habla SOLO de otra cosa. Si hay departamento, o una preposición de
+  // lugar seguida de un nombre propio, hay destino y se lee.
+  // ==========================================================================
+  if (departamentoEn(crudo)) return false;
+  if (hayPreposicionDeLugar(crudo)) {
+    const tras = candidatoTrasPreposicion(crudo);
+    if (tras && pareceNombrePropio(tras)) return false;
+  }
+
+  // 🔑 Nombrar un producto del catálogo, sin ninguna señal de lugar, es la señal
+  // más fuerte de todas: quien escribe "son los intercomunicadores" está eligiendo
+  // qué comprar, no diciendo a dónde vive.
+  if (catalogo.productoEn(crudo)) return true;
+
+  return RE_NO_ES_DESTINO.some((re) => re.test(crudo));
+}
+
 function municipioEn(texto) {
   const crudo = String(texto == null ? "" : texto);
+  // ⛔ La guarda del bug del 29-sep. Ver `noEsUnDestino`.
+  if (noEsUnDestino(crudo)) return null;
   const depto = departamentoEn(crudo);
 
   // 🔑 El departamento se quita ANTES de medir el largo de la frase. Si no,
@@ -1689,6 +1776,61 @@ function lineaDePrecio(cot) {
 // producto y envío están siempre separados y explícitos, porque el precio del V10
 // no incluye el envío y el dueño pidió que eso no se confunda nunca.
 // ============================================================================
+// ============================================================================
+// 🛑 LA NOTA DEL TURNO: ¿ESTE MENSAJE PIDE CERRAR O PIDE INFORMACIÓN?
+//
+// 🔴 PROBLEMA REAL DE PRODUCCIÓN (29-sep). El bot intentaba cerrar después de
+// CADA pregunta:
+//
+//     cliente: "¿tiene garantía?"          → responde y pide nombre/celular/dirección
+//     cliente: "¿sirve para casco abierto?"→ responde y vuelve a pedir los datos
+//     cliente: "¿cómo se instala?"         → responde y vuelve a intentar cerrar
+//
+// Un cliente que está averiguando se siente perseguido y se va.
+//
+// 🔑 POR QUÉ ESTO NO ES SOLO UNA LÍNEA MÁS EN EL GUION. Este repo tiene escrito en
+// cinco lugares que "una instrucción al modelo no es un candado", y el guion ya
+// decía "sé breve". Lo que cambia acá es que el CÓDIGO reconoce el tipo de turno
+// —con la misma lista de preguntas de la ficha técnica— y se lo dice en el bloque
+// de datos, que es el canal que el modelo respeta turno por turno porque ahí viene
+// el precio.
+//
+// No bloquea ni reescribe nada: si el modelo igual pide los datos, el mensaje sale.
+// Es una instrucción mejor dirigida, no un candado, y está dicho a propósito.
+// ============================================================================
+function notaDelTurnoV10(contexto = {}) {
+  const texto = String(contexto.userText || "");
+  if (!texto.trim()) return "";
+  const productoId = contexto.producto || "intercom_v10_2x";
+
+  // ¿Es una pregunta de las que contesta la ficha técnica?
+  const informativa =
+    catalogo.respuestaConfirmada(texto, productoId) ||
+    catalogo.preguntaSinDatoConfirmado(texto, productoId);
+  if (!informativa) return "";
+
+  // ⚠️ Salvo que ADEMÁS venga una señal de compra en el mismo mensaje
+  // ("¿tiene garantía? dale, lo quiero") — ahí sí hay que cerrar.
+  if (haySenalDeCompra(texto)) return "";
+
+  return (
+    `## 🛑 ESTE TURNO ES UNA PREGUNTA, NO UNA COMPRA\n` +
+    `El cliente está preguntando por el producto. Respondé SU pregunta y nada más.\n` +
+    `⛔ NO le pidas nombre, celular ni dirección en este mensaje.\n` +
+    `⛔ Y no repitas el precio si ya lo dijiste antes.\n` +
+    `Cuando dé una señal de compra o acepte el total, ahí sí le pedís los datos.\n\n`
+  );
+}
+
+// Las formas en que la gente acepta el total o pide que se lo manden. Es lo que
+// habilita el cierre, y lo que distingue "¿cuánto vale?" de "mándemelo".
+const RE_SENAL_DE_COMPRA =
+  /\b(?:lo\s+quiero|la\s+quiero|los\s+quiero|me\s+sirve|me\s+parece|dale|h[aá]gale|listo|de\s+una|mand[aá](?:me|melo|melos)?|env[ií]e(?:me|melo)?|env[ií]a(?:me|melo)?|lo\s+llevo|los\s+llevo|me\s+lo\s+llevo|c[oó]mo\s+(?:hago|pago)|quiero\s+(?:pedir|comprar|ordenar)|voy\s+a\s+(?:pedir|comprar|llevar)|s[ií],?\s+(?:por\s+favor|gracias)?\s*$)/i;
+
+function haySenalDeCompra(texto) {
+  return RE_SENAL_DE_COMPRA.test(String(texto || ""));
+}
+
 function bloqueDeDatosV10(cot, contexto = {}) {
   const ficha = catalogo.de((cot && cot.productoId) || contexto.producto) || catalogo.de("intercom_v10_2x");
   const uno = fmt(ficha.precios[1]);
@@ -1746,6 +1888,7 @@ function bloqueDeDatosV10(cot, contexto = {}) {
 
   const cuantos = cot.uds === 2 ? `los dos ${ficha.nombreCorto}` : `un ${ficha.nombreCorto}`;
   return (
+    notaDelTurnoV10(contexto) +
     `## PRECIO — YA CALCULADO, USALO TAL CUAL\n` +
     `Producto: ${ficha.nombre} × ${cot.uds}\n` +
     `Destino: ${cot.ciudad}\n` +

@@ -2181,6 +2181,26 @@ async function handleWebhook(body) {
             source_id: String(ref.source_id),
             source_url: ref.source_url || null,
             source_type: ref.source_type || null,
+            // ================================================================
+            // 🔴 EL TÍTULO Y EL TEXTO DEL ANUNCIO — SE DESCARTABAN, Y SON LA
+            //    SEÑAL QUE FALTABA (29-sep)
+            //
+            // FUGA REAL: un cliente llegó del anuncio del intercomunicador,
+            // escribió "Hola, quiero más información", y el bot le ofreció
+            // impermeables. Tuvo que corregirlo él: "pero en la publicación
+            // muestra intercomunicadores".
+            //
+            // Con un "hola" pelado no hay forma de saber el producto por el
+            // texto — y adivinar sería peor. Pero Meta SÍ lo dice: manda el
+            // `headline` y el `body` del anuncio en el referral, y ahí está
+            // escrito de qué producto es la publicidad. Se guardaban solo el id
+            // y la URL, así que ese dato se tiraba en cada conversación.
+            //
+            // 🔑 Es la señal de origen que pidió el dueño, y no depende de que
+            // el cliente escriba nada.
+            // ================================================================
+            titulo: ref.headline || null,
+            body: ref.body || null,
             // El identificador del clic. Meta lo pide para medir conversiones
             // de vuelta; si algún día se hace, sin esto no se puede.
             ctwa_clid: ref.ctwa_clid || null,
