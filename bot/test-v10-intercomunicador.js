@@ -530,7 +530,7 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
   // =========================================================================
   {
     const mediaCat = require("./src/media");
-    const fotosV10 = ["v10", "v10_puesto", "v10_combo", "v10_contenido"];
+    const fotosV10 = ["v10", "v10_puesto", "v10_combo", "v10_contenido", "v10_caja"];
 
     // Las entradas existen en el catálogo de fotos.
     for (const k of fotosV10) {
@@ -575,7 +575,7 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
       let sePudo = true;
       try {
         if (!fs.existsSync(carpeta)) fs.mkdirSync(carpeta, { recursive: true });
-        for (const nombre of ["v10-producto.jpg", "v10-puesto.jpg", "v10-combo.jpg", "v10-contenido.jpg"]) {
+        for (const nombre of ["v10-producto.jpg", "v10-puesto.jpg", "v10-combo.jpg", "v10-contenido.jpg", "v10-caja.jpg"]) {
           const ruta = path.join(carpeta, nombre);
           if (!fs.existsSync(ruta)) {
             fs.writeFileSync(ruta, "foto de prueba");

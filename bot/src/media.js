@@ -136,6 +136,14 @@ const MEDIA = {
     archivo: "v10-contenido.jpg",
     caption: "📦 Esto es lo que viene en la caja.",
   },
+  // La caja cerrada. Sirve cuando preguntan por el modelo o si es original: se ve
+  // el nombre del producto impreso. Es una de las cuatro fotos que mandó el dueño.
+  v10_caja: {
+    type: "image",
+    url: process.env.MEDIA_V10_CAJA || `${BASE}/v10-caja.jpg`,
+    archivo: "v10-caja.jpg",
+    caption: "📦 Así viene presentado, es el modelo V10 2X.",
+  },
 };
 
 // ============================================================================
