@@ -547,7 +547,24 @@ function emparejar(campos, pedidos) {
  * @param {{telefonoRemitente?:string, yaEnviada?:(guia:string)=>object|null}} opciones
  */
 async function procesarPDF(buffer, pedidos, opciones = {}) {
-  const [paginas, hojas] = await Promise.all([lineasPorPagina(buffer), partirHojas(buffer)]);
+  // ==========================================================================
+  // 🧠 UNA COSA A LA VEZ, NO LAS DOS — 30-sep (correo de Render: "exceeded its
+  // memory limit")
+  //
+  // Acá había un Promise.all. Las dos funciones cargan el PDF ENTERO en memoria
+  // —`lineasPorPagina` para leer el texto y `partirHojas` para cortarlo— y con
+  // Promise.all los dos árboles de objetos de pdf-lib viven AL MISMO TIEMPO.
+  //
+  // 🔑 Y NO SE GANABA NADA. Node es de un solo hilo y esto es trabajo de CPU, no
+  // de red: Promise.all no lo hace más rápido, solo hace que el pico de memoria
+  // sea el doble. Secuencial, el primero se libera antes de que arranque el
+  // segundo.
+  //
+  // Un PDF de 40 hojas con fotos pesa decenas de MB, y pdf-lib en memoria ocupa
+  // varias veces lo que el archivo. Ese pico es lo que tira la instancia.
+  // ==========================================================================
+  const paginas = await lineasPorPagina(buffer);
+  const hojas = await partirHojas(buffer);
 
   const filas = [];
   const guiasVistas = new Map();
