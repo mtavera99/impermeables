@@ -10,6 +10,7 @@ const promesas = require("./promesas");
 const comercial = require("./comercial");
 const posventa = require("./posventa");
 const catalogo = require("./catalogo");
+const mediaCatalogo = require("./media");
 
 // ============================================================================
 // PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
@@ -260,11 +261,82 @@ function extractMedia(text) {
 
 // Respaldo: detecta por palabras clave del mensaje del cliente qué foto/video enviar,
 // por si la IA no puso el marcador. Así el envío de multimedia es confiable.
-function detectMediaIntent(text) {
+// ============================================================================
+// 📸 SOLO LAS FOTOS QUE EXISTEN DE VERDAD
+//
+// Dos razones, las dos aprendidas a los golpes:
+//
+//  1. El 21-sep TODAS las fotos daban 404 (el BASE apuntaba a la carpeta del repo
+//     y GitHub Pages publica desde `docs/`). El cliente pedía fotos, Meta
+//     respondía `131053 Media upload error 404`, y no llegaba nada. Nadie se
+//     enteraba.
+//  2. Hoy, con la campaña del V10 encendida antes de tener sus fotos, la
+//     alternativa a "no mandar nada" era mandar la del impermeable. Eso es peor:
+//     el cliente ve otro producto y desconfía de todo lo demás.
+// ============================================================================
+function mediaDisponible(claves) {
+  const disponibles = mediaCatalogo.soloDisponibles(claves);
+  const faltan = (claves || []).filter((k) => !disponibles.includes(k));
+  if (faltan.length) {
+    console.warn(
+      `📸 Se pidieron fotos que todavía no están subidas (${faltan.join(", ")}). ` +
+        "NO se manda ninguna en su lugar: el bot lo dice con palabras."
+    );
+  }
+  return disponibles;
+}
+
+function detectMediaIntent(text, productoId) {
   const t = (text || "").toLowerCase();
   const has = (arr) => arr.some((w) => t.includes(w));
   const quiereVer = has(["foto", "fotos", "imagen", "imagenes", "imágenes",
     "muestr", "muéstr", "enséñ", "enseñ", "ensename", "mira", "manda", "envia", "envía", " ver "]);
+
+  // ==========================================================================
+  // 🎧 LAS FOTOS DEL INTERCOMUNICADOR
+  //
+  // 🔴 REPRODUCIDO EL 28-SEP, CON LA CAMPAÑA YA ENCENDIDA: un cliente que venía
+  // del anuncio del V10 escribía "¿me manda fotos?" y recibía **la foto del
+  // conjunto impermeable**, con su caption de 4 piezas y PVC siliconado.
+  //
+  // La causa está al final de esta función: "si pidió ver algo y no reconocí qué,
+  // mandá la foto del producto" — y "el producto" era siempre el impermeable.
+  //
+  // 🔑 Esta rama va PRIMERO y sale con `return`: en un hilo de intercomunicadores,
+  // ninguna palabra del impermeable puede colarse. Un cliente del V10 que escribe
+  // "cómo se ve puesto" quiere ver el intercomunicador en el casco, no un
+  // impermeable puesto.
+  //
+  // ⚠️ Lo que devuelve pasa después por `media.soloDisponibles`, así que mientras
+  // no estén los archivos no se manda nada — en vez de mandar lo de otro producto.
+  // ==========================================================================
+  if (catalogo.esV10(productoId)) {
+    const delV10 = [];
+    // Lo específico primero.
+    if (has(["puesto", "puesta", "en el casco", "montado", "instalado", "como se ve", "cómo se ve", "se ve"])) {
+      delV10.push("v10_puesto");
+    }
+    if (has(["combo", "los dos", "las dos", "ambos", "pareja", "x2"])) delV10.push("v10_combo");
+    if (has(["incluye", "trae", "contenido", "viene con", "que viene", "adentro"])) delV10.push("v10_contenido");
+    // La caja cerrada responde "¿qué modelo es?" y "¿es original?", que son las dos
+    // preguntas donde ver el empaque con el nombre impreso vale más que un texto.
+    if (has(["caja", "empaque", "modelo", "original", "marca", "presentacion", "presentación"])) delV10.push("v10_caja");
+    // Y si pidió ver algo sin decir qué, la foto principal del producto.
+    if (quiereVer && delV10.length === 0) delV10.push("v10");
+    // Si nombró el producto y quiere verlo, también la principal.
+    if (quiereVer && has(["interco", "v10"]) && !delV10.includes("v10")) delV10.push("v10");
+    if (t.includes("video")) delV10.push("video");
+    // 🔑 UNA SOLA FOTO POR MENSAJE. El dueño fue explícito con el tono: "no
+    // bombardear con características", "mensajes relativamente cortos". Tres fotos
+    // seguidas por una pregunta se leen como spam, no como un vendedor.
+    //
+    // Se queda la PRIMERA, que es la más específica: las condiciones están
+    // ordenadas de lo más preciso ("puesto en el casco") a lo más genérico ("una
+    // foto cualquiera"). Ejemplo real: "¿qué trae la caja?" activaba el contenido Y
+    // la caja cerrada; gana el contenido, que es lo que preguntó.
+    return delV10.slice(0, 1);
+  }
+
   const keys = [];
   // Colores con foto individual disponible
   const conFoto = [];
@@ -946,7 +1018,14 @@ async function generateReply(phone, userText) {
     }
   }
   // Combina lo que pidió la IA (marcadores) con la detección por palabras clave del cliente
-  const media = Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText)]));
+  // 📸 Las fotos del producto de ESTE hilo, y solo las que existen de verdad.
+  //
+  // `soloDisponibles` es la red que evita el error del 21-sep (todas las fotos
+  // daban 404 y nadie se enteraba) y el de hoy (mandar la foto de otro producto
+  // porque la del correcto no está subida todavía).
+  const media = mediaDisponible(
+    Array.from(new Set([...mediaRes.keys, ...detectMediaIntent(userText, productoId)]))
+  );
 
   // ==========================================================================
   // 📊 LA CUENTA DE LO COMERCIAL — esto es lo que hace la mejora medible

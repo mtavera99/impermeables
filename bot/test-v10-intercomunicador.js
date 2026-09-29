@@ -518,6 +518,114 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
   }
 
   // =========================================================================
+  console.log("\n── 25. 📸 FOTOS: nunca la de otro producto ──");
+  //
+  // 🔴 REPRODUCIDO CON LA CAMPAÑA YA ENCENDIDA (28-sep): un cliente que venía del
+  // anuncio del intercomunicador escribía "¿me manda fotos?" y recibía **la foto
+  // del conjunto impermeable**, con su caption de 4 piezas y PVC siliconado.
+  //
+  // La causa estaba en la última regla de `detectMediaIntent`: "si pidió ver algo y
+  // no reconocí qué, mandá la foto del producto" — y "el producto" era siempre el
+  // impermeable.
+  // =========================================================================
+  {
+    const mediaCat = require("./src/media");
+    const fotosV10 = ["v10", "v10_puesto", "v10_combo", "v10_contenido", "v10_caja"];
+
+    // Las entradas existen en el catálogo de fotos.
+    for (const k of fotosV10) {
+      chequear(`la foto "${k}" está declarada en el catálogo`, Boolean(mediaCat.MEDIA[k]), "falta la entrada");
+      chequear(`  y dice qué archivo espera`, Boolean(mediaCat.MEDIA[k].archivo), mediaCat.MEDIA[k].archivo);
+    }
+    // Y sus captions hablan del intercomunicador, no de impermeables.
+    for (const k of fotosV10) {
+      const cap = mediaCat.MEDIA[k].caption || "";
+      chequear(`  el texto de "${k}" no menciona impermeables ni tallas`, !/impermeable|talla|franja/i.test(cap), cap.slice(0, 70));
+    }
+
+    // 🔑 EL CASO URGENTE: sin fotos subidas, NO se manda ninguna.
+    {
+      const t = nuevoTel();
+      await recorrer(t, [{ cliente: "info de los intercomunicadores" }]);
+      const r = await recorrer(t, [{ cliente: "me manda fotos?", ia: "Claro, mirá 📸" }]);
+      chequear(
+        "🔑 sin fotos subidas NO manda ninguna (antes mandaba la del impermeable)",
+        r.ultima.media.length === 0,
+        JSON.stringify(r.ultima.media)
+      );
+      // ⛔ Y nunca, en ninguna circunstancia, una foto del impermeable.
+      const delImpermeable = ["producto", "modelo", "colores", "rojo", "verde", "negro", "colmena", "reflectiva", "guantes"];
+      chequear(
+        "⛔ ninguna foto del impermeable se cuela en un hilo de V10",
+        !r.ultima.media.some((k) => delImpermeable.includes(k)),
+        JSON.stringify(r.ultima.media)
+      );
+      // Y el guion le dice al modelo que no prometa lo que no hay.
+      const g = buildSystemPrompt(V);
+      chequear("  el guion avisa que todavía no hay fotos", /TODAVÍA NO TENEMOS FOTOS/.test(g));
+      chequear("  y le prohíbe prometerlas", /NO prometas mandarlas/.test(g));
+      chequear("  y le prohíbe mandar una del impermeable", /NUNCA mandes una foto del impermeable/.test(g));
+    }
+
+    // 🔑 Y AHORA EL CASO DE MAÑANA: con las fotos subidas, funcionan solas.
+    // Se crean los archivos de verdad en docs/img/ y se borran al final.
+    {
+      const carpeta = mediaCat.CARPETA_IMG;
+      const creados = [];
+      let sePudo = true;
+      try {
+        if (!fs.existsSync(carpeta)) fs.mkdirSync(carpeta, { recursive: true });
+        for (const nombre of ["v10-producto.jpg", "v10-puesto.jpg", "v10-combo.jpg", "v10-contenido.jpg", "v10-caja.jpg"]) {
+          const ruta = path.join(carpeta, nombre);
+          if (!fs.existsSync(ruta)) {
+            fs.writeFileSync(ruta, "foto de prueba");
+            creados.push(ruta);
+          }
+        }
+      } catch (e) {
+        sePudo = false;
+      }
+
+      if (!sePudo) {
+        console.log("⚠️  no se pudo escribir en docs/img/, se salta la prueba de fotos subidas");
+      } else {
+        // El módulo guarda en caché si el archivo existe, así que se recarga.
+        delete require.cache[require.resolve("./src/media")];
+        delete require.cache[require.resolve("./src/prompt")];
+        const mediaFresco = require("./src/media");
+        const promptFresco = require("./src/prompt");
+
+        for (const k of fotosV10) {
+          chequear(`🔑 con el archivo subido, "${k}" queda disponible`, mediaFresco.disponible(k) === true);
+        }
+        const g2 = promptFresco.buildSystemPrompt(V);
+        chequear("  el guion ahora SÍ ofrece las fotos", /\[\[MEDIA:v10\]\]/.test(g2) && !/TODAVÍA NO TENEMOS FOTOS/.test(g2));
+        chequear("  con el marcador de la del casco", /\[\[MEDIA:v10_puesto\]\]/.test(g2));
+        chequear("  y sigue prohibiendo las del impermeable", /Nunca mandes fotos del impermeable/.test(g2));
+        chequear("  y no hay que tocar código: alcanza con subir el archivo", mediaFresco.fotosFaltantes().length === 0, JSON.stringify(mediaFresco.fotosFaltantes()));
+      }
+
+      // Se borra lo que creó la prueba: no deja basura en el repo.
+      for (const ruta of creados) {
+        try { fs.unlinkSync(ruta); } catch {}
+      }
+      delete require.cache[require.resolve("./src/media")];
+      delete require.cache[require.resolve("./src/prompt")];
+    }
+
+    // Las instrucciones para el dueño existen y están donde se van a buscar.
+    {
+      const leeme = path.join(__dirname, "..", "docs", "img", "LEEME-fotos.md");
+      chequear("hay instrucciones escritas en docs/img/", fs.existsSync(leeme));
+      if (fs.existsSync(leeme)) {
+        const texto = fs.readFileSync(leeme, "utf8");
+        chequear("  con los nombres exactos de los archivos", /v10-producto\.jpg/.test(texto) && /v10-puesto\.jpg/.test(texto));
+        chequear("  y avisan del límite de peso de WhatsApp", /5 MB/.test(texto));
+      }
+    }
+  }
+
+  // =========================================================================
   console.log("\n── 23. 🔒 EL V10 NO HEREDA LAS TARIFAS DE DOS IMPERMEABLES ──");
   //
   // 🔴 EL DUEÑO LO PIDIÓ CON ESTAS PALABRAS: que intercom_v10_2x "no herede nunca

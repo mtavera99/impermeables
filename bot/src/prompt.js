@@ -636,6 +636,49 @@ Si el cliente está muy molesto, pide un asesor, o pregunta algo que no puedes r
 // el precio se lo entrega el código en el bloque `## PRECIO` (ver
 // cotizacion.bloqueDeDatos). Este guion solo explica CÓMO vender, nunca calcula.
 // ============================================================================
+// ----------------------------------------------------------------------------
+// 📸 QUÉ DECIRLE AL MODELO SOBRE LAS FOTOS DEL V10
+//
+// 🔴 POR QUÉ ES CONDICIONAL Y SE MIRA EN CADA TURNO. La campaña del
+// intercomunicador arrancó ANTES de que estuvieran las fotos del producto. Si el
+// guion dijera siempre "mandá la foto", el modelo se la prometería al cliente, no
+// llegaría nada, y el cliente se queda esperando algo que no existe — que es la
+// forma más rápida de perder una venta que ya estaba caliente.
+//
+// Así que el guion dice la verdad de HOY: se consulta qué archivos hay de verdad
+// en `docs/img/`. En el momento en que el dueño suba las fotos, este texto cambia
+// solo, sin tocar código ni desplegar.
+// ----------------------------------------------------------------------------
+function seccionDeFotosV10() {
+  const media = require("./media");
+  const hay = ["v10", "v10_puesto", "v10_combo", "v10_contenido"].filter((k) => media.disponible(k));
+
+  if (!hay.length) {
+    return (
+      `⛔ TODAVÍA NO TENEMOS FOTOS DE ESTE PRODUCTO CARGADAS.\n` +
+      `Si te piden fotos, NO prometas mandarlas y NO digas "te la envío" ni "ahí te va":\n` +
+      `no va a llegar nada y el cliente se queda esperando.\n` +
+      `Decí la verdad y seguí vendiendo, algo así:\n` +
+      `*"Ahora mismo no tengo la foto a mano acá 🙌 Te cuento: se monta en el casco y sirve para\n` +
+      `hablar de casco a casco, música, GPS y llamadas. ¿Para qué ciudad sería el envío?"*\n` +
+      `⛔ Y NUNCA mandes una foto del impermeable: es otro producto.`
+    );
+  }
+
+  const marcadores = {
+    v10: "el intercomunicador → [[MEDIA:v10]]",
+    v10_puesto: "cómo se ve puesto en el casco → [[MEDIA:v10_puesto]]",
+    v10_combo: "el combo de dos → [[MEDIA:v10_combo]]",
+    v10_contenido: "qué viene en la caja → [[MEDIA:v10_contenido]]",
+  };
+  return (
+    `Si piden ver el producto, agregá el marcador que corresponda al final del mensaje:\n` +
+    hay.map((k) => `- ${marcadores[k]}`).join("\n") +
+    `\n- UNA sola foto por mensaje, y no repitas una que ya mandaste.\n` +
+    `⛔ Nunca mandes fotos del impermeable en esta conversación.`
+  );
+}
+
 function promptV10() {
   const v10 = catalogo.de("intercom_v10_2x");
   return `Sos el asesor de ventas de BikerPro por WhatsApp. Colombiano, cálido y directo.
@@ -741,6 +784,9 @@ mensaje de cierre, agregá como ÚLTIMA línea EXACTAMENTE este bloque:
   Si no coincide, el pedido se despacha con el recaudo mal.
 - No pongas "talla" ni "color": este producto no los tiene.
 - NO generes el bloque antes de que confirme, y no lo menciones al cliente.
+
+## 📸 FOTOS
+${seccionDeFotosV10()}
 
 ## PASAR A UN HUMANO
 Si el cliente está muy molesto, pide un asesor, insiste en un descuento, quiere al por mayor, o
