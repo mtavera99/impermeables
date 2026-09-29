@@ -329,17 +329,67 @@ const PLANES_GUIAS = new Map(); // id -> { filas, creado }
 // error: si pasaron horas, la ventana de 24h de esos clientes pudo cambiar.
 const PLAN_TTL_MS = 2 * 60 * 60 * 1000;
 
+/**
+ * Cuántos MB de hojas de PDF están retenidas en los planes en memoria.
+ * 🔑 Es el número que explica un reinicio por memoria: cada hoja de un PDF de
+ * guías es un PDF entero de una página, y el plan las guarda TODAS.
+ */
+function mbDeHojasRetenidas() {
+  let bytes = 0;
+  let hojas = 0;
+  for (const p of PLANES_GUIAS.values()) {
+    for (const f of p.filas || []) {
+      if (f && f.hoja && f.hoja.length) {
+        bytes += f.hoja.length;
+        hojas++;
+      }
+    }
+  }
+  return { mb: Math.round((bytes / 1048576) * 10) / 10, hojas, planes: PLANES_GUIAS.size };
+}
+
+// ============================================================================
+// ⏳ UN PLAN NO PUEDE VIVIR PARA SIEMPRE — 30-sep (correo de Render)
+//
+// El TTL de 2 horas se mide desde `creado`, y cuando una guía falla el código
+// REFRESCA `creado` para que el dueño pueda reintentar sin subir el PDF de nuevo.
+// Eso está bien, pero significa que cada reintento le regala otras 2 horas.
+//
+// 🔴 Y el barrido solo corría al subir un PDF NUEVO. O sea: un plan con alguna
+// guía que falló y que el dueño no terminó de reintentar se quedaba en memoria
+// CON TODAS SUS HOJAS hasta el próximo PDF, que puede ser al otro día. Cada hoja
+// es un PDF completo de una página.
+//
+// `nacio` es la fecha real de nacimiento y NO se refresca nunca: pone un techo a
+// la vida del plan por más reintentos que haya.
+// ============================================================================
+const PLAN_VIDA_MAX_MS = 6 * 60 * 60 * 1000; // 6 horas
+
 function limpiarPlanesViejos() {
   const ahora = Date.now();
+  let liberadas = 0;
   for (const [id, p] of PLANES_GUIAS) {
-    if (ahora - p.creado > PLAN_TTL_MS) PLANES_GUIAS.delete(id);
+    const vencido = ahora - p.creado > PLAN_TTL_MS;
+    const demasiadoViejo = ahora - (p.nacio || p.creado) > PLAN_VIDA_MAX_MS;
+    if (vencido || demasiadoViejo) {
+      liberadas += (p.filas || []).filter((f) => f && f.hoja).length;
+      PLANES_GUIAS.delete(id);
+    }
   }
   for (const [id, p] of PLANES_NOVEDADES) {
     if (ahora - p.creado > PLAN_TTL_MS) PLANES_NOVEDADES.delete(id);
   }
   // Los guardados en disco también, para que el archivo no crezca sin control.
   store.limpiarPlanesGuardados(PLAN_TTL_MS);
+  if (liberadas) console.log(`🧠 Se liberaron ${liberadas} hoja(s) de PDF de planes vencidos.`);
+  return liberadas;
 }
+
+// 🔑 Y AHORA EL BARRIDO CORRE SOLO. Antes dependía de que el dueño subiera otro
+// PDF: si no lo hacía, las hojas se quedaban en memoria indefinidamente. `unref`
+// para que este reloj no sea motivo de que el proceso siga vivo.
+const RELOJ_PLANES = setInterval(limpiarPlanesViejos, 10 * 60 * 1000);
+if (RELOJ_PLANES.unref) RELOJ_PLANES.unref();
 
 // Mismo mecanismo que las guías: el plan vive entre "revisar" y "enviar" para
 // no obligar a pegar el texto dos veces, y se muere en 30 minutos.
@@ -833,7 +883,16 @@ app.post("/guias/revisar", express.raw({ type: "application/pdf", limit: "40mb" 
 
   limpiarPlanesViejos();
   const id = require("crypto").randomUUID();
-  PLANES_GUIAS.set(id, { filas, creado: Date.now() });
+  // `nacio` no se refresca nunca: es el techo de vida del plan. Ver PLAN_VIDA_MAX_MS.
+  PLANES_GUIAS.set(id, { filas, creado: Date.now(), nacio: Date.now() });
+
+  // 🧠 Se deja anotado en el log cuánta memoria quedó retenida y cuánta usa el
+  // proceso. Sin este número, un reinicio por memoria solo se puede adivinar.
+  const ret = mbDeHojasRetenidas();
+  console.log(
+    `🧠 Después de procesar el PDF: ${Math.round(process.memoryUsage().rss / 1048576)} MB de proceso, ` +
+      `${ret.mb} MB en ${ret.hojas} hoja(s) retenida(s) en ${ret.planes} plan(es).`
+  );
 
   anotarEvento({
     tipo: "guias-revisadas",
@@ -1639,6 +1698,35 @@ app.get("/health", (_req, res) => {
     // Para poder confirmar que la nota comercial quedó APAGADA sin entrar a Render.
     nota_comercial: String(process.env.NOTA_COMERCIAL ?? "0").trim() === "1" ? "ENCENDIDA" : "apagada",
     disco: disco ? { configurado: disco.configurado, aparte: disco.discoAparte, arranques: disco.arranques } : null,
+    // ======================================================================
+    // 🧠 MEMORIA — 30-sep, después del correo de Render "exceeded its memory
+    // limit".
+    //
+    // Sin esto, un reinicio por memoria solo se puede adivinar. `hojas_retenidas`
+    // es el dato que importa: cada hoja de un PDF de guías es un PDF completo de
+    // una página, y el plan las guarda TODAS mientras el dueño revisa. Si acá hay
+    // decenas de MB, ya está explicado el reinicio.
+    // ======================================================================
+    archivos: (() => {
+      try {
+        return store.tamanosEnDisco();
+      } catch {
+        return null;
+      }
+    })(),
+    memoria: (() => {
+      const m = process.memoryUsage();
+      const ret = mbDeHojasRetenidas();
+      return {
+        proceso_mb: Math.round(m.rss / 1048576),
+        heap_mb: Math.round(m.heapUsed / 1048576),
+        // Los Buffers de los PDF NO están en el heap: van acá. Mirar solo el
+        // heap haría parecer que no pasa nada.
+        buffers_mb: Math.round((m.external || 0) / 1048576),
+        hojas_retenidas: ret,
+        planes_novedades: PLANES_NOVEDADES.size,
+      };
+    })(),
   });
 });
 
@@ -2415,7 +2503,8 @@ async function handleWebhook(body) {
         }
 
         console.log(`Cliente ${from}: ${text}`);
-        const { reply, order, handoff, media, pedidoRescatado, revisionHumana } = await generateReply(from, text);
+        const { reply, order, handoff, media, pedidoRescatado, revisionHumana, posventaSoporte } =
+          await generateReply(from, text);
         if (reply) {
           // 🔴 Registrar el RESULTADO del envío, no solo el intento. Si Meta
           // rechaza el mensaje, esto es lo único que lo delata en los logs.
@@ -2574,6 +2663,25 @@ async function handleWebhook(body) {
 
 ` +
               `El cliente recibió una versión sin esa promesa. El chat quedó en pausa: seguí vos.`
+          );
+        }
+        // ==================================================================
+        // 🛟 SOPORTE DE POSVENTA: garantía, cambio, o algo que llegó mal.
+        //
+        // Un cliente que ya pagó y tiene el producto con un problema no puede
+        // quedar esperando a que alguien mire el panel. El chat NO se pausa —el
+        // bot puede seguir siendo útil— pero el dueño se entera en el momento.
+        // ==================================================================
+        if (posventaSoporte && OWNER) {
+          await sendText(
+            OWNER,
+            `🛟 POSVENTA: ${from}
+` +
+              `${posventaSoporte}
+
+` +
+              `Ya compró y tiene un problema con el producto. En el panel sale con borde violeta ` +
+              `y el atajo «🛟 Posventa» arriba. El bot sigue activo en ese chat.`
           );
         }
       }
