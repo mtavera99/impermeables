@@ -317,13 +317,24 @@ function detectMediaIntent(text, productoId) {
       delV10.push("v10_puesto");
     }
     if (has(["combo", "los dos", "las dos", "ambos", "pareja", "x2"])) delV10.push("v10_combo");
-    if (has(["caja", "incluye", "trae", "contenido", "viene con", "que viene"])) delV10.push("v10_contenido");
+    if (has(["incluye", "trae", "contenido", "viene con", "que viene", "adentro"])) delV10.push("v10_contenido");
+    // La caja cerrada responde "¿qué modelo es?" y "¿es original?", que son las dos
+    // preguntas donde ver el empaque con el nombre impreso vale más que un texto.
+    if (has(["caja", "empaque", "modelo", "original", "marca", "presentacion", "presentación"])) delV10.push("v10_caja");
     // Y si pidió ver algo sin decir qué, la foto principal del producto.
     if (quiereVer && delV10.length === 0) delV10.push("v10");
     // Si nombró el producto y quiere verlo, también la principal.
     if (quiereVer && has(["interco", "v10"]) && !delV10.includes("v10")) delV10.push("v10");
     if (t.includes("video")) delV10.push("video");
-    return delV10;
+    // 🔑 UNA SOLA FOTO POR MENSAJE. El dueño fue explícito con el tono: "no
+    // bombardear con características", "mensajes relativamente cortos". Tres fotos
+    // seguidas por una pregunta se leen como spam, no como un vendedor.
+    //
+    // Se queda la PRIMERA, que es la más específica: las condiciones están
+    // ordenadas de lo más preciso ("puesto en el casco") a lo más genérico ("una
+    // foto cualquiera"). Ejemplo real: "¿qué trae la caja?" activaba el contenido Y
+    // la caja cerrada; gana el contenido, que es lo que preguntó.
+    return delV10.slice(0, 1);
   }
 
   const keys = [];
