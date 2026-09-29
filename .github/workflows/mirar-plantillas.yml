@@ -1,0 +1,82 @@
+name: Mirar el estado de las plantillas
+
+# ============================================================================
+# 🔴 POR QUÉ EXISTE (29-sep)
+#
+# El dueño intentó avisar 5 novedades y las 5 fallaron: "Enviados 0 de 5. 5
+# fallaron". Cuando FALLAN TODAS, el problema no es de un cliente: es de la
+# plantilla, del token o de la cuenta de Meta. Y eso no se puede adivinar desde
+# el código — hay que preguntárselo a Meta.
+#
+# El bot ya tiene el diagnóstico en /plantillas, pero para leerlo hace falta
+# salida a internet. Este flujo la tiene.
+#
+# 🔒 Y ESTE REPOSITORIO ES PÚBLICO, así que el flujo publica SOLO lo seguro:
+# nombre de la plantilla, idioma, estado, categoría y cuántas variables tiene.
+#
+# ⛔ NO se imprime `fallosDeEntrega`, porque trae los teléfonos de clientes
+# reales. Un log de Actions en un repo público es tan visible como una página
+# web: ya se decidió antes no volcar /chat ni /panel por la misma razón.
+# ============================================================================
+
+on:
+  workflow_dispatch:
+
+jobs:
+  mirar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preguntarle a Meta por las plantillas
+        env:
+          BOT_URL: ${{ secrets.BOT_URL }}
+          BOT_TOKEN: ${{ secrets.BOT_VERIFY_TOKEN }}
+        run: |
+          if [ -z "$BOT_URL" ] || [ -z "$BOT_TOKEN" ]; then
+            echo "🔴 Faltan los secretos BOT_URL o BOT_VERIFY_TOKEN en el repo."
+            exit 1
+          fi
+
+          CODE=$(curl -s -o p.json -w "%{http_code}" --max-time 90 \
+            "$BOT_URL/plantillas?token=$BOT_TOKEN")
+          echo "GET /plantillas → HTTP $CODE"
+          if [ "$CODE" != "200" ]; then
+            echo "🔴 No contestó 200. Si es 403, el BOT_VERIFY_TOKEN del repo no coincide con PANEL_TOKEN de Render."
+            exit 1
+          fi
+
+          # 🔒 Se imprime SOLO lo que no identifica a nadie. Ver la cabecera.
+          node -e '
+            const d = JSON.parse(require("fs").readFileSync("p.json","utf8"));
+            if (!d.ok) {
+              console.log("🔴 Meta no contestó bien:", d.error || "(sin detalle)");
+              if (d.pista) console.log("   pista:", d.pista);
+              console.log("");
+              console.log("Lo que el bot espera encontrar:");
+              for (const p of d.queEsperaElBot || []) {
+                console.log(`   · ${p.nombre} (${p.idioma}) — ${p.variables} variable(s) — ${p.queHace}`);
+              }
+              process.exit(0);
+            }
+
+            console.log("── Lo que el bot USA y cómo está en Meta ──");
+            for (const p of d.plantillas || []) {
+              const icono = p.ok ? "✅" : "🔴";
+              console.log(`${icono} ${p.nombre} (${p.idioma})`);
+              console.log(`     para: ${p.queHace || "?"}`);
+              if (p.estado) console.log(`     estado en Meta: ${p.estado}`);
+              if (p.variablesEnMeta !== undefined || p.variables !== undefined) {
+                console.log(`     variables: el bot manda ${p.variables}, la plantilla espera ${p.variablesEnMeta ?? "?"}`);
+              }
+              if (!p.ok && p.problema) console.log(`     🔴 ${p.problema}`);
+            }
+
+            console.log("");
+            console.log("── Resumen ──");
+            console.log(JSON.stringify(d.resumen, null, 2));
+
+            console.log("");
+            console.log("── Todas las plantillas de la cuenta ──");
+            for (const t of d.enLaCuenta || []) {
+              console.log(`   ${t.estado === "APPROVED" ? "✅" : "⚠️ "} ${t.nombre} (${t.idioma}) · ${t.estado} · ${t.categoria} · ${t.variables} variable(s)`);
+            }
+          '
