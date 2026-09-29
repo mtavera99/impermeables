@@ -1365,23 +1365,18 @@ function cotizarPorProductoMasEnvio({ producto, destino, uds, texto }) {
     };
   }
 
-  // `bandaDe` devuelve la letra o null si no reconoce la ciudad. Cuando no
-  // reconoce se usa la banda por defecto, que es la MISMA regla del impermeable
-  // (la E, la más cara): así un municipio desconocido nunca se cotiza de menos.
-  const bandaHallada = fletes.bandaDe(destino.ciudadTarifario || destino.ciudad);
-  const claveBanda = bandaHallada || fletes.BANDA_POR_DEFECTO;
-  const envio = catalogo.envioCobradoDe(claveBanda);
-
-  if (!Number.isFinite(Number(envio)) || Number(envio) <= 0) {
-    return { ...base, ok: false, motivo: "sin_total", uds };
-  }
-
-  const precio = catalogo.precioDe(producto.id, uds);
-
-  // ⛔ CANTIDAD FUERA DE TABLA: se informan los precios que existen y se escala.
+  // ⛔ EL PRECIO SE MIRA PRIMERO, Y EL ORDEN NO ES CASUAL.
+  //
+  // 🔴 Lo cazó la prueba: cuando el envío se evaluaba antes, una cantidad de 3+
+  // salía por "sin_total" —porque la política de paquete único no cubre 3— y se
+  // perdía el motivo que de verdad le sirve al bot: que NO HAY PRECIO autorizado
+  // para esa cantidad, junto con los precios que sí existen. Un "no se pudo
+  // cotizar" genérico deja al modelo sin nada útil que decirle al cliente.
+  //
   // El dueño lo pidió textual: "NO crear silenciosamente una nueva promoción no
   // autorizada". Sumar "el par en promo + el resto suelto" ya sería decidir una
   // política de mayoreo que nadie aprobó.
+  const precio = catalogo.precioDe(producto.id, uds);
   if (!precio || precio.fueraDeTabla) {
     return {
       ...base,
@@ -1393,6 +1388,23 @@ function cotizarPorProductoMasEnvio({ producto, destino, uds, texto }) {
         `Para ${uds} unidades no hay precio autorizado. Los que sí existen: ` +
         `1 = ${fletes.fmt(producto.precios[1])} · 2 = ${fletes.fmt(producto.precios[2])}.`,
     };
+  }
+
+  // `bandaDe` devuelve la letra o null si no reconoce la ciudad. Cuando no
+  // reconoce se usa la banda por defecto, que es la MISMA regla del impermeable
+  // (la E, la más cara): así un municipio desconocido nunca se cotiza de menos.
+  const bandaHallada = fletes.bandaDe(destino.ciudadTarifario || destino.ciudad);
+  const claveBanda = bandaHallada || fletes.BANDA_POR_DEFECTO;
+  // 🔒 El envío sale de `catalogo.envioDe`, que es el ÚNICO camino y aplica la
+  // política declarada del producto. Para el V10 eso significa el cargo de un
+  // paquete individual, igual para 1 y 2 unidades, y NUNCA las constantes de dos
+  // conjuntos impermeables. Ver POLITICAS_DE_ENVIO en catalogo.js.
+  const envio = catalogo.envioDe(producto.id, claveBanda, precio.uds);
+
+  // Si la política no cubre esta cantidad, `envioDe` devuelve null a propósito en
+  // vez de estirar la regla: que 2 quepan en un sobre no dice nada de que quepan 8.
+  if (!Number.isFinite(Number(envio)) || Number(envio) <= 0) {
+    return { ...base, ok: false, motivo: "sin_total", uds };
   }
 
   const total = precio.precio + envio;

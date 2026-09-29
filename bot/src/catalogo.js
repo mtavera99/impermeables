@@ -29,11 +29,11 @@
 
 const fletes = require("./fletes");
 
-// ----------------------------------------------------------------------------
-// EL ENVÍO DEL V10: DE DÓNDE SALE Y POR QUÉ NO ES UNA TARIFA NUEVA
+// ============================================================================
+// 📦 LA POLÍTICA DE ENVÍO, DECLARADA POR PRODUCTO
 //
 // El dueño fue explícito: "no crear un segundo sistema de tarifas, reutilizar
-// EXACTAMENTE el motor de envíos que ya usa BikerPro". Así que el envío del V10
+// EXACTAMENTE el motor de envíos que ya usa BikerPro". Así que el cargo de envío
 // se deriva del mismo tarifario, no de una tabla inventada:
 //
 //     envío de la banda = BANDAS[banda].total − PRECIO_PRODUCTO
@@ -41,25 +41,85 @@ const fletes = require("./fletes");
 // O sea, literalmente lo que el negocio YA le cobra de envío a un cliente de esa
 // banda: A $13.100 · B $18.100 · C $22.100 · D $23.100 · E $25.100.
 //
-// ⚠️ SUPUESTO QUE HAY QUE CONFIRMAR (está en el PR): el envío es EL MISMO para 1
-// y para 2 intercomunicadores.
-//
-// Por qué: dos intercomunicadores caben en el mismo paquete chico. NO se usa
-// ENVIO_REAL_2 —el flete de dos unidades del tarifario— porque ese número está
-// medido para DOS CONJUNTOS IMPERMEABLES, que son voluminosos: va de $23.947 a
-// $45.214. Aplicárselo al V10 haría que el combo de banda E saliera $145.114 en
-// vez de $125.000, y estaríamos cobrando un flete de ropa por un paquete que
-// pesa gramos. Eso no es prudencia, es un error caro.
-//
-// Y al revés también está cubierto: la tarifa de 1 unidad está calibrada para el
-// paquete de un impermeable, que abulta MÁS que un intercomunicador. Así que
-// cobrar eso por el V10 deja margen de sobra en el flete, nunca al revés.
 // ----------------------------------------------------------------------------
-function envioCobradoDe(claveBanda) {
+// 🔒 POR QUÉ ESTO ES UN CANDADO Y NO UN COMENTARIO
+//
+// El dueño lo pidió con estas palabras: que `intercom_v10_2x` **no herede nunca
+// automáticamente reglas de peso/volumen de múltiples impermeables**.
+//
+// El riesgo es concreto y caro. El tarifario tiene tres constantes pensadas para
+// llevar DOS CONJUNTOS IMPERMEABLES, que son voluminosos:
+//
+//     ENVIO_REAL_2      $23.947 (A) … $45.214 (E)   ← flete medido de 2 conjuntos
+//     FLETE_2_OBSERVADO fletes de 2 conjuntos por ciudad
+//     PROMO_2_TOTAL     totales de la promo de 2 conjuntos
+//
+// Si alguna de ésas se le aplicara al combo del V10, el total de banda E pasaría
+// de $125.000 a $145.114: un flete de ropa cobrado por un paquete que pesa
+// gramos. Y el error sería invisible, porque el número "viene del tarifario" y
+// parece legítimo.
+//
+// Así que la política se DECLARA por producto (`politicaDeEnvio`) y hay una
+// función única que la aplica (`envioDe`). Un producto con política
+// `paquete_unico` ignora la cantidad a propósito, y `test-v10-intercomunicador.js`
+// comprueba que su envío no coincida con ninguno de esos valores.
+// ----------------------------------------------------------------------------
+
+/**
+ * Políticas de envío disponibles. Cada producto declara la suya.
+ *
+ * · `por_unidades`  el tarifario decide según la cantidad (impermeable: dos
+ *                   conjuntos abultan el doble y el flete sube de verdad).
+ * · `paquete_unico` 1 o más unidades caben en el MISMO paquete chico, así que el
+ *                   cargo no cambia con la cantidad.
+ */
+const POLITICAS_DE_ENVIO = { POR_UNIDADES: "por_unidades", PAQUETE_UNICO: "paquete_unico" };
+
+/** El cargo de envío de un paquete individual en esa banda. */
+function envioDeUnPaquete(claveBanda) {
   const banda = fletes.BANDAS[claveBanda];
   if (!banda) return null;
   return banda.total - fletes.PRECIO_PRODUCTO;
 }
+
+/**
+ * El cargo de envío de este producto, para esta banda y esta cantidad.
+ *
+ * 🔑 ES EL ÚNICO CAMINO. Si mañana alguien agrega un producto y quiere cobrarle
+ * el envío, pasa por acá y declara su política; no hay una segunda puerta por
+ * donde se pueda colar la tarifa de dos impermeables.
+ *
+ * @param {string} productoId
+ * @param {string} claveBanda A..E
+ * @param {number} uds
+ */
+function envioDe(productoId, claveBanda, uds) {
+  const p = de(productoId);
+  const politica = (p && p.politicaDeEnvio && p.politicaDeEnvio.tipo) || POLITICAS_DE_ENVIO.POR_UNIDADES;
+
+  if (politica === POLITICAS_DE_ENVIO.PAQUETE_UNICO) {
+    // ⛔ `uds` se IGNORA a propósito: es el corazón de esta política. Las unidades
+    // viajan juntas en el mismo paquete, así que el cargo no cambia.
+    //
+    // ⚠️ Y si algún día un producto de esta política supera el tope declarado
+    // (`hastaUnidades`), NO se estira la regla en silencio: se devuelve null y
+    // quien llama lo trata como "no se puede cotizar solo". Que 2 quepan en un
+    // sobre no dice nada de que quepan 8.
+    const tope = Number((p.politicaDeEnvio && p.politicaDeEnvio.hastaUnidades) || 0);
+    if (tope && Number(uds) > tope) return null;
+    return envioDeUnPaquete(claveBanda);
+  }
+
+  // El impermeable no pasa por acá: su total sale de `fletes.cotizar`, donde el
+  // flete de dos unidades está medido de verdad. Esta rama existe para que un
+  // producto futuro pueda pedir ese comportamiento explícitamente.
+  const q = fletes.cotizar(claveBanda, uds);
+  return q && Number.isFinite(Number(q.flete)) ? Number(q.flete) : envioDeUnPaquete(claveBanda);
+}
+
+// Se mantiene el nombre viejo como alias: lo usa la cotización y no hay razón
+// para tocar ese llamado.
+const envioCobradoDe = envioDeUnPaquete;
 
 // ============================================================================
 // LOS PRODUCTOS
@@ -76,6 +136,14 @@ const PRODUCTOS = {
     nombreCorto: "Impermeable",
     etiquetaPanel: "🧥 Impermeable",
     motorDePrecio: "tarifario",
+    costoUnitario: fletes.COSTO_PRODUCTO,
+    // Su flete SÍ sube con la cantidad, y está medido: dos conjuntos abultan el
+    // doble. Por eso su política es la opuesta a la del V10.
+    politicaDeEnvio: {
+      tipo: "por_unidades",
+      provisional: false,
+      porQue: "dos conjuntos abultan el doble; el flete de 2 está medido por ciudad",
+    },
     // Campos que SÍ tienen sentido para este producto y que el bot pide.
     pideTalla: true,
     pideColor: true,
@@ -103,6 +171,41 @@ const PRODUCTOS = {
     // "2 intercomunicadores por $99.900". Decir 2x1 sería prometer que el
     // segundo es gratis, y no lo es.
     precios: { 1: 59900, 2: 99900 },
+
+    // Costo de compra por unidad, confirmado por el dueño el 28-sep.
+    // Sirve para el piso económico que defiende `test-v10-intercomunicador.js`:
+    // si alguien bajara el precio de venta, la prueba avisa antes de desplegar.
+    costoUnitario: 35000,
+
+    // ------------------------------------------------------------------------
+    // 📦 POLÍTICA LOGÍSTICA — REGLA COMERCIAL INICIAL, NO UN COSTO MEDIDO
+    //
+    // 🔴 LA DISTINCIÓN IMPORTA Y EL DUEÑO LA PIDIÓ EXPLÍCITA: esto NO afirma que
+    // conozcamos el costo real de transportadora del V10. **Todavía no hay ni una
+    // guía despachada de este producto**, así que no hay histórico con qué
+    // comparar.
+    //
+    // Lo que sí sabemos es lo físico: 1 o 2 intercomunicadores caben en un solo
+    // paquete chico. De ahí sale la regla — se cobra el envío de UN paquete
+    // individual, el mismo para 1 y para 2 unidades.
+    //
+    // Es una decisión comercial tomada con información incompleta, y está marcada
+    // como tal (`provisional: true`). Cuando salgan las primeras guías se compara
+    // lo cobrado contra lo que facturó la transportadora y se ajusta si hace falta.
+    // ------------------------------------------------------------------------
+    politicaDeEnvio: {
+      tipo: "paquete_unico",
+      hastaUnidades: 2,
+      provisional: true,
+      porQue:
+        "1 o 2 intercomunicadores caben en un solo paquete pequeño; no representan " +
+        "el volumen de dos conjuntos impermeables",
+      // ⛔ Las constantes del tarifario que este producto NO puede usar nunca.
+      // Están medidas para DOS CONJUNTOS IMPERMEABLES. Hay pruebas que verifican
+      // que el envío del V10 no coincida con ninguno de esos valores.
+      noHeredar: ["ENVIO_REAL_2", "FLETE_2_OBSERVADO", "PROMO_2_TOTAL", "RECARGO_UNIDAD_EXTRA"],
+      revisarCuando: "haya las primeras guías despachadas de este producto",
+    },
 
     // Lo que la publicidad empuja: el combo. Cuando alguien pregunta en general,
     // se presenta esto primero.
@@ -414,8 +517,11 @@ function precioDe(productoId, uds) {
 module.exports = {
   PRODUCTOS,
   PRODUCTO_POR_DEFECTO,
+  POLITICAS_DE_ENVIO,
   de,
   esV10,
+  envioDe,
+  envioDeUnPaquete,
   envioCobradoDe,
   productoEn,
   productoDelHilo,

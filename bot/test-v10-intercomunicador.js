@@ -518,6 +518,134 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
   }
 
   // =========================================================================
+  console.log("\n── 23. 🔒 EL V10 NO HEREDA LAS TARIFAS DE DOS IMPERMEABLES ──");
+  //
+  // 🔴 EL DUEÑO LO PIDIÓ CON ESTAS PALABRAS: que intercom_v10_2x "no herede nunca
+  // automáticamente reglas de peso/volumen de múltiples impermeables".
+  //
+  // El riesgo es concreto y caro. El tarifario tiene constantes medidas para llevar
+  // DOS CONJUNTOS IMPERMEABLES, que son voluminosos. Si alguna se le aplicara al
+  // combo del V10, el total de banda E pasaría de $125.000 a $145.114 — un flete de
+  // ropa cobrado por un paquete que pesa gramos. Y sería invisible, porque el
+  // número "viene del tarifario" y parece legítimo.
+  //
+  // Esto no se defiende con un comentario. Se defiende acá.
+  // =========================================================================
+  {
+    const fletes = require("./src/fletes");
+    const bandas = ["A", "B", "C", "D", "E"];
+
+    for (const b of bandas) {
+      const e1 = catalogo.envioDe(V, b, 1);
+      const e2 = catalogo.envioDe(V, b, 2);
+      chequear(`banda ${b}: el envío es el MISMO para 1 y para 2 unidades`, e1 === e2 && e1 > 0, `1ud=${e1} 2uds=${e2}`);
+    }
+
+    // ⛔ Y no puede coincidir con ninguna constante de dos impermeables.
+    const prohibidos = new Set([
+      ...Object.values(fletes.ENVIO_REAL_2),
+      ...Object.values(fletes.PROMO_2_TOTAL),
+      fletes.PROMO_2_UNIDADES,
+      fletes.RECARGO_UNIDAD_EXTRA,
+    ]);
+    for (const b of bandas) {
+      const e = catalogo.envioDe(V, b, 2);
+      chequear(
+        `⛔ banda ${b}: su envío (${e}) NO es ninguna tarifa de dos impermeables`,
+        !prohibidos.has(e),
+        `${e} está en la lista de prohibidos`
+      );
+    }
+
+    // Y el total del combo tampoco puede ser el de dos impermeables.
+    for (const [ciudad, b] of [["Bogota", "A"], ["Cali", "C"], ["Piendamo", "E"]]) {
+      const c = cotizacion.calcular(ciudad, "el combo", { producto: V, cantidad: { uds: 2 } });
+      chequear(
+        `⛔ ${ciudad}: el total del combo V10 (${c.total}) ≠ el de dos impermeables (${fletes.PROMO_2_TOTAL[b]})`,
+        c.total !== fletes.PROMO_2_TOTAL[b],
+        `ambos dan ${c.total}`
+      );
+    }
+
+    // 🔑 La política está DECLARADA, no implícita, y marcada como provisional.
+    const pol = catalogo.de(V).politicaDeEnvio;
+    chequear("la política de envío está declarada en el catálogo", pol && pol.tipo === "paquete_unico", JSON.stringify(pol && pol.tipo));
+    chequear(
+      "🔑 y marcada como PROVISIONAL, porque no hay ni una guía despachada todavía",
+      pol && pol.provisional === true,
+      "si esto dijera false, estaríamos afirmando que medimos un costo que no medimos"
+    );
+    chequear("con el motivo escrito", pol && /paquete pequeño/i.test(pol.porQue || ""), pol && pol.porQue);
+    chequear("y con las constantes prohibidas anotadas", pol && (pol.noHeredar || []).includes("ENVIO_REAL_2"));
+    chequear("y cuándo hay que revisarla", pol && /guías despachadas/i.test(pol.revisarCuando || ""), pol && pol.revisarCuando);
+
+    // Por encima del tope declarado NO se estira la regla en silencio.
+    chequear(
+      "⛔ por encima de 2 unidades no devuelve un envío inventado",
+      catalogo.envioDe(V, "A", 3) === null && catalogo.envioDe(V, "A", 8) === null
+    );
+
+    // 🔒 Y EL CÓDIGO DE LA COTIZACIÓN DEL V10 NO NOMBRA ESAS CONSTANTES.
+    // Análisis del fuente: si alguien mete ENVIO_REAL_2 en ese camino, esto lo caza.
+    const fuenteCotizacion = fs.readFileSync(path.join(__dirname, "src", "cotizacion.js"), "utf8");
+    const funcionV10 = (fuenteCotizacion.match(/function cotizarPorProductoMasEnvio[\s\S]*?\n}/) || [""])[0];
+    chequear("la función existe y se pudo leer", funcionV10.length > 200, `leyó ${funcionV10.length} caracteres`);
+    for (const constante of ["ENVIO_REAL_2", "FLETE_2_OBSERVADO", "PROMO_2_TOTAL", "RECARGO_UNIDAD_EXTRA"]) {
+      chequear(
+        `🔒 el cálculo del V10 no menciona ${constante}`,
+        !funcionV10.includes(constante),
+        `aparece en cotizarPorProductoMasEnvio`
+      );
+    }
+  }
+
+  // =========================================================================
+  console.log("\n── 24. 💰 PISO ECONÓMICO: el precio cubre costo + flete ──");
+  //
+  // El costo de compra del V10 es $35.000 por unidad (confirmado por el dueño).
+  // Esta prueba es la que avisa si alguien baja el precio de venta o sube el costo
+  // y el producto se empieza a vender en pérdida sin que nadie lo note.
+  //
+  // ⚠️ El flete que se usa acá es el de UN IMPERMEABLE, como referencia
+  // conservadora: el paquete del V10 es más chico, así que su flete real debería
+  // ser menor. O sea que estos márgenes son el PISO, no una promesa.
+  // =========================================================================
+  {
+    const fletes = require("./src/fletes");
+    const v10 = catalogo.de(V);
+    chequear("el costo unitario está registrado", v10.costoUnitario === 35000, String(v10.costoUnitario));
+
+    let peor = Infinity;
+    for (const b of ["A", "B", "C", "D", "E"]) {
+      for (const uds of [1, 2]) {
+        const envioCobrado = catalogo.envioDe(V, b, uds);
+        const total = v10.precios[uds] + envioCobrado;
+        const margen = total - v10.costoUnitario * uds - fletes.ENVIO_REAL_1[b];
+        if (margen < peor) peor = margen;
+        chequear(
+          `banda ${b}, ${uds}ud: margen ${"$" + margen.toLocaleString("es-CO")} > 0`,
+          margen > 0,
+          `cobra ${total}, costo ${v10.costoUnitario * uds}, flete ref ${fletes.ENVIO_REAL_1[b]}`
+        );
+      }
+    }
+    // El peor caso medido hoy es banda E con 1 unidad: $21.303.
+    chequear(
+      "🔑 el peor margen del catálogo supera los $15.000",
+      peor > 15000,
+      `el peor es $${peor.toLocaleString("es-CO")} — si bajó de ahí, alguien cambió un precio o un costo`
+    );
+    // ⛔ Y el combo nunca puede dejar menos que una unidad suelta: si eso pasara,
+    // la promo estaría trabajando contra el negocio.
+    for (const b of ["A", "B", "C", "D", "E"]) {
+      const envio = catalogo.envioDe(V, b, 1);
+      const m1 = v10.precios[1] + envio - v10.costoUnitario - fletes.ENVIO_REAL_1[b];
+      const m2 = v10.precios[2] + envio - v10.costoUnitario * 2 - fletes.ENVIO_REAL_1[b];
+      chequear(`⛔ banda ${b}: el combo deja más que una unidad suelta`, m2 > m1, `1ud=${m1} vs combo=${m2}`);
+    }
+  }
+
+  // =========================================================================
   console.log("\n── Extra: la frase que propone el CÓDIGO tiene que pasar su propio validador ──");
   //
   // 🔴 ESTO NO ES UNA PRUEBA DE ADORNO. Al recorrer la conversación a mano encontré
