@@ -1699,14 +1699,38 @@ app.get("/health", (_req, res) => {
     nota_comercial: String(process.env.NOTA_COMERCIAL ?? "0").trim() === "1" ? "ENCENDIDA" : "apagada",
     disco: disco ? { configurado: disco.configurado, aparte: disco.discoAparte, arranques: disco.arranques } : null,
     // ======================================================================
-    // 🧠 MEMORIA — 30-sep, después del correo de Render "exceeded its memory
-    // limit".
+    // 🔐 EL DETALLE VA CON TOKEN, EL RESTO NO.
     //
-    // Sin esto, un reinicio por memoria solo se puede adivinar. `hojas_retenidas`
-    // es el dato que importa: cada hoja de un PDF de guías es un PDF completo de
-    // una página, y el plan las guarda TODAS mientras el dueño revisa. Si acá hay
-    // decenas de MB, ya está explicado el reinicio.
+    // /health es PÚBLICA a propósito: Render la usa para saber si el servicio
+    // está vivo, y tiene que responder sin credenciales.
+    //
+    // Pero la cantidad de conversaciones y el tamaño de los archivos son volumen
+    // de negocio, y este repo es público: cualquiera podría mirar cuánto vende
+    // BikerPro. El diagnóstico de memoria se pide con el token del panel:
+    //   /health?token=TU_PANEL_TOKEN
     // ======================================================================
+    ...(_req.query.token === PANEL_TOKEN ? detalleDeSalud() : { detalle: "pedilo con ?token=TU_PANEL_TOKEN" }),
+  });
+});
+
+// ============================================================================
+// 🧠 MEMORIA Y TAMAÑOS — 30-sep, después del correo de Render "exceeded its
+// memory limit".
+//
+// Sin esto, un reinicio por memoria solo se puede adivinar. `hojas_retenidas` es
+// el dato que importa: cada hoja de un PDF de guías es un PDF completo de una
+// página, y el plan las guarda TODAS mientras el dueño revisa. Si ahí hay decenas
+// de MB, el reinicio ya está explicado.
+//
+// Y `archivos` es el otro sospechoso: acá no hay base de datos, así que cada
+// mensaje lee y reescribe conversations.json COMPLETO. Un JSON de 20 MB ocupa
+// varias veces eso al parsearlo. Si ese número está alto, el arreglo es otro — y
+// conviene saberlo antes de pagar una instancia más grande.
+//
+// Va detrás del token porque es volumen de negocio y este repo es público.
+// ============================================================================
+function detalleDeSalud() {
+  return {
     archivos: (() => {
       try {
         return store.tamanosEnDisco();
@@ -1727,8 +1751,8 @@ app.get("/health", (_req, res) => {
         planes_novedades: PLANES_NOVEDADES.size,
       };
     })(),
-  });
-});
+  };
+}
 
 // ============================================================================
 // PROBAR EL BOT SIN WHATSAPP  —  GET /probar?token=...&msg=...
