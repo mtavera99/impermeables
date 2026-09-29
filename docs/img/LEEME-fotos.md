@@ -23,6 +23,31 @@ Subí los archivos a esta carpeta **con estos nombres exactos**:
 | `v10-puesto.jpg` | Cuando preguntan cómo se ve montado en el casco. |
 | `v10-combo.jpg` | Cuando preguntan por el combo de dos. |
 | `v10-contenido.jpg` | Cuando preguntan qué viene en la caja. |
+| `v10-caja.jpg` | Cuando preguntan qué modelo es o si es original. |
+
+### Cómo se llaman hoy en el Drive de BikerPro (carpeta `Bikerpro`)
+
+Para no equivocarse al renombrar, éste es el mapeo de las fotos que tomó el dueño
+el 29-sep:
+
+| En el Drive se llama | Qué se ve | Renombrala a |
+|---|---|---|
+| `0A71E85E-B3F0-4AF1-…` | el intercomunicador solo, sobre fondo gris | `v10-producto.jpg` |
+| `IMG_3423.PNG` | el casco azul y amarillo con el aparato montado | `v10-puesto.jpg` |
+| `Screenshot 2026-09-29…` | las dos unidades del combo | `v10-combo.jpg` |
+| `A9C0B776-5226-479B-…` | la caja abierta, con el aparato adentro | `v10-contenido.jpg` |
+| `812D0989-7511-43B0-…` | la caja cerrada, se lee "HELMET WIRELESS EARPHONE V10" | `v10-caja.jpg` |
+
+⚠️ **La extensión importa: tienen que terminar en `.jpg`.** Varias de esas fotos son
+`.PNG`. Un `.png` renombrado a `.jpg` funciona igual —WhatsApp lee el contenido, no el
+nombre— pero el nombre del archivo sí tiene que ser exactamente el de la tabla, porque
+es el que busca el bot.
+
+⚠️ **Y ojo con las fotos del impermeable.** En esa misma carpeta hay tomas de una persona
+con chaqueta y franja reflectiva (`IMG_3267` a `IMG_3271`): **ésas son del impermeable**, no
+del intercomunicador. Si alguna se subiera como `v10-*.jpg`, el bot le mandaría un
+impermeable a quien pregunta por un intercomunicador — que es exactamente el error que se
+corrigió el 28-sep.
 
 **No hay que tocar código ni desplegar nada.** En cuanto el archivo está acá, el bot lo empieza
 a ofrecer solo.
