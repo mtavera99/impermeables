@@ -220,6 +220,32 @@ const PRODUCTOS = {
       "llamadas",
     ],
 
+    // ------------------------------------------------------------------------
+    // ✅ DATOS CONFIRMADOS POR EL DUEÑO EL 29-SEP
+    //
+    // Estos SÍ se pueden afirmar, y por eso salieron de `sinDatoConfirmado`. Cada
+    // uno con la respuesta exacta, para que el modelo no tenga que redactarla de
+    // cero y no se le vaya la mano.
+    //
+    // ⚠️ Y CON UN LÍMITE QUE IMPORTA: "resistente al agua" NO es lo mismo que
+    // "sumergible" ni que una certificación IP. El dueño confirmó que se puede
+    // usar bajo la lluvia, que es la pregunta real del motociclista. Si alguien
+    // pregunta si es IP67 o si aguanta sumergido, eso sigue SIN confirmar — ver
+    // `sinDatoConfirmado`, donde quedaron esas palabras a propósito.
+    // ------------------------------------------------------------------------
+    datosConfirmados: {
+      garantia: {
+        pregunta: ["garantia", "garantía", "garantizado"],
+        respuesta: "Sí, tiene 1 mes de garantía 👍",
+      },
+      agua: {
+        pregunta: ["resistente al agua", "resiste el agua", "se moja", "moja", "lluvia", "llueve", "agua"],
+        respuesta:
+          "Sí, resiste el agua sin problema: están hechos para usarlos en la moto y " +
+          "andar bajo la lluvia 🌧️",
+      },
+    },
+
     // ⛔ LO QUE NO SE PUEDE INVENTAR, Y POR QUÉ ESTÁ ESCRITO ACÁ.
     //
     // El 14-sep el bot le prometió a una clienta una oficina de Servientrega que
@@ -229,16 +255,35 @@ const PRODUCTOS = {
     //
     // Estas palabras se usan para detectar la pregunta y contestar que se
     // confirma, en vez de dejar que el modelo rellene el hueco.
+    // ⚠️ 29-SEP: salieron de acá "garantía" y "resistente al agua", porque el dueño
+    // los confirmó. Ver `datosConfirmados`.
+    //
+    // ⛔ PERO "sumergible", "ip67", "ip65" e "ipx" SE QUEDAN. Que aguante la lluvia
+    // —lo que el dueño confirmó— no es lo mismo que aguantar sumergido ni que tener
+    // una certificación IP, que es un número medido en laboratorio. Decir "es IP67"
+    // sin que nadie lo haya verificado es exactamente la clase de promesa que
+    // termina en una devolución con motivo.
     sinDatoConfirmado: [
       "alcance", "metros", "distancia", "rango",
       "bateria", "batería", "autonomia", "autonomía", "duracion", "duración",
       "cuanto dura", "cuánto dura", "horas",
       "bluetooth", "version", "versión",
-      "resistente al agua", "sumergible", "impermeable", "ip67", "ip65", "ipx",
+      // 🔑 Las formas de preguntar por SUMERGIRLO, que no es lo mismo que la lluvia.
+      // "¿se puede meter al agua?" es exactamente esa pregunta dicha en colombiano,
+      // y la primera versión de esto contestaba que sí resiste — lo cazó la prueba.
+      // ⚠️ Y ACÁ HAY QUE SER PRECISO, NO AMPLIO. Mi primera versión puso "al agua"
+      // suelto y se comió "¿es resistente AL AGUA?", que es justo lo que el dueño
+      // SÍ confirmó: el bot dejó de responder la pregunta más frecuente del
+      // producto. Lo cazó la prueba. Van los verbos de sumergir, no la palabra
+      // "agua" a secas.
+      "sumergible", "sumergir", "ip67", "ip65", "ipx",
+      "meter al agua", "meterlo al agua", "meter en agua", "meterlo en agua",
+      "bajo el agua", "dentro del agua", "hundir", "hundirlo",
+      "lavar", "lavarlo", "piscina", "nadar",
       "certificacion", "certificación", "homologado",
       "cuantos se conectan", "cuántos se conectan", "cuantos dispositivos",
       "cuántos dispositivos", "compatible", "compatibilidad",
-      "garantia", "garantía", "marca", "watts", "vatios", "parlante",
+      "marca", "watts", "vatios", "parlante",
     ],
 
     envioIncluido: false,
@@ -469,6 +514,16 @@ function preguntaPorUna(texto) {
   return unidadesPedidas(texto) === 1;
 }
 
+/** ¿El texto parece una pregunta o un pedido de dato? */
+function pareceConsulta(texto) {
+  const t = aplanar(texto);
+  // Sin esto, "se me descargó la batería del celular" activaría la detección.
+  return (
+    /\?/.test(texto) ||
+    /\b(cuanto|cuantos|cuanta|que|cual|tiene|tienen|trae|traen|es|son|sirve|sirven|funciona|dura|duran|alcanza|viene|vienen|resiste|se\s+moja|aguanta|puedo|se\s+puede)\b/.test(t)
+  );
+}
+
 /**
  * ¿Está preguntando una especificación técnica que NO tenemos confirmada?
  *
@@ -479,12 +534,40 @@ function preguntaSinDatoConfirmado(texto, productoId) {
   if (!p || !p.sinDatoConfirmado) return null;
   const t = aplanar(texto);
   if (!t.trim()) return null;
-  // Tiene que parecer una pregunta o un pedido de dato; si no, "la batería" en
-  // "se me descargó la batería del celular" activaría esto sin sentido.
-  const pregunta = /\?/.test(texto) || /\b(cuanto|cuantos|cuanta|que|cual|tiene|trae|es|son|sirve|funciona|dura|alcanza|viene)\b/.test(t);
-  if (!pregunta) return null;
+  if (!pareceConsulta(texto)) return null;
   const hallada = p.sinDatoConfirmado.find((s) => t.includes(aplanar(s)));
   return hallada || null;
+}
+
+/**
+ * ¿Está preguntando algo que SÍ tenemos confirmado? Devuelve la respuesta exacta.
+ *
+ * 🔑 EL ORDEN IMPORTA, Y ES EL PUNTO DELICADO DE ESTA FUNCIÓN: primero se mira si
+ * la pregunta toca un dato SIN confirmar, y si lo toca, gana eso.
+ *
+ * El caso concreto: el dueño confirmó que el V10 "resiste el agua, se puede usar
+ * bajo la lluvia". Pero si alguien pregunta *"¿lo puedo sumergir en agua?"*, esa
+ * frase contiene "agua" —confirmado— y "sumergir" —sin confirmar—. Tiene que ganar
+ * la duda: aguantar lluvia no es aguantar sumergido, y contestar que sí a eso es
+ * prometer algo que nadie verificó.
+ *
+ * @returns {{clave:string, respuesta:string}|null}
+ */
+function respuestaConfirmada(texto, productoId) {
+  const p = de(productoId);
+  if (!p || !p.datosConfirmados) return null;
+  if (!pareceConsulta(texto)) return null;
+
+  // ⛔ Si la pregunta toca algo sin confirmar, no se responde con un dato firme.
+  if (preguntaSinDatoConfirmado(texto, productoId)) return null;
+
+  const t = aplanar(texto);
+  for (const [clave, dato] of Object.entries(p.datosConfirmados)) {
+    if ((dato.pregunta || []).some((s) => t.includes(aplanar(s)))) {
+      return { clave, respuesta: dato.respuesta };
+    }
+  }
+  return null;
 }
 
 /**
@@ -529,6 +612,8 @@ module.exports = {
   unidadesPedidas,
   preguntaPorUna,
   preguntaSinDatoConfirmado,
+  respuestaConfirmada,
+  pareceConsulta,
   precioDe,
   aplanar,
 };
