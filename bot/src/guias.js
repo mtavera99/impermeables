@@ -65,8 +65,8 @@ const digitos = (s) => String(s == null ? "" : s).replace(/\D/g, "");
 const RE_BSUID = /^[A-Za-z]{2}\.[A-Za-z0-9]{1,128}$/;
 const esBsuid = (s) => RE_BSUID.test(String(s == null ? "" : s).trim());
 
-/** Colombia: se comparan los últimos 10 dígitos, así "573138615813",
- *  "+57 313 861 5813" y "3138615813" son el mismo número. */
+/** Colombia: se comparan los últimos 10 dígitos, así "573001112233",
+ *  "+57 300 111 2233" y "3001112233" son el mismo número. */
 function tel10(s) {
   const d = digitos(s);
   return d.length > 10 ? d.slice(-10) : d;
@@ -201,8 +201,37 @@ async function partirHojas(buffer) {
  * del formato exacto: busca rótulos y, si no los encuentra, usa el texto
  * completo como red.
  */
+// ============================================================================
+// 📮 EL REMITENTE PUEDEN SER VARIOS NÚMEROS — 30-sep
+//
+// DE DÓNDE SALE: el dueño movió los avisos del bot a su celular personal. Y acá
+// se usaba ESA MISMA variable (OWNER_WHATSAPP) para otra cosa completamente
+// distinta: saber qué teléfono va impreso como remitente en la etiqueta, para NO
+// confundirlo con el del cliente.
+//
+// 🔑 SON DOS COSAS QUE NO TIENEN POR QUÉ SER EL MISMO NÚMERO. Si el aviso va al
+// personal pero la etiqueta sigue impresa con el de BikerPro, el filtro deja de
+// reconocerlo y el número de BikerPro entra como si fuera un teléfono del
+// destinatario. Eso ensucia el pareo de guías: es el mismo terreno del
+// "mejor coincidencia 45 de 50", donde un teléfono vale 50 puntos.
+//
+// Así que se aceptan VARIOS, separados por coma. Excluir un número propio de más
+// no cuesta nada —nunca va a ser el de un cliente—, y olvidarse de uno sí cuesta.
+// ============================================================================
+
+/** Los teléfonos propios que van impresos en la etiqueta, como set de 10 dígitos. */
+function telefonosRemitente(valor) {
+  const lista = Array.isArray(valor) ? valor : String(valor == null ? "" : valor).split(/[,;]/);
+  const set = new Set();
+  for (const v of lista) {
+    const t = tel10(v);
+    if (t) set.add(t);
+  }
+  return set;
+}
+
 function extraerCampos(lineas, opciones = {}) {
-  const telefonoRemitente = tel10(opciones.telefonoRemitente);
+  const remitentes = telefonosRemitente(opciones.telefonoRemitente);
   const texto = lineas.join(" \n ");
   const plano = normalizar(texto);
 
@@ -220,7 +249,7 @@ function extraerCampos(lineas, opciones = {}) {
     const candidatos = [...plano.matchAll(/\b(\d{9,14})\b/g)]
       .map((m) => m[1])
       .filter((n) => !(n.length === 10 && n.startsWith("3")))
-      .filter((n) => tel10(n) !== telefonoRemitente);
+      .filter((n) => !remitentes.has(tel10(n)));
     guia = candidatos.sort((a, b) => b.length - a.length)[0] || null;
   }
 
@@ -243,7 +272,7 @@ function extraerCampos(lineas, opciones = {}) {
     const t = tel10(crudo);
     // 10 dígitos que empiezan en 3: un celular colombiano. Nada más entra.
     if (!/^3\d{9}$/.test(t)) return;
-    if (t === telefonoRemitente) return;
+    if (remitentes.has(t)) return;
     telefonos.add(t);
   };
   // 1) Pegado, con o sin indicativo: 3155551234 · 573155551234 · 5713155551234
@@ -683,7 +712,7 @@ function nombreArchivo(guia) {
 module.exports = {
   PESOS, MINIMO, MARGEN, TRANSPORTADORAS,
   normalizar, tel10, numerosDireccion, palabrasNombre, palabrasCiudad,
-  porQueNoAlcanzo, lineasPorPagina, partirHojas, extraerCampos,
+  porQueNoAlcanzo, lineasPorPagina, partirHojas, extraerCampos, telefonosRemitente,
   puntuar, emparejar, procesarPDF, destinoDe,
   transportadoraDe, textoParaCliente, nombreArchivo,
 };

@@ -925,6 +925,28 @@ async function generateReply(phone, userText) {
   });
 
   // ==========================================================================
+  // 🛟 SOPORTE DE POSVENTA: SE MARCA LA CONVERSACIÓN — 30-sep
+  //
+  // Pedido del dueño: que los casos de garantía, cambio, o "ya compré y necesito
+  // ayuda" se distingan con su propia categoría para atenderlos aparte.
+  //
+  // 🔑 SE MARCA ACÁ, NO SOLO EN EL PANEL. El panel también lo detecta leyendo el
+  // texto, pero `messages` se rota: sin esta marca el caso se borraría de la
+  // pantalla cuando el cliente mande unos cuantos mensajes más, estando el
+  // problema todavía sin resolver.
+  //
+  // ⚠️ ESTO NO CAMBIA LO QUE EL BOT RESPONDE. Es a propósito: marcar es seguro,
+  // y cambiarle la respuesta a un cliente con un reclamo en curso es una decisión
+  // del dueño, no mía. Lo único que hace es que el caso se VEA.
+  // ==========================================================================
+  const soportePosventa = posventa.necesitaSoporte(userText, {
+    compro: Boolean(conv.compro) || pedidosDelCliente.length > 0,
+  });
+  if (soportePosventa.necesita) {
+    store.fijarCategoria(phone, "posventa", soportePosventa.motivo);
+  }
+
+  // ==========================================================================
   // 🔴 EL ESTADO LOGÍSTICO NO SE INVENTA (caso Heber)
   //
   // El bot le contestó "tu pedido ya fue procesado y está en manos de la
@@ -1343,7 +1365,18 @@ async function generateReply(phone, userText) {
   if (handoff || revisionHumana) store.setPaused(phone, true);
 
   store.pushMsg(phone, "assistant", reply);
-  return { reply, order: savedOrder, handoff, media, pedidoRescatado, revisionHumana };
+  // 🛟 `posventaSoporte` sale para que server.js pueda avisarle al dueño. NO entra
+  // en la condición de `setPaused` de arriba: marcar el caso es seguro, callar al
+  // bot en medio de un reclamo es una decisión del dueño.
+  return {
+    reply,
+    order: savedOrder,
+    handoff,
+    media,
+    pedidoRescatado,
+    revisionHumana,
+    posventaSoporte: soportePosventa.necesita ? soportePosventa.motivo : null,
+  };
 }
 
 // ============================================================================

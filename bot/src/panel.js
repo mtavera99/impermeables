@@ -214,6 +214,10 @@ function render(aviso) {
   const HOY = resumen.hoyBogota();
   const AYER = resumen.ayerBogota();
   const chatsPendientes = [...urgentes, ...medios];
+  // 🛟 Los de posventa YA ESTÁN en `urgentes` (salen con nivel "alta"). Esto es
+  // solo para contarlos y poder llevar el dedo directo: son los que se atienden
+  // distinto, porque el cliente ya pagó y tiene el producto con un problema.
+  const dePosventa = chatsPendientes.filter((x) => prior.get(x.tel)?.posventa);
 
   // ==========================================================================
   // 🔘 UN PUNTO QUE SE PRENDE AL TOQUE — UNA SOLA LISTA (25-sep)
@@ -286,7 +290,11 @@ function render(aviso) {
         ? "lo marcaste como resuelto"
         : "le respondiste vos"
       : e.motivos?.[0] || "";
-    return `<div class="fila ${hecho ? "hecho" : e.nivel}" data-tel="${esc(x.tel)}" data-listo="${
+    // 🛟 La clase de posventa se SUMA a la del nivel, no la reemplaza: así el
+    // chat sigue contando como urgente en todas las listas y solo cambia de
+    // color. Si ya se atendió manda `hecho`, que apaga el renglón.
+    const clasePosventa = !hecho && e.posventa ? " posventa" : "";
+    return `<div class="fila ${hecho ? "hecho" : e.nivel}${clasePosventa}" data-tel="${esc(x.tel)}" data-listo="${
       hecho ? "1" : "0"
     }">
       <button type="button" class="punto" onclick="marcarChat(this)"
@@ -669,10 +677,17 @@ function render(aviso) {
           const etiquetaAtencion = e
             ? `<span class="tag ${e.nivel === "alta" ? "alta" : "media"}">${e.nivel === "alta" ? "🔴 atender" : "🟡 revisar"}</span>`
             : "";
+          // 🛟 La etiqueta de posventa va ANTES de la de atención: es lo que
+          // define el caso. Las dos conviven —sigue siendo urgente— pero lo
+          // primero que se lee es de qué se trata.
+          const etiquetaPosventa = e && e.posventa
+            ? `<span class="tag posventa">🛟 posventa</span>`
+            : "";
           const porQue = e && e.motivos.length
-            ? `<div class="porque">${e.nivel === "alta" ? "🔴" : "🟡"} ${e.motivos.map(esc).join(" · ")}</div>`
+            ? `<div class="porque">${e.posventa ? "🛟" : e.nivel === "alta" ? "🔴" : "🟡"} ${e.motivos.map(esc).join(" · ")}</div>`
             : "";
           const etiquetas = [
+            etiquetaPosventa,
             etiquetaAtencion,
             x.c.compro ? `<span class="tag ok">compró</span>` : "",
             // ✅ Ya se le contestó después de su último mensaje. Se distingue de
@@ -898,6 +913,14 @@ function render(aviso) {
   .tag{font-size:10px;padding:3px 8px;border-radius:99px;background:#2a313d;color:#c8cfdd;white-space:nowrap}
   .tag.ok{background:#12351f;color:var(--verde)}.tag.warn{background:#3a2d0c;color:var(--amarillo)}.tag.no{background:#3a1414;color:var(--rojo)}
   .tag.oficina{background:#132c40;color:#7fd1ff}
+  /* 🔴🟡 Estas dos se usaban desde siempre en la etiqueta de atención y NUNCA
+     estuvieron definidas: salían con el gris de .tag a secas, así que "atender"
+     y "revisar" se veían igual. */
+  .tag.alta{background:#3a1414;color:#ff9aa4}
+  .tag.media{background:#3a2d0c;color:#ffd479}
+  /* 🛟 POSVENTA. Violeta, que no choca con el rojo de urgente ni el amarillo de
+     revisar: es una categoría distinta, no un nivel más de lo mismo. */
+  .tag.posventa{background:#33204d;color:#d9b8ff;border:1px solid #6b3fa0;font-weight:700}
 
   /* --- Burbujas del chat --- */
   .chat{
@@ -945,6 +968,17 @@ function render(aviso) {
   .fila{display:flex;gap:8px;align-items:center;padding:7px 9px;border-radius:8px;margin-bottom:5px;text-decoration:none;color:#e7e9ee;background:#1b212b;border-left:3px solid #6b5416}
   .fila.alta{border-left-color:#ff6b6b;background:#241417}
   .fila.media{border-left-color:#ffb020;background:#241f14}
+  /* 🛟 POSVENTA — garantía, cambio, o algo que llegó mal.
+     Va DESPUÉS de .alta y .media para ganarle al borde: el chat sigue siendo
+     urgente, pero se tiene que poder separar de un vistazo de los otros
+     urgentes, porque se atiende distinto (no es una venta que se puede perder,
+     es un cliente que ya pagó y tiene un problema).
+     El borde es más grueso a propósito: en un celular, al sol, el color solo no
+     alcanza para distinguirlo. */
+  .fila.posventa{border-left-color:#a06bff;border-left-width:5px;background:#1d1630}
+  .fila.posventa .punto span{border-color:#a06bff}
+  /* El atajo de arriba, del mismo violeta, para que la asociación sea inmediata. */
+  .atajos a.atajoPosventa{background:#33204d;border-color:#6b3fa0;color:#d9b8ff}
   .fila:hover{background:#232b36}
   .fila .por{font-size:12px;color:#c8cfdd;flex:1}
   .fila .cuando{font-size:11px;color:#8b93a4}
@@ -1111,6 +1145,7 @@ function render(aviso) {
        38 despachados para llegar a un chat. -->
   <nav class="atajos">
     <a href="#atencion">🔴 Atender${chatsPendientes.length ? ` (${chatsPendientes.length})` : ""}</a>
+    ${dePosventa.length ? `<a class="atajoPosventa" href="#atencion">🛟 Posventa (${dePosventa.length})</a>` : ""}
     <a href="#pendientes">📋 Despachar${pendientes.length ? ` (${pendientes.length})` : ""}</a>
     <a href="#chats">💬 Chats</a>
   </nav>

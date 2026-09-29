@@ -104,6 +104,147 @@ const RE_QUIERE_MODIFICAR = new RegExp(
 const RE_QUIERE_CANCELAR =
   /\b(cancelar|cancela|cancelalo|cancelen|anular|anula|anulen|devolver|devolucion|ya no lo quiero|ya no quiero|no lo quiero|desistir)\b/;
 
+// ============================================================================
+// 🛟 SOPORTE DE POSVENTA: GARANTÍA, CAMBIO, O ALGO QUE LLEGÓ MAL — 30-sep
+//
+// DE DÓNDE SALE, pedido del dueño: "cuando un cliente escriba para cambios,
+// garantías, o que ya compró y necesita algún tipo de soporte o ayuda, ponle una
+// nueva categoría o color para diferenciarlo y darle atención a ese tipo de caso".
+//
+// 🔴 POR QUÉ HOY SE PIERDEN. `atencion.evaluar()` tiene esta línea:
+//
+//     if (c.compro && puntos < 60) return { nivel: null, puntos: 0, motivos: [] };
+//
+// O sea: un cliente que YA COMPRÓ y no llega a 60 puntos desaparece del panel.
+// La idea era sana —"el que ya compró y no tiene problema no necesita atención"—
+// pero "me llegó la talla equivocada" no matchea ninguna de las señales que dan
+// puntos, así que suma 25 y se va a cero. Y si el bot ya le contestó (tiene una
+// respuesta armada para "¿tiene garantía?"), suma 0 y NO APARECE NUNCA.
+//
+// Resultado: el caso más caro de todos —un cliente con el producto en la mano y
+// un problema— es justo el que el panel esconde.
+//
+// 🔑 ESTAS SEÑALES NO DEPENDEN DE `c.compro`. Ese flag solo se prende si el
+// pedido pasó por el bot, y hay ventas tomadas a mano y del agente anterior. Si
+// alguien escribe "me llegó roto", compró: no hace falta que nuestro flag lo
+// sepa. Pedir las dos cosas dejaría afuera justo a los clientes viejos.
+// ============================================================================
+
+// ── Algo que ya tiene en la mano y salió mal ────────────────────────────────
+// Sin tildes: `plano()` las quita, así que "dañado" acá se escribe "danad".
+const RE_LLEGO_MAL = new RegExp(
+  [
+    // "me llegó roto", "vino incompleto", "llegó otra talla"
+    // ⚠️ SIN \b AL FINAL. Estos son PREFIJOS: "danad" tiene que casar con
+    // "danado" y "danada". Con el \b de cierre no casaba con ninguno de los dos,
+    // y "el pedido llegó dañado" —el reclamo más común que existe— no se
+    // detectaba. Ese \b de más me costó cuatro casos de esta batería.
+    "\\b(llego|llegaron|me llego|recibi|vino|venia|trajeron)\\b.{0,30}\\b(rot[oa]|danad|mal\\b|mal[oa]|defectuos|incomplet|partid|rajad|rayad|sucio|usad|otra talla|otro color|equivocad|distint|diferent|cambiad)",
+    // "se rompió", "se descosió", "se despegó la costura"
+    "\\b(se\\s+)?(rompio|revento|descosio|despego|rajo|partio|dano)\\b",
+    // "está roto", "salió defectuoso"
+    "\\b(esta|estaba|salio|vino)\\s+(rot[oa]|danad|defectuos|mal[oa]|incomplet)",
+    // "le falta una pieza", "vino sin el cargador"
+    "\\b(le falta|me falta|falta el|falta la|falta una|vino sin|llego sin|no venia|no trajo)\\b",
+    // La talla: el motivo de cambio más común en ropa.
+    "\\b(me queda|quedo|me quedo|queda)\\s+(grande|pequen|chic[oa]|apretad|corto|corta|anch[oa]|holgad)",
+    "\\b(talla|color)\\s+(equivocad|errad|cambiad|distint|diferent|incorrect)",
+    "\\b(no es la talla|no es el color|no era la talla|no era el color)\\b",
+    // "el color es diferente al que pedí", "la talla está cambiada"
+    "\\b(talla|color)\\b.{0,15}\\b(es|esta|era|vino|llego)\\b.{0,12}(distint|diferent|otr[oa]\\b|equivocad|cambiad|errad)",
+  ].join("|")
+);
+
+// ── No funciona ─────────────────────────────────────────────────────────────
+// Sobre todo para el V10: "no carga", "no empareja", "no prende".
+const RE_NO_FUNCIONA = new RegExp(
+  [
+    "\\bno\\s+(me\\s+)?(funciona|sirve|anda|enciende|prende|carga|conecta|empareja|emparej|pega|reconoce|responde)\\b",
+    "\\b(dejo de|deja de)\\s+(funcionar|servir|cargar|prender|encender|conectar)\\b",
+    "\\b(no da|no hay)\\s+(sonido|audio|senal|bateria)\\b",
+  ].join("|")
+);
+
+// ⛔ "No funciona" también se dice de cosas que NO son el producto. Sin esto, un
+// cliente que todavía no compró y escribe "no me funciona el link" entraría como
+// posventa, y ensuciar la categoría nueva es la forma más rápida de que el dueño
+// deje de confiar en ella.
+const RE_NO_ES_EL_PRODUCTO =
+  /\b(link|enlace|pagina|web|whatsapp|numero|telefono|formulario|codigo|cupon|descuento|promocion|boton|catalogo|foto|imagen|video|audio que mande)\b/;
+
+// ── Garantía ────────────────────────────────────────────────────────────────
+// 🔑 "¿Tiene garantía?" ANTES de comprar es una pregunta informativa, y el bot ya
+// la responde solo. Lo que es posventa es querer USARLA. Se separan a propósito:
+// meter la pregunta previa acá llenaría la categoría de gente que solo averigua.
+const RE_USAR_LA_GARANTIA = new RegExp(
+  [
+    "\\b(hacer|hago|haga|aplicar|aplico|reclamar|reclamo|usar|uso|cobrar)\\s+(efectiva\\s+)?(la\\s+)?garantia\\b",
+    "\\bgarantia\\b.{0,20}\\b(efectiva|reclam|aplic|cubre esto|me cubre|sirve para esto)\\b",
+    "\\b(esta|entra|aplica|cubre)\\s+(en|con|la)?\\s*garantia\\b",
+    "\\bpor\\s+garantia\\b",
+  ].join("|")
+);
+
+// La palabra sola. Solo cuenta si hay otra señal de que ya lo tiene.
+const RE_MENCIONA_GARANTIA = /\bgarantia\b/;
+
+// ── Cambio de producto ──────────────────────────────────────────────────────
+// ⚠️ Ojo con RE_QUIERE_MODIFICAR: eso es cambiar el PEDIDO antes de que salga.
+// Esto es cambiar algo que el cliente YA TIENE. Se distinguen por las palabras
+// de recibido ("me llegó", "me queda"), no por adivinar.
+const RE_QUIERE_CAMBIARLO = new RegExp(
+  [
+    "\\b(cambio|cambiar|cambiarlo|cambiarla|cambien|camben)\\b.{0,30}\\b(por otra talla|por otro color|por uno nuevo|por otra|por otro)\\b",
+    "\\b(cambio|cambiar)\\s+de\\s+(talla|color)\\b",
+    "\\b(quiero|necesito|puedo|podria|como hago para)\\b.{0,20}\\bcambiar(lo|la)?\\b",
+  ].join("|")
+);
+
+// ── Pedir ayuda habiendo comprado ───────────────────────────────────────────
+const RE_PIDE_AYUDA =
+  /\b(ayuda|ayudenme|ayudeme|ayudar|soporte|asesor|reclamo|queja|problema|inconveniente)\b/;
+
+/**
+ * ¿Es un caso de soporte de posventa —garantía, cambio, o algo que llegó mal?
+ *
+ * @param {string} texto lo que escribió el cliente
+ * @param {{compro?: boolean}} [opciones] `compro` es solo una señal de APOYO:
+ *   las señales fuertes valen por sí solas, porque hay ventas que no pasaron por
+ *   el bot y ese flag no las conoce.
+ * @returns {{necesita: boolean, motivo: string}}
+ */
+function necesitaSoporte(texto, opciones = {}) {
+  const t = plano(texto);
+  if (!t) return { necesita: false, motivo: "" };
+  const compro = Boolean(opciones.compro);
+
+  // --- Señales fuertes: valen solas ---
+  if (RE_LLEGO_MAL.test(t)) {
+    return { necesita: true, motivo: "🛟 posventa: dice que lo que recibió llegó mal o se dañó" };
+  }
+  if (RE_NO_FUNCIONA.test(t) && !RE_NO_ES_EL_PRODUCTO.test(t)) {
+    return { necesita: true, motivo: "🛟 posventa: dice que no le funciona" };
+  }
+  if (RE_USAR_LA_GARANTIA.test(t)) {
+    return { necesita: true, motivo: "🛟 posventa: quiere usar la garantía" };
+  }
+  if (RE_QUIERE_CAMBIARLO.test(t)) {
+    return { necesita: true, motivo: "🛟 posventa: quiere cambiar el producto" };
+  }
+
+  // --- Señales que necesitan que ya haya comprado ---
+  // Solas serían ambiguas: "garantía" a secas es una pregunta de alguien que
+  // está averiguando, y "ayuda" lo dice cualquiera.
+  if (compro && RE_MENCIONA_GARANTIA.test(t)) {
+    return { necesita: true, motivo: "🛟 posventa: ya compró y pregunta por la garantía" };
+  }
+  if (compro && RE_PIDE_AYUDA.test(t)) {
+    return { necesita: true, motivo: "🛟 posventa: ya compró y pide ayuda o tiene un reclamo" };
+  }
+
+  return { necesita: false, motivo: "" };
+}
+
 // Y "mi pedido" SÍ cuenta como consulta cuando viene con una palabra de estado.
 const RE_PEDIDO_CON_ESTADO =
   /\b(mi|el|ese|este)\s+(pedido|envio|paquete)\b/;
@@ -339,6 +480,7 @@ module.exports = {
   esPreguntaDeEstado,
   quiereModificar,
   quiereCancelar,
+  necesitaSoporte,
   mencionaOtroDestinatario,
   mencionoOtroDestinatarioReciente,
   esSoloCortesia,

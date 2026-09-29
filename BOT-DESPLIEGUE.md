@@ -87,12 +87,31 @@ GEMINI_MODEL=gemini-3.1-flash-lite
 MAX_HISTORIAL=8
 WHATSAPP_VERIFY_TOKEN=<secreto — el mismo que se pone en Meta>
 PANEL_TOKEN=<secreto — la contraseña del panel, larga>
-OWNER_WHATSAPP=573138615813
+OWNER_WHATSAPP=<el celular del dueño — a este llegan los avisos>
 ```
 
 > 🔐 **`PANEL_TOKEN` no es opcional.** Es lo único que protege `/panel`, `/pedidos.csv` y
 > `/responder`. El valor va **solo en Render**, nunca en un archivo de este repo: el repo
 > es público y el secreto anterior terminó publicado por escribirlo acá.
+
+> 📱 **`OWNER_WHATSAPP` va solo en Render también**, y por la misma razón: es un celular
+> personal y este repo es público. Se puede escribir como salga —`3001112233`,
+> `+57 300 111 2233`, `573001112233`—: el bot le pone el 57 si falta. Lo que **no** hace es
+> inventarle indicativo a un número que no reconoce, porque eso mandaría los datos de un
+> cliente al teléfono de un tercero; en ese caso avisa en el log al arrancar.
+
+> 📮 **`TELEFONO_REMITENTE` — ponela si `OWNER_WHATSAPP` NO es el número impreso en las guías.**
+> Son dos cosas distintas: a dónde llegan los avisos, y qué teléfono va impreso como
+> remitente en la etiqueta. El segundo se usa para **no confundirlo con el del cliente** al
+> leer el PDF. Si no coincide, pasan dos cosas malas: el teléfono propio entra como si fuera
+> del destinatario (**50 puntos** en el pareo, suficiente para pasar el mínimo), y con el `57`
+> adelante son 12 dígitos —los mismos que una guía de Interrapidísimo—, así que en una
+> etiqueta sin el rótulo "Guía No" **se lo puede llevar como número de guía** y al cliente le
+> llega un número que no existe.
+>
+> Acepta **varios separados por coma**: `TELEFONO_REMITENTE=573001112233,573109998877`.
+> Declarar uno propio de más no cuesta nada —nunca va a ser el de un cliente—; olvidarse de
+> uno sí. Si no se define, usa `OWNER_WHATSAPP` (el comportamiento de antes).
 
 Estas van **después**, cuando tengas la app de Meta:
 ```

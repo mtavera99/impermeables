@@ -410,6 +410,38 @@ function fijarProductoActivo(phone, productoId, porQue) {
   );
 }
 
+// ============================================================================
+// 🛟 LA CATEGORÍA DE LA CONVERSACIÓN — 30-sep
+//
+// Hoy la única categoría es "posventa": garantía, cambio, o algo que llegó mal.
+// Pedido del dueño, para poder darle a esos casos una atención aparte.
+//
+// 🔑 POR QUÉ SE PERSISTE EN VEZ DE RECALCULARLO DEL HILO: `messages` se ROTA a
+// MAX_MSGS. El turno donde el cliente dijo "me llegó la talla equivocada" se cae
+// del historial después de unos mensajes más, y con él se borraría la categoría
+// justo mientras el caso sigue abierto. Es el mismo argumento de
+// fijarProductoActivo.
+//
+// ⛔ Y NO SE APAGA SOLA. Un reclamo de garantía no deja de existir porque el
+// cliente después escriba "gracias": se cierra cuando el dueño lo marca como
+// atendido, que es lo que ya hace con el punto verde del panel.
+// ============================================================================
+function fijarCategoria(phone, categoria, porQue) {
+  if (!phone || !categoria) return;
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone] || { messages: [], paused: false };
+  if (c.categoria === categoria) return; // ya estaba, no se reescribe el archivo
+  c.categoria = categoria;
+  c.categoriaDesde = Date.now();
+  // El motivo se guarda, no solo se loguea: es lo que el panel muestra en el
+  // renglón cuando el mensaje original ya se cayó del historial.
+  if (porQue) c.categoriaPorQue = porQue;
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+  console.log(`🛟 ${phone}: la conversación queda como ${categoria} — ${porQue || "señal de soporte"}`);
+}
+
 /** El anuncio que trajo a este cliente, o null. Lo usa saveOrder. */
 function atribucionDe(phone) {
   if (!phone) return null;
@@ -1891,7 +1923,7 @@ module.exports = {
   registrarArranque, estadoDelDisco,
   marcarComprado, registrarSeguimiento, reclamarSeguimiento,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
-  guardarPerfil, guardarAtribucion, atribucionDe, fijarProductoActivo,
+  guardarPerfil, guardarAtribucion, atribucionDe, fijarProductoActivo, fijarCategoria,
   reemplazarPedidos,
   todosLosPedidos,
   motivosDeRevision, requiereRevision, listoParaDespachar, textoDeRevision,
