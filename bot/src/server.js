@@ -694,6 +694,69 @@ function motivoDeEnvio(envio) {
       "El mensaje NO salió. Esperá un minuto y reintentá."
     );
   }
+  // ==========================================================================
+  // 🔴 LOS ERRORES DE PLANTILLA — 29-SEP, "Enviados 0 de 5. 5 fallaron"
+  //
+  // El dueño intentó avisar 5 novedades y fallaron las 5. Cuando fallan TODAS, el
+  // problema no es de un cliente: es de la plantilla. Y lo que veía en la tabla
+  // era el texto crudo de Meta en inglés, que no dice qué hacer.
+  //
+  // Estos cuatro códigos cubren todo lo que le puede pasar a una plantilla, y cada
+  // uno se arregla de una forma distinta — por eso vale distinguirlos en vez de
+  // decir "falló el envío".
+  // ==========================================================================
+  if (code === 132001) {
+    return (
+      "La plantilla no existe en Meta con ese nombre o ese idioma (error 132001). " +
+      "Ojo con el idioma: tiene que ser el mismo con el que la subiste — si la creaste " +
+      "en «Spanish (COL)» es es_CO, y con «es» a secas Meta la rechaza aunque esté aprobada. " +
+      "Mirá /plantillas para ver cómo está."
+    );
+  }
+  if (code === 132000) {
+    return (
+      "La plantilla espera una cantidad de datos distinta de la que se le mandó " +
+      "(error 132000). Por ejemplo, la de oficina manda DOS datos —en qué oficina y " +
+      "hasta cuándo—: si la plantilla aprobada tiene una sola variable o ninguna, " +
+      "Meta la rechaza. Mirá /plantillas: ahí dice cuántas variables espera cada una."
+    );
+  }
+  if (code === 132015 || code === 132016) {
+    return (
+      "Meta pausó o deshabilitó esa plantilla por su calidad (error " + code + "). " +
+      "No se puede usar hasta que se reactive o se cree una nueva. Nada de esto se " +
+      "arregla reintentando."
+    );
+  }
+  if (code === 132005 || code === 132007 || code === 132012) {
+    return (
+      "Meta rechazó el contenido de la plantilla (error " + code + "): el texto o alguno " +
+      "de los datos que se le pasan no cumple lo que aprobó. Mirá /plantillas."
+    );
+  }
+  if (code === 131026) {
+    return (
+      "Ese número no puede recibir el mensaje (error 131026): puede no tener WhatsApp, " +
+      "o estar mal escrito. Revisá el celular del pedido."
+    );
+  }
+  if (code === 131049) {
+    return (
+      "Meta no entregó el mensaje para cuidar la calidad del número (error 131049). " +
+      "Pasa cuando se manda mucho a gente que no responde. No se arregla reintentando ya."
+    );
+  }
+  // 🌎 29-SEP: apareció un 130497 contra el número 559184366754. El 55 de adelante
+  // es Brasil: es un celular colombiano mal cargado (o pegado con un dígito de
+  // más), no un cliente brasileño. El texto de Meta —"restricted from messaging
+  // users in this country"— suena a una sanción de la cuenta y no lo es.
+  if (code === 130497) {
+    return (
+      "El número quedó apuntando a otro país, así que Meta no deja mandarle nada " +
+      "(error 130497). Casi siempre es un celular mal cargado: revisá que sean 10 " +
+      "dígitos empezando por 3, con el 57 de Colombia adelante y nada más."
+    );
+  }
   if (envio.etapa === "subida") {
     return "no se pudo subir el PDF a WhatsApp: " + (envio.body?.error?.message || "revisá el WHATSAPP_TOKEN");
   }

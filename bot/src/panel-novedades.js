@@ -76,6 +76,18 @@ function render(opciones = {}) {
   .res.ok{background:#12291c;border:1px solid #1f6b3f;color:#9be8b8}
   .res.mal{background:#2b1518;border:1px solid #7a2b33;color:#ffb3ba}
   .res.info{background:#14202e;border:1px solid #2b5480;color:#a9cdf5}
+  /* 🔴 EL MOTIVO DE CADA FALLO, UNO POR UNO — 29-sep.
+     El servidor siempre mandó el motivo exacto de cada novedad que no salió, y
+     esta pantalla lo TIRABA A LA BASURA: solo imprimía
+     "Enviados 0 de 5. 5 fallaron." Acá es donde se ve. */
+  .detalle{margin:0 0 14px;display:none}
+  .detalle .fila{background:#151a22;border:1px solid #222a35;border-radius:12px;
+       padding:10px 12px;margin-bottom:8px;font-size:13px;line-height:1.45}
+  .detalle .fila.mal{border-color:#7a2b33;background:#1e1416}
+  .detalle .fila.bien{border-color:#1f6b3f;background:#121a15}
+  .detalle .quien{font-weight:600;color:#e7e9ee;display:block;margin-bottom:3px}
+  .detalle .porque{color:#ffb3ba}
+  .detalle .fila.bien .porque{color:#9be8b8}
   .aviso{background:#241c10;border:1px solid #6b5220;color:#f5d9a0;padding:12px 14px;border-radius:12px;font-size:14px;margin:0 0 14px}
   .tag{font-size:10px;padding:3px 8px;border-radius:99px;background:#2a313d;color:#c8cfdd;white-space:nowrap}
   .tag.abierta{background:#12351f;color:#8ff0b5}
@@ -115,6 +127,7 @@ function render(opciones = {}) {
 </header>
 <main>
   <div id="res" class="res"></div>
+  <div id="detalle" class="detalle"></div>
 
   <div class="aviso">
     ℹ️ <b>Cada novedad usa su propia plantilla</b>, así el cliente lee lo que le pasó sin tener
@@ -193,6 +206,60 @@ function mostrar(clase, texto) {
   res.className = "res " + clase;
   res.textContent = texto;
   res.style.display = "block";
+}
+
+// ---------------------------------------------------------------------------
+// 🔴 EL MOTIVO DE CADA NOVEDAD QUE NO SALIÓ — 29-SEP
+//
+// DE DÓNDE SALE: "Volvió este error al enviar novedades" + "Enviados 0 de 5.
+// 5 fallaron." Y no había NADA más en la pantalla. Ni qué guía, ni por qué.
+//
+// 🔑 LA CAUSA NO ERA EL ENVÍO: era que esta pantalla escondía el motivo. El
+// servidor manda un resultado por novedad, y cada fallo trae su motivo ya escrito
+// en castellano y accionable ("falta completar en qué oficina está", "no encontré
+// a quién corresponde esta guía", "la plantilla no existe con ese nombre o ese
+// idioma"...). Esta función era el único eslabón que faltaba: el manejador leía
+// enviados/intentados/fallaron y descartaba la lista de resultados entera.
+//
+// Costó un diagnóstico a ciegas: sin el motivo no se puede distinguir un fallo
+// de Meta de una fila que nunca se intentó mandar, y son problemas opuestos.
+// Que se vean los cinco motivos vale más que cualquier suposición mía.
+// ---------------------------------------------------------------------------
+var detalle = document.getElementById("detalle");
+
+function mostrarDetalle(resultados) {
+  detalle.textContent = "";
+  if (!resultados || !resultados.length) {
+    detalle.style.display = "none";
+    return;
+  }
+
+  // Los fallos primero: son lo que hay que accionar. Las que salieron van
+  // después, solo para confirmar que esas ya están avisadas.
+  var ordenados = resultados.filter(function (r) { return !r.ok; })
+    .concat(resultados.filter(function (r) { return r.ok; }));
+
+  for (var i = 0; i < ordenados.length; i++) {
+    var r = ordenados[i];
+    var fila = document.createElement("div");
+    fila.className = "fila " + (r.ok ? "bien" : "mal");
+
+    var quien = document.createElement("span");
+    quien.className = "quien";
+    // La guía es lo que le permite buscarla en 99 Envíos, así que va siempre.
+    quien.textContent = (r.ok ? "✅ " : "🔴 ") + (r.nombre || "sin nombre") + " · guía " + (r.guia || "?");
+    fila.appendChild(quien);
+
+    var porque = document.createElement("span");
+    porque.className = "porque";
+    // textContent y no innerHTML: este texto viene de Meta y de los datos del
+    // cliente. No se interpreta como HTML.
+    porque.textContent = r.ok ? "El mensaje salió." : (r.error || "no dijo por qué");
+    fila.appendChild(porque);
+
+    detalle.appendChild(fila);
+  }
+  detalle.style.display = "block";
 }
 
 // ---------------------------------------------------------------------------
@@ -462,10 +529,16 @@ alTocar("btnEnviar", function () {
       return r.json();
     })
     .then(function (d) {
-      if (!d.ok) { mostrar("mal", "🔴 " + (d.error || "no se pudo enviar")); return; }
+      if (!d.ok) { mostrar("mal", "🔴 " + (d.error || "no se pudo enviar")); mostrarDetalle(null); return; }
+      // 🔑 "mirá el motivo de cada una abajo": sin esa frase el dueño no sabe que
+      // hay algo más que leer. Con 0 enviados el motivo es lo ÚNICO que importa.
       mostrar(d.fallaron ? "info" : "ok",
         "Enviados " + d.enviados + " de " + d.intentados + "." +
-        (d.fallaron ? " " + d.fallaron + " fallaron." : ""));
+        (d.fallaron
+          ? " " + d.fallaron + (d.fallaron === 1 ? " falló" : " fallaron") +
+            ": mirá abajo el motivo de cada una."
+          : ""));
+      mostrarDetalle(d.resultados);
       document.querySelectorAll("#tabla input[type=checkbox]").forEach(function (c) { c.checked = false; });
     })
     .catch(function (e) { mostrar("mal", "🔴 No salió: " + e.message); })
