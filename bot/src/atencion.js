@@ -11,6 +11,11 @@
 // 🟡 MEDIA = oportunidad. Un empujón tuyo cambia el resultado.
 // ============================================================================
 
+// 🛟 Las señales de soporte de posventa (garantía, cambio, algo que llegó mal)
+// viven en posventa.js, que es donde ya están todas las regex de posventa. Acá
+// solo se las pondera.
+const posventa = require("./posventa");
+
 // Minutos sin respuesta a partir de los cuales un cliente se enfría.
 // En contraentrega la decisión es impulsiva: el que espera 15 minutos ya se fue.
 const MINUTOS_SIN_RESPUESTA = 12;
@@ -170,6 +175,38 @@ function evaluar(tel, c) {
     motivos.push(c.compro ? "reclamo de alguien que YA compró" : "cliente molesto o con reclamo");
   }
 
+  // ==========================================================================
+  // 🛟 3b. SOPORTE DE POSVENTA: garantía, cambio, o algo que llegó mal — 30-sep
+  //
+  // Pedido del dueño: que estos casos se distingan con su propia categoría y
+  // color, para poder atenderlos aparte.
+  //
+  // 🔴 Y HACÍA FALTA MÁS QUE UN COLOR: hoy estos chats DESAPARECEN del panel. La
+  // línea de más abajo —`if (c.compro && puntos < 60) return {nivel:null}`—
+  // esconde a todo el que ya compró y no llega a 60 puntos. "Me llegó la talla
+  // equivocada" no matchea ninguna otra señal: suma 25 y se va a cero. Y si el
+  // bot ya le contestó, suma 0 y no aparece nunca.
+  //
+  // El caso más caro que existe —cliente con el producto en la mano y un
+  // problema— era justo el que el panel tapaba.
+  //
+  // 🔑 Se detecta sobre el texto del cliente Y sobre la categoría guardada. Lo
+  // segundo importa porque `messages` se rota: sin eso, el caso se borra del
+  // panel cuando el cliente manda unos cuantos mensajes más.
+  // ==========================================================================
+  const soporte = c.categoria === "posventa"
+    ? { necesita: true, motivo: c.categoriaPorQue || "🛟 posventa: caso de soporte ya detectado" }
+    : posventa.necesitaSoporte(textoCliente, { compro: c.compro });
+
+  if (soporte.necesita) {
+    // Alcanza el umbral de "alta" por sí solo: un reclamo de garantía no puede
+    // depender de que el cliente además suene molesto o lleve horas esperando.
+    puntos += 100;
+    // Va PRIMERO en la lista: el panel muestra `motivos[0]` en el renglón, y lo
+    // que define este caso es que es posventa, no que escribió hace un rato.
+    motivos.unshift(soporte.motivo);
+  }
+
   // 4. Desconfianza. Se resuelve hablando con una persona.
   if (RE_DESCONFIANZA.test(textoCliente)) {
     puntos += 60;
@@ -208,12 +245,28 @@ function evaluar(tel, c) {
   }
 
   // Los que ya compraron y no tienen problema no necesitan atención.
-  if (c.compro && puntos < 60) return { nivel: null, puntos: 0, motivos: [] };
+  // ⚠️ Un caso de soporte SÍ es un problema, y con los 100 puntos de arriba ya no
+  // cae acá. La condición se deja explícita igual: si mañana alguien baja ese
+  // peso, esto sigue protegiendo la categoría.
+  if (c.compro && puntos < 60 && !soporte.necesita) {
+    return { nivel: null, puntos: 0, motivos: [] };
+  }
 
   const nivel = puntos >= 60 ? "alta" : puntos >= 30 ? "media" : null;
+  // 🛟 `posventa` va SEPARADO de `nivel` a propósito. El panel arma sus listas con
+  // `nivel === "alta"` y `nivel === "media"`: un nivel nuevo no entraría en
+  // ninguna de las dos y el chat se caería de la pantalla. Así el caso es "alta"
+  // como cualquier urgencia, y `posventa` solo agrega el color y la etiqueta.
   // `esperaDesde` es la hora del último mensaje del cliente: con eso el panel
   // agrupa por día (hoy / ayer / más viejos) y dice cuánto lleva esperando.
-  return { nivel, puntos, motivos, atendido: false, esperaDesde };
+  return {
+    nivel,
+    puntos,
+    motivos,
+    posventa: soporte.necesita ? soporte.motivo : null,
+    atendido: false,
+    esperaDesde,
+  };
 }
 
 /** Ordena las conversaciones por urgencia y devuelve las que requieren algo. */
