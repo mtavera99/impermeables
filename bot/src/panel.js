@@ -28,6 +28,7 @@ function panelToken() {
 }
 
 const store = require("./store");
+const catalogo = require("./catalogo");
 const resumen = require("./resumen");
 const atencion = require("./atencion");
 const embudo = require("./embudo");
@@ -79,6 +80,45 @@ function hace(ms) {
 // que no hay teléfono — porque para despachar contraentrega hace falta y se lo
 // va a tener que pedir en el chat.
 const RE_BSUID = /^[A-Za-z]{2}\.[A-Za-z0-9]{1,128}$/;
+
+// ============================================================================
+// 🛒 QUÉ SE VENDIÓ, EN UNA CELDA
+//
+// 🔴 POR QUÉ CAMBIÓ ESTA COLUMNA (28-sep). Antes decía "Talla / color", que
+// alcanzaba cuando BikerPro vendía UNA sola cosa. Con dos productos eso es
+// peligroso: un pedido de intercomunicadores —que no tiene talla ni color— se
+// veía como " / ", o sea igual a un pedido de impermeable al que le faltaran los
+// datos. El dueño lo pidió explícito: "en el panel debe ser visualmente imposible
+// confundir un pedido de impermeable con uno de intercomunicador".
+//
+// Ahora la línea grande dice el producto y la cantidad, y la talla/color quedan
+// abajo en chico — donde siguen siendo útiles para el impermeable y simplemente no
+// aparecen cuando el producto no las usa.
+//
+// ⚠️ LOS PEDIDOS VIEJOS NO TIENEN EL CAMPO `producto`, y son todos impermeables.
+// Se los trata como tal en vez de mostrarlos como "?": el panel sigue mostrando
+// el historial igual que siempre, sin tocar un solo dato guardado.
+// ============================================================================
+function celdaDeProducto(p) {
+  const id = p.producto || "impermeable";
+  const ficha = catalogo.de(id);
+  const etiqueta = ficha ? ficha.etiquetaPanel : `📦 ${id}`;
+  const uds = Number(p.unidades) || 1;
+  // La cantidad se muestra siempre, también cuando es 1: así "× 2" no es lo único
+  // que llama la atención y no hay que adivinar si la ausencia significa uno.
+  const titulo = `${etiqueta} × ${uds}`;
+
+  // Talla y color solo si el producto los usa Y el pedido los trae.
+  const detalle =
+    ficha && ficha.pideTalla && (p.talla || p.color)
+      ? `${esc(p.talla || "—")} / ${esc(p.color || "—")}`
+      : "";
+
+  return (
+    `<b class="prod ${id === "impermeable" ? "prodA" : "prodB"}">${esc(titulo)}</b>` +
+    (detalle ? `<div class="sub">${detalle}</div>` : "")
+  );
+}
 
 function comoSeLlama(tel, conv) {
   if (!RE_BSUID.test(String(tel))) return { texto: "+" + tel, sinTelefono: false };
@@ -449,7 +489,7 @@ function render(aviso) {
               "</b>"
             : "")
     }</div></td>
-      <td data-label="Talla / color">${esc(p.talla)} / ${esc(p.color)}</td>
+      <td data-label="Producto">${celdaDeProducto(p)}</td>
       <td class="nowrap" data-label="Total"><b>${esc(fmtCOP(p.total))}</b><div class="sub">${esc(p.pago)}</div></td>
       <td class="nowrap" data-label="${
         opciones.anulado ? "Motivo" : opciones.despachado ? "Guía" : "Anuncio"
@@ -505,7 +545,7 @@ function render(aviso) {
        <p class="nota">No cuentan como venta ni aparecen para despachar, pero <b>quedan en el
          registro</b>. Si anulaste uno por error, reactivalo acá.</p>
        <div class="tabla"><table>
-         <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Motivo</th><th></th></tr>
+         <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Producto</th><th>Total</th><th>Motivo</th><th></th></tr>
          ${anulados
            .slice(0, 40)
            .map((p) => filaPedido(p, { anulado: true }))
@@ -807,6 +847,12 @@ function render(aviso) {
   tr:last-child td{border-bottom:0}
   th{background:var(--card2);font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--gris)}
   .sub{color:var(--gris);font-size:12px;margin-top:2px}
+  /* 🛒 El producto de cada pedido, con color propio. Dos productos que se
+     distinguen solo por el texto se confunden leyendo rápido una lista de 30
+     pedidos; con el color puesto, no. */
+  .prod{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;white-space:nowrap}
+  .prodA{background:#16304a;color:#a9cdf5;border:1px solid #2b5480}
+  .prodB{background:#3a2555;color:#d9b8ff;border:1px solid #6b3fa0}
   .nowrap{white-space:nowrap}
   .vacio{color:var(--gris);text-align:center;padding:26px}
 
@@ -1104,7 +1150,7 @@ function render(aviso) {
       : ""
   }
   <div class="tabla"><table>
-    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Anuncio</th><th></th></tr>
+    <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Producto</th><th>Total</th><th>Anuncio</th><th></th></tr>
     ${filasPendientes}
   </table></div>
 
@@ -1133,7 +1179,7 @@ function render(aviso) {
            <p class="nota">Ya tienen su guía enviada al cliente. Quedan acá para consultar:
              <b>no se borran nunca</b>.</p>
            <div class="tabla"><table>
-             <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Talla / color</th><th>Total</th><th>Guía</th><th></th></tr>
+             <tr><th>Fecha</th><th>Cliente</th><th>Dirección</th><th>Producto</th><th>Total</th><th>Guía</th><th></th></tr>
              ${filasDespachados}
            </table></div>
          </details>`

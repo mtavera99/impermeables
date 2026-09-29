@@ -203,13 +203,93 @@ function primerMensaje() {
   ].join("\n\n");
 }
 
+// ----------------------------------------------------------------------------
+// 🎧 EL ARRANQUE DEL INTERCOMUNICADOR
+//
+// 🔴 POR QUÉ HACE FALTA, Y ES UNA REGRESIÓN QUE CASI SE ESCAPA: este módulo
+// contesta SIN llamar a la IA. Un cliente que llega del anuncio del V10 y escribe
+// solo "hola" caía en `esSaludoGenerico` y recibía el folleto del impermeable
+// completo —4 piezas, PVC, tallas S a 3XL, colores de franja— cuando venía a
+// preguntar por un intercomunicador. El dueño listó ese caso explícitamente:
+// "mandar solamente 'hola' después de venir del anuncio".
+//
+// Cumple las mismas reglas que el del impermeable, por las mismas razones:
+//  · Presenta PRIMERO el combo x2, que es lo que se publicita.
+//  · Dice el precio del producto y que el envío va APARTE — nunca "más el
+//    envío", que la gente entiende como incluido (la corrección del 25-sep).
+//  · No da ninguna cifra de envío, porque todavía no se sabe la ciudad.
+//  · Nombra el beneficio principal en una línea, sin bombardear.
+//  · Termina con UNA pregunta, la ciudad, que además es el dato que se necesita
+//    para cotizar.
+//  · ⛔ No dice "2x1" ni promete especificaciones que no tenemos.
+// ----------------------------------------------------------------------------
+function primerMensajeV10() {
+  const v10 = require("./catalogo").de("intercom_v10_2x");
+  return [
+    `¡Hola! 👋 Claro que sí. Tenemos el combo de 2 intercomunicadores ${v10.nombreCorto} por ${fmt(v10.precios[2])} 🏍️`,
+    "Sirven para hablar de casco a casco con tu acompañante, y también los usás para música, las indicaciones del GPS y llamadas 🎧",
+    `Ese precio es por los dos, y aparte el envío según tu ciudad. Pagás todo junto contraentrega cuando lo recibís 📦`,
+    "¿Para qué ciudad o municipio sería? Así te doy el total exacto.",
+  ].join("\n\n");
+}
+
 /**
  * La unica funcion que usa el agente.
  * Devuelve el texto fijo, o null si este caso lo tiene que contestar la IA.
+ *
+ * @param {Array} messages historial de la conversación
+ * @param {string} texto el mensaje del cliente
+ * @param {string} [productoId] del catálogo. Sin esto, el impermeable — que es
+ *   el comportamiento de siempre y lo que esperan las pruebas existentes.
  */
-function respuestaDeArranque(messages, texto) {
+// ----------------------------------------------------------------------------
+// 🎧 EL PRERRELLENADO DEL ANUNCIO DEL V10
+//
+// 🔴 POR QUÉ HACE FALTA UNA COMPROBACIÓN APARTE. El dueño dijo que el mensaje de
+// entrada más común va a ser:
+//
+//     "Hola, quiero más información de la promoción de intercomunicadores."
+//
+// Eso son NUEVE palabras, y `esSaludoGenerico` descarta cualquier mensaje de más
+// de ocho. Ese límite está bien puesto para el impermeable —un mensaje largo
+// normalmente ya preguntó algo concreto y merece una respuesta a ESO—, pero acá
+// deja afuera justamente el mensaje de más tráfico del producto nuevo: se iba a la
+// IA, costaba una llamada y la respuesta era menos predecible.
+//
+// 🔑 Se pide que se cumplan las tres cosas, y las tres importan:
+//   1. nombra el intercomunicador (si no, no sabemos de qué habla);
+//   2. es una PEDIDA DE INFORMACIÓN genérica, no una pregunta concreta;
+//   3. no trae ninguna palabra que merezca respuesta propia (precio, envío,
+//      ciudad, talla...) — se reutiliza el mismo RE_ANULA del impermeable, así
+//      que "¿cuánto valen los intercomunicadores?" sigue yendo a la IA.
+// ----------------------------------------------------------------------------
+const RE_PIDE_INFO =
+  /\b(?:info|informacion|informes|me interesan?|interesado|interesada|quiero saber|cuenteme|cuentame|detalles|promocion|promo|disponible|disponibles|tienen|venden)\b/;
+
+function esPedidoDeInfoDeProducto(texto) {
+  const t = limpiar(texto);
+  if (!t) return false;
+  // Un mensaje muy largo ya es una conversación, no un prerrellenado.
+  if (t.split(" ").length > 14) return false;
+  // Si preguntó algo concreto, lo contesta la IA.
+  if (RE_ANULA.test(t)) return false;
+  return RE_PIDE_INFO.test(t);
+}
+
+function respuestaDeArranque(messages, texto, productoId) {
   if (!esPrimerContacto(messages)) return null;
+
+  // 🎧 El prerrellenado del anuncio del intercomunicador entra por acá, porque es
+  // más largo que el del impermeable y el corte de 8 palabras lo dejaba afuera.
+  if (require("./catalogo").esV10(productoId) && esPedidoDeInfoDeProducto(texto)) {
+    return primerMensajeV10();
+  }
+
   if (!esSaludoGenerico(texto)) return null;
+  // 🔑 El arranque tiene que ser del producto por el que preguntan. Mandarle el
+  // folleto del impermeable a alguien que viene del anuncio del intercomunicador
+  // es perder el lead en el primer mensaje.
+  if (require("./catalogo").esV10(productoId)) return primerMensajeV10();
   return primerMensaje();
 }
 
@@ -218,5 +298,6 @@ module.exports = {
   esSaludoGenerico,
   esPrimerContacto,
   primerMensaje,
+  primerMensajeV10,
   limpiar,
 };
