@@ -535,7 +535,7 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
     // Las entradas existen en el catálogo de fotos.
     for (const k of fotosV10) {
       chequear(`la foto "${k}" está declarada en el catálogo`, Boolean(mediaCat.MEDIA[k]), "falta la entrada");
-      chequear(`  y dice qué archivo espera`, Boolean(mediaCat.MEDIA[k].archivo), mediaCat.MEDIA[k].archivo);
+      chequear(`  y dice qué archivo espera`, Boolean(mediaCat.MEDIA[k].base), mediaCat.MEDIA[k].base);
     }
     // Y sus captions hablan del intercomunicador, no de impermeables.
     for (const k of fotosV10) {
@@ -543,8 +543,19 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
       chequear(`  el texto de "${k}" no menciona impermeables ni tallas`, !/impermeable|talla|franja/i.test(cap), cap.slice(0, 70));
     }
 
-    // 🔑 EL CASO URGENTE: sin fotos subidas, NO se manda ninguna.
+    // 🔑 SIN FOTOS SUBIDAS, NO SE MANDA NINGUNA.
+    //
+    // Las fotos ya están en el repo, así que para probar este caso se apuntan las
+    // claves a un nombre base que no existe. Es el estado en el que estuvo el bot
+    // entre que arrancó la campaña y que el dueño subió las fotos.
     {
+      const basesReales = {};
+      for (const k of fotosV10) {
+        basesReales[k] = mediaCat.MEDIA[k].base;
+        mediaCat.MEDIA[k].base = "no-existe-" + k;
+      }
+      mediaCat.olvidarCache();
+
       const t = nuevoTel();
       await recorrer(t, [{ cliente: "info de los intercomunicadores" }]);
       const r = await recorrer(t, [{ cliente: "me manda fotos?", ia: "Claro, mirá 📸" }]);
@@ -565,6 +576,10 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
       chequear("  el guion avisa que todavía no hay fotos", /TODAVÍA NO TENEMOS FOTOS/.test(g));
       chequear("  y le prohíbe prometerlas", /NO prometas mandarlas/.test(g));
       chequear("  y le prohíbe mandar una del impermeable", /NUNCA mandes una foto del impermeable/.test(g));
+
+      // Se devuelven los nombres reales.
+      for (const k of fotosV10) mediaCat.MEDIA[k].base = basesReales[k];
+      mediaCat.olvidarCache();
     }
 
     // 🔑 Y AHORA EL CASO DE MAÑANA: con las fotos subidas, funcionan solas.
@@ -611,6 +626,88 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
       }
       delete require.cache[require.resolve("./src/media")];
       delete require.cache[require.resolve("./src/prompt")];
+    }
+
+    // =======================================================================
+    // 📸 LAS FOTOS DE VERDAD QUE SUBIÓ EL DUEÑO
+    //
+    // 🔴 DOS COSAS SALIERON MAL AL SUBIRLAS Y LAS DOS HABRÍAN DEJADO AL CLIENTE
+    // SIN FOTO, en silencio:
+    //
+    // 1. LA EXTENSIÓN. Llegaron como `v10-producto.jpg.PNG` — al renombrar en el
+    //    Finder, el sistema deja pegada la extensión original. El bot buscaba
+    //    `v10-producto.jpg` exacto, no lo encontraba, y no ofrecía nada. Las fotos
+    //    estaban en el repo y el bot seguía diciendo "no tengo la foto a mano".
+    //
+    // 2. EL PESO. `v10-puesto` pesaba 11,4 MB porque venía en 16 bits por canal.
+    //    El límite de Meta es 5 MB: esa foto no se iba a enviar nunca.
+    // =======================================================================
+    {
+      const LIMITE_META_MB = 5;
+      for (const clave of fotosV10) {
+        const r = mediaCat.resolver(clave);
+        chequear(`🔑 "${clave}" resuelve a una foto de verdad`, Boolean(r && r.url), r ? r.url : "no resuelve");
+        if (!r) continue;
+
+        // La URL tiene que apuntar al archivo que EXISTE, con su extensión real.
+        const nombre = r.url.split("/").pop();
+        const ruta = path.join(mediaCat.CARPETA_IMG, nombre);
+        chequear(`  la URL apunta a un archivo que existe (${nombre})`, fs.existsSync(ruta), ruta);
+        if (!fs.existsSync(ruta)) continue;
+
+        const mb = fs.statSync(ruta).size / 1024 / 1024;
+        chequear(
+          `  y pesa ${mb.toFixed(1)} MB, por debajo del límite de Meta (${LIMITE_META_MB} MB)`,
+          mb < LIMITE_META_MB,
+          `${mb.toFixed(1)} MB — Meta la rechazaría y el cliente no recibiría nada`
+        );
+
+        // Y es una imagen de verdad, no un archivo roto ni un placeholder.
+        const cabecera = fs.readFileSync(ruta, { length: 8 });
+        const esPng = cabecera.slice(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+        const esJpg = cabecera[0] === 0xff && cabecera[1] === 0xd8;
+        const esWebp = cabecera.slice(0, 4).toString() === "RIFF";
+        chequear(`  y es una imagen válida de verdad`, esPng || esJpg || esWebp, cabecera.toString("hex"));
+      }
+    }
+
+    // 🔑 Y QUE LA EXTENSIÓN NO PUEDA VOLVER A ROMPER EL ENVÍO.
+    // El dueño no es técnico y no tiene por qué pelear con extensiones: ".PNG" en
+    // mayúscula, ".jpeg", o una doble como la que llegó. Cualquiera tiene que servir.
+    {
+      const carpeta = mediaCat.CARPETA_IMG;
+      const variantes = [
+        ["prueba-ext.jpg", "extensión normal"],
+        ["prueba-ext.PNG", "mayúsculas"],
+        ["prueba-ext.jpeg", "jpeg"],
+        ["prueba-ext.jpg.PNG", "🔑 doble, como la que llegó de verdad"],
+        ["prueba-ext.webp", "webp"],
+      ];
+      for (const [nombre, comoEs] of variantes) {
+        const ruta = path.join(carpeta, nombre);
+        let sePudo = true;
+        try {
+          fs.writeFileSync(ruta, "x");
+        } catch {
+          sePudo = false;
+        }
+        if (!sePudo) continue;
+        mediaCat.olvidarCache();
+        const hallado = mediaCat.archivoReal("prueba-ext");
+        chequear(`encuentra la foto con ${comoEs} (${nombre})`, hallado === nombre, `halló ${hallado}`);
+        try { fs.unlinkSync(ruta); } catch {}
+      }
+      mediaCat.olvidarCache();
+      chequear("⛔ y si no hay ningún archivo, devuelve null", mediaCat.archivoReal("prueba-ext") === null);
+      // ⛔ Un archivo que NO es imagen no se toma por foto.
+      const basura = path.join(carpeta, "prueba-ext.txt");
+      try {
+        fs.writeFileSync(basura, "x");
+        mediaCat.olvidarCache();
+        chequear("⛔ un .txt no se confunde con una foto", mediaCat.archivoReal("prueba-ext") === null);
+        fs.unlinkSync(basura);
+      } catch {}
+      mediaCat.olvidarCache();
     }
 
     // Las instrucciones para el dueño existen y están donde se van a buscar.
