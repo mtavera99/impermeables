@@ -9,6 +9,7 @@ const cotizacion = require("./cotizacion");
 const promesas = require("./promesas");
 const comercial = require("./comercial");
 const posventa = require("./posventa");
+const catalogo = require("./catalogo");
 
 // ============================================================================
 // PROVEEDOR DE IA — configurable, para no quedar amarrado a uno
@@ -298,6 +299,72 @@ function detectMediaIntent(text) {
 }
 
 // Genera la respuesta para un mensaje entrante
+// ============================================================================
+// 🔢 CUÁNTAS UNIDADES, SEGÚN EL PRODUCTO
+//
+// El impermeable cuenta las unidades leyendo TALLAS: "una S y una XL" son dos
+// conjuntos, y esa lógica lleva varias correcciones encima (el 2XL que contaba
+// como dos, la cantidad que se perdía al tercer mensaje). No se toca.
+//
+// El intercomunicador no tiene tallas, así que su cantidad sale de las palabras
+// de cantidad: "solo uno", "el combo", "los dos". Ver catalogo.unidadesPedidas.
+//
+// 🔑 Y RECORRE TODO EL HILO, no solo este turno. Es el requisito de "no perder el
+// contexto": si el cliente dijo "quiero el combo" y tres mensajes después escribe
+// su dirección, las 2 unidades tienen que seguir en pie. Ese defecto exacto —la
+// cantidad que se perdía al mensaje siguiente— ya se pagó una vez en impermeables.
+// ============================================================================
+function cantidadDelProducto(productoId, conv, userText, previa) {
+  if (!catalogo.esV10(productoId)) {
+    return cotizacion.cantidadDelHilo(conv, userText, previa && previa.uds);
+  }
+
+  // 1. Lo que dice ESTE turno manda: es el mecanismo del cambio de cantidad
+  //    ("mejor uno", "mejor mándeme los dos").
+  const deAhora = catalogo.unidadesPedidas(userText);
+  if (deAhora != null) return { uds: deAhora, origen: "este turno" };
+
+  // 2. Si no, lo último que pidió el CLIENTE en el hilo (lo que el bot ofrezca no
+  //    es una decisión del cliente).
+  const mensajes = (conv && conv.messages) || [];
+  for (let i = mensajes.length - 1; i >= Math.max(0, mensajes.length - 12); i--) {
+    const m = mensajes[i];
+    if (!m || m.role !== "user" || !m.content) continue;
+    const n = catalogo.unidadesPedidas(m.content);
+    if (n != null) return { uds: n, origen: "lo que pidió antes en el hilo" };
+  }
+
+  // 3. La cantidad de la cotización vigente, para no perderla entre turnos.
+  //
+  // 🔴 PERO SOLO SI ES DEL MISMO PRODUCTO, y esto lo encontró la prueba del cambio
+  // de producto: un cliente venía cotizando UN conjunto impermeable en Medellín y
+  // preguntó "también vi los intercomunicadores, ¿cuánto cuestan?". La cantidad se
+  // heredaba de la cotización del impermeable —1 unidad— así que se le mostraba
+  // $82.000 (un intercomunicador) en vez del combo de $122.000 que es lo que se
+  // publicita y lo que estaba preguntando.
+  //
+  // La cantidad de un producto no dice nada de la del otro. Son decisiones
+  // distintas: querer un impermeable no significa querer un intercomunicador.
+  if (
+    previa &&
+    previa.productoId === productoId &&
+    Number.isFinite(Number(previa.uds)) &&
+    Number(previa.uds) > 0
+  ) {
+    return { uds: Number(previa.uds), origen: "la cotización vigente de este producto" };
+  }
+
+  // 4. 🔑 POR DEFECTO, EL COMBO DE DOS.
+  //
+  // Y no es un capricho: la publicidad del V10 empuja el combo x2 por $99.900, así
+  // que alguien que llega preguntando "info de la promoción" está preguntando por
+  // ESO. Arrancar en una unidad le mostraría un precio que no es el del anuncio.
+  //
+  // Vender una sola sigue disponible en cualquier momento: basta que lo pida
+  // ("solo uno", "¿cuánto vale uno?") y el paso 1 lo detecta.
+  return { uds: 2, origen: "el combo del anuncio, que es lo que se publicita" };
+}
+
 async function generateReply(phone, userText) {
   store.pushMsg(phone, "user", userText);
   const conv = store.getConv(phone);
@@ -315,7 +382,31 @@ async function generateReply(phone, userText) {
   // Cualquier otro caso (pregunta concreta, anuncio del colmena, charla ya
   // empezada) devuelve null y sigue el camino normal.
   // ==========================================================================
-  const arranque = respuestaDeArranque(conv.messages, userText);
+  // ==========================================================================
+  // 🛒 DE QUÉ PRODUCTO ESTAMOS HABLANDO
+  //
+  // Desde el 28-sep BikerPro vende dos cosas: el conjunto impermeable y el
+  // intercomunicador V10 2X. Esto se resuelve ACÁ ARRIBA, antes del arranque fijo,
+  // y el orden importa: el arranque contesta SIN llamar a la IA, así que si se
+  // resolviera después, un cliente que llega del anuncio del intercomunicador y
+  // escribe "hola" recibiría el folleto completo del impermeable.
+  //
+  // 🔑 Decide en este orden: lo que dijo en este turno > lo que venía diciendo el
+  // hilo > el anuncio por el que entró > el de siempre. Ver catalogo.productoDelHilo.
+  //
+  // ⚠️ SI NO HAY NINGUNA SEÑAL, EL RESULTADO ES EL IMPERMEABLE, o sea exactamente
+  // el comportamiento de antes. Un "quiero información" pelado no puede empezar a
+  // vender intercomunicadores por su cuenta.
+  // ==========================================================================
+  const delAnuncio = catalogo.productoDelAnuncio(store.atribucionDe(phone));
+  const eleccion = catalogo.productoDelHilo(conv, userText, { producto: delAnuncio });
+  const productoId = eleccion.producto;
+  const ficha = catalogo.de(productoId);
+  if (catalogo.esV10(productoId)) {
+    console.log(`🎧 ${phone}: la conversación es del ${ficha.nombreCorto} (${eleccion.porQue}).`);
+  }
+
+  const arranque = respuestaDeArranque(conv.messages, userText, productoId);
   if (arranque) {
     store.pushMsg(phone, "assistant", arranque);
     return { reply: arranque, order: null, handoff: false, media: [], pedidoRescatado: false, revisionHumana: null };
@@ -336,8 +427,12 @@ async function generateReply(phone, userText) {
   // unidad. Las dos funciones viven en cotizacion.js para que las pruebas
   // recorran exactamente este camino y no una versión de laboratorio.
   const previa = store.leerCotizacion(phone);
+
   let destino = cotizacion.destinoDelHilo(conv, userText);
-  const cantidad = cotizacion.cantidadDelHilo(conv, userText, previa && previa.uds);
+  // La cantidad se lee distinto según el producto: la del impermeable cuenta
+  // tallas ("una S y una XL" son dos conjuntos), y el V10 no tiene tallas. Ver
+  // `cantidadDelProducto`.
+  const cantidad = cantidadDelProducto(productoId, conv, userText, previa);
   // ==========================================================================
   // 🔴 A QUIEN YA COMPRÓ NO SE LE VUELVE A PEDIR LA CIUDAD
   //
@@ -392,6 +487,7 @@ async function generateReply(phone, userText) {
   let cot = cotizacion.calcular(destino.ciudad, userText, {
     cantidad,
     ofrecerComboDeRescate: retrocedio,
+    producto: productoId,
   });
   // 🏷️ La cotización guardada es la que trae `oferta_id`: un identificador que
   // PERSISTE mientras las condiciones no cambien, en vez de nacer en cada mensaje.
@@ -417,6 +513,11 @@ async function generateReply(phone, userText) {
     objecionDePrecio,
     messages: conv.messages,
     rescateYaOfrecido,
+    // 🔑 El producto viaja en el contexto y no solo en la cotización, porque el
+    // validador lo necesita incluso cuando NO hay cotización: el primer mensaje del
+    // anuncio dice "$99.900 + envío" antes de saber la ciudad, y sin esto el
+    // validador borraría ese precio por no estar autorizado.
+    producto: productoId,
   };
   if (cot.comboDeRescate && objecionDePrecio && !rescateYaOfrecido) {
     console.log(
@@ -484,7 +585,8 @@ async function generateReply(phone, userText) {
     // volviéndola a 0, sin desplegar nada. Las capas 1 y 2 van siempre, porque no
     // son una mejora a medir: son el precio, y el precio no puede fallar.
     // ========================================================================
-    const guionConPrecio = buildSystemPrompt() + "\n\n" + cotizacion.bloqueDeDatos(cot, contextoPrecio);
+    const guionConPrecio =
+      buildSystemPrompt(productoId) + "\n\n" + cotizacion.bloqueDeDatos(cot, contextoPrecio);
     const conNota = comercial.guionConNota(guionConPrecio, conv.messages, userText, {
       sinPromo2: Boolean(
         cot.sinPromo2 || (cot.destino && cot.destino.sinPromo2) || cot.motivo === "dificil_sin_promo"
@@ -1041,6 +1143,26 @@ async function generateReply(phone, userText) {
       };
       savedOrder = store.saveOrder({
         ...conDireccion,
+        // ====================================================================
+        // 🛒 QUÉ SE VENDIÓ — LO PONE EL CÓDIGO, NO EL MODELO
+        //
+        // 🔑 DECISIÓN IMPORTANTE: el campo `producto` NO se le pide a la IA en el
+        // bloque ##ORDER##. Se escribe acá, desde la misma detección que ya eligió
+        // el guion y calculó el precio de este turno.
+        //
+        // Por dos razones:
+        //   1. Este proyecto tiene escrito en cinco lugares que "una instrucción
+        //      al modelo no es un candado". El bloque ##ORDER## salía duplicado
+        //      aunque el guion lo prohibiera. Si el producto lo dijera el modelo,
+        //      un pedido podría quedar registrado como el producto equivocado — y
+        //      eso se despacha mal.
+        //   2. El guion del impermeable está a 11 tokens de su techo de 9.000.
+        //      Agregarle un campo al esquema del pedido lo pasaría.
+        //
+        // Así que el dato es determinista y no cuesta un solo token.
+        // ====================================================================
+        producto: productoId,
+        producto_nombre: ficha ? ficha.nombre : "",
         ...(modificaA ? { modifica_a: modificaA } : {}),
         // ⚠️ Se mira la conversación reciente y no solo este turno: el cliente pide
         // "quiero otros dos para mi hermano" en un turno y confirma en el siguiente.

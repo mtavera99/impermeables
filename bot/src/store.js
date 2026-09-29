@@ -908,6 +908,32 @@ const firmaDeTallas = (o) => {
 // Lo que rompió el caso Heber fue solo la TALLA comparada como cadena cruda, así
 // que el arreglo se queda ahí: total + unidades + tallas por significado.
 const mismoPedido = (a, b) => {
+  // ==========================================================================
+  // 🛒 PRODUCTOS DISTINTOS NUNCA SON EL MISMO PEDIDO (28-sep)
+  //
+  // 🔴 ESTE ES EL RIESGO CONCRETO QUE TRAJO EL SEGUNDO PRODUCTO, y no es teórico:
+  // un conjunto impermeable en Bogotá cuesta $73.000, y UN intercomunicador en
+  // Bogotá cuesta $73.000 también — mismo total, misma cantidad (1), y ninguno de
+  // los dos tiene talla que los distinga, porque el V10 no usa tallas.
+  //
+  // Con la comparación anterior —total + unidades + tallas— esos dos pedidos eran
+  // "el mismo". Consecuencia: un cliente que compra un impermeable y a los días un
+  // intercomunicador, y su segundo pedido se descarta como duplicado. Se pierde una
+  // venta y el cliente se queda esperando algo que nunca se despachó.
+  //
+  // El mismo problema aparece con 2 unidades en banda C: dos impermeables $148.000
+  // y dos V10 $122.000 no chocan, pero otras bandas sí pueden coincidir.
+  //
+  // 🔑 Se compara con `||` a impermeable: los pedidos guardados ANTES de este
+  // cambio no tienen el campo, y hay que seguir tratándolos como impermeables —
+  // que es lo que son. Sin eso, un pedido viejo y uno nuevo del mismo impermeable
+  // dejarían de reconocerse como duplicados y se colaría el defecto que el
+  // antiduplicados vino a resolver.
+  // ==========================================================================
+  const prodA = a.producto || "impermeable";
+  const prodB = b.producto || "impermeable";
+  if (prodA !== prodB) return false;
+
   if (Number(a.total) !== Number(b.total)) return false;
 
   // Unidades por significado: el campo, la talla enumerada o el texto del producto.
@@ -987,7 +1013,11 @@ function previoSinConfirmar(orders, nuevo, contexto = {}) {
 // Ante esa duda no se elige: se conservan los dos registros y se marcan. Perder
 // una venta por fusionarla es peor que tener dos pedidos que alguien revisa.
 // ============================================================================
-const CAMPOS_DEL_PRODUCTO = ["talla", "color", "ciudad", "total", "unidades"];
+// 🛒 "producto" entra acá desde el 28-sep. Si el producto cambia, NO es una
+// corrección del mismo pedido: es otra cosa. Y este arreglo ya está diseñado para
+// eso — cuando cambia un campo del producto, `saveOrder` conserva los DOS pedidos
+// y los marca, en vez de escribir uno encima del otro en silencio.
+const CAMPOS_DEL_PRODUCTO = ["producto", "talla", "color", "ciudad", "total", "unidades"];
 
 // 🔴 QUIÉN RECIBE EL PEDIDO ES IDENTIDAD, NO UN DATO DE ENTREGA MÁS.
 //
@@ -1497,13 +1527,28 @@ function saveOrder(order, contexto = {}) {
     // compró sigue marcándose. El anti-duplicados no se retira.
     // ========================================================================
     const previo = pedidoSospechoso(orders, record);
-    const decididoAdrede = Boolean(record.modifica_a) || record.compra_adicional === true;
+    // 🛒 COMPRAR OTRO PRODUCTO NO ES SOSPECHOSO (28-sep).
+    //
+    // Un cliente que ya tiene su impermeable y a los días pide un intercomunicador
+    // no está repitiendo nada: son dos cosas distintas. Marcarlo con "¿REPETIDO?"
+    // le crea al dueño trabajo de verificación por un pedido que está perfecto — y
+    // el panel ya tiene bastantes marcas que sí hay que mirar.
+    //
+    // ⚠️ Solo cuando los productos son DISTINTOS de verdad. Dos pedidos del mismo
+    // producto siguen marcándose igual que antes: el anti-duplicados no se retira.
+    const otroProducto =
+      Boolean(previo) && (previo.producto || "impermeable") !== (record.producto || "impermeable");
+    const decididoAdrede =
+      Boolean(record.modifica_a) || record.compra_adicional === true || otroProducto;
     if (previo && decididoAdrede) {
       console.log(
         `🔁 Cliente repetido NO marcado como sospechoso (${record.nombre || "?"}): ` +
           (record.modifica_a
             ? `es una modificación confirmada del pedido ${record.modifica_a}.`
-            : "el cliente pidió explícitamente otra compra.")
+            : otroProducto
+              ? `su pedido anterior era de otro producto (${previo.producto || "impermeable"}) ` +
+                `y este es de ${record.producto || "impermeable"}.`
+              : "el cliente pidió explícitamente otra compra.")
       );
     }
     if (previo && !decididoAdrede) {

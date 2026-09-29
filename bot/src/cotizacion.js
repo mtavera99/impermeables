@@ -38,6 +38,7 @@
 // ============================================================================
 
 const fletes = require("./fletes");
+const catalogo = require("./catalogo");
 
 // Versión de la política. Va pegada a cada cotización guardada: si mañana cambia
 // un precio o un tope de descuento, se puede saber con qué reglas se cotizó.
@@ -1326,6 +1327,103 @@ function yaSeOfrecioElRescate(messages, monto) {
   );
 }
 
+// ============================================================================
+// 🎧 COTIZAR UN PRODUCTO DE PRECIO FIJO + ENVÍO
+//
+// Sirve para el intercomunicador V10 2X y para cualquier producto futuro que se
+// cobre así: un precio de tabla por cantidad, más el envío del destino.
+//
+// A diferencia del impermeable, acá el producto y el envío NUNCA están fusionados:
+// se sabe exactamente cuánto es cada cosa. Eso es justo lo que el dueño pidió
+// poder distinguir — "nunca comunicar $99.900 como total final si todavía falta
+// sumar un envío".
+// ============================================================================
+function cotizarPorProductoMasEnvio({ producto, destino, uds, texto }) {
+  const base = {
+    productoId: producto.id,
+    productoNombre: producto.nombre,
+    destino,
+    ciudad: destino.ciudad,
+  };
+
+  // ⛔ ZONA DE DIFÍCIL ACCESO: NO SE COTIZA SOLO.
+  //
+  // En esos destinos el tarifario guarda un TOTAL confirmado a mano por el dueño
+  // (Tadó $93.000, El Charco $115.500), no un envío. Ese total lleva el precio del
+  // impermeable adentro, así que no hay forma de despejar el envío para sumárselo
+  // a otro producto. Restarlo sería inventar una tarifa, y el 22-sep un envío
+  // inventado costó una venta de $158.000. Se escala y lo cotiza una persona.
+  if (destino.estado === "dificil_con_tarifa" || destino.estado === "dificil_sin_tarifa") {
+    return {
+      ...base,
+      ok: false,
+      motivo: "producto_en_zona_dificil",
+      uds,
+      detalle:
+        `${destino.ciudad} es zona de difícil acceso y el envío del ${producto.nombreCorto} ahí ` +
+        `no está medido. No se cotiza solo.`,
+    };
+  }
+
+  // `bandaDe` devuelve la letra o null si no reconoce la ciudad. Cuando no
+  // reconoce se usa la banda por defecto, que es la MISMA regla del impermeable
+  // (la E, la más cara): así un municipio desconocido nunca se cotiza de menos.
+  const bandaHallada = fletes.bandaDe(destino.ciudadTarifario || destino.ciudad);
+  const claveBanda = bandaHallada || fletes.BANDA_POR_DEFECTO;
+  const envio = catalogo.envioCobradoDe(claveBanda);
+
+  if (!Number.isFinite(Number(envio)) || Number(envio) <= 0) {
+    return { ...base, ok: false, motivo: "sin_total", uds };
+  }
+
+  const precio = catalogo.precioDe(producto.id, uds);
+
+  // ⛔ CANTIDAD FUERA DE TABLA: se informan los precios que existen y se escala.
+  // El dueño lo pidió textual: "NO crear silenciosamente una nueva promoción no
+  // autorizada". Sumar "el par en promo + el resto suelto" ya sería decidir una
+  // política de mayoreo que nadie aprobó.
+  if (!precio || precio.fueraDeTabla) {
+    return {
+      ...base,
+      ok: false,
+      motivo: "cantidad_sin_precio",
+      uds,
+      preciosConocidos: { ...producto.precios },
+      detalle:
+        `Para ${uds} unidades no hay precio autorizado. Los que sí existen: ` +
+        `1 = ${fletes.fmt(producto.precios[1])} · 2 = ${fletes.fmt(producto.precios[2])}.`,
+    };
+  }
+
+  const total = precio.precio + envio;
+
+  return {
+    ...base,
+    ok: true,
+    banda: claveBanda,
+    reconocida: Boolean(bandaHallada),
+    uds: precio.uds,
+    // 🔑 Separados y exactos: producto + envio === total, siempre.
+    producto: precio.precio,
+    envio,
+    total,
+    esOfertaPrincipal: precio.esOfertaPrincipal,
+    // El ahorro del combo contra llevar dos sueltas. Con el mismo envío en los dos
+    // casos, el ahorro es solo del producto: 2×$59.900 − $99.900 = $19.900.
+    ahorro: precio.uds === 2 ? producto.precios[1] * 2 - producto.precios[2] : null,
+    // ⛔ El V10 NO tiene precio de negociación autorizado. El impermeable sí
+    // (tope de $3.000 y precios de rescate por banda, todos aprobados con márgenes
+    // medidos). Para el V10 no hay nada de eso, así que rebajar sería a ciegas.
+    rescate: null,
+    comboDeRescate: null,
+    politica: POLITICA_VERSION,
+    creado: Date.now(),
+    // La firma lleva el producto: sin eso, una oferta de impermeable y una de V10
+    // con el mismo total y ciudad tendrían la misma identidad.
+    firma: `${POLITICA_VERSION}|${producto.id}|${fletes.normalizar(String(destino.ciudad || ""))}|${precio.uds}|${total}`,
+  };
+}
+
 function calcular(ciudad, texto, opciones = {}) {
   // Si en el texto del turno hay más de un destino reconocible, no se cotiza: se
   // pregunta cuál es. Elegir una sería adivinar sobre el número que se cobra.
@@ -1372,6 +1470,31 @@ function calcular(ciudad, texto, opciones = {}) {
   }
   if (cantidad.escalar) {
     return { ok: false, motivo: "cantidad_escalada", destino, uds: 0, detalle: cantidad.motivo };
+  }
+
+  // ========================================================================
+  // 🎧 SEGUNDO PRODUCTO: PRECIO DE TABLA + ENVÍO DEL DESTINO
+  //
+  // Acá se bifurca, y la bifurcación va DESPUÉS de resolver el destino a
+  // propósito: así el V10 hereda gratis toda la inteligencia de destinos que
+  // costó semanas —normalización, homónimos de Madrid y Riosucio, "Santander de
+  // Quilichao", localidades de Bogotá, ambigüedad, difícil acceso— sin copiar
+  // una sola línea.
+  //
+  // Lo único distinto es cómo se arma el número: el impermeable saca el total del
+  // tarifario (donde producto y flete vienen fusionados), y el V10 suma su precio
+  // de tabla más el envío de la banda. Ver catalogo.js para de dónde sale ese
+  // envío y por qué no es una tarifa nueva.
+  // ========================================================================
+  const productoId = opciones.producto || catalogo.PRODUCTO_POR_DEFECTO;
+  const fichaProducto = catalogo.de(productoId);
+  if (fichaProducto && fichaProducto.motorDePrecio === "producto_mas_envio") {
+    return cotizarPorProductoMasEnvio({
+      producto: fichaProducto,
+      destino,
+      uds: cantidad.uds,
+      texto: texto || "",
+    });
   }
   // ========================================================================
   // 🔴 `sinPromo2` NO PUEDE TUMBAR LA TARIFA DE UNA UNIDAD
@@ -1496,9 +1619,36 @@ function firmaDeCondiciones(cot) {
 
 const fmt = fletes.fmt;
 
+/**
+ * La línea de precio del V10, escrita por el código.
+ *
+ * Es la que se usa como reemplazo si el modelo dice algo que no valida. Nombra el
+ * producto, separa producto y envío, y dice que se paga al recibir.
+ */
+function lineaDePrecioV10(cot) {
+  const ficha = catalogo.de(cot.productoId);
+  const nombre = ficha ? ficha.nombreCorto : "intercomunicador";
+  if (cot.uds === 2) {
+    return (
+      `Los dos ${nombre} te quedan en ${fmt(cot.total)} en total: ${fmt(cot.producto)} el combo ` +
+      `+ ${fmt(cot.envio)} de envío a ${cot.ciudad}` +
+      (cot.ahorro ? `. Te ahorrás ${fmt(cot.ahorro)} contra llevarlos por separado` : "") +
+      `, y pagás todo junto al recibir 📦`
+    );
+  }
+  return (
+    `Te queda en ${fmt(cot.total)} en total: ${fmt(cot.producto)} el ${nombre} ` +
+    `+ ${fmt(cot.envio)} de envío a ${cot.ciudad}, y pagás al recibir 📦`
+  );
+}
+
 /** La línea de precio, escrita por el código. Es la que debería salir tal cual. */
 function lineaDePrecio(cot) {
   if (!cot || !cot.ok) return "";
+  // Cada producto tiene su forma de decir el precio: el impermeable habla de
+  // "conjuntos", el V10 de "intercomunicadores". Decirle "conjunto" a un
+  // intercomunicador delata que el bot está leyendo el guion equivocado.
+  if (catalogo.esV10(cot.productoId)) return lineaDePrecioV10(cot);
   // Difícil acceso: hay total confirmado pero NO hay desglose. Se dice el total y
   // nada más — inventar el envío para que la resta cuadre es lo que costó la
   // venta de $158.000 el 22-sep.
@@ -1519,9 +1669,95 @@ function lineaDePrecio(cot) {
   );
 }
 
+// ============================================================================
+// 🎧 EL BLOQUE `## PRECIO` DEL V10
+//
+// Mismo principio que el del impermeable: el modelo NO calcula, recibe los
+// números resueltos y su trabajo es la redacción. Lo único distinto es que acá
+// producto y envío están siempre separados y explícitos, porque el precio del V10
+// no incluye el envío y el dueño pidió que eso no se confunda nunca.
+// ============================================================================
+function bloqueDeDatosV10(cot, contexto = {}) {
+  const ficha = catalogo.de((cot && cot.productoId) || contexto.producto) || catalogo.de("intercom_v10_2x");
+  const uno = fmt(ficha.precios[1]);
+  const dos = fmt(ficha.precios[2]);
+  const base =
+    `✅ Precios de catálogo, que SÍ podés decir siempre (el envío va aparte):\n` +
+    `   · 1 ${ficha.nombreCorto} = ${uno}\n` +
+    `   · combo de 2 = ${dos}\n`;
+
+  if (!cot || !cot.ok) {
+    const d = (cot && cot.destino) || {};
+    if (cot && cot.motivo === "cantidad_sin_precio") {
+      return (
+        `## PRECIO — ${cot.uds} UNIDADES NO TIENEN PRECIO AUTORIZADO\n` +
+        `⛔ NO inventes un precio ni un descuento por cantidad: no existe.\n` +
+        base +
+        `→ Decile los precios que sí existen y ofrecele pasarlo con un asesor (##HANDOFF##) ` +
+        `si de verdad quiere ${cot.uds}.`
+      );
+    }
+    if (cot && cot.motivo === "producto_en_zona_dificil") {
+      return (
+        `## PRECIO — DESTINO SIN ENVÍO MEDIDO PARA ESTE PRODUCTO\n` +
+        `${d.ciudad || "Ese destino"} es zona de difícil acceso y el envío del ${ficha.nombreCorto} ` +
+        `ahí no está confirmado.\n` +
+        `⛔ NO des ningún total ni ningún valor de envío.\n` +
+        base +
+        `→ Decí que confirmás el envío a ese destino y le escribís en un momento.`
+      );
+    }
+    if (cot && (cot.motivo === "sin_destino" || cot.motivo === "varios_destinos")) {
+      const nombró = cot.motivo === "varios_destinos" ? ` Nombró: ${(d.candidatas || []).join(", ")}.` : "";
+      return (
+        `## PRECIO — TODAVÍA NO HAY DESTINO\n` +
+        `⛔ NO des ningún total ni ningún valor de envío: no sabés a dónde va.${nombró}\n` +
+        base +
+        `⛔ Y NO digas que el envío está incluido ni que es gratis: se suma aparte.\n` +
+        `→ Preguntá la ciudad o municipio para dar el total exacto.`
+      );
+    }
+    if (cot && cot.motivo === "ambiguo") {
+      return (
+        `## PRECIO — NOMBRE DE CIUDAD REPETIDO\n` +
+        `"${d.ciudad}" existe en: ${(d.preguntarDepartamento || []).join(", ")}.\n` +
+        `⛔ NO des ningún número. Preguntá de qué departamento es: el envío cambia mucho.`
+      );
+    }
+    return (
+      `## PRECIO — NO SE PUDO COTIZAR\n` +
+      `⛔ NO des ningún total.\n` +
+      base +
+      `→ Preguntá la ciudad, o decí que confirmás el envío y le escribís.`
+    );
+  }
+
+  const cuantos = cot.uds === 2 ? `los dos ${ficha.nombreCorto}` : `un ${ficha.nombreCorto}`;
+  return (
+    `## PRECIO — YA CALCULADO, USALO TAL CUAL\n` +
+    `Producto: ${ficha.nombre} × ${cot.uds}\n` +
+    `Destino: ${cot.ciudad}\n` +
+    `· Producto (${cuantos}): ${fmt(cot.producto)}\n` +
+    `· Envío a ${cot.ciudad}: ${fmt(cot.envio)}\n` +
+    `· **TOTAL a pagar al recibir: ${fmt(cot.total)}**\n` +
+    (cot.ahorro ? `· Ahorro del combo contra llevarlos por separado: ${fmt(cot.ahorro)}\n` : "") +
+    `\n⛔ NO recalcules nada. NO sumes ni redondeés.\n` +
+    `⛔ ${fmt(cot.producto)} es SOLO el producto: no lo presentes como el total.\n` +
+    `⛔ El envío NO está incluido en el precio del producto, y NO es gratis.\n` +
+    `⛔ No hay descuentos para este producto: no negociés el precio.\n` +
+    `✅ Podés decirlo así: "${lineaDePrecioV10(cot)}"`
+  );
+}
+
 /** El bloque de datos duros que se le inyecta al modelo para ESE turno. */
 function bloqueDeDatos(cot, contexto = {}) {
   if (!cot) return "";
+
+  // 🔑 El producto decide el bloque. Se mira el contexto además de la cotización,
+  // porque cuando todavía no hay destino la cotización no sabe de qué producto es
+  // —sale por un `return` temprano— y el contexto sí.
+  const fichaBloque = productoDelTurno(cot, contexto);
+  if (fichaBloque && catalogo.esV10(fichaBloque.id)) return bloqueDeDatosV10(cot, contexto);
 
   if (!cot.ok) {
     const d = cot.destino || {};
@@ -1719,15 +1955,43 @@ function extraerImportes(texto) {
  * @param {object} cot
  * @param {{objecionDePrecio?:boolean}} contexto
  */
+/**
+ * Qué producto rige este turno, para sembrar los precios base correctos.
+ *
+ * 🔴 POR QUÉ HACE FALTA (28-sep, segundo producto): el validador sembraba SIEMPRE
+ * los precios del impermeable ($59.900 y $110.000). En un hilo de
+ * intercomunicadores eso hacía dos daños a la vez:
+ *   · el bot NO podía decir $99.900 —el precio del combo publicitado— porque no
+ *     estaba autorizado, así que el validador se lo borraba del mensaje;
+ *   · y SÍ podía decir $110.000, que es el combo de DOS IMPERMEABLES, en una
+ *     conversación sobre intercomunicadores.
+ *
+ * Se mira primero el contexto (que lo sabe incluso sin cotización, porque el
+ * primer mensaje presenta el combo antes de tener ciudad) y después la cotización.
+ */
+function productoDelTurno(cot, contexto = {}) {
+  const id = contexto.producto || (cot && cot.productoId) || catalogo.PRODUCTO_POR_DEFECTO;
+  return catalogo.de(id) || catalogo.de(catalogo.PRODUCTO_POR_DEFECTO);
+}
+
 function importesAutorizados(cot, contexto = {}) {
   const mapa = new Map();
   const poner = (valor, rol) => {
     if (Number.isFinite(Number(valor)) && Number(valor) > 0) mapa.set(Number(valor), rol);
   };
 
+  const ficha = productoDelTurno(cot, contexto);
+
   // El precio base del producto se puede decir siempre: no depende del destino.
-  poner(fletes.PRECIO_PRODUCTO, "precio base del conjunto");
-  poner(fletes.PROMO_2_UNIDADES, "precio base de dos conjuntos");
+  if (ficha && ficha.precios) {
+    // Producto con tabla de precios propia (el V10). Se autorizan SUS precios y
+    // nada más: el combo de impermeables no existe en esta conversación.
+    poner(ficha.precios[1], `precio base de un ${ficha.nombreCorto}`);
+    poner(ficha.precios[2], `precio base de dos ${ficha.nombreCorto}`);
+  } else {
+    poner(fletes.PRECIO_PRODUCTO, "precio base del conjunto");
+    poner(fletes.PROMO_2_UNIDADES, "precio base de dos conjuntos");
+  }
 
   if (cot && cot.ok) {
     poner(cot.producto, "producto de la cotización");
@@ -1795,7 +2059,16 @@ const ETIQUETAS_ROL = [
   { rol: "envio", patron: /envio|flete|domicilio|transportadora|despacho|mensajeria/g },
   {
     rol: "producto",
-    patron: /producto|conjuntos?|trajes?|impermeables?|prenda|cada uno|c\/u|precio base/g,
+    // 🔑 28-SEP: se agregaron las palabras del intercomunicador. Sin ellas, en un
+    // hilo de V10 la frase "los intercomunicadores quedan en $99.900 + envío" no
+    // tenía ninguna etiqueta reconocible, así que el rol salía null y el
+    // validador no podía comprobar que el número estuviera haciendo de producto.
+    //
+    // ⛔ "combo" NO entra a propósito: en impermeables el combo de dos se comunica
+    // como TOTAL con envío incluido ("el combo queda en $137.000"), así que
+    // etiquetarlo como producto marcaría en falso mensajes correctos del flujo
+    // que ya funciona.
+    patron: /producto|conjuntos?|trajes?|impermeables?|prenda|cada uno|c\/u|precio base|intercomunicador(?:es)?|intercoms?|v10/g,
   },
   { rol: "total", patron: /total|todo junto|a pagar/g },
   { rol: "ahorro", patron: /ahorr\w*/g },
@@ -1833,6 +2106,38 @@ function rolesEnTexto(texto, importes) {
 
   return lista.map((imp) => {
     const fin = imp.indice + String(imp.crudo).length;
+
+    // ── 0) "$59.900 + envío" NUNCA es un total ─────────────────────────────
+    //
+    // 🔑 28-SEP. La frase "una sola unidad queda en $59.900 + envío" se rechazaba:
+    // el verbo "queda" la etiquetaba como TOTAL, y $59.900 no es un total válido
+    // en ninguna parte del país. Pero la frase es CORRECTA y es exactamente la
+    // que hay que decir cuando todavía no se sabe la ciudad.
+    //
+    // El "+ envío" pegado al número es la señal más clara que existe de que ese
+    // número es el PRODUCTO y que el envío va aparte. Gana sobre cualquier otra
+    // etiqueta, incluido el verbo de adelante.
+    const siguiente = plano.slice(fin, fin + 44);
+    // "$59.900 + envío" — el número es el producto y el envío va aparte.
+    if (/^\s*(?:\+|mas|más|y)\s+(?:el\s+|los\s+)?(?:envio|envío|flete|domicilio)/.test(siguiente)) {
+      return { ...imp, rol: "producto", etiqueta: "+ envío" };
+    }
+    // 🔑 "$99.900 el combo + $13.100 de envío" — la misma señal, pero con un par de
+    // palabras en medio que nombran lo que se compra.
+    //
+    // 🔴 ESTO LO ENCONTRÉ PROBANDO A MANO, Y ERA GRAVE: la frase de arriba es
+    // LITERALMENTE la que genera `lineaDePrecioV10` como redacción correcta, y el
+    // validador la rechazaba. Leía "en total:" de más atrás y concluía que $99.900
+    // pretendía ser el total. O sea que el código proponía una frase que su propio
+    // candado borraba — y el cliente se quedaba sin el desglose.
+    //
+    // La estructura "A + B de envío" es inequívoca: si a un número le sigue una
+    // suma con un envío, ese número es el producto. Se permiten hasta 18 caracteres
+    // de letras en medio ("el combo", "los dos", "el intercomunicador") pero ningún
+    // dígito, porque un dígito ahí ya sería otro importe.
+    if (/^\s*[a-z\s]{0,18}\+\s*\$?\s*[\d.,]+\s*(?:de\s+)?(?:envio|envío|flete|domicilio)/.test(siguiente)) {
+      return { ...imp, rol: "producto", etiqueta: "+ … de envío" };
+    }
 
     // ── 1) La etiqueta pegada DESPUÉS del número gana ─────────────────────
     //
@@ -1881,9 +2186,19 @@ function rolesEnTexto(texto, importes) {
       return mejor;
     };
     // El sustantivo manda sobre el verbo, esté más cerca o más lejos.
-    const mejor = buscarEnAntes(ETIQUETAS_ROL) || buscarEnAntes(ETIQUETAS_DEBILES);
+    const fuerte = buscarEnAntes(ETIQUETAS_ROL);
+    const mejor = fuerte || buscarEnAntes(ETIQUETAS_DEBILES);
 
-    return { ...imp, rol: mejor ? mejor.rol : null, etiqueta: mejor ? mejor.etiqueta : null };
+    return {
+      ...imp,
+      rol: mejor ? mejor.rol : null,
+      etiqueta: mejor ? mejor.etiqueta : null,
+      // 🔑 Se marca de dónde salió el rol. Un rol sacado de un VERBO ("queda en
+      // $59.900") es una suposición mucho más débil que uno sacado de un
+      // sustantivo ("el total es $59.900"), y `validarRespuesta` lo usa para no
+      // rechazar frases correctas. Ver "rol débil" allá abajo.
+      debil: Boolean(mejor && !fuerte),
+    };
   });
 }
 
@@ -1897,8 +2212,17 @@ function rolesEnTexto(texto, importes) {
  * @returns {Map<string, Set<number>>}
  */
 function valoresPorRol(cot, contexto = {}) {
+  const ficha = productoDelTurno(cot, contexto);
+  // 🔑 Los precios base que se siembran dependen del producto del turno. Ver
+  // `productoDelTurno`: sembrar los del impermeable en un hilo de V10 le prohibía
+  // al bot decir $99.900 y le permitía decir $110.000, las dos cosas mal.
+  const preciosBase =
+    ficha && ficha.precios
+      ? [ficha.precios[1], ficha.precios[2]].filter((n) => Number.isFinite(Number(n)))
+      : [fletes.PRECIO_PRODUCTO, fletes.PROMO_2_UNIDADES];
+
   const mapa = new Map([
-    ["producto", new Set([fletes.PRECIO_PRODUCTO, fletes.PROMO_2_UNIDADES])],
+    ["producto", new Set(preciosBase.map(Number))],
     ["envio", new Set()],
     ["total", new Set()],
     ["ahorro", new Set()],
@@ -1993,9 +2317,41 @@ function faltaParaConfirmar(cot) {
  */
 function validarRespuesta(texto, cot, contexto = {}) {
   const problemas = [];
-  const importes = rolesEnTexto(texto, extraerImportes(texto));
+  const importesCrudos = rolesEnTexto(texto, extraerImportes(texto));
   const autorizados = importesAutorizados(cot, contexto);
   const porRol = valoresPorRol(cot, contexto);
+
+  // ========================================================================
+  // 🔑 UN ROL SACADO DE UN VERBO NO PUEDE CONTRADECIR UN PRECIO DE CATÁLOGO
+  //
+  // 🔴 DE DÓNDE SALE (28-sep). Esta frase —que es LITERALMENTE la que pidió el
+  // dueño para el V10— se estaba rechazando:
+  //
+  //     "Uno queda en $59.900; si necesitas dos, el combo queda en $99.900"
+  //
+  // El motivo: "queda" es una etiqueta débil que apunta al rol TOTAL, y sin
+  // destino no hay ningún total válido. Pero la frase no afirma ningún total:
+  // dice el precio de catálogo de cada opción, que es verdad siempre y no
+  // depende de la ciudad.
+  //
+  // Así que cuando el rol vino de un VERBO (no de un sustantivo) y el número es
+  // exactamente un precio base del producto, el rol se corrige a "producto".
+  //
+  // ⛔ Lo que NO se relaja: "Total con envío incluido: $59.900" sigue rechazado,
+  // porque ahí "Total" es un SUSTANTIVO y el rol no es débil. Esa distinción es
+  // la que mantiene en pie la corrección del 26-sep.
+  // ========================================================================
+  const fichaRoles = productoDelTurno(cot, contexto);
+  const basesDelProducto =
+    fichaRoles && fichaRoles.precios
+      ? [Number(fichaRoles.precios[1]), Number(fichaRoles.precios[2])]
+      : [Number(fletes.PRECIO_PRODUCTO), Number(fletes.PROMO_2_UNIDADES)];
+
+  const importes = importesCrudos.map((imp) =>
+    imp.debil && imp.rol === "total" && basesDelProducto.includes(imp.valor)
+      ? { ...imp, rol: "producto", etiqueta: `${imp.etiqueta} (precio de catálogo)` }
+      : imp
+  );
 
   // ========================================================================
   // 🔑 LA COMPROBACIÓN DE SIGNIFICADO
@@ -2058,8 +2414,16 @@ function validarRespuesta(texto, cot, contexto = {}) {
   // Lo que está mal no es el número, es lo que afirma que ese número es.
   // ========================================================================
   if (cot && !cot.ok && (cot.motivo === "sin_destino" || cot.motivo === "varios_destinos")) {
+    // Los precios base del producto de ESTE turno, no siempre los del impermeable:
+    // en un hilo de V10 el precio que sí se puede decir sin destino es $59.900 o
+    // $99.900, no $110.000.
+    const fichaTurno = productoDelTurno(cot, contexto);
+    const basesPermitidas =
+      fichaTurno && fichaTurno.precios
+        ? [Number(fichaTurno.precios[1]), Number(fichaTurno.precios[2])]
+        : [fletes.PRECIO_PRODUCTO, fletes.PROMO_2_UNIDADES];
     for (const imp of importes) {
-      const esPrecioBase = imp.valor === fletes.PRECIO_PRODUCTO || imp.valor === fletes.PROMO_2_UNIDADES;
+      const esPrecioBase = basesPermitidas.includes(imp.valor);
       const rolProhibido = imp.rol === "total" || imp.rol === "envio";
       if (!esPrecioBase || rolProhibido) {
         problemas.push({
@@ -2069,6 +2433,61 @@ function validarRespuesta(texto, cot, contexto = {}) {
             ? `presenta ${fmt(imp.valor)} como ${NOMBRE_ROL[imp.rol]} ("${imp.etiqueta}") sin saber a dónde ` +
               `se despacha: el envío todavía no se puede sumar`
             : `dio ${fmt(imp.valor)} sin saber a dónde se despacha`,
+        });
+      }
+    }
+  }
+
+  // ========================================================================
+  // ⛔ NO SE DICE QUE EL ENVÍO ESTÁ INCLUIDO NI QUE ES GRATIS
+  //
+  // 🔴 DE DÓNDE SALE (28-sep, al agregar el V10). El dueño lo pidió dos veces y
+  // en mayúsculas: "El envío NO está incluido en ninguno de esos precios" y "NO
+  // ofrecer envío gratis". Y al probar el validador encontré que esto pasaba
+  // limpio:
+  //
+  //     "El combo de 2 intercomunicadores sale $99.900 con envío incluido"
+  //
+  // Pasaba porque $99.900 SÍ es un importe autorizado y el sustantivo
+  // "intercomunicadores" lo etiquetaba como producto. O sea: el número estaba
+  // bien y la afirmación era falsa. Es el mismo tipo de error que costó la
+  // corrección del 26-sep ("Total con envío incluido: $59.900").
+  //
+  // 🔑 La regla: la frase "con envío incluido" solo es verdad al lado del TOTAL de
+  // la cotización. Al lado del precio del producto es mentira, y "envío gratis" es
+  // mentira siempre.
+  //
+  // ⚠️ SE APLICA SOLO A LOS PRODUCTOS QUE LO DECLARAN (`envioIncluido: false`),
+  // que hoy es el V10. En impermeables el total de banda SÍ lleva el envío dentro
+  // y hay mensajes legítimos que lo dicen; meterle esta regla ahí sería cambiar
+  // reglas comerciales que funcionan, que es justo lo que se pidió no hacer.
+  // ========================================================================
+  const fichaEnvio = productoDelTurno(cot, contexto);
+  if (fichaEnvio && fichaEnvio.envioIncluido === false) {
+    const plano = sinTilde(texto);
+    const afirmaGratis = /envio\s+(?:es\s+)?(?:gratis|gratuito)|gratis\s+el\s+envio|sin\s+costo\s+de\s+envio|no\s+pagas\s+(?:el\s+)?envio|envio\s+sin\s+costo/.test(plano);
+    const afirmaIncluido = /(?:con|incluye|incluido|incluida|incluyendo)\s*(?:el\s+)?envio|envio\s+(?:ya\s+)?inclu/.test(plano);
+
+    if (afirmaGratis) {
+      problemas.push({
+        tipo: "promete_envio_gratis",
+        detalle:
+          `dice que el envío es gratis, y el ${fichaEnvio.nombreCorto} se cobra con el envío ` +
+          `aparte según el destino. Nunca se ofrece envío gratis`,
+      });
+    } else if (afirmaIncluido) {
+      // Solo vale al lado del total de verdad. Si no hay cotización, no hay total
+      // posible, así que la frase es falsa por definición.
+      const posiblesTotal = porRol.get("total");
+      const loDiceDelTotal =
+        cot && cot.ok && importes.some((i) => posiblesTotal && posiblesTotal.has(i.valor) && i.valor === Number(cot.total));
+      if (!loDiceDelTotal) {
+        problemas.push({
+          tipo: "envio_incluido_falso",
+          detalle:
+            `dice que el envío está incluido sin estar al lado del total real` +
+            (cot && cot.ok ? ` (${fmt(cot.total)})` : " (todavía no hay total: falta el destino)") +
+            `. El precio del ${fichaEnvio.nombreCorto} NO incluye el envío`,
         });
       }
     }
