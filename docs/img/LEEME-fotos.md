@@ -38,10 +38,21 @@ el 29-sep:
 | `A9C0B776-5226-479B-…` | la caja abierta, con el aparato adentro | `v10-contenido.jpg` |
 | `812D0989-7511-43B0-…` | la caja cerrada, se lee "HELMET WIRELESS EARPHONE V10" | `v10-caja.jpg` |
 
-⚠️ **La extensión importa: tienen que terminar en `.jpg`.** Varias de esas fotos son
-`.PNG`. Un `.png` renombrado a `.jpg` funciona igual —WhatsApp lee el contenido, no el
-nombre— pero el nombre del archivo sí tiene que ser exactamente el de la tabla, porque
-es el que busca el bot.
+✅ **La extensión ya no importa.** Antes el bot buscaba el nombre con `.jpg` exacto, y
+cuando el dueño subió las fotos llegaron como `v10-producto.jpg.PNG` —al renombrar en el
+Finder, el sistema deja pegada la extensión original— así que el bot no las encontraba:
+las fotos estaban en el repo y seguía diciendo "no tengo la foto a mano".
+
+Ahora **alcanza con que el nombre empiece por el de la tabla** y sea una imagen. Todas
+estas funcionan igual:
+
+```
+v10-producto.jpg      v10-producto.png      v10-producto.PNG
+v10-producto.jpeg     v10-producto.webp     v10-producto.jpg.PNG
+```
+
+Lo que sí tiene que coincidir es **la parte de adelante** (`v10-producto`), porque es la
+que busca el bot.
 
 ⚠️ **Y ojo con las fotos del impermeable.** En esa misma carpeta hay tomas de una persona
 con chaqueta y franja reflectiva (`IMG_3267` a `IMG_3271`): **ésas son del impermeable**, no

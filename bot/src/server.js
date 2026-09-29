@@ -5,7 +5,10 @@ const {
   sendText, sendImage, sendVideo, sendCatalog, catalogoActivo,
   sendPdf, sendPdfPorPlantilla, sendTemplate, esBsuid,
 } = require("./whatsapp");
-const { MEDIA } = require("./media");
+// `resolverMedia` decide la URL REAL de cada foto: el archivo puede tener
+// cualquier extensión de imagen y la URL tiene que coincidir con la de verdad o
+// Meta devuelve 404 y el cliente no recibe nada. Ver media.js.
+const { MEDIA, resolver: resolverMedia } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
 const panel = require("./panel");
@@ -2360,9 +2363,16 @@ async function handleWebhook(body) {
             continue;
           }
 
-          const item = MEDIA[key];
+          // 🔑 La URL sale del resolvedor y no de `MEDIA[key].url`: el archivo real
+          // puede llamarse `v10-puesto.png` aunque el catálogo lo declare como
+          // `v10-puesto`, y si la URL no coincide con el archivo exacto Meta
+          // devuelve 404 y el cliente no recibe nada — sin que nadie se entere.
+          const item = resolverMedia(key);
           if (!item || !item.url) {
-            console.log(`Media '${key}' sin URL configurada (agrega MEDIA_${key.toUpperCase()} en Render)`);
+            console.log(
+              `📸 Media '${key}' sin foto disponible: no hay archivo en docs/img/ ni variable de ` +
+                `entorno configurada. NO se manda nada en su lugar.`
+            );
             continue;
           }
           if (item.type === "video") await sendVideo(from, item.url, item.caption);
