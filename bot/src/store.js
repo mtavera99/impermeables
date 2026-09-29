@@ -1883,6 +1883,51 @@ function registrarArranque() {
  * Estado real del almacenamiento, para que el panel diga la verdad.
  * Nunca lanza: si algo falla, lo reporta como desconocido en vez de mentir.
  */
+// ============================================================================
+// 📏 CUÁNTO PESAN LOS ARCHIVOS — 30-sep (correo de Render por memoria)
+//
+// POR QUÉ IMPORTA PARA LA MEMORIA: acá NO hay base de datos. Cada operación lee
+// el archivo COMPLETO con readFileSync y lo parsea, y cada escritura lo serializa
+// COMPLETO. `pushMsg` —que corre en cada mensaje de cada cliente— hace las dos
+// cosas.
+//
+// 🔑 Un JSON de 20 MB no ocupa 20 MB al parsearlo: ocupa varias veces eso en
+// objetos de JavaScript. Y con dos mensajes llegando a la vez, esos picos se
+// suman. No es una fuga —la memoria se libera— pero es el techo que decide si la
+// instancia aguanta.
+//
+// Tenerlo en /health es lo que permite responder "se reinició por esto" en vez de
+// suponerlo.
+// ============================================================================
+function tamanosEnDisco() {
+  const kb = (f) => {
+    try {
+      return Math.round(fs.statSync(f).size / 1024);
+    } catch {
+      return 0;
+    }
+  };
+  const conversaciones_kb = kb(CONV_FILE);
+  const pedidos_kb = kb(ORDERS_FILE);
+  let conversaciones = 0;
+  try {
+    conversaciones = Object.keys(readJSON(CONV_FILE, {})).length;
+  } catch {}
+  return {
+    conversaciones_kb,
+    pedidos_kb,
+    guias_kb: kb(GUIAS_FILE),
+    planes_kb: kb(PLANES_FILE),
+    conversaciones,
+    // Si esto se pone en rojo, el arreglo es dejar de leer el archivo entero en
+    // cada mensaje (o archivar las conversaciones viejas), no subir el plan.
+    aviso:
+      conversaciones_kb > 15000
+        ? "🔴 conversations.json pasa los 15 MB: cada mensaje lo lee y lo reescribe completo. Ese es el techo de memoria."
+        : null,
+  };
+}
+
 function estadoDelDisco() {
   const out = {
     dir: DIR,
@@ -1920,7 +1965,7 @@ module.exports = {
   guardarCotizacion, leerCotizacion, pedidoPendienteDeOferta, pedidoEnRevisionDe,
   anotarFalloEntrega, fallosDeEntrega,
   guardarPlan, leerPlan, borrarPlan, limpiarPlanesGuardados,
-  registrarArranque, estadoDelDisco,
+  registrarArranque, estadoDelDisco, tamanosEnDisco,
   marcarComprado, registrarSeguimiento, reclamarSeguimiento,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
   guardarPerfil, guardarAtribucion, atribucionDe, fijarProductoActivo, fijarCategoria,
