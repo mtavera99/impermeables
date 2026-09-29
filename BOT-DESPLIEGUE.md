@@ -87,12 +87,18 @@ GEMINI_MODEL=gemini-3.1-flash-lite
 MAX_HISTORIAL=8
 WHATSAPP_VERIFY_TOKEN=<secreto — el mismo que se pone en Meta>
 PANEL_TOKEN=<secreto — la contraseña del panel, larga>
-OWNER_WHATSAPP=573138615813
+OWNER_WHATSAPP=<el celular del dueño — a este llegan los avisos>
 ```
 
 > 🔐 **`PANEL_TOKEN` no es opcional.** Es lo único que protege `/panel`, `/pedidos.csv` y
 > `/responder`. El valor va **solo en Render**, nunca en un archivo de este repo: el repo
 > es público y el secreto anterior terminó publicado por escribirlo acá.
+
+> 📱 **`OWNER_WHATSAPP` va solo en Render también**, y por la misma razón: es un celular
+> personal y este repo es público. Se puede escribir como salga —`3001112233`,
+> `+57 300 111 2233`, `573001112233`—: el bot le pone el 57 si falta. Lo que **no** hace es
+> inventarle indicativo a un número que no reconoce, porque eso mandaría los datos de un
+> cliente al teléfono de un tercero; en ese caso avisa en el log al arrancar.
 
 Estas van **después**, cuando tengas la app de Meta:
 ```

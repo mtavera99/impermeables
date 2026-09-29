@@ -15,6 +15,7 @@ const panel = require("./panel");
 const panelGuias = require("./panel-guias");
 const guias = require("./guias");
 const panelNovedades = require("./panel-novedades");
+const { numeroDelDueno } = require("./numero-del-dueno");
 const panelChat = require("./panel-chat");
 const { avisoParaElDueno: avisoDireccion } = require("./direccion");
 const panelAuditoria = require("./panel-auditoria");
@@ -92,7 +93,10 @@ if (SECRETOS_QUEMADOS.has(PANEL_TOKEN)) {
   );
 }
 
-const OWNER = process.env.OWNER_WHATSAPP;
+// 📱 El número del dueño se normaliza SIEMPRE: ver numero-del-dueno.js. Escrito
+// sin el 57 (como lo escribiría cualquiera desde el celular) Meta no entrega
+// nada, y los avisos se perderían en silencio.
+const OWNER = numeroDelDueno(process.env.OWNER_WHATSAPP);
 const WABA_ID = process.env.WHATSAPP_WABA_ID || "2213159576112051";
 const WA_TOKEN = process.env.WHATSAPP_TOKEN;
 
@@ -1903,7 +1907,7 @@ app.get("/producto", async (req, res) => {
 });
 
 // ============================================================================
-// GET /enviar-prueba?token=...&to=573138615813[&msg=...]
+// GET /enviar-prueba?token=...&to=573001112233[&msg=...]
 //
 // POR QUÉ EXISTE: hasta acá lo único que teníamos era Meta diciendo que el
 // número estaba "CONNECTED". Eso es Meta hablando de sí misma, no evidencia de
@@ -1933,7 +1937,7 @@ app.get("/enviar-prueba", async (req, res) => {
   if (!to) {
     return res.status(400).json({
       error: "Falta ?to= con el número destino (con código de país, sin + ni espacios) o el identificador del cliente.",
-      ejemplo: "/enviar-prueba?token=...&to=573138615813",
+      ejemplo: "/enviar-prueba?token=...&to=573001112233",
     });
   }
 

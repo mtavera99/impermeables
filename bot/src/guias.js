@@ -65,8 +65,8 @@ const digitos = (s) => String(s == null ? "" : s).replace(/\D/g, "");
 const RE_BSUID = /^[A-Za-z]{2}\.[A-Za-z0-9]{1,128}$/;
 const esBsuid = (s) => RE_BSUID.test(String(s == null ? "" : s).trim());
 
-/** Colombia: se comparan los últimos 10 dígitos, así "573138615813",
- *  "+57 313 861 5813" y "3138615813" son el mismo número. */
+/** Colombia: se comparan los últimos 10 dígitos, así "573001112233",
+ *  "+57 300 111 2233" y "3001112233" son el mismo número. */
 function tel10(s) {
   const d = digitos(s);
   return d.length > 10 ? d.slice(-10) : d;

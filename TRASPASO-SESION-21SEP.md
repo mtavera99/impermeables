@@ -143,7 +143,7 @@ GEMINI_MODEL=gemini-3.1-flash-lite
 MAX_HISTORIAL=8
 WHATSAPP_VERIFY_TOKEN=<secreto>
 PANEL_TOKEN=<secreto>          🔐 la contraseña del panel
-OWNER_WHATSAPP=573138615813
+OWNER_WHATSAPP=<el celular del dueño — a este llegan los avisos>
 ```
 
 🔴 **El valor que este documento tenía escrito acá era el secreto real del panel, y este

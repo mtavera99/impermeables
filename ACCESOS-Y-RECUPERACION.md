@@ -175,8 +175,11 @@ PANEL_TOKEN=<secreto>             🔐 la contraseña del panel — ver abajo
 WHATSAPP_TOKEN=<secreto>
 WHATSAPP_PHONE_NUMBER_ID=1234151273126000
 WHATSAPP_WABA_ID=1345319974418244
-OWNER_WHATSAPP=573138615813
+OWNER_WHATSAPP=<el celular del dueño — a este llegan los avisos>
 ```
+
+> 📱 Ese número va **solo en Render**: es un celular personal y este repo es público.
+> El valor real está en el panel de Render, en las variables de entorno del servicio.
 
 ### 🔴 `PANEL_TOKEN`: LA PUERTA DE LA CASA
 

@@ -265,8 +265,8 @@ TOTAL a pagar al recibir: (el total de su zona)
 **Antes de escribirlo, revisa los 8 campos uno por uno.**
 
 ### 🔴 El celular: quita el "57"
-Si el cliente manda el número con **57** al inicio (ej. `573138615813`), **guárdalo sin el
-57**: `3138615813`. Son 10 dígitos que empiezan por 3.
+Si el cliente manda el número con **57** al inicio (ej. `573001112233`), **guárdalo sin el
+57**: `3001112233`. Son 10 dígitos que empiezan por 3.
 Esto pasó **8 veces en 4 días** y llega mal a la transportadora.
 
 ### 🔴🔴 SIN CELULAR NO HAY DESPACHO — y ya no siempre lo hay (22-sep)
