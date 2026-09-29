@@ -97,6 +97,24 @@ if (SECRETOS_QUEMADOS.has(PANEL_TOKEN)) {
 // sin el 57 (como lo escribiría cualquiera desde el celular) Meta no entrega
 // nada, y los avisos se perderían en silencio.
 const OWNER = numeroDelDueno(process.env.OWNER_WHATSAPP);
+
+// ============================================================================
+// 📮 A DÓNDE VAN LOS AVISOS ≠ QUÉ TELÉFONO VA IMPRESO EN LA ETIQUETA — 30-sep
+//
+// Estas dos cosas eran la MISMA variable, y no tienen por qué ser el mismo
+// número. El dueño movió sus avisos al celular personal; las guías se siguen
+// imprimiendo con el número de BikerPro como remitente.
+//
+// 🔑 SI NO SE SEPARAN, SE ENSUCIA EL PAREO DE GUÍAS. El teléfono del remitente se
+// usa para NO confundirlo con el del cliente al leer la etiqueta. Con OWNER
+// apuntando a otro número, el de BikerPro deja de reconocerse y entra como si
+// fuera un teléfono del destinatario. Un teléfono vale 50 puntos en el pareo:
+// ese es el terreno del "mejor coincidencia 45 de 50".
+//
+// Acepta varios separados por coma, y por defecto usa OWNER para no cambiarle
+// nada a quien no toque esta variable.
+// ============================================================================
+const TELEFONO_REMITENTE = process.env.TELEFONO_REMITENTE || OWNER;
 const WABA_ID = process.env.WHATSAPP_WABA_ID || "2213159576112051";
 const WA_TOKEN = process.env.WHATSAPP_TOKEN;
 
@@ -805,7 +823,7 @@ app.post("/guias/revisar", express.raw({ type: "application/pdf", limit: "40mb" 
   let filas;
   try {
     filas = await guias.procesarPDF(buf, pedidos, {
-      telefonoRemitente: OWNER,
+      telefonoRemitente: TELEFONO_REMITENTE,
       yaEnviada: (g) => store.guiaYaEnviada(g),
     });
   } catch (e) {
