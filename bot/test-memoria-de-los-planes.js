@@ -206,5 +206,93 @@ console.log("\n── 4. El contador de memoria no miente ──");
   chequear("las filas sin hoja no suman memoria", r.mb === 2 && r.hojas === 2, JSON.stringify(r));
 }
 
-console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
+// ===========================================================================
+// 📈 5. EL PICO DE MEMORIA Y CUÁNDO FUE — 30-sep
+//
+// DE DÓNDE SALE: la primera lectura de /health del dueño dio proceso 467 MB,
+// heap usado 34 MB, buffers 5 MB y 0 hojas retenidas... 80 SEGUNDOS DESPUÉS DE
+// ARRANCAR. O sea 467 MB de proceso contra 39 MB de uso real, sin haber hecho
+// nada.
+//
+// 🔑 Y CON UNA SOLA FOTO NO SE PUEDE DECIDIR NADA. Esos 467 MB pueden ser:
+//   · el proceso arrancó ya usando eso -> es cómo V8 se dimensiona solo
+//   · se infló procesando algo y no devolvió las páginas -> otra causa distinta
+// Son arreglos distintos. Por eso se guarda el máximo CON SU HORA y cuánto
+// usaba recién arrancado.
+//
+// Se prueba la lógica del seguidor, que es lo único que puede estar mal acá.
+// ===========================================================================
+console.log("\n── 5. El pico de memoria y cuándo fue ──");
+
+/** El mismo seguidor del server, para poder probar la regla sin levantarlo. */
+function hacerSeguidor() {
+  const PICO = { rssMb: 0, heapMb: 0, cuando: null, alArrancarMb: null };
+  return {
+    PICO,
+    medir(rssMb, heapMb, ahora) {
+      if (PICO.alArrancarMb === null) PICO.alArrancarMb = rssMb;
+      if (rssMb > PICO.rssMb) {
+        PICO.rssMb = rssMb;
+        PICO.heapMb = heapMb;
+        PICO.cuando = ahora;
+      }
+    },
+  };
+}
+
+{
+  const s = hacerSeguidor();
+  s.medir(60, 20, 1000);
+  chequear(
+    "la primera medición queda como 'al arrancar'",
+    s.PICO.alArrancarMb === 60,
+    String(s.PICO.alArrancarMb)
+  );
+  s.medir(467, 400, 2000);
+  chequear("y el pico se actualiza al subir", s.PICO.rssMb === 467 && s.PICO.cuando === 2000, JSON.stringify(s.PICO));
+  chequear(
+    "🔑 'al arrancar' NO se sobreescribe: es lo que distingue las dos causas",
+    s.PICO.alArrancarMb === 60,
+    `quedó en ${s.PICO.alArrancarMb}, y con eso se pierde la diferencia entre ` +
+      `"arrancó gordo" y "se infló procesando algo"`
+  );
+}
+
+{
+  const s = hacerSeguidor();
+  s.medir(467, 400, 1000);
+  s.medir(120, 90, 2000); // bajó: el pico tiene que quedarse en 467
+  chequear(
+    "si la memoria baja, el pico se conserva",
+    s.PICO.rssMb === 467 && s.PICO.cuando === 1000,
+    JSON.stringify(s.PICO)
+  );
+}
+
+{
+  // El caso que hay que poder reconocer: arrancó chico y se infló con un PDF.
+  const s = hacerSeguidor();
+  s.medir(55, 30, 1000); // arranque
+  s.medir(60, 32, 2000);
+  s.medir(430, 380, 3000); // subió un PDF
+  chequear(
+    "🔑 se distingue 'arrancó en 55 y se infló a 430' de 'arrancó en 430'",
+    s.PICO.alArrancarMb === 55 && s.PICO.rssMb === 430,
+    JSON.stringify(s.PICO)
+  );
+}
+
+{
+  // Y el opuesto: arrancó ya gordo. Acá el arreglo es la bandera de V8, no el PDF.
+  const s = hacerSeguidor();
+  s.medir(467, 420, 1000);
+  s.medir(467, 420, 2000);
+  chequear(
+    "🔑 y se reconoce 'arrancó ya en 467 y no se movió' (eso apunta a V8, no al PDF)",
+    s.PICO.alArrancarMb === 467 && s.PICO.rssMb === 467,
+    JSON.stringify(s.PICO)
+  );
+}
+
+console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos (con el seguidor de memoria).\n`);
 process.exit(mal === 0 ? 0 : 1);
