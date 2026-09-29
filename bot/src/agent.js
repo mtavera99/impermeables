@@ -477,6 +477,16 @@ async function generateReply(phone, userText) {
   if (catalogo.esV10(productoId)) {
     console.log(`🎧 ${phone}: la conversación es del ${ficha.nombreCorto} (${eleccion.porQue}).`);
   }
+  // 🔒 Se FIJA el producto cuando la señal es fuerte: lo dijo el cliente en este
+  // turno, o vino del anuncio. Así sobrevive a la rotación del historial — sin
+  // esto, en una conversación larga el bot se olvidaba de qué estaba vendiendo.
+  //
+  // ⛔ Con una heurística NO se fija: un error de lectura quedaría congelado para
+  // toda la conversación en vez de corregirse al turno siguiente.
+  if (eleccion.explicito || (delAnuncio && delAnuncio === productoId)) {
+    store.fijarProductoActivo(phone, productoId, eleccion.porQue);
+    conv.productoActivo = productoId; // el objeto en memoria de este turno
+  }
 
   const arranque = respuestaDeArranque(conv.messages, userText, productoId);
   if (arranque) {
@@ -590,6 +600,9 @@ async function generateReply(phone, userText) {
     // anuncio dice "$99.900 + envío" antes de saber la ciudad, y sin esto el
     // validador borraría ese precio por no estar autorizado.
     producto: productoId,
+    // El texto del turno, para que el bloque de datos pueda distinguir una pregunta
+    // informativa de una señal de compra. Ver `notaDelTurnoV10`.
+    userText,
   };
   if (cot.comboDeRescate && objecionDePrecio && !rescateYaOfrecido) {
     console.log(

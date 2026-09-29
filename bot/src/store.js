@@ -379,6 +379,37 @@ function guardarAtribucion(phone, anuncio) {
   writeJSON(CONV_FILE, all);
 }
 
+// ============================================================================
+// 🛒 EL PRODUCTO ACTIVO DE LA CONVERSACIÓN
+//
+// 🔴 POR QUÉ SE PERSISTE Y NO SE RECALCULA LEYENDO EL HILO (29-sep): el historial
+// se ROTA —solo se guardan los últimos mensajes— así que en una conversación larga
+// el turno donde se nombró el producto se cae del hilo, y la conversación vuelve
+// sola al impermeable. Para el cliente, el bot "se olvidó" de qué estaba vendiendo
+// en la mitad de la venta.
+//
+// Se guarda solo con SEÑAL FUERTE: lo dijo el cliente, o vino del anuncio. Nunca
+// con una heurística, porque entonces un error se congelaría para toda la
+// conversación en vez de corregirse al turno siguiente.
+// ============================================================================
+function fijarProductoActivo(phone, productoId, porQue) {
+  if (!phone || !productoId) return;
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone] || { messages: [], paused: false };
+  if (c.productoActivo === productoId) return; // ya estaba, no se reescribe el archivo
+  const antes = c.productoActivo;
+  c.productoActivo = productoId;
+  c.productoActivoDesde = Date.now();
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+  console.log(
+    `🛒 ${phone}: el producto de la conversación ahora es ${productoId}` +
+      (antes ? ` (antes ${antes})` : "") +
+      ` — ${porQue || "señal fuerte"}`
+  );
+}
+
 /** El anuncio que trajo a este cliente, o null. Lo usa saveOrder. */
 function atribucionDe(phone) {
   if (!phone) return null;
@@ -1860,7 +1891,7 @@ module.exports = {
   registrarArranque, estadoDelDisco,
   marcarComprado, registrarSeguimiento, reclamarSeguimiento,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
-  guardarPerfil, guardarAtribucion, atribucionDe,
+  guardarPerfil, guardarAtribucion, atribucionDe, fijarProductoActivo,
   reemplazarPedidos,
   todosLosPedidos,
   motivosDeRevision, requiereRevision, listoParaDespachar, textoDeRevision,

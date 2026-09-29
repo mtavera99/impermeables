@@ -251,19 +251,22 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
   // alcanza 300, el cliente lo rechaza en la puerta y pagamos el flete redondo.
   // =========================================================================
   {
-    // ⚠️ "¿es resistente al agua?" y "¿tiene garantía?" ESTABAN en esta lista y
-    // salieron el 29-sep, cuando el dueño confirmó los dos datos (1 mes de garantía,
-    // y que resisten el agua porque están hechos para la moto). Ahora se responden,
-    // y eso se prueba en la sección 26. Acá quedan solo los que siguen sin medir.
+    // ⚠️ ESTA LISTA SE VACIÓ CASI POR COMPLETO EL 29-SEP, y es una buena noticia:
+    // el dueño autorizó la ficha técnica entera (Bluetooth 5.3, alcance 300-500 m,
+    // batería 1.500 mAh, 32 h de autonomía, IPX6, cascos, instalación,
+    // emparejamiento, reducción de ruido, Android/iPhone). Todo eso AHORA SE
+    // RESPONDE, y está probado en test-v10-parche-produccion.js.
+    //
+    // Lo que queda acá es la línea que el dueño pidió no cruzar: sumergirlo,
+    // cuántos aparatos a la vez, la marca y los vatios.
     const preguntas = [
-      "¿cuántos metros alcanza?",
-      "¿cuánto le dura la batería?",
-      "¿cuántas horas de autonomía tiene?",
-      "¿qué versión de bluetooth es?",
       "¿es sumergible?",
-      "¿cuántos dispositivos se conectan?",
-      "¿tiene certificación IP67?",
-      "¿qué alcance tiene en carretera?",
+      "¿lo puedo sumergir?",
+      "¿se puede meter al agua?",
+      "¿lo puedo lavar?",
+      "¿cuántos dispositivos se conectan a la vez?",
+      "¿cuántos watts tiene?",
+      "¿qué marca es?",
     ];
     for (const p of preguntas) {
       const hallada = catalogo.preguntaSinDatoConfirmado(p, V);
@@ -315,26 +318,30 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
     const dc = catalogo.de(V).datosConfirmados;
     chequear("🔑 la garantía dice 1 mes", /1 mes/.test(dc.garantia.respuesta), dc.garantia.respuesta);
     chequear("  y no inventa un plazo distinto", !/(3|6|12)\s*mes|año/i.test(dc.garantia.respuesta), dc.garantia.respuesta);
-    chequear("🔑 el agua habla de lluvia y de usarlo en la moto", /lluvia/i.test(dc.agua.respuesta) && /moto/i.test(dc.agua.respuesta), dc.agua.respuesta);
+    chequear("🔑 el agua habla de lluvia y de IPX6", /lluvia/i.test(dc.agua.respuesta) && /IPX6/.test(dc.agua.respuesta), dc.agua.respuesta);
+    // ⚠️ Ahora SÍ nombra la certificación real (IPX6), que el dueño autorizó. Lo que
+    // no puede hacer es invitar a sumergirlo: tiene que decir lo contrario.
     chequear(
-      "⛔ y NO dice sumergible ni una certificación",
-      !/sumergi|ip\d|certificac/i.test(dc.agua.respuesta),
+      "⛔ y aclara que NO se sumerja",
+      /no recomendamos.{0,12}sumergirlo/i.test(dc.agua.respuesta),
       dc.agua.respuesta
     );
 
     // =======================================================================
     // ⛔ LA LÍNEA QUE NO SE PUEDE CRUZAR
     // =======================================================================
+    // ⚠️ SE ACORTÓ EL 29-SEP: el alcance, la batería, el bluetooth y la certificación
+    // ahora SÍ se responden, porque el dueño autorizó la ficha técnica. Lo que queda
+    // es sumergirlo y los datos que la ficha no trae.
     const siguenSinConfirmar = [
       "es sumergible?",
       "lo puedo sumergir en agua?",
       "¿se puede meter al agua?",
-      "tiene certificación IP67?",
-      "es IP65?",
-      "cuántos metros alcanza?",
-      "cuánto dura la batería?",
-      "qué bluetooth tiene?",
+      "lo puedo lavar?",
+      "sirve en la piscina?",
       "cuántos dispositivos se conectan?",
+      "cuántos watts tiene?",
+      "qué marca es?",
     ];
     for (const pregunta of siguenSinConfirmar) {
       const sin = catalogo.preguntaSinDatoConfirmado(pregunta, V);
