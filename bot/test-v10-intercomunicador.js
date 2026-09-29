@@ -251,14 +251,18 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
   // alcanza 300, el cliente lo rechaza en la puerta y pagamos el flete redondo.
   // =========================================================================
   {
+    // ⚠️ "¿es resistente al agua?" y "¿tiene garantía?" ESTABAN en esta lista y
+    // salieron el 29-sep, cuando el dueño confirmó los dos datos (1 mes de garantía,
+    // y que resisten el agua porque están hechos para la moto). Ahora se responden,
+    // y eso se prueba en la sección 26. Acá quedan solo los que siguen sin medir.
     const preguntas = [
       "¿cuántos metros alcanza?",
       "¿cuánto le dura la batería?",
       "¿cuántas horas de autonomía tiene?",
       "¿qué versión de bluetooth es?",
-      "¿es resistente al agua?",
+      "¿es sumergible?",
       "¿cuántos dispositivos se conectan?",
-      "¿tiene garantía?",
+      "¿tiene certificación IP67?",
       "¿qué alcance tiene en carretera?",
     ];
     for (const p of preguntas) {
@@ -275,6 +279,85 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
       !catalogo.preguntaSinDatoConfirmado("¿sirve para hablar de casco a casco?", V) &&
         !catalogo.preguntaSinDatoConfirmado("¿se puede escuchar música?", V)
     );
+  }
+
+  // =========================================================================
+  console.log("\n── 26. ✅ GARANTÍA Y RESISTENCIA AL AGUA (confirmados el 29-sep) ──");
+  //
+  // El dueño confirmó dos datos que antes estaban en la lista de "no inventar":
+  // 1 mes de garantía, y que resisten el agua porque están hechos para la moto.
+  //
+  // 🔑 PERO CON UN LÍMITE QUE NO SE PUEDE PERDER: que aguante la LLUVIA no es lo
+  // mismo que aguantar SUMERGIDO ni que tener una certificación IP67, que es un
+  // número medido en laboratorio. Esa distinción es el corazón de esta sección.
+  // =========================================================================
+  {
+    // ✅ Lo que ahora SÍ se responde, en las formas en que la gente lo pregunta.
+    const seResponden = [
+      ["tiene garantía?", "garantia"],
+      ["¿cuánta garantía tiene?", "garantia"],
+      ["¿viene con garantía?", "garantia"],
+      ["son resistentes al agua?", "agua"],
+      ["¿se mojan con la lluvia?", "agua"],
+      ["¿aguanta la lluvia?", "agua"],
+      ["y si llueve que pasa?", "agua"],
+      ["¿se moja?", "agua"],
+    ];
+    for (const [pregunta, claveEsperada] of seResponden) {
+      const r = catalogo.respuestaConfirmada(pregunta, V);
+      chequear(`"${pregunta}" → se responde`, Boolean(r) && r.clave === claveEsperada, r ? r.clave : "no responde");
+    }
+    // Y ya no figuran como desconocidos.
+    chequear("⛔ la garantía ya NO está en la lista de no confirmados", !catalogo.preguntaSinDatoConfirmado("tiene garantía?", V));
+    chequear("⛔ la resistencia al agua tampoco", !catalogo.preguntaSinDatoConfirmado("es resistente al agua?", V));
+
+    // Los textos dicen lo que el dueño confirmó, y nada más.
+    const dc = catalogo.de(V).datosConfirmados;
+    chequear("🔑 la garantía dice 1 mes", /1 mes/.test(dc.garantia.respuesta), dc.garantia.respuesta);
+    chequear("  y no inventa un plazo distinto", !/(3|6|12)\s*mes|año/i.test(dc.garantia.respuesta), dc.garantia.respuesta);
+    chequear("🔑 el agua habla de lluvia y de usarlo en la moto", /lluvia/i.test(dc.agua.respuesta) && /moto/i.test(dc.agua.respuesta), dc.agua.respuesta);
+    chequear(
+      "⛔ y NO dice sumergible ni una certificación",
+      !/sumergi|ip\d|certificac/i.test(dc.agua.respuesta),
+      dc.agua.respuesta
+    );
+
+    // =======================================================================
+    // ⛔ LA LÍNEA QUE NO SE PUEDE CRUZAR
+    // =======================================================================
+    const siguenSinConfirmar = [
+      "es sumergible?",
+      "lo puedo sumergir en agua?",
+      "¿se puede meter al agua?",
+      "tiene certificación IP67?",
+      "es IP65?",
+      "cuántos metros alcanza?",
+      "cuánto dura la batería?",
+      "qué bluetooth tiene?",
+      "cuántos dispositivos se conectan?",
+    ];
+    for (const pregunta of siguenSinConfirmar) {
+      const sin = catalogo.preguntaSinDatoConfirmado(pregunta, V);
+      const conf = catalogo.respuestaConfirmada(pregunta, V);
+      chequear(
+        `⛔ "${pregunta}" sigue SIN respuesta inventada`,
+        Boolean(sin) && !conf,
+        sin ? `pero además respondió como ${conf && conf.clave}` : "se escapó de la lista"
+      );
+    }
+    // 🔑 El caso preciso: la palabra "agua" está en los dos lados. Gana la duda.
+    chequear(
+      "🔑 «sumergir en agua» gana la duda sobre el dato confirmado del agua",
+      catalogo.respuestaConfirmada("lo puedo sumergir en agua?", V) === null,
+      "respondió que sí resiste, y sumergirlo no está confirmado"
+    );
+
+    // Y el guion se lo dice al modelo con las dos caras.
+    const g = buildSystemPrompt(V);
+    chequear("el guion lista los datos confirmados", /DATOS CONFIRMADOS/.test(g) && /1 mes de garantía/.test(g));
+    chequear("  dice que resiste la lluvia", /lluvia/i.test(g));
+    chequear("🔑 y aclara la diferencia con sumergirlo", /SUMERGIBLE/.test(g) && /nadie lo verificó/.test(g));
+    chequear("  la garantía ya no figura entre lo que no se sabe", !/·\s*garantía/.test(g), "sigue en la lista de no confirmados");
   }
 
   // =========================================================================
