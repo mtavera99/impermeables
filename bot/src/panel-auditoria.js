@@ -41,9 +41,24 @@ const HORA = (ms) =>
     minute: "2-digit",
   });
 
+// Mismo arreglo que en `resumen.js`: un formateador reusado en vez de uno nuevo
+// por llamada. Acá pesa igual o más, porque `auditar()` llama a esta función
+// DENTRO del bucle de mensajes de cada conversación. Ver el comentario largo de
+// `resumen.js` para los números medidos.
+const FMT_DIA = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Bogota",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 /** El día en Bogotá de una marca de tiempo: "2026-09-23". */
 function diaBogota(ms) {
-  return new Date(ms).toLocaleDateString("en-CA", { timeZone: "America/Bogota" });
+  const d = new Date(ms);
+  // `Intl.format` lanza con una fecha inválida; `toLocaleDateString` devolvía
+  // "Invalid Date". Se conserva el comportamiento viejo.
+  if (Number.isNaN(d.getTime())) return "Invalid Date";
+  return FMT_DIA.format(d);
 }
 
 function limpiar(s) {

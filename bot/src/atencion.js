@@ -285,11 +285,27 @@ function priorizar(convs) {
  * No son trabajo pendiente: son el registro de lo que se hizo. El dueño lo pidió
  * explícitamente — "para que tenga orden y control de lo que se respondió".
  */
-function atendidos(convs) {
+// ============================================================================
+// ♻️ `yaEvaluadas`: EL SEGUNDO RECORRIDO COMPLETO SE PODÍA EVITAR — 30-sep
+//
+// `panel.render()` ya corre `evaluar()` sobre TODAS las conversaciones para armar
+// la prioridad, y tres líneas después llamaba a `atendidos(convs)`, que las
+// volvía a recorrer y a evaluar TODAS otra vez. Con 2.185 conversaciones de 12
+// mensajes son ~26.000 mensajes normalizados y pasados por decenas de regex,
+// dos veces, cada 45 segundos.
+//
+// `evaluar()` es pura —no toca la conversación, está verificado— así que el
+// resultado de la primera pasada sirve tal cual.
+//
+// El parámetro es OPCIONAL a propósito: sin él la función se comporta igual que
+// siempre, así que `test-atendido-y-orden.js` y cualquier otro llamador siguen
+// funcionando sin cambios.
+// ============================================================================
+function atendidos(convs, yaEvaluadas) {
   const out = [];
   for (const [tel, c] of Object.entries(convs || {})) {
     if (tel.startsWith("prueba-")) continue;
-    const e = evaluar(tel, c);
+    const e = (yaEvaluadas && yaEvaluadas.get(tel)) || evaluar(tel, c);
     if (e.atendido) out.push({ tel, c, ...e });
   }
   return out.sort((a, b) => b.atendidoAt - a.atendidoAt);

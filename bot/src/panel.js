@@ -181,9 +181,15 @@ function render(aviso) {
     .sort((a, b) => b.cuando - a.cuando);
 
   // ---- Prioridad de atención: quién necesita que entres vos ----
+  // ♻️ `evaluadas` guarda TODAS las evaluaciones, no solo las que tienen nivel.
+  // `prior` solo necesita las que escalan, pero `atencion.atendidos()` de más
+  // abajo necesita las demás, y sin esto las recalculaba todas de cero. Ver el
+  // comentario de `atendidos()` en atencion.js.
+  const evaluadas = new Map();
   const prior = new Map();
   for (const x of lista) {
     const e = atencion.evaluar(x.tel, x.c);
+    evaluadas.set(x.tel, e);
     if (e.nivel) prior.set(x.tel, e);
   }
   // Los que requieren atención van primero, y entre ellos el más urgente arriba
@@ -247,7 +253,7 @@ function render(aviso) {
   // dedo quedaría sobre otro chat y el siguiente toque marcaría al equivocado.
   // El orden se acomoda en el próximo refresco, cuando ya no hay un dedo encima.
   // ==========================================================================
-  const todosAtendidos = atencion.atendidos(convs);
+  const todosAtendidos = atencion.atendidos(convs, evaluadas);
   const atendidoDe = new Map(todosAtendidos.map((a) => [a.tel, a]));
 
   // Los atendidos siguen en la MISMA lista. Solo se muestran los de hoy y ayer:
@@ -257,9 +263,16 @@ function render(aviso) {
     return d === HOY || d === AYER;
   });
 
+  // 📅 Memorizado: `armarGrupo` llama a `diaDe` dentro de tres filtros, y en el
+  // de "Más viejos" lo llama DOS veces por chat. Son 4 cálculos por chat de un
+  // valor que no puede cambiar en el medio de un render.
+  const diasCache = new Map();
   const diaDe = (x) => {
+    if (diasCache.has(x.tel)) return diasCache.get(x.tel);
     const e = prior.get(x.tel) || atendidoDe.get(x.tel);
-    return resumen.diaBogota(e?.esperaDesde || x.cuando || e?.atendidoAt);
+    const d = resumen.diaBogota(e?.esperaDesde || x.cuando || e?.atendidoAt);
+    diasCache.set(x.tel, d);
+    return d;
   };
   const todosLosChats = [...chatsPendientes, ...atendidosVisibles];
   const armarGrupo = (titulo, filtro) => {
@@ -570,7 +583,11 @@ function render(aviso) {
   // medio. Un 4% de cierre puede venir de tres problemas distintos y cada uno
   // se arregla en otro lado. Esto contesta cuál es.
   // ==========================================================================
-  const emb = embudo.calcular(store.todasLasConversaciones(), pedidos);
+  // ♻️ `convs`, no `store.todasLasConversaciones()` otra vez. Acá se volvía a leer
+  // y a parsear el conversations.json COMPLETO (5,9 MB en producción) por segunda
+  // vez en el mismo render, para obtener exactamente los mismos datos que ya
+  // están en memoria desde el principio de la función.
+  const emb = embudo.calcular(convs, pedidos);
   const pct = (x) => Math.round(x * 100) + "%";
   const filasEmbudo = emb.etapas
     .map((e, i) => {
@@ -1380,9 +1397,36 @@ document.querySelectorAll("form.resp").forEach(function (f) {
     return false;
   }
 
+  // ==========================================================================
+  // 30-sep · CADA 3 MINUTOS, Y NADA SI LA PESTAÑA NO SE ESTA MIRANDO
+  //
+  // Esto recargaba cada 45 segundos, SIEMPRE: con la pestaña en el fondo, con el
+  // celular en el bolsillo, toda la noche. Y cada recarga del panel le cuesta al
+  // bot cientos de MB (medido en analisis/memoria-del-panel-30sep.js), asi que
+  // una pestaña olvidada abierta alcanzaba para que Render lo matara por memoria.
+  // Fueron 74 reinicios.
+  //
+  // Dos cambios, y el segundo es el que importa:
+  //   1. de 45 segundos a 3 minutos
+  //   2. si la pestaña no esta a la vista, no recarga nada
+  //
+  // Y para no perder frescura donde si se nota: al volver a la pestaña se
+  // refresca en el momento. O sea que ve datos mas frescos que antes justo
+  // cuando esta mirando, y el bot no trabaja cuando no lo mira.
+  // ==========================================================================
+  var cargadoEn = Date.now();
+
   setInterval(function () {
+    if (document.hidden) return;
     if (!ocupado()) location.reload();
-  }, 45000);
+  }, 180000);
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) return;
+    if (ocupado()) return;
+    // El minuto de gracia evita una recarga si solo cambio de pestaña y volvio.
+    if (Date.now() - cargadoEn > 60000) location.reload();
+  });
 })();
 
 // ============================================================================

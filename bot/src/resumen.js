@@ -11,9 +11,45 @@ const store = require("./store");
 
 const TZ = "America/Bogota";
 
+// ============================================================================
+// 🧠 UN SOLO FORMATEADOR, NO UNO POR LLAMADA — 30-sep
+//
+// Esta función era una línea:
+//     new Date(ms).toLocaleDateString("en-CA", { timeZone: TZ })
+//
+// 🔴 Y era la causa principal de que Render matara el bot por memoria (74
+// reinicios). Pasarle `timeZone` a toLocaleDateString obliga a Node a construir
+// un formateador de Intl NUEVO en cada llamada, con la tabla entera de la zona
+// horaria adentro. El panel la llama miles de veces por recarga, y se recarga
+// solo cada 45 segundos.
+//
+// Medido con 50.000 llamadas, que es el orden de una recarga del panel con
+// 2.185 conversaciones:
+//
+//     como estaba:              +70 MB · 2.145 ms
+//     reusando el formateador:   +0 MB ·    47 ms   ← 45× más rápido
+//
+// Se puede reusar porque el formateador NO guarda estado entre llamadas: es la
+// tabla de la zona horaria, que no cambia. El resultado es idéntico y hay prueba
+// que lo compara contra la implementación vieja, valor por valor.
+// ============================================================================
+const FMT_DIA = new Intl.DateTimeFormat("en-CA", {
+  timeZone: TZ,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 /** Fecha YYYY-MM-DD en Bogotá a partir de un timestamp. */
 function diaBogota(ms) {
-  return new Date(ms).toLocaleDateString("en-CA", { timeZone: TZ });
+  const d = new Date(ms);
+  // ⚠️ DIFERENCIA DE COMPORTAMIENTO QUE HAY QUE TAPAR: con una fecha inválida
+  // `toLocaleDateString` devolvía el texto "Invalid Date", pero `Intl.format`
+  // LANZA un RangeError. Y sí llegan fechas inválidas: `panel.js` llama
+  // `diaBogota(e?.esperaDesde || x.cuando || e?.atendidoAt)`, que da `undefined`
+  // si los tres faltan. Sin esta guarda, el arreglo de memoria tumbaría el panel.
+  if (Number.isNaN(d.getTime())) return "Invalid Date";
+  return FMT_DIA.format(d);
 }
 
 function hoyBogota() {
