@@ -299,9 +299,15 @@ function datosCompletados() {
   document.querySelectorAll("input.dato").forEach(function (i) {
     var g = i.getAttribute("data-guia");
     var campo = i.getAttribute("data-campo");
-    if (!datos[g]) datos[g] = {};
     var valor = i.value.trim();
     if (!valor && campo === "plazo" && plazoGeneral) valor = plazoGeneral;
+    // ⛔ UN CAMPO VACÍO NO SE MANDA (30-sep). Mandarlo tenía dos costos: hacía
+    // que el envío recalculara el plan sin necesidad, y ese recálculo borraba
+    // los datos de las filas que ya estaban resueltas —que no dibujan campos, así
+    // que no hay forma de que los vuelvan a mandar—. El servidor además ignora
+    // los vacíos, pero no mandarlos evita disparar el recálculo de entrada.
+    if (!valor) return;
+    if (!datos[g]) datos[g] = {};
     datos[g][campo] = valor;
   });
   return datos;
