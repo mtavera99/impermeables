@@ -144,7 +144,119 @@ function palabrasCiudad(ciudad) {
  * chorro de texto, el nombre del destinatario se pega con el del remitente y
  * el parseo empieza a adivinar. Se agrupa por la coordenada Y de cada pedazo.
  */
+// ============================================================================
+// 🧠 ESTO CORRE EN UN PROCESO APARTE — 30-sep
+//
+// EL PROBLEMA, medido: `pdfjs` NO devuelve la memoria que usa. Ni con
+// `page.cleanup()`, ni con `doc.destroy()`, ni forzando el recolector:
+//
+//     solo CARGAR el módulo pdfjs        +41 MB
+//     leer 40 páginas                    +30 MB
+//     después de destroy() + recolector    0 MB devueltos
+//                                        ─────────
+//                                         71 MB que no vuelven NUNCA
+//
+// Node SÍ libera por dentro (el heap y `external` bajan a lo normal), pero el
+// sistema operativo nunca recupera esos 71 MB. Con el contenedor de 512 MB de
+// Render, dos o tres lotes de guías y el proceso muere. Probado también:
+// `useSystemFonts: false` no cambia nada, y `MALLOC_ARENA_MAX=2` lo empeora.
+//
+// 🔑 LA SALIDA: cuando un PROCESO termina, el sistema recupera el 100% de lo que
+// tenía, incluido todo lo que una librería nativa se negó a soltar. Así que el
+// parseo se hace en un proceso hijo que se muere al terminar, y el bot recibe
+// solo el texto ya extraído. Medido, 3 lotes seguidos:
+//
+//     pdfjs dentro del bot:   +71 MB cada lote
+//     en un proceso aparte:    +1 MB en total
+//
+// El costo es ~300 ms de arranque del hijo, una vez por PDF subido. El dueño
+// sube PDFs a mano unas veces al día: no se nota.
+//
+// ⚠️ Si el hijo no puede arrancar, se cae con gracia al parseo de siempre y se
+// avisa en el log. Es mejor un bot que gasta memoria que un bot que no puede
+// mandar las guías.
+// ============================================================================
 async function lineasPorPagina(buffer) {
+  try {
+    return await lineasEnProcesoAparte(buffer);
+  } catch (e) {
+    console.error(
+      `⚠️ No se pudo leer el PDF en un proceso aparte (${e.message}). ` +
+        "Se lee en el proceso del bot, que deja ~71 MB sin devolver al sistema."
+    );
+    return await lineasEnEsteProceso(buffer);
+  }
+}
+
+/**
+ * Lanza el worker, le pasa el PDF por un archivo temporal y lee el resultado de
+ * otro archivo temporal.
+ *
+ * ⚠️ POR QUÉ ARCHIVOS Y NO stdout: cualquier `console.log` de un módulo que el
+ * worker cargue —hoy o dentro de tres meses— se mezclaría con el JSON y lo
+ * volvería ilegible. Con un archivo de salida, lo que el worker imprima es
+ * irrelevante. Es la misma clase de trampa que el parser del export, donde un
+ * bloque multilínea se pegaba a los mensajes.
+ */
+function lineasEnProcesoAparte(buffer) {
+  const { fork } = require("child_process");
+  const fs = require("fs");
+  const os = require("os");
+  const path = require("path");
+
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), "guias-"));
+  const entrada = path.join(base, "entrada.pdf");
+  const salida = path.join(base, "salida.json");
+  fs.writeFileSync(entrada, buffer);
+
+  const limpiar = () => {
+    try {
+      fs.rmSync(base, { recursive: true, force: true });
+    } catch {}
+  };
+
+  return new Promise((resolve, reject) => {
+    const hijo = fork(path.join(__dirname, "leer-pdf-worker.js"), [entrada, salida], {
+      silent: true,
+    });
+    let error = "";
+    if (hijo.stderr) hijo.stderr.on("data", (d) => (error += d));
+
+    // Un PDF corrupto podría dejar a pdfjs dando vueltas para siempre, y el
+    // dueño se quedaría mirando una pantalla que no responde. Con el tope, a los
+    // 2 minutos cae al camino de siempre y las guías igual salen.
+    const reloj = setTimeout(() => {
+      hijo.kill("SIGKILL");
+      reject(new Error("el worker del PDF tardó más de 2 minutos"));
+    }, 120000);
+
+    hijo.on("error", (e) => {
+      clearTimeout(reloj);
+      limpiar();
+      reject(e);
+    });
+
+    hijo.on("close", (code) => {
+      clearTimeout(reloj);
+      if (code !== 0) {
+        limpiar();
+        return reject(new Error(`el worker salió con código ${code}: ${error.slice(0, 300)}`));
+      }
+      try {
+        const paginas = JSON.parse(fs.readFileSync(salida, "utf8"));
+        limpiar();
+        resolve(paginas);
+      } catch (e) {
+        limpiar();
+        reject(new Error(`no se pudo leer la salida del worker: ${e.message}`));
+      }
+    });
+  });
+}
+
+/** El parseo de siempre, tal cual. Lo usa el worker, y es la red de seguridad
+ *  si el worker no puede arrancar. */
+async function lineasEnEsteProceso(buffer) {
   // Import dinámico: pdfjs es ESM y este proyecto es CommonJS. Además así el
   // bot arranca aunque nadie vaya a usar las guías en esa ejecución.
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
@@ -730,6 +842,9 @@ module.exports = {
   PESOS, MINIMO, MARGEN, TRANSPORTADORAS,
   normalizar, tel10, numerosDireccion, palabrasNombre, palabrasCiudad,
   porQueNoAlcanzo, lineasPorPagina, partirHojas, extraerCampos, telefonosRemitente,
+  // Exportada SOLO para que `leer-pdf-worker.js` la invoque. El resto del código
+  // usa `lineasPorPagina`, que es la que manda el trabajo al proceso aparte.
+  lineasEnEsteProceso,
   puntuar, emparejar, procesarPDF, destinoDe,
   transportadoraDe, textoParaCliente, nombreArchivo,
 };
