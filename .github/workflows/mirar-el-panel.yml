@@ -23,6 +23,19 @@ name: Mirar el panel
 #   · las rutas son una lista cerrada, y TODAS son de solo lectura. A propósito
 #     NO está `/seguimiento/correr`, que dispara mensajes a clientes
 #   · solo quien puede lanzar workflows en este repo puede usarlo
+#
+# 🔴 PERO OJO CON LO QUE QUEDA EN EL LOG (30-sep). Este repo es PÚBLICO, y los
+# logs de Actions de un repo público los puede leer cualquiera. `/panel` imprime
+# nombre, dirección y teléfono de cada cliente, así que cada corrida deja esos
+# datos a la vista. Es una exposición que ya existía; queda anotada acá para que
+# se decida qué hacer (lo más simple: volver el repo privado).
+#
+# Lo que sí se hizo: las dos rutas nuevas se imprimen SIN datos personales.
+#   · /pedidos.csv  -> se quitan las columnas nombre, celular y direccion
+#   · /eventos      -> los teléfonos salen enmascarados (últimos 4 dígitos)
+# Se agregaron para poder auditar TODOS los pedidos (el panel solo dibuja los 60
+# despachados más recientes) y para leer el motivo exacto de un envío fallido,
+# que vive en memoria y se pierde en el próximo reinicio.
 # ══════════════════════════════════════════════════════════════════════════════
 
 on:
@@ -40,6 +53,9 @@ on:
           - /cierre          # cierre del día (NO envía WhatsApp desde acá)
           - /setup-waba      # conexión del número + calidad
           - /chat            # una conversación real (hay que dar el id)
+          - /eventos         # los últimos 60 eventos, con el motivo de cada fallo
+          - /plantillas      # estado real de cada plantilla en Meta + fallos de entrega
+          - /pedidos.csv     # TODOS los pedidos (el panel solo dibuja 60)
       id:
         description: "Solo para /chat — el número del cliente (ej. 573116093103)"
         required: false
@@ -98,9 +114,66 @@ jobs:
           # El panel es HTML y en el log crudo es ilegible. Se pasa a texto para
           # poder leerlo de un vistazo (y desde el celular).
           python3 - <<'PY'
-          import html, json, re, sys
+          import csv, html, io, json, os, re, sys
 
           crudo = open("cruda.txt", encoding="utf-8", errors="replace").read()
+          ruta = os.environ.get("RUTA", "")
+
+          # ------------------------------------------------------------------
+          # 🔒 /pedidos.csv — TODOS los pedidos, SIN datos personales.
+          #
+          # El panel solo dibuja los 60 despachados más recientes
+          # (`despachados.slice(0, 60)`), así que para auditar el histórico
+          # completo hace falta el CSV. Pero el CSV trae nombre, celular y
+          # dirección, y este log es público: esas tres columnas se van.
+          # Quedan las que sirven para auditar (producto no está en el CSV, pero
+          # talla/color vacíos delatan un V10).
+          # ------------------------------------------------------------------
+          if ruta == "/pedidos.csv":
+              FUERA = {"nombre", "celular", "direccion"}
+              filas = list(csv.reader(io.StringIO(crudo.lstrip("\ufeff"))))
+              if not filas:
+                  print("(vacío)")
+                  sys.exit(0)
+              cab = filas[0]
+              quedan = [i for i, c in enumerate(cab) if c.strip().lower() not in FUERA]
+              salida = csv.writer(sys.stdout)
+              for f in filas:
+                  salida.writerow([f[i] if i < len(f) else "" for i in quedan])
+              print(f"\n({len(filas)-1} pedidos · se omitieron las columnas {sorted(FUERA)})", file=sys.stderr)
+              sys.exit(0)
+
+          # ------------------------------------------------------------------
+          # 🔒 /eventos — el motivo exacto de cada fallo, con los teléfonos
+          # enmascarados. Es JSON, así que se enmascara sobre el texto crudo
+          # antes de imprimirlo: cualquier número largo se recorta.
+          # ------------------------------------------------------------------
+          if ruta in ("/eventos", "/plantillas"):
+              # ⚠️ Se enmascara por CLAVE y no por longitud: un teléfono con
+              # indicativo (573204841897) y una guía (240062483714) tienen los
+              # mismos 12 dígitos, y la guía hay que poder leerla — es el dato
+              # con el que se busca el pedido.
+              CLAVES = {"para", "destino", "de", "telefono", "telefono_chat", "celular", "to", "wa_id"}
+
+              def tapar(v):
+                  s = str(v)
+                  return "…" + s[-4:] if len(s) > 4 else s
+
+              def limpiar(o):
+                  if isinstance(o, dict):
+                      return {k: (tapar(v) if k in CLAVES and isinstance(v, (str, int)) else limpiar(v))
+                              for k, v in o.items()}
+                  if isinstance(o, list):
+                      return [limpiar(x) for x in o]
+                  return o
+
+              try:
+                  print(json.dumps(limpiar(json.loads(crudo)), indent=2, ensure_ascii=False))
+              except ValueError:
+                  # Si no es JSON (un error de Render, por ejemplo) se tapa todo
+                  # número largo antes que arriesgar un teléfono en claro.
+                  print(re.sub(r"\b\d{10,15}\b", lambda m: "…" + m.group(0)[-4:], crudo))
+              sys.exit(0)
 
           # /cierre y /setup-waba responden JSON: se imprime tal cual, indentado.
           limpio = crudo.lstrip()
