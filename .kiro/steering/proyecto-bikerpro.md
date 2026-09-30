@@ -4,18 +4,24 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-16 01:15 Bogotá** — 🆕 **sección 0-BG: el gate se disparó ($1.603),
-la quincena queda descartada, el colmena se dio vuelta (231% de su equilibrio) y se recortó a $10.000.
-Y el error #24: casi corto `Domiciliarios`, que fue el conjunto que MÁS utilidad dejó.** *(ojo: verificar siempre la fecha en
+Última actualización: **2026-09-30 02:30 Bogotá** — 🆕 **sección 0-BI: los reinicios por memoria NO eran
+el PDF ni V8, era el PANEL (821 MB por recarga, cada 45 segundos). Pico 478 → 183 MB, sin pagar más
+instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las plantillas de Meta y la
+causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR `TRASPASO-SESION-24SEP.md`.**
-> Es lo más reciente y está escrito para retomar: pendientes del dueño, los 23 PRs del 23-24 de
-> septiembre, los precios vigentes, los números ya medidos (para no volver a medirlos), las 25
-> baterías de prueba, las trampas conocidas y cómo trabajar con el dueño.
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LA SECCIÓN `0-BI`** (al final de este
+> archivo) **y después `TRASPASO-SESION-29SEP.md`.**
+> `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
+> del repo y cómo trabajar con el dueño.
 > **El bot de WhatsApp ya reemplazó al agente de Meta y está en producción** —
 > `https://bikerpro-bot.onrender.com` — así que las secciones de este archivo que dicen que el bot
 > no está corriendo (0-BD) están vencidas.
+>
+> ⛔ **TRES COSAS ESCRITAS EN ESTE ARCHIVO QUE YA SON FALSAS** (corregidas el 30-sep, ver 0-BI):
+> 1. *"la línea del 313 está CAÍDA"* → **funciona**, SMS y llamadas. Era el equipo, no el operador.
+> 2. *"faltan las plantillas de Meta, pedirla"* → **ya están aprobadas y en uso** desde finales de sep.
+> 3. *"el reinicio por memoria es el PDF de guías / la bandera de V8"* → **era el panel.**
 
 > 🚀 **Para el contexto de Meta Ads:** el bloque "TRASPASO A LA SESIÓN NUEVA" de la sección 12 tiene
 > qué hacer primero (incluido el MCP de Meta Ads), el estado confirmado de la cuenta, los tres
@@ -30,6 +36,8 @@ Y el error #24: casi corto `Domiciliarios`, que fue el conjunto que MÁS utilida
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BJ** | 📇 **CORRECCIONES DE DATOS: tres cosas de este archivo que eran falsas** · ✅ **la línea del 313 FUNCIONA** (SMS y llamadas; era el equipo, no el operador) → se retiran el riesgo del número reciclado, el pendiente con el operador y mi recomendación de mover los avisos · ✅ **las plantillas de Meta YA están aprobadas y en uso** (seis, con nombre por defecto) — lo que falta son 2 avisos AL DUEÑO, que es una decisión suya · 📮 **el número impreso en la etiqueta de 99 Envíos es el CELULAR DEL HERMANO del dueño**, dato que no estaba en ninguna parte y por eso `TELEFONO_REMITENTE` estuvo mal | **30-sep** |
+| **0-BI** | 🧠 **LOS REINICIOS POR MEMORIA: era el PANEL, no el PDF ni V8** · cada recarga costaba **821 MB para producir 358 KB de HTML**, y se recargaba **cada 45 s** aunque la pestaña estuviera en el fondo · 🔑 **la causa nº1 era `diaBogota()`**, que creaba un formateador de Intl nuevo por llamada (+77 MB / 2.184 ms por cada 50.000) · ⛔ **`heap_techo_mb` volvió 268: la bandera de V8 nunca habría servido** · ⛔ **las hojas del PDF pesan 2 MB, no 30** · **pico 478 → 183 MB, del 93% al 36% del límite, sin pagar más** · 🔧 y aparte: **pdfjs no devuelve 71 MB por lote** → se parsea en un proceso hijo · ⚠️ **`arranques` NO mide salud: el estado de cuenta se commitea a `main` cada hora y eso redespliega el bot** · **errores #25-27 · reglas 27-32** · PR **#189** | **30-sep** |
 | **0-BH** | 🔴 **CLIENTES SIN TELÉFONO: el bot no les contestaba y los mezclaba a TODOS en una conversación llamada `undefined`** · WhatsApp lanzó los nombres de usuario y Meta **oculta el teléfono** (BSUID `CO.1098…`, no se puede derivar) · el payload trae `from_user_id`, no `from` → el bot enviaba sin destino → **400, lead pagado en silencio: 1 de cada 4** · 🔴 **peor que no contestar: le respondía a un cliente nuevo con el historial de otro** (*"ya te he dado todos los detalles…"* en su PRIMER mensaje) · ⛔ **CORRIGE 0-BE: las 24h SÍ aplican ahora** que está en la Cloud API — **4 cosas ya necesitan la plantilla** · 🔒 **regla nueva: SIN CELULAR NO HAY DESPACHO**, blindada en código · **reglas 23-26** | **22-sep** |
 | **0-BG** | 🎯 **EL GATE SE DISPARÓ: $1.603 > $1.134 → la quincena queda DESCARTADA** · el martes cerró en **$1.501/conv y $60.975 de utilidad** (×3,6 vs el lunes, pero un tercio de lo normal) · 🔴 **44% del gasto se fue a las 3 horas MÁS CARAS ($2.763/conv) y la cuenta quedó racionada de 18h a 21:21, cuando costaban $453-$1.142** · ⚠️ pero en días CON plata la noche no es más barata → **no hacer dayparting con 2 días** · 🔴 **el colmena se dio vuelta: $7.661/conv = 231% de su equilibrio** → recortado a $10.000 · 🟢 **TEST Creativos $614/conv y conv/mil 11,37 pero usa solo el 39%** → ⛔ **anula la acción 1-B: su límite es la subasta, no el presupuesto** · ⚠️ **error #24: casi corto `Domiciliarios`, que dejó $25.990 — el que más utilidad dio** · **5 reglas nuevas (18-22)** | **16-sep** |
 | **0-BF** | 🎯 **LA DESCOMPOSICIÓN: `$/conv = CPM ÷ conv-por-mil`. Amor y Amistad explica el 41%, la caída de audiencia el 59%** · ⛔ **corrige 0-AU** (el domingo 13 tuvo el CPM MÁS ALTO y salió bien: $1.032) · ⛔ **corrige 0-AO**: la degradación **NO fue uniforme** — Motorizados y el colmena tuvieron su MEJOR conv/mil mientras los dos grandes se derrumbaron · 🔑 **Motorizados pagó el peor CPM ($7.771) y trajo las conversaciones más baratas ($885)** · el lunes ganó **$16.700 vs $189.737 de promedio** (9%) · ✅ el CPM sube en TODOS los conjuntos a la vez = firma de la subasta · 📅 **proyección Q4: con conv/mil 2,76 el Cyber Monday PIERDE $57.652; con 4,45 GANA $60.380** · 🌧️ **nunca se midió si la lluvia mueve las ventas** (#98) · 🔴 **`balance` ≠ saldo** · 🔴 **leer a las 13:00 subestima el gasto 5,8%** · **errores #21, #22 y #23** | **15-sep** |
@@ -10820,7 +10828,29 @@ API**, y ahí la ventana de 24h aplica. Pasado ese plazo Meta **acepta el mensaj
 entrega**, sin error visible.
 
 📌 **Ya son cuatro cosas que necesitan la plantilla aprobada:** guías, cierre diario,
-seguimiento de 72h y responder desde el panel a un chat viejo. **Pedirla.**
+seguimiento de 72h y responder desde el panel a un chat viejo. ~~**Pedirla.**~~
+
+> ✅ **RESUELTO — no volver a pedirlo (verificado el 30-sep).** Las plantillas **ya están aprobadas
+> y en uso.** El dueño lo corrigió: *"si nosotros ya las tenemos aprobadas… ya las estamos usando,
+> no sé si de pronto te quedaste atrasado en eso"*. Y tenía razón. En el código hay seis, todas con
+> su nombre por defecto, así que funcionan sin configurar nada:
+>
+> | para qué | variable | nombre por defecto |
+> |---|---|---|
+> | cierre del día | `PLANTILLA_CIERRE` | `cierre_del_dia` |
+> | mandar la guía | `PLANTILLA_GUIA` | `guia_de_envio` |
+> | novedad de dirección | `PLANTILLA_NOVEDAD_DIRECCION` | `novedad_direccion` |
+> | novedad de ausente | `PLANTILLA_NOVEDAD_AUSENTE` | `novedad_ausente` |
+> | novedad de oficina | `PLANTILLA_NOVEDAD_OFICINA` | `novedad_oficina` |
+> | seguimiento de 44h | `SEGUIMIENTO_PLANTILLA_2` | *(vacía = el paso se salta)* |
+>
+> Idioma: **`es_CO`**, no `es` (`PLANTILLA_IDIOMA`).
+>
+> 🔴 **LO QUE SÍ SIGUE SIN PLANTILLA son dos avisos AL DUEÑO, no a clientes:**
+> `avisarSinAtribuir` y el handoff *"🙋 El cliente pidió hablar con un asesor"* salen como texto
+> libre. Con su ventana de 24h cerrada, Meta los rechaza (131047) o los acepta y no los entrega.
+> El cierre diario **sí** está protegido y sirve de modelo. **Es una decisión pendiente del dueño,
+> no una plantilla que falte pedir.**
 
 ### La regla nueva: SIN CELULAR NO HAY DESPACHO
 
@@ -10856,3 +10886,202 @@ bloque `##ORDER##` se emitía dos veces aunque el prompt lo prohibiera.
 
 *Arreglado en el PR #91. Limpieza de la basura que quedó:*
 `/limpiar-conversaciones-rotas?token=...` *(previsualiza; con `&aplicar=1` borra).*
+
+---
+
+## 0-BI · 🧠 LOS REINICIOS POR MEMORIA: NO ERA EL PDF NI V8, ERA EL PANEL (mié 30-sep, 02:30 Bogotá)
+
+> **Resultado en una línea:** pico de memoria en producción **478 MB → 183 MB**, del **93% al 36%**
+> del límite del contenedor, **sin pagar una instancia más grande.** PR **#189**.
+>
+> **Reproducible entero con un comando:**
+> ```bash
+> node analisis/memoria-del-panel-30sep.js
+> ```
+
+### 🔴 Las tres hipótesis que había, y por qué las tres eran falsas
+
+La sesión del 29-sep dejó escrito que había que pedirle al dueño dos lecturas de `/health?token=...`
+y el plan de Render, y que *"si `heap_techo_mb` vuelve en miles, el arreglo es una bandera en el
+comando de arranque"*. **La lectura llegó y mató las tres hipótesis de una vez:**
+
+```
+proceso 474 MB · heap usado 25 MB · heap reservado 31 MB
+heap_techo 268 MB · buffers 5 MB · hojas retenidas 0 · planes 0
+al_arrancar 78 MB · pico 478 MB · arranques 74
+```
+
+| hipótesis | el dato que la mata |
+|---|---|
+| ⛔ **V8 se dimensiona contra la RAM de la máquina** → bandera `--max-old-space-size` | **`heap_techo_mb` es 268, no miles.** En el contenedor V8 **ya** se ajusta solo. Y la memoria no está en el heap: usa 25 de 268. La bandera no habría hecho nada |
+| ⛔ **Las hojas del PDF retenidas** (lo que dejó escrito 0-BF/#186: *"40 hojas de 300 KB = 11,7 MB, tres PDFs sin terminar = 30,8 MB"*) | **`hojas_retenidas: 0`**, y medidas de verdad pesan **2 MB**. Confirmado después en producción: 52 hojas = 2 MB |
+| ⛔ **El `conversations.json` de 5,9 MB** | 200 mensajes seguidos: el RSS sube a 128 MB y **se planta**. No es fuga |
+| ⛔ **Fragmentación de glibc** | probado `MALLOC_ARENA_MAX=2`: **sale peor** (340 vs 308 MB) |
+
+🔑 **Y el dato del dueño fue el que destrabó todo.** Le pregunté si había subido un PDF en esos
+11 minutos y dijo que no. Con eso, `pdfjs` **ni siquiera estaba cargado** (es un import diferido), así
+que no podía explicar un crecimiento de 78 → 478 MB. **Van 5 de 5 secciones donde su respuesta
+encuentra el error.**
+
+### 🎯 LA CAUSA REAL: cada recarga del panel costaba 821 MB para producir 358 KB de HTML
+
+Y el panel **se recargaba solo cada 45 segundos** (`location.reload()`), con la pestaña en el fondo o
+el celular en el bolsillo. **Una pestaña olvidada abierta alcanzaba para matar el bot.**
+
+Dentro de `panel.render()`, en orden de costo:
+
+1. 🔴 **`diaBogota()` creaba un formateador de Intl NUEVO en cada llamada.**
+   Era `new Date(ms).toLocaleDateString("en-CA", { timeZone: TZ })`. Pasarle `timeZone` construye toda
+   la maquinaria de zonas horarias cada vez. 50.000 llamadas —el orden de UNA recarga—:
+   **+77 MB y 2.184 ms, contra +0 MB y 62 ms** reusando un formateador. **35× más rápido.**
+2. **`atencion.evaluar()` corría DOS veces sobre las 2.185 conversaciones**: una en `panel.js` para la
+   prioridad y otra completa dentro de `atencion.atendidos()`. ~26.000 mensajes normalizados y pasados
+   por decenas de regex, dos veces.
+3. **El `conversations.json` se leía y parseaba DOS veces** en el mismo render.
+4. **`diaDe()` se calculaba 4 veces por chat** (tres filtros, y el de "Más viejos" lo llama dos veces).
+
+Todo eso para mostrar **20 filas por grupo**.
+
+### Antes y después, mismo script y mismos datos
+
+| | `main` del 29-sep | después del #189 |
+|---|---|---|
+| RSS tras la 1ª recarga | **821 MB** | **135 MB** |
+| tiempo por recarga | **2.898 ms** | **263 ms** |
+| **pico en producción** | **478 MB (93% del límite)** | **183 MB (36%)** |
+
+Y el detalle que lo confirma en vivo: **el pico fue 183 y después bajó a 154.** Antes el RSS solo
+subía. Que baje significa que la memoria se está devolviendo.
+
+### 🔧 El otro bug, real pero secundario: `pdfjs` no devuelve 71 MB por lote
+
+No era la causa del reinicio de ese día, pero iba a morder con un lote grande:
+
+```
+solo CARGAR el módulo pdfjs        +41 MB
+leer 40 páginas                    +30 MB
+después de destroy() + recolector    0 MB devueltos
+```
+
+Node **sí** libera por dentro (el heap y `external` vuelven a lo normal) y el sistema operativo **no
+recupera nada**. La salida: **parsear en un proceso hijo que se muere al terminar**, porque al terminar
+un proceso el sistema recupera el 100%, incluido lo que una librería nativa se negó a soltar. Medido:
+**+71 MB por lote adentro del bot, +2 MB por tres lotes con el proceso aparte.**
+
+⚠️ **Si el hijo no arranca, cae al parseo de siempre y avisa en el log.** Un bot que gasta memoria es
+mejor que un bot que no puede mandar las guías.
+
+### ⚠️ EL CONTADOR `arranques` NO SIRVE PARA DETECTAR MUERTES POR MEMORIA
+
+**El workflow del estado de cuenta commitea `ESTADO-CUENTA.md` a `main` cada hora, y Render despliega
+automáticamente desde `main`. O sea que el bot se reinicia CADA HORA, por diseño.**
+
+Así que `arranques` sube ~24/día sin que nada falle. **El indicador bueno es `pico.proceso_mb` contra
+los 512 MB del contenedor**, no el contador.
+
+🔴 **Y eso tiene una consecuencia operativa que nadie había notado:** el plan de guías vive en
+`PLANES_GUIAS = new Map()`, **solo en memoria**. El de novedades **sí** se persiste (se arregló el
+25-sep, porque daba un `400` incomprensible). Entonces la ventana real para confirmar un lote de guías
+**no son las 2-6 horas documentadas: es "hasta el próximo despliegue de la hora"**, que pueden ser dos
+minutos.
+
+✅ **Decisión del dueño (30-sep): se deja así.** Volver a subir el PDF cuesta poco, y **es seguro**:
+`procesarPDF` recibe `yaEnviada: (g) => store.guiaYaEnviada(g)`, así que una guía ya enviada no se
+manda dos veces. Queda anotado por si algún día molesta.
+
+### ⚠️ Errores #25, #26 y #27
+
+| # | lo que estaba escrito | lo que dice el dato |
+|---|---|---|
+| **25** | 0-BF/#186: *"el reinicio es el PDF de guías: las hojas retenidas son 30,8 MB"* | **las hojas pesan 2 MB.** El arreglo del `Promise.all` y del TTL estaban bien, pero no eran la causa |
+| **26** | (mío) *"`heap_techo_mb` va a volver en miles → poner `--max-old-space-size`"* | **volvió 268.** V8 ya se ajusta al contenedor. Reproduje el 4.144 MB que alimentó la hipótesis: **solo pasa en una máquina de mucha RAM, nunca en el contenedor.** Una medición correcta aplicada al lugar equivocado |
+| **27** | (mío, dos veces) pedirle al dueño el plan de Render, y pedirle una lectura de `/health` sin haber mirado antes qué se pierde en un reinicio | **el plan estaba escrito en `ACCESOS-Y-RECUPERACION.md`** ("Starter $7/mes"), en dos lugares. Es el mismo error del 29-sep con la columna "Estado" que no existía: **pedirle un dato sin verificar primero si ya lo tengo** |
+
+🔑 **El patrón nuevo, y es distinto a los de #8 al #24:** esos eran de *interpretación* (comparar mal,
+promediar mal, aceptar una explicación sin contraejemplo). Estos tres son de **no medir el lugar
+correcto**: se eligió una causa plausible, se construyó una solución elegante para ella, y nadie fue a
+medir si esa causa existía. **El contraejemplo costaba un comando.**
+
+### Reglas nuevas
+
+27. **Antes de pedirle un dato al dueño, buscarlo en el repo.** Van dos veces: el plan de Render y la
+    columna "Estado". Es la regla de "verificar antes de pedir" del 29-sep, que hay que aplicar también
+    a los datos de configuración, no solo a las pantallas.
+28. **Un diagnóstico de memoria no se cierra con una foto: hay que separar "arrancó gordo" de "se
+    infló haciendo algo".** `al_arrancar_mb` contra `pico.proceso_mb` es lo que decide, y son arreglos
+    opuestos.
+29. **RSS alto con el heap vacío nunca es un problema de JavaScript.** Si `heap_usado` está en 25 MB y
+    el proceso en 474, buscar afuera del heap: librerías nativas, `Intl`, o asignaciones transitorias
+    enormes que el sistema no devuelve.
+30. **Un medidor puede contaminarse a sí mismo.** La primera versión del script medía las tres
+    secciones en un proceso, y como la sección de la fecha quema memoria midiendo el camino viejo, la
+    del render arrancaba sucia y **parecía que el arreglo no servía**. Cada sección va en un proceso
+    nuevo.
+31. **Un contador de reinicios no mide salud si los despliegues también lo suben.** Acá sube ~24/día
+    porque el estado de cuenta se commitea a `main` cada hora.
+32. **`Intl.format` lanza con una fecha inválida; `toLocaleDateString` devolvía "Invalid Date".**
+    Cualquier cambio de uno al otro necesita la guarda, o tumba la pantalla que lo use.
+
+---
+
+## 0-BJ · 📇 CORRECCIONES DE DATOS DEL 30-SEP (cosas de este archivo que eran falsas)
+
+### ✅ La línea del **313** funciona. No está caída
+
+`TRASPASO-SESION-22SEP.md` la marcaba como *"🔴 CAÍDA: no recibe SMS y las llamadas no entran"* y como
+*"un punto único de falla con dos amenazas encima"*. **El dueño lo corrigió el 30-sep:** era el
+**equipo**, no el operador. Después hizo otra confirmación por SMS y funcionó. Hoy recibe **SMS y
+llamadas**.
+
+**Qué se retira con esto:**
+
+- ⛔ el riesgo de *"si el número se recicla, quien lo reciba puede pedir códigos de la cuenta de Meta"*
+- ⛔ el pendiente *"llamar al operador por el 313"*
+- ⛔ **y una recomendación mía:** insistí en mover `OWNER_WHATSAPP` al celular personal argumentando que
+  era *"sacar los avisos de un número que no podés recuperar"*. **Ese argumento ya no vale.**
+  **Los cierres se quedan en el 313** y no hay nada que hacer.
+
+📌 **Y destraba algo:** `ACCESOS-Y-RECUPERACION.md` dice que no se podía cambiar el 2FA de Meta ni
+re-verificar el número. Con el 313 recibiendo SMS, ese camino está abierto cuando se necesite.
+
+⚠️ El 313 **ya no se usa para atender**: eso lo hace el número de la Cloud API del bot. El 313 sigue
+activo y es el que recibe los avisos.
+
+### 📮 `TELEFONO_REMITENTE`: el número de la etiqueta es **el personal del hermano del dueño**
+
+**Este dato no estaba en ningún archivo, y por eso el filtro estuvo mal configurado.** Lo encontró el
+dueño solo, después de entender para qué servía la variable.
+
+`TELEFONO_REMITENTE` **no imprime ni manda nada.** Es **solo un filtro de lectura**: la lista de
+números propios que el bot tiene que **ignorar** cuando lee una etiqueta, para no confundirlos con el
+teléfono del cliente ni con el número de guía. Se usa en dos lugares de `guias.js` y los dos son para
+descartar.
+
+🔑 **El número que 99 Envíos imprime como remitente es el CELULAR PERSONAL DEL HERMANO del dueño**, que
+es el contacto configurado allá. **No es el del bot, ni el 313, ni el personal del dueño.**
+
+> ⚠️ **Y eso significa que el único número que de verdad hacía falta en la lista era ese.** Los otros
+> tres no aparecen impresos. Sin él, el filtro no protegía nada.
+
+**La lista correcta tiene los cuatro** (los números reales viven solo en Render: el repo es público):
+
+```
+TELEFONO_REMITENTE = <el 313>,<el del bot>,<el personal del dueño>,<el del hermano>
+```
+
+Poner uno de más no cuesta nada —ninguno va a ser el de un cliente— y olvidarse de uno sí.
+
+⛔ **La trampa:** `TELEFONO_REMITENTE` **reemplaza** el valor por defecto, que era `OWNER_WHATSAPP`.
+Ponerla con un solo número **saca de la lista** al que estaba protegido solo. Durante unas horas del
+30-sep quedó con un único número que no aparece en ninguna etiqueta: **peor que dejarla vacía.**
+
+**Cómo verificar si el hueco alguna vez se disparó:** mirar las guías ya enviadas y buscar alguna que
+**empiece por `57`**. Una guía real empieza por `24` (Interrapidísimo), `64` (Coordinadora) o `2`
+(Servientrega). Si alguna arranca en 57, es un teléfono que se colaró como número de guía y a ese
+cliente hay que reenviarle la guía buena.
+
+📌 **Por qué el riesgo es parcial y no total:** `extraerCampos` busca **primero** el rótulo
+*"Guía No"* y solo si no lo encuentra agarra el número más largo de la hoja. Además descarta los de 10
+dígitos que empiezan en 3 por parecer celulares. **El caso peligroso es la etiqueta sin rótulo legible
+donde el teléfono esté impreso con el `57` adelante**: ahí son 12 dígitos, los mismos que una guía de
+Interrapidísimo.
