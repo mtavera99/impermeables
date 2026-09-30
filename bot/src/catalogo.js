@@ -260,9 +260,14 @@ const PRODUCTOS = {
         // ⚠️ "resistent" va como RAÍZ y no como palabra completa: el cliente escribe
         // tanto "¿es resistente al agua?" como "¿son resistentes al agua?", y con la
         // forma singular el plural se caía. Lo cazó la prueba.
+        // ⚠️ "impermeables?" en plural va aparte y no alcanza con "impermeable?":
+        // el match es por substring, y en "son impermeables?" el carácter que sigue
+        // a "impermeable" es la s, así que la forma singular NO pega. Sin esta
+        // entrada la pregunta más común del producto se contestaba por el modelo
+        // en vez de con el dato firme. (30-sep, junto con el arreglo del adjetivo.)
         pregunta: [
           "resistent", "resiste el agua", "se moja", "moja", "mojar",
-          "lluvia", "llueve", "impermeable?",
+          "lluvia", "llueve", "impermeable?", "impermeables?",
           "ipx", "ip6", "ip67", "ip68", "certificacion", "certificación",
         ],
         respuesta:
@@ -456,13 +461,78 @@ const SENALES_V10 = [
   { re: /\bdiadema\w*\b[^.]{0,15}\bcasco/, confianza: "media", senal: "diadema para casco" },
 ];
 
+// ----------------------------------------------------------------------------
+// ⚠️ "IMPERMEABLE" ES TAMBIÉN UN ADJETIVO, Y ESO ROMPÍA UN PEDIDO REAL
+//
+// 🔴 EL CASO (30-sep, cliente Fabian Tascon): un hilo de intercomunicadores donde
+// el cliente preguntó si eran impermeables. La detección lo leyó como CAMBIO DE
+// PRODUCTO al conjunto impermeable, lo congeló para toda la conversación, y el
+// pedido se guardó como "impermeable × 1 — $85.000" cuando era un combo de 2
+// intercomunicadores. El dueño lo vio en el panel y no cuadraba con el chat.
+//
+// La asimetría delataba el bug: "son resistentes al agua?" se quedaba en el V10,
+// pero "son impermeables?" —la misma pregunta— se iba al otro producto. Y no es
+// una pregunta rara: la propia ficha del V10 lista "impermeable?" como pregunta
+// esperada en `datosConfirmados.agua` (responde IPX6). O sea que una capa del
+// código la trataba como pregunta del V10 y la otra como cambio de producto.
+//
+// 🔑 LA DISTINCIÓN ES GRAMATICAL: adjetivo vs sustantivo.
+//
+//     "¿son impermeables?"            -> ADJETIVO. Pregunta por el producto que
+//                                        ya estábamos vendiendo. NO cambia nada.
+//     "y el impermeable cuánto vale?" -> SUSTANTIVO. Sí es cambio de producto.
+//
+// Lo que NO se hizo: sacar `impermeabl` de las señales. Eso rompería el cambio de
+// vuelta legítimo, que es la razón por la que esas señales existen.
+// ----------------------------------------------------------------------------
+
+/** Verbos copulativos: lo que va detrás es una cualidad, no un producto. */
+const IMPERMEABLE_ADJETIVO = [
+  // "es impermeable", "son impermeables", "vienen impermeables", "quedan impermeables".
+  // Los intensificadores van en medio porque el cliente escribe "son bien
+  // impermeables?" y "es 100% impermeable?".
+  /\b(?:es|son|sera|seran|seria|serian|era|eran|esta|estan|viene|vienen|queda|quedan|resulta|resultan|salen)\s+(?:muy|bien|algo|todo|del\s+todo|100\s*%|totalmente|completamente|realmente|casi|super)?\s*impermeables?\b/,
+  // "¿qué tan impermeable es?"
+  /\bque\s+tan\s+impermeables?\b/,
+  // Pregunta indirecta: "quería saber si son impermeables".
+  /\bsi\s+(?:es|son)\s+impermeables?\b/,
+  // El mensaje entero ES la pregunta: "impermeable?", "¿impermeables?".
+  /^[\s¿]*impermeables?\s*\??\s*$/,
+];
+
+/**
+ * Si el cliente NOMBRA el producto, gana el sustantivo aunque también haya un
+ * verbo copulativo. Cubre "los impermeables son buenos?" y "el conjunto es
+ * impermeable?", que sí son del otro producto.
+ */
+const IMPERMEABLE_SUSTANTIVO = [
+  /\b(?:el|los|un|unos|otro|otros|1|2|dos)\s+impermeables?\b/,
+  /\b(chaqueta|pantalon|traje\s+de\s+agua|enterizo|capa\s+de\s+agua|conjuntos?)\b/,
+];
+
+/**
+ * ¿Acá "impermeable" es una CUALIDAD que se pregunta, no el producto?
+ *
+ * Solo se consulta cuando la señal encontrada fue la del impermeable. Si
+ * devuelve true, `productoDelHilo` no lo toma como cambio de producto.
+ */
+function impermeableEsAdjetivo(t) {
+  if (!IMPERMEABLE_ADJETIVO.some((re) => re.test(t))) return false;
+  // Nombró el producto -> es sustantivo, sí es cambio.
+  if (IMPERMEABLE_SUSTANTIVO.some((re) => re.test(t))) return false;
+  return true;
+}
+
 /**
  * ¿Este texto nombra algún producto? Devuelve null si no hay señal.
  *
  * ⚠️ Devolver null es un resultado válido y necesario: "quiero información" no
  * nombra nada, y adivinar ahí es justo lo que NO hay que hacer.
  *
- * @returns {{producto:string, confianza:"alta"|"media", senal:string}|null}
+ * `adjetivo: true` significa "dijo la palabra impermeable, pero como cualidad".
+ * Quien decide qué hacer con eso es `productoDelHilo`.
+ *
+ * @returns {{producto:string, confianza:"alta"|"media", senal:string, adjetivo:boolean}|null}
  */
 function productoEn(texto) {
   const t = aplanar(texto);
@@ -470,7 +540,7 @@ function productoEn(texto) {
 
   for (const s of SENALES_V10) {
     if (s.re.test(t)) {
-      return { producto: "intercom_v10_2x", confianza: s.confianza, senal: s.senal };
+      return { producto: "intercom_v10_2x", confianza: s.confianza, senal: s.senal, adjetivo: false };
     }
   }
 
@@ -478,7 +548,14 @@ function productoEn(texto) {
   // venía preguntando por intercomunicadores y dice "y el impermeable?" tiene que
   // volver al otro flujo.
   if (/\b(impermeabl|chaqueta|pantalon|traje\s+de\s+agua|enterizo|capa\s+de\s+agua)/.test(t)) {
-    return { producto: "impermeable", confianza: "alta", senal: "dijo impermeable" };
+    return {
+      producto: "impermeable",
+      confianza: "alta",
+      senal: "dijo impermeable",
+      // 🔑 Ver el bloque de arriba: "¿son impermeables?" es una pregunta sobre el
+      // producto del hilo, no un pedido de otro producto.
+      adjetivo: impermeableEsAdjetivo(t),
+    };
   }
 
   return null;
@@ -512,8 +589,18 @@ function productoDelHilo(conv, userText, opciones = {}) {
   // vino del anuncio del V10 y pregunta "¿y los impermeables cuánto cuestan?"
   // tiene que irse al impermeable, aunque el referral diga V10.
   // ==========================================================================
+  // ⛔ SALVO cuando dijo "impermeable" como ADJETIVO ("¿son impermeables?"). Eso no
+  // es pedir otro producto: es preguntar por el que ya estábamos vendiendo. Si se
+  // tomara como cambio, además quedaría CONGELADO (`explicito: true` hace que
+  // agent.js llame a `fijarProductoActivo`) y el pedido se guardaría con el
+  // producto y el precio equivocados. Pasó con un pedido real — ver el bloque
+  // "IMPERMEABLE ES TAMBIÉN UN ADJETIVO" más arriba.
+  //
+  // 🔑 No se corta acá: se DEJA SEGUIR a los pasos de abajo. Así el hilo de V10 se
+  // queda en V10 (paso 2), y una conversación que no era de nada termina igual que
+  // antes en el impermeable (paso 5). Cero regresión en el caso sin contexto.
   const ahora = productoEn(userText);
-  if (ahora) {
+  if (ahora && !ahora.adjetivo) {
     return { producto: ahora.producto, porQue: ahora.senal, explicito: true };
   }
 
