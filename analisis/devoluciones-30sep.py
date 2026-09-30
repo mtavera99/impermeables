@@ -183,6 +183,14 @@ def clasificar(estado, flete, seguro):
     clase: entregada | devuelta | riesgo | transito
     liquidada: solo aplica a devueltas. Regla dura de la seccion 0-AY:
                una devolucion esta liquidada cuando flete == seguro.
+
+    ⚠️ Los estados se cazan por RAIZ y no por coincidencia exacta. El archivo
+    real de 99 Envios trae sufijos que la lista cerrada no preveia:
+    "Reclamo en oficina informado WhatsApp - Recordatorio 48h",
+    "Reclamo en oficina informado WhatsApp - Mensaje inicial". Con igualdad
+    exacta esas filas caian en "transito" y el TECHO salia subestimado, que es
+    el error mas caro posible en este analisis: haria parecer que hay menos
+    riesgo del que hay.
     """
     e = norm(estado).upper()
     if e in {norm(x).upper() for x in ENTREGADA}:
@@ -194,6 +202,12 @@ def clasificar(estado, flete, seguro):
         return ("devuelta", liq)
     if e in {norm(x).upper() for x in RIESGO}:
         return ("riesgo", None)
+    # Raices de riesgo: el paquete existe pero la entrega se trabo.
+    for raiz in ("RECLAM", "INTENTO DE ENTREGA", "CERRADO POR INCIDENCIA",
+                 "NO SE LOCALIZA", "LUGAR DIFERENTE", "TELEMERCADEO",
+                 "NO SE ENTREGA", "NO CANCELA RECAUDO", "DETERIORO"):
+        if raiz in e:
+            return ("riesgo", None)
     return ("transito", None)
 
 
