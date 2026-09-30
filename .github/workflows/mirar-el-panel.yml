@@ -54,6 +54,7 @@ on:
           - /setup-waba      # conexión del número + calidad
           - /chat            # una conversación real (hay que dar el id)
           - /eventos         # los últimos 60 eventos, con el motivo de cada fallo
+          - /plantillas      # estado real de cada plantilla en Meta + fallos de entrega
           - /pedidos.csv     # TODOS los pedidos (el panel solo dibuja 60)
       id:
         description: "Solo para /chat — el número del cliente (ej. 573116093103)"
@@ -147,7 +148,7 @@ jobs:
           # enmascarados. Es JSON, así que se enmascara sobre el texto crudo
           # antes de imprimirlo: cualquier número largo se recorta.
           # ------------------------------------------------------------------
-          if ruta == "/eventos":
+          if ruta in ("/eventos", "/plantillas"):
               # ⚠️ Se enmascara por CLAVE y no por longitud: un teléfono con
               # indicativo (573204841897) y una guía (240062483714) tienen los
               # mismos 12 dígitos, y la guía hay que poder leerla — es el dato
