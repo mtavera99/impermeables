@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-09-29 19:23 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-09-29 20:24 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,14 +9,14 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$165,888** |
-| gastado hoy (hasta las 19h) | $181,383 |
+| **saldo ahora** | **$149,538** |
+| gastado hoy (hasta las 20h) | $197,145 |
 | presupuesto activo | $235,000/día |
-| cierre proyectado del día | $207,309 |
-| saldo proyectado a medianoche | $139,962 |
+| cierre proyectado del día | $212,339 |
+| saldo proyectado a medianoche | $134,344 |
 | objetivo (cubrir un día de 143% + colchón) | $356,050 |
 
-### 🟠 Recargar $8,779 para cubrir un día malo
+### 🟠 Recargar $9,367 para cubrir un día malo
 
 Hoy aguanta, pero no cubre un día de sobre-entrega alta.
 
@@ -24,31 +24,31 @@ Hoy aguanta, pero no cubre un día de sobre-entrega alta.
 
 ---
 
-## 📈 Hoy contra los días anteriores — mismo tramo 00:00–19:59
+## 📈 Hoy contra los días anteriores — mismo tramo 00:00–20:59
 
 *(Comparar medio día contra un día completo es el error #10. Acá va el mismo tramo.)*
 
 | día | gasto | conv | $/conv | CPM | conv/mil |
 |---|---|---|---|---|---|
-| 2026-09-25 | $119,417 | 151 | **$791** | $4,962 | 6.27 |
-| 2026-09-26 | $114,240 | 153 | **$747** | $5,408 | 7.24 |
-| 2026-09-27 | $164,299 | 229 | **$717** | $4,398 | 6.13 |
-| 2026-09-28 | $176,354 | 367 | **$481** | $5,132 | 10.68 |
-| 2026-09-29 **HOY** | $181,383 | 380 | **$477** | $4,839 | 10.14 |
+| 2026-09-25 | $128,534 | 167 | **$770** | $5,000 | 6.50 |
+| 2026-09-26 | $124,518 | 166 | **$750** | $5,380 | 7.17 |
+| 2026-09-27 | $178,805 | 260 | **$688** | $4,403 | 6.40 |
+| 2026-09-28 | $183,320 | 384 | **$477** | $5,089 | 10.66 |
+| 2026-09-29 **HOY** | $197,145 | 419 | **$471** | $4,795 | 10.19 |
 
-🟢 **Hoy va mejor que ayer a la misma hora** ($477 vs $481).
+🟢 **Hoy va mejor que ayer a la misma hora** ($471 vs $477).
 
 ### La descomposición — dónde está el problema
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$   477  =  $ 4,839  ÷  10.14
+$   471  =  $ 4,795  ÷  10.19
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $4,839 | ~$3.615 | 🔴 alto |
-| **conv/mil** (la calidad de la audiencia) | 10.14 | 5,33 | 🟢 |
+| **CPM** (el precio de la subasta) | $4,795 | ~$3.615 | 🔴 alto |
+| **conv/mil** (la calidad de la audiencia) | 10.19 | 5,33 | 🟢 |
 
 🔑 **El CPM está alto: hay algo en la subasta** (fecha comercial del país). Antes de culpar a la cuenta, mirar el calendario.
 
@@ -58,15 +58,15 @@ $   477  =  $ 4,839  ÷  10.14
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
-| Domiciliarios - API | $35,000 | $25,388 | 73% | 50 | $508 | 8.37 |
-| Domiciliarios INTER - API | $20,000 | $25,201 | 126% | 89 | $283 | 14.46 |
-| Domiciliarios - Expancion - API | $40,000 | $24,704 | 62% | 41 | $603 | 6.80 |
-| Motorizados - INTER | $20,000 | $24,675 | 123% | 65 | $380 | 13.92 |
-| TEST Creativos - API | $40,000 | $24,484 | 61% | 22 | $1,113 | 6.64 |
-| Domiciliarios - Expancion - INTER | $20,000 | $24,128 | 121% | 50 | $483 | 10.56 |
-| Domiciliarios VIDEO INTER - API | $20,000 | $17,382 | 87% | 35 | $497 | 12.74 |
-| Motorizados - API | $20,000 | $11,017 | 55% | 21 | $525 | 7.20 |
-| Domiciliarios VIDEO - API | $20,000 | $4,404 | 22% | 7 | $629 | 7.37 |
+| TEST Creativos - API | $40,000 | $27,810 | 70% | 30 | $927 | 7.86 |
+| Domiciliarios - Expancion - API | $40,000 | $27,526 | 69% | 53 | $519 | 7.84 |
+| Domiciliarios - API | $35,000 | $27,347 | 78% | 52 | $526 | 7.96 |
+| Domiciliarios INTER - API | $20,000 | $27,084 | 135% | 97 | $279 | 14.43 |
+| Motorizados - INTER | $20,000 | $26,228 | 131% | 66 | $397 | 13.25 |
+| Domiciliarios - Expancion - INTER | $20,000 | $25,504 | 128% | 55 | $464 | 10.82 |
+| Domiciliarios VIDEO INTER - API | $20,000 | $18,963 | 95% | 36 | $527 | 12.03 |
+| Motorizados - API | $20,000 | $11,962 | 60% | 23 | $520 | 7.22 |
+| Domiciliarios VIDEO - API | $20,000 | $4,721 | 24% | 7 | $674 | 6.74 |
 
 ### Cada producto contra SU propio equilibrio
 
@@ -74,12 +74,12 @@ $   477  =  $ 4,839  ÷  10.14
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
-| **TRADICIONAL** | $181,383 | 380 | **$477** | $2,402 | **20%** 🟢 |
+| **TRADICIONAL** | $197,145 | 419 | **$471** | $2,402 | **20%** 🟢 |
 
 | | |
 |---|---|
-| CPA implícito (cierre 8.4%) | **$5,682**/pedido |
-| utilidad estimada de lo que va del día | **$579,082** |
+| CPA implícito (cierre 8.4%) | **$5,601**/pedido |
+| utilidad estimada de lo que va del día | **$641,367** |
 
 ---
 
@@ -91,29 +91,29 @@ $   477  =  $ 4,839  ÷  10.14
 
 | conjunto | 09-24 | 09-25 | 09-26 | 09-27 | 09-28 | 09-29 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios - API | $1,108 | $1,005 | $992 | $676 | $433 | $508 | 🔴 |
-| Domiciliarios INTER - API | — | — | — | — | — | $283 |  |
-| Domiciliarios - Expancion - API | $1,140 | $734 | $643 | $648 | $408 | $603 | 🔴 |
-| Motorizados - INTER | — | — | — | — | — | $380 |  |
-| TEST Creativos - API | $757 | $820 | $831 | $861 | $588 | $1,113 | 🔴 |
-| Domiciliarios - Expancion - INTER | — | — | — | — | — | $483 |  |
-| Domiciliarios VIDEO INTER - API | — | — | — | — | — | $497 |  |
-| Motorizados - API | $701 | $675 | $465 | $522 | $311 | $525 | 🔴 |
-| Domiciliarios VIDEO - API | $681 | $698 | $701 | $496 | $881 | $629 | 🟢 |
+| TEST Creativos - API | $757 | $820 | $831 | $861 | $588 | $927 | 🔴 |
+| Domiciliarios - Expancion - API | $1,140 | $734 | $643 | $648 | $408 | $519 | 🔴 |
+| Domiciliarios - API | $1,108 | $1,005 | $992 | $676 | $433 | $526 | 🔴 |
+| Domiciliarios INTER - API | — | — | — | — | — | $279 |  |
+| Motorizados - INTER | — | — | — | — | — | $397 |  |
+| Domiciliarios - Expancion - INTER | — | — | — | — | — | $464 |  |
+| Domiciliarios VIDEO INTER - API | — | — | — | — | — | $527 |  |
+| Motorizados - API | $701 | $675 | $465 | $522 | $311 | $520 | 🔴 |
+| Domiciliarios VIDEO - API | $681 | $698 | $701 | $496 | $881 | $674 | 🟢 |
 
 ### conv/mil por día *(la calidad de la audiencia de cada uno)*
 
 | conjunto | 09-24 | 09-25 | 09-26 | 09-27 | 09-28 | 09-29 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios - API | 4.04 | 5.46 | 5.71 | 6.36 | 12.59 | 8.37 | 🔴 |
-| Domiciliarios INTER - API | — | — | — | — | — | 14.46 |  |
-| Domiciliarios - Expancion - API | 2.81 | 5.38 | 6.56 | 5.27 | 9.43 | 6.80 | 🔴 |
-| Motorizados - INTER | — | — | — | — | — | 13.92 |  |
-| TEST Creativos - API | 10.08 | 8.98 | 9.92 | 8.91 | 12.22 | 6.64 | 🔴 |
-| Domiciliarios - Expancion - INTER | — | — | — | — | — | 10.56 |  |
-| Domiciliarios VIDEO INTER - API | — | — | — | — | — | 12.74 |  |
-| Motorizados - API | 5.39 | 7.40 | 10.38 | 7.75 | 13.63 | 7.20 | 🔴 |
-| Domiciliarios VIDEO - API | 6.86 | 6.85 | 7.30 | 8.47 | 6.66 | 7.37 | 🟢 |
+| TEST Creativos - API | 10.08 | 8.98 | 9.92 | 8.91 | 12.22 | 7.86 | 🔴 |
+| Domiciliarios - Expancion - API | 2.81 | 5.38 | 6.56 | 5.27 | 9.43 | 7.84 | 🔴 |
+| Domiciliarios - API | 4.04 | 5.46 | 5.71 | 6.36 | 12.59 | 7.96 | 🔴 |
+| Domiciliarios INTER - API | — | — | — | — | — | 14.43 |  |
+| Motorizados - INTER | — | — | — | — | — | 13.25 |  |
+| Domiciliarios - Expancion - INTER | — | — | — | — | — | 10.82 |  |
+| Domiciliarios VIDEO INTER - API | — | — | — | — | — | 12.03 |  |
+| Motorizados - API | 5.39 | 7.40 | 10.38 | 7.75 | 13.63 | 7.22 | 🔴 |
+| Domiciliarios VIDEO - API | 6.86 | 6.85 | 7.30 | 8.47 | 6.66 | 6.74 | 🟡 |
 
 🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). Eso es canibalización, y se arregla diferenciando la segmentación.
 
@@ -128,7 +128,7 @@ $   477  =  $ 4,839  ÷  10.14
 | 2026-09-25 | $140,503 | 179 | $785 | $5,071 | 6.46 | $217,716 |
 | 2026-09-26 | $134,478 | 186 | $723 | $5,407 | 7.48 | $237,749 |
 | 2026-09-27 | $197,302 | 302 | $653 | $4,445 | 6.80 | $407,067 |
-| 2026-09-28 | $195,203 | 426 | $458 | $5,065 | 11.05 | $657,318 |
+| 2026-09-28 | $195,211 | 426 | $458 | $5,065 | 11.05 | $657,310 |
 
 ---
 
