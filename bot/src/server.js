@@ -1741,18 +1741,89 @@ function detalleDeSalud() {
     memoria: (() => {
       const m = process.memoryUsage();
       const ret = mbDeHojasRetenidas();
+      const mb = (n) => Math.round((n || 0) / 1048576);
+      let techo = null;
+      try {
+        techo = mb(require("v8").getHeapStatistics().heap_size_limit);
+      } catch {}
       return {
-        proceso_mb: Math.round(m.rss / 1048576),
-        heap_mb: Math.round(m.heapUsed / 1048576),
+        proceso_mb: mb(m.rss),
+        heap_mb: mb(m.heapUsed),
+        // ====================================================================
+        // 🔴 ESTOS DOS SON LOS QUE FALTABAN, Y SON LOS QUE DECIDEN — 30-sep
+        //
+        // La primera lectura del dueño dio: proceso 467 MB, heap USADO 34 MB,
+        // buffers 5 MB, 0 hojas retenidas... 80 SEGUNDOS DESPUÉS DE ARRANCAR.
+        // O sea 467 MB de proceso contra 39 MB de uso real, sin haber hecho
+        // nada. Con lo que había en /health no se podía explicar la diferencia,
+        // y sin explicarla no se puede decidir si hay que pagar más instancia.
+        //
+        // `heap_reservado_mb` es cuánto le PIDIÓ V8 al sistema (no cuánto usa):
+        // si está en cientos de MB con 34 usados, V8 se quedó con páginas que no
+        // necesita y el proceso las paga igual.
+        //
+        // `heap_techo_mb` es cuánto cree V8 que PUEDE usar. Y acá está la
+        // sospecha: sin la bandera --max-old-space-size, V8 calcula ese techo a
+        // partir de la RAM de la MÁQUINA, no del límite del contenedor. Medido en
+        // una máquina de 31 GB: V8 se pone un techo de 4.144 MB solo. Si en
+        // Render pasa lo mismo, V8 cree que tiene gigabytes, no siente ninguna
+        // presión para liberar, deja crecer el heap tranquilo... y Render mata el
+        // proceso a los 512 MB. Eso explicaría los 71 arranques.
+        //
+        // Si `heap_techo_mb` vuelve en miles, el arreglo es una bandera en el
+        // comando de arranque. Sin tocar una línea de código.
+        // ====================================================================
+        heap_reservado_mb: mb(m.heapTotal),
+        heap_techo_mb: techo,
         // Los Buffers de los PDF NO están en el heap: van acá. Mirar solo el
         // heap haría parecer que no pasa nada.
-        buffers_mb: Math.round((m.external || 0) / 1048576),
+        buffers_mb: mb(m.external),
+        array_buffers_mb: mb(m.arrayBuffers),
         hojas_retenidas: ret,
         planes_novedades: PLANES_NOVEDADES.size,
+        // 🔑 El pico y CUÁNDO fue. Una sola lectura no distingue "arrancó ya
+        // gordo" de "se infló procesando algo y nunca devolvió las páginas", y
+        // son causas distintas con arreglos distintos.
+        pico: {
+          proceso_mb: PICO.rssMb,
+          heap_reservado_mb: PICO.heapMb,
+          hace_seg: PICO.cuando ? Math.round((Date.now() - PICO.cuando) / 1000) : null,
+          al_arrancar_mb: PICO.alArrancarMb,
+        },
       };
     })(),
   };
 }
+
+// ============================================================================
+// 📈 EL PICO DE MEMORIA Y CUÁNDO FUE — 30-sep
+//
+// Una sola lectura de /health no alcanza para decidir nada. 467 MB puede ser:
+//
+//   · el proceso arrancó ya usando eso  -> es cómo V8 se dimensiona, bandera
+//   · se infló procesando un PDF y no devolvió las páginas al sistema -> otra cosa
+//
+// Son causas distintas con arreglos distintos, y una foto no las separa. Por eso
+// se muestrea cada 30 segundos y se guarda el máximo con su hora, más cuánto
+// usaba recién arrancado.
+//
+// Es solo lectura: no cambia nada del comportamiento del bot.
+// ============================================================================
+const PICO = { rssMb: 0, heapMb: 0, cuando: null, alArrancarMb: null };
+
+function medirMemoria() {
+  const m = process.memoryUsage();
+  const rssMb = Math.round(m.rss / 1048576);
+  if (PICO.alArrancarMb === null) PICO.alArrancarMb = rssMb;
+  if (rssMb > PICO.rssMb) {
+    PICO.rssMb = rssMb;
+    PICO.heapMb = Math.round(m.heapTotal / 1048576);
+    PICO.cuando = Date.now();
+  }
+}
+medirMemoria(); // la primera, apenas arranca
+const RELOJ_MEMORIA = setInterval(medirMemoria, 30 * 1000);
+if (RELOJ_MEMORIA.unref) RELOJ_MEMORIA.unref();
 
 // ============================================================================
 // PROBAR EL BOT SIN WHATSAPP  —  GET /probar?token=...&msg=...
