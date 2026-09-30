@@ -555,6 +555,54 @@ app.post(
   }
 );
 
+// ============================================================================
+// 📮 LOS DATOS DE LAS NOVEDADES DE OFICINA SE ACUMULAN, NO SE REEMPLAZAN
+//
+// 🔴 EL BUG (30-sep, reportado por el dueño: le daba Enviar y TODAS las filas
+// volvían con "Falta completar en qué oficina está y hasta cuándo").
+//
+// Las novedades de oficina necesitan dos datos que el dueño escribe a mano. El
+// envío recalculaba el plan con lo que mandaba el navegador, y el navegador solo
+// puede mandar los campos que están DIBUJADOS. Una fila que ya quedó resuelta
+// deja de dibujar sus campos (pasa a mostrar el mensaje), así que sus datos NO
+// viajaban, el recálculo no los encontraba y la fila volvía a bloquearse.
+//
+// Y se agravaba solo: bastaba UNA fila sin resolver para que el recálculo se
+// disparara y borrara los datos de TODAS las que ya estaban listas. El dueño veía
+// que había completado todo y que igual no se enviaba nada.
+//
+// 🔑 EL ARREGLO: los datos viven EN EL PLAN y se acumulan. Lo que llega nuevo
+// manda sobre lo guardado (si corrigió algo a mano, su corrección gana), pero lo
+// que no llega NO se borra. Los vacíos se descartan: un campo vacío no es una
+// corrección, es un campo que no se tocó.
+// ============================================================================
+
+/** Deja solo los valores con contenido, indexados por guía. */
+function limpiarDatosDeNovedad(datos) {
+  const limpio = {};
+  for (const [guia, campos] of Object.entries(datos || {})) {
+    if (!campos || typeof campos !== "object") continue;
+    for (const [campo, valor] of Object.entries(campos)) {
+      const v = String(valor == null ? "" : valor).trim();
+      if (!v) continue; // ⛔ un vacío no borra lo que ya había
+      if (!limpio[guia]) limpio[guia] = {};
+      limpio[guia][campo] = v;
+    }
+  }
+  return limpio;
+}
+
+/** Une los datos guardados en el plan con los que acaban de llegar. */
+function unirDatosDeNovedad(guardados, nuevos) {
+  const unido = {};
+  for (const fuente of [guardados || {}, nuevos || {}]) {
+    for (const [guia, campos] of Object.entries(fuente)) {
+      unido[guia] = { ...(unido[guia] || {}), ...campos };
+    }
+  }
+  return unido;
+}
+
 app.post("/novedades/revisar", (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
@@ -565,12 +613,17 @@ app.post("/novedades/revisar", (req, res) => {
     limpiarPlanesViejos();
     // `datos` trae lo que el dueño completó para las novedades de oficina
     // (dónde está y hasta cuándo). Va indexado por número de guía.
-    const plan = novedades.revisar(texto, { datos: req.body?.datos || {} });
+    const datos = limpiarDatosDeNovedad(req.body?.datos);
+    const plan = novedades.revisar(texto, { datos });
     const id = Math.random().toString(36).slice(2, 10);
-    PLANES_NOVEDADES.set(id, { filas: plan.filas, creado: Date.now(), texto });
+    // 🔑 `datos` se GUARDA EN EL PLAN (30-sep). Antes solo sobrevivía dentro de
+    // las filas ya calculadas, y en el envío se recalculaba con lo que el
+    // navegador pudiera mandar: los datos de las filas ya resueltas se perdían y
+    // volvían a salir bloqueadas. Ver el bloque del recálculo en /novedades/enviar.
+    PLANES_NOVEDADES.set(id, { filas: plan.filas, creado: Date.now(), texto, datos });
     // Y también a disco: si Render reinicia entre "Revisar" y "Enviar" —un
     // despliegue alcanza— el plan en memoria se pierde y el envío responde 400.
-    store.guardarPlan("novedades", id, { filas: plan.filas, texto });
+    store.guardarPlan("novedades", id, { filas: plan.filas, texto, datos });
 
     anotarEvento({
       tipo: "novedades-revisadas",
@@ -649,12 +702,31 @@ app.post("/novedades/enviar", async (req, res) => {
   // marcó el dueño siguen apuntando a lo mismo.
   // ==========================================================================
   let filas = plan.filas;
-  const datos = req.body?.datos || {};
+  // 🔑 Se une lo guardado en el plan con lo que llega ahora. Ver el bloque
+  // "LOS DATOS DE LAS NOVEDADES DE OFICINA SE ACUMULAN" más arriba: sin esto,
+  // las filas ya resueltas perdían sus datos y volvían a salir bloqueadas.
+  const datos = unirDatosDeNovedad(plan.datos, limpiarDatosDeNovedad(req.body?.datos));
   if (plan.texto && Object.keys(datos).length) {
     try {
       const recalculado = novedades.revisar(plan.texto, { datos });
       if (recalculado.filas.length === plan.filas.length) {
-        filas = recalculado.filas;
+        // ⛔ SEGUNDA RED: un recálculo puede MEJORAR una fila, nunca empeorarla.
+        //
+        // Si por cualquier motivo el recálculo deja bloqueada una fila que el
+        // dueño ya tenía lista y revisada, se conserva la original. Él ya la
+        // aprobó; invalidarla en silencio es justo el fallo que se está
+        // arreglando, y esta red no depende de que la causa sea la de arriba.
+        filas = recalculado.filas.map((nueva, i) => {
+          const vieja = plan.filas[i];
+          if (vieja && vieja.enviar && nueva && !nueva.enviar && vieja.guia === nueva.guia) {
+            console.warn(
+              `⚠️  El recálculo dejó bloqueada la guía ${vieja.guia}, que ya estaba lista. ` +
+                `Se conserva la fila revisada.`
+            );
+            return vieja;
+          }
+          return nueva;
+        });
       } else {
         // Si el recálculo no da la misma cantidad de filas, los índices ya no
         // significan lo mismo: se usa el plan original antes que mandarle el
