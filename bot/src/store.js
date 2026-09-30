@@ -3,6 +3,10 @@
 const fs = require("fs");
 const path = require("path");
 const cotizacion = require("./cotizacion");
+// Para la regla "producto_no_cuadra": reutiliza la MISMA detección que decide el
+// producto de la conversación, así no hay dos listas de palabras que se separen.
+// No hay ciclo: catalogo solo depende de fletes.
+const catalogo = require("./catalogo");
 
 // ============================================================================
 // 🔴 DÓNDE SE GUARDAN LOS DATOS — LO MÁS IMPORTANTE DE ESTE ARCHIVO
@@ -616,6 +620,56 @@ const MOTIVOS_REVISION = [
     etiqueta: "el cliente ya tenía un pedido",
     detalle: (o) =>
       o.pedido_previo_total ? `el anterior era de $${Number(o.pedido_previo_total).toLocaleString("es-CO")}` : "",
+  },
+  {
+    // ========================================================================
+    // 🔴 EL PEDIDO SE CONTRADICE A SÍ MISMO — RED DE SEGURIDAD, NO UN ARREGLO
+    //
+    // EL CASO REAL (29-sep, cliente Fabian Tascon). Un combo de dos
+    // intercomunicadores quedó guardado así:
+    //
+    //     producto: impermeable · unidades: 1 · total: $85.000
+    //     talla: "Intercomunicador"   ← 🔑
+    //
+    // El modelo estaba en el guion del impermeable, que pide talla, y como no
+    // tenía ninguna talla puso ahí el nombre del producto. El dueño lo cachó
+    // revisando las guías antes de despachar; el pedido pasó el despacho sin una
+    // sola marca porque ninguna regla miraba esa contradicción.
+    //
+    // 💰 Lo que costaba: el combo de 2 V10 cuesta $70.000 de compra y cobrado
+    // como impermeable de banda E son $85.000, de los que ~$25.100 es flete.
+    // Quedaban $59.900 para pagar algo de $70.000: la venta salía en PÉRDIDA.
+    //
+    // 🔑 POR QUÉ ESTA REGLA Y NO SOLO EL ARREGLO DE LA DETECCIÓN. La causa de ese
+    // caso ya está corregida en catalogo.js ("¿son impermeables?" se leía como
+    // cambio de producto). Pero esta regla no depende de CUÁL fue la causa: si el
+    // producto se pierde por cualquier motivo nuevo, el pedido queda marcado y no
+    // se despacha en silencio. Es barata y mira el pedido ya guardado.
+    //
+    // ⚠️ No confundir con las tallas dobles legítimas: un pedido de 2 impermeables
+    // trae "M y XL", "XXL y L", "2XL y 2XL". Ninguna nombra un producto, así que
+    // no la tocan. Se comprobó contra los 133 pedidos reales del sistema: de 15
+    // tallas que no son una talla simple, 13 eran tallas dobles válidas, 1 un
+    // typo ("CXXL") y 1 sola era este bug.
+    // ========================================================================
+    clave: "producto_no_cuadra",
+    cuando: (o) => {
+      // Solo aplica al producto por defecto: es el único al que se puede caer
+      // por un fallback. Un pedido guardado como V10 fue una decisión explícita.
+      const prod = o.producto || "impermeable";
+      if (prod !== "impermeable") return false;
+      const dicho = catalogo.productoEn(`${o.talla || ""} ${o.color || ""}`);
+      return Boolean(dicho && dicho.producto !== "impermeable" && !dicho.adjetivo);
+    },
+    etiqueta: "el pedido dice impermeable pero la talla nombra otro producto",
+    detalle: (o) => {
+      const dicho = catalogo.productoEn(`${o.talla || ""} ${o.color || ""}`);
+      const ficha = dicho ? catalogo.de(dicho.producto) : null;
+      return (
+        `la talla dice "${o.talla || ""}" — casi seguro es un ${ficha ? ficha.nombreCorto : "otro producto"} ` +
+        `que quedó guardado como impermeable, así que el total y las unidades también están mal`
+      );
+    },
   },
 ];
 
