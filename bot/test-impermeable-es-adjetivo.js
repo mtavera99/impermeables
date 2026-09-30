@@ -341,6 +341,106 @@ async function recorrer(telefono, turnos) {
     }
   }
 
+  // =========================================================================
+  console.log("\n── 9. EL PEDIDO REAL, TAL COMO QUEDÓ GUARDADO (auditoría del 30-sep) ──");
+  //
+  // Se auditaron los 133 pedidos del sistema y apareció UNO solo con el bug. Así
+  // quedó, y es la forma exacta que hay que reproducir:
+  //
+  //     29-sep · Andes · producto impermeable · 1 unidad · $85.000
+  //     talla: "Intercomunicador"
+  //
+  // Andes es banda E, y el combo de V10 en banda E son $125.000 — que es justo
+  // lo que el dueño había cotizado bien en el chat. O sea: el chat estuvo
+  // correcto y el pedido salió mal.
+  // =========================================================================
+  {
+    const t = nuevoTel();
+    const pedido = {
+      nombre: "Fabian Tascon", celular: "3182224455", ciudad: "Andes",
+      direccion: "Calle 8 # 4-21", unidades: 2, pago: "contraentrega", total: 125000,
+    };
+    const r = await recorrer(t, [
+      { cliente: "hola, quiero la promo de intercomunicadores" },
+      { cliente: "para Andes, Antioquia", ia: "El combo de los dos te queda en $125.000 con envío 🎧 ¿Tu nombre, celular y dirección?" },
+      // 🔴 El turno que rompía todo, DESPUÉS de haber cotizado bien.
+      { cliente: "son impermeables?", ia: "Sí 👍 Tienen protección IPX6, resisten lluvia y salpicaduras 🌧️" },
+      {
+        cliente: "Fabian Tascon, 3182224455, Calle 8 # 4-21",
+        ia: "📋 *Confirmemos tu pedido:*\n• Producto: V10 2X (x2)\n• Nombre: Fabian Tascon\n• Celular: 3182224455\n• Ciudad: Andes\n• Dirección: Calle 8 # 4-21\n• Total a pagar al recibir: $125.000\n\n*¿Está todo bien? Respondé SÍ CONFIRMO*",
+      },
+      { cliente: "sí confirmo", ia: `¡Listo Fabian! 🎧\n${ORDER(pedido)}` },
+    ]);
+    chequear("se creó el pedido", r.pedidos.length === 1, `creó ${r.pedidos.length}`);
+    chequear("🔑 queda como V10 y no como impermeable", r.pedido && r.pedido.producto === V, r.pedido && r.pedido.producto);
+    chequear("  2 unidades", r.pedido && Number(r.pedido.unidades) === 2, r.pedido && String(r.pedido.unidades));
+    chequear("  $125.000, el combo en banda E", r.pedido && Number(r.pedido.total) === 125000, r.pedido && String(r.pedido.total));
+    chequear("⛔ y NO el $85.000 que quedó en producción", r.pedido && Number(r.pedido.total) !== 85000);
+    chequear(
+      "⛔ la talla NO lleva el nombre del producto",
+      r.pedido && !/interc|v10/i.test(String(r.pedido.talla || "")),
+      r.pedido && `talla = "${r.pedido.talla}"`
+    );
+  }
+
+  // =========================================================================
+  console.log("\n── 10. RED DE SEGURIDAD: un pedido que se contradice se marca solo ──");
+  //
+  // El arreglo de arriba tapa la causa conocida. Esta regla no depende de la
+  // causa: mira el pedido YA GUARDADO. Si el producto se pierde por un motivo
+  // nuevo, el pedido queda marcado y no se despacha en silencio — que es lo que
+  // pasó con el de Fabian, que pasó el despacho sin una sola marca.
+  //
+  // ⚠️ Lo delicado es no marcar las tallas dobles legítimas. Los 13 casos de
+  // abajo salieron de los pedidos reales del sistema.
+  // =========================================================================
+  {
+    const CLAVE = "producto_no_cuadra";
+    const marcado = (o) => store.motivosDeRevision(o).some((m) => m.clave === CLAVE);
+    const base = { celular: "3001112233", ciudad: "Andes", pago: "contraentrega" };
+
+    // 🔴 Los que SÍ hay que marcar.
+    chequear(
+      "🔑 el pedido de Fabian, tal como quedó, se marca",
+      marcado({ ...base, producto: IMP, talla: "Intercomunicador", color: "", unidades: 1, total: 85000 })
+    );
+    for (const talla of ["Intercomunicador", "intercomunicadores", "V10", "v10 2x", "intercom"]) {
+      chequear(`  talla "${talla}" se marca`, marcado({ ...base, producto: IMP, talla, unidades: 1, total: 85000 }));
+    }
+    // Y el motivo tiene que ser accionable, no un "revisar" seco.
+    const det = store
+      .motivosDeRevision({ ...base, producto: IMP, talla: "Intercomunicador", unidades: 1, total: 85000 })
+      .find((m) => m.clave === CLAVE);
+    chequear("  y dice qué producto era y que el total está mal", det && /V10 2X/.test(det.detalle) && /total/.test(det.detalle), det && det.detalle);
+
+    // ⛔ Los que NO se pueden marcar: tallas dobles reales de 2 impermeables.
+    for (const [talla, color] of [
+      ["M y XL", "Roja"], ["M y L", "Morado y Azul"], ["2XL y XL", "diferentes"],
+      ["XXL y L", "Azul y Rosado"], ["XL y S", "Negro"], ["S y L", "Morado"],
+      ["M, M", "1 blanca, 1 azul"], ["2XL y 2XL", "Morado"], ["2 unidades talla XL", "Uno rojo y uno blanco"],
+      ["XXL y M", "Negro"], ["XL y 2XL", "Verde"], ["XL y XL", "Morado y Negro"], ["CXXL", "Negro"],
+    ]) {
+      chequear(
+        `⛔ "${talla}" / "${color}" NO se marca (es un impermeable de verdad)`,
+        !marcado({ ...base, producto: IMP, talla, color, unidades: 2, total: 155000 })
+      );
+    }
+    // Y las tallas simples, obviamente.
+    for (const talla of ["S", "M", "L", "XL", "XXL", "2XL", "3XL"]) {
+      chequear(`⛔ talla "${talla}" NO se marca`, !marcado({ ...base, producto: IMP, talla, color: "Negro", unidades: 1, total: 85000 }));
+    }
+    // ⛔ Un pedido de V10 bien guardado tampoco se toca, aunque no tenga talla.
+    chequear(
+      "⛔ un V10 bien guardado NO se marca",
+      !marcado({ ...base, producto: V, talla: "", color: "", unidades: 2, total: 125000 })
+    );
+    // ⛔ Y un pedido viejo sin campo `producto` sigue siendo un impermeable legacy.
+    chequear(
+      "⛔ un pedido viejo sin campo producto NO se marca",
+      !marcado({ ...base, talla: "L", color: "Negro", unidades: 1, total: 85000 })
+    );
+  }
+
   fs.rmSync(DIR, { recursive: true, force: true });
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   process.exit(mal === 0 ? 0 : 1);
