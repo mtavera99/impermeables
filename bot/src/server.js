@@ -45,6 +45,36 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ============================================================================
+// 🔴 LA PANTALLA QUE SE QUEDA "PENSANDO" PARA SIEMPRE (28-sep)
+//
+// DE DÓNDE SALE. El dueño subió el PDF de guías, le dio a Revisar, y la pantalla
+// quedó en "Partiendo el PDF y buscando a quién corresponde cada guía..." sin
+// avanzar nunca. El botón gris, ningún error, nada.
+//
+// LA CAUSA, Y ES UNA TRAMPA DE EXPRESS 4: este proyecto usa express 4.19, y esa
+// versión NO entiende los handlers `async`. Si uno de ellos lanza una excepción,
+// la promesa queda rechazada y Express **no se entera**: nadie llama a res.json()
+// ni a res.status(), así que la petición se queda abierta PARA SIEMPRE. En el
+// navegador eso no es un error —es un fetch que nunca resuelve ni rechaza—, así
+// que el .catch no corre, el .finally no corre, y el botón queda muerto hasta
+// recargar la página. Idéntico al bug del botón Enviar de novedades: el fallo es
+// invisible.
+//
+// Hay 17 rutas `async` en este archivo. Cualquiera de las 17 podía hacer esto.
+//
+// 🔑 SE ARREGLA UNA VEZ Y PARA TODAS, incluidas las rutas que se escriban
+// mañana: se envuelve el registro de rutas para que cualquier promesa rechazada
+// RESPONDA en vez de colgar. Envolver las 17 a mano habría dejado afuera la 18.
+// ============================================================================
+require("./rutas-protegidas").proteger(app);
+
+// Y si algo se escapa igual, que quede en los logs de Render en vez de tumbar el
+// proceso en silencio. Un bot caído se ve igual que un bot sin mensajes.
+process.on("unhandledRejection", (e) => {
+  console.error("🔴 Promesa rechazada que nadie atrapó:", e && e.stack ? e.stack : e);
+});
+
+// ============================================================================
 // 🔐 DOS SECRETOS DISTINTOS, Y POR QUÉ NO PUEDEN SER EL MISMO
 //
 //   WHATSAPP_VERIFY_TOKEN -> lo usa SOLO Meta, para verificar el webhook.

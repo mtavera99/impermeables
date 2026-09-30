@@ -174,7 +174,10 @@ function render() {
       <b>Cómo funciona:</b>
       <ol>
         <li>Generás las guías en 99 Envíos como siempre y descargás el PDF con todas.</li>
-        <li>Lo subís acá y le das <b>Revisar</b>. Se parte en una hoja por guía y se muestra a quién le corresponde cada una. <b>Todavía no se envía nada.</b></li>
+        <li>Lo subís acá y le das <b>Revisar</b>. Se parte en una hoja por guía y se muestra a quién le corresponde cada una. <b>Todavía no se envía nada.</b>
+        <br><span class="reglas">⏳ Con muchas hojas esto tarda. Y si el bot estaba dormido, el
+        primer arranque se demora cerca de un minuto. Vas a ver el contador de segundos moviéndose:
+        mientras se mueva, está trabajando — no recargues la página.</span></li>
         <li>Revisás el pareo, destildás lo que no quieras, y le das <b>Enviar</b>.</li>
         <li>Cada cliente recibe <b>su hoja en PDF</b> con el número de guía y el enlace para rastrear.</li>
       </ol>
@@ -268,13 +271,60 @@ btnRevisar.addEventListener("click", function () {
   var f = archivo.files[0];
   if (!f) return;
   btnRevisar.disabled = true;
-  estadoRevisar.textContent = "Partiendo el PDF y buscando a quién corresponde cada guía...";
   aviso.style.display = "none";
+
+  // ==========================================================================
+  // ⏳ DECIRLE QUE SIGUE TRABAJANDO
+  //
+  // 🔴 DE DÓNDE SALE (28-sep). El dueño: "le doy al botón y ahora ya no lee, se
+  // queda ahí sin leer nada". NO estaba colgado: estaba tardando. Leer 25 hojas
+  // de PDF lleva su tiempo, y si además Render venía dormido, el arranque solo
+  // se come casi un minuto.
+  //
+  // El problema es que un mensaje fijo que no cambia NUNCA se ve igual que algo
+  // roto. Y si parece roto, uno recarga la página a la mitad — y entonces sí se
+  // pierde el trabajo.
+  //
+  // Así que el texto avanza y va contando los segundos. No es una barra de
+  // progreso de verdad (el servidor no reporta hoja por hoja), pero resuelve lo
+  // que importa: se ve que está vivo.
+  // ==========================================================================
+  var desde = Date.now();
+  var PASOS = [
+    "Subiendo el PDF...",
+    "Partiendo el PDF en una hoja por guía...",
+    "Leyendo el texto de cada etiqueta...",
+    "Buscando a quién corresponde cada guía...",
+    "Sigo trabajando. Con muchas hojas esto tarda un rato.",
+    "Todavía trabajando. Si el bot estaba dormido, el primer arranque se demora.",
+  ];
+  var reloj = setInterval(function () {
+    var seg = Math.round((Date.now() - desde) / 1000);
+    var paso = PASOS[Math.min(Math.floor(seg / 8), PASOS.length - 1)];
+    estadoRevisar.textContent = paso + " (" + seg + "s)";
+  }, 1000);
+  estadoRevisar.textContent = PASOS[0] + " (0s)";
+
+  // ⏱️ Y un límite, para que NUNCA se quede muerta. Si a los 4 minutos no
+  // contestó, se corta y se dice qué hacer, en vez de dejar el botón gris para
+  // siempre. 4 minutos es holgado: el peor caso medido es un arranque en frío de
+  // Render más un PDF grande.
+  var corte = null;
+  var abortador = typeof AbortController !== "undefined" ? new AbortController() : null;
+  if (abortador) {
+    corte = setTimeout(function () { abortador.abort(); }, 4 * 60 * 1000);
+  }
+
+  var terminar = function () {
+    clearInterval(reloj);
+    if (corte) clearTimeout(corte);
+  };
 
   fetch("/guias/revisar?token=" + encodeURIComponent(TOKEN), {
     method: "POST",
     headers: { "Content-Type": "application/pdf" },
-    body: f
+    body: f,
+    signal: abortador ? abortador.signal : undefined
   })
     .then(function (r) {
       // Un 403 devuelve el texto "Forbidden", no JSON. Sin esto, r.json()
@@ -291,8 +341,21 @@ btnRevisar.addEventListener("click", function () {
       plan = d;
       pintarPareo(d);
     })
-    .catch(function (e) { mostrar("mal", "🔴 " + e.message); })
+    .catch(function (e) {
+      // Si se cortó por el límite de tiempo, el mensaje de AbortError no le dice
+      // nada a nadie. Se traduce a algo que se pueda hacer.
+      if (e && e.name === "AbortError") {
+        mostrar(
+          "mal",
+          "🔴 Pasaron 4 minutos y el servidor no contestó, así que corté. NO se envió nada. " +
+            "Volvé a darle Revisar: si el bot estaba dormido, ya despertó y la segunda vez es rápida."
+        );
+        return;
+      }
+      mostrar("mal", "🔴 " + e.message + " No se envió nada.");
+    })
     .finally(function () {
+      terminar();
       btnRevisar.disabled = false;
       estadoRevisar.textContent = "";
     });
