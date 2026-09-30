@@ -9,6 +9,18 @@ Todo lo de esta sesión está **fusionado en `main`**. Se verificó commit por c
 
 ### 1. ⚠️ Las variables de Render — SIN CONFIRMAR que se hayan puesto
 
+> ## ✅ CERRADO EL 30-SEP — y el número que hacía falta era otro
+>
+> - **`OWNER_WHATSAPP` NO se mueve.** Los avisos se quedan en el **313**, que sigue activo y recibe
+>   SMS y llamadas. El argumento para moverlos (*"es un número que no podés recuperar"*) **era falso**:
+>   la línea nunca estuvo caída, era el equipo.
+> - **`TELEFONO_REMITENTE` ya está puesta**, con los cuatro números propios.
+> - 🔑 **Y el dato que faltaba:** el número que 99 Envíos imprime como remitente es **el celular
+>   personal del HERMANO del dueño**, no el de BikerPro como dice el ejemplo de abajo. **Era el único
+>   que de verdad hacía falta en la lista.** Lo encontró el dueño solo.
+>
+> Detalle completo en la sección **`0-BJ`** de la memoria y en `ACCESOS-Y-RECUPERACION.md`.
+
 El dueño pidió mover los avisos del bot a su celular personal. El código ya lo soporta,
 **pero las variables de entorno las tiene que cambiar él en Render** y no confirmó haberlo
 hecho. En Render → el servicio → **Environment**:
@@ -54,6 +66,34 @@ tema más importante que queda abierto.
 ---
 
 ## 🧠 MEMORIA — el tema abierto más importante
+
+> # ✅ RESUELTO EL 30-SEP — Y LAS DOS HIPÓTESIS DE ESTA SECCIÓN ERAN FALSAS
+>
+> **No leas esta sección como plan de trabajo. Está resuelta, y la conclusión fue otra.**
+> El diagnóstico completo, con las mediciones, está en la sección **`0-BI`** de
+> `.kiro/steering/proyecto-bikerpro.md`. Resumen:
+>
+> | lo que decía esta sección | lo que resultó |
+> |---|---|
+> | *"la sospecha principal: V8 se dimensiona contra la RAM de la máquina → la bandera `--max-old-space-size`"* | ⛔ **falso.** `heap_techo_mb` volvió **268**: en el contenedor V8 ya se ajusta solo. Y la memoria no estaba en el heap (25 de 268 MB) |
+> | *"el PDF de guías: 40 hojas de 300 KB = 11,7 MB, tres PDFs sin terminar = 30,8 MB retenidos"* | ⛔ **falso.** Las hojas pesan **2 MB**. Confirmado en producción: 52 hojas = 2 MB |
+> | *"pedirle el plan de Render"* | ⛔ **ya estaba escrito en `ACCESOS-Y-RECUPERACION.md`**: Starter, 512 MB. Mismo error que pedirle la columna "Estado" que no existía |
+>
+> 🎯 **La causa real era el PANEL:** cada recarga costaba **821 MB de RSS para producir 358 KB de
+> HTML**, y el panel se recargaba solo **cada 45 segundos**, con la pestaña en el fondo o el celular en
+> el bolsillo. La causa nº1 dentro del render era `diaBogota()`, que creaba un formateador de `Intl`
+> nuevo en cada llamada.
+>
+> **Resultado (PR #189): pico 478 → 183 MB, del 93% al 36% del límite, sin pagar más instancia.**
+>
+> 📌 Lo que sí quedó confirmado de esta sección: **el arreglo del `Promise.all` y del TTL (#186) estaba
+> bien** y sigue en pie — simplemente no era la causa. Y **`pdfjs` sí pierde ~71 MB por lote**, que se
+> arregló aparte parseando en un proceso hijo.
+>
+> ⚠️ **Y ojo con el paso siguiente que proponía esta sección** (*"pedirle dos lecturas de
+> `/health`"*): sirvió, pero lo que destrabó el caso fue una pregunta que no estaba en el plan —
+> **"¿subiste un PDF en esos 11 minutos?"**. El dueño dijo que no, y con eso `pdfjs` quedó descartado
+> de una, porque es un import diferido y ni estaba cargado.
 
 ### Lo que se encontró y ya está arreglado (#186)
 
@@ -327,15 +367,22 @@ no hay ImageMagick ni Pillow ni sharp).
 
 ## 🎯 Lo que sigue, en orden
 
-1. **Confirmar con el dueño que puso `OWNER_WHATSAPP` y `TELEFONO_REMITENTE` en Render.**
-   Sin `TELEFONO_REMITENTE` el pareo de guías se ensucia.
-2. **Cerrar la memoria:** pedirle dos lecturas de `/health?token=...` (una antes y una después
-   de subir un PDF de guías) y el plan de Render. Con `heap_techo_mb` y `al_arrancar_mb` se
-   decide entre la bandera de V8 y bajar las hojas a disco. **No pagar el upgrade antes de
-   tener ese dato.**
-3. **Que suba un PDF de guías** para confirmar que el cambio de `procesarPDF` (secuencial en
-   vez de `Promise.all`) no rompió nada. No se pudo probar en el sandbox, solo en CI.
-4. **Sus dos decisiones:** plantilla para los avisos con la ventana cerrada, y si el bot debe
-   callarse en un caso de posventa.
-5. Cuando entre el primer caso de posventa real, verificar con él que la categoría acierta y
+> **Estado al 30-sep:** los puntos 1, 2 y 3 están **cerrados**. Quedan el 4 y el 5.
+
+1. ✅ ~~**Confirmar con el dueño que puso `OWNER_WHATSAPP` y `TELEFONO_REMITENTE` en Render.**~~
+   **HECHO.** `OWNER_WHATSAPP` se queda en el 313 (la línea funciona); `TELEFONO_REMITENTE` quedó con
+   los cuatro números, incluido **el del hermano, que es el que 99 Envíos imprime** → `0-BJ`
+2. ✅ ~~**Cerrar la memoria.**~~ **CERRADO, y las dos hipótesis eran falsas: era el panel.**
+   Pico **478 → 183 MB**, del 93% al 36% del límite, **sin pagar el upgrade** → `0-BI`, PR #189
+3. ✅ ~~**Que suba un PDF de guías** para confirmar que `procesarPDF` no se rompió.~~ **HECHO**, y de
+   paso confirmó el arreglo: 52 hojas procesadas con el pico en 183 MB
+4. 🔵 **Sus dos decisiones, que siguen abiertas:**
+   - ¿plantilla para los **2 avisos al dueño** que salen como texto libre con su ventana de 24h
+     cerrada (`avisarSinAtribuir` y el handoff del asesor)? ⚠️ **No confundir con "pedir la plantilla":
+     las plantillas ya están aprobadas y en uso** → `0-BJ`
+   - ¿el bot debe callarse en un caso de posventa, o sigue contestando como ahora?
+5. 🔵 Cuando entre el primer caso de posventa real, verificar con él que la categoría acierta y
    que no le está marcando cosas que no son.
+6. 🔵 **Buscar en las guías ya enviadas alguna que empiece por `57`.** Es el síntoma de que el número
+   del hermano se colaró como número de guía antes de que la lista estuviera completa. Si aparece
+   alguna, a ese cliente hay que reenviarle la guía buena → `0-BJ`

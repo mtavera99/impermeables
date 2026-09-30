@@ -139,7 +139,8 @@ valor_comercial · estado_del_envio · fecha_actualizacion · aplica_contrapago 
 | **Número del bot** | **`+57 322 7545695`** ("Biker") · Phone Number ID **`1234151273126000`** |
 | Estado del número | **CONNECTED** · `code_verification_status: VERIFIED` · calidad **GREEN** · `CLOUD_API` |
 | Nombre para mostrar | ⚠️ `name_status: NON_EXISTS` — **"Biker" no está aprobado por Meta.** Pendiente de enviar |
-| **Servicio del bot** | **`https://bikerpro-bot.onrender.com`** (Render, plan Starter $7/mes) |
+| **Servicio del bot** | **`https://bikerpro-bot.onrender.com`** (Render, plan **Starter $7/mes = 0,5 CPU / 512 MB RAM**) |
+| **Número viejo de ventas** (el "313") | ya **no** atiende clientes —eso lo hace el número de arriba— pero **sigue activo y recibe SMS y llamadas**, y es el `OWNER_WHATSAPP` al que llegan los avisos del bot. ⚠️ Corregido el 30-sep: estaba documentado como "línea caída" y **era el equipo, no el operador** |
 | Webhook | `https://bikerpro-bot.onrender.com/webhook` · campo **`messages`** suscrito ✅ |
 | Verify token (solo para Meta) | vive en `WHATSAPP_VERIFY_TOKEN` de Render. **El valor no se escribe acá** |
 | **Contraseña del panel** | vive en `PANEL_TOKEN` de Render. **El valor no se escribe acá** |
@@ -162,7 +163,22 @@ y está en modo desarrollo. Son dos apps distintas y no hay que mezclarlas.
 | **Language** | **`Node`** ⬅️ el error clásico es dejarlo en Python |
 | **Root Directory** | **`bot`** ⬅️ el otro error clásico, dejarlo vacío |
 | Branch | `main` · Build `npm install` · Start `npm start` |
-| Instance | **Starter $7/mes — NO Free** (el Free se duerme y pierde el primer mensaje) |
+| Instance | **Starter $7/mes — NO Free** (el Free se duerme y pierde el primer mensaje). Son **512 MB**: el techo que importa para la memoria |
+
+> ⚠️ **EL BOT SE REDESPLIEGA CADA HORA, Y ES NORMAL (descubierto el 30-sep).** El workflow del estado
+> de cuenta commitea `ESTADO-CUENTA.md` a `main` cada hora, y Render despliega solo desde `main`.
+> Consecuencias que hay que tener presentes:
+>
+> - ⛔ **el contador `arranques` de `/health` NO mide salud**: sube ~24/día por los despliegues. Para
+>   saber si hay problema de memoria hay que mirar **`pico.proceso_mb` contra los 512 MB**
+> - **el plan de guías se pierde en cada reinicio** (vive solo en memoria). La ventana real para
+>   confirmar un lote no son las 2-6 h documentadas: es *"hasta el próximo despliegue de la hora"*.
+>   ✅ **Decisión del dueño (30-sep): se deja así.** Volver a subir el PDF cuesta poco y **es seguro**:
+>   una guía ya enviada no se manda dos veces (`guiaYaEnviada`)
+> - el log de eventos en memoria también se borra (ya estaba anotado como trampa)
+>
+> 📊 **Estado de la memoria al 30-sep, después del PR #189:** pico **183 MB de 512 (36%)**. Antes era
+> 478 MB (93%) y Render lo mataba. **No hace falta subir de plan.** Ver la sección `0-BI` de la memoria.
 
 Variables de entorno (los valores secretos van en el gestor de contraseñas):
 ```
@@ -176,10 +192,45 @@ WHATSAPP_TOKEN=<secreto>
 WHATSAPP_PHONE_NUMBER_ID=1234151273126000
 WHATSAPP_WABA_ID=1345319974418244
 OWNER_WHATSAPP=<el celular del dueño — a este llegan los avisos>
+TELEFONO_REMITENTE=<los números PROPIOS que van impresos en las etiquetas, con coma>
 ```
 
-> 📱 Ese número va **solo en Render**: es un celular personal y este repo es público.
-> El valor real está en el panel de Render, en las variables de entorno del servicio.
+> 📱 Esos números van **solo en Render**: son celulares personales y este repo es público.
+> Los valores reales están en el panel de Render, en las variables de entorno del servicio.
+
+#### 📮 `OWNER_WHATSAPP` y `TELEFONO_REMITENTE` son cosas DISTINTAS (aclarado el 30-sep)
+
+Se confunden fácil y confundirlas ensucia las guías. No tienen por qué ser el mismo número.
+
+| variable | qué hace |
+|---|---|
+| `OWNER_WHATSAPP` | **a dónde le llegan los avisos al dueño.** Hoy es el **313**, el número viejo de ventas — y se queda ahí, la línea funciona |
+| `TELEFONO_REMITENTE` | **un filtro de LECTURA, nada más.** La lista de números propios que el bot debe **ignorar** al leer una etiqueta |
+
+🔑 **`TELEFONO_REMITENTE` no imprime ni manda nada.** Las etiquetas las hace 99 Envíos; el bot solo las
+lee. La lista existe porque en cada etiqueta hay **dos** teléfonos —el del cliente y el del remitente—
+y para el bot son dos números de 10 dígitos en una hoja. Sin la lista:
+
+1. toma el número propio como **teléfono del cliente** → vale 50 puntos en el pareo, justo el mínimo,
+   y puede asignarle la guía a la persona equivocada;
+2. peor: con el `57` adelante son 12 dígitos, **los mismos que una guía de Interrapidísimo**, así que
+   en una etiqueta sin el rótulo *"Guía No"* legible **se lo lleva como número de guía**. Medido: la
+   guía salía `573001112233` en vez de `240061604892`.
+
+⛔ **LA TRAMPA:** si `TELEFONO_REMITENTE` está vacía, el código la copia de `OWNER_WHATSAPP`
+(`server.js`). Entonces **ponerla con un solo número SACA de la lista al que estaba protegido solo** —
+queda peor que dejarla vacía. Pasó el 30-sep.
+
+🔴 **Y el dato que faltaba en toda la documentación:** el número que 99 Envíos imprime como remitente
+es **el celular personal del HERMANO del dueño**, que es el contacto configurado allá. **No es el del
+bot, ni el 313, ni el personal del dueño.** Era el único que de verdad hacía falta en la lista.
+
+**La lista correcta lleva los cuatro:** el 313, el del bot, el personal del dueño y el del hermano.
+Poner uno de más no cuesta nada —ninguno va a ser el de un cliente— y olvidarse de uno sí.
+
+**Para verificar si el hueco alguna vez se disparó:** buscar en las guías ya enviadas alguna que
+**empiece por `57`**. Una guía real empieza por `24` (Interrapidísimo), `64` (Coordinadora) o `2`
+(Servientrega).
 
 ### 🔴 `PANEL_TOKEN`: LA PUERTA DE LA CASA
 

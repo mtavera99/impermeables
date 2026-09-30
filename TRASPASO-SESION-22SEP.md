@@ -5,6 +5,11 @@
 >
 > Estado del código: **todo mergeado en `main` y desplegado.** Nada pendiente de mergear.
 
+> ⚠️ **LEER ANTES DE USAR ESTE DOCUMENTO (nota del 30-sep):** dos de sus cinco puntos urgentes eran
+> **falsos o ya están resueltos** — la línea del 313 funciona, y las plantillas de Meta ya están
+> aprobadas y en uso. Están tachados abajo. La corrección completa está en la sección **`0-BJ`** de
+> `.kiro/steering/proyecto-bikerpro.md`.
+
 ---
 
 ## 🔴 Lo urgente, en orden
@@ -13,9 +18,9 @@
 |---|---|---|
 | 1 | **Recargar Meta Ads: ~$58.000** | Última lectura 12h: saldo **$113.057**, gasto $70.711, cierre proyectado $128.892. ⛔ Recargar **en la mañana**: recargar de noche dispara el rebote de 0-AI |
 | 2 | **Rotar el `PANEL_TOKEN`** | El valor actual quedó pegado en el chat de hoy. Render → Environment → valor nuevo y largo. **No hay que tocar nada de Meta** (por eso están separados) |
-| 3 | **Pedir la plantilla aprobada de Meta** | Ya van **4 cosas** que la necesitan: guías, cierre diario, seguimiento 72h, y responder desde el panel a un chat viejo. Hoy zafamos de casualidad |
+| 3 | ~~**Pedir la plantilla aprobada de Meta**~~ ✅ **RESUELTO** — ya están aprobadas y en uso (son seis). Ver `0-BJ` de la memoria | ~~Ya van 4 cosas que la necesitan~~ Lo único que sigue sin plantilla son **2 avisos AL DUEÑO**, y eso es una decisión suya, no una plantilla que falte pedir |
 | 4 | **Desconectar Hermes del número real** | Sigue abierto desde el 21-sep. Baileys = riesgo de ban del número |
-| 5 | 🔴 **La línea del 313 861 5813 está CAÍDA** | Ver sección de accesos. Es un punto único de falla con dos amenazas encima |
+| 5 | ~~🔴 **La línea del 313 861 5813 está CAÍDA**~~ ✅ **FALSO, corregido el 30-sep: FUNCIONA** (SMS y llamadas). Era el **equipo**, no el operador | Se retiran las dos amenazas y el pendiente de llamar al operador. Ver `0-BJ` de la memoria. El 313 ya no atiende clientes —eso lo hace el número de la Cloud API— pero sigue activo y recibe los avisos del bot |
 
 ---
 
