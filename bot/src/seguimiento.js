@@ -486,10 +486,39 @@ function configuracionEfectiva() {
     toques: PASOS.map((p) => `${p.desde / H}h (${p.tipo})`),
     plantilla_2: PLANTILLA_2 || "(ninguna: el paso 2 se salta)",
     plantilla_3: PLANTILLA_3 || "(ninguna: el paso 3 se salta)",
+    // ========================================================================
+    // 🔴 FALTABA LA DEL V10, QUE ERA JUSTO LA QUE HABÍA QUE COMPROBAR (1-oct)
+    //
+    // Este bloque existe desde el 24-sep para no tener que entrar a Render a
+    // adivinar qué va a mandar el bot. Pero cuando el seguimiento se partió por
+    // producto, la plantilla del V10 quedó afuera: el dueño creó
+    // `seguimiento_intercomunicador` en Meta, puso la variable, y la única forma
+    // de confirmar que el bot la había tomado era entrar a Render — o esperar a
+    // que un lead de intercomunicadores cumpliera 44h y mirar los logs.
+    //
+    // Es el mismo error del 24-sep repetido en un campo nuevo: la pantalla que
+    // existe para no confundirse, callada justo en el dato que se estaba
+    // esperando. Se arregla acá, que es donde vive la verdad.
+    // ========================================================================
+    plantilla_v10: PLANTILLA_V10 || "(ninguna: a un lead de V10 se le salta el toque de 44h)",
+    // 🔘 En palabras, igual que `toque_44h`: esta línea es la que se mira para
+    // confirmar que la variable quedó bien puesta, sin entrar a Render.
+    toque_44h_del_v10: !PASO_44H_ACTIVO
+      ? "🔴 APAGADO para todos por SEGUIMIENTO_44H"
+      : PLANTILLA_V10
+        ? `🟢 ACTIVO — a un lead de intercomunicadores le manda "${PLANTILLA_V10}"`
+        : "🟡 SALTADO — falta SEGUIMIENTO_PLANTILLA_V10. ⛔ NO se le manda la del " +
+          "impermeable: sería el producto equivocado. Recibe los toques de 2h y 20h, " +
+          "que sí hablan de intercomunicadores.",
     // De dónde viene cada uno, para no volver a confundirse.
     origen: {
       plantilla_2: process.env.SEGUIMIENTO_PLANTILLA_2 ? "variable de entorno" : "default del código",
       plantilla_3: process.env.SEGUIMIENTO_PLANTILLA_3 ? "variable de entorno" : "default del código",
+      // ⚠️ Acá NO hay default en el código, y es a propósito: inventarle una
+      // plantilla al V10 significaría mandarle la del impermeable.
+      plantilla_v10: process.env.SEGUIMIENTO_PLANTILLA_V10
+        ? "variable de entorno"
+        : "no está puesta (no hay default: el código no le inventa una plantilla al V10)",
       idioma: process.env.SEGUIMIENTO_IDIOMA ? "variable de entorno" : "default del código (es_CO)",
       toque_44h: process.env.SEGUIMIENTO_44H
         ? `variable de entorno (SEGUIMIENTO_44H=${process.env.SEGUIMIENTO_44H})`
