@@ -378,6 +378,95 @@ chequear(
   "volvió la traba al panel"
 );
 
+// ────────────────────────────────────────────────────────────────────────────
+console.log("\n── UN BARRIO NO ES UNA DIRECCIÓN (1-oct) ──");
+//
+// 🔴 EL CASO: el dueño avisó que "los dos últimos pedidos no pidió bien la
+// dirección y salieron solo con barrio".
+//
+// LA CAUSA: `barrio`, `sector` y `etapa` estaban en la MISMA lista que `calle` y
+// `carrera` —la lista de vías—, y el chequeo de número acepta cualquier dígito.
+// Así "Barrio el Rosario 15" pasaba como dirección de casa despachable, sin una
+// sola marca. Un barrio le dice al mensajero la zona, no la puerta: eso es una
+// "no se localiza dirección", la novedad más frecuente que tenemos.
+// ────────────────────────────────────────────────────────────────────────────
+for (const solo of [
+  "Barrio el Rosario 15",
+  "barrio Bellizca 3",
+  "Barrio Tres Avemaria 2",
+  "Barrio La Frontera Mi C9",
+  "barrio villa rosa 1",
+  "Sector Jazmin parte baja 4",
+  "Etapa 2 Villa Luz",
+  "urbanizacion El Parque 7",
+]) {
+  const r = d.revisar(solo);
+  chequear(
+    `🔑 "${solo}" NO se despacha`,
+    !r.despachable && r.estado === "dudosa",
+    `quedó "${r.estado}" despachable=${r.despachable} — es el bug del 1-oct`
+  );
+}
+{
+  const r = d.revisar("Barrio el Rosario 15");
+  chequear(
+    "  y el motivo dice que falta la calle, no un genérico",
+    /barrio o la zona/.test(r.motivo) && /calle o carrera/.test(r.queFalta),
+    `motivo="${r.motivo}"`
+  );
+}
+
+// ⛔ LO QUE NO SE PODÍA ROMPER: marcar una dirección COMPLETA sería peor que el
+// bug — frenaría ventas buenas. Estas 29 salieron del export real de 99 Envíos.
+console.log("\n   ⛔ direcciones REALES completas que deben seguir pasando:");
+for (const buena of [
+  "Calle 24 #7 - 65 la tienda de los peces",
+  "Cll 69 121221 interior 150 Corregimiento San Cristobal",
+  "Cl 41 4918 Barrio Santa Ana",
+  "Carrera 7A 2569 Villa del Sol",
+  "Cra 14A Bis 69A Sur51 Nuevo San Andres",
+  "Sector 1 MZ 8 1998 Vista Hermosa",
+  "Barrio Obrero Bloque 1 Manzana 128 Numero 17",
+  "Manzana J3 Lote 14 Barrio El Paraiso",
+  "Barrio Independencia calle 12 64c04",
+  // 🔑 abreviaturas sueltas: la primera version del arreglo las marcaba mal
+  "CR 98 cl63194",
+  "Cr 8 1926 barrio Bellizca",
+  "Kr 44 4368 urbanizacion El Parque",
+  "KRA 5 5317 sur barrio La Paz",
+  "Karr 13 1886 barrio Kennedy",
+  // 🔑 sin espacio entre la via y el numero
+  "Cr22c este 44b51sur barrio Villa Mercedes 1 sector",
+  "Av42a6027 Niquia parte baja tercer piso",
+  "AK 45 12780 Conjunto Rincon de la Calleja",
+  // 🔑 en un conjunto, bloque+apto SI es la direccion completa
+  "Conjunto multifamiliar bucarica 4 etapa bloque 1325A apto 409 Barrio Bucarica",
+  // 🔑 via con nombre en vez de numero, y el numero lejos
+  "Calle el mercado 14178 al lado de la umata",
+  "Kilometro 3 via Piendamo Morales",
+  "Parque logistico PASS km 3 via a Gaira bodega A23",
+  "Transversal 49B 102BB31",
+  "Calle 235 8002 Arboleda de Guaymaral casa 33",
+]) {
+  const r = d.revisar(buena);
+  chequear(
+    `   ⛔ "${buena.slice(0, 44)}" se despacha`,
+    r.despachable,
+    `quedó "${r.estado}" — se frenaría una venta buena`
+  );
+}
+
+// Y las que de verdad son vagas siguen marcadas.
+for (const vaga of ["Troncal frente a la bomba del Toquez", "Brisas de Galicia", "Antiguo colegio", "Parque principal"]) {
+  chequear(`   vaga de verdad sigue marcada: "${vaga.slice(0, 38)}"`, !d.revisar(vaga).despachable);
+}
+
+// ⛔ Y oficina sigue sin pedir dirección, que es la regla del dueño.
+for (const of of ["OFICINA Interrapidisimo Zipaquira", "Oficina Interrapidisimo", "lo recojo en Servientrega"]) {
+  const r = d.revisar(of);
+  chequear(`   ⛔ "${of.slice(0, 34)}" sigue siendo oficina despachable`, r.estado === "oficina" && r.despachable);
+}
+
 fs.rmSync(DIR, { recursive: true, force: true });
 console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal === 0 ? 0 : 1);

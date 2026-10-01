@@ -51,10 +51,63 @@ function limpiar(s) {
 }
 
 // ── Señales de que es una dirección de casa de verdad ──────────────────────
-// Nomenclatura colombiana. Se pide una de estas Y un número: "calle 45 #12-30".
-const RE_VIA =
-  /\b(calle|cll|cl|carrera|cra|kra|kr|avenida|av|ave|diagonal|diag|dg|transversal|transv|tv|autopista|circunvalar|manzana|mz|mzna|lote|lt|vereda|kilometro|km|bloque|torre|casa|apto|apartamento|conjunto|urbanizacion|barrio|bario|etapa|sector)\b/;
+//
+// 🔴 UN BARRIO NO ES UNA DIRECCIÓN (1-oct). El dueño: *"los dos últimos pedidos
+// no pidió bien la dirección y salieron solo con barrio"*.
+//
+// LA CAUSA, y era una sola lista mal armada: `barrio`, `sector` y `etapa`
+// estaban metidas en la lista de VÍAS, al lado de `calle` y `carrera`. Y el
+// chequeo de número acepta cualquier dígito suelto. Entonces:
+//
+//     "Barrio el Rosario 15"  ->  via=barrio ✓  numero=15 ✓  ->  "casa",
+//                                 despachable: true
+//
+// El pedido salía a despacho sin una sola marca. Y un barrio le dice al
+// mensajero la ZONA, no la puerta: eso es exactamente una "no se localiza
+// dirección", que es la novedad más frecuente que tenemos y la que termina en
+// devolución pagada.
+//
+// 🔑 LA DISTINCIÓN: hay palabras que UBICAN y palabras que solo CONTEXTUALIZAN.
+//
+//   UBICAN (vía principal) ..... calle, carrera, avenida, diagonal, manzana,
+//                               lote, kilómetro. Con una de estas + número, el
+//                               mensajero llega.
+//   CONTEXTUALIZAN ............. barrio, sector, etapa, vereda, conjunto, casa,
+//                               apto, torre. Sirven DESPUÉS de la vía, pero
+//                               solas no alcanzan para llegar.
+//
+// Se exige una vía principal + un número. Lo demás es complemento.
+//
+// ⚠️ Esto NO bloquea el pedido —sigue siendo mejor una venta marcada que una
+// venta perdida—: lo manda a revisión, que es lo que el dueño ya hace cuando
+// revisa las guías antes de despachar.
+// 🔑 DOS FORMAS DE ESCRIBIR UNA VÍA, Y HAY QUE ACEPTAR LAS DOS:
+//
+//   a) PALABRA COMPLETA ("Calle el mercado 14178", "bloque 1325A apto 409").
+//      Acá la palabra sola basta como señal, y el número puede venir lejos.
+//
+//   b) ABREVIATURA PEGADA AL NÚMERO ("Cr 8 1926", "Cr22c", "Av42a6027",
+//      "cl63194", "KRA 5 5317"). Acá se EXIGE que el número venga justo
+//      después, y por dos razones: así se cazan las que van sin espacio
+//      —"Cr22c" no tiene borde de palabra y se perdía— y a la vez no se
+//      confunde "cr" con el principio de otra palabra.
+//
+// ⚠️ `bloque`, `torre`, `apto` e `interior` SÍ ubican: en un conjunto, "bloque
+// 1325A apto 409" es la dirección completa. Se comprobó contra una dirección
+// real del export que la primera versión de este arreglo marcaba mal.
+const RE_VIA = new RegExp(
+  "\\b(?:calle|carrera|avenida|diagonal|transversal|autopista|circunvalar|anillo|" +
+    "troncal|peatonal|pasaje|manzana|lote|kilometro|bloque|torre|apartamento|apto|interior)\\b" +
+    "|\\b(?:cll?e?|cra|crr?|kra|krr?|karr|kr|mz(?:na)?|lt|ave?|ak|ac|dg|diag|tv|transv|km)" +
+    "\\s*#?\\s*\\d"
+);
 const RE_NUMERO = /(#|n°|nro\.?|numero|no\.?\s*\d|\d+\s*-\s*\d+|\d{1,4})/;
+
+// ⛔ Palabras que NO son una vía: ubican un área, no una puerta. Están acá solo
+// para documentar la decisión y para que la prueba las use: si una dirección
+// trae SOLO estas, se marca para revisión.
+const RE_SOLO_AREA =
+  /\b(barrio|bario|sector|etapa|vereda|corregimiento|urbanizacion|urbanizacion|conjunto|casa|apto|apartamento|bloque|torre|interior|finca|edificio|local|parque|centro)\b/;
 
 // ── Señales de que el cliente quiere recibir en una oficina ────────────────
 const RE_OFICINA =
@@ -166,14 +219,24 @@ function revisar(direccion) {
     };
   }
 
+  // 🔑 Se distingue "solo barrio" de "no dijo nada". No es lo mismo para quien
+  // va a arreglarlo: con un barrio ya sabés la zona y lo único que falta es la
+  // nomenclatura; sin nada, hay que empezar de cero. Decir "no hay calle ni
+  // número" cuando el cliente SÍ escribió algo hace dudar del aviso.
+  const soloArea = RE_SOLO_AREA.test(t);
   return {
     estado: "dudosa",
     entrega: null,
     transportadora: null,
     despachable: false,
-    motivo:
-      "no se sabe si va a una casa o a una oficina: no hay calle ni número, y tampoco dijo oficina",
-    queFalta: PREGUNTA_SIMPLE,
+    motivo: soloArea
+      ? "solo dice el barrio o la zona, y con eso el mensajero no llega a una puerta: " +
+        "falta la calle o carrera con su número"
+      : "no se sabe si va a una casa o a una oficina: no hay calle ni número, y tampoco dijo oficina",
+    queFalta: soloArea
+      ? "la calle o carrera con el número (ej: «Calle 45 # 12-30»), o si prefiere " +
+        "recogerlo en la oficina de Interrapidísimo de su ciudad"
+      : PREGUNTA_SIMPLE,
   };
 }
 
