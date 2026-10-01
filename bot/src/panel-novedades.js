@@ -342,8 +342,42 @@ function revisar(btn) {
       d.filas.forEach(function (f, i) {
         var tr = document.createElement("tr");
         if (!f.enviar) tr.className = "no";
-        var chk = f.enviar
-          ? '<input type="checkbox" data-i="' + i + '" checked style="width:22px;height:22px">'
+        // ====================================================================
+        // 🔴 LAS FILAS QUE PIDEN DATOS NO TENÍAN CASILLA (1-oct)
+        //
+        // DE DÓNDE SALE: el dueño, con tres novedades de oficina en pantalla y
+        // los campos ya llenos: *"los que me salen así para escribir detalles
+        // les escribo los detalles pero no se envían, ¿cómo hago?"*.
+        //
+        // LA CAUSA: la casilla se dibujaba solo si la fila ya era enviable, y
+        // una fila que pide la oficina y el plazo tiene enviar = false por
+        // definición —es justo lo que significa que falte un dato—. Sin casilla
+        // no hay nada que marcar, el botón Enviar junta únicamente las casillas
+        // marcadas, y el índice de esa fila NUNCA viaja al servidor.
+        //
+        // ⚠️ OJO AL EDITAR: este comentario vive DENTRO del template literal del
+        // HTML, así que no puede llevar comillas invertidas. Poner una cierra la
+        // cadena y el módulo entero deja de cargar. Me pasó escribiendo esto, y
+        // lo cazó test-javascript-de-los-paneles.js en la primera corrida.
+        //
+        // Lo peor es que el servidor ya sabía resolverla: los datos sí llegan y
+        // el plan se recalcula (arreglo del 30-sep). Pero recalcular no sirve si
+        // nadie pide que esa fila se mande. Se saltaba en silencio, sin error,
+        // porque el bucle del envío solo recorre los índices marcados.
+        //
+        // 🔑 Ahora la casilla se dibuja también cuando la fila pide datos,
+        // porque el servidor puede volverla enviable con lo que el dueño acaba
+        // de escribir. Si los campos quedaron vacíos no se manda nada y el
+        // servidor DICE qué falta, que es información útil y no un silencio.
+        //
+        // ⛔ Las filas sin destinatario, o bloqueadas por un motivo que no se
+        // arregla escribiendo (pedido rechazado, novedad sin plantilla), siguen
+        // sin casilla: ahí no hay nada que el dueño pueda completar.
+        // ====================================================================
+        var puedeMandarse = Boolean(f.destino) && Boolean(f.enviar || f.pidoDatos);
+        var chk = puedeMandarse
+          ? '<input type="checkbox" data-i="' + i + '" data-guia="' + f.guia +
+            '" checked style="width:22px;height:22px">'
           : "";
         var ventana = f.destino
           ? (f.ventanaAbierta
@@ -399,8 +433,12 @@ function revisar(btn) {
         d.bloqueadas ? "info" : "ok",
         "Se leyeron " + d.filas.length + " novedad(es): " + d.listas + " lista(s) para avisar" +
           (d.bloqueadas ? " y " + d.bloqueadas + " que NO se pueden enviar (mirá el motivo)." : ".") +
+          // 🔑 Ya NO dice "y le des Revisar otra vez". Ese paso extra existía
+          // porque la fila sin datos no tenía casilla; ahora la tiene, así que
+          // completar y darle Enviar es el camino, que es lo que cualquiera
+          // intenta primero.
           (faltanDatos
-            ? " ⚠️ " + faltanDatos + " de oficina necesitan que completes los dos campos y le des Revisar otra vez."
+            ? " ⚠️ " + faltanDatos + " de oficina necesitan que completes los dos campos; después dale Enviar."
             : "") +
           " Todavía no se envió nada."
       );
@@ -545,7 +583,17 @@ alTocar("btnEnviar", function () {
             ": mirá abajo el motivo de cada una."
           : ""));
       mostrarDetalle(d.resultados);
-      document.querySelectorAll("#tabla input[type=checkbox]").forEach(function (c) { c.checked = false; });
+      // 🔑 SOLO se desmarcan las que SÍ salieron. Antes se desmarcaban todas, y
+      // eso castigaba justo el caso normal: si de 5 salieron 3 y fallaron 2 por
+      // un dato mal escrito, había que corregir el dato Y volver a marcar las 2
+      // a mano. Las que fallaron quedan marcadas, así corregir y darle Enviar
+      // otra vez es un clic. Reenviarle a quien ya recibió el aviso no es
+      // posible: el servidor recuerda las guías ya avisadas.
+      var salieron = {};
+      (d.resultados || []).forEach(function (r) { if (r.ok) salieron[String(r.guia)] = true; });
+      document.querySelectorAll("#tabla input[type=checkbox]").forEach(function (c) {
+        if (salieron[String(c.getAttribute("data-guia"))]) c.checked = false;
+      });
     })
     .catch(function (e) { mostrar("mal", "🔴 No salió: " + e.message); })
     .finally(function () { btn.disabled = false; });
