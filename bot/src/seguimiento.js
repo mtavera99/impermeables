@@ -60,8 +60,57 @@ const ACTIVO = process.env.SEGUIMIENTO_ACTIVO === "1";
 //
 // Poner SEGUIMIENTO_PLANTILLA_2 en blanco en Render ahora sí lo apaga: el paso
 // se salta (ver correrSeguimientos) sin consumirle el turno a nadie.
-const PLANTILLA_2 = process.env.SEGUIMIENTO_PLANTILLA_2 ?? "seguimiento_impermeable";
-const PLANTILLA_3 = process.env.SEGUIMIENTO_PLANTILLA_3 ?? "seguimiento_impermeable";
+
+// ============================================================================
+// 🔴 UN DEDAZO EN RENDER NO PUEDE QUEMARLE EL TURNO A UN CLIENTE (1-oct)
+//
+// DE DÓNDE SALE. El dueño acababa de crear `seguimiento_intercomunicador` en
+// Meta y puso en Render:
+//
+//     SEGUIMIENTO_PLANTILLA_V10 = SEGUIMIENTO_PLANTILLA_V10
+//
+// o sea el NOMBRE de la variable como valor. Un error de un segundo al copiar.
+//
+// LO QUE ESO PROVOCABA, Y ES LO PEOR POSIBLE. El bot veía un valor no vacío, así
+// que creía tener plantilla del V10 y DEJABA DE SALTAR el toque de 44h. Entonces
+// reservaba el turno del cliente —`reclamarSeguimiento`, que es irreversible y se
+// escribe en disco— y después le pedía a Meta una plantilla llamada
+// "SEGUIMIENTO_PLANTILLA_V10". Meta la rechaza con 132001. El cliente no recibe
+// NADA, nunca: su turno ya está gastado y con `seguimientos = 3` queda fuera para
+// siempre. Y el contador lo cuenta como "enviado", así que ni se nota.
+//
+// 🔑 EL ARREGLO. Meta solo acepta nombres en minúsculas, números y guión bajo.
+// Lo que no cumple eso NO ES un nombre de plantilla, y tratarlo como si lo fuera
+// garantiza el peor final. Se trata como "no configurada": el paso SE SALTA
+// —cuesta un toque— en vez de QUEMARSE —cuesta el cliente—.
+//
+// ⚠️ Esto NO reemplaza mirar /seguimiento: un nombre bien escrito que no existe
+// en Meta pasa este filtro igual. Lo que evita es la clase de error que convierte
+// un valor mal puesto en pérdida permanente.
+// ============================================================================
+const RE_NOMBRE_DE_PLANTILLA = /^[a-z0-9_]+$/;
+
+function nombreDePlantilla(valor, cual) {
+  const v = String(valor ?? "").trim();
+  if (!v) return "";                              // vacío = apagado a propósito
+  if (RE_NOMBRE_DE_PLANTILLA.test(v)) return v;
+  console.error(
+    `🔴 ${cual} = "${v}" no es un nombre de plantilla de Meta (solo minúsculas, ` +
+      "números y guión bajo). SE IGNORA y ese toque se salta, para no gastarle el " +
+      "turno al cliente en un envío que Meta va a rechazar. Revisá el valor en " +
+      "Render: ¿quedó pegado el nombre de la variable en vez del de la plantilla?"
+  );
+  return "";
+}
+
+const PLANTILLA_2 = nombreDePlantilla(
+  process.env.SEGUIMIENTO_PLANTILLA_2 ?? "seguimiento_impermeable",
+  "SEGUIMIENTO_PLANTILLA_2"
+);
+const PLANTILLA_3 = nombreDePlantilla(
+  process.env.SEGUIMIENTO_PLANTILLA_3 ?? "seguimiento_impermeable",
+  "SEGUIMIENTO_PLANTILLA_3"
+);
 
 // ============================================================================
 // 🔴 EL SEGUIMIENTO LE HABLABA DE IMPERMEABLES A QUIEN PREGUNTÓ POR V10 (1-oct)
@@ -137,7 +186,13 @@ function textoDe(productoId, n) {
 //
 // Cuando el dueño cree `seguimiento_intercomunicador` en Meta, se prende solo
 // poniendo SEGUIMIENTO_PLANTILLA_V10 en Render. Sin tocar código.
-const PLANTILLA_V10 = process.env.SEGUIMIENTO_PLANTILLA_V10 ?? "";
+// 🔑 Pasa por el mismo filtro que las otras dos: es justo la variable donde el
+// dedazo ocurrió, y la única sin default, así que un valor basura acá no tiene
+// nada que lo tape.
+const PLANTILLA_V10 = nombreDePlantilla(
+  process.env.SEGUIMIENTO_PLANTILLA_V10 ?? "",
+  "SEGUIMIENTO_PLANTILLA_V10"
+);
 
 /** La plantilla que corresponde al producto. "" significa "saltar este paso". */
 function plantillaDe(productoId, plantillaBase) {
@@ -516,9 +571,18 @@ function configuracionEfectiva() {
       plantilla_3: process.env.SEGUIMIENTO_PLANTILLA_3 ? "variable de entorno" : "default del código",
       // ⚠️ Acá NO hay default en el código, y es a propósito: inventarle una
       // plantilla al V10 significaría mandarle la del impermeable.
-      plantilla_v10: process.env.SEGUIMIENTO_PLANTILLA_V10
-        ? "variable de entorno"
-        : "no está puesta (no hay default: el código no le inventa una plantilla al V10)",
+      //
+      // 🔑 Y se distinguen tres estados, no dos. "Puesta pero con un valor que no
+      // es un nombre de plantilla" tiene que decirse DISTINTO de "no está
+      // puesta": si el dedazo del 1-oct se reportara como "no está puesta", el
+      // dueño la daría por configurada mal y no sabría qué corregir.
+      plantilla_v10: !process.env.SEGUIMIENTO_PLANTILLA_V10
+        ? "no está puesta (no hay default: el código no le inventa una plantilla al V10)"
+        : PLANTILLA_V10
+          ? "variable de entorno"
+          : `🔴 la variable está puesta con un valor que NO es un nombre de plantilla ` +
+            `("${process.env.SEGUIMIENTO_PLANTILLA_V10}"): se ignora y el toque se salta. ` +
+            "Meta solo acepta minúsculas, números y guión bajo.",
       idioma: process.env.SEGUIMIENTO_IDIOMA ? "variable de entorno" : "default del código (es_CO)",
       toque_44h: process.env.SEGUIMIENTO_44H
         ? `variable de entorno (SEGUIMIENTO_44H=${process.env.SEGUIMIENTO_44H})`

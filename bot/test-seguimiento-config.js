@@ -137,6 +137,89 @@ console.log("\n── 1b. Con la plantilla del V10 puesta, la pantalla lo confir
   );
 }
 
+console.log("\n── 1bis. 🔴 Un dedazo en Render no puede quemarle el turno a un cliente ──");
+
+// ===========================================================================
+// EL CASO REAL (1-oct). El dueño puso en Render:
+//     SEGUIMIENTO_PLANTILLA_V10 = SEGUIMIENTO_PLANTILLA_V10
+// o sea el NOMBRE de la variable como valor.
+//
+// El bot veía un valor no vacío, creía tener plantilla, DEJABA DE SALTAR el
+// toque de 44h, reservaba el turno del cliente (irreversible, en disco) y le
+// pedía a Meta una plantilla que no existe. Meta rechaza con 132001, el cliente
+// no recibe nada nunca, y el contador lo cuenta como "enviado".
+//
+// Saltar cuesta un toque. Quemar cuesta el cliente.
+// ===========================================================================
+{
+  const s = cargarCon({ SEGUIMIENTO_PLANTILLA_V10: "SEGUIMIENTO_PLANTILLA_V10" });
+  const c = s.configuracionEfectiva();
+  chequear(
+    "🔑 el nombre de la variable como valor se IGNORA (no se manda a Meta)",
+    c.plantilla_v10.indexOf("SEGUIMIENTO_PLANTILLA_V10") === -1,
+    `plantilla_v10: ${c.plantilla_v10}`
+  );
+  chequear(
+    "🔑 y el toque se SALTA, que es lo barato, en vez de quemarse",
+    /SALTADO/.test(String(c.toque_44h_del_v10)),
+    String(c.toque_44h_del_v10)
+  );
+  chequear(
+    "🔑 el reporte distingue «puesta con valor inválido» de «no está puesta»",
+    /NO es un nombre de plantilla/.test(String(c.origen.plantilla_v10)) &&
+      /SEGUIMIENTO_PLANTILLA_V10/.test(String(c.origen.plantilla_v10)),
+    String(c.origen.plantilla_v10)
+  );
+  chequear(
+    "⛔ y NO cae en la del impermeable como premio de consuelo",
+    String(c.plantilla_v10).indexOf("seguimiento_impermeable") === -1,
+    String(c.plantilla_v10)
+  );
+}
+
+{
+  // Las otras dos variables pasan por el mismo filtro: el dedazo no es exclusivo
+  // del V10. Con un valor basura, el paso se salta en vez de quemar el turno.
+  const s = cargarCon({ SEGUIMIENTO_PLANTILLA_2: "SEGUIMIENTO_PLANTILLA_2" });
+  const c = s.configuracionEfectiva();
+  chequear(
+    "el mismo filtro protege al paso 2",
+    c.plantilla_2.indexOf("SEGUIMIENTO_PLANTILLA_2") === -1 && /se salta/.test(c.plantilla_2),
+    `plantilla_2: ${c.plantilla_2}`
+  );
+  chequear(
+    "  y la cadencia deja de tener el paso que no puede mandar",
+    s.configuracionEfectiva().toques.length === 2,
+    JSON.stringify(s.configuracionEfectiva().toques)
+  );
+}
+
+{
+  // ✅ Lo válido sigue pasando: minúsculas, números y guión bajo. Y los espacios
+  // de más al copiar desde Meta no pueden tumbar un nombre que está bien.
+  const s = cargarCon({ SEGUIMIENTO_PLANTILLA_V10: "  seguimiento_intercomunicador  " });
+  chequear(
+    "✅ un nombre válido con espacios de sobra se recorta y se usa",
+    s.configuracionEfectiva().plantilla_v10 === "seguimiento_intercomunicador",
+    s.configuracionEfectiva().plantilla_v10
+  );
+  const s2 = cargarCon({ SEGUIMIENTO_PLANTILLA_V10: "plantilla_v10_2026" });
+  chequear(
+    "✅ y los números y guiones bajos son válidos para Meta",
+    s2.configuracionEfectiva().plantilla_v10 === "plantilla_v10_2026",
+    s2.configuracionEfectiva().plantilla_v10
+  );
+  // ⛔ Mayúsculas, espacios internos, guiones y acentos: Meta los rechaza.
+  for (const malo of ["Seguimiento_V10", "seguimiento v10", "seguimiento-v10", "seguimientó_v10"]) {
+    const sx = cargarCon({ SEGUIMIENTO_PLANTILLA_V10: malo });
+    chequear(
+      `⛔ "${malo}" se rechaza antes de llamar a Meta`,
+      sx.configuracionEfectiva().plantilla_v10.indexOf(malo) === -1,
+      sx.configuracionEfectiva().plantilla_v10
+    );
+  }
+}
+
 console.log("\n── 1c. Si el toque de 44h está apagado, no promete lo contrario ──");
 
 {
