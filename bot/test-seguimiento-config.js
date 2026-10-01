@@ -42,7 +42,10 @@ function chequear(nombre, condicion, detalle) {
 
 /** Carga seguimiento.js de cero con las variables de entorno que se le pasen. */
 function cargarCon(env) {
-  for (const k of ["SEGUIMIENTO_ACTIVO", "SEGUIMIENTO_PLANTILLA_2", "SEGUIMIENTO_PLANTILLA_3", "SEGUIMIENTO_IDIOMA", "SEGUIMIENTO_44H"]) {
+  // ⚠️ SEGUIMIENTO_PLANTILLA_V10 va en esta lista. Si no se borra, una prueba
+  // que la pone contamina a todas las que vienen después y empiezan a pasar (o a
+  // fallar) por un valor que no pusieron ellas.
+  for (const k of ["SEGUIMIENTO_ACTIVO", "SEGUIMIENTO_PLANTILLA_2", "SEGUIMIENTO_PLANTILLA_3", "SEGUIMIENTO_IDIOMA", "SEGUIMIENTO_44H", "SEGUIMIENTO_PLANTILLA_V10"]) {
     delete process.env[k];
   }
   Object.assign(process.env, env || {});
@@ -70,6 +73,82 @@ console.log("\n── 1. 🔑 Sin variables de entorno, dice el default REAL del
   chequear("avisa que viene del código, no de una variable", c.origen.plantilla_2 === "default del código");
   chequear("el idioma efectivo es es_CO", c.idioma === "es_CO");
   chequear("y dice de dónde sale", /default del c[óo]digo/.test(c.origen.idioma));
+
+  // ==========================================================================
+  // 🔴 LA PLANTILLA DEL V10 TAMBIÉN TIENE QUE SALIR EN LA PANTALLA (1-oct)
+  //
+  // El dueño creó `seguimiento_intercomunicador` en Meta y puso la variable en
+  // Render. Para confirmar que el bot la había tomado no había NINGUNA forma de
+  // mirarlo desde afuera: ni /seguimiento ni /health la reportaban. Había que
+  // entrar a Render, o esperar a que un lead de intercomunicadores cumpliera 44h
+  // y leer los logs.
+  //
+  // Es el mismo fallo del 24-sep —la pantalla que existe para no confundirse,
+  // callada en el dato que se está esperando— repetido en un campo nuevo.
+  // ==========================================================================
+  chequear(
+    "🔑 reporta la plantilla del V10 (antes no existía en la pantalla)",
+    "plantilla_v10" in c,
+    `campos: ${Object.keys(c).join(", ")}`
+  );
+  chequear(
+    "  sin la variable, dice que al V10 se le SALTA el toque de 44h",
+    /salta/i.test(String(c.plantilla_v10)) && /SALTADO/.test(String(c.toque_44h_del_v10)),
+    `plantilla_v10: ${c.plantilla_v10} · toque: ${c.toque_44h_del_v10}`
+  );
+  chequear(
+    "⛔ y avisa que NO se le manda la del impermeable (sería el producto equivocado)",
+    /impermeable/i.test(String(c.toque_44h_del_v10)) && /NO se le manda/.test(String(c.toque_44h_del_v10)),
+    String(c.toque_44h_del_v10)
+  );
+  chequear(
+    "⛔ no hay default del código para el V10: inventarle uno es el bug que se arregló",
+    c.origen.plantilla_v10 === "no está puesta (no hay default: el código no le inventa una plantilla al V10)" &&
+      String(c.plantilla_v10).indexOf("seguimiento_impermeable") === -1,
+    `origen: ${c.origen.plantilla_v10} · valor: ${c.plantilla_v10}`
+  );
+}
+
+console.log("\n── 1b. Con la plantilla del V10 puesta, la pantalla lo confirma ──");
+
+{
+  const s = cargarCon({ SEGUIMIENTO_PLANTILLA_V10: "seguimiento_intercomunicador" });
+  const c = s.configuracionEfectiva();
+  chequear(
+    "🔑 dice el nombre exacto que va a mandar al lead de intercomunicadores",
+    c.plantilla_v10 === "seguimiento_intercomunicador",
+    `dijo "${c.plantilla_v10}"`
+  );
+  chequear(
+    "  y lo dice en palabras, para confirmarlo sin entrar a Render",
+    /ACTIVO/.test(String(c.toque_44h_del_v10)) &&
+      /seguimiento_intercomunicador/.test(String(c.toque_44h_del_v10)),
+    String(c.toque_44h_del_v10)
+  );
+  chequear(
+    "  y avisa que salió de la variable de entorno",
+    c.origen.plantilla_v10 === "variable de entorno",
+    String(c.origen.plantilla_v10)
+  );
+  chequear(
+    "⛔ y la del impermeable NO se contagia: sigue siendo la suya",
+    c.plantilla_3 === "seguimiento_impermeable",
+    `plantilla_3: ${c.plantilla_3}`
+  );
+}
+
+console.log("\n── 1c. Si el toque de 44h está apagado, no promete lo contrario ──");
+
+{
+  // Tener la plantilla del V10 puesta no sirve de nada si el paso 3 está
+  // apagado para todos. La pantalla no puede decir ACTIVO en ese caso.
+  const s = cargarCon({ SEGUIMIENTO_PLANTILLA_V10: "seguimiento_intercomunicador", SEGUIMIENTO_44H: "0" });
+  const c = s.configuracionEfectiva();
+  chequear(
+    "con SEGUIMIENTO_44H=0 dice APAGADO, no ACTIVO",
+    /APAGADO/.test(String(c.toque_44h_del_v10)) && !/🟢/.test(String(c.toque_44h_del_v10)),
+    String(c.toque_44h_del_v10)
+  );
 }
 
 console.log("\n── 2. Si se configura una variable, se respeta y se dice ──");
