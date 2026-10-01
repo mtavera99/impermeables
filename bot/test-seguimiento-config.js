@@ -149,10 +149,10 @@ function seguir() {
   );
   chequear(
     "los dos textos son distintos (a las 2h no se recuerda, se resuelve la duda)",
-    s.TEXTO_1 !== s.TEXTO_2 && s.TEXTO_1.length > 0
+    s.textoDe("impermeable", 1) !== s.textoDe("impermeable", 2) && s.textoDe("impermeable", 1).length > 0
   );
-  chequear("el de 2h va directo a la duda que frena", /duda/i.test(s.TEXTO_1));
-  chequear("y ofrece la salida fácil", /despacho/i.test(s.TEXTO_1));
+  chequear("el de 2h va directo a la duda que frena", /duda/i.test(s.textoDe("impermeable", 1)));
+  chequear("y ofrece la salida fácil", /despacho/i.test(s.textoDe("impermeable", 1)));
 
   console.log("\n── 6-B. 📊 SE PUEDE MEDIR CUÁL TOQUE PAGA ──");
   //
@@ -212,12 +212,14 @@ function seguir() {
 
   console.log("\n── 7. El texto del paso 1 trae el argumento que más cierra ──");
 
-  chequear("el de 2h tranquiliza sobre el pago", /cuando lo recib/i.test(s.TEXTO_1));
-  chequear("el de 20h menciona contraentrega", /contraentrega/i.test(s.TEXTO_2));
-  chequear("y pide la ciudad, que es lo que desbloquea el total", /ciudad/i.test(s.TEXTO_2));
+  chequear("el de 2h tranquiliza sobre el pago", /cuando lo recib/i.test(s.textoDe("impermeable", 1)));
+  chequear("el de 20h menciona contraentrega", /contraentrega/i.test(s.textoDe("impermeable", 2)));
+  chequear("y pide la ciudad, que es lo que desbloquea el total", /ciudad/i.test(s.textoDe("impermeable", 2)));
   chequear(
     "ninguno presiona con descuentos",
-    !/descuento|oferta|ultima oportunidad/i.test(s.TEXTO_1 + s.TEXTO_2)
+    !/descuento|oferta|ultima oportunidad/i.test(
+      ["impermeable", "intercom_v10_2x"].map((p) => s.textoDe(p, 1) + s.textoDe(p, 2)).join(" ")
+    )
   );
 
   console.log("\n── 8. La ruta del panel muestra la config efectiva ──");
@@ -360,7 +362,7 @@ function seguir() {
 
   const src2 = fs.readFileSync(`${__dirname}/src/seguimiento.js`, "utf8");
   const iReclama = src2.indexOf("reclamarSeguimiento(phone");
-  const iManda = src2.indexOf("await sendText(phone, paso.texto())");
+  const iManda = src2.indexOf("await sendText(phone, textoDe(productoId, paso.n))");
   chequear(
     "🔑 el código reserva el turno ANTES de mandar",
     iReclama > 0 && iManda > 0 && iReclama < iManda,
@@ -510,6 +512,62 @@ function seguir() {
     })(),
     "si no, se consume un seguimiento sin mandar nada"
   );
+
+  // ──────────────────────────────────────────────────────────────────────────
+  console.log("\n── EL SEGUIMIENTO HABLA DEL PRODUCTO QUE EL CLIENTE PREGUNTÓ (1-oct) ──");
+  //
+  // 🔴 EL CASO: el dueño preguntó si a un lead de intercomunicadores el
+  // remarketing le llegaba hablando de impermeables. Le llegaba, y en los TRES
+  // toques — el de 2h incluso mencionaba la TALLA, que el V10 no tiene.
+  //
+  // Y estaba activo: 6.371 mensajes enviados, 13 clientes en cola.
+  // ──────────────────────────────────────────────────────────────────────────
+  {
+    const seg = require("./src/seguimiento");
+    const V = "intercom_v10_2x";
+
+    for (const n of [1, 2]) {
+      const t = seg.textoDe(V, n);
+      chequear(`🔑 paso ${n} del V10 NO menciona impermeables`, !/impermeabl/i.test(t), t.slice(0, 90));
+      chequear(`   paso ${n} del V10 SÍ dice intercomunicadores`, /intercomunicador/i.test(t), t.slice(0, 90));
+    }
+    // 🔑 La peor parte del bug: hablarle de talla a un producto que no tiene.
+    chequear(
+      "🔑 el paso de 2h del V10 NO habla de talla",
+      !/talla/i.test(seg.textoDe(V, 1)),
+      seg.textoDe(V, 1)
+    );
+    // ⛔ Y el del impermeable no se tocó: su redacción está medida (8 compras).
+    chequear(
+      "⛔ el paso de 2h del impermeable sigue igual, con su talla",
+      /talla/i.test(seg.textoDe("impermeable", 1)) && /impermeable/i.test(seg.textoDe("impermeable", 1))
+    );
+    chequear(
+      "⛔ y los dos conservan el argumento que cierra: contraentrega",
+      /recib/i.test(seg.textoDe(V, 1)) && /contraentrega/i.test(seg.textoDe(V, 2))
+    );
+
+    // 🔴 LA PLANTILLA DEL V10 NO EXISTE EN META: el paso se SALTA, no se manda
+    // la del impermeable. Un toque menos es barato; el producto equivocado no.
+    chequear(
+      "🔑 al V10 NO se le manda la plantilla del impermeable",
+      seg.plantillaDe(V, "seguimiento_impermeable") === "",
+      `devolvió "${seg.plantillaDe(V, "seguimiento_impermeable")}"`
+    );
+    chequear(
+      "⛔ y al impermeable sí se le manda la suya",
+      seg.plantillaDe("impermeable", "seguimiento_impermeable") === "seguimiento_impermeable"
+    );
+    // Un producto desconocido cae al impermeable, que es el de siempre.
+    chequear(
+      "   un producto desconocido cae al texto del impermeable (cero regresión)",
+      seg.textoDe("lo_que_sea", 1) === seg.textoDe("impermeable", 1)
+    );
+    chequear(
+      "   y los dos productos tienen texto para los dos pasos",
+      ["impermeable", V].every((p) => [1, 2].every((n) => String(seg.textoDe(p, n) || "").length > 40))
+    );
+  }
 
   fs.rmSync(DIR, { recursive: true, force: true });
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
