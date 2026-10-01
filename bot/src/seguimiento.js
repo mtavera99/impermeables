@@ -26,6 +26,7 @@
 // ---------------------------------------------------------------------------
 
 const store = require("./store");
+const catalogo = require("./catalogo");
 const { sendText, sendTemplate } = require("./whatsapp");
 
 const H = 60 * 60 * 1000;
@@ -61,6 +62,99 @@ const ACTIVO = process.env.SEGUIMIENTO_ACTIVO === "1";
 // se salta (ver correrSeguimientos) sin consumirle el turno a nadie.
 const PLANTILLA_2 = process.env.SEGUIMIENTO_PLANTILLA_2 ?? "seguimiento_impermeable";
 const PLANTILLA_3 = process.env.SEGUIMIENTO_PLANTILLA_3 ?? "seguimiento_impermeable";
+
+// ============================================================================
+// 🔴 EL SEGUIMIENTO LE HABLABA DE IMPERMEABLES A QUIEN PREGUNTÓ POR V10 (1-oct)
+//
+// El dueño: *"un cliente está escribiendo por intercomunicadores y le vamos a
+// hacer el remarketing con las plantillas, pues solamente que corresponda el
+// tipo de producto que le está consultando, ¿no?"*. Tenía razón, y era peor de
+// lo que él creía: no era solo la plantilla de las 44h. Los TRES toques estaban
+// escritos a mano para impermeables, y el de 2 horas hablaba de **talla**:
+//
+//   "¿Te quedó alguna duda con el impermeable? ... Si no te sirve la talla,
+//    se cambia."
+//
+// El V10 no tiene talla. A un cliente que preguntó por intercomunicadores eso le
+// dice, en un solo mensaje, que no le estábamos prestando atención. Y el
+// seguimiento estaba ACTIVO: 6.371 mensajes enviados y 13 clientes en cola.
+//
+// 🔑 El producto de la conversación ya lo sabe el bot (`productoActivo`, que se
+// fija con señal fuerte y sobrevive a la rotación del historial). Acá solo hay
+// que usarlo.
+// ============================================================================
+
+const TEXTOS_POR_PRODUCTO = {
+  // El del impermeable es el original, medido: 268 enviados -> 8 compras en el
+  // paso de 2h. No se toca su redacción.
+  impermeable: {
+    1:
+      "¿Te quedó alguna duda con el impermeable? 🏍️\n\n" +
+      "Te cuento lo que más preguntan: pagás *cuando lo recibís*, no antes. Si no te " +
+      "sirve la talla, se cambia.\n\n" +
+      "¿Te lo despacho?",
+    2:
+      "Hola 👋 Te escribo por el impermeable que estabas mirando.\n\n" +
+      "Sigue disponible y recuerda que es *contraentrega*: pagas cuando lo " +
+      "tienes en la mano, no antes 🏍️\n\n" +
+      "¿Te lo despacho? Si quieres dime tu ciudad y te confirmo el total exacto.",
+  },
+  // ⚠️ El del V10 es el MISMO esqueleto —quitar la duda y recordar que es
+  // contraentrega— con dos cambios obligados: sin talla (no tiene), y el gancho
+  // es que el combo es por los DOS, que es lo que publicita el anuncio.
+  //
+  // ⛔ No se promete nada más. Todo lo que el bot puede afirmar del V10 está en
+  // `catalogo.datosConfirmados`, y acá no se agrega ni un dato nuevo.
+  intercom_v10_2x: {
+    1:
+      "¿Te quedó alguna duda con los intercomunicadores? 🏍️\n\n" +
+      "Te cuento lo que más preguntan: pagás *cuando los recibís*, no antes. Y el " +
+      "combo es por los DOS, no por uno.\n\n" +
+      "¿Te los despacho?",
+    2:
+      "Hola 👋 Te escribo por los intercomunicadores que estabas mirando.\n\n" +
+      "Siguen disponibles y recuerda que es *contraentrega*: pagas cuando los " +
+      "tienes en la mano, no antes 🏍️\n\n" +
+      "¿Te los despacho? Si quieres dime tu ciudad y te confirmo el total exacto.",
+  },
+};
+
+/** El texto del paso `n` para el producto de esa conversación. */
+function textoDe(productoId, n) {
+  const porProducto = TEXTOS_POR_PRODUCTO[productoId] || TEXTOS_POR_PRODUCTO.impermeable;
+  return porProducto[n] || TEXTOS_POR_PRODUCTO.impermeable[n];
+}
+
+// 🔴 LA PLANTILLA DEL V10 NO EXISTE TODAVÍA, Y ESO NO SE INVENTA.
+//
+// En Meta hay UNA sola plantilla de seguimiento aprobada: `seguimiento_impermeable`
+// (se comprobó contra /plantillas). Mandársela a un lead de intercomunicadores es
+// justo el bug que se está arreglando.
+//
+// 🔑 Entonces, mientras no exista una del V10, ese paso SE SALTA. Un toque menos
+// es barato; un mensaje del producto equivocado quema al cliente y además gasta
+// el tope de frecuencia de marketing que Meta cuenta por persona.
+//
+// Cuando el dueño cree `seguimiento_intercomunicador` en Meta, se prende solo
+// poniendo SEGUIMIENTO_PLANTILLA_V10 en Render. Sin tocar código.
+const PLANTILLA_V10 = process.env.SEGUIMIENTO_PLANTILLA_V10 ?? "";
+
+/** La plantilla que corresponde al producto. "" significa "saltar este paso". */
+function plantillaDe(productoId, plantillaBase) {
+  if (catalogo.esV10(productoId)) return PLANTILLA_V10;
+  return plantillaBase;
+}
+
+/** De qué producto es esta conversación. Mira lo fijado y, si no, el anuncio. */
+function productoDeLaConversacion(phone, c) {
+  try {
+    return catalogo.productoDelHilo(c, "", {
+      producto: catalogo.productoDelAnuncio(store.atribucionDe(phone)),
+    }).producto;
+  } catch {
+    return catalogo.PRODUCTO_POR_DEFECTO;
+  }
+}
 
 // 🔴 es_CO, NO es. Las plantillas se subieron en "Spanish (COL)", que en la API
 // es es_CO. Con "es" Meta RECHAZA el envio aunque la plantilla este aprobada, y
@@ -125,8 +219,10 @@ const PASO_44H_ACTIVO = !APAGADO.has(
 );
 
 const PASOS = [
-  { n: 1, desde: 2 * H, hasta: 5 * H, tipo: "texto", texto: () => TEXTO_1 },
-  { n: 2, desde: 20 * H, hasta: 23 * H, tipo: "texto", texto: () => TEXTO_2 },
+  // 🔑 El texto ya NO vive en el paso: sale de `textoDe(producto, n)` en el
+  // momento del envío, porque depende de la conversación y no del paso.
+  { n: 1, desde: 2 * H, hasta: 5 * H, tipo: "texto" },
+  { n: 2, desde: 20 * H, hasta: 23 * H, tipo: "texto" },
   // El de 44h entra solo si está prendido Y tiene plantilla. Si se saca de la
   // lista, nadie queda "esperándolo": simplemente recibe dos toques en vez de
   // tres, y no se ensucia el log con un salto cada 30 minutos.
@@ -135,29 +231,18 @@ const PASOS = [
     : []),
 ];
 
-// El texto del seguimiento 1. Va sin presion y le devuelve el argumento que
-// mas cierra en el guion: contraentrega, no paga nada por adelantado.
-// ── Paso 1, a las 2 horas ──────────────────────────────────────────────────
-// Corto y sin presión. El cliente todavía se acuerda de la conversación, así que
-// no hay que recordarle nada: hay que quitarle la duda que lo frenó.
+// ── Por qué estos textos y en estos momentos ───────────────────────────────
 //
-// 🔑 Medido en el embudo del 23-sep: de 54 personas que recibieron el total, solo
-// 10 llegaron al cuadro de confirmación. El freno está justo después del precio,
-// así que este mensaje va directo a eso y ofrece la salida más fácil.
-const TEXTO_1 =
-  "¿Te quedó alguna duda con el impermeable? 🏍️\n\n" +
-  "Te cuento lo que más preguntan: pagás *cuando lo recibís*, no antes. Si no te " +
-  "sirve la talla, se cambia.\n\n" +
-  "¿Te lo despacho?";
-
-// ── Paso 2, a las 20 horas ─────────────────────────────────────────────────
-// Último mensaje de texto libre antes de que se cierre la ventana de 24h. Acá sí
-// conviene recordar qué es, porque ya pasó un día.
-const TEXTO_2 =
-  "Hola 👋 Te escribo por el impermeable que estabas mirando.\n\n" +
-  "Sigue disponible y recuerda que es *contraentrega*: pagas cuando lo " +
-  "tienes en la mano, no antes 🏍️\n\n" +
-  "¿Te lo despacho? Si quieres dime tu ciudad y te confirmo el total exacto.";
+// Paso 1 (2h): corto y sin presión. El cliente todavía se acuerda de la
+// conversación, así que no hay que recordarle nada: hay que quitarle la duda que
+// lo frenó. Medido en el embudo del 23-sep: de 54 personas que recibieron el
+// total, solo 10 llegaron al cuadro de confirmación. El freno está justo después
+// del precio, así que este mensaje va directo a eso.
+//
+// Paso 2 (20h): último mensaje de texto libre antes de que se cierre la ventana
+// de 24h. Acá sí conviene recordar qué es, porque ya pasó un día.
+//
+// 🔑 La redacción de los dos, por producto, está en TEXTOS_POR_PRODUCTO arriba.
 
 /** Un cliente entra al seguimiento solo si cumple TODO esto. */
 function elegible(phone, c, ahora) {
@@ -223,15 +308,25 @@ async function correrSeguimientos() {
 
     const horas = ((ahora - c.ultimoDelCliente) / H).toFixed(1);
 
+    // 🔑 DE QUÉ PRODUCTO ES ESTA CONVERSACIÓN. Decide el texto y la plantilla:
+    // sin esto, a quien preguntó por intercomunicadores le llegaba el mensaje del
+    // impermeable, con mención a la talla incluida.
+    const productoId = productoDeLaConversacion(phone, c);
+    const plantilla = paso.tipo === "plantilla" ? plantillaDe(productoId, paso.plantilla) : null;
+
     // ⚠️ Esto va ANTES de reclamar el turno. Si se reclama primero y después se
     // descubre que falta la plantilla, se consume un seguimiento sin mandar nada
     // y el cliente pierde ese toque para siempre.
-    if (paso.tipo === "plantilla" && !paso.plantilla) {
+    if (paso.tipo === "plantilla" && !plantilla) {
       saltados++;
       console.log(
         `[seguimiento ${paso.n}] ${phone} (${horas}h) SALTADO: ` +
-          `falta configurar SEGUIMIENTO_PLANTILLA_${paso.n}. ` +
-          "Pasadas las 24h Meta solo acepta plantillas aprobadas."
+          (catalogo.esV10(productoId)
+            ? "la conversación es de intercomunicadores y no hay plantilla del V10. " +
+              "⛔ NO se le manda la del impermeable: sería el producto equivocado. " +
+              "Creá `seguimiento_intercomunicador` en Meta y ponela en SEGUIMIENTO_PLANTILLA_V10."
+            : `falta configurar SEGUIMIENTO_PLANTILLA_${paso.n}. ` +
+              "Pasadas las 24h Meta solo acepta plantillas aprobadas.")
       );
       continue;
     }
@@ -249,7 +344,7 @@ async function correrSeguimientos() {
     }
 
     if (paso.tipo === "texto") {
-      const r = await sendText(phone, paso.texto());
+      const r = await sendText(phone, textoDe(productoId, paso.n));
       if (r && r.ok === false) {
         console.error(
           `🔴 [seguimiento ${paso.n}] ${phone} NO SE ENTREGÓ: ${JSON.stringify(r.body?.error || r.body).slice(0, 180)}. ` +
@@ -257,21 +352,27 @@ async function correrSeguimientos() {
         );
       }
       enviados++;
-      console.log(`[seguimiento ${paso.n}] ${phone} (${horas}h) texto libre enviado`);
+      console.log(
+        `[seguimiento ${paso.n}] ${phone} (${horas}h) texto libre enviado ` +
+          `(producto: ${productoId})`
+      );
     } else {
-      const r = await sendTemplate(phone, paso.plantilla, IDIOMA);
+      const r = await sendTemplate(phone, plantilla, IDIOMA);
       if (r && r.ok === false) {
         // 🔴 Acá es donde se va a ver si la plantilla tiene variables: Meta la
         // rechaza y el error lo dice. Se registra fuerte porque es el estreno.
         console.error(
-          `🔴 [seguimiento ${paso.n}] ${phone} PLANTILLA '${paso.plantilla}' RECHAZADA: ` +
+          `🔴 [seguimiento ${paso.n}] ${phone} PLANTILLA '${plantilla}' RECHAZADA: ` +
             `${JSON.stringify(r.body?.error || r.body).slice(0, 220)}. ` +
             "Si dice que faltan parámetros, la plantilla tiene variables {{1}} y hay que " +
             "mandarla con componentes. Si habla del idioma, revisar que sea es_CO."
         );
       }
       enviados++;
-      console.log(`[seguimiento ${paso.n}] ${phone} (${horas}h) plantilla '${paso.plantilla}' enviada`);
+      console.log(
+        `[seguimiento ${paso.n}] ${phone} (${horas}h) plantilla '${plantilla}' enviada ` +
+          `(producto: ${productoId})`
+      );
     }
   }
   return { revisadas: Object.keys(todas).length, enviados, saltados };
@@ -402,7 +503,10 @@ module.exports = {
   correrSeguimientos,
   diagnostico,
   configuracionEfectiva,
-  TEXTO_1,
-  TEXTO_2,
+  // 🔑 Reemplazan a los viejos TEXTO_1/TEXTO_2, que eran dos constantes de
+  // impermeable. Ahora el texto depende del producto de la conversación.
+  textoDe,
+  plantillaDe,
+  TEXTOS_POR_PRODUCTO,
   PASOS,
 };
