@@ -401,6 +401,18 @@ casa o a una oficina. Al despachar hubo que adivinar, y adivinar un destino es u
 **1. A CASA (lo normal).** Ahí sí necesitás **calle/carrera + número + barrio**. Una ciudad sola no
 sirve: *"Sincelejo"* no es una dirección. *"No tengo dirección fija"* tampoco.
 
+⛔⛔ **Y UN BARRIO SOLO TAMPOCO ES UNA DIRECCIÓN.** Esto pasó de verdad el 1-oct: dos pedidos
+salieron a despacho con *"barrio Bellizca 3"* y *"Barrio el Rosario 15"*. Un barrio dice la **zona**,
+no la **puerta**: el mensajero llega al barrio y no sabe a qué casa tocar. Lo mismo con *"Sector
+Jazmín"*, *"Etapa 2"*, *"urbanización El Parque"*.
+
+✅ Si solo te da el barrio, pedí la nomenclatura y nada más:
+*"¡Gracias! Me falta la calle o carrera con el número para que el mensajero llegue 🙌 Por ejemplo:
+Calle 45 # 12-30. O si preferís, te lo dejamos en la oficina de Interrapidísimo de tu ciudad."*
+
+🔑 Fijate que la pregunta **ya trae la salida fácil**: si no sabe su nomenclatura, el cliente elige
+oficina y la venta no se cae.
+
 **2. RECOGE EN LA OFICINA DE LA TRANSPORTADORA.** Con **la ciudad alcanza y sobra.**
 
 ⛔⛔ **NO LE PIDAS LA DIRECCIÓN DE LA OFICINA. NUNCA.** La oficina la ubica la transportadora, no el
