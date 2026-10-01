@@ -316,7 +316,11 @@ const pedir = async (ruta, cuerpo) => {
   }
 
   // =========================================================================
-  console.log("\n── 6. El plan se consume: un segundo clic no reenvía ──");
+  console.log("\n── 6. Un segundo clic no le escribe dos veces a la misma persona ──");
+  //
+  // 🔑 El candado dejó de ser "se borra el plan entero" y pasó a ser "se recuerda
+  // qué guías ya se avisaron" (1-oct). Protege lo mismo —nadie recibe el aviso
+  // dos veces— pero sin tirar a la basura las filas que todavía no salieron.
   // =========================================================================
   {
     const rev = await pedir("/novedades/revisar", {
@@ -330,6 +334,70 @@ const pedir = async (ruta, cuerpo) => {
     const segundo = await pedir("/novedades/enviar", { id: rev.cuerpo.id, indices: [i], datos: {} });
     chequear("⛔ el segundo clic no reenvía", segundo.cuerpo.ok === false || segundo.cuerpo.enviados === 0, JSON.stringify(segundo.cuerpo).slice(0, 120));
     chequear("⛔ y no salió otro mensaje", enviados.length === antes);
+    chequear(
+      "  y dice que ya se le avisó, en vez de un error confuso",
+      /ya se le avis/i.test(JSON.stringify(segundo.cuerpo.resultados || [])),
+      JSON.stringify(segundo.cuerpo.resultados)
+    );
+  }
+
+  // =========================================================================
+  console.log("\n── 7. Lo que falló se puede reintentar sin pegar todo otra vez ──");
+  //
+  // 🔴 EL COSTO DEL CANDADO VIEJO. Al terminar el envío se borraba el plan
+  // COMPLETO. Si de 3 novedades salían 2 y fallaba 1 por un dato mal escrito, esa
+  // una ya no se podía reintentar: había que volver a pegar las novedades desde
+  // cero. Y con las filas de oficina —que desde el 1-oct se mandan completando
+  // los campos ahí mismo— un dato mal escrito es lo más normal del mundo.
+  //
+  // Cada novedad sin avisar es un paquete que se devuelve, y una devolución
+  // cuesta $17.384. Hacer que reintentar sea caro es hacer que no se reintente.
+  // =========================================================================
+  {
+    const rev = await pedir("/novedades/revisar", { texto: TEXTO, datos: {} });
+    const iG1 = rev.cuerpo.filas.findIndex((f) => f.guia === G1);
+    const iG2 = rev.cuerpo.filas.findIndex((f) => f.guia === G2);
+
+    // Primer intento: G1 con los datos completos, G2 sin ellos. Es el caso real.
+    const antes1 = enviados.length;
+    const primero = await pedir("/novedades/enviar", {
+      id: rev.cuerpo.id,
+      indices: [iG1, iG2],
+      datos: { [G1]: { oficina: "Interrapidísimo Montería", plazo: "el 6 de octubre" } },
+    });
+    chequear("sale la que estaba completa", primero.cuerpo.enviados === 1, JSON.stringify(primero.cuerpo.resultados));
+    chequear("y la otra falla diciendo qué falta", /oficina/i.test((primero.cuerpo.resultados.find((r) => !r.ok) || {}).error || ""), JSON.stringify(primero.cuerpo.resultados));
+    chequear("salió 1 solo mensaje", enviados.length - antes1 === 1, `salieron ${enviados.length - antes1}`);
+
+    // Segundo intento con EL MISMO plan: solo se completa lo que faltaba.
+    const antes2 = enviados.length;
+    const segundo = await pedir("/novedades/enviar", {
+      id: rev.cuerpo.id,
+      indices: [iG1, iG2],
+      datos: { [G2]: { oficina: "Interrapidísimo Cereté", plazo: "el 7 de octubre" } },
+    });
+    chequear(
+      "🔑 el plan sigue vivo: no hay que pegar las novedades otra vez",
+      segundo.cuerpo.ok === true,
+      JSON.stringify(segundo.cuerpo).slice(0, 160)
+    );
+    chequear(
+      "🔑 y ahora sí sale la que había fallado",
+      segundo.cuerpo.enviados === 1,
+      JSON.stringify(segundo.cuerpo.resultados)
+    );
+    chequear(
+      "⛔ sin reenviarle a la que ya había salido",
+      enviados.length - antes2 === 1 &&
+        /ya se le avis/i.test((segundo.cuerpo.resultados.find((r) => r.guia === G1) || {}).error || ""),
+      JSON.stringify(segundo.cuerpo.resultados)
+    );
+    const params = JSON.stringify(enviados[enviados.length - 1]);
+    chequear(
+      "  y le llega SU oficina, no la de la otra guía",
+      /Ceret[eé]/.test(params) && !/Monter[ií]a/.test(params),
+      params
+    );
   }
 
   fs.rmSync(DIR, { recursive: true, force: true });

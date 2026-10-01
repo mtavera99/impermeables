@@ -741,6 +741,38 @@ app.post("/novedades/enviar", async (req, res) => {
     }
   }
 
+  // ==========================================================================
+  // 🔒 EL CANDADO ANTIDUPLICADOS PASA A SER POR GUÍA, NO POR PLAN (1-oct)
+  //
+  // Antes, al terminar el envío se borraba el plan completo para que un segundo
+  // clic no reenviara lo mismo. Protegía bien, pero cobraba caro: si de 5
+  // novedades salían 3 y fallaban 2, las 2 que fallaron ya no se podían
+  // reintentar — había que volver a pegar las novedades desde cero.
+  //
+  // Y con las filas de oficina eso pasa seguido, porque ahora se pueden mandar
+  // completando los campos ahí mismo: es normal que una salga con un dato mal y
+  // haya que corregirla. Perder las otras cuatro por eso es inaceptable cuando
+  // lo que está en juego es que el pedido no se devuelva.
+  //
+  // 🔑 Se recuerdan las GUÍAS ya avisadas. El plan sobrevive hasta su
+  // vencimiento normal, así que corregir y reintentar es un clic; y avisarle dos
+  // veces a la misma persona sigue siendo imposible, porque su guía queda en la
+  // lista y la fila se marca como no enviable con ese motivo escrito.
+  // ==========================================================================
+  const yaAvisadas = new Set((Array.isArray(plan.yaAvisadas) ? plan.yaAvisadas : []).map(String));
+  if (yaAvisadas.size) {
+    filas = filas.map((f) =>
+      f && yaAvisadas.has(String(f.guia))
+        ? {
+            ...f,
+            enviar: false,
+            motivoNoEnvio:
+              "Ya se le avisó esta novedad hace un momento. No se repite para no escribirle dos veces.",
+          }
+        : f
+    );
+  }
+
   for (const i of indices) {
     const f = filas[i];
     // No se manda nada que la revisión haya marcado como no enviable, aunque
@@ -791,6 +823,8 @@ app.post("/novedades/enviar", async (req, res) => {
         porPlantilla: Boolean(f.porPlantilla),
       });
       console.log(`📮 Novedad ${f.tipo} avisada a ${f.nombre || f.destino} (guía ${f.guia})`);
+      // 🔒 Queda anotada para que un segundo clic no le escriba de nuevo.
+      yaAvisadas.add(String(f.guia));
       resultados.push({ guia: f.guia, nombre: f.nombre, ok: true });
     } else {
       const motivo = motivoDeEnvio(envio);
@@ -800,9 +834,22 @@ app.post("/novedades/enviar", async (req, res) => {
     }
   }
 
-  // El plan se consume: un segundo clic no puede reenviar lo mismo.
-  PLANES_NOVEDADES.delete(String(req.body.id));
-  store.borrarPlan("novedades", String(req.body.id));
+  // El plan NO se borra: se guarda con lo aprendido —los datos que el dueño
+  // completó y las guías ya avisadas—. Así puede corregir lo que falló y darle
+  // Enviar otra vez sin pegar nada, y nadie recibe el mismo aviso dos veces.
+  //
+  // ⚠️ `creado` se conserva a propósito: el vencimiento se cuenta desde que
+  // revisó, no desde el último clic. Si se renovara, un plan podría quedar vivo
+  // para siempre a base de reintentos y mezclarse con la tanda del día siguiente.
+  const guardado = {
+    filas,
+    texto: plan.texto,
+    datos,
+    yaAvisadas: [...yaAvisadas],
+    creado: plan.creado || Date.now(),
+  };
+  PLANES_NOVEDADES.set(idPlan, guardado);
+  store.guardarPlan("novedades", idPlan, guardado);
 
   const enviados = resultados.filter((r) => r.ok).length;
   res.json({

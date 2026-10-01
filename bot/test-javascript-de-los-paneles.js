@@ -649,6 +649,238 @@ console.log("\n── 5. El botón Revisar sigue andando ──");
     );
   }
 
+  // =========================================================================
+  // 🔴 7. LAS FILAS QUE PIDEN LA OFICINA TIENEN QUE TENER CASILLA (1-oct)
+  //
+  // DE DÓNDE SALE: el dueño, con tres novedades de oficina en pantalla y los dos
+  // campos ya escritos: *"los que me salen así para escribir detalles les
+  // escribo los detalles pero no se envían, ¿cómo hago?"*.
+  //
+  // LA CAUSA: la casilla se dibujaba solo si la fila ya era enviable, y una fila
+  // que pide la oficina y el plazo tiene `enviar: false` — es lo que significa
+  // que le falte un dato. Sin casilla, el botón Enviar (que junta solo
+  // `:checked`) nunca mandaba su índice, y el servidor no se enteraba de que esa
+  // fila existía: la saltaba sin error, porque el bucle solo recorre los índices
+  // marcados.
+  //
+  // Lo caro del caso es que el servidor YA sabía resolverlas: los datos llegan y
+  // el plan se recalcula (arreglo del 30-sep). Arreglé la mitad del camino y la
+  // batería de ese día lo probó en el servidor, donde funcionaba. Nadie probó la
+  // pantalla, que es donde se cortaba. Esta sección prueba el camino completo:
+  // se PINTAN las filas, se saca la casilla del HTML pintado y se toca Enviar.
+  // =========================================================================
+  console.log("\n── 7. Las filas que piden la oficina se pueden mandar sin «Revisar otra vez» ──");
+
+  // Iris y las otras dos son las de la captura del dueño: guía real, novedad de
+  // oficina, ventana cerrada y los dos datos sin completar.
+  const FILA_PIDE_DATOS = {
+    guia: "240062298816",
+    motivo: "Reclame en oficina Iris SOLEDAD/SOLEDAD",
+    tipo: "oficina",
+    tipoNombre: "Quedó para reclamar en oficina",
+    nombre: "Iris",
+    destino: "573013779312",
+    ventanaAbierta: false,
+    texto: "",
+    enviar: false,
+    motivoNoEnvio:
+      "Falta completar en qué oficina está y hasta cuándo tiene para reclamarlo. " +
+      "Esos datos salen de la novedad: el bot no los puede inventar.",
+    porPlantilla: false,
+    plantilla: "novedad_oficina",
+    pidoDatos: ["oficina", "plazo"],
+  };
+
+  /** Toca Revisar con esas filas y devuelve las <tr> que se pintaron. */
+  async function pintar(filas) {
+    const p = abrirPanelDeNovedades({
+      ok: true,
+      id: "plan-1",
+      listas: filas.filter((f) => f.enviar).length,
+      bloqueadas: filas.filter((f) => !f.enviar).length,
+      filas,
+    });
+    // 🔑 El tbody del arnés devolvía un nodo NUEVO en cada llamada, así que lo
+    // que el panel pintaba no se podía mirar. Acá se fija uno solo.
+    const tbody = {
+      hijos: [],
+      innerHTML: "",
+      appendChild(h) {
+        this.hijos.push(h);
+        return h;
+      },
+    };
+    p.contexto.document.querySelector = () => tbody;
+    p.nodos.pegado.value = "240062298816  Reclame en oficina";
+    p.listeners["btnRevisar:click"].call(p.nodos.btnRevisar);
+    await new Promise((r) => setTimeout(r, 0));
+    return { p, tbody, html: tbody.hijos.map((tr) => String(tr.innerHTML || "")) };
+  }
+
+  /** Las casillas que el navegador habría dibujado, sacadas del HTML pintado. */
+  function casillasDe(html) {
+    return html
+      .map((fila) => /data-i="(\d+)" data-guia="(\d+)"/.exec(fila))
+      .filter(Boolean)
+      .map((m) => ({
+        checked: true,
+        getAttribute: (a) => ({ "data-i": m[1], "data-guia": m[2] })[a] || null,
+      }));
+  }
+
+  {
+    const { p, html } = await pintar([FILA_PIDE_DATOS]);
+
+    chequear(
+      "🔑 la fila que pide la oficina SÍ tiene casilla (esto es el bug del 1-oct)",
+      /type="checkbox"/.test(html[0] || ""),
+      `fila pintada: ${JSON.stringify(html[0] || "").slice(0, 300)}`
+    );
+    chequear(
+      "  y la casilla lleva su índice y su guía",
+      /data-i="0" data-guia="240062298816"/.test(html[0] || ""),
+      `fila pintada: ${JSON.stringify(html[0] || "").slice(0, 300)}`
+    );
+    chequear(
+      "  los dos campos para completar siguen ahí",
+      /data-campo="oficina"/.test(html[0] || "") && /data-campo="plazo"/.test(html[0] || ""),
+      `fila pintada: ${JSON.stringify(html[0] || "").slice(0, 300)}`
+    );
+    chequear(
+      "🔑 y el aviso ya NO manda a darle «Revisar otra vez»",
+      !/Revisar otra vez/i.test(p.nodos.res.textContent) &&
+        /dale Enviar/i.test(p.nodos.res.textContent),
+      JSON.stringify(p.nodos.res.textContent)
+    );
+  }
+
+  {
+    // El camino completo, que es lo que el dueño hace: la fila se pinta con
+    // casilla, él escribe los dos datos, toca Enviar. El índice TIENE que viajar.
+    const { p, html } = await pintar([FILA_PIDE_DATOS]);
+    const casillas = casillasDe(html);
+    const campos = [
+      {
+        value: "Oficina Interrapidisimo SOLEDAD",
+        getAttribute: (a) =>
+          ({ "data-guia": "240062298816", "data-campo": "oficina" })[a] || null,
+      },
+      {
+        value: "6 de octubre",
+        getAttribute: (a) => ({ "data-guia": "240062298816", "data-campo": "plazo" })[a] || null,
+      },
+    ];
+    p.contexto.document.querySelectorAll = (sel) => {
+      if (sel === "input.dato") return campos;
+      if (sel.indexOf("type=checkbox") !== -1) return casillas;
+      return [];
+    };
+    p.llamadas.length = 0; // se descarta la llamada de Revisar
+    p.listeners["btnEnviar:click"].call(p.nodos.btnEnviar);
+    await new Promise((r) => setTimeout(r, 0));
+
+    const cuerpo = p.llamadas[0] && p.llamadas[0].cuerpo;
+    chequear(
+      "🔑 completar los dos campos y darle Enviar manda la fila (antes: nada)",
+      Boolean(cuerpo) && cuerpo.indices.length === 1 && cuerpo.indices[0] === 0,
+      `cuerpo: ${JSON.stringify(cuerpo)}`
+    );
+    chequear(
+      "  con la oficina y la fecha que escribió",
+      Boolean(cuerpo) &&
+        cuerpo.datos["240062298816"].oficina === "Oficina Interrapidisimo SOLEDAD" &&
+        cuerpo.datos["240062298816"].plazo === "6 de octubre",
+      `datos: ${JSON.stringify(cuerpo && cuerpo.datos)}`
+    );
+  }
+
+  {
+    // ⛔ Lo que NO se puede arreglar escribiendo sigue sin casilla: marcarlo solo
+    // serviría para que el envío lo rechace. Sin destinatario no hay a quién
+    // mandarle, y un pedido rechazado lo maneja el dueño, no un mensaje.
+    const sinDestino = { ...FILA_PIDE_DATOS, guia: "240062298822", destino: "", pidoDatos: null };
+    const rechazado = {
+      ...FILA_PIDE_DATOS,
+      guia: "240062298833",
+      pidoDatos: null,
+      motivoNoEnvio: "El cliente rechazó el pedido: esto lo maneja el dueño",
+    };
+    const { html } = await pintar([sinDestino, rechazado]);
+    chequear(
+      "⛔ la fila sin destinatario no tiene casilla",
+      !/type="checkbox"/.test(html[0] || ""),
+      `fila: ${JSON.stringify(html[0] || "").slice(0, 200)}`
+    );
+    chequear(
+      "⛔ la bloqueada por un motivo que no se arregla escribiendo tampoco",
+      !/type="checkbox"/.test(html[1] || ""),
+      `fila: ${JSON.stringify(html[1] || "").slice(0, 200)}`
+    );
+  }
+
+  {
+    // Y no se rompió lo que ya andaba: una fila lista sigue con su casilla.
+    const lista = {
+      ...FILA_PIDE_DATOS,
+      guia: "240062298844",
+      pidoDatos: null,
+      enviar: true,
+      porPlantilla: true,
+      texto: "Tu pedido quedó para reclamar en la oficina...",
+      motivoNoEnvio: "",
+    };
+    const { p, html } = await pintar([lista]);
+    chequear(
+      "la fila que ya estaba lista conserva su casilla",
+      /type="checkbox"/.test(html[0] || "") && /data-guia="240062298844"/.test(html[0] || ""),
+      `fila: ${JSON.stringify(html[0] || "").slice(0, 300)}`
+    );
+    chequear(
+      "  y sin filas que pidan datos, el aviso no habla de completar nada",
+      !/completes los dos campos/i.test(p.nodos.res.textContent),
+      JSON.stringify(p.nodos.res.textContent)
+    );
+  }
+
+  {
+    // 🔑 Lo que falló queda MARCADO para reintentar. Antes se desmarcaba todo, y
+    // corregir un dato obligaba a volver a marcar a mano las que no salieron.
+    const p = abrirPanelDeNovedades({
+      ok: true,
+      intentados: 2,
+      enviados: 1,
+      fallaron: 1,
+      resultados: [
+        { guia: "111111111111", nombre: "Sí Salió", ok: true },
+        { guia: "222222222222", nombre: "No Salió", ok: false, error: "falta la oficina" },
+      ],
+    });
+    const salio = {
+      checked: true,
+      getAttribute: (a) => ({ "data-i": "0", "data-guia": "111111111111" })[a] || null,
+    };
+    const fallo = {
+      checked: true,
+      getAttribute: (a) => ({ "data-i": "1", "data-guia": "222222222222" })[a] || null,
+    };
+    p.contexto.document.querySelectorAll = (sel) =>
+      sel.indexOf("type=checkbox") !== -1 ? [salio, fallo] : [];
+    p.contexto.PLAN = { id: "plan-1", filas: [] };
+    p.listeners["btnEnviar:click"].call(p.nodos.btnEnviar);
+    await new Promise((r) => setTimeout(r, 0));
+
+    chequear(
+      "la que salió se desmarca (no se le puede escribir dos veces)",
+      salio.checked === false,
+      `checked: ${salio.checked}`
+    );
+    chequear(
+      "🔑 y la que falló queda marcada, para corregir el dato y reintentar de un clic",
+      fallo.checked === true,
+      `checked: ${fallo.checked}`
+    );
+  }
+
   fs.rmSync(DIR, { recursive: true, force: true });
   console.log(`\n${mal === 0 ? "🟢" : "🔴"} ${ok}/${ok + mal} correctos.\n`);
   process.exit(mal === 0 ? 0 : 1);
