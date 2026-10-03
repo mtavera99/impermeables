@@ -86,10 +86,33 @@ for (const p of PANTALLAS) {
     console.log(`ℹ️  ${p.nombre}: no hace peticiones, no aplica`);
     continue;
   }
+  // ==========================================================================
+  // CONTAR `status === 403` UNA VEZ POR PETICIÓN YA NO ALCANZA (3-oct)
+  //
+  // La cuenta era: tantos manejos de 403 como fetch. Funcionaba mientras cada
+  // petición repitiera el chequeo en línea. Pero el panel de guías pasó a
+  // centralizar el manejo de respuestas en `leerRespuesta()` —que trata el 403,
+  // lee el motivo que manda el servidor y recién entonces tira el error—, así
+  // que quedó 1 manejo para 4 peticiones y esta prueba lo marcó como un fallo.
+  //
+  // 🔑 Lo que importa no es que el chequeo esté repetido: es que NINGUNA
+  // petición pueda llegar a `r.json()` sin pasar por un manejo del 403.
+  // Centralizarlo lo cumple MEJOR que repetirlo, porque no se puede olvidar en
+  // una petición nueva. Así que cada petición cuenta como cubierta si maneja el
+  // 403 en línea o si encadena el helper que lo maneja.
+  //
+  // ⚠️ Y el helper tiene que tratar el 403 de verdad: si alguien lo vacía, la
+  // primera condición se cae y la prueba vuelve a fallar.
+  // ==========================================================================
   const manejados = (script.match(/status === 403/g) || []).length;
+  const helperManeja =
+    /function leerRespuesta\s*\([\s\S]*?status === 403/.test(script) &&
+    /clave del panel/i.test(script);
+  const porElHelper = helperManeja ? (script.match(/\.then\(leerRespuesta\)/g) || []).length : 0;
   chequear(
-    `${p.nombre}: sus ${fetches} petición(es) manejan el 403 (${manejados})`,
-    manejados >= fetches,
+    `${p.nombre}: sus ${fetches} petición(es) manejan el 403 ` +
+      `(${manejados} en línea + ${porElHelper} por leerRespuesta)`,
+    manejados + porElHelper >= fetches,
     "un 403 va a salir como 'Unexpected token F' en vez de decir que es la clave"
   );
   chequear(
