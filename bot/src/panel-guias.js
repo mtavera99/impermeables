@@ -253,6 +253,68 @@ function mostrar(clase, texto) {
   aviso.style.display = "block";
 }
 
+// ===========================================================================
+// 🔴 LA PANTALLA TIRABA EL CÓDIGO Y SE COMÍA EL MOTIVO (3-oct)
+//
+// DE DÓNDE SALE. El dueño subió el PDF de la guía de una clienta y la pantalla
+// dijo, entero: "el servidor respondió 400." Nada más. Las demás guías habían
+// cargado bien, así que no tenía ni por dónde empezar.
+//
+// LA CAUSA. Los cuatro fetch de este panel hacían:
+//
+//     if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
+//
+// y el servidor SÍ manda el motivo, siempre, en {ok:false,error:"..."}. Cada uno
+// de los 400 de /guias/revisar trae una frase escrita para que el dueño sepa qué
+// hacer. Esa línea las descartaba todas: tiraba el error ANTES de leer el
+// cuerpo. El "then" de abajo, que sí sabe mostrar d.error, nunca llegaba a
+// correr porque solo se ejecuta en las respuestas que salieron bien.
+//
+// ⚠️ OJO AL EDITAR: este comentario vive DENTRO del template literal del HTML,
+// así que no puede llevar comillas invertidas. Poner una cierra la cadena y el
+// módulo entero deja de cargar. Me pasó escribiendo esto —y el día anterior en
+// panel-novedades.js—, así que acá queda el aviso.
+//
+// Es el mismo fallo que el 29-sep en el panel de novedades: el envío no estaba
+// roto, estaba MUDO. Acá era peor, porque además de no decir el motivo hacía
+// que dos problemas opuestos se vieran idénticos — un archivo que no es PDF y
+// una subida cortada dan los dos "400", y uno se arregla reintentando.
+//
+// 🔑 Ahora se lee el cuerpo antes de tirar. Y se cae a texto plano, porque un
+// error que no sale de nuestras rutas puede venir como HTML de Express.
+// ===========================================================================
+function leerRespuesta(r) {
+  // Un 403 devuelve el texto "Forbidden", no JSON. Sin esto, r.json() explota
+  // con "Unexpected token 'F'" y el dueño ve un error que no tiene nada que ver
+  // con el problema real, que es la clave del panel.
+  if (r.status === 403) {
+    throw new Error("la clave del panel no coincide. Volvé a abrir el panel y entrá de nuevo a Guías.");
+  }
+  if (r.ok) return r.json();
+
+  return r.text().then(function (cuerpo) {
+    var motivo = "";
+    try {
+      motivo = (JSON.parse(cuerpo) || {}).error || "";
+    } catch (e) {
+      motivo = ""; // vino HTML: lo tira un middleware, no una ruta nuestra
+    }
+    if (!motivo) {
+      // Sin motivo del servidor, al menos se dice algo accionable según el
+      // código, en vez de un número pelado.
+      motivo =
+        r.status === 413
+          ? "el PDF es demasiado grande (el tope es 40 MB)."
+          : r.status === 400
+            ? "la subida no llegó completa. Casi siempre es la conexión: volvé a intentar."
+            : r.status === 502 || r.status === 503
+              ? "el bot se está reiniciando. Esperá un minuto y volvé a intentar."
+              : "el servidor respondió " + r.status + ".";
+    }
+    throw new Error(motivo);
+  });
+}
+
 archivo.addEventListener("change", function () {
   btnRevisar.disabled = !archivo.files.length;
   document.getElementById("zonaPareo").style.display = "none";
@@ -276,16 +338,7 @@ btnRevisar.addEventListener("click", function () {
     headers: { "Content-Type": "application/pdf" },
     body: f
   })
-    .then(function (r) {
-      // Un 403 devuelve el texto "Forbidden", no JSON. Sin esto, r.json()
-      // explota con "Unexpected token 'F'" y el dueño ve un error que no tiene
-      // nada que ver con el problema real, que es la clave del panel.
-      if (r.status === 403) {
-        throw new Error("la clave del panel no coincide. Volvé a abrir el panel y entrá de nuevo a Guías.");
-      }
-      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
-      return r.json();
-    })
+    .then(leerRespuesta)
     .then(function (d) {
       if (!d.ok) { mostrar("mal", "🔴 " + (d.error || "No se pudo leer el PDF.")); return; }
       plan = d;
@@ -441,11 +494,7 @@ document.getElementById("tablaPareo").addEventListener("click", function (ev) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id: plan.id, pagina: pagina, pedidoId: sel.value })
   })
-    .then(function (r) {
-      if (r.status === 403) throw new Error("la clave del panel no coincide. Abrí el panel de nuevo.");
-      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
-      return r.json();
-    })
+    .then(leerRespuesta)
     .then(function (d) {
       if (!d.ok) {
         msg.className = "asignarMsg mal";
@@ -531,11 +580,7 @@ document.getElementById("btnReintentar").addEventListener("click", function () {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id: plan.id, paginas: REINTENTABLES })
   })
-    .then(function (r) {
-      if (r.status === 403) throw new Error("la clave del panel no coincide. Abrí el panel de nuevo.");
-      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
-      return r.json();
-    })
+    .then(leerRespuesta)
     .then(function (d) {
       if (!d.ok) { mostrar("mal", "🔴 " + (d.error || "No se pudo reintentar.")); return; }
       pintarReporte(d);
@@ -562,13 +607,7 @@ btnEnviar.addEventListener("click", function () {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id: plan.id, paginas: paginas })
   })
-    .then(function (r) {
-      if (r.status === 403) {
-        throw new Error("la clave del panel no coincide. Volvé a abrir el panel y entrá de nuevo a Guías.");
-      }
-      if (!r.ok) throw new Error("el servidor respondió " + r.status + ".");
-      return r.json();
-    })
+    .then(leerRespuesta)
     .then(function (d) {
       if (!d.ok) { mostrar("mal", "🔴 " + (d.error || "No se pudo enviar.")); return; }
       pintarReporte(d);

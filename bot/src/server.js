@@ -970,15 +970,55 @@ app.get("/guias", (req, res) => {
 app.post("/guias/revisar", express.raw({ type: "application/pdf", limit: "40mb" }), async (req, res) => {
   if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
 
-  const buf = req.body;
+  let buf = req.body;
   if (!Buffer.isBuffer(buf) || !buf.length) {
     return res.status(400).json({ ok: false, error: "No llegó ningún archivo. Elegí el PDF y volvé a intentar." });
   }
-  if (buf.subarray(0, 5).toString("latin1") !== "%PDF-") {
+
+  // ==========================================================================
+  // 🔴 EL PDF DE UNA GUÍA DABA 400 Y NO SE SABÍA POR QUÉ (3-oct)
+  //
+  // DE DÓNDE SALE. El dueño: "estaba cargando las guías de los pedidos y todas
+  // cargaron sin problema pero una que no cargó es la de esta persona"
+  // —Mildonia Durango—, con la pantalla diciendo solo "el servidor respondió
+  // 400." y nada más.
+  //
+  // ESTE CHEQUEO EXIGÍA `%PDF-` EN EL BYTE 0, EXACTO. Y los lectores de PDF no
+  // son tan estrictos: por especificación se acepta la cabecera dentro del
+  // primer kilobyte, justamente porque es común que queden bytes de preámbulo
+  // cuando el archivo se descarga, se reenvía por WhatsApp o lo vuelve a guardar
+  // una app del celular. O sea que el archivo se abría bien en el visor —por eso
+  // el dueño no entendía nada— y acá se rechazaba.
+  //
+  // 🔑 Se busca la cabecera en el primer kilobyte y, si está más adelante, se
+  // recorta el preámbulo y se sigue. Eso es lo que hace cualquier lector.
+  //
+  // Y si DE VERDAD no hay cabecera, el error dice qué llegó (tamaño y los
+  // primeros bytes legibles). Sin ese dato, un 400 acá es indistinguible de una
+  // subida cortada, que es un problema completamente distinto.
+  // ==========================================================================
+  const CABECERA = "%PDF-";
+  const asomo = buf.subarray(0, 1024).toString("latin1");
+  const donde = asomo.indexOf(CABECERA);
+  if (donde < 0) {
+    // Solo lo imprimible, y poquito: esto va a la pantalla y a los logs.
+    const muestra = buf.subarray(0, 24).toString("latin1").replace(/[^\x20-\x7E]/g, "·");
     return res.status(400).json({
       ok: false,
-      error: "Ese archivo no es un PDF. Si la transportadora te lo dio como foto o ZIP, subí el PDF original.",
+      error:
+        `Ese archivo no parece un PDF: llegaron ${buf.length} bytes y no encontré la cabecera ` +
+        `"%PDF-" en el primer kilobyte (los primeros bytes son: ${muestra}). ` +
+        "Si la transportadora te lo dio como foto o ZIP, subí el PDF original. " +
+        "Y si el archivo abre bien en el celular, lo más probable es que la subida se haya " +
+        "cortado: volvé a intentar.",
     });
+  }
+  if (donde > 0) {
+    // No es un error del dueño ni algo que tenga que ver: se arregla y se anota.
+    console.log(
+      `📎 El PDF traía ${donde} byte(s) de basura antes de la cabecera %PDF-. Se recortan y se sigue.`
+    );
+    buf = buf.subarray(donde);
   }
 
   const pedidos = store.todosLosPedidos();
@@ -2937,6 +2977,51 @@ app.get("/seguimiento/correr", async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// ============================================================================
+// 🔴 LOS ERRORES QUE NO TIRA NUESTRO CÓDIGO SALÍAN COMO HTML (3-oct)
+//
+// DE DÓNDE SALE. El dueño vio "el servidor respondió 400." al subir el PDF de
+// una guía. Uno de los candidatos era un 400 que NO sale de ninguna de nuestras
+// rutas: `express.raw()` lo tira cuando la subida se corta a mitad de camino
+// ("request aborted") o cuando el tamaño declarado no coincide con lo que llegó.
+// Y si el archivo pasa de 40 MB, tira un 413.
+//
+// Sin un manejador de errores, Express responde esos casos con una PÁGINA HTML.
+// Los paneles esperan JSON: intentan leer el motivo, no lo encuentran, y lo
+// único que les queda para mostrar es el número. Así un problema de conexión y
+// un archivo que no es PDF se ven EXACTAMENTE IGUAL en la pantalla, siendo
+// cosas opuestas —uno se arregla reintentando, el otro no—.
+//
+// 🔑 Va al final a propósito: un manejador de 4 argumentos solo corre cuando
+// algo falló, y tiene que estar después de todas las rutas para verlas.
+// ============================================================================
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  if (!err) return next();
+  const codigo = Number(err.status || err.statusCode) || 500;
+
+  const motivo =
+    err.type === "entity.too.large" || codigo === 413
+      ? "El archivo es demasiado grande (el tope es 40 MB)."
+      : err.type === "request.aborted" || /aborted/i.test(String(err.message || ""))
+        ? "La subida se cortó antes de terminar. Casi siempre es la conexión: volvé a intentar."
+        : err.type === "request.size.invalid"
+          ? "El archivo llegó incompleto (el tamaño no coincide con lo que se recibió). Volvé a intentar."
+          : err.type === "entity.parse.failed"
+            ? "Lo que llegó no se pudo leer como JSON."
+            : `Error ${codigo} en el servidor.`;
+
+  // El detalle técnico va al log, no a la pantalla: ahí sirve para diagnosticar.
+  console.error(
+    `🔴 ${req.method} ${req.path} → ${codigo} (${err.type || err.code || "sin tipo"}): ${err.message}`
+  );
+
+  if (res.headersSent) return;
+  // Siempre JSON: todas las pantallas que pueden provocar esto son paneles que
+  // leen `error` para mostrárselo al dueño.
+  res.status(codigo).json({ ok: false, error: motivo });
 });
 
 const PORT = process.env.PORT || 3000;
