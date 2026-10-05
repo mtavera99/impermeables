@@ -310,7 +310,10 @@ async function recorrer(telefono, turnos) {
   {
     const v10 = catalogo.de(V);
     const costoCombo = v10.costoUnitario * 2;
-    chequear("el combo de 2 V10 cuesta $70.000 de compra", costoCombo === 70000, String(costoCombo));
+    // 💰 $32.000/unidad desde el 5-oct (antes $35.000, que era el precio de
+    // arranque del proveedor). El número va escrito para que cambiar el costo
+    // obligue a volver a mirar este razonamiento, no para que pase solo.
+    chequear("el combo de 2 V10 cuesta $64.000 de compra", costoCombo === 64000, String(costoCombo));
 
     // Lo que habría quedado cobrando $85.000 (banda E del impermeable).
     const fletes = require("./src/fletes");
@@ -319,10 +322,14 @@ async function recorrer(telefono, turnos) {
     const netoSiSeCobraComoImpermeable = bandaE - envioE;
     chequear("cobrado como impermeable de banda E son $85.000", bandaE === 85000, String(bandaE));
     chequear(
-      "🔴 de ahí quedan $59.900 para pagar algo que costó $70.000",
+      "🔴 de ahí quedan $59.900 para pagar algo que costó $64.000",
       netoSiSeCobraComoImpermeable === 59900,
       String(netoSiSeCobraComoImpermeable)
     );
+    // 🔑 ESTA es la aserción que importa, y NO depende del costo exacto: pase lo
+    // que pase con el precio del proveedor, cobrar el combo como un impermeable
+    // tiene que seguir dando pérdida. Al bajar el costo a $32.000 el hueco se
+    // encogió de $10.100 a $4.100 — menos grave, igual de pérdida.
     chequear(
       "🔴 o sea PÉRDIDA, no menor ganancia",
       netoSiSeCobraComoImpermeable < costoCombo,

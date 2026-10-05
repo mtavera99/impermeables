@@ -172,10 +172,21 @@ const PRODUCTOS = {
     // segundo es gratis, y no lo es.
     precios: { 1: 59900, 2: 99900 },
 
-    // Costo de compra por unidad, confirmado por el dueño el 28-sep.
-    // Sirve para el piso económico que defiende `test-v10-intercomunicador.js`:
-    // si alguien bajara el precio de venta, la prueba avisa antes de desplegar.
-    costoUnitario: 35000,
+    // Costo de compra por unidad. Sirve para el piso económico que defiende
+    // `test-v10-intercomunicador.js`: si alguien bajara el precio de venta, la
+    // prueba avisa antes de desplegar.
+    //
+    // 💰 BAJÓ DE $35.000 A $32.000 (5-oct). El dueño: *"el costo del
+    // Intercomunicador sí es de 32.000, lo que pasa es que al inicio lo consiguió
+    // en 35 pero ya pude bajar el precio a 32.000"*. O sea que los $35.000 eran
+    // el costo de arranque y ya no son el de hoy.
+    //
+    // 🔑 POR QUÉ IMPORTA TENERLO AL DÍA, aunque el bot no lo use para cotizar:
+    // con este número se calcula si el producto se vende con ganancia. Con
+    // $35.000 la utilidad de los 6 días cerrados al 4-oct daba $2.331.065; con
+    // $32.000 da $2.768.789. La diferencia —$437.724 en 6 días— es exactamente
+    // el tamaño del error que se comete al decidir con un costo viejo.
+    costoUnitario: 32000,
 
     // ------------------------------------------------------------------------
     // 📦 POLÍTICA LOGÍSTICA — REGLA COMERCIAL INICIAL, NO UN COSTO MEDIDO
