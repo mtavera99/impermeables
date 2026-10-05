@@ -1059,25 +1059,51 @@ app.post("/guias/revisar", express.raw({ type: "application/pdf", limit: "40mb" 
     listas: filas.filter((f) => f.enviar).length,
   });
 
+  // ==========================================================================
   // 🔑 LOS PEDIDOS A LOS QUE SE PUEDE ASIGNAR UNA GUÍA A MANO.
   //
   // Va UNA sola lista para todas las filas, no una por fila: son los mismos
   // pedidos y repetirla 25 veces sería una respuesta enorme al celular.
   //
-  // Se excluyen los que ya tienen guía anotada: si ya se despachó, no es
-  // candidato, y ofrecerlo invita a mandarle dos guías al mismo cliente.
-  const candidatos = pedidos
-    .filter((p) => !p.guia)
-    .slice(0, 60)
-    .map((p) => ({
-      id: String(p.id || p.fecha),
-      nombre: p.nombre || "(sin nombre)",
-      ciudad: p.ciudad || "",
-      // Solo los últimos 4 dígitos: alcanza para reconocerlo y no llena la
-      // pantalla del celular con teléfonos completos.
-      cel: String(p.celular || p.telefono_chat || "").slice(-4),
-      total: "$" + Number(p.total || 0).toLocaleString("es-CO"),
-    }));
+  // 🔴 TENÍA DOS FILTROS Y LOS DOS ESCONDÍAN AL CLIENTE QUE HACÍA FALTA (5-oct)
+  //
+  // DE DÓNDE SALE. El dueño, con la guía 240062816786 en rojo y el desplegable
+  // abierto: "este cliente no me sale para enviarle la guía y es este Henrry
+  // Danilo Castillo". O sea: el panel SÍ le ofrecía asignarla a mano, pero la
+  // persona no estaba en la lista. Sin lista no hay forma de mandarla.
+  //
+  // CAUSA 1 — `.slice(0, 60)`. Se mandaban los 60 pedidos MÁS NUEVOS sin guía
+  // (`todosLosPedidos` devuelve del más nuevo al más viejo). Con el volumen de
+  // hoy —43 pedidos el 4-oct, 38 el 3-oct— esos 60 no alcanzan ni para día y
+  // medio. Cualquier guía de un pedido de hace dos días quedaba imposible de
+  // asignar. Y era silencioso: la lista se veía llena.
+  //
+  // CAUSA 2 — `filter(p => !p.guia)`. Esconder los que ya tienen guía parecía
+  // prudente, pero el candado de verdad NO está acá: está en /guias/asignar,
+  // que rechaza la guía que YA SE ENVIÓ (`store.guiaYaEnviada`). Ese candado
+  // protege lo que hay que proteger —que un cliente no reciba la misma guía dos
+  // veces— y no depende de esta lista. Lo único que lograba el filtro era que un
+  // pedido con una guía mal anotada quedara sin arreglo posible, sin decir por
+  // qué. Esconder un candidato sin explicación es el mismo error que un 400 sin
+  // motivo.
+  //
+  // 🔑 Ahora van TODOS, y el que ya tiene guía va marcado con cuál, para que la
+  // decisión sea informada en vez de imposible. La pantalla los separa en grupos
+  // y trae un buscador, porque con 295 pedidos un desplegable plano no sirve.
+  // ==========================================================================
+  const candidatos = pedidos.map((p) => ({
+    id: String(p.id || p.fecha),
+    nombre: p.nombre || "(sin nombre)",
+    ciudad: p.ciudad || "",
+    // Solo los últimos 4 dígitos: alcanza para reconocerlo y no llena la
+    // pantalla del celular con teléfonos completos.
+    cel: String(p.celular || p.telefono_chat || "").slice(-4),
+    total: "$" + Number(p.total || 0).toLocaleString("es-CO"),
+    // El día ayuda a elegir cuando hay dos pedidos del mismo nombre.
+    dia: p.fecha ? String(p.fecha).slice(0, 10) : "",
+    // 👈 Para AVISAR, no para esconder. La pantalla lo muestra aparte.
+    guia: p.guia ? String(p.guia) : "",
+  }));
 
   // ⚠️ Se devuelve TODO menos las hojas: los PDF se quedan en el servidor. No
   // hay razón para que el navegador reciba las etiquetas de todos los clientes.
