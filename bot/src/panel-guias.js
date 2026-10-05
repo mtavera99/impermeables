@@ -102,6 +102,9 @@ function render() {
   .asignar select{width:100%;background:#0f1319;border:1px solid #39424f;border-radius:10px;
     padding:10px;color:#e7e9ee;font-size:16px;min-height:44px;max-width:100%}
   .asignar select:focus{outline:none;border-color:#3b82f6}
+  .asignar .filtroPedido{width:100%;background:#0f1319;border:1px solid #39424f;border-radius:10px;
+    padding:10px;color:#e7e9ee;font-size:16px;min-height:44px;max-width:100%}
+  .asignar .filtroPedido:focus{outline:none;border-color:#3b82f6}
   .asignar .btnAsignar{background:#1d4ed8;border:1px solid #2563eb;color:#fff;font-weight:700;
     border-radius:10px;padding:10px 12px;font-size:14px;min-height:44px;cursor:pointer}
   .asignar .btnAsignar:disabled{opacity:.5;cursor:not-allowed}
@@ -374,37 +377,94 @@ function escapar(s) {
 // Los 3 más parecidos van primero y con su puntaje, porque casi siempre el
 // primero es el correcto: lo que falló fue un dato, no la identidad.
 // ---------------------------------------------------------------------------
-function cajonDeAsignar(f) {
-  // El servidor decide si se puede asignar: es false en las guías repetidas
-  // dentro del mismo PDF y en las que ya se enviaron antes.
-  if (!f.asignable) return "";
-  var mejores = f.mejores || [];
+// Los 3 más parecidos de cada hoja, para poder repintar su desplegable cuando
+// el dueño escribe en el buscador.
+var MEJORES_POR_PAGINA = {};
+
+function comoTexto(c) {
+  return escapar(c.nombre) + (c.ciudad ? " · " + escapar(c.ciudad) : "") +
+    (c.cel ? " · ...." + escapar(c.cel) : "") + " · " + escapar(c.total) +
+    (c.dia ? " · " + escapar(c.dia) : "");
+}
+
+// ---------------------------------------------------------------------------
+// 🔴 EL CLIENTE QUE HACÍA FALTA NO ESTABA EN LA LISTA (5-oct)
+//
+// El dueño: "este cliente no me sale para enviarle la guía y es este Henrry
+// Danilo Castillo". El panel SÍ ofrecía asignar la guía a mano, pero la persona
+// no aparecía entre las opciones, así que no había forma de mandarla.
+//
+// El servidor mandaba solo los 60 pedidos más nuevos SIN guía. Con 43 pedidos en
+// un día, 60 no alcanzan ni para día y medio. Ahora manda todos, y acá se
+// agrupan y se pueden buscar — con 295 pedidos un desplegable plano no sirve.
+//
+// Tres grupos, en este orden:
+//   ★ los parecidos ..... casi siempre el correcto: falló un dato, no la identidad
+//   sin guía ............ los candidatos normales
+//   ⚠️ ya tienen guía .... visibles y marcados, no escondidos. El candado real
+//                          está en el servidor, que rechaza la guía ya enviada.
+// ---------------------------------------------------------------------------
+function opcionesDeAsignar(pagina, filtro) {
+  var mejores = MEJORES_POR_PAGINA[pagina] || [];
   var idsMejores = mejores.map(function (m) { return m.pedidoId; });
   var puntosDe = {};
   mejores.forEach(function (m) { puntosDe[m.pedidoId] = m.puntos; });
 
-  var comoTexto = function (c) {
-    return escapar(c.nombre) + (c.ciudad ? " · " + escapar(c.ciudad) : "") +
-      (c.cel ? " · ...." + escapar(c.cel) : "") + " · " + escapar(c.total);
-  };
+  var texto = String(filtro || "").trim().toLowerCase();
+  function pasa(c) {
+    if (!texto) return true;
+    var donde = (c.nombre + " " + c.ciudad + " " + c.cel + " " + (c.guia || "") + " " + (c.dia || ""));
+    return donde.toLowerCase().indexOf(texto) !== -1;
+  }
+  function esMejor(c) { return idsMejores.indexOf(c.id) !== -1; }
 
-  var opciones = '<option value="">— elegí el cliente —</option>';
-  // Primero los parecidos, con su puntaje, para que se vea por qué se sugieren.
-  CANDIDATOS.filter(function (c) { return idsMejores.indexOf(c.id) !== -1; })
-    .sort(function (a, b) { return puntosDe[b.id] - puntosDe[a.id]; })
-    .forEach(function (c) {
-      opciones += '<option value="' + escapar(c.id) + '">★ ' + comoTexto(c) +
-        "  (" + puntosDe[c.id] + " pts)</option>";
+  var html = '<option value="">— elegí el cliente —</option>';
+
+  var parecidos = CANDIDATOS.filter(function (c) { return esMejor(c) && pasa(c); })
+    .sort(function (a, b) { return puntosDe[b.id] - puntosDe[a.id]; });
+  parecidos.forEach(function (c) {
+    html += '<option value="' + escapar(c.id) + '">★ ' + comoTexto(c) +
+      "  (" + puntosDe[c.id] + " pts)</option>";
+  });
+
+  var sinGuia = CANDIDATOS.filter(function (c) { return !esMejor(c) && !c.guia && pasa(c); });
+  if (sinGuia.length) {
+    html += '<optgroup label="Pedidos sin guía (' + sinGuia.length + ')">';
+    sinGuia.forEach(function (c) {
+      html += '<option value="' + escapar(c.id) + '">' + comoTexto(c) + "</option>";
     });
-  var resto = CANDIDATOS.filter(function (c) { return idsMejores.indexOf(c.id) === -1; });
-  if (resto.length) {
-    opciones += '<optgroup label="Los demás pedidos sin guía">';
-    resto.forEach(function (c) { opciones += '<option value="' + escapar(c.id) + '">' + comoTexto(c) + "</option>"; });
-    opciones += "</optgroup>";
+    html += "</optgroup>";
   }
 
+  // ⚠️ Se muestran, pero separados y diciendo con cuál guía quedaron. Esconderlos
+  // dejaba sin arreglo posible a un pedido con la guía mal anotada.
+  var conGuia = CANDIDATOS.filter(function (c) { return !esMejor(c) && c.guia && pasa(c); });
+  if (conGuia.length) {
+    html += '<optgroup label="⚠️ Ya tienen una guía anotada (' + conGuia.length + ') — revisá antes">';
+    conGuia.forEach(function (c) {
+      html += '<option value="' + escapar(c.id) + '">' + comoTexto(c) +
+        "  · ya tiene la guía " + escapar(c.guia) + "</option>";
+    });
+    html += "</optgroup>";
+  }
+
+  if (!parecidos.length && !sinGuia.length && !conGuia.length) {
+    html += '<option value="" disabled>(ningún pedido coincide con la búsqueda)</option>';
+  }
+  return html;
+}
+
+function cajonDeAsignar(f) {
+  // El servidor decide si se puede asignar: es false en las guías repetidas
+  // dentro del mismo PDF y en las que ya se enviaron antes.
+  if (!f.asignable) return "";
+  MEJORES_POR_PAGINA[f.pagina] = f.mejores || [];
+
   return '<div class="asignar">' +
-    '<select class="selPedido" data-pagina="' + f.pagina + '">' + opciones + "</select>" +
+    '<input type="text" class="filtroPedido" data-pagina="' + f.pagina + '" ' +
+      'placeholder="🔍 Buscar por nombre, ciudad o últimos 4 del celular">' +
+    '<select class="selPedido" data-pagina="' + f.pagina + '">' +
+      opcionesDeAsignar(f.pagina, "") + "</select>" +
     '<button type="button" class="btnAsignar" data-pagina="' + f.pagina + '">' +
       "📲 Es este cliente, mandale la guía</button>" +
     '<div class="asignarMsg"></div>' +
@@ -466,6 +526,20 @@ function pintarPareo(d) {
 // ── ASIGNAR A MANO ──────────────────────────────────────────────────────────
 // Un solo oyente en la tabla y no uno por botón: las filas se crean y se
 // destruyen cada vez que se revisa, y los oyentes por botón se perdían.
+// 🔍 El buscador de cada hoja repinta SU desplegable. Va por delegación, como
+// el botón: las filas se crean después de que este script corre.
+document.getElementById("tablaPareo").addEventListener("input", function (ev) {
+  var caja = ev.target;
+  if (!caja.className || caja.className.indexOf("filtroPedido") === -1) return;
+  var pagina = Number(caja.getAttribute("data-pagina"));
+  var padre = caja.closest ? caja.closest(".asignar") : null;
+  var sel = padre ? padre.querySelector(".selPedido") : null;
+  if (!sel) return;
+  var elegido = sel.value;                 // no se pierde lo que ya había elegido
+  sel.innerHTML = opcionesDeAsignar(pagina, caja.value);
+  if (elegido) sel.value = elegido;
+});
+
 document.getElementById("tablaPareo").addEventListener("click", function (ev) {
   var btn = ev.target.closest ? ev.target.closest(".btnAsignar") : null;
   if (!btn) return;
@@ -479,11 +553,19 @@ document.getElementById("tablaPareo").addEventListener("click", function (ev) {
   if (!sel.value) { msg.className = "asignarMsg mal"; msg.textContent = "Elegí primero de qué cliente es."; return; }
 
   var quien = sel.options[sel.selectedIndex].textContent.replace(/^★ /, "");
+  // ⚠️ Si el pedido elegido YA tiene una guía anotada, la confirmación lo dice.
+  // Se puede hacer —a veces la guía vieja quedó mal— pero tiene que ser una
+  // decisión consciente, no una sorpresa.
+  var yaTeniaGuia = / ya tiene la gu[ií]a (\\S+)/.exec(quien);
+  var aviso = yaTeniaGuia
+    ? "\\n\\n⚠️ OJO: este pedido ya tiene anotada la guía " + yaTeniaGuia[1] +
+      ". Si mandás esta, el cliente va a recibir dos guías distintas."
+    : "";
   // 🔒 Confirmación con el nombre adentro: la etiqueta lleva la dirección y el
   // teléfono impresos, así que mandarla al cliente equivocado le filtra datos a
   // un desconocido y no se puede deshacer.
   if (!confirm("Se le va a mandar la guía de la hoja " + pagina + " a:\\n\\n" + quien +
-               "\\n\\n¿Es esa persona?")) return;
+               aviso + "\\n\\n¿Es esa persona?")) return;
 
   btn.disabled = true;
   msg.className = "asignarMsg";
