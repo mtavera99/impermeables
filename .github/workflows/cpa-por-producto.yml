@@ -1,0 +1,123 @@
+name: CPA por producto
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CRUZA EL GASTO POR ANUNCIO DE META CON LOS PEDIDOS DEL BOT.
+#
+# POR QUE EXISTE (5-oct): el dueño preguntó el CPA de cada producto y después,
+# con razón: *"no sé si hizo el cálculo con el total gastado en solo los
+# conjuntos de anuncios para ese tipo de producto"*. No se podía. Había que
+# repartir el gasto total con una proporción estimada, y la misma pregunta daba
+# tres respuestas según la proporción que se eligiera:
+#
+#     si el impermeable es el 50% del gasto -> CPA $7.476
+#     si es el 67% .......................... CPA $10.018
+#     si es el 75% .......................... CPA $11.214
+#
+# Con eso no se decide un presupuesto. Este workflow lo mide, no lo estima: cada
+# pedido guarda de qué ANUNCIO vino, y Meta sabe lo que gastó cada anuncio.
+#
+# ══════════════════════════════════════════════════════════════════════════════
+# 🔒 SOLO LECTURA, y por candado técnico además de por regla.
+#
+#   · analisis/cpa-por-producto.py reusa meta-api-lectura.py, cuya única función
+#     de red es un GET. No hay una línea que pueda mover un presupuesto.
+#   · del bot solo lee /pedidos.csv, y se queda con 7 columnas: estado, día,
+#     talla, color, unidades, total y anuncio_id. Nombre, celular y dirección
+#     NO se cargan, así que el archivo que genera no puede filtrarlos.
+#   · bot/test-costos-no-se-desincronizan.js comprueba las dos cosas.
+#
+# 🔑 El informe NO se imprime en el log: se commitea a CPA-POR-PRODUCTO.md. El
+# log de Actions de este repo es público y ya hay una deuda abierta por eso.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  # Una vez al día, después del cierre. Los dos informes que ya existen corren
+  # cada hora porque vigilan el saldo; este mira días CERRADOS, así que una vez
+  # al día alcanza y no gasta corridas de más.
+  schedule:
+    # 09:17 UTC = 04:17 Bogotá. Bien pasada la medianoche, con el día ya cerrado.
+    - cron: "17 9 * * *"
+
+  # Si se cambia el script, regenerar de una: si no, el archivo queda con la
+  # lógica vieja hasta mañana.
+  push:
+    branches: [main]
+    paths:
+      - "analisis/cpa-por-producto.py"
+      - ".github/workflows/cpa-por-producto.yml"
+
+  workflow_dispatch:
+    inputs:
+      dias:
+        description: "Cuántos días cerrados mirar"
+        required: false
+        default: "7"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cpa-por-producto
+  cancel-in-progress: true
+
+jobs:
+  medir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cruzar el gasto por anuncio con los pedidos
+        env:
+          META_ADS_TOKEN: ${{ secrets.META_ADS_TOKEN }}
+          BOT_URL: ${{ secrets.BOT_URL }}
+          BOT_TOKEN: ${{ secrets.BOT_VERIFY_TOKEN }}
+          DIAS: ${{ inputs.dias || '7' }}
+        run: |
+          set -uo pipefail
+
+          if [ -z "${META_ADS_TOKEN:-}" ]; then
+            echo "::error::Falta el secreto META_ADS_TOKEN."
+            exit 1
+          fi
+          if [ -z "${BOT_URL:-}" ] || [ -z "${BOT_TOKEN:-}" ]; then
+            echo "::error::Faltan BOT_URL y/o BOT_VERIFY_TOKEN: sin los pedidos no hay cruce."
+            exit 1
+          fi
+
+          python3 analisis/cpa-por-producto.py "$DIAS"
+
+          # ⚠️ El informe NO se imprime: el log es público y, aunque el archivo no
+          # lleva datos personales, sí lleva el detalle comercial completo.
+          # Solo se dice que salió y cuánto mide.
+          if [ -f CPA-POR-PRODUCTO.md ]; then
+            echo "✅ informe generado ($(wc -c < CPA-POR-PRODUCTO.md) bytes)"
+          else
+            echo "::error::el script terminó pero no dejó el archivo"
+            exit 1
+          fi
+
+      - name: Commitear el informe
+        run: |
+          set -uo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CPA-POR-PRODUCTO.md
+          if git diff --staged --quiet; then
+            echo "sin cambios, no commiteo"
+            exit 0
+          fi
+          MSG="$(cat /tmp/cpa-resumen.txt 2>/dev/null || echo 'CPA por producto')"
+          git commit -m "$MSG"
+          # El repo puede haber avanzado mientras corríamos (estado-cuenta.yml
+          # commitea cada hora): rebase y reintento, igual que ese workflow.
+          for t in 1 2 3; do
+            git push && break || {
+              git pull --rebase --autostash -q origin main || true
+              sleep 5
+            }
+          done

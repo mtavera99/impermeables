@@ -33,9 +33,48 @@ EQ_TRAD = 2402          # equilibrio del tradicional, $/conversacion
 EQ_COLMENA = 3322       # equilibrio del colmena (error #12: cada SKU su umbral)
 MARGEN_UD = 23244       # margen por unidad medido en 39 unidades (0-AX)
 UDS_PEDIDO = 1.3
-CIERRE = 0.084
-TASA_DEV = 0.19
-COSTO_DEV = 33648
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 🔴 TRES CONSTANTES QUE SE QUEDARON VIEJAS Y SOBREESTIMABAN LA UTILIDAD (5-oct)
+#
+# Se encontraron al cruzar este informe contra los pedidos reales. El 4-oct:
+#
+#     este archivo decia .... 63 pedidos y $1.207.867 de utilidad
+#     la realidad fue ....... 43 pedidos y ~$679.000
+#
+# O sea 46% mas pedidos y 78% mas utilidad de la que hubo. Y con esos numeros se
+# decide cuanto presupuesto poner.
+#
+# QUE ESTABA MAL, UNA POR UNA:
+#
+#   CIERRE 0.084 -> 0.0544
+#     El 8,4% venia de una medicion vieja. Medido sobre 6 dias cerrados y 3.454
+#     conversaciones: 188 pedidos = 5,44%. Esta es la constante que mas pesa,
+#     porque multiplica todo lo demas.
+#
+#   TASA_DEV 0.19 -> 0.228
+#     El 19% era de la cohorte de septiembre sin madurar. Medido sobre 386 guias
+#     con corte al 30-sep: 22,8% (IC 16,8-30,2%).
+#
+#   COSTO_DEV 33648 -> 3109
+#     🔴 ESTE ERA DIEZ VECES EL REAL, y es el peor de los tres. Los $33.648
+#     cobraban el flete de ida y vuelta mas el producto perdido. Pero la regla
+#     0-AY lo desmintio con 8 de 8 guias identicas: *"nunca le cobraron ningun
+#     flete de devolucion"* — una devolucion liquidada paga SOLO la prima del
+#     seguro, y el producto vuelve y se revende. Medido en
+#     analisis/devoluciones-30sep.py sobre 54 devoluciones: $3.109.
+#
+#     Lo curioso: este error empujaba la utilidad para ABAJO, mientras CIERRE la
+#     empujaba para ARRIBA. Se tapaban entre si, y por eso el numero parecia
+#     razonable mientras los tres estaban mal.
+#
+# 🔑 Y PARA QUE NO VUELVA A PASAR: `construir()` ahora IMPRIME estos valores en
+# el informe. Una constante que se queda vieja tiene que verse, no esconderse
+# dentro del calculo.
+# ══════════════════════════════════════════════════════════════════════════════
+CIERRE = 0.0544         # 188 pedidos / 3.454 conv, 6 dias cerrados al 4-oct
+TASA_DEV = 0.228        # 386 guias, corte 30-sep (IC 16,8-30,2%)
+COSTO_DEV = 3109        # solo la prima del seguro — regla 0-AY
 PEOR_DIA = 1.43         # el dia peor gasto 143% del presupuesto (0-BH)
 UMBRAL_FRENO = 20000    # Meta deja de entregar bajo ~$16.000-20.000 (0-AN)
 
@@ -388,6 +427,34 @@ def construir():
                  f"{c/i*1000 if i else 0:.2f} | ${utilidad(g, c):,.0f} |")
     L.append("")
     L.append("---")
+    L.append("")
+    # ══════════════════════════════════════════════════════════════════════════
+    # 🔑 LOS SUPUESTOS, IMPRESOS.
+    #
+    # El 5-oct se descubrió que tres de estas constantes estaban viejas y que
+    # este informe venía sobreestimando la utilidad del día en un 78%. Nadie lo
+    # vio en semanas porque los números vivían en el código y solo salía el
+    # RESULTADO. Una constante que se queda vieja tiene que verse.
+    # ══════════════════════════════════════════════════════════════════════════
+    L.append("## 🔢 Con qué números se calculó lo de arriba")
+    L.append("")
+    L.append("*(Van impresos a propósito: el 5-oct tres de estos estaban viejos y este "
+             "informe sobreestimaba la utilidad del día en un 78% sin que se notara.)*")
+    L.append("")
+    L.append("| supuesto | valor | medido en |")
+    L.append("|---|---|---|")
+    L.append(f"| cierre (pedidos / conversaciones) | **{CIERRE*100:.2f}%** | "
+             "188 pedidos / 3.454 conv · 6 días cerrados al 4-oct |")
+    L.append(f"| tasa de devolución | **{TASA_DEV*100:.1f}%** | 386 guías, corte 30-sep (IC 16,8–30,2%) |")
+    L.append(f"| costo de una devolución | **${COSTO_DEV:,}** | solo la prima del seguro — regla 0-AY |")
+    L.append(f"| margen por unidad | ${MARGEN_UD:,} | 39 unidades (0-AX) |")
+    L.append(f"| unidades por pedido | {UDS_PEDIDO} | |")
+    L.append("")
+    L.append("⚠️ **El margen y las unidades son los del impermeable.** Con dos productos "
+             "vendiendo mitad y mitad, un solo margen promedia cosas distintas: el CPA y la "
+             "utilidad de cada producto están en "
+             "[`CPA-POR-PRODUCTO.md`](CPA-POR-PRODUCTO.md), que cruza el gasto **por anuncio** "
+             "contra los pedidos y no estima nada.")
     L.append("")
     L.append("## ⚠️ Lo que este archivo NO hace")
     L.append("")
