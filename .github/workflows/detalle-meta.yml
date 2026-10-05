@@ -1,0 +1,100 @@
+name: Detalle de Meta por anuncio
+
+# ══════════════════════════════════════════════════════════════════════════════
+# VUELCA EL GASTO DE META POR CAMPANA / CONJUNTO / ANUNCIO — SOLO LECTURA.
+#
+# POR QUE EXISTE (5-oct): el dueno pidio el gasto desglosado por campana,
+# conjunto Y ANUNCIO, con ad_id, para 22-sep a 5-oct. `estado-cuenta.py` no podia
+# darlo: consulta `level=adset` y nunca `level=ad` — la cadena "ad_id" aparece
+# CERO veces en ese script y en su informe. O sea que el dato faltaba porque
+# nunca se le habia pedido a la API, no porque el informe se publicara mal.
+#
+# ══════════════════════════════════════════════════════════════════════════════
+# 🔒 CERO ESCRITURAS EN META, por candado tecnico y no por disciplina:
+#   · analisis/detalle-meta.py reusa meta-api-lectura.py, cuya UNICA funcion de
+#     red es un GET. No hay POST, PUT ni DELETE en ninguna linea.
+#   · el permiso que usa es `ads_read`. `ads_management` no se usa en ningun
+#     punto, asi que no puede tocar una campana, un anuncio, un conjunto, un
+#     presupuesto ni una configuracion.
+#   · no lee ni escribe nada de `bot/`, asi que no puede alterar la logica
+#     comercial ni ningun dato historico.
+#
+# ⚠️ NO comparte el grupo de concurrencia de `estado-cuenta.yml`. Ese workflow
+# tiene `cancel-in-progress: true`, y meter este en el mismo grupo cancelaria su
+# bucle horario — que es justo una de las dos causas del hueco de 4 horas del
+# 5-oct. Escriben archivos distintos, asi que no se pisan.
+#
+# 🔑 El informe NO se imprime en el log: el log de Actions de este repo es
+# publico. Se commitea a DETALLE-META.md.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      desde:
+        description: "Primer dia (YYYY-MM-DD)"
+        required: false
+        default: "2026-09-22"
+      hasta:
+        description: "Ultimo dia (YYYY-MM-DD). Vacio = hoy."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: detalle-meta
+  cancel-in-progress: false
+
+jobs:
+  volcar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Leer Meta por campana, conjunto y anuncio
+        env:
+          META_ADS_TOKEN: ${{ secrets.META_ADS_TOKEN }}
+          DESDE: ${{ inputs.desde }}
+          HASTA: ${{ inputs.hasta }}
+        run: |
+          set -uo pipefail
+          if [ -z "${META_ADS_TOKEN:-}" ]; then
+            echo "::error::Falta el secreto META_ADS_TOKEN."
+            exit 1
+          fi
+          python3 analisis/detalle-meta.py "${DESDE:-2026-09-22}" ${HASTA:+"$HASTA"}
+
+          if [ -f DETALLE-META.md ]; then
+            echo "✅ detalle generado ($(wc -c < DETALLE-META.md) bytes)"
+            # Solo los encabezados, para confirmar que trae los tres niveles sin
+            # volcar los numeros comerciales al log publico.
+            grep -c "^### Por anuncio" DETALLE-META.md | xargs -I{} echo "   bloques por anuncio: {}"
+          else
+            echo "::error::el script termino pero no dejo el archivo"
+            exit 1
+          fi
+
+      - name: Commitear el detalle
+        run: |
+          set -uo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add DETALLE-META.md
+          if git diff --staged --quiet; then
+            echo "sin cambios, no commiteo"
+            exit 0
+          fi
+          git commit -m "$(cat /tmp/detalle-resumen.txt 2>/dev/null || echo 'Detalle de Meta por anuncio')"
+          for t in 1 2 3; do
+            git push && break || {
+              git pull --rebase --autostash -q origin main || true
+              sleep 5
+            }
+          done
