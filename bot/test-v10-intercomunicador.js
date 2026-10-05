@@ -897,9 +897,16 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
   // =========================================================================
   console.log("\n── 24. 💰 PISO ECONÓMICO: el precio cubre costo + flete ──");
   //
-  // El costo de compra del V10 es $35.000 por unidad (confirmado por el dueño).
+  // El costo de compra del V10 es $32.000 por unidad (bajó de $35.000 el 5-oct:
+  // los $35.000 eran el precio de arranque del proveedor).
   // Esta prueba es la que avisa si alguien baja el precio de venta o sube el costo
   // y el producto se empieza a vender en pérdida sin que nadie lo note.
+  //
+  // ⚠️ El número va escrito ACÁ a propósito, repetido del catálogo. Si la prueba
+  // leyera `v10.costoUnitario` para compararlo consigo mismo, pasaría siempre y no
+  // probaría nada: un dedazo que lo ponga en $3.200 o en $320.000 quedaría verde.
+  // Al estar duplicado, cambiar el costo obliga a tocar las dos puntas, y eso es
+  // justo lo que se quiere de un dato del que depende saber si se gana plata.
   //
   // ⚠️ El flete que se usa acá es el de UN IMPERMEABLE, como referencia
   // conservadora: el paquete del V10 es más chico, así que su flete real debería
@@ -908,7 +915,7 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
   {
     const fletes = require("./src/fletes");
     const v10 = catalogo.de(V);
-    chequear("el costo unitario está registrado", v10.costoUnitario === 35000, String(v10.costoUnitario));
+    chequear("el costo unitario está registrado y al día", v10.costoUnitario === 32000, String(v10.costoUnitario));
 
     let peor = Infinity;
     for (const b of ["A", "B", "C", "D", "E"]) {
