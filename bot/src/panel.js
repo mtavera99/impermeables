@@ -1123,6 +1123,12 @@ function render(aviso) {
   .kpi .d{display:block;font-size:11px;font-style:normal;margin-top:3px;color:#8b93a4}
   .kpi .d.up{color:#3ddc84}.kpi .d.dn{color:#ff6b6b}
   .nota{color:#8b93a4;font-size:12px;margin:8px 0 0}
+  /* 🔎 Buscador de chats. Ancho completo y alto generoso: se usa con el pulgar. */
+  .buscarChat{display:flex;gap:8px;margin:12px 0 0}
+  .buscarChat input{flex:1;min-width:0;background:#0f141b;border:1px solid #263041;
+    color:#e6edf3;border-radius:10px;padding:11px 13px;font-size:15px;font-family:inherit}
+  .buscarChat button{background:#1f6feb;border:0;color:#fff;border-radius:10px;
+    padding:11px 18px;font-size:15px;font-weight:700;white-space:nowrap}
   /* --- Embudo --- */
   .embudo{background:var(--card);border:1px solid var(--linea);border-radius:14px;padding:14px}
   .paso{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:6px;border-radius:10px;overflow:hidden;background:#12161d}
@@ -1329,6 +1335,27 @@ function render(aviso) {
       : ""
   }
   <h2 id="chats">💬 Conversaciones</h2>
+  <!-- ====================================================================
+       🔎 BUSCADOR DE CHATS (9-oct)
+
+       DE DÓNDE SALE, textual: *"No hay un buscador para los chats"*. Y no lo
+       había: el atajo «💬 Chats» de arriba solo bajaba a esta lista, que
+       muestra las conversaciones recientes. Con 315 conversaciones en un día,
+       un cliente de ayer no se encuentra scrolleando.
+
+       El buscador vivía escondido DENTRO de /chat, o sea que había que llegar a
+       la pantalla de un cliente para poder buscar otro. Y encima solo miraba
+       los pedidos. Ahora busca también en los chats: ver buscarChats() en
+       panel-chat.js.
+       ==================================================================== -->
+  <form class="buscarChat" method="get" action="/chat">
+    <input type="hidden" name="token" value="${esc(panelToken())}">
+    <input type="search" name="q" placeholder="🔎 Buscar un chat por nombre o celular"
+      autocomplete="off" enterkeyhint="search">
+    <button type="submit">Buscar</button>
+  </form>
+  <p class="nota">Encuentra también a los clientes <b>sin pedido</b> — los que quedaron a medias
+    o pagaron y nunca se cerró la venta. Sirve el celular con o sin el 57, con espacios o guiones.</p>
   ${bloquesConv}
 </main>
 <!-- ⬆️ Volver arriba. Fijo, porque el dueño trabaja del celular y la página es
