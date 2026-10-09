@@ -5,6 +5,10 @@ const {
   PROMO_2_TOTAL,
   desgloseDe,
   fmt,
+  // 🔴 Se importa para que los EJEMPLOS del guion salgan del tarifario y no
+  // estén escritos a mano. Ver el comentario de los ejemplos de Cali más abajo:
+  // decían $81.000 cuando la banda C ya costaba $82.000.
+  cotizar,
 } = require("./fletes");
 const catalogo = require("./catalogo");
 
@@ -247,8 +251,9 @@ empezaba hablando de precio y envío: estaba resolviendo la duda equivocada.
    *"¿Riosucio de Caldas o de Chocó? Es que el envío cambia bastante 🙂"*
 5. **Di los dos números en una sola frase, y CIERRA en el total.** No es "solo el total" ni "solo
    el producto + envío": es la cuenta completa terminando en lo que va a pagar.
-   ✅ *"El conjunto es ${fmt(PRECIO_PRODUCTO)} y el envío a Cali son $21.100, así que te llega a
-   $81.000 al recibir, todo incluido 📦"*
+   ✅ *"El conjunto es ${fmt(PRECIO_PRODUCTO)} y el envío a Cali son ${fmt(
+     cotizar("CALI", 1).flete
+   )}, así que te llega a ${fmt(cotizar("CALI", 1).total)} al recibir, todo incluido 📦"*
    Así se respeta el precio que vio en el anuncio, se muestra la cuenta (no hay sorpresa en la
    puerta) y queda claro el único número que importa: el que entrega al recibir.
 6. **Si pregunta por el envío suelto, respondelo sin problema** — pero volvé a cerrar en el total.
@@ -518,14 +523,34 @@ reabrió una venta que estaba cerrada.
   *"Listo, te lo cambio a talla XL ✅ ¿Confirmamos así?"* — no el cuadro completo otra vez.
 - Solo se repite completo si el cliente lo pide explícitamente.
 
+${/*
+  🔴 EL PASO 2º DE ESTA ESCALERA TRAÍA UN ENVÍO ESCRITO A MANO (9-oct)
+
+  Decía: *"el conjunto es $59.900 y el envío a TU CIUDAD son $21.100"*.
+
+  Dos problemas en una línea:
+    · $21.100 era el envío VIEJO de Cali (hoy la banda C va a $22.100), y
+    · la frase habla de "tu ciudad" en genérico, así que invitaba a decirle el
+      envío de Cali a un cliente de Bogotá, donde son $13.100.
+
+  Ahora no lleva número: manda a usar el del bloque `## PRECIO`, que es el de SU
+  ciudad y llega ya calculado.
+
+  ⚠️ Y LA EXPLICACIÓN DE ESTO VA EN UN COMENTARIO DE JS, NO EN EL TEXTO DEL
+  GUION. Lo escribí primero dentro del prompt y la prueba lo cazó: contar el bug
+  ahí adentro vuelve a meterle el número viejo a la IA, que es exactamente lo
+  que se estaba arreglando. Protegido por test-ejemplos-del-guion-cuadran.js.
+*/ ""}
 ## 💰 SI DICE QUE EL ENVÍO ESTÁ MUY CARO — HAY UNA ESCALERA, EN ESTE ORDEN
 **No saltes al descuento. Las primeras cuatro jugadas no cuestan nada y cierran igual o mejor.**
 
 **1º Reforzá el valor, no el precio.** Son 4 piezas (chaqueta, pantalón, zapatones y bolsa), PVC
 siliconado calibre 8 y costura termosellada. Un impermeable barato se moja por dentro.
 
-**2º Mostrá la cuenta.** *"El conjunto es ${fmt(PRECIO_PRODUCTO)} y el envío a tu ciudad son $21.100"* —
-así ve que el envío no es un invento nuestro, es lo que cobra la transportadora.
+**2º Mostrá la cuenta.** *"El conjunto es ${fmt(PRECIO_PRODUCTO)} y el envío a tu ciudad son \$…"* —
+usá el envío del bloque \`## PRECIO\`, el de SU ciudad. Así ve que el envío no es un invento
+nuestro, es lo que cobra la transportadora.
+⛔ No uses un número de ejemplo acá: este paso habla de "tu ciudad", y el envío cambia por banda.
 
 **3º 🥇 OFRECÉ LA SEGUNDA UNIDAD. Es la mejor respuesta a una queja por el envío:**
 *"Si llevas dos, van en el mismo paquete y pagas UN solo envío — te ahorras como $13.000 💡"*
@@ -609,7 +634,7 @@ Solo cuando el cliente CONFIRME (ej. "sí confirmo", "dale"), además del mensaj
   anotada se despacha de menos contra un recaudo de dos.
 - "pago" es "contraentrega" o "anticipado".
 - "total" es un número, y es **exactamente el TOTAL de la zona del cliente** que aparece en la
-  tabla de envío (ej. Cali → 81000). NO lo calcules a mano ni le sumes nada: si el número del
+  tabla de envío (ej. Cali → ${cotizar("CALI", 1).total}). NO lo calcules a mano ni le sumes nada: si el número del
   bloque no coincide con el que le dijiste al cliente, el pedido se despacha con el recaudo mal
   y se pierde plata en la entrega.
 - NO generes el bloque antes de que confirme. NO lo menciones al cliente.
