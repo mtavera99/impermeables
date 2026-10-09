@@ -40,15 +40,16 @@ const HORA = (ms) =>
 const fmtCOP = (n) =>
   Number.isFinite(Number(n)) ? "$" + Number(n).toLocaleString("es-CO") : "—";
 
+const limpiar = (s) =>
+  String(s == null ? "" : s)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
 /** Busca pedidos por nombre (sin tildes, sin mayúsculas) o por id de chat. */
 function buscar({ id, q }) {
   const pedidos = store.todosLosPedidos();
-  const limpiar = (s) =>
-    String(s == null ? "" : s)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim();
 
   if (id) return pedidos.filter((p) => String(p.telefono_chat) === String(id));
   if (q) {
@@ -59,6 +60,67 @@ function buscar({ id, q }) {
     );
   }
   return [];
+}
+
+// ============================================================================
+// 🔎 BUSCAR EN LOS CHATS, NO SOLO EN LOS PEDIDOS (9-oct)
+//
+// DE DÓNDE SALE. Después del caso del comprobante perdido, el dueño fue a buscar
+// el chat de ese cliente y dijo: *"no hay un buscador para los chats"*.
+//
+// Tenía razón a medias, y la mitad que faltaba era la importante: el buscador
+// existía, pero `buscar()` mira SOLO los PEDIDOS. Y ese cliente no tenía pedido
+// —el chat se cortó antes de cerrarse, que es justamente lo que había fallado—.
+//
+// 🔴 O SEA QUE EL BUSCADOR NO ENCONTRABA EXACTAMENTE A QUIEN HABÍA QUE BUSCAR.
+// Los clientes que más falta encontrar son los que pagaron y no tienen pedido,
+// o los que quedaron a medias. Por nombre eran invisibles: la única forma de
+// abrir su chat era pegar el teléfono a mano en la URL.
+//
+// Acá se busca en las CONVERSACIONES: por teléfono (aunque se escriba con
+// espacios o guiones, o sin el 57 del país) y por el nombre que el cliente tiene
+// en WhatsApp.
+// ============================================================================
+function buscarChats({ q, conversaciones }) {
+  const t = limpiar(q);
+  if (!t) return [];
+  const convs = conversaciones || store.todasLasConversaciones();
+
+  // Si escribió números, se comparan solo los dígitos: así "321 555 7305",
+  // "321-555-7305" y "3215557305" encuentran lo mismo. Y se compara por el
+  // final, porque el chat se guarda con el 57 del país adelante y nadie lo
+  // escribe al buscar.
+  const digitos = t.replace(/\D/g, "");
+
+  const salida = [];
+  for (const [tel, c] of Object.entries(convs)) {
+    if (tel.startsWith("prueba-")) continue; // chats de prueba, no son clientes
+    const perfil = (c && c.perfil) || {};
+    const nombre = perfil.nombre || perfil.username || "";
+    const telDigitos = String(tel).replace(/\D/g, "");
+
+    const porTelefono = digitos.length >= 4 && telDigitos.endsWith(digitos);
+    const porNombre = nombre && limpiar(nombre).includes(t);
+    if (!porTelefono && !porNombre) continue;
+
+    const msgs = (c && c.messages) || [];
+    const ultimo = msgs.length ? msgs[msgs.length - 1] : null;
+    salida.push({
+      tel,
+      nombre,
+      cuando: c.ultimoDelCliente || (ultimo && ultimo.at) || 0,
+      mensajes: msgs.length,
+      // Para que el dueño reconozca el chat sin abrirlo.
+      adelanto: ultimo ? String(ultimo.content || "").slice(0, 70) : "",
+      // 💸 Si este chat está esperando un comprobante, se dice acá: es la razón
+      // por la que se buscan estos chats en primer lugar.
+      esperaComprobante: c.esperaComprobante === true,
+      comprobanteRecibidoEl: c.comprobanteRecibidoEl || null,
+    });
+  }
+  // Lo más reciente primero, y con techo: esta pantalla muestra datos
+  // personales, no es para pasear por la base de clientes.
+  return salida.sort((a, b) => b.cuando - a.cuando).slice(0, 20);
 }
 
 function burbuja(m) {
@@ -387,8 +449,23 @@ function cajonDeVenta(p, token, pedidosPrevios) {
  * @param {string} [opciones.resultado] "ok" o el motivo del fallo del último envío
  */
 function render({ id, q, token, resultado, venta } = {}) {
-  const encontrados = buscar({ id, q });
+  let encontrados = buscar({ id, q });
   const conversaciones = store.todasLasConversaciones();
+
+  // 🔎 Si lo que se buscó no tiene PEDIDO, se busca en los CHATS antes de
+  // rendirse. Un cliente sin pedido es el que más falta leer (ver buscarChats).
+  let chatsSugeridos = [];
+  if (!encontrados.length && q) {
+    chatsSugeridos = buscarChats({ q, conversaciones });
+    // Si hay uno solo, se abre directo: hacer tocar un resultado único es un
+    // paso para nada cuando el dueño está despachando desde el celular.
+    if (chatsSugeridos.length === 1) {
+      id = chatsSugeridos[0].tel;
+      q = "";
+      chatsSugeridos = [];
+      encontrados = buscar({ id });
+    }
+  }
 
   let cuerpo;
   if (!id && !q) {
@@ -433,6 +510,29 @@ function render({ id, q, token, resultado, venta } = {}) {
       }</div>` +
       cajonDeEnvio(p, conv, token) +
       cajonDeVenta(p, token, 0);
+  } else if (chatsSugeridos.length) {
+    // 💬 Varios chats coinciden. Se listan para elegir, sin pedido de por medio.
+    cuerpo =
+      `<p class="nota">No hay ningún <b>pedido</b> con eso, pero sí ${
+        chatsSugeridos.length === 1 ? "este chat" : `estos ${chatsSugeridos.length} chats`
+      }:</p>` +
+      `<div class="resultados">${chatsSugeridos
+        .map(
+          (r) => `<a class="resultado" href="/chat?token=${esc(token || "")}&id=${encodeURIComponent(r.tel)}">
+            <b>${esc(r.nombre || r.tel)}</b>${
+            r.comprobanteRecibidoEl
+              ? ' <span class="marca">💸 mandó comprobante</span>'
+              : r.esperaComprobante
+              ? ' <span class="marca">💸 pago anticipado</span>'
+              : ""
+          }
+            <span class="meta">${esc(r.tel)} · ${r.mensajes} mensaje(s)${
+            r.cuando ? ` · ${esc(HORA(r.cuando))}` : ""
+          }</span>
+            ${r.adelanto ? `<span class="meta">“${esc(r.adelanto)}”</span>` : ""}
+          </a>`
+        )
+        .join("")}</div>`;
   } else if (encontrados.length === 0) {
     // Ayuda concreta en vez de un "no encontrado" seco: los últimos nombres,
     // que es lo que uno necesita cuando escribió el nombre distinto.
@@ -441,7 +541,9 @@ function render({ id, q, token, resultado, venta } = {}) {
       .slice(0, 12)
       .map((p) => `<li>${esc(p.nombre)}</li>`)
       .join("");
-    cuerpo = `<p class="nota">No encontré ningún pedido con eso.</p>
+    cuerpo = `<p class="nota">No encontré ningún pedido ni ningún chat con eso.</p>
+      <p class="nota">Buscá por el nombre que el cliente tiene en WhatsApp, o por su celular
+        (con o sin el 57, con espacios o guiones da igual).</p>
       <p class="nota">Los últimos pedidos son:</p><ul class="lista">${ultimos}</ul>`;
   } else {
     cuerpo = encontrados
@@ -518,6 +620,15 @@ function render({ id, q, token, resultado, venta } = {}) {
   .hora{text-transform:none;letter-spacing:0}
   .nota{color:var(--gris);font-size:13px}
   .lista{color:var(--gris);font-size:13px;padding-left:20px}
+  /* 🔎 Resultados de la búsqueda de chats. Cada uno es un bloque grande y
+     tocable: esto se usa con una mano, desde el celular, despachando. */
+  .resultados{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  .resultado{display:block;background:var(--card);border:1px solid var(--linea);
+    border-radius:10px;padding:11px 13px;text-decoration:none;color:#e6edf3}
+  .resultado b{display:block;font-size:15px;margin-bottom:3px}
+  .resultado .meta{display:block;color:var(--gris);font-size:12px;line-height:1.5}
+  .resultado .marca{display:inline-block;background:#3a2a14;color:#ffc98a;
+    border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;vertical-align:middle}
   .sep{border:0;border-top:1px solid var(--linea);margin:22px 0}
   .res{padding:10px 12px;border-radius:10px;margin-bottom:14px;font-size:14px}
   .res.ok{background:#12351f;color:#7ee2a8}
@@ -594,12 +705,13 @@ function render({ id, q, token, resultado, venta } = {}) {
   </div>
   <form method="get" action="/chat">
     <input type="hidden" name="token" value="${esc(token || "")}">
-    <input type="text" name="q" value="${esc(q || "")}" placeholder="Nombre o celular del cliente"
-      autocomplete="off">
+    <input type="search" name="q" value="${esc(q || "")}"
+      placeholder="Nombre o celular — busca también chats sin pedido"
+      autocomplete="off" enterkeyhint="search">
     <button type="submit">Buscar</button>
   </form>
   ${cuerpo}
 </body></html>`;
 }
 
-module.exports = { render, buscar };
+module.exports = { render, buscar, buscarChats };
