@@ -1350,12 +1350,13 @@ function render(aviso) {
        ==================================================================== -->
   <form class="buscarChat" method="get" action="/chat">
     <input type="hidden" name="token" value="${esc(panelToken())}">
-    <input type="search" name="q" placeholder="🔎 Buscar un chat por nombre o celular"
+    <input type="search" name="q" placeholder="🔎 Nombre, celular, dirección, ciudad o N° de guía"
       autocomplete="off" enterkeyhint="search">
     <button type="submit">Buscar</button>
   </form>
-  <p class="nota">Encuentra también a los clientes <b>sin pedido</b> — los que quedaron a medias
-    o pagaron y nunca se cerró la venta. Sirve el celular con o sin el 57, con espacios o guiones.</p>
+  <p class="nota">Busca por <b>cualquier dato</b>: el nombre de WhatsApp o el que dio para el pedido
+    (suelen ser distintos), celular, dirección, ciudad o número de guía. Encuentra también a los
+    clientes <b>sin pedido</b> — los que quedaron a medias o pagaron y nunca se cerró la venta.</p>
   ${bloquesConv}
 </main>
 <!-- ⬆️ Volver arriba. Fijo, porque el dueño trabaja del celular y la página es

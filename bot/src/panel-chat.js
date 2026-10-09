@@ -47,17 +47,105 @@ const limpiar = (s) =>
     .toLowerCase()
     .trim();
 
-/** Busca pedidos por nombre (sin tildes, sin mayúsculas) o por id de chat. */
+/** Los últimos 10 dígitos de un teléfono, que es la parte que identifica. */
+const diez = (v) => {
+  const d = String(v == null ? "" : v).replace(/\D/g, "");
+  return d.length >= 10 ? d.slice(-10) : "";
+};
+
+/**
+ * ¿Estos dígitos buscados corresponden a este teléfono?
+ *
+ * ⚠️ Compara por el FINAL y en los dos sentidos, y eso no es paranoia: el chat
+ * se guarda con el 57 del país ("573215557305") y la gente busca de todas las
+ * formas. Si solo se hiciera `telefono.endsWith(buscado)`, escribir el número
+ * COMPLETO con el 57 no encontraba nada —el buscado era más largo que los 10
+ * dígitos con los que se compara—. Eso ya falló una vez.
+ */
+function coincideTelefono(telefono, digitos) {
+  if (!digitos || digitos.length < MIN_DIGITOS) return false;
+  const tel = diez(telefono);
+  if (!tel) return false;
+  // Si escribió 10 dígitos o más, se comparan los últimos 10 de cada lado: así
+  // "3215557305", "573215557305" y "+57 321 555 7305" son lo mismo.
+  if (digitos.length >= 10) return tel === digitos.slice(-10);
+  // Si escribió menos, alcanza con que sea el final del número.
+  return tel.endsWith(digitos);
+}
+
+// Mínimos para no devolver media base de clientes: 3 letras para texto, y 4
+// dígitos para teléfono (con 3 dígitos coincidían decenas de números).
+const MIN_TEXTO = 3;
+const MIN_DIGITOS = 4;
+
+/**
+ * Todo lo buscable de un pedido, en una sola cadena.
+ *
+ * DE DÓNDE SALE (9-oct), pedido del dueño: *"que se pueda buscar tanto por el
+ * nombre de la persona con el que hizo la compra, celular, dirección o
+ * cualquiera de esos datos... hay personas que dan un nombre para el pedido pero
+ * el nombre de usuario es otro"*.
+ *
+ * 🔑 Ese es el caso que importa: el nombre del PEDIDO y el nombre de WhatSApp
+ * suelen ser distintos. Antes se buscaba por uno o por el otro según qué función
+ * corriera, así que escribir el nombre del pedido no encontraba el chat.
+ *
+ * Incluye el número de guía a propósito: cuando llega un reclamo, lo único que
+ * trae el cliente es ese número.
+ */
+function textoDePedido(p) {
+  if (!p) return "";
+  // ⚠️ Los TELÉFONOS no van acá a propósito, aunque parezca que faltan. Se
+  // buscan por el camino de los dígitos, que exige 4 y compara por el final.
+  // Metiéndolos en este texto, escribir "123" encontraba el chat 573001234567
+  // por coincidencia de substring y se saltaba ese mínimo: volvía a devolver
+  // ruido, que es justo lo que los mínimos evitan.
+  return limpiar(
+    [p.nombre, p.ciudad, p.direccion, p.color, p.talla, p.guia, p.pago].filter(Boolean).join(" ")
+  );
+}
+
+/**
+ * Dice POR QUÉ coincidió un pedido, con el nombre del campo.
+ * Sin esto, buscar una dirección devuelve un chat y no se entiende por qué.
+ */
+function motivoDePedido(p, t, digitos) {
+  const campos = [
+    ["el nombre del pedido", p.nombre],
+    ["la dirección", p.direccion],
+    ["la ciudad", p.ciudad],
+    ["el número de guía", p.guia],
+    ["el color", p.color],
+    ["la talla", p.talla],
+  ];
+  for (const [etiqueta, valor] of campos) {
+    if (valor && limpiar(valor).includes(t)) return `por ${etiqueta}`;
+  }
+  if (coincideTelefono(p.celular, digitos)) return "por el celular del pedido";
+  return "por un dato del pedido";
+}
+
+/**
+ * Busca pedidos por nombre, celular, ciudad, dirección, color, talla, forma de
+ * pago o número de guía. O por id de chat exacto.
+ */
 function buscar({ id, q }) {
-  const pedidos = store.todosLosPedidos();
+  // Se incluyen los anulados: si el dueño busca un cliente que canceló, lo que
+  // necesita es encontrarlo, no que el sistema se lo esconda.
+  const pedidos = store.todosLosPedidos({ incluirAnulados: true });
 
   if (id) return pedidos.filter((p) => String(p.telefono_chat) === String(id));
   if (q) {
     const t = limpiar(q);
-    if (!t) return [];
-    return pedidos.filter(
-      (p) => limpiar(p.nombre).includes(t) || String(p.celular || "").includes(t)
-    );
+    if (t.length < MIN_TEXTO) return [];
+    const digitos = t.replace(/\D/g, "");
+    return pedidos.filter((p) => {
+      if (textoDePedido(p).includes(t)) return true;
+      // Y por teléfono escrito de cualquier forma: "321 555 7305",
+      // "321-555-7305", "+57 321...". Se compara por el final.
+      if (coincideTelefono(p.celular, digitos) || coincideTelefono(p.telefono_chat, digitos)) return true;
+      return false;
+    });
   }
   return [];
 }
@@ -77,13 +165,19 @@ function buscar({ id, q }) {
 // o los que quedaron a medias. Por nombre eran invisibles: la única forma de
 // abrir su chat era pegar el teléfono a mano en la URL.
 //
-// Acá se busca en las CONVERSACIONES: por teléfono (aunque se escriba con
-// espacios o guiones, o sin el 57 del país) y por el nombre que el cliente tiene
-// en WhatsApp.
+// Acá se busca en las CONVERSACIONES por TODO lo que se sabe del cliente:
+//   · el nombre que tiene en WhatsApp
+//   · el teléfono del chat (con espacios, guiones, o sin el 57 del país)
+//   · y todos los datos de SUS PEDIDOS: nombre del pedido, celular, ciudad,
+//     dirección, color, talla y número de guía
+//
+// 🔑 LO DE LOS PEDIDOS LO PIDIÓ EL DUEÑO (9-oct) y es el caso que más pasa:
+// *"hay personas que dan un nombre para el pedido pero el nombre de usuario es
+// otro"*. Antes, buscar por el nombre del pedido no encontraba el chat.
 // ============================================================================
 function buscarChats({ q, conversaciones }) {
   const t = limpiar(q);
-  if (!t) return [];
+  if (t.length < MIN_TEXTO) return [];
   const convs = conversaciones || store.todasLasConversaciones();
 
   // Si escribió números, se comparan solo los dígitos: así "321 555 7305",
@@ -92,22 +186,55 @@ function buscarChats({ q, conversaciones }) {
   // escribe al buscar.
   const digitos = t.replace(/\D/g, "");
 
+  // Los pedidos se agrupan UNA vez por chat, en vez de recorrerlos por cada
+  // conversación. Con 300 conversaciones y 130 pedidos eso era 39.000 vueltas.
+  const pedidosPorChat = new Map();
+  for (const p of store.todosLosPedidos({ incluirAnulados: true })) {
+    const k = String(p.telefono_chat || "");
+    if (!k) continue;
+    if (!pedidosPorChat.has(k)) pedidosPorChat.set(k, []);
+    pedidosPorChat.get(k).push(p);
+  }
+
   const salida = [];
   for (const [tel, c] of Object.entries(convs)) {
     if (tel.startsWith("prueba-")) continue; // chats de prueba, no son clientes
     const perfil = (c && c.perfil) || {};
     const nombre = perfil.nombre || perfil.username || "";
-    const telDigitos = String(tel).replace(/\D/g, "");
+    const mios = pedidosPorChat.get(String(tel)) || [];
 
-    const porTelefono = digitos.length >= 4 && telDigitos.endsWith(digitos);
-    const porNombre = nombre && limpiar(nombre).includes(t);
-    if (!porTelefono && !porNombre) continue;
+    const porTelefono = coincideTelefono(tel, digitos);
+    const porNombre = Boolean(nombre) && limpiar(nombre).includes(t);
+    // 🔑 Acá entra todo lo del pedido: nombre distinto, dirección, ciudad, guía…
+    const pedidoQueCoincide = mios.find((p) => {
+      if (textoDePedido(p).includes(t)) return true;
+      if (coincideTelefono(p.celular, digitos)) return true;
+      return false;
+    });
+    if (!porTelefono && !porNombre && !pedidoQueCoincide) continue;
 
     const msgs = (c && c.messages) || [];
     const ultimo = msgs.length ? msgs[msgs.length - 1] : null;
+    // El nombre del pedido vale más que el de WhatsApp para reconocer a alguien:
+    // es el que el cliente dio para que le llegue el paquete.
+    const ultimoPedido = mios.length ? mios[mios.length - 1] : null;
+    const nombrePedido = (pedidoQueCoincide || ultimoPedido || {}).nombre || "";
     salida.push({
       tel,
       nombre,
+      // Para mostrar: se prefiere el nombre del pedido si el perfil no tiene.
+      nombreMostrar: nombre || nombrePedido || "",
+      nombrePedido,
+      // Por qué apareció este chat. Sirve cuando el nombre del pedido no se
+      // parece en nada a lo que se buscó (una dirección, una guía).
+      porQue: porNombre
+        ? "por el nombre de WhatsApp"
+        : porTelefono
+        ? "por el teléfono del chat"
+        : pedidoQueCoincide
+        ? motivoDePedido(pedidoQueCoincide, t, digitos)
+        : "",
+      pedido: pedidoQueCoincide || ultimoPedido || null,
       cuando: c.ultimoDelCliente || (ultimo && ultimo.at) || 0,
       mensajes: msgs.length,
       // Para que el dueño reconozca el chat sin abrirlo.
@@ -519,16 +646,35 @@ function render({ id, q, token, resultado, venta } = {}) {
       `<div class="resultados">${chatsSugeridos
         .map(
           (r) => `<a class="resultado" href="/chat?token=${esc(token || "")}&id=${encodeURIComponent(r.tel)}">
-            <b>${esc(r.nombre || r.tel)}</b>${
+            <b>${esc(r.nombreMostrar || r.tel)}</b>${
             r.comprobanteRecibidoEl
               ? ' <span class="marca">💸 mandó comprobante</span>'
               : r.esperaComprobante
               ? ' <span class="marca">💸 pago anticipado</span>'
               : ""
+          }${
+            // 🔑 Si el nombre del PEDIDO es distinto del de WhatsApp, se muestran
+            // los dos. Es el caso que pidió el dueño: la gente pide a un nombre
+            // y tiene el WhatsApp con otro, y ver solo uno confunde.
+            r.nombrePedido && limpiar(r.nombrePedido) !== limpiar(r.nombre)
+              ? `<span class="meta">📦 en el pedido: <b>${esc(r.nombrePedido)}</b></span>`
+              : ""
           }
             <span class="meta">${esc(r.tel)} · ${r.mensajes} mensaje(s)${
             r.cuando ? ` · ${esc(HORA(r.cuando))}` : ""
           }</span>
+            ${
+              // Por qué salió este chat. Imprescindible cuando se buscó una
+              // dirección o una guía: sin esto el resultado parece aleatorio.
+              r.porQue ? `<span class="meta">🔎 coincide ${esc(r.porQue)}</span>` : ""
+            }
+            ${
+              r.pedido && r.pedido.direccion
+                ? `<span class="meta">📍 ${esc(r.pedido.ciudad || "")}${
+                    r.pedido.ciudad && r.pedido.direccion ? " · " : ""
+                  }${esc(r.pedido.direccion)}</span>`
+                : ""
+            }
             ${r.adelanto ? `<span class="meta">“${esc(r.adelanto)}”</span>` : ""}
           </a>`
         )
@@ -542,8 +688,10 @@ function render({ id, q, token, resultado, venta } = {}) {
       .map((p) => `<li>${esc(p.nombre)}</li>`)
       .join("");
     cuerpo = `<p class="nota">No encontré ningún pedido ni ningún chat con eso.</p>
-      <p class="nota">Buscá por el nombre que el cliente tiene en WhatsApp, o por su celular
-        (con o sin el 57, con espacios o guiones da igual).</p>
+      <p class="nota">Podés buscar por <b>nombre</b> (el de WhatsApp o el que dio para el pedido),
+        <b>celular</b> (con o sin el 57, con espacios o guiones da igual), <b>dirección</b>,
+        <b>ciudad</b> o <b>número de guía</b>. Mínimo ${MIN_TEXTO} letras, o ${MIN_DIGITOS} dígitos
+        si buscás un teléfono.</p>
       <p class="nota">Los últimos pedidos son:</p><ul class="lista">${ultimos}</ul>`;
   } else {
     cuerpo = encontrados
@@ -706,7 +854,7 @@ function render({ id, q, token, resultado, venta } = {}) {
   <form method="get" action="/chat">
     <input type="hidden" name="token" value="${esc(token || "")}">
     <input type="search" name="q" value="${esc(q || "")}"
-      placeholder="Nombre o celular — busca también chats sin pedido"
+      placeholder="Nombre, celular, dirección, ciudad o N° de guía"
       autocomplete="off" enterkeyhint="search">
     <button type="submit">Buscar</button>
   </form>

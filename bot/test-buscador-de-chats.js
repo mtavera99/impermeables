@@ -165,6 +165,107 @@ chequear("…apunta a /chat", /<form class="buscarChat" method="get" action="\/c
 chequear("…manda el token", html.includes('name="token"'));
 chequear("…y dice que encuentra a los que no tienen pedido", /sin pedido/.test(html));
 
+
+// ============================================================================
+// 🔎 BUSCAR POR CUALQUIER DATO DEL PEDIDO (9-oct)
+//
+// Pedido del dueño, textual: *"que se pueda buscar tanto por el nombre de la
+// persona con el que hizo la compra, celular, dirección o cualquiera de esos
+// datos... hay personas que dan un nombre para el pedido pero el nombre de
+// usuario es otro, entonces para que el buscador pueda filtrar todos los datos
+// y encontrar el chat"*.
+//
+// 🔑 ESE ES EL CASO QUE IMPORTA: el nombre del PEDIDO y el de WhatsApp suelen
+// ser distintos, y antes se buscaba por uno o por el otro según qué función
+// corriera. Escribir el nombre del pedido no encontraba el chat.
+// ============================================================================
+console.log("\n── 8. Buscar por cualquier dato del pedido ──");
+
+// WhatsApp dice "Pipe Moto", pero el pedido lo hizo a nombre de otra persona.
+const TEL_P = "573001234567";
+store.guardarPerfil(TEL_P, { nombre: "Pipe Moto" });
+store.pushMsg(TEL_P, "user", "hola, quiero uno");
+store.saveOrder({
+  nombre: "Luis Fernando Gómez",
+  celular: "3109876543",
+  ciudad: "Palmira",
+  direccion: "Carrera 12 # 8-40, barrio El Prado",
+  color: "Negro",
+  talla: "XL",
+  total: 82000,
+  pago: "contraentrega",
+  telefono_chat: TEL_P,
+});
+const pedidoP = store.todosLosPedidos().find((p) => p.telefono_chat === TEL_P);
+store.anotarGuiaEnPedido(pedidoP.id || pedidoP.fecha, "240099887766");
+
+const encuentraP = (q) => panelChat.buscarChats({ q }).some((r) => r.tel === TEL_P);
+
+chequear("por el nombre de WhatsApp", encuentraP("Pipe"));
+chequear(
+  "🔑 por el nombre del PEDIDO, que es otro",
+  encuentraP("Luis Fernando"),
+  "es el caso que pidió el dueño: pide a un nombre y tiene el WhatsApp con otro"
+);
+chequear("por el apellido del pedido", encuentraP("gómez"));
+chequear("sin tildes también", encuentraP("gomez"));
+chequear("por el celular del pedido", encuentraP("3109876543"));
+chequear("por el celular con espacios", encuentraP("310 987 6543"));
+chequear("por los últimos 4 del celular", encuentraP("6543"));
+chequear("🏠 por la dirección", encuentraP("Carrera 12"));
+chequear("por el barrio que va en la dirección", encuentraP("El Prado"));
+chequear("🏙️ por la ciudad", encuentraP("Palmira"));
+chequear(
+  "📦 por el número de guía (lo único que trae un reclamo)",
+  encuentraP("240099887766")
+);
+chequear("por el teléfono del chat", encuentraP("3001234567"));
+
+console.log("\n   El resultado explica POR QUÉ coincidió:");
+const rDir = panelChat.buscarChats({ q: "Carrera 12" }).find((r) => r.tel === TEL_P);
+chequear("dice que fue por la dirección", rDir && rDir.porQue === "por la dirección", rDir && rDir.porQue);
+const rGuia = panelChat.buscarChats({ q: "240099887766" }).find((r) => r.tel === TEL_P);
+chequear("dice que fue por la guía", rGuia && rGuia.porQue === "por el número de guía", rGuia && rGuia.porQue);
+const rNom = panelChat.buscarChats({ q: "Luis Fernando" }).find((r) => r.tel === TEL_P);
+chequear("dice que fue por el nombre del pedido", rNom && rNom.porQue === "por el nombre del pedido");
+chequear(
+  "y trae el nombre del pedido aparte del de WhatsApp",
+  rNom && rNom.nombrePedido === "Luis Fernando Gómez" && rNom.nombre === "Pipe Moto"
+);
+
+console.log("\n   La pantalla abre el cliente al buscar su dirección:");
+// ⚠️ Acá NO se lista: como el pedido existe, `buscar()` lo encuentra y se
+// muestra su ficha completa con el chat, que es más útil que un resultado
+// suelto. La lista con el "coincide por…" es para los chats SIN pedido.
+const htmlP = panelChat.render({ q: "Carrera 12", token: "tk" });
+chequear("muestra el nombre del pedido", htmlP.includes("Luis Fernando Gómez"));
+chequear("muestra la dirección buscada", htmlP.includes("Carrera 12"));
+chequear("y muestra el chat del cliente", htmlP.includes("quiero uno"));
+
+console.log("\n   Y el 'coincide por…' sale en los chats SIN pedido:");
+// Un prospecto con un nombre que solo está en WhatsApp.
+store.guardarPerfil("573007776655", { nombre: "Marcela Prospecto" });
+store.pushMsg("573007776655", "user", "cuanto vale");
+const htmlProsp = panelChat.render({ q: "Marcela", token: "tk" });
+chequear(
+  "lo encuentra y abre su chat",
+  htmlProsp.includes("cuanto vale"),
+  "un solo resultado se abre directo"
+);
+
+console.log("\n   Y los mínimos siguen evitando el ruido:");
+chequear(
+  "3 dígitos NO encuentran por teléfono",
+  panelChat.buscarChats({ q: "123" }).length === 0,
+  "el teléfono se busca por los dígitos (mínimo 4), no como texto suelto"
+);
+chequear("2 letras no devuelven nada", panelChat.buscarChats({ q: "ab" }).length === 0);
+
+console.log("\n   buscar() de pedidos también se amplió:");
+chequear("encuentra el pedido por la dirección", panelChat.buscar({ q: "Carrera 12" }).length === 1);
+chequear("y por el número de guía", panelChat.buscar({ q: "240099887766" }).length === 1);
+chequear("y por la ciudad", panelChat.buscar({ q: "Palmira" }).length === 1);
+
 try {
   fs.rmSync(DIR, { recursive: true, force: true });
 } catch {
