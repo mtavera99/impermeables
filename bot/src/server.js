@@ -26,6 +26,7 @@ const excel = require("./excel");
 const rechazo = require("./rechazo");
 const plantillas = require("./plantillas");
 const audio = require("./audio");
+const comprobante = require("./comprobante");
 const resumen = require("./resumen");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -1630,6 +1631,36 @@ app.post("/anular", (req, res) => {
   res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${encodeURIComponent(aviso)}`);
 });
 
+// ============================================================================
+// ✅ "LA PLATA ENTRÓ": EL BOTÓN QUE DESBLOQUEA UN PEDIDO ANTICIPADO
+//
+// Un pedido con pago anticipado queda frenado por el motivo de revisión
+// `pago_anticipado_sin_verificar` hasta que alguien confirme que la
+// transferencia está en la cuenta. Esto es ese "alguien".
+//
+// 🔑 NO LO PUEDE HACER EL BOT. El bot lee una captura; una captura se puede
+// editar, puede ser de otro pago o de uno que se reversó. Lo único que cuenta es
+// que el dueño mire el banco. Por eso es una acción manual y queda firmada.
+// ============================================================================
+app.post("/pago-verificado", (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const ref = String(req.body?.fecha || req.body?.id || "");
+  const r = store.marcarPagoVerificado(ref, String(req.body?.quien || "el dueño"));
+  const aviso = r
+    ? `✅ Pago de ${r.nombre || "?"} verificado por $${Number(r.total || 0).toLocaleString("es-CO")}. ` +
+      `Ya se puede despachar.`
+    : "No se encontró ese pedido.";
+  anotarEvento({ tipo: r ? "pago-verificado" : "pago-verificar-fallido", fecha: ref });
+  // Si se marcó desde la pantalla del chat, se vuelve ahí.
+  if (req.body?.volver === "chat" && req.body?.chat) {
+    return res.redirect(
+      `/chat?token=${encodeURIComponent(PANEL_TOKEN)}&id=${encodeURIComponent(String(req.body.chat))}` +
+        `&r=${encodeURIComponent(aviso)}`
+    );
+  }
+  res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${encodeURIComponent(aviso)}`);
+});
+
 app.post("/reactivar", (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   const fecha = String(req.body?.fecha || "");
@@ -2741,9 +2772,97 @@ async function handleWebhook(body) {
           }
         }
 
-        // Imágenes y otros tipos: el bot no los procesa todavía, pero ya no se
-        // ignoran en silencio. Antes el cliente mandaba una foto y nadie contestaba.
+        // ====================================================================
+        // 💸 UNA IMAGEN PUEDE SER UN COMPROBANTE DE PAGO (8-oct, caso Wilmer)
+        //
+        // EL CASO. Cliente con pago anticipado: transfirió y mandó la captura
+        // del comprobante a las 8 de la mañana. Cayó en la rama de abajo, el bot
+        // le dijo "todavía no puedo abrir ese tipo de archivo" y el `continue`
+        // cortó el turno. Apareció al día siguiente POR INSTAGRAM preguntando
+        // por su guía. El pedido nunca se despachó.
+        //
+        // 🔴 LO QUE DE VERDAD FALLÓ FUE EL `continue`, no la respuesta. Al
+        // cortar ahí, el mensaje del cliente NO pasaba por store.pushMsg: no
+        // quedaba en el historial, así que no existía para el panel, ni para el
+        // embudo, ni para el puntaje de atencion.js. Un cliente que YA PAGÓ era
+        // invisible para todo el sistema. Y como no quedaba rastro, tampoco se
+        // puede saber cuántos pedidos se perdieron así antes.
+        //
+        // 🔑 Y encima el guion se lo PEDÍA: prompt.js le dice "envía el
+        // comprobante de pago por este chat". El bot pedía justo el único tipo
+        // de archivo que no sabía recibir.
+        //
+        // EL ORDEN DE ACÁ ABAJO ES A PROPÓSITO:
+        //   1. guardar el mensaje   ← lo primero, nunca más un mensaje invisible
+        //   2. leer la imagen       ← un lujo: si falla, se sigue igual
+        //   3. marcar el pedido     ← queda frenado para que no se despache
+        //   4. avisarle al dueño    ← se manda SIEMPRE, con datos o sin ellos
+        //   5. contestarle al cliente
+        // ====================================================================
+        if (!text && from && comprobante.puedeSerComprobante(msg)) {
+          const mediaId = comprobante.mediaIdDe(msg);
+          const esperaba = store.getConv(from).esperaComprobante === true;
+
+          // 1. PRIMERO SE GUARDA. Antes que la IA, antes que la red, antes que
+          // cualquier cosa que pueda fallar: así el chat deja rastro aunque todo
+          // lo demás se caiga. Es la corrección del bug de fondo.
+          store.pushMsg(from, "user", "[el cliente mandó una imagen: posible comprobante de pago]", {
+            tipo: msg.type,
+            mediaId: mediaId || null,
+            comprobante: true,
+          });
+          anotarEvento({ tipo: "comprobante-recibido", de: from, clase: msg.type, esperaba });
+
+          // 2. Intentar leerla. `datos` queda en null si no se pudo, y el aviso
+          // lo dice con esas palabras en vez de callarse.
+          const t0 = Date.now();
+          const lectura = await comprobante.leerDeMedia(mediaId, msg.document?.mime_type || msg.image?.mime_type);
+          const datos = lectura.ok ? lectura.datos : null;
+          if (lectura.ok) {
+            console.log(
+              `💸 Imagen de ${from} leída en ${Date.now() - t0}ms — ` +
+                `${datos.esComprobante ? "ES comprobante" : `NO parece comprobante (${datos.queEs || "?"})`}` +
+                `${datos.monto ? ` · $${datos.monto}` : ""}`
+            );
+          } else {
+            console.error(`🔴 No se pudo leer la imagen de ${from}: ${lectura.error}`);
+            anotarEvento({ tipo: "comprobante-ilegible", de: from, error: String(lectura.error).slice(0, 160) });
+          }
+
+          // 3. Marcar el pedido para que NO se despache sin verificar la plata.
+          store.marcarComprobanteEnChat(from, datos);
+          const pedido = store.marcarComprobanteRecibido(from, datos);
+
+          // 4. AVISARLE AL DUEÑO. Esto va aunque no haya pedido y aunque la
+          // imagen no se haya podido leer: enterarse es el punto.
+          //
+          // ⚠️ Si OWNER_WHATSAPP no está puesto, el aviso se perdería en
+          // silencio y volveríamos exactamente al bug de origen. Así que se
+          // grita en el log, que sí sobrevive.
+          const aviso = comprobante.avisoParaDueno({ de: from, datos, error: lectura.error, pedido });
+          if (OWNER) {
+            await sendText(OWNER, aviso);
+          } else {
+            console.error(
+              `🔴🔴 LLEGÓ UN COMPROBANTE DE PAGO Y NO HAY A QUIÉN AVISARLE: OWNER_WHATSAPP ` +
+                `no está configurado. Poné esa variable YA. El aviso que no se pudo mandar era:\n${aviso}`
+            );
+          }
+
+          // 5. Contestarle al cliente. Nunca más "no puedo abrir ese archivo" a
+          // alguien que acaba de pagar.
+          await sendText(from, comprobante.respuestaAlCliente(datos));
+          continue;
+        }
+
+        // Otros tipos (stickers, videos, ubicaciones): el bot no los procesa,
+        // pero el mensaje SÍ se guarda. Un mensaje que no queda en el historial
+        // es un cliente que desaparece del panel y del embudo —ese fue el error
+        // que costó el pedido del 8-oct—, así que acá ya no se corta sin anotar.
         if (!text && from && msg.type !== "text") {
+          store.pushMsg(from, "user", `[el cliente mandó un ${msg.type}, que el bot no puede abrir]`, {
+            tipo: msg.type,
+          });
           anotarEvento({ tipo: "no-soportado", de: from, clase: msg.type });
           console.log(`(${from}) mandó un ${msg.type}, que el bot todavía no procesa.`);
           await sendText(
@@ -2775,6 +2894,75 @@ async function handleWebhook(body) {
           console.log(`(${from}) pidio no ser contactado (${evalRechazo.motivo}). Marcado como noMolestar.`);
         } else if (evalRechazo.esCorreccion) {
           console.log(`(${from}) dijo "no" pero es una corrección del pedido, NO un rechazo.`);
+        }
+
+        // ====================================================================
+        // 💸 PAGO ANTICIPADO DETECTADO POR TEXTO
+        //
+        // Pedido textual del dueño después del caso del 8-oct: "me gustaría que
+        // cuando una persona vaya a hacer pago anticipado que también quede
+        // marcado de alguna forma distinta para yo poder estar pendiente de si
+        // hace el pago y envía el comprobante".
+        //
+        // Son dos momentos distintos y los dos importan:
+        //   (a) ELIGE pagar anticipado  → se marca el chat y queda en espera.
+        //   (b) dice que YA PAGÓ        → plata que ya se movió: aviso fuerte.
+        //
+        // 🔑 VA ANTES DEL CANDADO DE PAUSA. Si un humano ya tomó el chat, el bot
+        // no contesta —correcto—, pero un "ya pagué" no puede depender de que
+        // alguien esté mirando esa pantalla justo en ese momento. El aviso se
+        // manda igual.
+        //
+        // ⚠️ Y no corta el turno: el mensaje sigue su camino normal a la IA.
+        // Esto solo observa y avisa.
+        // ====================================================================
+        if (from && text) {
+          if (comprobante.eligePagoAnticipado(text)) {
+            // Solo la primera vez: marcarPagoAnticipadoEsperado devuelve false
+            // si el chat ya estaba marcado, así que no se repite el aviso cada
+            // vez que el cliente vuelve a nombrar Nequi.
+            if (store.marcarPagoAnticipadoEsperado(from)) {
+              anotarEvento({ tipo: "pago-anticipado-elegido", de: from, texto: text.slice(0, 80) });
+              console.log(`🔖 ${from} va a pagar por adelantado. Chat marcado: queda esperando comprobante.`);
+              if (OWNER) {
+                await sendText(
+                  OWNER,
+                  `🔖 PAGO ANTICIPADO EN CAMINO: ${from}\n\n` +
+                    `El cliente dijo que va a pagar por adelantado:\n"${text.slice(0, 140)}"\n\n` +
+                    `Quedá pendiente del comprobante. Cuando llegue te aviso con los datos.\n` +
+                    `⛔ Este pedido NO se despacha hasta que confirmes que la plata entró: ` +
+                    `sale marcado en «🔴 revisar antes de despachar» del panel.`
+                );
+              }
+            }
+          }
+
+          // (b) Dice que ya pagó. Puede venir con imagen o sin ella —hay clientes
+          // que avisan primero y mandan la captura después, y otros que nunca la
+          // mandan—. En todos los casos el dueño tiene que poder ir a mirar.
+          if (comprobante.declaraPagoHecho(text)) {
+            anotarEvento({ tipo: "pago-declarado", de: from, texto: text.slice(0, 80) });
+            console.log(`💸 ${from} dice que YA PAGÓ: "${text.slice(0, 90)}"`);
+            if (store.debeAvisarPagoDeclarado(from)) {
+              const pedidoDicho = store.pedidoAbiertoDe(from);
+              if (OWNER) {
+                await sendText(
+                  OWNER,
+                  `💸 EL CLIENTE DICE QUE YA PAGÓ: ${from}\n\n` +
+                    `Lo que escribió:\n"${text.slice(0, 160)}"\n\n` +
+                    (pedidoDicho
+                      ? `Pedido: ${pedidoDicho.nombre || "?"} · ${pedidoDicho.ciudad || "?"} · ` +
+                        `$${Number(pedidoDicho.total || 0).toLocaleString("es-CO")}\n`
+                      : `⚠️ Este chat NO tiene un pedido guardado todavía.\n`) +
+                    `\n⛔ Revisá la cuenta antes de despachar. Si la plata entró, marcá el pago en el panel.`
+                );
+              } else {
+                console.error(
+                  `🔴🔴 UN CLIENTE DICE QUE PAGÓ Y NO HAY A QUIÉN AVISARLE: OWNER_WHATSAPP no está configurado.`
+                );
+              }
+            }
+          }
         }
 
         if (store.isPaused(from)) {
@@ -2900,7 +3088,13 @@ async function handleWebhook(body) {
               `Nombre: ${order.nombre}\nCel: ${order.celular || "🔴 FALTA"}\n` +
               `Ciudad: ${order.ciudad}\nDir: ${order.direccion || "🔴 FALTA"}\n` +
               `Color: ${order.color} · Talla: ${order.talla}\n` +
-              `Total al recibir: $${Number(order.total).toLocaleString("es-CO")}\n` +
+              // 🔴 "Total al recibir" estaba fijo en el código y era MENTIRA en
+              // los pedidos anticipados: en esos no se recauda nada en la puerta
+              // —ya pagó, o debería haber pagado—. Despachar a recaudar un pedido
+              // anticipado es cobrarle dos veces al cliente.
+              (store.esPagoAnticipado(order)
+                ? `Total: $${Number(order.total).toLocaleString("es-CO")} 💸 PAGO ANTICIPADO (no se recauda en la entrega)\n`
+                : `Total al recibir: $${Number(order.total).toLocaleString("es-CO")}\n`) +
               `Chat: ${order.telefono_chat}` +
               (order.celularDelChat ? `\n(el celular se tomó del número por el que escribe)` : "") +
               // ⚠️ Ya le habíamos vendido a este cliente. Puede ser una compra

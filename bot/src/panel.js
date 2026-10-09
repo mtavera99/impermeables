@@ -164,6 +164,15 @@ function render(aviso) {
   const totalPendiente = pendientes.reduce((s, p) => s + Number(p.total || 0), 0);
   const totalPorRevisar = paraRevisar.reduce((s, p) => s + Number(p.total || 0), 0);
   const sinCelularCuantos = pendientes.filter((p) => !String(p.celular || "").trim()).length;
+  // 💸 PAGOS ANTICIPADOS ESPERANDO QUE ALGUIEN MIRE EL BANCO (8-oct).
+  // Su propia tarjeta porque es una cola de trabajo distinta: acá no falta un
+  // dato del pedido, falta una comprobación en la cuenta. Los que YA mandaron
+  // el comprobante se cuentan aparte: esos son los urgentes —el cliente ya
+  // pagó y está esperando—, y son exactamente el caso que se nos perdió.
+  const pagosPorVerificar = pendientes.filter(
+    (p) => (store.esPagoAnticipado(p) || p.comprobante_recibido === true) && p.pago_verificado !== true
+  );
+  const conComprobante = pagosPorVerificar.filter((p) => p.comprobante_recibido === true);
 
   // Ordenar por el último mensaje del cliente: lo más reciente arriba
   const lista = Object.entries(convs)
@@ -398,6 +407,21 @@ function render(aviso) {
       </div>`
           : ""
       }
+      <!-- 💸 Pagos anticipados sin verificar. Esta tarjeta existe por el caso
+           del 8-oct: un cliente pagó, mandó la captura, el bot no supo leerla y
+           el pedido se quedó quieto sin que nadie se enterara. El número de
+           "ya mandó el comprobante" es el que hay que atender hoy. -->
+      ${
+        pagosPorVerificar.length
+          ? `<div class="kpi ${conComprobante.length ? "no" : "warn"}"><b>${pagosPorVerificar.length}</b><span>💸 pagos por verificar</span>
+        <span class="d">${
+          conComprobante.length
+            ? `${conComprobante.length} ya mandó comprobante — mirá la cuenta`
+            : "esperando que paguen"
+        }</span>
+      </div>`
+          : ""
+      }
     </div>
     ${hoy.cierreTopado ? `<p class="nota">* Hay más pedidos que conversaciones de hoy: alguien escribió ayer y confirmó hoy. El cierre se topa en 100%.</p>` : ""}
     ${hoy.topCiudades.length ? `<p class="nota">📍 ${hoy.topCiudades.map(([c, n]) => `${esc(c)} <b>${n}</b>`).join(" · ")}</p>` : ""}
@@ -444,6 +468,19 @@ function render(aviso) {
     // el PDF ya subido cuesta una llamada y un despacho trabado.
     // ========================================================================
     const sinDireccion = !String(p.direccion || "").trim();
+    // ========================================================================
+    // 💸 PAGO ANTICIPADO SIN VERIFICAR (8-oct)
+    //
+    // El caso: un cliente pagó por adelantado, mandó la captura por el chat, el
+    // bot no supo abrirla y el pedido se quedó quieto sin que nadie lo supiera.
+    // Acá se ve de un vistazo y desde acá se desbloquea.
+    //
+    // 🔑 Que el cliente haya mandado el comprobante NO es que el pago esté
+    // verificado. Son dos cosas distintas y el panel las muestra distinto: una
+    // la hace el cliente, la otra solo la puede cerrar el dueño mirando el banco.
+    // ========================================================================
+    const pagoPorVerificar =
+      (store.esPagoAnticipado(p) || p.comprobante_recibido === true) && p.pago_verificado !== true;
     // Enlace para leer el chat completo de ese cliente desde el celular, sin
     // tener que entrar al shell de Render.
     const verChat = p.telefono_chat
@@ -469,6 +506,17 @@ function render(aviso) {
       // motivo más caro de todos: despachar así cobra mal en la puerta del
       // cliente. Antes esta marca se guardaba y NADIE la miraba.
       p.precio_no_cuadra ? ' <span class="tag no">🔴 PRECIO NO CUADRA</span>' : ""
+    }${
+      // 💸 Pago anticipado: la etiqueta dice en qué paso va. "Mandó comprobante"
+      // es una cosa; "la plata entró" es otra, y mezclarlas es justo lo que
+      // dejó un pedido sin despachar.
+      pagoPorVerificar
+        ? p.comprobante_recibido
+          ? ' <span class="tag no">💸 COMPROBANTE SIN VERIFICAR</span>'
+          : ' <span class="tag warn">💸 ESPERANDO PAGO</span>'
+        : store.esPagoAnticipado(p) && p.pago_verificado
+        ? ' <span class="tag ok">💸 PAGADO</span>'
+        : ""
     }<div class="sub">${esc(p.celular || p.telefono_chat)}${
       sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""
     }${
@@ -480,6 +528,26 @@ function render(aviso) {
     }${
       p.sin_confirmar
         ? '<br><b style="color:#ff9aa4">🔴 no dijo un "sí" claro — leé el chat antes de despachar</b>'
+        : ""
+    }${
+      // 💸 El detalle del pago anticipado, con lo que se leyó de la captura.
+      pagoPorVerificar
+        ? `<br><b style="color:#ff9aa4">💸 ${
+            p.comprobante_recibido
+              ? `mandó el comprobante${
+                  p.comprobante_recibido_el ? ` el ${esc(HORA(new Date(p.comprobante_recibido_el).getTime()))}` : ""
+                }${p.comprobante_monto ? ` por ${esc(fmtCOP(p.comprobante_monto))}` : ""}${
+                  p.comprobante_banco ? ` (${esc(p.comprobante_banco)})` : ""
+                } — revisá la cuenta`
+              : "pago anticipado: todavía no mandó el comprobante"
+          }</b>${
+            // Si el monto de la captura no coincide con el pedido, se dice acá.
+            p.comprobante_monto && Number(p.total) && Number(p.comprobante_monto) !== Number(p.total)
+              ? `<br><b style="color:#ff9aa4">🔴 el comprobante dice ${esc(
+                  fmtCOP(p.comprobante_monto)
+                )} y el pedido es de ${esc(fmtCOP(p.total))}</b>`
+              : ""
+          }`
         : ""
     }${
       // ⚠️ "debería ser $X" SOLO si el total esperado es distinto al del pedido.
@@ -532,7 +600,20 @@ function render(aviso) {
                <input type="hidden" name="fecha" value="${esc(p.id || p.fecha)}">
                <button type="submit" class="mini">↩️ reactivar</button>
              </form>`
-          : `<form method="post" action="/anular" class="acc"
+          : // 💸 Si es anticipado y falta confirmar la plata, el botón de
+            // "la plata entró" va PRIMERO: es lo que desbloquea el despacho.
+            `${
+              pagoPorVerificar && !opciones.despachado
+                ? `<form method="post" action="/pago-verificado" class="acc"
+                 onsubmit="return confirm('¿Confirmás que la plata de ${esc(
+                   String(p.nombre || "").replace(/'/g, "")
+                 )} YA ESTÁ en la cuenta? Con esto el pedido queda listo para despachar.')">
+               <input type="hidden" name="token" value="${esc(panelToken())}">
+               <input type="hidden" name="fecha" value="${esc(p.id || p.fecha)}">
+               <button type="submit" class="mini destacado">✅ la plata entró</button>
+             </form>`
+                : ""
+            }<form method="post" action="/anular" class="acc"
                  onsubmit="return confirm('¿Anular el pedido de ${esc(
                    String(p.nombre || "").replace(/'/g, "")
                  )}? Deja de contar como venta, pero queda en el registro.')">

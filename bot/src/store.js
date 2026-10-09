@@ -545,7 +545,76 @@ function todosLosPedidos(opciones) {
 // faltaba era que alguien lo hiciera cumplir.
 // ============================================================================
 
+/**
+ * ¿Este pedido se paga POR ADELANTADO?
+ *
+ * El campo `pago` es texto libre: lo escribe la IA en el bloque del pedido y
+ * también se puede elegir a mano en el panel. Así que no se compara con
+ * `=== "anticipado"` —eso dejaría pasar "transferencia", "nequi" o "adelantado"
+ * y justamente esos son los pedidos cuya plata hay que ir a buscar.
+ */
+function esPagoAnticipado(order) {
+  if (!order) return false;
+  const pago = String(order.pago || "").toLowerCase();
+  if (!pago) return false;
+  // Contraentrega es el otro mundo: la plata la recauda la transportadora.
+  if (/contra\s?entrega|contra\s?-?\s?entrega|cod\b/.test(pago) && !/anticip|adelant/.test(pago)) return false;
+  return /anticip|adelant|transferenc|consignaci|nequi|daviplata|bancolombia|bre-?b|previo/.test(pago);
+}
+
 const MOTIVOS_REVISION = [
+  {
+    // ========================================================================
+    // 💸 PAGO ANTICIPADO QUE NADIE VERIFICÓ (8-oct, caso Wilmer)
+    //
+    // EL CASO. El cliente eligió pago anticipado, transfirió y mandó la captura
+    // del comprobante por el chat a las 8 de la mañana. El bot le contestó que
+    // no podía abrir ese tipo de archivo y cortó el turno ahí: el mensaje ni se
+    // guardó. Nadie se enteró. El cliente apareció al día siguiente por
+    // INSTAGRAM preguntando por su guía, con las capturas en la mano.
+    //
+    // 🔑 POR QUÉ ES UN MOTIVO DE REVISIÓN Y NO UNA ETAPA NUEVA DEL EMBUDO. Un
+    // pedido pagado por adelantado tiene DOS estados que antes se confundían en
+    // uno: "el cliente dice que pagó" y "la plata está en la cuenta". Solo el
+    // dueño puede cerrar el segundo —hay que mirar el banco—. Y mientras no esté
+    // cerrado, el pedido NO se puede despachar: si la captura era de otro pago,
+    // estaba editada o se reversó, se regala la mercancía y el flete.
+    //
+    // Enganchándolo acá, el pedido aparece solo en el encabezado rojo del aviso
+    // al dueño, en «🔴 revisar antes de despachar» del panel y en el CSV, sin
+    // tocar ninguno de esos tres lugares. Una sola fuente de verdad.
+    //
+    // ⚠️ ESTE MOTIVO SÍ ALCANZA A LOS PEDIDOS VIEJOS, a diferencia de los que
+    // dependen de un campo nuevo. Es deliberado: se calcula sobre `pago`, que ya
+    // existía, así que los pedidos anticipados que están pendientes AHORA
+    // —incluido el que destapó esto— quedan marcados. Frenar un pedido cuya
+    // plata quizá nunca entró es el error barato; el caro es el otro. Los que ya
+    // tienen guía no se tocan: el panel solo evalúa los pendientes.
+    // ========================================================================
+    clave: "pago_anticipado_sin_verificar",
+    // El `|| o.comprobante_recibido` no es redundante: si el cliente manda un
+    // comprobante en un pedido que quedó guardado como contraentrega, el que
+    // está mal es el campo `pago`, y despacharlo a recaudar sería cobrarle dos
+    // veces. Llegó una captura de pago ⇒ alguien lo mira antes de despachar.
+    cuando: (o) => (esPagoAnticipado(o) || o.comprobante_recibido === true) && o.pago_verificado !== true,
+    etiqueta: "pago anticipado sin verificar: hay que mirar si la plata entró",
+    detalle: (o) => {
+      if (o.comprobante_recibido) {
+        const cuando = o.comprobante_recibido_el
+          ? new Date(o.comprobante_recibido_el).toLocaleString("es-CO", { timeZone: "America/Bogota" })
+          : "";
+        const monto = Number(o.comprobante_monto);
+        const partes = [`el cliente ya mandó el comprobante${cuando ? ` el ${cuando}` : ""}`];
+        if (Number.isFinite(monto) && monto > 0) {
+          partes.push(`dice $${monto.toLocaleString("es-CO")}`);
+          const total = Number(o.total || 0);
+          if (total && monto !== total) partes.push(`🔴 y el pedido es de $${total.toLocaleString("es-CO")}`);
+        }
+        return partes.join(" · ");
+      }
+      return "todavía no mandó el comprobante";
+    },
+  },
   {
     clave: "precio_no_cuadra",
     cuando: (o) => o.precio_no_cuadra === true,
@@ -888,6 +957,182 @@ function pedidoEnRevisionDe(phone) {
     if (requiereRevision(mios[i])) return mios[i];
   }
   return null;
+}
+
+/**
+ * El pedido abierto de este chat: el último sin guía y sin anular.
+ *
+ * Se diferencia de `pedidoEnRevisionDe` en que NO exige que ya tenga un motivo
+ * de revisión. Cuando entra un comprobante hay que encontrar el pedido para
+ * marcarlo, y un pedido perfecto —sin una sola marca— es justo el caso normal.
+ */
+function pedidoAbiertoDe(phone) {
+  ensure();
+  const orders = readJSON(ORDERS_FILE, []);
+  const mios = orders.filter(
+    (o) => o && String(o.telefono_chat || "") === String(phone) && !o.anulado && !o.guia
+  );
+  return mios.length ? mios[mios.length - 1] : null;
+}
+
+/**
+ * 💸 ENTRÓ UN COMPROBANTE DE PAGO. Queda anotado en el pedido.
+ *
+ * 🔑 Esto es lo único que crea TRAZABILIDAD, que es exactamente lo que faltaba:
+ * antes el comprobante llegaba, el bot contestaba una confusión y no quedaba
+ * rastro en ninguna parte. Ahora el pedido queda marcado, y por el motivo de
+ * revisión `pago_anticipado_sin_verificar` no se puede despachar hasta que
+ * alguien confirme que la plata entró.
+ *
+ * ⚠️ NO marca el pago como verificado. Leer una captura no es ver el extracto.
+ *
+ * @param {string} phone  el chat por el que llegó
+ * @param {object} datos  lo que se pudo leer de la imagen (puede venir vacío)
+ * @returns {object|null} el pedido marcado, o null si este chat no tiene pedido
+ */
+function marcarComprobanteRecibido(phone, datos) {
+  try {
+    ensure();
+    const d = datos || {};
+    const orders = readJSON(ORDERS_FILE, []);
+    let i = -1;
+    for (let k = orders.length - 1; k >= 0; k--) {
+      const o = orders[k];
+      if (o && String(o.telefono_chat || "") === String(phone) && !o.anulado && !o.guia) {
+        i = k;
+        break;
+      }
+    }
+    // Sin pedido guardado no hay dónde anotarlo. No es un error: el cliente
+    // puede pagar antes de que el pedido quede cerrado. El aviso al dueño se
+    // manda igual —eso lo decide server.js— y por eso acá solo se devuelve null.
+    if (i === -1) return null;
+    orders[i] = {
+      ...orders[i],
+      comprobante_recibido: true,
+      comprobante_recibido_el: new Date().toISOString(),
+      comprobante_monto: Number.isFinite(Number(d.monto)) && Number(d.monto) > 0 ? Number(d.monto) : null,
+      comprobante_banco: String(d.banco || "") || null,
+      comprobante_referencia: String(d.referencia || "") || null,
+    };
+    writeJSON(ORDERS_FILE, orders);
+    console.log(
+      `💸 COMPROBANTE anotado en el pedido de ${orders[i].nombre || "?"} (${phone})` +
+        `${orders[i].comprobante_monto ? ` por $${orders[i].comprobante_monto}` : ""} — falta verificar que entró`
+    );
+    return orders[i];
+  } catch (e) {
+    console.error(`🔴 No se pudo anotar el comprobante: ${e.message}`);
+    return null;
+  }
+}
+
+/**
+ * ✅ El dueño miró la cuenta y la plata entró. Ahora sí se puede despachar.
+ * @param {string} refPedido  el id o la fecha ISO con que se guardó
+ * @param {string} quien      quién lo verificó (queda en el registro)
+ */
+function marcarPagoVerificado(refPedido, quien) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, refPedido);
+    if (i === -1) return null;
+    orders[i] = {
+      ...orders[i],
+      pago_verificado: true,
+      pago_verificado_el: new Date().toISOString(),
+      pago_verificado_por: String(quien || "el dueño"),
+    };
+    writeJSON(ORDERS_FILE, orders);
+    console.log(`✅ PAGO VERIFICADO: ${orders[i].nombre || "?"} por $${orders[i].total} (${orders[i].pago_verificado_por})`);
+    return orders[i];
+  } catch (e) {
+    console.error(`🔴 No se pudo marcar el pago como verificado: ${e.message}`);
+    return null;
+  }
+}
+
+/**
+ * Los pedidos anticipados pendientes de que alguien confirme la plata.
+ * Es la cola de trabajo del dueño: los más viejos primero.
+ */
+function pedidosConPagoPorVerificar() {
+  return todosLosPedidos()
+    .filter((p) => !p.guia && (esPagoAnticipado(p) || p.comprobante_recibido === true) && p.pago_verificado !== true)
+    .sort((a, b) => String(a.fecha || "").localeCompare(String(b.fecha || "")));
+}
+
+/**
+ * 🔖 MARCA EL CHAT: este cliente dijo que va a pagar por adelantado.
+ *
+ * Pedido textual del dueño: "cuando una persona vaya a hacer pago anticipado
+ * que quede marcado de alguna forma distinta para yo poder estar pendiente de
+ * si hace el pago y envía el comprobante".
+ *
+ * Va en la conversación y no en el pedido porque pasa ANTES: el cliente elige
+ * el medio de pago mientras todavía se está cerrando la venta.
+ */
+function marcarPagoAnticipadoEsperado(phone) {
+  try {
+    ensure();
+    const all = readJSON(CONV_FILE, {});
+    const c = all[phone] || { messages: [], paused: false };
+    if (c.esperaComprobante) return false; // ya estaba marcado, no se repite el aviso
+    c.esperaComprobante = true;
+    c.esperaComprobanteDesde = Date.now();
+    all[phone] = c;
+    writeJSON(CONV_FILE, all);
+    return true;
+  } catch (e) {
+    console.error(`🔴 No se pudo marcar el chat como pago anticipado: ${e.message}`);
+    return false;
+  }
+}
+
+/**
+ * ¿Hay que avisarle al dueño que este cliente dice que ya pagó?
+ *
+ * Con freno de 6 horas: un cliente que escribe "ya pagué", "te mandé el
+ * comprobante" y "¿lo viste?" en dos minutos está nervioso, no mandando tres
+ * pagos. Tres avisos iguales entrenan al dueño a ignorarlos, y un aviso
+ * ignorado es igual de inútil que no mandarlo.
+ *
+ * @returns {boolean} true si se debe avisar (y queda anotado que se avisó)
+ */
+function debeAvisarPagoDeclarado(phone, ventanaMs = 6 * 60 * 60 * 1000) {
+  try {
+    ensure();
+    const all = readJSON(CONV_FILE, {});
+    const c = all[phone] || { messages: [], paused: false };
+    const ultimo = Number(c.avisoPagoDeclaradoEl || 0);
+    if (ultimo && Date.now() - ultimo < ventanaMs) return false;
+    c.avisoPagoDeclaradoEl = Date.now();
+    all[phone] = c;
+    writeJSON(CONV_FILE, all);
+    return true;
+  } catch (e) {
+    // Si no se puede anotar, se avisa igual: un aviso repetido molesta, uno
+    // que falta cuesta un pedido.
+    console.error(`🔴 No se pudo anotar el aviso de pago: ${e.message}`);
+    return true;
+  }
+}
+
+/** Anota en el chat que ya llegó el comprobante (cierra la espera). */
+function marcarComprobanteEnChat(phone, datos) {
+  try {
+    ensure();
+    const all = readJSON(CONV_FILE, {});
+    const c = all[phone] || { messages: [], paused: false };
+    c.comprobanteRecibidoEl = Date.now();
+    c.comprobanteDatos = datos || null;
+    delete c.esperaComprobante;
+    all[phone] = c;
+    writeJSON(CONV_FILE, all);
+  } catch (e) {
+    console.error(`🔴 No se pudo anotar el comprobante en el chat: ${e.message}`);
+  }
 }
 
 /** La última cotización validada del chat, o null. */
@@ -2017,6 +2262,10 @@ module.exports = {
   getConv, pushMsg, isPaused, setPaused, saveOrder, borrarConversacion,
   marcarAtendido, desmarcarAtendido,
   guardarCotizacion, leerCotizacion, pedidoPendienteDeOferta, pedidoEnRevisionDe,
+  // 💸 Pago anticipado: marcar el chat, anotar el comprobante y confirmar la plata.
+  esPagoAnticipado, pedidoAbiertoDe, marcarComprobanteRecibido, marcarPagoVerificado,
+  pedidosConPagoPorVerificar, marcarPagoAnticipadoEsperado, marcarComprobanteEnChat,
+  debeAvisarPagoDeclarado,
   anotarFalloEntrega, fallosDeEntrega,
   guardarPlan, leerPlan, borrarPlan, limpiarPlanesGuardados,
   registrarArranque, estadoDelDisco, tamanosEnDisco,

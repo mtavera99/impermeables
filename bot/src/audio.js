@@ -37,6 +37,12 @@ function disponible() {
 /**
  * Baja un archivo de medios de WhatsApp. Son DOS pasos: primero se pide la URL
  * temporal por el id, y después se descarga esa URL —que también exige el token.
+ *
+ * 🔑 NO ES SOLO PARA AUDIO, y por eso se exporta: comprobante.js baja con esto
+ * las capturas de pago. El mecanismo de medios de WhatsApp es el mismo para
+ * audio, imagen y documento; lo único que cambia es qué se hace con los bytes.
+ * Tener dos copias de esta función era garantizar que una se quedara vieja.
+ *
  * @returns {{ok:boolean, buffer?:Buffer, mime?:string, error?:string}}
  */
 async function descargarMedia(mediaId) {
@@ -46,16 +52,16 @@ async function descargarMedia(mediaId) {
     });
     const info = await meta.json().catch(() => ({}));
     if (!meta.ok || !info.url) {
-      return { ok: false, error: `no se pudo pedir la URL del audio: ${JSON.stringify(info).slice(0, 180)}` };
+      return { ok: false, error: `no se pudo pedir la URL del archivo: ${JSON.stringify(info).slice(0, 180)}` };
     }
     if (info.file_size && Number(info.file_size) > MAX_BYTES) {
-      return { ok: false, error: `audio demasiado grande (${info.file_size} bytes)` };
+      return { ok: false, error: `archivo demasiado grande (${info.file_size} bytes)` };
     }
     // La URL de descarga TAMBIÉN necesita el token: sin él devuelve 401.
     const bin = await fetch(info.url, { headers: { Authorization: `Bearer ${WA_TOKEN}` } });
     if (!bin.ok) return { ok: false, error: `descarga falló con HTTP ${bin.status}` };
     const buffer = Buffer.from(await bin.arrayBuffer());
-    if (buffer.length > MAX_BYTES) return { ok: false, error: "audio demasiado grande" };
+    if (buffer.length > MAX_BYTES) return { ok: false, error: "archivo demasiado grande" };
     return { ok: true, buffer, mime: info.mime_type || "audio/ogg" };
   } catch (e) {
     return { ok: false, error: e.message };
@@ -123,4 +129,4 @@ async function transcribirNotaDeVoz(mediaId) {
   return transcribir(media.buffer, media.mime);
 }
 
-module.exports = { transcribirNotaDeVoz, disponible };
+module.exports = { transcribirNotaDeVoz, disponible, descargarMedia };
