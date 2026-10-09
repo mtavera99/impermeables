@@ -23,9 +23,32 @@ function pagoAnticipadoInfo() {
   if (lines.length === 0) {
     return `Si el cliente elige PAGO ANTICIPADO, dile con amabilidad que un asesor le comparte los datos de pago enseguida y agrega la línea ##HANDOFF##.`;
   }
+  // ==========================================================================
+  // 🔴 ESTA INSTRUCCIÓN DECÍA "CUANDO LO MANDE, CONFIRMAS Y SE DESPACHA" (8-oct)
+  //
+  // Dos mentiras en una frase, y las dos costaron un pedido:
+  //
+  //   1. El bot NO PUEDE confirmar un pago. Lee una captura; eso no es ver el
+  //      extracto. Una captura se puede editar, puede ser de otra cuenta o de un
+  //      pago que se reversó. Lo único que vale es que el dueño mire el banco.
+  //   2. "Y se despacha" ponía al bot a prometer un despacho que no controla.
+  //
+  // Y el remate: durante meses el bot pidió el comprobante por el chat cuando la
+  // rama de imágenes de server.js contestaba "todavía no puedo abrir ese tipo de
+  // archivo". Pedía justo el único archivo que no sabía recibir. El 8-oct un
+  // cliente pagó, mandó la captura, nadie se enteró y apareció al día siguiente
+  // por Instagram preguntando por su guía.
+  //
+  // Ahora server.js SÍ lee la imagen y le avisa al dueño, pero la promesa que da
+  // el guion tiene que seguir siendo la verdadera: recibido y en verificación.
+  // ==========================================================================
   return `Medios de PAGO ANTICIPADO (compártelos SOLO si el cliente elige pagar antes):
 ${lines.join("\n")}
-Pídele que envíe el comprobante de pago por este chat. Cuando lo mande, confirmas y se despacha.`;
+Pídele que envíe el comprobante de pago por este chat (una captura sirve).
+Cuando lo mande: dile que YA LO RECIBISTE y que el equipo está verificando que el pago entró,
+y que en cuanto se confirme se despacha y le llega el número de guía por ahí mismo.
+NUNCA le digas que el pago ya quedó confirmado ni que el pedido ya salió: eso lo revisa una
+persona mirando la cuenta. Tampoco le prometas una hora exacta de despacho.`;
 }
 
 // ============================================================================
