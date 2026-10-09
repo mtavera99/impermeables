@@ -112,7 +112,7 @@ const BANDAS = {
 //
 // Criterio de la lista: Pacífico fluvial (Chocó, Nariño, Cauca), Amazonía,
 // Orinoquía profunda e insular. NO incluye los puertos y capitales con vía
-// terrestre, que ya están tarifados: Buenaventura ($81.000), Quibdó ($83.000),
+// terrestre, que ya están tarifados: Buenaventura ($82.000, banda C), Quibdó ($83.000),
 // Puerto Asís y Puerto Gaitán (banda E).
 // ============================================================================
 const ZONA_DIFICIL_ACCESO = {
