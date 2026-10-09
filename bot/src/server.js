@@ -1652,6 +1652,28 @@ app.post("/anular", (req, res) => {
 // ⚠️ NO LE MANDA NADA AL CLIENTE — la guía ya se envió. Para que el bot la
 // mande está /guias/asignar; esto es lo contrario: solo registrar.
 // ============================================================================
+// ============================================================================
+// 🔄 CONCILIAR: arreglar de una vez los pedidos cuya guía ya salió
+//
+// Las guías enviadas y los pedidos son dos archivos distintos y se pueden
+// contradecir (caso Yordy, 9-oct: la guía salió a las 4:38 p.m. y el pedido
+// siguió en "pendientes de despachar"). Esto cruza los dos y cierra los que
+// tengan una guía realmente enviada a su teléfono.
+//
+// ⚠️ No le escribe nada a ningún cliente, y solo toca pedidos SIN guía a los
+// que les encuentra una guía ya enviada. No puede marcar algo que no salió.
+// ============================================================================
+app.post("/conciliar-guias", (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const arreglados = store.conciliarGuiasConPedidos();
+  const aviso = arreglados.length
+    ? `🔄 ${arreglados.length} pedido(s) salieron de la cola porque su guía ya se había enviado: ` +
+      arreglados.map((a) => `${a.nombre} (${a.guia})`).join(", ")
+    : "No había ningún pedido con la guía ya enviada sin marcar. Todo cuadra.";
+  anotarEvento({ tipo: "guias-conciliadas", cuantos: arreglados.length });
+  res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${encodeURIComponent(aviso)}#pendientes`);
+});
+
 app.post("/marcar-despachado", (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   const ref = String(req.body?.fecha || req.body?.id || "");

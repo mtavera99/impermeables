@@ -155,6 +155,79 @@ chequear(
   antesPlata - despuesPlata === 85000
 );
 
+
+// ============================================================================
+// 🔎 EL DESFASE ENTRE LAS GUÍAS ENVIADAS Y LOS PEDIDOS (el caso real de Yordy)
+//
+// Lo que pasó de verdad: la guía SE ENVIÓ y SE REGISTRÓ —la pantalla de guías la
+// reconocía como repetida, "ya se le envió a Yordy el 9/10 4:38:31 p.m."— pero
+// el PEDIDO nunca quedó marcado y siguió en "pendientes de despachar".
+//
+// Son dos archivos distintos (guias-enviadas.json y orders.json) que pueden
+// contradecirse, y no había nada que los cruzara. Encima, cuando la anotación
+// falla, anotarGuiaEnPedido devolvía `false` SIN ESCRIBIR UNA LÍNEA en el log:
+// la guía salía, el pedido quedaba sin marcar, y nadie se enteraba nunca.
+// ============================================================================
+console.log("\n── 7. 🔎 Guía enviada que el pedido no refleja ──");
+
+const TEL_Y = "573105169999";
+store.saveOrder({
+  nombre: "Yordy Desfase",
+  celular: "3105169999",
+  ciudad: "Viterbo",
+  total: 85000,
+  pago: "contraentrega",
+  telefono_chat: TEL_Y,
+});
+// La guía salió y quedó registrada, pero el pedido no se marcó: el desfase.
+store.registrarGuiaEnviada({
+  guia: "240063178083",
+  telefono: TEL_Y,
+  nombre: "Yordy Desfase",
+  transportadora: "interrapidisimo",
+});
+const yordy = store.todosLosPedidos().find((p) => p.telefono_chat === TEL_Y);
+
+chequear("el pedido NO tiene guía (así se veía el bug)", !yordy.guia);
+chequear("pero la guía SÍ está registrada como enviada", Boolean(store.guiaYaEnviada("240063178083")));
+
+const huerfana = store.guiaEnviadaAlCliente(yordy);
+chequear("🔑 el cruce detecta la guía huérfana", Boolean(huerfana));
+chequear("…y trae el número correcto", huerfana && huerfana.guia === "240063178083");
+
+const htmlY = panel.render("");
+chequear("el panel avisa con la etiqueta 📦 GUÍA YA ENVIADA", htmlY.includes("GUÍA YA ENVIADA"));
+chequear("…dice el número en la fila", htmlY.includes("ya se le envió la guía 240063178083"));
+chequear(
+  "…y el botón viene con el número puesto (un clic y queda cerrado)",
+  /name="guia"[^>]*value="240063178083"/.test(htmlY)
+);
+chequear("…y ofrece conciliar todos de una", htmlY.includes("Cerrar los pedidos cuya guía ya salió"));
+
+console.log("\n   Conciliar los arregla:");
+const arreglados = store.conciliarGuiasConPedidos();
+chequear("arregló el de Yordy", arreglados.some((a) => a.guia === "240063178083"));
+const yaY = store.todosLosPedidos().find((p) => p.telefono_chat === TEL_Y);
+chequear("el pedido quedó con la guía", yaY && yaY.guia === "240063178083");
+chequear("y marcado como conciliado", yaY && yaY.guia_conciliada === true);
+chequear("salió de pendientes", !pendientes().some((p) => p.telefono_chat === TEL_Y));
+
+console.log("\n   Y NO toca lo que no debe:");
+store.saveOrder({
+  nombre: "Nunca Enviada",
+  celular: "3009998888",
+  ciudad: "Buga",
+  total: 85000,
+  pago: "contraentrega",
+  telefono_chat: "573009998888",
+});
+chequear("conciliar otra vez no arregla nada", store.conciliarGuiasConPedidos().length === 0);
+chequear(
+  "🔑 un pedido sin guía enviada SIGUE pendiente",
+  pendientes().some((p) => p.nombre === "Nunca Enviada"),
+  "conciliar no puede marcar como despachado algo que no salió"
+);
+
 try {
   fs.rmSync(DIR, { recursive: true, force: true });
 } catch {
