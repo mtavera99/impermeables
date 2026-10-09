@@ -2126,13 +2126,196 @@ function todasLasGuiasEnviadas() {
  * equivocado — un paquete a otra persona. Se acepta `fecha` solo para los
  * pedidos viejos que se guardaron sin id.
  */
+/**
+ * 🔎 ¿A ESTE CLIENTE YA SE LE MANDÓ UNA GUÍA, aunque su pedido no lo diga?
+ *
+ * DE DÓNDE SALE (9-oct, caso Yordy). Las guías enviadas y los pedidos viven en
+ * archivos distintos, y se desincronizaron: `guias-enviadas.json` decía que la
+ * guía había salido a las 4:38 p.m. —la pantalla de guías la reconocía como
+ * repetida— pero el pedido seguía en "pendientes de despachar".
+ *
+ * Esto cruza los dos. Se compara por los últimos 10 dígitos del teléfono porque
+ * la guía se registra con el destino al que se mandó (que puede traer el 57 del
+ * país) y el pedido guarda el celular sin indicativo.
+ *
+ * @returns {object|null} el registro de la guía enviada, o null
+ */
+function guiaEnviadaAlCliente(pedido) {
+  if (!pedido) return null;
+  try {
+    ensure();
+    const diez = (v) => {
+      const d = String(v == null ? "" : v).replace(/\D/g, "");
+      return d.length >= 10 ? d.slice(-10) : "";
+    };
+    const mios = new Set([diez(pedido.celular), diez(pedido.telefono_chat)].filter(Boolean));
+    if (!mios.size) return null;
+    const todas = readJSON(GUIAS_FILE, {});
+    // La más reciente primero: si por alguna razón hay varias, interesa la última.
+    const candidatas = Object.entries(todas)
+      .map(([guia, r]) => ({ guia, ...r }))
+      .filter((r) => mios.has(diez(r.telefono)))
+      .sort((a, b) => Number(b.fecha || 0) - Number(a.fecha || 0));
+    return candidatas[0] || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 🔄 Arregla de una vez todos los pedidos a los que ya se les mandó la guía
+ * pero quedaron sin marcar.
+ *
+ * Es la reparación del desfase que describe guiaEnviadaAlCliente(). Solo toca
+ * pedidos SIN guía a los que les encuentra una guía realmente enviada a su
+ * teléfono, así que no puede marcar como despachado algo que no salió.
+ *
+ * @returns {Array<{nombre:string, guia:string}>} lo que arregló
+ */
+function conciliarGuiasConPedidos() {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const arreglados = [];
+    for (let i = 0; i < orders.length; i++) {
+      const o = orders[i];
+      if (!o || o.guia || o.anulado) continue;
+      const g = guiaEnviadaAlCliente(o);
+      if (!g || !g.guia) continue;
+      orders[i] = {
+        ...o,
+        guia: String(g.guia),
+        guiaEnviadaEl: g.fecha ? new Date(Number(g.fecha)).toISOString() : new Date().toISOString(),
+        // Queda explícito que esto lo cerró la conciliación, no el envío.
+        guia_conciliada: true,
+      };
+      arreglados.push({ nombre: o.nombre || "?", guia: String(g.guia) });
+    }
+    if (arreglados.length) {
+      writeJSON(ORDERS_FILE, orders);
+      console.log(
+        `🔄 CONCILIADAS ${arreglados.length} guía(s) que ya se habían enviado y el pedido no lo decía: ` +
+          arreglados.map((a) => `${a.nombre} (${a.guia})`).join(", ")
+      );
+    }
+    return arreglados;
+  } catch (e) {
+    console.error(`🔴 No se pudo conciliar las guías: ${e.message}`);
+    return [];
+  }
+}
+
+// ============================================================================
+// ✅ "ESTA GUÍA YA LA MANDÉ YO" (9-oct)
+//
+// DE DÓNDE SALE, textual: *"a Yordy ya se le envió la guía y sigue saliendo en
+// despachar, ¿por qué?"*.
+//
+// 🔴 PORQUE NO HABÍA FORMA DE DECÍRSELO AL SISTEMA. El campo `guia` de un pedido
+// se escribía en UN solo lugar: `mandarHojaDeGuia()`, o sea cuando el bot manda
+// la guía él mismo desde el panel. Si la guía salió por fuera —el dueño la
+// manda por su WhatsApp, o el pareo del PDF se la pegó a otro registro— el
+// pedido se queda en "pendientes de despachar" PARA SIEMPRE.
+//
+// Y no es solo cosmético: esa cola es la lista de trabajo, el contador de
+// pendientes y el total "por recaudar". Un pedido fantasma ahí adentro hace que
+// los tres números mientan, y al dueño lo manda a buscar algo que ya hizo.
+//
+// ⚠️ ESTO NO LE MANDA NADA AL CLIENTE. La premisa es que la guía YA se envió;
+// mandarla otra vez sería escribirle dos veces al cliente por lo mismo.
+//
+// 🔑 Queda anotado que la marcó el dueño (`guia_a_mano`), igual que el `aMano`
+// de registrarGuiaEnviada: si mañana hay que auditar por qué un cliente no
+// recibió su guía, hay que poder distinguir "el bot la mandó" de "alguien dijo
+// que la mandó".
+// ============================================================================
+function marcarDespachadoAMano(refPedido, guia) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, refPedido);
+    if (i === -1) return null;
+    if (orders[i].guia) return orders[i]; // ya estaba despachado, no se toca
+    // Sin número de guía igual se marca: lo que el dueño necesita es sacarlo de
+    // la cola. Pero queda explícito que no hay número, en vez de inventar uno.
+    const numero = String(guia || "").trim() || "SIN-NÚMERO";
+    orders[i] = {
+      ...orders[i],
+      guia: numero,
+      guiaEnviadaEl: new Date().toISOString(),
+      guia_a_mano: true,
+    };
+    writeJSON(ORDERS_FILE, orders);
+    console.log(
+      `✅ DESPACHADO A MANO: ${orders[i].nombre || "?"} (${orders[i].celular || orders[i].telefono_chat}) ` +
+        `guía ${numero} — lo marcó el dueño, el bot no mandó nada`
+    );
+    return orders[i];
+  } catch (e) {
+    console.error(`🔴 No se pudo marcar el pedido como despachado: ${e.message}`);
+    return null;
+  }
+}
+
+/**
+ * ↩️ Deshace la marca de arriba.
+ *
+ * Existe porque el error de marcar de más es PEOR que el de marcar de menos: un
+ * pedido marcado por equivocación desaparece de la cola de despacho y nadie lo
+ * vuelve a mirar. Eso es un paquete que no se manda nunca.
+ *
+ * Solo revierte los marcados a mano: una guía que el bot mandó de verdad no se
+ * puede "desenviar", el cliente ya tiene el PDF.
+ */
+function desmarcarDespachado(refPedido) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, refPedido);
+    if (i === -1) return null;
+    if (orders[i].guia_a_mano !== true) return null;
+    const { guia, guiaEnviadaEl, guia_a_mano, ...resto } = orders[i];
+    orders[i] = resto;
+    writeJSON(ORDERS_FILE, orders);
+    console.log(`↩️ Se deshizo el despacho a mano de ${orders[i].nombre || "?"}: vuelve a pendientes.`);
+    return orders[i];
+  } catch (e) {
+    console.error(`🔴 No se pudo deshacer el despacho: ${e.message}`);
+    return null;
+  }
+}
+
 function anotarGuiaEnPedido(refPedido, guia) {
   const fechaPedido = refPedido;
   try {
     ensure();
     const orders = readJSON(ORDERS_FILE, []);
     const i = indiceDePedido(orders, fechaPedido);
-    if (i === -1) return false;
+    // ========================================================================
+    // 🔴 ESTE `return false` ERA MUDO (9-oct, caso Yordy)
+    //
+    // La guía se le mandó al cliente a las 4:38 p.m., quedó registrada en
+    // guias-enviadas.json —tanto que la pantalla de guías la reconocía como
+    // repetida— pero el PEDIDO nunca quedó marcado, así que siguió saliendo en
+    // "pendientes de despachar". El dueño lo vio y preguntó por qué.
+    //
+    // Y no había forma de averiguarlo: si no encontraba el pedido, esta función
+    // devolvía `false` sin escribir una línea en el log. El que la llama
+    // (mandarHojaDeGuia) tampoco mira lo que devuelve. O sea que la guía salía,
+    // el pedido quedaba sin marcar, y NADIE se enteraba nunca.
+    //
+    // Son dos archivos distintos que pueden contradecirse: las guías enviadas y
+    // los pedidos. Que se desincronicen puede pasar; que pase en silencio, no.
+    // ========================================================================
+    if (i === -1) {
+      console.error(
+        `🔴🔴 GUÍA ${guia} ENVIADA PERO EL PEDIDO NO QUEDÓ MARCADO: no encontré el pedido ` +
+          `con referencia "${fechaPedido}". El cliente YA tiene su guía, pero el pedido va a ` +
+          `seguir saliendo en "pendientes de despachar" hasta que alguien lo marque a mano. ` +
+          `Revisá si el pedido se anuló o se volvió a guardar con otro id.`
+      );
+      return false;
+    }
     orders[i] = { ...orders[i], guia: String(guia), guiaEnviadaEl: new Date().toISOString() };
     writeJSON(ORDERS_FILE, orders);
     return true;
@@ -2287,4 +2470,8 @@ module.exports = {
   pedidoSospechoso,
   VENTANA_PEDIDO_DUPLICADO_MS,
   guiaYaEnviada, registrarGuiaEnviada, todasLasGuiasEnviadas, anotarGuiaEnPedido,
+  // ✅ "esa guía ya la mandé yo": saca el pedido de la cola sin escribirle al cliente.
+  marcarDespachadoAMano, desmarcarDespachado,
+  // 🔎 Cruce entre guias-enviadas.json y orders.json, que se pueden contradecir.
+  guiaEnviadaAlCliente, conciliarGuiasConPedidos,
 };

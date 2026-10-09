@@ -432,6 +432,16 @@ function render(aviso) {
       <a class="btn" href="/pedidos.csv?token=${esc(panelToken())}">⬇️ Descargar pedidos (CSV)</a>
       <a class="btn" href="/cierre?token=${esc(panelToken())}&enviar=1">📲 Mandarme el cierre por WhatsApp</a>
       <a class="btn" href="/limpiar-duplicados?token=${esc(panelToken())}">🧹 Revisar pedidos duplicados</a>
+      ${
+        // 🔄 Solo aparece si de verdad hay algo que conciliar. Un botón que
+        // nunca hace nada estorba.
+        pendientes.some((p) => store.guiaEnviadaAlCliente(p))
+          ? `<form method="post" action="/conciliar-guias" style="display:inline">
+               <input type="hidden" name="token" value="${esc(panelToken())}">
+               <button type="submit" class="btn destacado">🔄 Cerrar los pedidos cuya guía ya salió</button>
+             </form>`
+          : ""
+      }
     </div>`;
 
   // ==========================================================================
@@ -481,6 +491,17 @@ function render(aviso) {
     // ========================================================================
     const pagoPorVerificar =
       (store.esPagoAnticipado(p) || p.comprobante_recibido === true) && p.pago_verificado !== true;
+    // ========================================================================
+    // 🔎 ¿YA SE LE MANDÓ LA GUÍA AUNQUE EL PEDIDO NO LO DIGA? (9-oct, Yordy)
+    //
+    // Las guías enviadas y los pedidos son dos archivos distintos y se
+    // desincronizaron: la guía había salido a las 4:38 p.m. y el pedido seguía
+    // en esta cola. El dueño lo vio y no tenía forma de saber por qué.
+    //
+    // Acá se cruzan los dos por teléfono. Si aparece, se avisa y el botón de
+    // "ya la envié" viene con el número puesto: un clic y queda cerrado.
+    // ========================================================================
+    const guiaHuerfana = !p.guia && !opciones.despachado ? store.guiaEnviadaAlCliente(p) : null;
     // Enlace para leer el chat completo de ese cliente desde el celular, sin
     // tener que entrar al shell de Render.
     const verChat = p.telefono_chat
@@ -517,6 +538,9 @@ function render(aviso) {
         : store.esPagoAnticipado(p) && p.pago_verificado
         ? ' <span class="tag ok">💸 PAGADO</span>'
         : ""
+    }${
+      // 📦 Ya tiene guía enviada pero el pedido no quedó marcado.
+      guiaHuerfana ? ' <span class="tag ok">📦 GUÍA YA ENVIADA</span>' : ""
     }<div class="sub">${esc(p.celular || p.telefono_chat)}${
       sinCelular ? ' · <b style="color:#ff9aa4">🔴 falta celular</b>' : ""
     }${
@@ -531,6 +555,12 @@ function render(aviso) {
         : ""
     }${
       // 💸 El detalle del pago anticipado, con lo que se leyó de la captura.
+      guiaHuerfana
+        ? `<br><b style="color:#7ee2a8">📦 ya se le envió la guía ${esc(guiaHuerfana.guia)}${
+            guiaHuerfana.fecha ? ` el ${esc(HORA(Number(guiaHuerfana.fecha)))}` : ""
+          } — el pedido quedó sin marcar. Tocá «✅ ya la envié» para cerrarlo.</b>`
+        : ""
+    }${
       pagoPorVerificar
         ? `<br><b style="color:#ff9aa4">💸 ${
             p.comprobante_recibido
@@ -586,7 +616,20 @@ function render(aviso) {
       opciones.anulado
         ? `<span class="sub">${esc(p.motivo_anulacion || "sin motivo")}</span>`
         : opciones.despachado
-        ? `<code>${esc(p.guia)}</code>`
+        ? `<code>${esc(p.guia)}</code>${
+            // 🖐️ Distinguir la guía que mandó el bot de la que alguien dijo que
+            // mandó. Si mañana hay que auditar por qué un cliente no recibió su
+            // guía, son dos problemas distintos.
+            p.guia_a_mano
+              ? `<div class="sub">🖐️ marcada a mano</div>
+                 <form method="post" action="/desmarcar-despachado" class="acc"
+                   onsubmit="return confirm('¿Devolver este pedido a pendientes de despachar?')">
+                   <input type="hidden" name="token" value="${esc(panelToken())}">
+                   <input type="hidden" name="fecha" value="${esc(p.id || p.fecha)}">
+                   <button type="submit" class="mini">↩️ sigue pendiente</button>
+                 </form>`
+              : ""
+          }`
         : p.anuncio_id
         ? `<span title="${esc(p.anuncio_origen || "")}">…${esc(String(p.anuncio_id).slice(-6))}</span>`
         : `<span class="sub">—</span>`
@@ -603,6 +646,23 @@ function render(aviso) {
           : // 💸 Si es anticipado y falta confirmar la plata, el botón de
             // "la plata entró" va PRIMERO: es lo que desbloquea el despacho.
             `${
+              // ✅ "YA LA MANDÉ YO" (9-oct). Un pedido cuya guía salió por fuera
+              // del panel se quedaba en esta cola para siempre, inflando el
+              // contador de pendientes y el total por recaudar. No le escribe
+              // nada al cliente: solo lo registra.
+              !opciones.despachado
+                ? `<form method="post" action="/marcar-despachado" class="acc despachar"
+                 onsubmit="return confirm('¿La guía de ${esc(
+                   String(p.nombre || "").replace(/'/g, "")
+                 )} ya se envió? Sale de la cola de despacho. NO se le escribe nada al cliente.')">
+               <input type="hidden" name="token" value="${esc(panelToken())}">
+               <input type="hidden" name="fecha" value="${esc(p.id || p.fecha)}">
+               <input type="text" name="guia" placeholder="N° guía" inputmode="numeric" autocomplete="off"
+                 value="${esc(guiaHuerfana ? guiaHuerfana.guia : "")}">
+               <button type="submit" class="mini${guiaHuerfana ? " destacado" : ""}">✅ ya la envié</button>
+             </form>`
+                : ""
+            }${
               pagoPorVerificar && !opciones.despachado
                 ? `<form method="post" action="/pago-verificado" class="acc"
                  onsubmit="return confirm('¿Confirmás que la plata de ${esc(
@@ -1123,6 +1183,11 @@ function render(aviso) {
   .kpi .d{display:block;font-size:11px;font-style:normal;margin-top:3px;color:#8b93a4}
   .kpi .d.up{color:#3ddc84}.kpi .d.dn{color:#ff6b6b}
   .nota{color:#8b93a4;font-size:12px;margin:8px 0 0}
+  /* ✅ "ya la envié": el campo del número de guía va angosto y al lado del
+     botón, para que la fila no crezca en el celular. */
+  .acc.despachar{display:flex;gap:4px;align-items:center;margin-bottom:4px}
+  .acc.despachar input{width:78px;min-width:0;background:#0f141b;border:1px solid #263041;
+    color:#e6edf3;border-radius:7px;padding:5px 7px;font-size:12px;font-family:inherit}
   /* 🔎 Buscador de chats. Ancho completo y alto generoso: se usa con el pulgar. */
   .buscarChat{display:flex;gap:8px;margin:12px 0 0}
   .buscarChat input{flex:1;min-width:0;background:#0f141b;border:1px solid #263041;
