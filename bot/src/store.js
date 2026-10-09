@@ -2126,6 +2126,86 @@ function todasLasGuiasEnviadas() {
  * equivocado — un paquete a otra persona. Se acepta `fecha` solo para los
  * pedidos viejos que se guardaron sin id.
  */
+// ============================================================================
+// ✅ "ESTA GUÍA YA LA MANDÉ YO" (9-oct)
+//
+// DE DÓNDE SALE, textual: *"a Yordy ya se le envió la guía y sigue saliendo en
+// despachar, ¿por qué?"*.
+//
+// 🔴 PORQUE NO HABÍA FORMA DE DECÍRSELO AL SISTEMA. El campo `guia` de un pedido
+// se escribía en UN solo lugar: `mandarHojaDeGuia()`, o sea cuando el bot manda
+// la guía él mismo desde el panel. Si la guía salió por fuera —el dueño la
+// manda por su WhatsApp, o el pareo del PDF se la pegó a otro registro— el
+// pedido se queda en "pendientes de despachar" PARA SIEMPRE.
+//
+// Y no es solo cosmético: esa cola es la lista de trabajo, el contador de
+// pendientes y el total "por recaudar". Un pedido fantasma ahí adentro hace que
+// los tres números mientan, y al dueño lo manda a buscar algo que ya hizo.
+//
+// ⚠️ ESTO NO LE MANDA NADA AL CLIENTE. La premisa es que la guía YA se envió;
+// mandarla otra vez sería escribirle dos veces al cliente por lo mismo.
+//
+// 🔑 Queda anotado que la marcó el dueño (`guia_a_mano`), igual que el `aMano`
+// de registrarGuiaEnviada: si mañana hay que auditar por qué un cliente no
+// recibió su guía, hay que poder distinguir "el bot la mandó" de "alguien dijo
+// que la mandó".
+// ============================================================================
+function marcarDespachadoAMano(refPedido, guia) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, refPedido);
+    if (i === -1) return null;
+    if (orders[i].guia) return orders[i]; // ya estaba despachado, no se toca
+    // Sin número de guía igual se marca: lo que el dueño necesita es sacarlo de
+    // la cola. Pero queda explícito que no hay número, en vez de inventar uno.
+    const numero = String(guia || "").trim() || "SIN-NÚMERO";
+    orders[i] = {
+      ...orders[i],
+      guia: numero,
+      guiaEnviadaEl: new Date().toISOString(),
+      guia_a_mano: true,
+    };
+    writeJSON(ORDERS_FILE, orders);
+    console.log(
+      `✅ DESPACHADO A MANO: ${orders[i].nombre || "?"} (${orders[i].celular || orders[i].telefono_chat}) ` +
+        `guía ${numero} — lo marcó el dueño, el bot no mandó nada`
+    );
+    return orders[i];
+  } catch (e) {
+    console.error(`🔴 No se pudo marcar el pedido como despachado: ${e.message}`);
+    return null;
+  }
+}
+
+/**
+ * ↩️ Deshace la marca de arriba.
+ *
+ * Existe porque el error de marcar de más es PEOR que el de marcar de menos: un
+ * pedido marcado por equivocación desaparece de la cola de despacho y nadie lo
+ * vuelve a mirar. Eso es un paquete que no se manda nunca.
+ *
+ * Solo revierte los marcados a mano: una guía que el bot mandó de verdad no se
+ * puede "desenviar", el cliente ya tiene el PDF.
+ */
+function desmarcarDespachado(refPedido) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, refPedido);
+    if (i === -1) return null;
+    if (orders[i].guia_a_mano !== true) return null;
+    const { guia, guiaEnviadaEl, guia_a_mano, ...resto } = orders[i];
+    orders[i] = resto;
+    writeJSON(ORDERS_FILE, orders);
+    console.log(`↩️ Se deshizo el despacho a mano de ${orders[i].nombre || "?"}: vuelve a pendientes.`);
+    return orders[i];
+  } catch (e) {
+    console.error(`🔴 No se pudo deshacer el despacho: ${e.message}`);
+    return null;
+  }
+}
+
 function anotarGuiaEnPedido(refPedido, guia) {
   const fechaPedido = refPedido;
   try {
@@ -2287,4 +2367,6 @@ module.exports = {
   pedidoSospechoso,
   VENTANA_PEDIDO_DUPLICADO_MS,
   guiaYaEnviada, registrarGuiaEnviada, todasLasGuiasEnviadas, anotarGuiaEnPedido,
+  // ✅ "esa guía ya la mandé yo": saca el pedido de la cola sin escribirle al cliente.
+  marcarDespachadoAMano, desmarcarDespachado,
 };

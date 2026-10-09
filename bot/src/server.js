@@ -1642,6 +1642,40 @@ app.post("/anular", (req, res) => {
 // editar, puede ser de otro pago o de uno que se reversó. Lo único que cuenta es
 // que el dueño mire el banco. Por eso es una acción manual y queda firmada.
 // ============================================================================
+// ============================================================================
+// ✅ "ESA GUÍA YA LA MANDÉ YO" — saca el pedido de la cola de despacho
+//
+// DE DÓNDE SALE (9-oct): *"a Yordy ya se le envió la guía y sigue saliendo en
+// despachar, ¿por qué?"*. Porque el pedido solo se marcaba despachado cuando el
+// BOT mandaba la guía. Si salió por fuera, no había forma de decírselo.
+//
+// ⚠️ NO LE MANDA NADA AL CLIENTE — la guía ya se envió. Para que el bot la
+// mande está /guias/asignar; esto es lo contrario: solo registrar.
+// ============================================================================
+app.post("/marcar-despachado", (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const ref = String(req.body?.fecha || req.body?.id || "");
+  const r = store.marcarDespachadoAMano(ref, req.body?.guia);
+  const aviso = r
+    ? `✅ ${r.nombre || "El pedido"} salió de la cola de despacho (guía ${r.guia}). No se le escribió al cliente.`
+    : "No se encontró ese pedido.";
+  anotarEvento({ tipo: r ? "despachado-a-mano" : "despachado-a-mano-fallido", fecha: ref, guia: r?.guia });
+  res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${encodeURIComponent(aviso)}#pendientes`);
+});
+
+// ↩️ Deshacer lo de arriba. Marcar de más esconde un pedido que nadie va a
+// despachar, así que tiene que haber vuelta atrás.
+app.post("/desmarcar-despachado", (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const ref = String(req.body?.fecha || req.body?.id || "");
+  const r = store.desmarcarDespachado(ref);
+  const aviso = r
+    ? `↩️ ${r.nombre || "El pedido"} volvió a pendientes de despachar.`
+    : "No se pudo deshacer: ese pedido no estaba marcado a mano.";
+  anotarEvento({ tipo: "despacho-a-mano-deshecho", fecha: ref });
+  res.redirect(`/panel?token=${encodeURIComponent(PANEL_TOKEN)}&r=${encodeURIComponent(aviso)}#pendientes`);
+});
+
 app.post("/pago-verificado", (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   const ref = String(req.body?.fecha || req.body?.id || "");
