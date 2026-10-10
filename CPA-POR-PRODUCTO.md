@@ -1,6 +1,6 @@
 # 🎯 CPA exacto por producto — BikerPro
 
-> **Ultima lectura: 2026-10-09 11:10 Bogota.** Ventana **2026-10-02 a 2026-10-08** (solo dias cerrados).
+> **Ultima lectura: 2026-10-10 10:21 Bogota.** Ventana **2026-10-03 a 2026-10-09** (solo dias cerrados).
 > Generado por `analisis/cpa-por-producto.py`. **Solo lectura** — regla 4-B.
 
 El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido guarda de que anuncio vino. No hay ninguna proporcion estimada en esta tabla.
@@ -9,14 +9,14 @@ El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido
 
 | producto | gasto | conv | pedidos | **CPA** | $/conv | cierre | recaudo |
 |---|---|---|---|---|---|---|---|
-| **V10** | $531,496 | 1736 | 107 | **$4,967** | $306 | 6.16% | $13,010,000 |
-| **IMPERMEABLE** | $1,091,388 | 2545 | 123 | **$8,873** | $429 | 4.83% | $10,850,000 |
+| **V10** | $545,805 | 1772 | 110 | **$4,962** | $308 | 6.21% | $13,395,000 |
+| **IMPERMEABLE** | $1,090,530 | 2566 | 129 | **$8,454** | $425 | 5.03% | $11,414,000 |
 
 ### 🔎 Cuanta confianza tienen estos numeros
 
 | | |
 |---|---|
-| gasto atribuido a un producto | **$1,622,884** (100.0%) |
+| gasto atribuido a un producto | **$1,636,335** (100.0%) |
 | gasto de anuncios sin pedidos en la ventana | $0 |
 | anuncios clasificados por la forma de sus pedidos | 10 |
 | anuncios con pedidos de los DOS productos | 0 ✅ |
@@ -27,13 +27,13 @@ El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido
 
 | dia | gasto V10 | ped | CPA V10 | gasto imper | ped | CPA imper |
 |---|---|---|---|---|---|---|
-| 2026-10-02 | $63,968 | 11 | $5,815 | $143,504 | 13 | $11,039 |
 | 2026-10-03 | $54,276 | 21 | $2,585 | $127,744 | 17 | $7,514 |
 | 2026-10-04 | $101,380 | 23 | $4,408 | $188,117 | 20 | $9,406 |
 | 2026-10-05 | $92,480 | 18 | $5,138 | $180,451 | 12 | $15,038 |
 | 2026-10-06 | $69,845 | 9 | $7,761 | $138,379 | 8 | $17,297 |
-| 2026-10-07 | $70,755 | 13 | $5,443 | $161,806 | 27 | $5,993 |
-| 2026-10-08 | $78,792 | 12 | $6,566 | $151,387 | 26 | $5,823 |
+| 2026-10-07 | $70,755 | 13 | $5,443 | $161,849 | 27 | $5,994 |
+| 2026-10-08 | $78,975 | 12 | $6,581 | $151,678 | 23 | $6,595 |
+| 2026-10-09 | $78,094 | 14 | $5,578 | $142,312 | 22 | $6,469 |
 
 ## Cada producto contra SU propio equilibrio
 
@@ -41,10 +41,10 @@ El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido
 
 | producto | contrib/entregado | **CPA de equilibrio** | CPA real | colchon | utilidad |
 |---|---|---|---|---|---|
-| **V10** | $32,828 | **$24,634** | $4,967 | 🟢 5.0x | $2,104,360 |
-| **IMPERMEABLE** | $25,032 | **$18,616** | $8,873 | 🟡 2.1x | $1,198,387 |
+| **V10** | $32,808 | **$24,619** | $4,962 | 🟢 5.0x | $2,162,314 |
+| **IMPERMEABLE** | $25,144 | **$18,702** | $8,454 | 🟡 2.2x | $1,322,083 |
 
-**Utilidad de la ventana: $3,302,747** ($471,821/dia)
+**Utilidad de la ventana: $3,484,396** ($497,771/dia)
 
 ## Con que numeros se calculo
 
