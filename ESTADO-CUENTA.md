@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-10-11 00:58 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-10-11 01:59 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -99,12 +99,12 @@ $     0  =  $     0  ÷  0.00
 |---|---|---|---|---|---|---|---|
 | Domiciliarios - Expancion - API | 6.83 | 6.61 | 6.11 | 5.63 | 6.95 | — | 🟢 |
 | TEST Creativos - API | 9.35 | 11.97 | 14.18 | 11.97 | 12.81 | — | 🟢 |
-| Domiciliarios - API | 10.93 | 11.81 | 11.79 | 9.23 | 9.78 | — | 🟢 |
+| Domiciliarios - API | 10.93 | 11.81 | 11.79 | 9.23 | 9.77 | — | 🟢 |
 | Motorizados - API | 5.95 | 8.67 | 11.74 | 7.01 | 10.27 | — | 🟢 |
-| Domiciliarios VIDEO - API | 9.18 | 8.65 | 12.37 | 11.67 | 10.98 | — | 🟡 |
+| Domiciliarios VIDEO - API | 9.18 | 8.65 | 12.37 | 11.67 | 10.97 | — | 🟡 |
 | Domiciliarios VIDEO INTER - API | 7.95 | 7.63 | 8.15 | 8.36 | 6.87 | — | 🔴 |
 | Domiciliarios - Expancion - INTER | 4.84 | 5.48 | 6.52 | 4.17 | 5.68 | — | 🟢 |
-| Domiciliarios INTER - API | 10.35 | 12.63 | 11.12 | 12.12 | 10.62 | — | 🟡 |
+| Domiciliarios INTER - API | 10.35 | 12.63 | 11.12 | 12.12 | 10.61 | — | 🟡 |
 | Motorizados - INTER | 13.48 | 11.75 | 11.80 | 10.09 | 11.63 | — | 🟢 |
 
 🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). Eso es canibalización, y se arregla diferenciando la segmentación.
@@ -120,7 +120,7 @@ $     0  =  $     0  ÷  0.00
 | 2026-10-07 | $232,604 | 600 | $388 | $3,641 | 9.39 | $730,548 |
 | 2026-10-08 | $230,663 | 624 | $370 | $3,731 | 10.09 | $771,016 |
 | 2026-10-09 | $220,977 | 606 | $365 | $3,141 | 8.61 | $751,807 |
-| 2026-10-10 | $185,284 | 496 | $374 | $3,464 | 9.27 | $610,922 |
+| 2026-10-10 | $185,284 | 496 | $374 | $3,463 | 9.27 | $610,922 |
 
 ---
 
