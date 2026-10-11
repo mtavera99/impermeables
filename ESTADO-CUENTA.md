@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-10-11 02:59 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-10-11 03:59 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -101,7 +101,7 @@ $     0  =  $     0  ÷  0.00
 | TEST Creativos - API | 9.35 | 11.97 | 14.18 | 11.97 | 12.80 | — | 🟢 |
 | Domiciliarios - API | 10.93 | 11.81 | 11.79 | 9.23 | 9.77 | — | 🟢 |
 | Motorizados - API | 5.95 | 8.67 | 11.74 | 7.01 | 10.27 | — | 🟢 |
-| Domiciliarios VIDEO - API | 9.18 | 8.65 | 12.37 | 11.67 | 10.97 | — | 🟡 |
+| Domiciliarios VIDEO - API | 9.18 | 8.65 | 12.37 | 11.67 | 10.96 | — | 🟡 |
 | Domiciliarios VIDEO INTER - API | 7.95 | 7.63 | 8.15 | 8.36 | 6.86 | — | 🔴 |
 | Domiciliarios - Expancion - INTER | 4.84 | 5.48 | 6.52 | 4.17 | 5.68 | — | 🟢 |
 | Domiciliarios INTER - API | 10.35 | 12.63 | 11.12 | 12.12 | 10.60 | — | 🟡 |
@@ -120,7 +120,7 @@ $     0  =  $     0  ÷  0.00
 | 2026-10-07 | $232,604 | 600 | $388 | $3,641 | 9.39 | $730,548 |
 | 2026-10-08 | $230,663 | 624 | $370 | $3,731 | 10.09 | $771,016 |
 | 2026-10-09 | $220,977 | 606 | $365 | $3,141 | 8.61 | $751,807 |
-| 2026-10-10 | $185,284 | 496 | $374 | $3,462 | 9.27 | $610,922 |
+| 2026-10-10 | $185,284 | 496 | $374 | $3,461 | 9.27 | $610,922 |
 
 ---
 
