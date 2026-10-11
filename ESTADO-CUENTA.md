@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-10-11 11:05 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-10-11 14:35 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,46 +9,46 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$164,499** |
-| gastado hoy (hasta las 11h) | $35,567 |
+| **saldo ahora** | **$108,217** |
+| gastado hoy (hasta las 14h) | $91,142 |
 | presupuesto activo | $235,000/día |
-| cierre proyectado del día | $170,520 |
-| saldo proyectado a medianoche | $29,546 |
+| cierre proyectado del día | $193,392 |
+| saldo proyectado a medianoche | $5,968 |
 | objetivo (cubrir un día de 143% + colchón) | $356,050 |
 
-### 🟠 Recargar $155,984 para cubrir un día malo
+### 🔴 RECARGAR $156,691 — entra en zona de freno a las 21:00
 
-Hoy aguanta, pero no cubre un día de sobre-entrega alta.
+Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin saldo ahí es la fuga más cara que tiene la operación.
 
 ⛔ **Recargar en la MAÑANA, no de noche.** Recargar después de quedarse seco dispara el rebote de 0-AI: Meta suelta el gasto de golpe sobre el inventario más frío.
 
 ---
 
-## 📈 Hoy contra los días anteriores — mismo tramo 00:00–11:59
+## 📈 Hoy contra los días anteriores — mismo tramo 00:00–14:59
 
 *(Comparar medio día contra un día completo es el error #10. Acá va el mismo tramo.)*
 
 | día | gasto | conv | $/conv | CPM | conv/mil |
 |---|---|---|---|---|---|
-| 2026-10-07 | $78,040 | 181 | **$431** | $3,942 | 9.14 |
-| 2026-10-08 | $86,261 | 219 | **$394** | $4,080 | 10.36 |
-| 2026-10-09 | $70,192 | 193 | **$364** | $3,281 | 9.02 |
-| 2026-10-10 | $66,162 | 166 | **$399** | $3,620 | 9.08 |
-| 2026-10-11 **HOY** | $35,192 | 62 | **$568** | $3,361 | 5.92 |
+| 2026-10-07 | $114,135 | 268 | **$426** | $3,985 | 9.36 |
+| 2026-10-08 | $123,787 | 328 | **$377** | $4,039 | 10.70 |
+| 2026-10-09 | $101,403 | 269 | **$377** | $3,346 | 8.88 |
+| 2026-10-10 | $100,359 | 244 | **$411** | $3,618 | 8.80 |
+| 2026-10-11 **HOY** | $91,142 | 193 | **$472** | $3,302 | 6.99 |
 
-🟠 Hoy va 42% más caro que ayer a la misma hora ($568 vs $399).
+🟠 Hoy va 15% más caro que ayer a la misma hora ($472 vs $411).
 
 ### La descomposición — dónde está el problema
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$   568  =  $ 3,361  ÷  5.92
+$   472  =  $ 3,302  ÷  6.99
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $3,361 | ~$3.615 | 🟢 normal |
-| **conv/mil** (la calidad de la audiencia) | 5.92 | 5,33 | 🟢 |
+| **CPM** (el precio de la subasta) | $3,302 | ~$3.615 | 🟢 normal |
+| **conv/mil** (la calidad de la audiencia) | 6.99 | 5,33 | 🟢 |
 
 
 ---
@@ -57,15 +57,15 @@ $   568  =  $ 3,361  ÷  5.92
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
-| Domiciliarios - Expancion - API | $40,000 | $7,159 | 18% | 9 | $795 | 4.68 |
-| TEST Creativos - API | $40,000 | $5,919 | 15% | 9 | $658 | 8.01 |
-| Domiciliarios - API | $35,000 | $5,403 | 15% | 10 | $540 | 6.29 |
-| Motorizados - INTER | $20,000 | $3,437 | 17% | 7 | $491 | 7.14 |
-| Domiciliarios VIDEO INTER - API | $20,000 | $3,221 | 16% | 9 | $358 | 8.91 |
-| Motorizados - API | $20,000 | $2,811 | 14% | 1 | $2,811 | 1.10 |
-| Domiciliarios - Expancion - INTER | $20,000 | $2,651 | 13% | 2 | $1,326 | 1.81 |
-| Domiciliarios VIDEO - API | $20,000 | $2,526 | 13% | 11 | $230 | 11.98 |
-| Domiciliarios INTER - API | $20,000 | $2,204 | 11% | 4 | $551 | 4.24 |
+| Domiciliarios - Expancion - API | $40,000 | $17,204 | 43% | 26 | $662 | 5.25 |
+| TEST Creativos - API | $40,000 | $15,815 | 40% | 29 | $545 | 9.21 |
+| Domiciliarios - API | $35,000 | $14,106 | 40% | 28 | $504 | 6.66 |
+| Motorizados - INTER | $20,000 | $9,580 | 48% | 26 | $368 | 10.24 |
+| Domiciliarios - Expancion - INTER | $20,000 | $7,405 | 37% | 6 | $1,234 | 1.89 |
+| Domiciliarios VIDEO INTER - API | $20,000 | $7,398 | 37% | 16 | $462 | 7.12 |
+| Motorizados - API | $20,000 | $7,036 | 35% | 8 | $880 | 3.49 |
+| Domiciliarios INTER - API | $20,000 | $6,656 | 33% | 24 | $277 | 8.60 |
+| Domiciliarios VIDEO - API | $20,000 | $5,942 | 30% | 27 | $220 | 11.95 |
 
 ### Cada producto contra SU propio equilibrio
 
@@ -73,12 +73,12 @@ $   568  =  $ 3,361  ÷  5.92
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
-| **TRADICIONAL** | $35,331 | 62 | **$570** | $2,402 | **24%** 🟢 |
+| **TRADICIONAL** | $91,142 | 190 | **$480** | $2,402 | **20%** 🟢 |
 
 | | |
 |---|---|
-| CPA implícito (cierre 5.4%) | **$10,475**/pedido |
-| utilidad estimada de lo que va del día | **$64,195** |
+| CPA implícito (cierre 5.4%) | **$8,818**/pedido |
+| utilidad estimada de lo que va del día | **$213,856** |
 
 ---
 
@@ -90,29 +90,29 @@ $   568  =  $ 3,361  ÷  5.92
 
 | conjunto | 10-06 | 10-07 | 10-08 | 10-09 | 10-10 | 10-11 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios - Expancion - API | $515 | $542 | $597 | $558 | $509 | $795 | 🔴 |
-| TEST Creativos - API | $531 | $460 | $425 | $440 | $433 | $658 | 🔴 |
-| Domiciliarios - API | $366 | $340 | $362 | $365 | $366 | $540 | 🔴 |
-| Motorizados - INTER | $303 | $344 | $314 | $353 | $343 | $491 | 🔴 |
-| Domiciliarios VIDEO INTER - API | $380 | $390 | $417 | $391 | $514 | $358 | 🟢 |
-| Motorizados - API | $538 | $414 | $331 | $433 | $312 | $2,811 | 🔴 |
-| Domiciliarios - Expancion - INTER | $626 | $540 | $438 | $483 | $442 | $1,326 | 🔴 |
-| Domiciliarios VIDEO - API | $365 | $400 | $297 | $250 | $282 | $230 | 🟢 |
-| Domiciliarios INTER - API | $218 | $192 | $218 | $192 | $242 | $551 | 🔴 |
+| Domiciliarios - Expancion - API | $515 | $542 | $597 | $558 | $509 | $662 | 🔴 |
+| TEST Creativos - API | $531 | $460 | $425 | $440 | $433 | $545 | 🔴 |
+| Domiciliarios - API | $366 | $340 | $362 | $365 | $366 | $504 | 🔴 |
+| Motorizados - INTER | $303 | $344 | $314 | $353 | $343 | $368 | 🟡 |
+| Domiciliarios - Expancion - INTER | $626 | $540 | $438 | $483 | $442 | $1,234 | 🔴 |
+| Domiciliarios VIDEO INTER - API | $380 | $390 | $417 | $391 | $514 | $462 | 🟢 |
+| Motorizados - API | $538 | $414 | $331 | $433 | $312 | $880 | 🔴 |
+| Domiciliarios INTER - API | $218 | $192 | $218 | $192 | $242 | $277 | 🟡 |
+| Domiciliarios VIDEO - API | $365 | $400 | $297 | $250 | $282 | $220 | 🟢 |
 
 ### conv/mil por día *(la calidad de la audiencia de cada uno)*
 
 | conjunto | 10-06 | 10-07 | 10-08 | 10-09 | 10-10 | 10-11 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios - Expancion - API | 6.83 | 6.61 | 6.11 | 5.63 | 6.93 | 4.68 | 🔴 |
-| TEST Creativos - API | 9.35 | 11.97 | 14.18 | 11.97 | 12.76 | 8.01 | 🔴 |
-| Domiciliarios - API | 10.93 | 11.81 | 11.79 | 9.23 | 9.73 | 6.29 | 🔴 |
-| Motorizados - INTER | 13.48 | 11.75 | 11.80 | 10.09 | 11.57 | 7.14 | 🔴 |
-| Domiciliarios VIDEO INTER - API | 7.95 | 7.63 | 8.15 | 8.36 | 6.83 | 8.91 | 🟢 |
-| Motorizados - API | 5.95 | 8.67 | 11.74 | 7.01 | 10.23 | 1.10 | 🔴 |
-| Domiciliarios - Expancion - INTER | 4.84 | 5.48 | 6.52 | 4.17 | 5.66 | 1.81 | 🔴 |
-| Domiciliarios VIDEO - API | 9.18 | 8.65 | 12.37 | 11.67 | 10.91 | 11.98 | 🟢 |
-| Domiciliarios INTER - API | 10.35 | 12.63 | 11.12 | 12.12 | 10.54 | 4.24 | 🔴 |
+| Domiciliarios - Expancion - API | 6.83 | 6.61 | 6.11 | 5.63 | 6.92 | 5.25 | 🔴 |
+| TEST Creativos - API | 9.35 | 11.97 | 14.18 | 11.97 | 12.76 | 9.21 | 🔴 |
+| Domiciliarios - API | 10.93 | 11.81 | 11.79 | 9.23 | 9.71 | 6.66 | 🔴 |
+| Motorizados - INTER | 13.48 | 11.75 | 11.80 | 10.09 | 11.55 | 10.24 | 🟡 |
+| Domiciliarios - Expancion - INTER | 4.84 | 5.48 | 6.52 | 4.17 | 5.65 | 1.89 | 🔴 |
+| Domiciliarios VIDEO INTER - API | 7.95 | 7.63 | 8.15 | 8.36 | 6.82 | 7.12 | 🟡 |
+| Motorizados - API | 5.95 | 8.67 | 11.74 | 7.01 | 10.22 | 3.49 | 🔴 |
+| Domiciliarios INTER - API | 10.35 | 12.63 | 11.12 | 12.12 | 10.52 | 8.60 | 🔴 |
+| Domiciliarios VIDEO - API | 9.18 | 8.65 | 12.37 | 11.67 | 10.91 | 11.95 | 🟢 |
 
 🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). Eso es canibalización, y se arregla diferenciando la segmentación.
 
@@ -127,7 +127,7 @@ $   568  =  $ 3,361  ÷  5.92
 | 2026-10-07 | $232,604 | 600 | $388 | $3,641 | 9.39 | $730,548 |
 | 2026-10-08 | $230,663 | 624 | $370 | $3,731 | 10.09 | $771,016 |
 | 2026-10-09 | $220,977 | 606 | $365 | $3,141 | 8.61 | $751,807 |
-| 2026-10-10 | $185,284 | 496 | $374 | $3,448 | 9.23 | $610,922 |
+| 2026-10-10 | $185,284 | 496 | $374 | $3,444 | 9.22 | $610,922 |
 
 ---
 
