@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> ⛔ **Error leyendo la cuenta** (2026-10-12 07:03 Bogotá).
+> ⛔ **Error leyendo la cuenta** (2026-10-12 08:04 Bogotá).
 
 ```
 Traceback (most recent call last):
