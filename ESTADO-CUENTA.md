@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-10-12 22:37 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-10-12 23:37 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -34,7 +34,7 @@ Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin s
 | 2026-10-09 | $209,889 | 568 | **$370** | $3,163 | 8.56 |
 | 2026-10-10 | $185,284 | 494 | **$375** | $3,444 | 9.18 |
 | 2026-10-11 | $220,035 | 506 | **$435** | $3,195 | 7.35 |
-| 2026-10-12 **HOY** | $264,255 | 754 | **$350** | $2,991 | 8.53 |
+| 2026-10-12 **HOY** | $264,255 | 754 | **$350** | $2,982 | 8.51 |
 
 🟢 **Hoy va mejor que ayer a la misma hora** ($350 vs $435).
 
@@ -42,13 +42,13 @@ Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin s
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$   350  =  $ 2,991  ÷  8.53
+$   350  =  $ 2,982  ÷  8.51
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $2,991 | ~$3.615 | 🟢 normal |
-| **conv/mil** (la calidad de la audiencia) | 8.53 | 5,33 | 🟢 |
+| **CPM** (el precio de la subasta) | $2,982 | ~$3.615 | 🟢 normal |
+| **conv/mil** (la calidad de la audiencia) | 8.51 | 5,33 | 🟢 |
 
 
 ---
@@ -57,15 +57,15 @@ $   350  =  $ 2,991  ÷  8.53
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
-| Domiciliarios - Expancion - API | $40,000 | $46,366 | 116% | 115 | $403 | 8.04 |
-| TEST Creativos - API | $40,000 | $44,759 | 112% | 87 | $514 | 9.49 |
-| Domiciliarios - API | $35,000 | $39,329 | 112% | 109 | $361 | 9.37 |
-| Domiciliarios VIDEO - API | $20,000 | $24,488 | 122% | 91 | $269 | 9.45 |
-| Motorizados - API | $20,000 | $23,096 | 115% | 87 | $265 | 11.61 |
-| Domiciliarios VIDEO INTER - API | $20,000 | $22,397 | 112% | 59 | $380 | 7.57 |
-| Domiciliarios INTER - API | $20,000 | $21,871 | 109% | 106 | $206 | 9.49 |
-| Motorizados - INTER | $20,000 | $21,001 | 105% | 54 | $389 | 8.06 |
-| Domiciliarios - Expancion - INTER | $20,000 | $20,948 | 105% | 48 | $436 | 4.58 |
+| Domiciliarios - Expancion - API | $40,000 | $46,366 | 116% | 116 | $400 | 8.08 |
+| TEST Creativos - API | $40,000 | $44,759 | 112% | 87 | $514 | 9.46 |
+| Domiciliarios - API | $35,000 | $39,329 | 112% | 109 | $361 | 9.35 |
+| Domiciliarios VIDEO - API | $20,000 | $24,488 | 122% | 91 | $269 | 9.42 |
+| Motorizados - API | $20,000 | $23,096 | 115% | 87 | $265 | 11.58 |
+| Domiciliarios VIDEO INTER - API | $20,000 | $22,397 | 112% | 60 | $373 | 7.68 |
+| Domiciliarios INTER - API | $20,000 | $21,871 | 109% | 106 | $206 | 9.47 |
+| Motorizados - INTER | $20,000 | $21,001 | 105% | 54 | $389 | 8.03 |
+| Domiciliarios - Expancion - INTER | $20,000 | $20,948 | 105% | 48 | $436 | 4.56 |
 
 ### Cada producto contra SU propio equilibrio
 
@@ -73,12 +73,12 @@ $   350  =  $ 2,991  ÷  8.53
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
-| **TRADICIONAL** | $264,255 | 756 | **$350** | $2,402 | **15%** 🟢 |
+| **TRADICIONAL** | $264,255 | 758 | **$349** | $2,402 | **15%** 🟢 |
 
 | | |
 |---|---|
-| CPA implícito (cierre 5.4%) | **$6,425**/pedido |
-| utilidad estimada de lo que va del día | **$949,317** |
+| CPA implícito (cierre 5.4%) | **$6,408**/pedido |
+| utilidad estimada de lo que va del día | **$952,528** |
 
 ---
 
@@ -90,12 +90,12 @@ $   350  =  $ 2,991  ÷  8.53
 
 | conjunto | 10-07 | 10-08 | 10-09 | 10-10 | 10-11 | 10-12 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios - Expancion - API | $542 | $597 | $558 | $509 | $550 | $403 | 🟢 |
+| Domiciliarios - Expancion - API | $542 | $597 | $558 | $509 | $550 | $400 | 🟢 |
 | TEST Creativos - API | $460 | $425 | $440 | $433 | $510 | $514 | 🟡 |
 | Domiciliarios - API | $340 | $362 | $365 | $366 | $451 | $361 | 🟢 |
 | Domiciliarios VIDEO - API | $400 | $297 | $250 | $282 | $276 | $269 | 🟡 |
 | Motorizados - API | $414 | $331 | $433 | $312 | $447 | $265 | 🟢 |
-| Domiciliarios VIDEO INTER - API | $390 | $417 | $391 | $514 | $515 | $380 | 🟢 |
+| Domiciliarios VIDEO INTER - API | $390 | $417 | $391 | $514 | $515 | $373 | 🟢 |
 | Domiciliarios INTER - API | $192 | $218 | $192 | $242 | $242 | $206 | 🟢 |
 | Motorizados - INTER | $344 | $314 | $353 | $343 | $365 | $389 | 🟡 |
 | Domiciliarios - Expancion - INTER | $540 | $438 | $483 | $442 | $603 | $436 | 🟢 |
@@ -104,15 +104,15 @@ $   350  =  $ 2,991  ÷  8.53
 
 | conjunto | 10-07 | 10-08 | 10-09 | 10-10 | 10-11 | 10-12 | |
 |---|---|---|---|---|---|---|---|
-| Domiciliarios - Expancion - API | 6.61 | 6.11 | 5.63 | 6.92 | 6.36 | 8.04 | 🟢 |
-| TEST Creativos - API | 11.97 | 14.18 | 11.97 | 12.76 | 8.95 | 9.49 | 🟢 |
-| Domiciliarios - API | 11.81 | 11.79 | 9.23 | 9.70 | 7.58 | 9.37 | 🟢 |
-| Domiciliarios VIDEO - API | 8.65 | 12.37 | 11.67 | 10.90 | 9.99 | 9.45 | 🟡 |
-| Motorizados - API | 8.67 | 11.74 | 7.01 | 10.22 | 6.89 | 11.61 | 🟢 |
-| Domiciliarios VIDEO INTER - API | 7.63 | 8.15 | 8.36 | 6.82 | 6.48 | 7.57 | 🟢 |
-| Domiciliarios INTER - API | 12.63 | 11.12 | 12.12 | 10.51 | 9.48 | 9.49 | 🟡 |
-| Motorizados - INTER | 11.75 | 11.80 | 10.09 | 11.54 | 10.05 | 8.06 | 🔴 |
-| Domiciliarios - Expancion - INTER | 5.48 | 6.52 | 4.17 | 5.65 | 3.35 | 4.58 | 🟢 |
+| Domiciliarios - Expancion - API | 6.61 | 6.11 | 5.63 | 6.92 | 6.36 | 8.08 | 🟢 |
+| TEST Creativos - API | 11.97 | 14.18 | 11.97 | 12.76 | 8.95 | 9.46 | 🟢 |
+| Domiciliarios - API | 11.81 | 11.79 | 9.23 | 9.70 | 7.58 | 9.35 | 🟢 |
+| Domiciliarios VIDEO - API | 8.65 | 12.37 | 11.67 | 10.90 | 9.99 | 9.42 | 🟡 |
+| Motorizados - API | 8.67 | 11.74 | 7.01 | 10.22 | 6.89 | 11.58 | 🟢 |
+| Domiciliarios VIDEO INTER - API | 7.63 | 8.15 | 8.36 | 6.82 | 6.48 | 7.68 | 🟢 |
+| Domiciliarios INTER - API | 12.63 | 11.12 | 12.12 | 10.51 | 9.48 | 9.47 | 🟡 |
+| Motorizados - INTER | 11.75 | 11.80 | 10.09 | 11.54 | 10.05 | 8.03 | 🔴 |
+| Domiciliarios - Expancion - INTER | 5.48 | 6.52 | 4.17 | 5.65 | 3.35 | 4.56 | 🟢 |
 
 🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). Eso es canibalización, y se arregla diferenciando la segmentación.
 
