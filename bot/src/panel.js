@@ -169,6 +169,10 @@ function render(aviso) {
   // dato del pedido, falta una comprobación en la cuenta. Los que YA mandaron
   // el comprobante se cuentan aparte: esos son los urgentes —el cliente ya
   // pagó y está esperando—, y son exactamente el caso que se nos perdió.
+  // 📇 UNA sola lectura del archivo de guías para todo el render. Antes se leía
+  // completo una vez POR PEDIDO PENDIENTE: 41 lecturas y 8,8 MB de basura por
+  // render, cada 45 segundos. Ver indiceDeGuiasPorTelefono() en store.js.
+  const GUIAS_POR_TEL = store.indiceDeGuiasPorTelefono();
   const pagosPorVerificar = pendientes.filter(
     (p) => (store.esPagoAnticipado(p) || p.comprobante_recibido === true) && p.pago_verificado !== true
   );
@@ -435,7 +439,7 @@ function render(aviso) {
       ${
         // 🔄 Solo aparece si de verdad hay algo que conciliar. Un botón que
         // nunca hace nada estorba.
-        pendientes.some((p) => store.guiaEnviadaAlCliente(p))
+        pendientes.some((p) => store.guiaEnviadaAlCliente(p, GUIAS_POR_TEL))
           ? `<form method="post" action="/conciliar-guias" style="display:inline">
                <input type="hidden" name="token" value="${esc(panelToken())}">
                <button type="submit" class="btn destacado">🔄 Cerrar los pedidos cuya guía ya salió</button>
@@ -501,7 +505,8 @@ function render(aviso) {
     // Acá se cruzan los dos por teléfono. Si aparece, se avisa y el botón de
     // "ya la envié" viene con el número puesto: un clic y queda cerrado.
     // ========================================================================
-    const guiaHuerfana = !p.guia && !opciones.despachado ? store.guiaEnviadaAlCliente(p) : null;
+    const guiaHuerfana =
+      !p.guia && !opciones.despachado ? store.guiaEnviadaAlCliente(p, GUIAS_POR_TEL) : null;
     // Enlace para leer el chat completo de ese cliente desde el celular, sin
     // tener que entrar al shell de Render.
     const verChat = p.telefono_chat

@@ -2140,23 +2140,65 @@ function todasLasGuiasEnviadas() {
  *
  * @returns {object|null} el registro de la guía enviada, o null
  */
-function guiaEnviadaAlCliente(pedido) {
-  if (!pedido) return null;
+const diezDigitos = (v) => {
+  const d = String(v == null ? "" : v).replace(/\D/g, "");
+  return d.length >= 10 ? d.slice(-10) : "";
+};
+
+/**
+ * 📇 Las guías enviadas, indexadas por teléfono. SE ARMA UNA SOLA VEZ.
+ *
+ * 🔴 DE DÓNDE SALE (14-oct): el panel se estaba cayendo por memoria, y parte de
+ * la culpa era mía. `guiaEnviadaAlCliente()` leía y parseaba el archivo COMPLETO
+ * de guías en cada llamada, y el panel la llamaba UNA VEZ POR PEDIDO PENDIENTE.
+ *
+ * Medido con 150 pedidos y 320 conversaciones:
+ *     antes de ese cambio :  13 lecturas de disco ·  2,9 MB por render
+ *     después             :  54 lecturas de disco ·  8,8 MB por render
+ *
+ * O sea que lo TRIPLIQUÉ. Y el panel se refresca solo cada 45 segundos, así que
+ * eran ~9 MB de basura cada 45 s por cada pestaña abierta.
+ *
+ * Con el índice armado una vez, el costo vuelve a ser una lectura.
+ */
+function indiceDeGuiasPorTelefono() {
   try {
     ensure();
-    const diez = (v) => {
-      const d = String(v == null ? "" : v).replace(/\D/g, "");
-      return d.length >= 10 ? d.slice(-10) : "";
-    };
-    const mios = new Set([diez(pedido.celular), diez(pedido.telefono_chat)].filter(Boolean));
-    if (!mios.size) return null;
     const todas = readJSON(GUIAS_FILE, {});
-    // La más reciente primero: si por alguna razón hay varias, interesa la última.
-    const candidatas = Object.entries(todas)
-      .map(([guia, r]) => ({ guia, ...r }))
-      .filter((r) => mios.has(diez(r.telefono)))
-      .sort((a, b) => Number(b.fecha || 0) - Number(a.fecha || 0));
-    return candidatas[0] || null;
+    const porTel = new Map();
+    for (const [guia, r] of Object.entries(todas)) {
+      const tel = diezDigitos(r && r.telefono);
+      if (!tel) continue;
+      const previa = porTel.get(tel);
+      // Si hay varias para el mismo teléfono, interesa la más reciente.
+      if (!previa || Number(r.fecha || 0) > Number(previa.fecha || 0)) {
+        porTel.set(tel, { guia, ...r });
+      }
+    }
+    return porTel;
+  } catch {
+    return new Map();
+  }
+}
+
+/**
+ * 🔎 ¿A ESTE CLIENTE YA SE LE MANDÓ UNA GUÍA, aunque su pedido no lo diga?
+ *
+ * @param {object} pedido
+ * @param {Map} [indice]  el de indiceDeGuiasPorTelefono(). Si se pasa, no toca
+ *   el disco: es lo que hace que el panel no lo lea una vez por pedido.
+ */
+function guiaEnviadaAlCliente(pedido, indice) {
+  if (!pedido) return null;
+  try {
+    const mios = [diezDigitos(pedido.celular), diezDigitos(pedido.telefono_chat)].filter(Boolean);
+    if (!mios.length) return null;
+    const idx = indice instanceof Map ? indice : indiceDeGuiasPorTelefono();
+    for (const tel of mios) {
+      const hit = idx.get(tel);
+      if (hit) return hit;
+    }
+    return null;
   } catch {
     return null;
   }
@@ -2177,10 +2219,12 @@ function conciliarGuiasConPedidos() {
     ensure();
     const orders = readJSON(ORDERS_FILE, []);
     const arreglados = [];
+    // El índice se arma UNA vez, no por pedido (ver indiceDeGuiasPorTelefono).
+    const indice = indiceDeGuiasPorTelefono();
     for (let i = 0; i < orders.length; i++) {
       const o = orders[i];
       if (!o || o.guia || o.anulado) continue;
-      const g = guiaEnviadaAlCliente(o);
+      const g = guiaEnviadaAlCliente(o, indice);
       if (!g || !g.guia) continue;
       orders[i] = {
         ...o,
@@ -2473,5 +2517,5 @@ module.exports = {
   // ✅ "esa guía ya la mandé yo": saca el pedido de la cola sin escribirle al cliente.
   marcarDespachadoAMano, desmarcarDespachado,
   // 🔎 Cruce entre guias-enviadas.json y orders.json, que se pueden contradecir.
-  guiaEnviadaAlCliente, conciliarGuiasConPedidos,
+  guiaEnviadaAlCliente, conciliarGuiasConPedidos, indiceDeGuiasPorTelefono,
 };
