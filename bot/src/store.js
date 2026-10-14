@@ -43,6 +43,42 @@ if (!process.env.DATA_DIR) {
   console.log(`💾 Datos en: ${DIR} (sin comprobar todavía si es un disco montado)`);
 }
 const CONV_FILE = path.join(DIR, "conversations.json");
+// ============================================================================
+// 🧠 EL ARCHIVO DE CONVERSACIONES VIEJAS — 14-oct
+//
+// DE DÓNDE SALE. Render mató el proceso 9 veces en 4 horas. La medición con los
+// datos reales (11.000 conversaciones, 32 MB) fue brutal:
+//
+//     UN mensaje que entra  ->  290 ms y 164 MB de RSS
+//
+// Porque `pushMsg` lee los 32 MB completos, los parsea, agrega UNA línea y
+// reescribe los 32 MB enteros. Con el techo de heap en 268 MB y el contenedor
+// en 512 MB, dos mensajes a la vez lo matan. El propio /health ya lo avisaba:
+// *"conversations.json pasa los 15 MB: cada mensaje lo lee y lo reescribe
+// completo. Ese es el techo de memoria"*.
+//
+// 🔑 LA SOLUCIÓN NO ES BORRAR, ES MOVER DE CAJÓN. Las conversaciones sin
+// actividad reciente se pasan a un segundo archivo que casi nunca se toca. El
+// archivo activo baja de 32 MB a ~6 MB, y con él el costo de cada mensaje.
+//
+// ⚠️ LO QUE NO SE PUEDE PERDER AL MOVER, y por qué cada cosa:
+//   · `noMolestar` — le prometimos no escribirle más. Si un archivado vuelve a
+//     escribir y la marca no viaja con él, el bot le empieza a vender otra vez.
+//     Por eso getConv y pushMsg lo TRAEN DE VUELTA completo en vez de arrancar
+//     una conversación nueva. Es la regla más importante de todo este bloque.
+//   · el historial — el buscador tiene que seguir encontrando a un cliente de
+//     hace un mes (`todasLasConversaciones({ incluirArchivo: true })`).
+//   · nada de pedidos ni guías: viven en otros archivos y no se tocan.
+//
+// Los seguimientos van hasta 47 h, así que una ventana de 7 días no corta
+// ninguno.
+// ============================================================================
+const ARCHIVO_FILE = path.join(DIR, "conversations-archivo.json");
+
+// Cuántos días de inactividad antes de archivar. Se puede subir sin tocar
+// código si hace falta más historia en caliente, pero cada día son ~315
+// conversaciones más en el archivo que se reescribe por mensaje.
+const DIAS_ACTIVAS = Math.max(1, Number(process.env.DIAS_CONVERSACIONES_ACTIVAS) || 7);
 const ORDERS_FILE = path.join(DIR, "orders.json");
 const GUIAS_FILE = path.join(DIR, "guias-enviadas.json");
 const FALLOS_FILE = path.join(DIR, "fallos-entrega.json");
@@ -123,10 +159,57 @@ function writeJSON(file, data) {
   }
 }
 
+/** La última señal de vida de una conversación, para decidir si se archiva. */
+function ultimaActividad(c) {
+  if (!c) return 0;
+  const msgs = c.messages || [];
+  const ultimoMsg = msgs.length ? Number(msgs[msgs.length - 1].at || 0) : 0;
+  return Math.max(
+    Number(c.ultimoDelCliente || 0),
+    Number(c.ultimaRespuestaHumana || 0),
+    Number(c.atendidoAt || 0),
+    ultimoMsg
+  );
+}
+
+/**
+ * 🔙 TRAE UNA CONVERSACIÓN DE VUELTA DEL ARCHIVO, si está allá.
+ *
+ * 🔴 ESTO ES LO QUE EVITA EL DAÑO GRANDE. Sin esto, un cliente archivado que
+ * vuelve a escribir arrancaría una conversación EN BLANCO: se perdería su
+ * `noMolestar` —y el bot le volvería a vender a alguien que pidió que no le
+ * escribieran—, su historial y su atribución al anuncio.
+ *
+ * Devuelve el registro ya movido al archivo activo, o null si no estaba.
+ */
+function recuperarDelArchivo(phone, activasYaLeidas) {
+  try {
+    const archivo = readJSON(ARCHIVO_FILE, {});
+    const c = archivo[phone];
+    if (!c) return null;
+    delete archivo[phone];
+    const activas = activasYaLeidas || readJSON(CONV_FILE, {});
+    activas[phone] = c;
+    // Primero el archivo activo: si falla la segunda escritura, el peor caso es
+    // que la conversación quede DUPLICADA en los dos archivos, y el activo gana
+    // siempre. Al revés se perdería.
+    writeJSON(CONV_FILE, activas);
+    writeJSON(ARCHIVO_FILE, archivo);
+    console.log(`🔙 ${phone} volvió a escribir: su conversación se recuperó del archivo.`);
+    return c;
+  } catch (e) {
+    console.error(`🔴 No se pudo recuperar del archivo a ${phone}: ${e.message}`);
+    return null;
+  }
+}
+
 function getConv(phone) {
   ensure();
   const all = readJSON(CONV_FILE, {});
-  return all[phone] || { messages: [], paused: false };
+  if (all[phone]) return all[phone];
+  // No está en las activas: puede estar archivada. Se trae de vuelta.
+  const recuperada = recuperarDelArchivo(phone, all);
+  return recuperada || { messages: [], paused: false };
 }
 // ============================================================================
 // 👤 QUIÉN CONTESTÓ: EL BOT O EL DUEÑO (25-sep)
@@ -149,7 +232,14 @@ function getConv(phone) {
 // ============================================================================
 function pushMsg(phone, role, content, extra) {
   ensure();
-  const all = readJSON(CONV_FILE, {});
+  let all = readJSON(CONV_FILE, {});
+  // 🔙 Si no está en las activas, puede estar archivada: se trae de vuelta ANTES
+  // de agregar el mensaje. Si no, se arrancaría una conversación en blanco y se
+  // perdería su `noMolestar` (ver recuperarDelArchivo).
+  if (!all[phone]) {
+    const recuperada = recuperarDelArchivo(phone, all);
+    if (recuperada) all = readJSON(CONV_FILE, {});
+  }
   const c = all[phone] || { messages: [], paused: false };
   c.messages.push({ role, content, at: Date.now(), ...(extra || null) });
   // Si contestó una persona, se anota aparte del historial de mensajes: ese
@@ -192,6 +282,13 @@ function borrarConversacion(phone) {
   const all = readJSON(CONV_FILE, {});
   delete all[phone];
   writeJSON(CONV_FILE, all);
+  // También del archivo: si no, una conversación de prueba archivada volvería a
+  // aparecer al recuperarse y la prueba siguiente arrancaría con historial.
+  const archivo = readJSON(ARCHIVO_FILE, {});
+  if (archivo[phone]) {
+    delete archivo[phone];
+    writeJSON(ARCHIVO_FILE, archivo);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -463,10 +560,72 @@ function marcarNoMolestar(phone) {
   writeJSON(CONV_FILE, all);
 }
 
-/** Devuelve todas las conversaciones, para que el seguimiento las revise. */
-function todasLasConversaciones() {
+/**
+ * Devuelve las conversaciones ACTIVAS, para que el seguimiento las revise.
+ *
+ * @param {object} [opciones]
+ * @param {boolean} [opciones.incluirArchivo]  también las viejas. Lo usa el
+ *   BUSCADOR: tiene que seguir encontrando a un cliente de hace un mes, que es
+ *   justo lo que el dueño pidió. Para todo lo demás —seguimiento, panel,
+ *   cierre— alcanza con las activas, y leer el archivo acá costaría la memoria
+ *   que estamos tratando de ahorrar.
+ */
+function todasLasConversaciones(opciones) {
   ensure();
-  return readJSON(CONV_FILE, {});
+  const activas = readJSON(CONV_FILE, {});
+  if (!opciones || !opciones.incluirArchivo) return activas;
+  // Las activas MANDAN sobre las archivadas: si por un fallo a mitad de camino
+  // una quedó en los dos lados, la buena es la del archivo activo.
+  return { ...readJSON(ARCHIVO_FILE, {}), ...activas };
+}
+
+/**
+ * 📦 MUEVE AL ARCHIVO las conversaciones sin actividad reciente.
+ *
+ * NO BORRA NADA: las saca de `conversations.json` y las pone en
+ * `conversations-archivo.json`, en el mismo disco. Si el cliente vuelve a
+ * escribir, `recuperarDelArchivo()` la trae de regreso completa.
+ *
+ * @param {number} [dias]  ventana de actividad; por defecto DIAS_ACTIVAS
+ * @returns {{movidas:number, activas:number, archivadas:number}}
+ */
+function archivarConversacionesViejas(dias) {
+  try {
+    ensure();
+    const ventana = Math.max(1, Number(dias) || DIAS_ACTIVAS) * 24 * 60 * 60 * 1000;
+    const corte = Date.now() - ventana;
+    const activas = readJSON(CONV_FILE, {});
+    const archivo = readJSON(ARCHIVO_FILE, {});
+
+    let movidas = 0;
+    for (const [tel, c] of Object.entries(activas)) {
+      // ⚠️ Una conversación SIN ninguna marca de tiempo no se archiva. Podría
+      // ser un registro recién creado al que todavía no se le puso la hora, y
+      // archivar algo activo es el error caro.
+      const cuando = ultimaActividad(c);
+      if (!cuando || cuando >= corte) continue;
+      archivo[tel] = c;
+      delete activas[tel];
+      movidas++;
+    }
+    if (!movidas) {
+      return { movidas: 0, activas: Object.keys(activas).length, archivadas: Object.keys(archivo).length };
+    }
+    // 🔑 EL ARCHIVO PRIMERO. Si falla la segunda escritura, la conversación
+    // queda en los DOS lados —y todasLasConversaciones() hace ganar a la
+    // activa—, así que no se pierde. Al revés se perdería.
+    writeJSON(ARCHIVO_FILE, archivo);
+    writeJSON(CONV_FILE, activas);
+    console.log(
+      `📦 ${movidas} conversación(es) sin actividad en ${Math.round(ventana / 86400000)} días pasaron al ` +
+        `archivo. Activas: ${Object.keys(activas).length} · archivadas: ${Object.keys(archivo).length}. ` +
+        `No se borró nada: si vuelven a escribir, se recuperan solas.`
+    );
+    return { movidas, activas: Object.keys(activas).length, archivadas: Object.keys(archivo).length };
+  } catch (e) {
+    console.error(`🔴 No se pudo archivar conversaciones viejas: ${e.message}`);
+    return { movidas: 0, activas: 0, archivadas: 0 };
+  }
 }
 
 /**
@@ -2498,6 +2657,8 @@ module.exports = {
   registrarArranque, estadoDelDisco, tamanosEnDisco,
   marcarComprado, registrarSeguimiento, reclamarSeguimiento,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
+  // 📦 Archivo de conversaciones viejas: baja el costo de cada mensaje sin borrar nada.
+  archivarConversacionesViejas, recuperarDelArchivo, ultimaActividad, DIAS_ACTIVAS,
   guardarPerfil, guardarAtribucion, atribucionDe, fijarProductoActivo, fijarCategoria,
   reemplazarPedidos,
   todosLosPedidos,
