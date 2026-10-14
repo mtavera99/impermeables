@@ -392,6 +392,36 @@ function limpiarPlanesViejos() {
 const RELOJ_PLANES = setInterval(limpiarPlanesViejos, 10 * 60 * 1000);
 if (RELOJ_PLANES.unref) RELOJ_PLANES.unref();
 
+// ============================================================================
+// 📦 ARCHIVAR LAS CONVERSACIONES VIEJAS — 14-oct
+//
+// El costo de CADA mensaje que entra es proporcional al tamaño de
+// conversations.json, porque pushMsg lo lee y lo reescribe completo. Medido con
+// los datos reales (11.000 conversaciones, 32 MB): 290 ms y 164 MB de RSS por
+// un solo mensaje, con el techo de heap en 268 MB. De ahí los reinicios.
+//
+// Esto lo mantiene chico moviendo —NO borrando— las conversaciones sin
+// actividad al archivo. Ver el bloque de ARCHIVO_FILE en store.js.
+//
+// ⏱️ Corre al arrancar (con 20 s de gracia para no competir con el arranque) y
+// después una vez por hora. Es una operación pesada: lee y escribe los dos
+// archivos, así que NO se hace por mensaje.
+// ============================================================================
+function archivarViejas() {
+  try {
+    const r = store.archivarConversacionesViejas();
+    if (r.movidas) {
+      anotarEvento({ tipo: "conversaciones-archivadas", movidas: r.movidas, activas: r.activas });
+    }
+  } catch (e) {
+    console.error(`🔴 Falló el archivado de conversaciones: ${e.message}`);
+  }
+}
+const PRIMER_ARCHIVADO = setTimeout(archivarViejas, 20 * 1000);
+if (PRIMER_ARCHIVADO.unref) PRIMER_ARCHIVADO.unref();
+const RELOJ_ARCHIVO = setInterval(archivarViejas, 60 * 60 * 1000);
+if (RELOJ_ARCHIVO.unref) RELOJ_ARCHIVO.unref();
+
 // Mismo mecanismo que las guías: el plan vive entre "revisar" y "enviar" para
 // no obligar a pegar el texto dos veces, y se muere en 30 minutos.
 const PLANES_NOVEDADES = new Map(); // id -> { filas, creado }

@@ -84,7 +84,10 @@ function buscar({ id, q }) {
 function buscarChats({ q, conversaciones }) {
   const t = limpiar(q);
   if (!t) return [];
-  const convs = conversaciones || store.todasLasConversaciones();
+  // 🔎 INCLUYE EL ARCHIVO a proposito: el buscador tiene que encontrar a un
+  // cliente de hace un mes. Es la unica pantalla que paga leer el archivo
+  // viejo, y solo cuando alguien busca algo.
+  const convs = conversaciones || store.todasLasConversaciones({ incluirArchivo: true });
 
   // Si escribió números, se comparan solo los dígitos: así "321 555 7305",
   // "321-555-7305" y "3215557305" encuentran lo mismo. Y se compara por el
@@ -450,7 +453,7 @@ function cajonDeVenta(p, token, pedidosPrevios) {
  */
 function render({ id, q, token, resultado, venta } = {}) {
   let encontrados = buscar({ id, q });
-  const conversaciones = store.todasLasConversaciones();
+  const conversaciones = store.todasLasConversaciones({ incluirArchivo: true });
 
   // 🔎 Si lo que se buscó no tiene PEDIDO, se busca en los CHATS antes de
   // rendirse. Un cliente sin pedido es el que más falta leer (ver buscarChats).
