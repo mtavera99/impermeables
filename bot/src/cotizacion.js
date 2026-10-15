@@ -1747,7 +1747,9 @@ function lineaDePrecio(cot) {
   // Cada producto tiene su forma de decir el precio: el impermeable habla de
   // "conjuntos", el V10 de "intercomunicadores". Decirle "conjunto" a un
   // intercomunicador delata que el bot está leyendo el guion equivocado.
-  if (catalogo.esV10(cot.productoId)) return lineaDePrecioV10(cot);
+  // Por capacidad: el Q58 Max también habla de "intercomunicadores", no de
+  // "conjuntos". Con esV10 caía en la redacción del impermeable.
+  if (catalogo.esProductoSimple(cot.productoId)) return lineaDePrecioV10(cot);
   // Difícil acceso: hay total confirmado pero NO hay desglose. Se dice el total y
   // nada más — inventar el envío para que la resta cuadre es lo que costó la
   // venta de $158.000 el 22-sep.
@@ -1801,7 +1803,11 @@ function lineaDePrecio(cot) {
 function notaDelTurnoV10(contexto = {}) {
   const texto = String(contexto.userText || "");
   if (!texto.trim()) return "";
-  const productoId = contexto.producto || "intercom_v10_2x";
+  // ⚠️ El default dejó de ser "intercom_v10_2x" (15-oct): con dos
+  // intercomunicadores, caer al V10 cuando no se sabe el producto significaba
+  // imprimir los precios del V10 en una conversación del Q58.
+  const productoId = contexto.producto || contexto.productoId || null;
+  if (!productoId) return "";
 
   // ¿Es una pregunta de las que contesta la ficha técnica?
   const informativa =
@@ -1832,7 +1838,17 @@ function haySenalDeCompra(texto) {
 }
 
 function bloqueDeDatosV10(cot, contexto = {}) {
-  const ficha = catalogo.de((cot && cot.productoId) || contexto.producto) || catalogo.de("intercom_v10_2x");
+  // 🔴 ANTES ESTE FALLBACK ERA `catalogo.de("intercom_v10_2x")`, y era una
+  // bomba: si la ficha no resolvía, imprimía los PRECIOS DEL V10 en el bloque
+  // de precio de cualquier producto. Con un solo intercomunicador no se notaba.
+  const ficha = catalogo.de((cot && cot.productoId) || contexto.producto);
+  if (!ficha) {
+    console.error(
+      "🔴 bloqueDeDatosV10 sin ficha de producto: no se arma el bloque de precio " +
+        "en vez de imprimir el de otro producto."
+    );
+    return "";
+  }
   const uno = fmt(ficha.precios[1]);
   const dos = fmt(ficha.precios[2]);
   const base =
@@ -1888,7 +1904,7 @@ function bloqueDeDatosV10(cot, contexto = {}) {
 
   const cuantos = cot.uds === 2 ? `los dos ${ficha.nombreCorto}` : `un ${ficha.nombreCorto}`;
   return (
-    notaDelTurnoV10(contexto) +
+    notaDelTurnoV10({ ...contexto, productoId: ficha.id }) +
     `## PRECIO — YA CALCULADO, USALO TAL CUAL\n` +
     `Producto: ${ficha.nombre} × ${cot.uds}\n` +
     `Destino: ${cot.ciudad}\n` +
@@ -1912,7 +1928,9 @@ function bloqueDeDatos(cot, contexto = {}) {
   // porque cuando todavía no hay destino la cotización no sabe de qué producto es
   // —sale por un `return` temprano— y el contexto sí.
   const fichaBloque = productoDelTurno(cot, contexto);
-  if (fichaBloque && catalogo.esV10(fichaBloque.id)) return bloqueDeDatosV10(cot, contexto);
+  // Por capacidad: si no, el Q58 caía al bloque del impermeable, que inyecta
+  // literalmente $59.900 y $110.000 — el cruce de precios que no puede pasar.
+  if (fichaBloque && catalogo.esProductoSimple(fichaBloque.id)) return bloqueDeDatosV10(cot, contexto);
 
   if (!cot.ok) {
     const d = cot.destino || {};

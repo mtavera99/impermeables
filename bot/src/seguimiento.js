@@ -196,7 +196,20 @@ const PLANTILLA_V10 = nombreDePlantilla(
 
 /** La plantilla que corresponde al producto. "" significa "saltar este paso". */
 function plantillaDe(productoId, plantillaBase) {
-  if (catalogo.esV10(productoId)) return PLANTILLA_V10;
+  // 🔑 CADA PRODUCTO SU PLANTILLA, declarada en su ficha (15-oct).
+  //
+  // 🔴 Antes esto era `if (esV10) return PLANTILLA_V10; return plantillaBase`,
+  // y con el Q58 adentro significaba mandarle la plantilla de IMPERMEABLES a un
+  // lead de intercomunicadores: el producto equivocado, por WhatsApp, con el
+  // nombre del cliente. Devolver "" hace que el paso se SALTE, que es lo
+  // correcto mientras no exista su plantilla aprobada en Meta.
+  const ficha = catalogo.de(productoId);
+  if (ficha && ficha.seguimientoPlantillaEnv) {
+    return nombreDePlantilla(
+      process.env[ficha.seguimientoPlantillaEnv] ?? "",
+      ficha.seguimientoPlantillaEnv
+    );
+  }
   return plantillaBase;
 }
 
@@ -376,10 +389,11 @@ async function correrSeguimientos() {
       saltados++;
       console.log(
         `[seguimiento ${paso.n}] ${phone} (${horas}h) SALTADO: ` +
-          (catalogo.esV10(productoId)
-            ? "la conversación es de intercomunicadores y no hay plantilla del V10. " +
-              "⛔ NO se le manda la del impermeable: sería el producto equivocado. " +
-              "Creá `seguimiento_intercomunicador` en Meta y ponela en SEGUIMIENTO_PLANTILLA_V10."
+          (catalogo.esIntercom(productoId)
+            ? `la conversación es de ${(catalogo.de(productoId) || {}).nombreCorto || "intercomunicadores"} ` +
+              "y no hay plantilla suya configurada. " +
+              "⛔ NO se le manda la de otro producto: sería el equivocado. " +
+              `Creá la plantilla en Meta y ponela en ${(catalogo.de(productoId) || {}).seguimientoPlantillaEnv || "la variable del producto"}.`
             : `falta configurar SEGUIMIENTO_PLANTILLA_${paso.n}. ` +
               "Pasadas las 24h Meta solo acepta plantillas aprobadas.")
       );

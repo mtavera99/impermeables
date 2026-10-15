@@ -223,8 +223,9 @@ function primerMensaje() {
 //    para cotizar.
 //  · ⛔ No dice "2x1" ni promete especificaciones que no tenemos.
 // ----------------------------------------------------------------------------
-function primerMensajeV10() {
-  const v10 = require("./catalogo").de("intercom_v10_2x");
+// `ficha` entra por parámetro (15-oct): sirve para el V10 2X y el Q58 Max.
+function primerMensajeV10(ficha) {
+  const v10 = ficha || require("./catalogo").de("intercom_v10_2x");
   return [
     `¡Hola! 👋 Claro que sí. Tenemos el combo de 2 intercomunicadores ${v10.nombreCorto} por ${fmt(v10.precios[2])} 🏍️`,
     "Sirven para hablar de casco a casco con tu acompañante, y también los usás para música, las indicaciones del GPS y llamadas 🎧",
@@ -281,15 +282,16 @@ function respuestaDeArranque(messages, texto, productoId) {
 
   // 🎧 El prerrellenado del anuncio del intercomunicador entra por acá, porque es
   // más largo que el del impermeable y el corte de 8 palabras lo dejaba afuera.
-  if (require("./catalogo").esV10(productoId) && esPedidoDeInfoDeProducto(texto)) {
-    return primerMensajeV10();
+  const cat = require("./catalogo");
+  if (cat.esProductoSimple(productoId) && esPedidoDeInfoDeProducto(texto)) {
+    return primerMensajeV10(cat.de(productoId));
   }
 
   if (!esSaludoGenerico(texto)) return null;
   // 🔑 El arranque tiene que ser del producto por el que preguntan. Mandarle el
   // folleto del impermeable a alguien que viene del anuncio del intercomunicador
   // es perder el lead en el primer mensaje.
-  if (require("./catalogo").esV10(productoId)) return primerMensajeV10();
+  if (cat.esProductoSimple(productoId)) return primerMensajeV10(cat.de(productoId));
   return primerMensaje();
 }
 
