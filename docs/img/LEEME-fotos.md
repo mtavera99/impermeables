@@ -109,3 +109,59 @@ Cambiar uno no cambia el otro. Ya pasó una vez: se corrigió el catálogo de Co
 bot siguió mandando las fotos viejas un rato más, porque nadie tocó esta carpeta.
 
 Si cambian las fotos del producto, hay que actualizar **los dos**.
+
+---
+
+## 🎧 Para agregar las fotos del intercomunicador Q58 Max (15-oct)
+
+Subí los archivos a **esta misma carpeta** (`docs/img/`) con estos nombres exactos:
+
+| Archivo | Cuándo la manda el bot | ¿Obligatoria? |
+|---|---|---|
+| `q58-producto.jpg` | La principal: cuando piden "fotos" sin decir más | ⭐ **Sí, la más importante** |
+| `q58-puesto.jpg` | Cuando preguntan cómo se ve montado en el casco | muy recomendada |
+| `q58-combo.jpg` | Cuando preguntan por el combo de dos | muy recomendada |
+| `q58-contenido.jpg` | Cuando preguntan qué viene en la caja | opcional |
+| `q58-caja.jpg` | Cuando preguntan qué modelo es o si es original | opcional |
+| `q58-pantalla.jpg` | Cuando preguntan por la pantalla (es una diferencia con el V10) | opcional |
+
+### Tres cosas que importan
+
+**1. La extensión da igual.** `.jpg`, `.jpeg`, `.png`, `.webp` — el bot busca el archivo por
+el nombre base y encuentra cualquiera de esas. Lo que **no** puede cambiar es la parte de
+antes del punto: tiene que ser exactamente `q58-producto`, `q58-puesto`, etc.
+
+**2. Con subir una sola ya sirve.** Las que falten simplemente no se ofrecen. Si no está
+`q58-combo.jpg`, el bot no la menciona y sigue vendiendo con texto; **no manda la del V10
+en su lugar**, que sería el producto equivocado.
+
+**3. Si no hay ninguna, el bot NO promete fotos.** El guion se lo prohíbe explícitamente:
+dice la verdad ("no tengo la foto a mano acá") y sigue hacia la ciudad. Eso es a propósito
+—prometer una foto que no llega deja al cliente esperando—.
+
+### Para verificar que quedaron bien
+
+Una vez subidas, cada archivo tiene que abrir en el navegador en esta dirección:
+
+```
+https://mtavera99.github.io/impermeables/img/q58-producto.jpg
+```
+
+Si da 404, el bot tampoco la va a poder mandar: **esa misma URL es la que le pasa a
+WhatsApp**. (En septiembre todas las fotos daban 404 porque apuntaban a `assets/`, que es
+una carpeta del repo pero no se publica. El cliente pedía fotos y no llegaba nada sin que
+nadie se enterara.)
+
+### Alternativa sin subir archivos
+
+Si las fotos ya están publicadas en otro lado, se pueden poner por variable de entorno en
+Render y el bot usa esa URL tal cual, sin tocar el repo:
+
+```
+MEDIA_Q58           = https://.../q58-producto.jpg
+MEDIA_Q58_PUESTO    = https://.../q58-puesto.jpg
+MEDIA_Q58_COMBO     = https://.../q58-combo.jpg
+MEDIA_Q58_CONTENIDO = https://.../q58-contenido.jpg
+MEDIA_Q58_CAJA      = https://.../q58-caja.jpg
+MEDIA_Q58_PANTALLA  = https://.../q58-pantalla.jpg
+```

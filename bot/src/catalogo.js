@@ -160,6 +160,19 @@ const PRODUCTOS = {
     nombre: "Intercomunicador V10 2X",
     nombreCorto: "V10 2X",
     etiquetaPanel: "🎧 V10 2X",
+    // 🏷️ Categoría: con DOS intercomunicadores en catálogo, la palabra
+    // "intercomunicador" ya no identifica el producto. Ver SENALES_DE_CATEGORIA.
+    categoria: "intercomunicador",
+    // 🥇 El que se asume cuando el cliente dice "intercomunicador" a secas y no
+    // hay ni anuncio ni historial. Es el V10 porque es el que ya estaba: así el
+    // comportamiento de hoy no cambia en ningún caso existente.
+    porDefectoDeCategoria: true,
+    // 🎯 Ids de anuncio de Meta de este producto (variable de entorno).
+    anunciosEnv: "ANUNCIOS_V10",
+    // 📸 Prefijo de sus fotos en media.js (v10, v10_puesto, v10_combo...).
+    mediaPrefijo: "v10",
+    // 📨 Plantilla de WhatsApp para el seguimiento pasadas las 24h.
+    seguimientoPlantillaEnv: "SEGUIMIENTO_PLANTILLA_V10",
     motorDePrecio: "producto_mas_envio",
     pideTalla: false,
     pideColor: false,
@@ -408,6 +421,281 @@ const PRODUCTOS = {
     envioIncluido: false,
     contraentrega: true,
   },
+
+  // ==========================================================================
+  // 🎧 INTERCOMUNICADOR Q58 MAX — tercer producto, 15-oct
+  //
+  // El dueño lo pidió así: *"el V10 sigue vendiéndose como estaba, pero ahora
+  // también vamos a vender el Q58 Max (individual y también en combo)"*.
+  //
+  // 🔴 LOS DOS SON INTERCOMUNICADORES, Y AHÍ ESTÁ EL RIESGO. Hasta hoy la palabra
+  // "intercomunicador" alcanzaba para saber qué vender, porque había uno solo.
+  // Con dos, esa palabra ya NO identifica el producto: identifica la CATEGORÍA.
+  // Ver el bloque de señales más abajo, que es donde se resolvió.
+  //
+  // ⚠️ EL ID NO LLEVA "2x" NI "combo" A PROPÓSITO. `resumen.js` deduce la
+  // cantidad leyendo el TEXTO del campo `producto` cuando el pedido no trae
+  // `unidades` (ventas cargadas a mano, históricos): busca /2|dos|x2|2x|combo/.
+  // El id del V10 (`intercom_v10_2x`) ya cae en esa trampa; este no la repite.
+  // ==========================================================================
+  intercom_q58_max: {
+    id: "intercom_q58_max",
+    nombre: "Intercomunicador Q58 Max",
+    nombreCorto: "Q58 Max",
+    etiquetaPanel: "🎧 Q58 Max",
+    categoria: "intercomunicador",
+    motorDePrecio: "producto_mas_envio",
+    pideTalla: false,
+    pideColor: false,
+    porDefecto: false,
+
+    // 💰 PRECIOS CONFIRMADOS POR EL DUEÑO (15-oct). Ninguno incluye envío.
+    //
+    // 🔑 LA UNIDAD QUEDÓ EN $79.900 Y NO EN $80.000 por decisión del dueño sobre
+    // una observación de la cuenta: con $79.900 los totales por banda salen
+    // redondos ($93.000 Bogotá · $102.000 Cali · $105.000 pueblos), igual que en
+    // el impermeable. Son $100 y un total redondo se dice y se recuerda mejor.
+    //
+    // ⛔ Y NO ES UN "2x1": el combo son DOS unidades por $129.900, no una gratis.
+    precios: { 1: 79900, 2: 129900 },
+
+    // Costo de compra por unidad, confirmado por el dueño el 15-oct. Él mismo
+    // dijo que va a intentar bajarlo, así que este número tiene fecha.
+    //
+    // 🔑 Con este costo, el combo deja ~$4.900 MÁS que vender una sola unidad
+    // (en el V10 la diferencia es ~$8.000). O sea que acá la unidad suelta es
+    // casi el mismo negocio que el combo. No cambia nada del código: queda
+    // anotado porque es la clase de dato con el que se decide dónde poner la
+    // pauta, y sin esto no se ve.
+    costoUnitario: 45000,
+
+    // Misma política que el V10, y por la misma razón física: 1 o 2
+    // intercomunicadores caben en un paquete chico. El dueño lo pidió explícito:
+    // *"el envío es lo mismo que en el caso de los otros intercomunicadores"*.
+    politicaDeEnvio: {
+      tipo: "paquete_unico",
+      hastaUnidades: 2,
+      provisional: true,
+      porQue:
+        "1 o 2 intercomunicadores caben en un solo paquete pequeño; el dueño pidió " +
+        "la misma tabla de envíos que el V10",
+      noHeredar: ["ENVIO_REAL_2", "FLETE_2_OBSERVADO", "PROMO_2_TOTAL", "RECARGO_UNIDAD_EXTRA"],
+      revisarCuando: "haya las primeras guías despachadas de este producto",
+    },
+
+    // La publicidad empuja el combo, igual que en el V10.
+    ofertaPrincipal: { unidades: 2, precio: 129900, nombre: "combo x2" },
+
+    // 🎯 Ids de anuncio de Meta de ESTE producto. Ver `productoDelAnuncio`.
+    // Se configuran en Render, no en el código: los anuncios los crea el dueño y
+    // cambian con cada campaña.
+    anunciosEnv: "ANUNCIOS_Q58",
+    // 📸 Prefijo de sus fotos. ⚠️ TODAVÍA NO HAY ARCHIVOS q58*: por eso el bot
+    // no manda ninguna foto en estas conversaciones, en vez de mandar las del
+    // V10 —que es otro producto— o las del impermeable.
+    mediaPrefijo: "q58",
+    // 📨 Su propia plantilla. Si no está configurada, el seguimiento de las 24h
+    // se SALTA en vez de mandarle la de otro producto.
+    seguimientoPlantillaEnv: "SEGUIMIENTO_PLANTILLA_Q58",
+
+    // ✅ Lo que el producto hace. Las cuatro primeras son las del V10; las otras
+    // cuatro son lo que el Q58 tiene DE MÁS, y son el argumento de los $30.000
+    // de diferencia en el combo.
+    funciones: [
+      "comunicación de casco a casco",
+      "música",
+      "indicaciones del GPS",
+      "llamadas",
+      "radio FM",
+      "música por memoria micro SD, sin depender del celular",
+      "pantalla",
+      "luz LED",
+    ],
+
+    // ------------------------------------------------------------------------
+    // ✅ FICHA DEL Q58 MAX
+    //
+    // 🔑 DE DÓNDE SALE CADA COSA, porque acá la regla del repo es estricta: el
+    // bot solo afirma lo confirmado.
+    //
+    //   · GARANTÍA (1 mes) y ALCANCE (500 m): los confirmó el dueño el 15-oct.
+    //   · Lo demás (Bluetooth 5.3, batería 1.000 mAh / ~25 h / carga ~2 h
+    //     Type-C, CVC + doble DSP, 6 ecualizadores, radio FM, micro SD, pantalla
+    //     LCD, luz LED, compartir música, modo dual) coincide en fuentes
+    //     INDEPENDIENTES entre sí: el fabricante (Extreme Freedom), Amazon
+    //     (Docooler Q58Max), Walmart (Uteam Max Q58) y AliExpress.
+    //
+    // ⚠️ TODO LLEVA "APROXIMADAMENTE", igual que en el V10 y por el mismo pedido
+    // del dueño: un alcance o una autonomía dependen del uso. Prometerlos como
+    // garantía es lo que vuelve como rechazo en la puerta.
+    // ------------------------------------------------------------------------
+    datosConfirmados: {
+      garantia: {
+        pregunta: ["garantia", "garantía", "garantizado", "garantizan"],
+        respuesta:
+          "Sí 👍 Tu Q58 Max tiene 1 mes de garantía por defectos de funcionamiento. " +
+          "Si te presenta algún inconveniente en ese tiempo, nos escribís y revisamos el caso.",
+      },
+      agua: {
+        // ========================================================================
+        // 🔴 ACÁ NO VA NINGÚN NÚMERO DE CERTIFICACIÓN, Y ES UNA DECISIÓN
+        //
+        // El dueño pidió buscar la certificación en internet. Se buscó, y las
+        // fuentes SE CONTRADICEN:
+        //    IPX6 -> Walmart (Uteam Max Q58), Tecnología Juli, Baratico
+        //    IP65 -> Agaval, Megahobbies, Expresscompra
+        //
+        // Las dos significan lo mismo en la práctica —aguanta chorros y lluvia,
+        // no inmersión— pero son números distintos, y el bot no puede afirmar
+        // uno cuando la mitad del mercado dice el otro. En el V10 SÍ se dice
+        // IPX6 porque el dueño lo confirmó; acá nadie lo confirmó.
+        //
+        // Así que se responde lo FUNCIONAL, que es lo que el motociclista
+        // pregunta de verdad ("¿se moja?"), sin inventar un número de laboratorio.
+        //
+        // 🔑 Y las palabras "ip65", "ipx6", "certificacion" SÍ están en la lista
+        // de preguntas: si alguien pregunta por la certificación, contesta esto
+        // —honesto y útil— en vez de dejar que el modelo rellene el hueco con un
+        // número. Cuando el proveedor confirme cuál es, se agrega acá.
+        // ========================================================================
+        pregunta: [
+          "resistent", "resiste el agua", "se moja", "moja", "mojar",
+          "lluvia", "llueve", "impermeable?", "impermeables?",
+          "ipx", "ip6", "ip65", "ip67", "ip68", "certificacion", "certificación",
+        ],
+        respuesta:
+          "Sí 👍 Está diseñado para resistir lluvia y salpicaduras en tus recorridos 🌧️🏍️ " +
+          "Lo que no recomendamos es sumergirlo en agua.",
+      },
+      alcance: {
+        pregunta: ["alcance", "metros", "distancia", "rango", "que tan lejos", "qué tan lejos"],
+        respuesta:
+          "El intercom de casco a casco alcanza aproximadamente hasta 500 metros en " +
+          "condiciones favorables 🏍️↔️🏍️ La distancia puede variar por obstáculos, " +
+          "edificios o interferencias.",
+      },
+      bateria: {
+        pregunta: [
+          "bateria", "batería", "autonomia", "autonomía", "mah",
+          "cuanto dura", "cuánto dura", "cuantas horas", "cuántas horas", "horas dura",
+          "carga", "cargar", "cuanto se demora en cargar", "type-c", "type c",
+        ],
+        respuesta:
+          "Tiene batería recargable de aproximadamente 1.000 mAh 🔋, con una autonomía de " +
+          "referencia de alrededor de 25 horas de uso según cómo lo uses. Se carga por USB " +
+          "Type-C y una carga completa toma unas 2 horas.",
+      },
+      bluetooth: {
+        pregunta: ["bluetooth", "conectividad", "version", "versión"],
+        respuesta:
+          "Se conecta por Bluetooth 5.3 📱 Sirve para llamadas, música y las indicaciones " +
+          "del GPS.",
+      },
+      celular: {
+        // ⚠️ PENDIENTE DE VERIFICAR CON UN iPHONE (15-oct). Un vendedor colombiano
+        // (smartjoys.co) dice que el comportamiento cambia según el sistema
+        // operativo y que en Android las llamadas entran sin problema —lo que
+        // sugiere algún límite en iPhone—. NO se pudo confirmar el detalle, y
+        // ninguna otra fuente (fabricante, Amazon, Walmart) lo menciona.
+        //
+        // Esta respuesta dice lo que afirman el fabricante y todas las demás
+        // fuentes. Si la prueba del dueño con un iPhone muestra una limitación,
+        // ESTA es la línea que hay que cambiar, y hay que cambiarla antes que
+        // nada: prometer que las llamadas funcionan y que no funcionen es una
+        // devolución con motivo.
+        pregunta: ["android", "iphone", "ios", "celular", "telefono", "teléfono", "compatible con mi"],
+        respuesta:
+          "Sí 👍 Se conecta por Bluetooth 5.3 al celular y funciona con Android y iPhone. " +
+          "Lo podés usar para llamadas, música e indicaciones del GPS.",
+      },
+      cascos: {
+        pregunta: ["casco abierto", "integral", "modular", "abatible", "cross", "jet", "tipo de casco", "sirve para mi casco", "que cascos"],
+        respuesta:
+          "Sí 👍 Se puede instalar en casco abierto, y también en integral, modular, cross " +
+          "y tipo jet. Lo importante es ubicar bien los parlantes y el micrófono para que " +
+          "quede cómodo y se escuche bien.",
+      },
+      instalacion: {
+        pregunta: ["instala", "instalación", "instalacion", "se pone", "se monta", "difícil de poner", "dificil de poner"],
+        respuesta:
+          "Sí 👍 Es fácil de instalar. La unidad se fija al casco y los parlantes y el " +
+          "micrófono van por dentro. No hay que hacerle modificaciones al casco.",
+      },
+      emparejar: {
+        pregunta: ["empareja", "emparejar", "vincular", "conectar entre", "hablar entre", "casco a casco", "entre los dos"],
+        respuesta:
+          "Sí 👍 Los dos Q58 Max se emparejan entre sí para hablar de casco a casco. Una vez " +
+          "vinculados, el piloto y el acompañante —o dos motociclistas— se comunican en ruta.",
+      },
+      ruido: {
+        pregunta: ["ruido", "se escucha bien", "viento", "cancelacion", "cancelación"],
+        respuesta:
+          "Tiene cancelación de ruido CVC y doble procesador de audio, así que la voz se " +
+          "escucha clara mientras vas andando 🎧",
+      },
+      // ----------------------------------------------------------------------
+      // 👇 LO QUE EL Q58 TIENE Y EL V10 NO. Es el argumento del precio.
+      // ----------------------------------------------------------------------
+      radio: {
+        pregunta: ["radio", "fm", "emisora", "emisoras", "dial"],
+        respuesta:
+          "Sí 👍 Trae radio FM incorporada 📻 Podés escuchar tus emisoras sin usar el celular.",
+      },
+      memoria: {
+        pregunta: ["memoria", "micro sd", "microsd", "sd", "usb", "mp3", "sin celular", "sin internet", "sin datos"],
+        respuesta:
+          "Sí 👍 Tiene entrada para memoria micro SD, así que podés llevar tu música dentro " +
+          "del equipo y escucharla sin depender del celular 🎵 (la memoria no viene incluida).",
+      },
+      pantalla: {
+        pregunta: ["pantalla", "display", "visor", "se ve", "digital"],
+        respuesta:
+          "Sí 👍 Tiene pantalla, así que ves el estado del equipo, el volumen y la emisora " +
+          "sin tener que adivinar 📺",
+      },
+      luz: {
+        pregunta: ["luz", "led", "linterna", "ilumina", "de noche"],
+        respuesta: "Sí 👍 Trae una luz LED integrada, útil de noche y para que te vean 💡",
+      },
+      compartirMusica: {
+        pregunta: ["compartir musica", "compartir música", "misma musica", "misma música", "escuchar lo mismo"],
+        respuesta:
+          "Sí 👍 Los dos equipos pueden compartir la música, así que el piloto y el " +
+          "acompañante escuchan lo mismo 🎶",
+      },
+      especificaciones: {
+        pregunta: ["especificacion", "especificación", "caracteristica", "característica", "ficha tecnica", "ficha técnica", "que trae", "qué trae", "como funciona", "cómo funciona"],
+        respuesta:
+          "Claro 👍 El Q58 Max tiene Bluetooth 5.3, comunicación casco a casco entre 2 " +
+          "usuarios con alcance aproximado de hasta 500 metros, batería de unos 1.000 mAh " +
+          "con cerca de 25 horas de uso, cancelación de ruido CVC y carga Type-C.\n\n" +
+          "Además trae radio FM 📻, entrada para memoria micro SD para llevar tu música sin " +
+          "celular 🎵, pantalla y luz LED 💡 Lo usás también para llamadas 📞 e indicaciones " +
+          "del GPS 📍, y es resistente a la lluvia.",
+      },
+    },
+
+    // ⛔ LO QUE NO SE INVENTA. Misma línea que el V10 y por la misma razón: una
+    // especificación inventada de un aparato electrónico es una devolución con
+    // motivo.
+    //
+    // 🔑 Acá se suma algo que el V10 no tiene: el NÚMERO de certificación. Como
+    // las fuentes se contradicen (IPX6 vs IP65), si alguien insiste en que le
+    // confirmen la certificación exacta, se escala en vez de elegir una.
+    sinDatoConfirmado: [
+      "sumergible", "sumergir", "sumerge", "inmersion", "inmersión",
+      "meter al agua", "meterlo al agua", "meter en agua", "meterlo en agua",
+      "bajo el agua", "dentro del agua", "hundir", "hundirlo",
+      "lavar", "lavarlo", "piscina", "nadar", "al rio", "al río", "al mar",
+      "cuantos dispositivos", "cuántos dispositivos", "cuantos aparatos",
+      "cuántos aparatos", "cuantos se conectan", "cuántos se conectan",
+      "watts", "vatios", "potencia del parlante",
+      "que marca", "qué marca", "homologado", "certificado por",
+    ],
+
+    envioIncluido: false,
+    contraentrega: true,
+  },
 };
 
 /** El producto que se asume cuando no hay ninguna señal. */
@@ -416,6 +704,43 @@ const PRODUCTO_POR_DEFECTO =
 
 const de = (id) => PRODUCTOS[id] || null;
 const esV10 = (id) => id === "intercom_v10_2x";
+
+// ============================================================================
+// 🔑 PREGUNTAR POR CAPACIDAD, NO POR NOMBRE — 15-oct
+//
+// 🔴 POR QUÉ EXISTEN ESTAS DOS FUNCIONES. Hasta hoy había 10 lugares en el
+// código que preguntaban `esV10(id)` para decidir cosas que NO tienen nada que
+// ver con el V10 en particular:
+//
+//     ¿qué guion uso?            ¿cuántas unidades pidió?
+//     ¿qué bloque de precio?     ¿qué fotos mando?
+//     ¿qué plantilla de seguimiento?
+//
+// Todas esas preguntas son en realidad *"¿este producto es del tipo simple
+// precio+envío, o es el impermeable con tallas y colores?"*. Mientras hubo un
+// solo intercomunicador, preguntar por el nombre daba la misma respuesta. Con
+// el Q58 Max adentro, el Q58 contestaba "no soy V10" y heredaba TODO lo del
+// impermeable: el guion con tallas, el bloque con $59.900, la foto del conjunto
+// y la plantilla de seguimiento de impermeables.
+//
+// Se deja `esV10` exportado porque lo usan pruebas que comprueban cosas
+// específicas del V10, pero ya no decide nada.
+// ============================================================================
+
+/**
+ * ¿Este producto se cotiza como "precio de tabla + envío del destino"?
+ * Es lo contrario del impermeable, cuyo total sale fusionado del tarifario.
+ */
+const esProductoSimple = (id) => {
+  const f = PRODUCTOS[id];
+  return Boolean(f && f.motorDePrecio === "producto_mas_envio");
+};
+
+/** ¿Es un intercomunicador? (hoy el V10 2X y el Q58 Max) */
+const esIntercom = (id) => {
+  const f = PRODUCTOS[id];
+  return Boolean(f && f.categoria === "intercomunicador");
+};
 
 // ============================================================================
 // 🔍 DETECTAR DE QUÉ PRODUCTO HABLA EL CLIENTE
@@ -450,8 +775,50 @@ function aplanar(s) {
 // resuelve `unidadesPedidas()` más abajo, que es lo correcto — ahí "combo" habla
 // de cantidad, no de producto.
 // ----------------------------------------------------------------------------
-const SENALES_V10 = [
-  // Alta confianza: nombran el producto y no se parecen a nada más del catálogo.
+// ============================================================================
+// 🏷️ SEÑALES DE MODELO vs SEÑALES DE CATEGORÍA — 15-oct
+//
+// 🔴 EL PROBLEMA QUE RESUELVE ESTA SEPARACIÓN. Hasta el 15-oct había UN solo
+// intercomunicador, así que la palabra "intercomunicador" alcanzaba para saber
+// qué vender. Con el Q58 Max entrando al catálogo, esa palabra ya NO identifica
+// el producto: identifica la categoría. Y si se dejara como estaba, TODO el
+// tráfico del anuncio del Q58 se habría vendido como V10.
+//
+// El caso concreto: el texto prellenado de un anuncio de Meta es algo como
+// "Hola, quiero más información de la promoción de intercomunicadores". Con la
+// lógica anterior eso detectaba V10 con confianza ALTA, lo congelaba para toda
+// la conversación con `fijarProductoActivo`, y cotizaba $99.900 en vez de
+// $129.900 — además de mandar a despachar el producto equivocado.
+//
+// 🔑 LA SEPARACIÓN:
+//
+//   SENALES_DE_MODELO     -> nombran el modelo ("V10", "Q58"). Deciden solas.
+//   SENALES_DE_CATEGORIA  -> dicen la categoría ("intercomunicador", "casco a
+//                            casco"). NO deciden solas: las resuelve
+//                            `productoDelHilo` mirando el producto activo, el
+//                            anuncio y, en último lugar, el default de categoría.
+//
+// ⚠️ Y EL DEFAULT DE CATEGORÍA ES EL V10 A PROPÓSITO. Es el producto que ya
+// estaba, así que cualquier conversación que antes terminaba en V10 sigue
+// terminando en V10. Cero regresión: lo nuevo solo agrega caminos.
+// ============================================================================
+
+/** Señales que nombran un MODELO concreto. Deciden el producto por sí solas. */
+const SENALES_DE_MODELO = [
+  { producto: "intercom_v10_2x", re: /\bv\s*-?\s*10\b/, confianza: "alta", senal: "dijo V10" },
+  { producto: "intercom_v10_2x", re: /\bv10\b/, confianza: "alta", senal: "dijo V10" },
+  // 🎧 Q58 Max. Las formas que escribe la gente: "q58", "q 58", "q-58", "q58 max".
+  // ⚠️ El `\b` del final NO va pegado al 58 en la primera: "q58max" junto es una
+  // escritura real y con `\b58\b` no pegaba.
+  { producto: "intercom_q58_max", re: /\bq\s*-?\s*58/, confianza: "alta", senal: "dijo Q58" },
+  { producto: "intercom_q58_max", re: /\bq\s*-?\s*58\s*-?\s*max\b/, confianza: "alta", senal: "dijo Q58 Max" },
+];
+
+/**
+ * Señales de la CATEGORÍA intercomunicador. Dicen de qué tipo de producto se
+ * habla, pero no de cuál de los dos.
+ */
+const SENALES_DE_CATEGORIA = [
   // 🔑 `interc[ou]` y no `interco`: el typo real que escribió un cliente el 29-sep
   // fue "intercumunicadores", con U. Con la raíz anterior no se detectaba y la frase
   // "Necesito son los intercumunicadores" terminó tomada como su ciudad de envío.
@@ -459,17 +826,30 @@ const SENALES_V10 = [
   // ⚠️ Y la clase de caracteres está cerrada a [ou] a propósito, no abierta: así
   // quedan afuera las palabras del español que empiezan igual y no tienen nada que
   // ver — "intercambio" (interca), "intercalar" (interca), "intercesión" (interce).
-  { re: /\binterc[ou]/, confianza: "alta", senal: "dijo intercomunicador" },
-  { re: /\bv\s*-?\s*10\b/, confianza: "alta", senal: "dijo V10" },
-  { re: /\bv10\b/, confianza: "alta", senal: "dijo V10" },
-  // "de casco a casco" es exactamente el beneficio del producto.
-  { re: /casco\s+a\s+casco/, confianza: "alta", senal: "habló de casco a casco" },
+  { categoria: "intercomunicador", re: /\binterc[ou]/, confianza: "alta", senal: "dijo intercomunicador" },
+  // "de casco a casco" es exactamente el beneficio de la categoría.
+  { categoria: "intercomunicador", re: /casco\s+a\s+casco/, confianza: "alta", senal: "habló de casco a casco" },
   // Cómo lo nombra la gente que no sabe el nombre técnico. El dueño dio estos
   // dos ejemplos literales: "los de los cascos", "los aparatos para hablar en moto".
-  { re: /\b(?:los|las|el|la)\s+(?:de\s+los|para\s+(?:el|los)|de)\s+cascos?\b/, confianza: "media", senal: "los de los cascos" },
-  { re: /\bhablar\b[^.]{0,20}\b(?:en|desde|por)\s+(?:la\s+)?mot/, confianza: "media", senal: "hablar en moto" },
-  { re: /\bcomunicar\w*\b[^.]{0,25}\bcasco/, confianza: "media", senal: "comunicarse con casco" },
-  { re: /\bdiadema\w*\b[^.]{0,15}\bcasco/, confianza: "media", senal: "diadema para casco" },
+  { categoria: "intercomunicador", re: /\b(?:los|las|el|la)\s+(?:de\s+los|para\s+(?:el|los)|de)\s+cascos?\b/, confianza: "media", senal: "los de los cascos" },
+  { categoria: "intercomunicador", re: /\bhablar\b[^.]{0,20}\b(?:en|desde|por)\s+(?:la\s+)?mot/, confianza: "media", senal: "hablar en moto" },
+  { categoria: "intercomunicador", re: /\bcomunicar\w*\b[^.]{0,25}\bcasco/, confianza: "media", senal: "comunicarse con casco" },
+  { categoria: "intercomunicador", re: /\bdiadema\w*\b[^.]{0,15}\bcasco/, confianza: "media", senal: "diadema para casco" },
+];
+
+/** El producto que se asume para una categoría cuando no hay más señales. */
+function productoPorDefectoDe(categoria) {
+  const ficha = Object.values(PRODUCTOS).find(
+    (p) => p.categoria === categoria && p.porDefectoDeCategoria
+  );
+  return ficha ? ficha.id : null;
+}
+
+// ⚠️ Compatibilidad: `SENALES_V10` existía y lo usan pruebas viejas. Se reconstruye
+// con las dos listas para que siga significando "lo que suena a intercomunicador".
+const SENALES_V10 = [
+  ...SENALES_DE_CATEGORIA.filter((s) => s.categoria === "intercomunicador"),
+  ...SENALES_DE_MODELO.filter((s) => s.producto === "intercom_v10_2x"),
 ];
 
 // ----------------------------------------------------------------------------
@@ -549,9 +929,51 @@ function productoEn(texto) {
   const t = aplanar(texto);
   if (!t.trim()) return null;
 
-  for (const s of SENALES_V10) {
+  // ==========================================================================
+  // 1. ¿NOMBRÓ UN MODELO? Eso decide solo, y va PRIMERO.
+  //
+  // "quiero el Q58" no puede resolverse por categoría: el cliente ya dijo cuál.
+  // Por eso los modelos se miran antes que la categoría, aunque la frase traiga
+  // las dos cosas ("intercomunicador Q58 Max" las trae).
+  // ==========================================================================
+  for (const s of SENALES_DE_MODELO) {
     if (s.re.test(t)) {
-      return { producto: "intercom_v10_2x", confianza: s.confianza, senal: s.senal, adjetivo: false };
+      return {
+        producto: s.producto,
+        confianza: s.confianza,
+        senal: s.senal,
+        adjetivo: false,
+        categoria: (PRODUCTOS[s.producto] || {}).categoria || null,
+        // Dijo el modelo: no hay nada que resolver.
+        generico: false,
+      };
+    }
+  }
+
+  // ==========================================================================
+  // 2. ¿NOMBRÓ LA CATEGORÍA? Entonces NO se decide acá.
+  //
+  // 🔴 ESTE `generico: true` ES EL ARREGLO DEL 15-OCT. Se devuelve un producto
+  // —el default de la categoría— para no romper a ningún llamador que espere
+  // `.producto`, pero marcado como genérico para que `productoDelHilo` sepa que
+  // NO tiene que congelarlo ni pisarle el anuncio por el que entró el cliente.
+  //
+  // Sin esta marca, un lead del anuncio del Q58 que escribe "info de los
+  // intercomunicadores" se vendía como V10: $30.000 menos y el producto
+  // equivocado en la guía.
+  // ==========================================================================
+  for (const s of SENALES_DE_CATEGORIA) {
+    if (s.re.test(t)) {
+      const porDefecto = productoPorDefectoDe(s.categoria);
+      if (!porDefecto) continue;
+      return {
+        producto: porDefecto,
+        confianza: s.confianza,
+        senal: s.senal,
+        adjetivo: false,
+        categoria: s.categoria,
+        generico: true,
+      };
     }
   }
 
@@ -611,8 +1033,64 @@ function productoDelHilo(conv, userText, opciones = {}) {
   // queda en V10 (paso 2), y una conversación que no era de nada termina igual que
   // antes en el impermeable (paso 5). Cero regresión en el caso sin contexto.
   const ahora = productoEn(userText);
-  if (ahora && !ahora.adjetivo) {
+  // ⛔ Y SALVO cuando la señal es solo de CATEGORÍA (15-oct). "Intercomunicador"
+  // con dos intercomunicadores en catálogo no dice CUÁL, así que no puede
+  // decidir ni congelar nada: se deja seguir a los pasos de abajo, que saben
+  // mirar el producto activo y el anuncio por el que entró.
+  if (ahora && !ahora.adjetivo && !ahora.generico) {
     return { producto: ahora.producto, porQue: ahora.senal, explicito: true };
+  }
+
+  // ==========================================================================
+  // 1-BIS. DIJO LA CATEGORÍA, PERO NO EL MODELO.
+  //
+  // Se resuelve con lo que ya se sabe del cliente, en este orden:
+  //   a) el producto de la conversación, si es de ESA categoría
+  //   b) el anuncio por el que entró, si es de ESA categoría
+  //
+  // 🔑 El filtro por categoría importa: si el hilo venía de impermeables y el
+  // cliente ahora pregunta por intercomunicadores, el productoActivo
+  // (impermeable) NO puede resolver una pregunta de intercomunicadores. En ese
+  // caso cae al default de la categoría, que es lo correcto.
+  //
+  // Si no hay ninguna de las dos, sigue hacia abajo y termina en el default de
+  // categoría que ya trae `ahora.producto`.
+  // ==========================================================================
+  if (ahora && ahora.generico && ahora.categoria) {
+    const activo = conv && conv.productoActivo && PRODUCTOS[conv.productoActivo];
+    if (activo && activo.categoria === ahora.categoria) {
+      return {
+        producto: activo.id,
+        porQue: `es el ${activo.nombreCorto} de esta conversación`,
+        explicito: false,
+      };
+    }
+    const delAnuncio = opciones.producto && PRODUCTOS[opciones.producto];
+    if (delAnuncio && delAnuncio.categoria === ahora.categoria) {
+      return {
+        producto: delAnuncio.id,
+        porQue: `el anuncio por el que entró era de ${delAnuncio.nombreCorto}`,
+        explicito: false,
+      };
+    }
+    // ========================================================================
+    // c) NI PRODUCTO ACTIVO NI ANUNCIO: el default de la categoría.
+    //
+    // 🔴 ESTE RETURN EVITA UNA REGRESIÓN QUE INTRODUJE Y QUE CAZÓ LA PRUEBA.
+    // Sin él, "info de los intercomunicadores" sin anuncio ni historial se caía
+    // hasta el paso 5 y terminaba en el IMPERMEABLE — cuando antes del cambio
+    // devolvía V10. O sea que arreglando el Q58 habría roto el V10.
+    //
+    // Y va con `explicito: true` a propósito, igual que antes: así el producto
+    // queda fijado en la conversación y no se va al impermeable tres mensajes
+    // después. Si el cliente nombra un modelo, la señal de modelo le gana a esto
+    // y cambia sin problema.
+    // ========================================================================
+    return {
+      producto: ahora.producto,
+      porQue: `${ahora.senal} (sin anuncio: se asume ${(PRODUCTOS[ahora.producto] || {}).nombreCorto})`,
+      explicito: true,
+    };
   }
 
   // ==========================================================================
@@ -681,16 +1159,68 @@ function productoDelHilo(conv, userText, opciones = {}) {
  * cada campaña nueva. Si no está configurado, esto devuelve null y la detección
  * se apoya en lo que escriba el cliente, que es la señal fuerte de todos modos.
  */
+/**
+ * Los ids de anuncio configurados para un producto, leyendo su variable de
+ * entorno. Acepta separados por coma, espacio o salto de línea.
+ */
+function idsDeAnuncioDe(productoId) {
+  const ficha = PRODUCTOS[productoId];
+  if (!ficha || !ficha.anunciosEnv) return [];
+  return String(process.env[ficha.anunciosEnv] || "")
+    .split(/[\s,]+/)
+    .filter(Boolean);
+}
+
+/**
+ * 🎯 EL MAPA DE ANUNCIOS → PRODUCTO, para revisarlo sin desplegar.
+ *
+ * DE DÓNDE SALE (15-oct), pedido del dueño: *"crea un sistema para poder
+ * diferenciar los anuncios que van a llegar por su ID de anuncio, de modo que el
+ * bot sepa si el lead viene del anuncio del V10 o del Q58 Max"*.
+ *
+ * 🔑 Un enrutamiento que no se puede verificar no sirve: si el dueño pega un id
+ * con un espacio de más o se le queda viejo, se entera vendiendo el producto
+ * equivocado. Esto lo expone en `/health?token=...` para poder mirarlo.
+ *
+ * @returns {Array<{producto:string, nombreCorto:string, variable:string, ids:string[], configurado:boolean}>}
+ */
+function anunciosConfigurados() {
+  return Object.values(PRODUCTOS)
+    .filter((p) => p.anunciosEnv)
+    .map((p) => {
+      const ids = idsDeAnuncioDe(p.id);
+      return {
+        producto: p.id,
+        nombreCorto: p.nombreCorto,
+        variable: p.anunciosEnv,
+        ids,
+        configurado: ids.length > 0,
+      };
+    });
+}
+
 function productoDelAnuncio(atribucion) {
   if (!atribucion) return null;
 
-  // 1. La lista de ids configurada a mano. Es la señal más fuerte cuando existe,
-  //    porque la puso una persona mirando la campaña.
-  const ids = String(process.env.ANUNCIOS_V10 || "")
-    .split(/[\s,]+/)
-    .filter(Boolean);
+  // ==========================================================================
+  // 1. LA LISTA DE IDS POR PRODUCTO. La señal más fuerte que existe.
+  //
+  // 🔴 ERA EL ÚNICO ARREGLO POSIBLE PARA EL RIESGO DEL Q58 (15-oct). Con dos
+  // intercomunicadores, el TEXTO del anuncio no alcanza: los dos anuncios dicen
+  // "intercomunicador", así que el paso 2 resolvería los dos al mismo producto.
+  // El id del anuncio es el único dato que los separa sin ambigüedad.
+  //
+  // Antes esto leía una sola variable (`ANUNCIOS_V10`) y devolvía el V10
+  // hardcodeado. Ahora cada producto declara la suya en su ficha
+  // (`anunciosEnv`), así que agregar un producto no toca esta función.
+  // ==========================================================================
   const id = String(atribucion.source_id || atribucion.anuncio_id || "");
-  if (id && ids.includes(id)) return "intercom_v10_2x";
+  if (id) {
+    for (const ficha of Object.values(PRODUCTOS)) {
+      if (!ficha.anunciosEnv) continue;
+      if (idsDeAnuncioDe(ficha.id).includes(id)) return ficha.id;
+    }
+  }
 
   // 2. El TÍTULO y el TEXTO del anuncio, que Meta manda en el referral.
   //
@@ -705,7 +1235,37 @@ function productoDelAnuncio(atribucion) {
     .filter(Boolean)
     .join(" ");
   const hallado = texto ? productoEn(texto) : null;
-  return hallado ? hallado.producto : null;
+  if (!hallado) return null;
+
+  // ==========================================================================
+  // 🔴 EL CASO QUE NO PUEDE PASAR EN SILENCIO (15-oct)
+  //
+  // Si el texto del anuncio solo dice la CATEGORÍA ("intercomunicadores") y hay
+  // DOS productos en ella, este camino resuelve al default —el V10— sin forma de
+  // saber si el anuncio era del Q58. Es exactamente la fuga de $30.000 por venta
+  // que motivó todo este bloque.
+  //
+  // No se puede "adivinar mejor": el dato que falta es el id en la variable de
+  // entorno. Lo que sí se puede es NO FALLAR CALLADO, para que el dueño lo vea
+  // en el log el primer día en vez de descubrirlo en un pedido mal despachado.
+  // ==========================================================================
+  if (hallado.generico && hallado.categoria) {
+    const enLaCategoria = Object.values(PRODUCTOS).filter((p) => p.categoria === hallado.categoria);
+    if (enLaCategoria.length > 1) {
+      const variables = enLaCategoria
+        .filter((p) => p.anunciosEnv)
+        .map((p) => `${p.anunciosEnv} (${p.nombreCorto})`)
+        .join(" · ");
+      console.warn(
+        `⚠️ ANUNCIO SIN MAPEAR: el anuncio ${id || "(sin id)"} habla de ` +
+          `${hallado.categoria} pero su id no está en ninguna variable, así que se asumió ` +
+          `${(PRODUCTOS[hallado.producto] || {}).nombreCorto || hallado.producto}. ` +
+          `Si ese anuncio es del otro producto, se está cotizando el precio equivocado. ` +
+          `Agregá el id a la variable que corresponda: ${variables}`
+      );
+    }
+  }
+  return hallado.producto;
 }
 
 // ============================================================================
@@ -854,6 +1414,14 @@ function precioDe(productoId, uds) {
 }
 
 module.exports = {
+  // 🎯 Enrutamiento de anuncios por producto (15-oct, para el Q58 Max).
+  esProductoSimple,
+  esIntercom,
+  anunciosConfigurados,
+  idsDeAnuncioDe,
+  productoPorDefectoDe,
+  SENALES_DE_MODELO,
+  SENALES_DE_CATEGORIA,
   PRODUCTOS,
   PRODUCTO_POR_DEFECTO,
   POLITICAS_DE_ENVIO,

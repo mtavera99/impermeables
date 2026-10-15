@@ -310,21 +310,30 @@ function detectMediaIntent(text, productoId) {
   // ⚠️ Lo que devuelve pasa después por `media.soloDisponibles`, así que mientras
   // no estén los archivos no se manda nada — en vez de mandar lo de otro producto.
   // ==========================================================================
-  if (catalogo.esV10(productoId)) {
+  // 🔑 Por capacidad, y con las claves del PREFIJO del producto. Si acá se
+  // dejara `esV10`, el Q58 caía a las fotos del impermeable; y si se usaran las
+  // claves "v10_*" para todos, un cliente del Q58 recibiría la foto del V10.
+  // El Q58 todavía no tiene archivos, así que `soloDisponibles` no manda nada.
+  if (catalogo.esProductoSimple(productoId)) {
+    const pref = (catalogo.de(productoId) || {}).mediaPrefijo || "v10";
     const delV10 = [];
     // Lo específico primero.
     if (has(["puesto", "puesta", "en el casco", "montado", "instalado", "como se ve", "cómo se ve", "se ve"])) {
-      delV10.push("v10_puesto");
+      delV10.push(pref + "_puesto");
     }
-    if (has(["combo", "los dos", "las dos", "ambos", "pareja", "x2"])) delV10.push("v10_combo");
-    if (has(["incluye", "trae", "contenido", "viene con", "que viene", "adentro"])) delV10.push("v10_contenido");
+    if (has(["combo", "los dos", "las dos", "ambos", "pareja", "x2"])) delV10.push(pref + "_combo");
+    if (has(["incluye", "trae", "contenido", "viene con", "que viene", "adentro"])) delV10.push(pref + "_contenido");
     // La caja cerrada responde "¿qué modelo es?" y "¿es original?", que son las dos
     // preguntas donde ver el empaque con el nombre impreso vale más que un texto.
-    if (has(["caja", "empaque", "modelo", "original", "marca", "presentacion", "presentación"])) delV10.push("v10_caja");
+    if (has(["caja", "empaque", "modelo", "original", "marca", "presentacion", "presentación"])) delV10.push(pref + "_caja");
+    // 📺 La pantalla es una de las diferencias del Q58 contra el V10, así que
+    // "¿tiene pantalla?" se contesta mejor mostrándola. En el V10 esta clave no
+    // existe, así que `soloDisponibles` la filtra y no pasa nada.
+    if (has(["pantalla", "display", "visor", "digital"])) delV10.push(pref + "_pantalla");
     // Y si pidió ver algo sin decir qué, la foto principal del producto.
-    if (quiereVer && delV10.length === 0) delV10.push("v10");
+    if (quiereVer && delV10.length === 0) delV10.push(pref);
     // Si nombró el producto y quiere verlo, también la principal.
-    if (quiereVer && has(["interco", "v10"]) && !delV10.includes("v10")) delV10.push("v10");
+    if (quiereVer && has(["interco", "v10"]) && !delV10.includes(pref)) delV10.push(pref);
     if (t.includes("video")) delV10.push("video");
     // 🔑 UNA SOLA FOTO POR MENSAJE. El dueño fue explícito con el tono: "no
     // bombardear con características", "mensajes relativamente cortos". Tres fotos
@@ -387,7 +396,9 @@ function detectMediaIntent(text, productoId) {
 // cantidad que se perdía al mensaje siguiente— ya se pagó una vez en impermeables.
 // ============================================================================
 function cantidadDelProducto(productoId, conv, userText, previa) {
-  if (!catalogo.esV10(productoId)) {
+  // Por capacidad: el Q58 contaba unidades con la lógica del impermeable —que
+  // lee tallas— y perdía el default de "combo de 2".
+  if (!catalogo.esProductoSimple(productoId)) {
     return cotizacion.cantidadDelHilo(conv, userText, previa && previa.uds);
   }
 
@@ -474,7 +485,10 @@ async function generateReply(phone, userText) {
   const eleccion = catalogo.productoDelHilo(conv, userText, { producto: delAnuncio });
   const productoId = eleccion.producto;
   const ficha = catalogo.de(productoId);
-  if (catalogo.esV10(productoId)) {
+  // Por categoría: el log tiene que servir igual para el Q58. Con `esV10` las
+  // conversaciones del Q58 no dejaban rastro de qué producto se eligió, que es
+  // justo lo que hay que poder auditar cuando hay dos productos parecidos.
+  if (catalogo.esIntercom(productoId)) {
     console.log(`🎧 ${phone}: la conversación es del ${ficha.nombreCorto} (${eleccion.porQue}).`);
   }
   // 🔒 Se FIJA el producto cuando la señal es fuerte: lo dijo el cliente en este

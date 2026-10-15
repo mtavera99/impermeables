@@ -160,7 +160,10 @@ function bodegaInfo() {
  * @param {string} [productoId] del catálogo. Si no se pasa, impermeable.
  */
 function buildSystemPrompt(productoId) {
-  if (catalogo.esV10(productoId)) return promptV10();
+  // 🔑 Por CAPACIDAD, no por nombre: cualquier producto que se cotice
+  // "precio + envío" usa este guion. Así el Q58 Max no hereda el del
+  // impermeable (tallas, colores, $59.900). Ver esProductoSimple en catalogo.js.
+  if (catalogo.esProductoSimple(productoId)) return promptV10(catalogo.de(productoId));
   return promptImpermeable();
 }
 
@@ -684,9 +687,15 @@ Si el cliente está muy molesto, pide un asesor, o pregunta algo que no puedes r
 // en `docs/img/`. En el momento en que el dueño suba las fotos, este texto cambia
 // solo, sin tocar código ni desplegar.
 // ----------------------------------------------------------------------------
-function seccionDeFotosV10() {
+function seccionDeFotosV10(ficha) {
   const media = require("./media");
-  const hay = ["v10", "v10_puesto", "v10_combo", "v10_contenido"].filter((k) => media.disponible(k));
+  // Las claves salen del PREFIJO del producto, no escritas a mano: un producto
+  // sin fotos cargadas (como el Q58 al arrancar) cae solo en la rama de abajo
+  // y el guion le prohíbe prometer fotos.
+  const pref = (ficha && ficha.mediaPrefijo) || "v10";
+  const hay = [pref, pref + "_puesto", pref + "_combo", pref + "_contenido"].filter((k) =>
+    media.disponible(k)
+  );
 
   if (!hay.length) {
     return (
@@ -701,10 +710,10 @@ function seccionDeFotosV10() {
   }
 
   const marcadores = {
-    v10: "el intercomunicador → [[MEDIA:v10]]",
-    v10_puesto: "cómo se ve puesto en el casco → [[MEDIA:v10_puesto]]",
-    v10_combo: "el combo de dos → [[MEDIA:v10_combo]]",
-    v10_contenido: "qué viene en la caja → [[MEDIA:v10_contenido]]",
+    [pref]: `el intercomunicador → [[MEDIA:${pref}]]`,
+    [pref + "_puesto"]: `cómo se ve puesto en el casco → [[MEDIA:${pref}_puesto]]`,
+    [pref + "_combo"]: `el combo de dos → [[MEDIA:${pref}_combo]]`,
+    [pref + "_contenido"]: `qué viene en la caja → [[MEDIA:${pref}_contenido]]`,
   };
   return (
     `Si piden ver el producto, agregá el marcador que corresponda al final del mensaje:\n` +
@@ -714,8 +723,12 @@ function seccionDeFotosV10() {
   );
 }
 
-function promptV10() {
-  const v10 = catalogo.de("intercom_v10_2x");
+// 🔑 `ficha` entra por parámetro desde el 15-oct: el mismo guion sirve para el
+// V10 2X y para el Q58 Max, porque todo lo que dice sale de la ficha (nombre,
+// funciones, datos confirmados y precios). Sin parámetro sigue siendo el V10,
+// así que las pruebas y los llamadores viejos no cambian.
+function promptV10(ficha) {
+  const v10 = ficha || catalogo.de("intercom_v10_2x");
   return `Sos el asesor de ventas de BikerPro por WhatsApp. Colombiano, cálido y directo.
 Hablás como un buen vendedor humano: mensajes cortos, sin sonar a robot, sin explicaciones
 innecesarias. Emojis con moderación (1 o 2 por mensaje). Tratá al cliente de "vos" o "tú"
@@ -795,7 +808,7 @@ No insistas más de una vez.
    y preguntá **la ciudad**. Nada más: no bombardees con características.
 2. Con la ciudad, das el total del bloque \`## PRECIO\` y hacés el microcierre de abajo.
 3. Los datos que necesitás para despachar: **nombre completo, celular (10 dígitos), ciudad,
-   dirección**. El V10 **no tiene talla ni color**: no preguntes eso.
+   dirección**. El ${v10.nombreCorto} **no tiene talla ni color**: no preguntes eso.
 4. ⛔ **No vuelvas a preguntar algo que el cliente ya te dijo.** Releé la conversación antes.
 
 ## 🛑 UNA PREGUNTA NO ES UNA SEÑAL DE COMPRA — NO CIERRES DESPUÉS DE CADA UNA
@@ -865,7 +878,7 @@ mensaje de cierre, agregá como ÚLTIMA línea EXACTAMENTE este bloque:
 - NO generes el bloque antes de que confirme, y no lo menciones al cliente.
 
 ## 📸 FOTOS
-${seccionDeFotosV10()}
+${seccionDeFotosV10(v10)}
 
 ## PASAR A UN HUMANO
 Si el cliente está muy molesto, pide un asesor, insiste en un descuento, quiere al por mayor, o
