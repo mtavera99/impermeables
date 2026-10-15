@@ -126,14 +126,56 @@ function buscarChats({ q, conversaciones }) {
   return salida.sort((a, b) => b.cuando - a.cuando).slice(0, 20);
 }
 
-function burbuja(m) {
+// ============================================================================
+// 📷 EL BOTÓN PARA VER LA FOTO QUE MANDÓ EL CLIENTE — 15-oct
+//
+// DE DÓNDE SALE, textual: *"cuando una persona manda una foto normalmente dice
+// 'envío una foto' pero yo no la puedo ver... poner un botón para que cuando yo
+// necesite ver esa imagen la pueda ver sin necesidad de que carguen todas...
+// porque puede que sea un comprobante, puede que sea algún dato importante"*.
+//
+// 🔑 LA IMAGEN NO SE CARGA HASTA QUE SE TOCA EL BOTÓN, y está hecho así por el
+// incidente del 14-oct: el `<img>` NO se pone en el HTML. Se guarda el id en un
+// `data-` y el visor lo crea al abrirse (ver el script al final del archivo).
+// Si fuera un `<img src>` escondido, el navegador se bajaría TODAS las fotos del
+// chat al abrirlo —que es justo lo que el dueño pidió evitar—.
+//
+// Cada foto se abre y se cierra sola, y queda una por vez.
+// ============================================================================
+function visorDeMedia(m, token) {
+  if (!m || !m.mediaId) return "";
+  const tipo = String(m.tipo || "image");
+  const etiqueta =
+    tipo === "image"
+      ? "📷 Ver la foto"
+      : tipo === "document"
+      ? "📄 Ver el archivo"
+      : tipo === "video"
+      ? "🎬 Ver el video"
+      : tipo === "sticker"
+      ? "🏷️ Ver el sticker"
+      : `📎 Ver el ${tipo}`;
+  const url = `/media?token=${encodeURIComponent(token || "")}&id=${encodeURIComponent(m.mediaId)}`;
+  return `<details class="vermedia" data-url="${esc(url)}" data-tipo="${esc(tipo)}">
+      <summary>${etiqueta}</summary>
+      <div class="visor"></div>
+      <a class="aparte" href="${esc(url)}" target="_blank" rel="noopener">abrir aparte ↗</a>
+    </details>`;
+}
+
+function burbuja(m, token) {
   const mio = m.role === "assistant";
   const cuando = m.at ? HORA(m.at) : "";
   return `<div class="msg ${mio ? "bot" : "cli"}">
       <div class="quien">${mio ? "BikerPro" : "Cliente"}${
     cuando ? ` · <span class="hora">${esc(cuando)}</span>` : ""
+  }${
+    // 💸 Si el bot lo marcó como posible comprobante, se dice acá: es el caso
+    // por el que más se abre una foto.
+    m.comprobante ? ' · <span class="esComprobante">💸 posible comprobante</span>' : ""
   }</div>
       <div class="txt">${esc(m.content)}</div>
+      ${visorDeMedia(m, token)}
     </div>`;
 }
 
@@ -509,7 +551,9 @@ function render({ id, q, token, resultado, venta } = {}) {
          }</p>
        </div>` +
       `<div class="chat">${
-        msgs.length ? msgs.map(burbuja).join("") : `<p class="nota">No hay mensajes guardados.</p>`
+        msgs.length
+          ? msgs.map((mm) => burbuja(mm, token)).join("")
+          : `<p class="nota">No hay mensajes guardados.</p>`
       }</div>` +
       cajonDeEnvio(p, conv, token) +
       cajonDeVenta(p, token, 0);
@@ -554,7 +598,7 @@ function render({ id, q, token, resultado, venta } = {}) {
         const conv = conversaciones[p.telefono_chat];
         const msgs = (conv && conv.messages) || [];
         const chat = msgs.length
-          ? msgs.map(burbuja).join("")
+          ? msgs.map((mm) => burbuja(mm, token)).join("")
           : `<p class="nota">No hay chat guardado para este cliente.
              ${
                p.telefono_chat
@@ -623,6 +667,22 @@ function render({ id, q, token, resultado, venta } = {}) {
   .hora{text-transform:none;letter-spacing:0}
   .nota{color:var(--gris);font-size:13px}
   .lista{color:var(--gris);font-size:13px;padding-left:20px}
+  /* 📷 El botón de ver la foto. Grande y tocable: esto se usa del celular. */
+  .vermedia{margin-top:8px}
+  .vermedia summary{display:inline-block;cursor:pointer;background:#1c2530;
+    border:1px solid var(--linea);color:#cfe3f5;border-radius:99px;
+    padding:6px 13px;font-size:13px;font-weight:600;list-style:none}
+  .vermedia summary::-webkit-details-marker{display:none}
+  .vermedia[open] summary{background:#24405c;border-color:#3d6b96}
+  .vermedia .visor{margin-top:8px}
+  /* La foto se adapta al ancho y no revienta el chat en el celular. */
+  .vermedia .visor img,.vermedia .visor video{max-width:100%;height:auto;
+    border-radius:10px;border:1px solid var(--linea);display:block}
+  .vermedia .visor .cargando{color:var(--gris);font-size:13px}
+  .vermedia .visor .mal{color:var(--rojo);font-size:13px}
+  .vermedia .aparte{display:none;margin-top:6px;color:#8ab4f8;font-size:12px}
+  .vermedia[open] .aparte{display:inline-block}
+  .esComprobante{color:#ffc98a;font-weight:700}
   /* 🔎 Resultados de la búsqueda de chats. Cada uno es un bloque grande y
      tocable: esto se usa con una mano, desde el celular, despachando. */
   .resultados{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
@@ -714,6 +774,75 @@ function render({ id, q, token, resultado, venta } = {}) {
     <button type="submit">Buscar</button>
   </form>
   ${cuerpo}
+  <script>
+    // ======================================================================
+    // 📷 EL VISOR DE FOTOS, QUE SOLO BAJA LA QUE SE PIDE — 15-oct
+    //
+    // ⚠️ ESTE BLOQUE VIVE DENTRO DE UN TEMPLATE LITERAL DE JAVASCRIPT. Acá NO
+    // se pueden usar comillas invertidas ni el signo de dólar seguido de llave:
+    // las dos cosas ya rompieron el panel antes. Todo va concatenado.
+    //
+    // 🔑 POR QUÉ EL <img> SE CREA ACÁ Y NO VIENE EN EL HTML. Si viniera en el
+    // HTML —aunque fuera dentro de un details cerrado— el navegador se bajaría
+    // TODAS las fotos del chat al abrirlo. El dueño pidió exactamente lo
+    // contrario: "sin necesidad de que carguen todas". Así que el HTML solo
+    // trae la URL en un data-, y la imagen nace cuando se toca el botón.
+    //
+    // Y al abrir una se cierran las demás: queda UNA foto en memoria por vez.
+    // ======================================================================
+    (function () {
+      var cajas = document.querySelectorAll("details.vermedia");
+
+      function pintar(caja) {
+        var visor = caja.querySelector(".visor");
+        if (!visor || visor.getAttribute("data-cargado") === "1") return;
+        visor.setAttribute("data-cargado", "1");
+
+        var url = caja.getAttribute("data-url");
+        var tipo = caja.getAttribute("data-tipo");
+
+        var aviso = document.createElement("div");
+        aviso.className = "cargando";
+        aviso.textContent = "Trayendo el archivo de WhatsApp...";
+        visor.appendChild(aviso);
+
+        // Un PDF no se intenta incrustar: en el celular se ve mal y el enlace
+        // de "abrir aparte" lo resuelve mejor.
+        if (tipo === "document") {
+          aviso.textContent = "Es un archivo. Tocá \\u0022abrir aparte\\u0022 para verlo.";
+          return;
+        }
+
+        var el = tipo === "video" ? document.createElement("video") : document.createElement("img");
+        if (tipo === "video") el.controls = true;
+        else el.alt = "Lo que mandó el cliente";
+
+        el.onload = function () {
+          if (aviso.parentNode) aviso.parentNode.removeChild(aviso);
+        };
+        el.onloadeddata = el.onload;
+        el.onerror = function () {
+          aviso.className = "mal";
+          aviso.textContent =
+            "No se pudo mostrar. WhatsApp guarda los archivos unos 30 dias: " +
+            "si este es mas viejo, ya no existe. Proba con \\u0022abrir aparte\\u0022.";
+        };
+        el.src = url;
+        visor.appendChild(el);
+      }
+
+      for (var i = 0; i < cajas.length; i++) {
+        cajas[i].addEventListener("toggle", function () {
+          if (!this.open) return;
+          // Cerrar las otras: una foto a la vez.
+          for (var j = 0; j < cajas.length; j++) {
+            if (cajas[j] !== this) cajas[j].open = false;
+          }
+          pintar(this);
+        });
+      }
+    })();
+  </script>
 </body></html>`;
 }
 
