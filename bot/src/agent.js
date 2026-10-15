@@ -326,6 +326,10 @@ function detectMediaIntent(text, productoId) {
     // La caja cerrada responde "¿qué modelo es?" y "¿es original?", que son las dos
     // preguntas donde ver el empaque con el nombre impreso vale más que un texto.
     if (has(["caja", "empaque", "modelo", "original", "marca", "presentacion", "presentación"])) delV10.push(pref + "_caja");
+    // 📺 La pantalla es una de las diferencias del Q58 contra el V10, así que
+    // "¿tiene pantalla?" se contesta mejor mostrándola. En el V10 esta clave no
+    // existe, así que `soloDisponibles` la filtra y no pasa nada.
+    if (has(["pantalla", "display", "visor", "digital"])) delV10.push(pref + "_pantalla");
     // Y si pidió ver algo sin decir qué, la foto principal del producto.
     if (quiereVer && delV10.length === 0) delV10.push(pref);
     // Si nombró el producto y quiere verlo, también la principal.
@@ -481,7 +485,10 @@ async function generateReply(phone, userText) {
   const eleccion = catalogo.productoDelHilo(conv, userText, { producto: delAnuncio });
   const productoId = eleccion.producto;
   const ficha = catalogo.de(productoId);
-  if (catalogo.esV10(productoId)) {
+  // Por categoría: el log tiene que servir igual para el Q58. Con `esV10` las
+  // conversaciones del Q58 no dejaban rastro de qué producto se eligió, que es
+  // justo lo que hay que poder auditar cuando hay dos productos parecidos.
+  if (catalogo.esIntercom(productoId)) {
     console.log(`🎧 ${phone}: la conversación es del ${ficha.nombreCorto} (${eleccion.porQue}).`);
   }
   // 🔒 Se FIJA el producto cuando la señal es fuerte: lo dijo el cliente en este

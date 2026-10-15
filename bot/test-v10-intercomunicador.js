@@ -707,7 +707,20 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
         chequear("  el guion ahora SÍ ofrece las fotos", /\[\[MEDIA:v10\]\]/.test(g2) && !/TODAVÍA NO TENEMOS FOTOS/.test(g2));
         chequear("  con el marcador de la del casco", /\[\[MEDIA:v10_puesto\]\]/.test(g2));
         chequear("  y sigue prohibiendo las del impermeable", /Nunca mandes fotos del impermeable/.test(g2));
-        chequear("  y no hay que tocar código: alcanza con subir el archivo", mediaFresco.fotosFaltantes().length === 0, JSON.stringify(mediaFresco.fotosFaltantes()));
+        // ⚠️ ACOTADO AL V10 EL 15-OCT, y la razón importa: antes exigía que NO
+        // faltara NINGUNA foto de TODO el catálogo. Al declarar las claves del
+        // Q58 Max —cuyos archivos el dueño todavía no había subido— esta prueba
+        // del V10 se puso roja por un producto que no es el que prueba.
+        //
+        // Lo que esta prueba tiene que defender es que las fotos DEL V10 se
+        // ofrezcan con solo subir el archivo. Las que falten de otro producto
+        // son asunto de la prueba de ese producto (test-q58-max.js).
+        const faltanDelV10 = mediaFresco.fotosFaltantes().filter((f) => fotosV10.includes(f.clave));
+        chequear(
+          "  y no hay que tocar código: alcanza con subir el archivo",
+          faltanDelV10.length === 0,
+          JSON.stringify(faltanDelV10)
+        );
       }
 
       // Se borra lo que creó la prueba: no deja basura en el repo.

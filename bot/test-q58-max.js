@@ -334,6 +334,64 @@ chequear(
   cotizacion.calcular("Cali", "uno", { producto: I, unidades: 1 }).total === 82000
 );
 
+// ============================================================================
+console.log("\n── 10. 📸 Las fotos del Q58 quedan cableadas ──");
+// El dueño ya tiene las fotos; esto verifica que al subirlas funcionen solas.
+// ============================================================================
+const CLAVES_Q58 = ["q58", "q58_puesto", "q58_combo", "q58_contenido", "q58_caja", "q58_pantalla"];
+for (const clave of CLAVES_Q58) {
+  chequear(`existe la entrada "${clave}"`, Boolean(media.MEDIA[clave]), "sin esto la foto no se ofrece nunca");
+}
+chequear(
+  "la principal busca el archivo q58-producto",
+  media.MEDIA.q58.base === "q58-producto",
+  media.MEDIA.q58.base
+);
+chequear(
+  "🔑 ninguna clave del Q58 apunta a un archivo del V10",
+  CLAVES_Q58.every((k) => !String(media.MEDIA[k].base).includes("v10")),
+  "sería mandarle al cliente del Q58 la foto del otro producto"
+);
+chequear(
+  "los textos de las fotos del Q58 no nombran al V10",
+  CLAVES_Q58.every((k) => !/V10/i.test(media.MEDIA[k].caption || ""))
+);
+chequear(
+  "la principal menciona lo que lo diferencia (radio FM)",
+  /radio FM/i.test(media.MEDIA.q58.caption)
+);
+
+console.log("\n   Y mientras no haya archivos, no se ofrecen:");
+chequear("hoy no está disponible (no hay archivo todavía)", media.disponible("q58") === false);
+
+console.log("\n   Al configurarla por variable de entorno, aparece sola:");
+const antesMedia = process.env.MEDIA_Q58;
+process.env.MEDIA_Q58 = "https://example.com/q58-producto.jpg";
+chequear("🔑 con MEDIA_Q58 puesta, ya está disponible", media.disponible("q58") === true);
+const resuelta = media.resolver("q58");
+chequear("…y resuelve a esa URL", resuelta && resuelta.url === "https://example.com/q58-producto.jpg");
+chequear("…con su texto propio", resuelta && /Q58 Max/.test(resuelta.caption));
+
+console.log("\n   Y entonces el guion SÍ la ofrece:");
+const guionConFoto = prompt.buildSystemPrompt(Q);
+chequear(
+  "el guion ofrece el marcador [[MEDIA:q58]]",
+  guionConFoto.includes("[[MEDIA:q58]]"),
+  "es lo que el bot escribe para que se mande la foto"
+);
+chequear(
+  "🔑 y NUNCA el del V10",
+  !guionConFoto.includes("[[MEDIA:v10]]"),
+  "mandaría la foto del producto equivocado"
+);
+if (antesMedia === undefined) delete process.env.MEDIA_Q58;
+else process.env.MEDIA_Q58 = antesMedia;
+
+chequear(
+  "las fotos del V10 siguen intactas",
+  media.MEDIA.v10.base === "v10-producto" && media.MEDIA.v10_caja.base === "v10-caja"
+);
+
 console.log(`\n${ok}/${ok + mal} correctos`);
 if (mal) {
   console.log(

@@ -144,6 +144,64 @@ const MEDIA = {
     env: "MEDIA_V10_CAJA",
     caption: "📦 Así viene presentado, es el modelo V10 2X.",
   },
+
+  // ==========================================================================
+  // 🎧 FOTOS DEL Q58 MAX — 15-oct
+  //
+  // 🔑 LAS CLAVES SON `q58*` PORQUE LA FICHA DEL PRODUCTO DECLARA
+  // `mediaPrefijo: "q58"`. El guion y `agent.js` arman las claves con ese
+  // prefijo, así que estas entradas son lo que hace que las fotos del Q58
+  // lleguen al cliente del Q58 — y NO las del V10, que es otro producto.
+  //
+  // ⚠️ MIENTRAS NO EXISTAN LOS ARCHIVOS, ESTAS ENTRADAS NO SE OFRECEN. Lo
+  // resuelve `disponible()`: si no hay ningún `q58-producto.*` en docs/img/,
+  // la clave se salta y el guion le prohíbe al bot prometer fotos. Por eso se
+  // pueden declarar antes de tener los archivos, sin riesgo.
+  //
+  // Los nombres de archivo están documentados en docs/img/LEEME-fotos.md.
+  // Cualquier extensión de imagen sirve: `archivoReal()` la encuentra.
+  // ==========================================================================
+  q58: {
+    type: "image",
+    base: "q58-producto",
+    env: "MEDIA_Q58",
+    caption:
+      "🎧 El intercomunicador Q58 Max. Se monta en el casco y te sirve para hablar de casco a " +
+      "casco con tu acompañante, escuchar música, las indicaciones del GPS y contestar llamadas. " +
+      "Además trae radio FM y entrada para memoria 🎵",
+  },
+  q58_puesto: {
+    type: "image",
+    base: "q58-puesto",
+    env: "MEDIA_Q58_PUESTO",
+    caption: "🪖 Así queda montado en el casco 🏍️",
+  },
+  q58_combo: {
+    type: "image",
+    base: "q58-combo",
+    env: "MEDIA_Q58_COMBO",
+    caption: "🎧🎧 El combo de 2, que es el de la promoción: uno para ti y uno para tu acompañante.",
+  },
+  q58_contenido: {
+    type: "image",
+    base: "q58-contenido",
+    env: "MEDIA_Q58_CONTENIDO",
+    caption: "📦 Esto es lo que viene en la caja.",
+  },
+  q58_caja: {
+    type: "image",
+    base: "q58-caja",
+    env: "MEDIA_Q58_CAJA",
+    caption: "📦 Así viene presentado, es el modelo Q58 Max.",
+  },
+  // La pantalla es una de las diferencias con el V10, así que vale una foto
+  // propia: "¿tiene pantalla?" se contesta mejor mostrándola.
+  q58_pantalla: {
+    type: "image",
+    base: "q58-pantalla",
+    env: "MEDIA_Q58_PANTALLA",
+    caption: "📺 Tiene pantalla, así que ves el volumen, la emisora y el estado del equipo.",
+  },
 };
 
 // ============================================================================
