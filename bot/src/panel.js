@@ -28,6 +28,8 @@ function panelToken() {
 }
 
 const store = require("./store");
+// 📷 Para reusar el visor de fotos del chat (visorDeMedia / estilos / script).
+const panelChat = require("./panel-chat");
 const catalogo = require("./catalogo");
 const resumen = require("./resumen");
 const atencion = require("./atencion");
@@ -869,6 +871,19 @@ function render(aviso) {
               (m) =>
                 `<div class="msg ${m.role === "user" ? "cli" : "bot"}">
                    <div class="txt">${esc(m.content).replace(/\n/g, "<br>")}</div>
+                   ${
+                     // 📷 EL BOTÓN DE VER LA FOTO, TAMBIÉN ACÁ (15-oct)
+                     //
+                     // 🔴 El dueño mandó una foto de prueba, abrió el panel y no
+                     // vio ningún botón. El botón existía, pero solo en /chat:
+                     // esta lista dibuja los mensajes con su propio HTML y se
+                     // había quedado sin visor. Y mirar acá es lo natural, porque
+                     // es la primera pantalla que se abre.
+                     //
+                     // Se reusa `visorDeMedia` de panel-chat.js en vez de copiar
+                     // el markup: una sola copia que arreglar.
+                     panelChat.visorDeMedia(m, panelToken())
+                   }
                    <div class="hora">${esc(HORA(m.at))}</div>
                  </div>`
             )
@@ -1193,6 +1208,7 @@ function render(aviso) {
   .acc.despachar{display:flex;gap:4px;align-items:center;margin-bottom:4px}
   .acc.despachar input{width:78px;min-width:0;background:#0f141b;border:1px solid #263041;
     color:#e6edf3;border-radius:7px;padding:5px 7px;font-size:12px;font-family:inherit}
+  ${panelChat.estilosDelVisor()}
   /* 🔎 Buscador de chats. Ancho completo y alto generoso: se usa con el pulgar. */
   .buscarChat{display:flex;gap:8px;margin:12px 0 0}
   .buscarChat input{flex:1;min-width:0;background:#0f141b;border:1px solid #263041;
@@ -1430,6 +1446,7 @@ function render(aviso) {
 </main>
 <!-- ⬆️ Volver arriba. Fijo, porque el dueño trabaja del celular y la página es
      larga por diseño: los despachados no se borran nunca. -->
+${panelChat.scriptDelVisor()}
 <a href="#arriba" class="subir" id="subir" title="Volver arriba">↑</a>
 <script>
 // La clave del panel, para los envíos que van por fetch. No agrega exposición:

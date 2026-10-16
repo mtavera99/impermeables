@@ -163,6 +163,108 @@ function visorDeMedia(m, token) {
     </details>`;
 }
 
+/** Los estilos del visor. Se exportan por lo mismo que el script: dos pantallas, una copia. */
+function estilosDelVisor() {
+  return `  /* 📷 El botón de ver la foto. Grande y tocable: esto se usa del celular. */
+  .vermedia{margin-top:8px}
+  .vermedia summary{display:inline-block;cursor:pointer;background:#1c2530;
+    border:1px solid var(--linea);color:#cfe3f5;border-radius:99px;
+    padding:6px 13px;font-size:13px;font-weight:600;list-style:none}
+  .vermedia summary::-webkit-details-marker{display:none}
+  .vermedia[open] summary{background:#24405c;border-color:#3d6b96}
+  .vermedia .visor{margin-top:8px}
+  /* La foto se adapta al ancho y no revienta el chat en el celular. */
+  .vermedia .visor img,.vermedia .visor video{max-width:100%;height:auto;
+    border-radius:10px;border:1px solid var(--linea);display:block}
+  .vermedia .visor .cargando{color:var(--gris);font-size:13px}
+  .vermedia .visor .mal{color:var(--rojo);font-size:13px}
+  .vermedia .aparte{display:none;margin-top:6px;color:#8ab4f8;font-size:12px}
+  .vermedia[open] .aparte{display:inline-block}
+  .esComprobante{color:#ffc98a;font-weight:700}`;
+}
+
+/**
+ * El script que crea el <img> al tocar el botón. Se exporta porque LA MISMA
+ * conversación se dibuja en DOS pantallas: acá y en la lista del panel.
+ *
+ * 🔴 DE DÓNDE SALE (15-oct). El dueño mandó una foto de prueba, abrió el panel
+ * y no vio ningún botón. El botón estaba… pero solo en /chat. La lista de
+ * "💬 Conversaciones" del panel dibuja los mensajes con su propio HTML, así que
+ * se quedó sin visor. Mirar ahí es lo natural —es la primera pantalla— así que
+ * el arreglo es que funcione en las dos, con UNA sola copia del código.
+ */
+function scriptDelVisor() {
+  return `<script>
+    // ======================================================================
+    // 📷 EL VISOR DE FOTOS, QUE SOLO BAJA LA QUE SE PIDE — 15-oct
+    //
+    // ⚠️ ESTE BLOQUE VIVE DENTRO DE UN TEMPLATE LITERAL DE JAVASCRIPT. Acá NO
+    // se pueden usar comillas invertidas ni el signo de dólar seguido de llave:
+    // las dos cosas ya rompieron el panel antes. Todo va concatenado.
+    //
+    // 🔑 POR QUÉ EL <img> SE CREA ACÁ Y NO VIENE EN EL HTML. Si viniera en el
+    // HTML —aunque fuera dentro de un details cerrado— el navegador se bajaría
+    // TODAS las fotos del chat al abrirlo. El dueño pidió exactamente lo
+    // contrario: "sin necesidad de que carguen todas". Así que el HTML solo
+    // trae la URL en un data-, y la imagen nace cuando se toca el botón.
+    //
+    // Y al abrir una se cierran las demás: queda UNA foto en memoria por vez.
+    // ======================================================================
+    (function () {
+      var cajas = document.querySelectorAll("details.vermedia");
+
+      function pintar(caja) {
+        var visor = caja.querySelector(".visor");
+        if (!visor || visor.getAttribute("data-cargado") === "1") return;
+        visor.setAttribute("data-cargado", "1");
+
+        var url = caja.getAttribute("data-url");
+        var tipo = caja.getAttribute("data-tipo");
+
+        var aviso = document.createElement("div");
+        aviso.className = "cargando";
+        aviso.textContent = "Trayendo el archivo de WhatsApp...";
+        visor.appendChild(aviso);
+
+        // Un PDF no se intenta incrustar: en el celular se ve mal y el enlace
+        // de "abrir aparte" lo resuelve mejor.
+        if (tipo === "document") {
+          aviso.textContent = "Es un archivo. Tocá \\u0022abrir aparte\\u0022 para verlo.";
+          return;
+        }
+
+        var el = tipo === "video" ? document.createElement("video") : document.createElement("img");
+        if (tipo === "video") el.controls = true;
+        else el.alt = "Lo que mandó el cliente";
+
+        el.onload = function () {
+          if (aviso.parentNode) aviso.parentNode.removeChild(aviso);
+        };
+        el.onloadeddata = el.onload;
+        el.onerror = function () {
+          aviso.className = "mal";
+          aviso.textContent =
+            "No se pudo mostrar. WhatsApp guarda los archivos unos 30 dias: " +
+            "si este es mas viejo, ya no existe. Proba con \\u0022abrir aparte\\u0022.";
+        };
+        el.src = url;
+        visor.appendChild(el);
+      }
+
+      for (var i = 0; i < cajas.length; i++) {
+        cajas[i].addEventListener("toggle", function () {
+          if (!this.open) return;
+          // Cerrar las otras: una foto a la vez.
+          for (var j = 0; j < cajas.length; j++) {
+            if (cajas[j] !== this) cajas[j].open = false;
+          }
+          pintar(this);
+        });
+      }
+    })();
+</script>`;
+}
+
 function burbuja(m, token) {
   const mio = m.role === "assistant";
   const cuando = m.at ? HORA(m.at) : "";
@@ -667,22 +769,7 @@ function render({ id, q, token, resultado, venta } = {}) {
   .hora{text-transform:none;letter-spacing:0}
   .nota{color:var(--gris);font-size:13px}
   .lista{color:var(--gris);font-size:13px;padding-left:20px}
-  /* 📷 El botón de ver la foto. Grande y tocable: esto se usa del celular. */
-  .vermedia{margin-top:8px}
-  .vermedia summary{display:inline-block;cursor:pointer;background:#1c2530;
-    border:1px solid var(--linea);color:#cfe3f5;border-radius:99px;
-    padding:6px 13px;font-size:13px;font-weight:600;list-style:none}
-  .vermedia summary::-webkit-details-marker{display:none}
-  .vermedia[open] summary{background:#24405c;border-color:#3d6b96}
-  .vermedia .visor{margin-top:8px}
-  /* La foto se adapta al ancho y no revienta el chat en el celular. */
-  .vermedia .visor img,.vermedia .visor video{max-width:100%;height:auto;
-    border-radius:10px;border:1px solid var(--linea);display:block}
-  .vermedia .visor .cargando{color:var(--gris);font-size:13px}
-  .vermedia .visor .mal{color:var(--rojo);font-size:13px}
-  .vermedia .aparte{display:none;margin-top:6px;color:#8ab4f8;font-size:12px}
-  .vermedia[open] .aparte{display:inline-block}
-  .esComprobante{color:#ffc98a;font-weight:700}
+  ${estilosDelVisor()}
   /* 🔎 Resultados de la búsqueda de chats. Cada uno es un bloque grande y
      tocable: esto se usa con una mano, desde el celular, despachando. */
   .resultados{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
@@ -774,76 +861,8 @@ function render({ id, q, token, resultado, venta } = {}) {
     <button type="submit">Buscar</button>
   </form>
   ${cuerpo}
-  <script>
-    // ======================================================================
-    // 📷 EL VISOR DE FOTOS, QUE SOLO BAJA LA QUE SE PIDE — 15-oct
-    //
-    // ⚠️ ESTE BLOQUE VIVE DENTRO DE UN TEMPLATE LITERAL DE JAVASCRIPT. Acá NO
-    // se pueden usar comillas invertidas ni el signo de dólar seguido de llave:
-    // las dos cosas ya rompieron el panel antes. Todo va concatenado.
-    //
-    // 🔑 POR QUÉ EL <img> SE CREA ACÁ Y NO VIENE EN EL HTML. Si viniera en el
-    // HTML —aunque fuera dentro de un details cerrado— el navegador se bajaría
-    // TODAS las fotos del chat al abrirlo. El dueño pidió exactamente lo
-    // contrario: "sin necesidad de que carguen todas". Así que el HTML solo
-    // trae la URL en un data-, y la imagen nace cuando se toca el botón.
-    //
-    // Y al abrir una se cierran las demás: queda UNA foto en memoria por vez.
-    // ======================================================================
-    (function () {
-      var cajas = document.querySelectorAll("details.vermedia");
-
-      function pintar(caja) {
-        var visor = caja.querySelector(".visor");
-        if (!visor || visor.getAttribute("data-cargado") === "1") return;
-        visor.setAttribute("data-cargado", "1");
-
-        var url = caja.getAttribute("data-url");
-        var tipo = caja.getAttribute("data-tipo");
-
-        var aviso = document.createElement("div");
-        aviso.className = "cargando";
-        aviso.textContent = "Trayendo el archivo de WhatsApp...";
-        visor.appendChild(aviso);
-
-        // Un PDF no se intenta incrustar: en el celular se ve mal y el enlace
-        // de "abrir aparte" lo resuelve mejor.
-        if (tipo === "document") {
-          aviso.textContent = "Es un archivo. Tocá \\u0022abrir aparte\\u0022 para verlo.";
-          return;
-        }
-
-        var el = tipo === "video" ? document.createElement("video") : document.createElement("img");
-        if (tipo === "video") el.controls = true;
-        else el.alt = "Lo que mandó el cliente";
-
-        el.onload = function () {
-          if (aviso.parentNode) aviso.parentNode.removeChild(aviso);
-        };
-        el.onloadeddata = el.onload;
-        el.onerror = function () {
-          aviso.className = "mal";
-          aviso.textContent =
-            "No se pudo mostrar. WhatsApp guarda los archivos unos 30 dias: " +
-            "si este es mas viejo, ya no existe. Proba con \\u0022abrir aparte\\u0022.";
-        };
-        el.src = url;
-        visor.appendChild(el);
-      }
-
-      for (var i = 0; i < cajas.length; i++) {
-        cajas[i].addEventListener("toggle", function () {
-          if (!this.open) return;
-          // Cerrar las otras: una foto a la vez.
-          for (var j = 0; j < cajas.length; j++) {
-            if (cajas[j] !== this) cajas[j].open = false;
-          }
-          pintar(this);
-        });
-      }
-    })();
-  </script>
+  ${scriptDelVisor()}
 </body></html>`;
 }
 
-module.exports = { render, buscar, buscarChats };
+module.exports = { render, buscar, buscarChats, visorDeMedia, scriptDelVisor, estilosDelVisor };
