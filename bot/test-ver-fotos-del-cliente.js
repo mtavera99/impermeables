@@ -128,6 +128,43 @@ chequear(
 chequear("y la página se sigue armando", html2.includes("Ver la foto"));
 
 // ============================================================================
+// ============================================================================
+console.log("\n── 3-BIS. 🔴 EL BOTÓN TAMBIÉN EN LA LISTA DEL PANEL ──");
+//
+// DE DÓNDE SALE (15-oct). El dueño mandó una foto de prueba, abrió el panel y
+// escribió: *"sale solo este texto sin el botón"*.
+//
+// El botón existía… pero SOLO en /chat. La lista de "💬 Conversaciones" del
+// panel dibuja los mensajes con su propio HTML (panel.js), así que se había
+// quedado sin visor. Y mirar ahí es lo natural: es la primera pantalla que se
+// abre, y el chat completo está un clic más adentro.
+//
+// Ahora las dos pantallas usan `visorDeMedia` de panel-chat.js — una sola copia
+// del markup, del script y de los estilos.
+// ============================================================================
+const panel = require("./src/panel");
+const htmlPanel = panel.render("");
+
+chequear(
+  "🔑 la lista del panel ahora muestra el botón",
+  htmlPanel.includes("📷 Ver la foto"),
+  "es donde el dueño miró primero"
+);
+chequear("…con el id de la foto en data-url", htmlPanel.includes("MEDIA_ABC123"));
+chequear(
+  "🔑 y sigue sin precargar ninguna imagen",
+  !/<img[^>]*\ssrc=/i.test(htmlPanel),
+  "el panel dibuja hasta 60 chats: precargar acá sería mucho peor que en /chat"
+);
+chequear("el script del visor está incluido", htmlPanel.includes("details.vermedia"));
+chequear("y los estilos también", htmlPanel.includes(".vermedia summary"));
+chequear(
+  "una sola copia del markup (se reusa panel-chat)",
+  typeof panelChat.visorDeMedia === "function" &&
+    typeof panelChat.scriptDelVisor === "function" &&
+    typeof panelChat.estilosDelVisor === "function"
+);
+
 console.log("\n── 4. Un chat sin fotos queda igual que antes ──");
 // ============================================================================
 const TEL3 = "573005554444";
