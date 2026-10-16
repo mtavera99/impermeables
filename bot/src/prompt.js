@@ -693,9 +693,18 @@ function seccionDeFotosV10(ficha) {
   // sin fotos cargadas (como el Q58 al arrancar) cae solo en la rama de abajo
   // y el guion le prohíbe prometer fotos.
   const pref = (ficha && ficha.mediaPrefijo) || "v10";
-  const hay = [pref, pref + "_puesto", pref + "_combo", pref + "_contenido"].filter((k) =>
-    media.disponible(k)
-  );
+  // ⚠️ `_caja` y `_pantalla` se agregaron el 15-oct: existían como archivos del
+  // Q58 pero el guion no las nombraba, así que la IA nunca podía ofrecerlas. Se
+  // filtran por `disponible()`, así que en el V10 —que no tiene pantalla— la
+  // clave simplemente no aparece.
+  const hay = [
+    pref,
+    pref + "_puesto",
+    pref + "_combo",
+    pref + "_contenido",
+    pref + "_caja",
+    pref + "_pantalla",
+  ].filter((k) => media.disponible(k));
 
   if (!hay.length) {
     return (
@@ -714,6 +723,8 @@ function seccionDeFotosV10(ficha) {
     [pref + "_puesto"]: `cómo se ve puesto en el casco → [[MEDIA:${pref}_puesto]]`,
     [pref + "_combo"]: `el combo de dos → [[MEDIA:${pref}_combo]]`,
     [pref + "_contenido"]: `qué viene en la caja → [[MEDIA:${pref}_contenido]]`,
+    [pref + "_caja"]: `la caja cerrada, si preguntan el modelo o si es original → [[MEDIA:${pref}_caja]]`,
+    [pref + "_pantalla"]: `la pantalla encendida → [[MEDIA:${pref}_pantalla]]`,
   };
   return (
     `Si piden ver el producto, agregá el marcador que corresponda al final del mensaje:\n` +

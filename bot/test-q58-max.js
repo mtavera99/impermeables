@@ -297,16 +297,54 @@ chequear(
 // ============================================================================
 console.log("\n── 8. Fotos y seguimiento: nada de otro producto ──");
 // ============================================================================
+// ⚠️ ACTUALIZADO EL 15-OCT (segunda tanda): el dueño subió las fotos, así que
+// las dos primeras comprobaciones cambiaron de signo. Antes verificaban que SIN
+// archivos el bot no prometiera fotos; ahora que existen, verifican que las
+// ofrezca — y que siga sin ofrecer las que faltan.
 chequear(
-  "🔑 no hay fotos del Q58 cargadas todavía",
-  !media.disponible("q58"),
-  "si alguien agrega archivos q58*, esta prueba cambia y está bien"
+  "🔑 la foto principal del Q58 ya está disponible",
+  media.disponible("q58"),
+  "debería resolver a q58-producto.jpg"
 );
 chequear(
-  "…así que el guion le PROHÍBE prometer fotos",
-  /NO prometas mandarlas|TODAVÍA NO TENEMOS FOTOS/i.test(guionQ)
+  "…y el guion la ofrece con su marcador",
+  guionQ.includes("[[MEDIA:q58]]") && !/TODAVÍA NO TENEMOS FOTOS/i.test(guionQ)
 );
 chequear("…y le prohíbe mandar las del impermeable", /NUNCA mandes.*impermeable/is.test(guionQ));
+chequear(
+  "🔑 y NUNCA ofrece las del V10",
+  !guionQ.includes("[[MEDIA:v10"),
+  "sería mandarle la foto del producto equivocado"
+);
+
+console.log("\n   Las que faltan NO se ofrecen (en vez de mandar otra):");
+chequear(
+  "falta la del casco y no se ofrece",
+  !media.disponible("q58_puesto") && !guionQ.includes("[[MEDIA:q58_puesto]]")
+);
+chequear(
+  "falta la del combo y no se ofrece",
+  !media.disponible("q58_combo") && !guionQ.includes("[[MEDIA:q58_combo]]")
+);
+
+console.log("\n   Y las que sí están, resuelven a un archivo real:");
+for (const [clave, archivo] of [
+  ["q58", "q58-producto.jpg"],
+  ["q58_pantalla", "q58-pantalla.jpg"],
+  ["q58_caja", "q58-caja.jpg"],
+  ["q58_contenido", "q58-contenido.jpg"],
+]) {
+  const r = media.resolver(clave);
+  chequear(
+    `"${clave}" → ${archivo}`,
+    Boolean(r && r.url && r.url.endsWith(archivo)),
+    r ? r.url : "no resuelve"
+  );
+  chequear(
+    `   …y es JPG, no HEIC (WhatsApp rechaza HEIC)`,
+    Boolean(r && /\.(jpg|jpeg|png|webp)$/i.test(r.url))
+  );
+}
 chequear("el Q58 declara su propio prefijo de fotos", q.mediaPrefijo === "q58");
 chequear("el V10 mantiene el suyo", catalogo.de(V).mediaPrefijo === "v10");
 
@@ -361,13 +399,10 @@ chequear(
   /radio FM/i.test(media.MEDIA.q58.caption)
 );
 
-console.log("\n   Y mientras no haya archivos, no se ofrecen:");
-chequear("hoy no está disponible (no hay archivo todavía)", media.disponible("q58") === false);
-
-console.log("\n   Al configurarla por variable de entorno, aparece sola:");
+console.log("\n   Y una variable de entorno puede reemplazar el archivo:");
 const antesMedia = process.env.MEDIA_Q58;
 process.env.MEDIA_Q58 = "https://example.com/q58-producto.jpg";
-chequear("🔑 con MEDIA_Q58 puesta, ya está disponible", media.disponible("q58") === true);
+chequear("con MEDIA_Q58 puesta sigue disponible (gana la variable)", media.disponible("q58") === true);
 const resuelta = media.resolver("q58");
 chequear("…y resuelve a esa URL", resuelta && resuelta.url === "https://example.com/q58-producto.jpg");
 chequear("…con su texto propio", resuelta && /Q58 Max/.test(resuelta.caption));
@@ -391,6 +426,71 @@ chequear(
   "las fotos del V10 siguen intactas",
   media.MEDIA.v10.base === "v10-producto" && media.MEDIA.v10_caja.base === "v10-caja"
 );
+
+// ============================================================================
+console.log("\n── 11. 🔑 PEDIR UNA FOTO QUE NO TENEMOS NO PUEDE DEJARLO SIN NADA ──");
+//
+// El dueño decidió lanzar con 4 fotos (equipo, pantalla, caja, contenido) y SIN
+// la del casco ni la del combo: *"sin la del casco, sin la foto de dos, con las
+// otras tenemos"*.
+//
+// 🔴 Y ahí había un agujero: la selección se quedaba con la primera de la lista
+// y recién después se filtraba por si existía. Un cliente que preguntaba *"¿cómo
+// se ve en el casco?"* —la pregunta que precede a la compra— se quedaba SIN
+// NINGUNA FOTO, teniendo cuatro buenas cargadas.
+// ============================================================================
+const { detectMediaIntent } = require("./src/agent");
+
+console.log("   Pide las que faltan → recibe la principal:");
+for (const texto of [
+  "como se ve en el casco?",
+  "me mandas una foto puesto?",
+  "como queda montado",
+  "tienes foto del combo de dos?",
+  "foto de los dos",
+]) {
+  const r = detectMediaIntent(texto, Q);
+  chequear(
+    `"${texto}" → manda la principal`,
+    r.length === 1 && r[0] === "q58",
+    `dio ${JSON.stringify(r)}. Si da [], el cliente se queda sin ninguna foto`
+  );
+}
+
+console.log("\n   Las que sí tenemos se mandan exactas:");
+for (const [texto, esperada] of [
+  ["mandame una foto", "q58"],
+  ["que trae la caja?", "q58_contenido"],
+  ["que modelo es?", "q58_caja"],
+  ["es original?", "q58_caja"],
+  ["tiene pantalla? mandame foto", "q58_pantalla"],
+]) {
+  chequear(`"${texto}" → ${esperada}`, detectMediaIntent(texto, Q)[0] === esperada);
+}
+
+console.log("\n   🔑 Y NUNCA una de otro producto:");
+for (const texto of ["como se ve en el casco?", "foto del combo", "mandame foto", "es original?"]) {
+  chequear(
+    `"${texto}" solo devuelve claves q58*`,
+    detectMediaIntent(texto, Q).every((k) => k.startsWith("q58")),
+    "mandar la del V10 o la del impermeable sería el producto equivocado"
+  );
+}
+
+console.log("\n   El V10 no cambió (tiene todas sus fotos):");
+for (const [texto, esperada] of [
+  ["como se ve puesto", "v10_puesto"],
+  ["foto del combo", "v10_combo"],
+  ["mandame una foto", "v10"],
+  ["que trae la caja", "v10_contenido"],
+]) {
+  chequear(`V10: "${texto}" → ${esperada}`, detectMediaIntent(texto, V)[0] === esperada);
+}
+
+console.log("\n   Y si no pidió ver nada, no manda nada:");
+for (const texto of ["cuanto vale el envio a cali", "tiene garantia?", "cuanto dura la bateria"]) {
+  chequear(`"${texto}" → ninguna foto`, detectMediaIntent(texto, Q).length === 0);
+}
 
 console.log(`\n${ok}/${ok + mal} correctos`);
 if (mal) {

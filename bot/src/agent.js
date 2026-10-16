@@ -343,7 +343,35 @@ function detectMediaIntent(text, productoId) {
     // ordenadas de lo más preciso ("puesto en el casco") a lo más genérico ("una
     // foto cualquiera"). Ejemplo real: "¿qué trae la caja?" activaba el contenido Y
     // la caja cerrada; gana el contenido, que es lo que preguntó.
-    return delV10.slice(0, 1);
+    // ========================================================================
+    // 🔑 LA PRIMERA QUE DE VERDAD EXISTE — Y SI NO HAY, LA PRINCIPAL (15-oct)
+    //
+    // 🔴 EL AGUJERO QUE ESTO TAPA. Antes esto era `delV10.slice(0, 1)`: se
+    // quedaba con la primera de la lista y recién después `soloDisponibles` la
+    // filtraba si no había archivo. Resultado: el cliente preguntaba *"¿cómo se
+    // ve en el casco?"*, la lista quedaba en `["q58_puesto"]`, el filtro la
+    // sacaba… y NO SE MANDABA NINGUNA FOTO. Teniendo cuatro buenas cargadas.
+    //
+    // Es el caso real del Q58: el dueño decidió lanzar con las fotos del equipo,
+    // la pantalla, la caja y el contenido, SIN la del casco ni la del combo —que
+    // son justo las dos que más se piden—. Quedarse callado ahí es perder la
+    // pregunta que precede a la compra.
+    //
+    // Ahora: se busca la primera que exista; y si pidió ver algo y ninguna de
+    // las específicas está, se manda la PRINCIPAL del producto. Peor que la foto
+    // del casco es ninguna foto. Lo que no se hace nunca es mandar la de OTRO
+    // producto: todo sale del prefijo de este.
+    // ========================================================================
+    const primeraQueExiste = delV10.find((k) => mediaCatalogo.disponible(k));
+    if (primeraQueExiste) return [primeraQueExiste];
+    // ⚠️ `delV10.length > 0` y no solo `quiereVer`, y lo cazó la prueba: la
+    // frase más común de todas —*"¿cómo se ve en el casco?"*— NO contiene la
+    // palabra "foto" ni "ver", así que `quiereVer` es false. Pero sí había
+    // activado la intención de la foto puesta, o sea que el cliente claramente
+    // pidió ver algo. Con la condición anterior ese cliente se quedaba sin
+    // ninguna foto, que es exactamente el agujero que este bloque tapa.
+    if ((quiereVer || delV10.length > 0) && mediaCatalogo.disponible(pref)) return [pref];
+    return [];
   }
 
   const keys = [];
@@ -1482,4 +1510,11 @@ function revisarTelefono(order, chatId) {
 // callIA se exporta para el extractor de datos del chat (src/extraer.js), que
 // necesita hacerle UNA pregunta corta al modelo sin pasar por el guion de ventas
 // ni escribirle nada al cliente.
-module.exports = { generateReply, pidioUnaCorreccion, revisarTelefono, celularValido, extractOrder, rescatarPedido, callIA };
+module.exports = {
+  generateReply, pidioUnaCorreccion, revisarTelefono, celularValido, extractOrder,
+  rescatarPedido, callIA,
+  // 📸 Se exporta para poder probar QUÉ FOTO se elige sin llamar a la IA. Es
+  // la decisión que hace que un cliente que pide ver el producto reciba algo
+  // —o se quede sin nada, como pasaba cuando pedía la del casco y no estaba—.
+  detectMediaIntent,
+};
