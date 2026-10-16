@@ -17,6 +17,7 @@ const guias = require("./guias");
 const panelNovedades = require("./panel-novedades");
 const { numeroDelDueno } = require("./numero-del-dueno");
 const panelChat = require("./panel-chat");
+const turnos = require("./turnos");
 const { avisoParaElDueno: avisoDireccion } = require("./direccion");
 const panelAuditoria = require("./panel-auditoria");
 const novedades = require("./novedades");
@@ -2209,6 +2210,21 @@ function detalleDeSalud() {
         },
       };
     })(),
+
+    // ========================================================================
+    // 🚦 LA FILA POR CLIENTE — para poder comprobar que está haciendo algo
+    //
+    // `carreras_evitadas` es el número que importa: cada una es un mensaje que
+    // llegó mientras otro del MISMO cliente se estaba atendiendo. Antes del
+    // 15-oct esos dos corrían en paralelo, el bot contestaba dos veces cosas
+    // que se contradecían, y el segundo en guardar pisaba lo del primero en
+    // conversations.json. Si este contador sube, el arreglo está trabajando.
+    //
+    // `mensajes_esperando` alto y sostenido sería la señal opuesta: la IA está
+    // tardando tanto que se hace cola. Ahí el problema es el tiempo de
+    // respuesta, no la fila.
+    // ========================================================================
+    turnos: turnos.estado(),
   };
 }
 
@@ -2841,6 +2857,31 @@ async function handleWebhook(body) {
         });
       }
       for (const msg of messages) {
+        // ====================================================================
+        // 🚦 UN TURNO POR CLIENTE — ver bot/src/turnos.js para el caso real
+        //
+        // Cada mensaje de WhatsApp llega en un POST aparte, y el webhook
+        // contesta 200 y procesa sin esperar al anterior. Dos mensajes pegados
+        // del mismo cliente se atendían EN PARALELO: los dos leían la
+        // conversación antes de que el otro escribiera, y el bot contestaba dos
+        // veces cosas que se contradecían (el 15-oct se despidió de un cliente
+        // y después le volvió a ofrecer el producto; a otro le mandó la misma
+        // foto dos veces).
+        //
+        // Peor: `store` reescribe conversations.json completo, así que el
+        // segundo en guardar PISABA lo que guardó el primero. Un mensaje —o los
+        // datos de un pedido— podían desaparecer sin un solo error en el log.
+        //
+        // La fila es por cliente, no global: dos personas distintas se siguen
+        // atendiendo al mismo tiempo igual que antes.
+        //
+        // ⚠️ El cuerpo de este bucle quedó dentro de una función, así que los
+        // `continue` que cortaban la atención de ESTE mensaje son ahora
+        // `return`. Hacen exactamente lo mismo. Los `continue` del bucle de
+        // adentro (`for (const key of media)`) se quedaron como estaban.
+        // ====================================================================
+        const quienDelTurno = quienEscribe(msg, value);
+        await turnos.enFila(quienDelTurno.id || "sin-remitente", async () => {
         const quien = quienEscribe(msg, value);
         const from = quien.id;
         // El nombre y el username son lo único humano que tenemos de un cliente
@@ -2941,7 +2982,7 @@ async function handleWebhook(body) {
               "Listo, no te escribo más 🙌 Si algún día lo necesitás, acá estamos. ¡Buen camino! 🏍️"
             );
             console.log(`(${from}) dijo NO por botón. Marcado como noMolestar.`);
-            continue;
+            return;
           }
         }
 
@@ -2969,7 +3010,7 @@ async function handleWebhook(body) {
               from,
               "Te escuché a medias, se me cortó el audio 🙈 ¿Me lo escribís? Así te respondo bien y no te hago repetir."
             );
-            continue;
+            return;
           }
         }
 
@@ -3053,7 +3094,7 @@ async function handleWebhook(body) {
           // 5. Contestarle al cliente. Nunca más "no puedo abrir ese archivo" a
           // alguien que acaba de pagar.
           await sendText(from, comprobante.respuestaAlCliente(datos));
-          continue;
+          return;
         }
 
         // Otros tipos (stickers, videos, ubicaciones): el bot no los procesa,
@@ -3075,10 +3116,10 @@ async function handleWebhook(body) {
             from,
             "Recibí tu mensaje 🙌 Todavía no puedo abrir ese tipo de archivo. ¿Me contás por escrito qué necesitás?"
           );
-          continue;
+          return;
         }
 
-        if (!text) continue;
+        if (!text) return;
 
         // Si pide que no le escriban mas, se respeta para siempre y se saca
         // del seguimiento. Esto va ANTES de la pausa: aunque un humano tenga el
@@ -3173,7 +3214,7 @@ async function handleWebhook(body) {
 
         if (store.isPaused(from)) {
           console.log(`(${from}) en modo humano; el bot no responde.`);
-          continue;
+          return;
         }
 
         console.log(`Cliente ${from}: ${text}`);
@@ -3364,6 +3405,7 @@ async function handleWebhook(body) {
               `y el atajo «🛟 Posventa» arriba. El bot sigue activo en ese chat.`
           );
         }
+        }); // 🚦 fin del turno de este cliente
       }
     }
   }
