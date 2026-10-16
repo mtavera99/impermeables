@@ -165,3 +165,30 @@ MEDIA_Q58_CONTENIDO = https://.../q58-contenido.jpg
 MEDIA_Q58_CAJA      = https://.../q58-caja.jpg
 MEDIA_Q58_PANTALLA  = https://.../q58-pantalla.jpg
 ```
+
+### ✅ Estado de las fotos del Q58 (15-oct)
+
+El dueño las subió desde el iPhone como `IMG_3842.heic` … `IMG_3847.heic`. Se renombraron y
+**se convirtieron a JPG**, porque **WhatsApp no acepta HEIC**: aunque el nombre fuera
+correcto, Meta habría rechazado el envío con `131053 Media upload error` y el cliente no
+habría recibido nada.
+
+| Archivo final | Era | Qué se ve |
+|---|---|---|
+| `q58-producto.jpg` | `IMG_3844` | el equipo solo sobre fondo blanco — la principal |
+| `q58-pantalla.jpg` | `IMG_3845` | la pantalla encendida y el aro RGB iluminado |
+| `q58-caja.jpg` | `IMG_3842` | la caja cerrada, se lee **Q58-Max** |
+| `q58-contenido.jpg` | `IMG_3843` | la caja abierta, con el equipo y el manual |
+
+`IMG_3846` e `IMG_3847` **no se usaron**: son casi la misma foto (el equipo sobre el manual)
+y el manual está en chino, así que como foto de venta resta más de lo que suma. Quedan en el
+historial de git por si se quieren recuperar.
+
+#### 🔴 Faltan las dos que más venden
+
+| Falta | Por qué importa |
+|---|---|
+| `q58-puesto.jpg` | **la más pedida.** *"¿Cómo se ve en el casco?"* es la pregunta que precede a la compra |
+| `q58-combo.jpg` | el anuncio empuja el combo de dos, y no hay ninguna foto que lo muestre |
+
+Mientras falten, el bot simplemente no las ofrece — **nunca manda las del V10 en su lugar**.

@@ -563,8 +563,17 @@ const PRODUCTOS = {
           "lluvia", "llueve", "impermeable?", "impermeables?",
           "ipx", "ip6", "ip65", "ip67", "ip68", "certificacion", "certificación",
         ],
+        // ✅ 15-OCT, SEGUNDA TANDA: "y al polvo" se agregó porque lo dice LA CAJA
+        // DEL PRODUCTO. Las fotos que mandó el dueño muestran el empaque con el
+        // texto impreso: *"Intercom mixing, Waterproof and dustproof, Intelligent
+        // noise reduction"*. Eso es el fabricante afirmándolo en su propio
+        // empaque, que es mejor fuente que cualquier vendedor.
+        //
+        // 🔑 Y sigue SIN número de certificación: la caja tampoco lo dice. Pero
+        // "dustproof" explica por qué media Colombia publica IP65 (el 6 es
+        // justamente polvo) y la otra mitad IPX6 (que no certifica polvo).
         respuesta:
-          "Sí 👍 Está diseñado para resistir lluvia y salpicaduras en tus recorridos 🌧️🏍️ " +
+          "Sí 👍 Está diseñado para resistir lluvia, salpicaduras y polvo en tus recorridos 🌧️🏍️ " +
           "Lo que no recomendamos es sumergirlo en agua.",
       },
       alcance: {
