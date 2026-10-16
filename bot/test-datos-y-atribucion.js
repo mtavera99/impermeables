@@ -211,14 +211,19 @@ const filasMal = csv
 chequear("todas las filas tienen la misma cantidad de columnas", filasMal.length === 0, `${filasMal.length} filas torcidas`);
 
 // ===========================================================================
-console.log("\n── A6. El panel muestra los pedidos por anuncio ──");
+console.log("\n── A6. El panel muestra charlas, clics muertos y ventas por anuncio ──");
 // ===========================================================================
 
 const panel = require("./src/panel");
 process.env.PANEL_TOKEN = "clave_de_prueba";
 const html = panel.render();
 
-chequear("el panel tiene la tabla de pedidos por anuncio", html.includes("Pedidos por anuncio"));
+// 16-oct: la tabla pasó de contar solo PEDIDOS a contar también CHARLAS y
+// "se fueron sin escribir". El cambio de título es a propósito: con el Q58 la
+// tabla vieja estaba vacía (0 ventas) justo cuando más hacía falta mirarla.
+chequear("el panel tiene la tabla por anuncio", html.includes("Por anuncio: charlas, clics muertos y ventas"));
+chequear("sigue mostrando los pedidos y lo vendido", html.includes("<th>Pedidos</th>") && html.includes("<th>Vendido</th>"));
+chequear("y agrega las charlas y los clics muertos", html.includes("<th>Charlas</th>") && html.includes("Se fueron sin escribir"));
 chequear("muestra el anuncio real", html.includes("120249499375070390"));
 chequear("agrupa los que no tienen dato en vez de esconderlos", html.includes("(sin dato)"));
 

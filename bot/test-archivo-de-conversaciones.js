@@ -210,6 +210,78 @@ chequear(
 chequear("una vacía da 0", store.ultimaActividad({}) === 0);
 chequear("null no explota", store.ultimaActividad(null) === 0);
 
+// ============================================================================
+// 📏 SE PUEDE VER EL TAMAÑO DEL HISTÓRICO Y LA VENTANA EN USO (16-oct)
+//
+// DE DÓNDE SALE: el dueño preguntó si bajar DIAS_CONVERSACIONES_ACTIVAS de 7 a 4
+// era seguro, y no se podía contestar con datos. `conversations-archivo.json` no
+// se medía en ningún lado, y es la mitad del trato: la ventana cambia costo del
+// archivo ACTIVO —que se lee en cada mensaje— por costo del HISTÓRICO, que se
+// lee solo cuando un cliente viejo vuelve a escribir.
+//
+// `dias_activas` está por una razón aparte y ya probada en carne propia con
+// ANUNCIOS_V10: poner una variable en Render y que NO tome se ve exactamente
+// igual que ponerla y que funcione. Si no se puede comprobar, no está hecho.
+// ============================================================================
+console.log("\n📏 Lo que se puede medir del archivo");
+const tam = store.tamanosEnDisco();
+chequear("informa el tamaño del histórico", typeof tam.archivo_kb === "number", `archivo_kb=${tam.archivo_kb}`);
+chequear(
+  "el histórico ya pesa algo (se archivó algo en esta corrida)",
+  tam.archivo_kb > 0,
+  `archivo_kb=${tam.archivo_kb}`
+);
+chequear("informa la ventana de días en uso", tam.dias_activas === 7, `dias_activas=${tam.dias_activas}`);
+chequear(
+  "no cuenta las conversaciones del histórico (parsearlo sería el bug otra vez)",
+  !("archivadas" in tam),
+  "contar el histórico obliga a leerlo entero, y /health se consulta seguido"
+);
+chequear("sin avisos cuando los tamaños son chicos", tam.aviso === null && tam.aviso_archivo === null);
+
+// ============================================================================
+// 🔑 LO QUE DE VERDAD CONTESTA LA PREGUNTA: QUÉ PASA AL 5º O 6º DÍA
+//
+// Con una ventana de 4 días, un cliente que escribe al 6º ya está archivado. La
+// respuesta tiene que ser "vuelve completo", no "casi completo".
+// ============================================================================
+// Va en su propio ámbito: este archivo ya usa `todas`, `ruta` y `vuelta` más
+// arriba, y un `const` repetido es un SyntaxError que tumba toda la batería.
+{
+  console.log("\n🔙 Un cliente archivado que escribe al 6º día, con ventana de 4");
+  const viejo = Date.now() - 6 * DIA; // DIA ya está definido más arriba
+  store.pushMsg("dia6", "user", "pregunté por el Q58 hace 6 días");
+  const rutaActivas = path.join(DIR, "conversations.json");
+  const activasAhora = JSON.parse(fs.readFileSync(rutaActivas, "utf8"));
+  activasAhora.dia6.messages.forEach((m) => (m.at = viejo));
+  activasAhora.dia6.ultimoDelCliente = viejo;
+  activasAhora.dia6.noMolestar = true;
+  activasAhora.dia6.atribucion = { source_id: "120249894780920390" };
+  fs.writeFileSync(rutaActivas, JSON.stringify(activasAhora, null, 2));
+
+  const movida = store.archivarConversacionesViejas(4); // ventana de 4 días
+  chequear("con ventana de 4 días, el de 6 días se archiva", movida.movidas === 1, JSON.stringify(movida));
+  chequear("salió del archivo activo", !("dia6" in JSON.parse(fs.readFileSync(rutaActivas, "utf8"))));
+  chequear(
+    "sigue estando para el buscador",
+    "dia6" in store.todasLasConversaciones({ incluirArchivo: true })
+  );
+
+  store.pushMsg("dia6", "user", "sigo interesado, ¿me lo manda a Cali?");
+  const vuelta = store.getConv("dia6");
+  chequear(
+    "vuelve con TODO el historial, no en blanco",
+    vuelta.messages.length === 2 && vuelta.messages[0].content.includes("hace 6 días"),
+    JSON.stringify(vuelta.messages.map((m) => m.content))
+  );
+  chequear("🔴 el noMolestar sobrevivió al viaje de ida y vuelta", vuelta.noMolestar === true);
+  chequear(
+    "la atribución al anuncio sobrevivió",
+    vuelta.atribucion && vuelta.atribucion.source_id === "120249894780920390"
+  );
+  chequear("y volvió al archivo activo", "dia6" in JSON.parse(fs.readFileSync(rutaActivas, "utf8")));
+}
+
 try {
   fs.rmSync(DIR, { recursive: true, force: true });
 } catch {

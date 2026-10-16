@@ -806,30 +806,111 @@ function render(aviso) {
   // Los pedidos viejos (de antes de este cambio) no tienen anuncio y salen
   // agrupados como "sin dato": no se inventa una atribución que no se midió.
   // ==========================================================================
+  // ==========================================================================
+  // 🔴 LA TABLA SOLO CONTABA PEDIDOS, Y ASÍ UN ANUNCIO NUEVO ES INVISIBLE
+  //    (16-oct)
+  //
+  // El comentario de arriba decía la idea correcta —"un anuncio puede traer
+  // charlas baratas y no vender, y ese es justo el que se venía premiando"—
+  // pero solo se construyó la mitad: la de los pedidos. Entonces un anuncio con
+  // CERO pedidos no aparece en ninguna fila, y es exactamente el que hay que
+  // mirar.
+  //
+  // Pasó con el Q58: la primera noche de pauta trajo 28 conversaciones y 0
+  // ventas, y esta tabla estaba vacía para sus tres anuncios. No se podía saber
+  // cuál de los tres creativos traía los clics malos.
+  //
+  // 🔑 Y LA COLUMNA QUE DE VERDAD DECIDE ES "se fueron sin escribir". Medido esa
+  // noche: de los 28 leads del Q58, **20 (71%) nunca escribieron una sola
+  // letra** — solo el texto que WhatsApp manda solo al tocar el botón del
+  // anuncio. En el V10, en la misma ventana, eran 35%. Ese número separa "el
+  // guion no convence" de "el anuncio trae gente que no quiere hablar", que son
+  // problemas distintos y se arreglan en lugares distintos.
+  //
+  // Cómo se cuenta: una conversación con UN SOLO mensaje del cliente. El primer
+  // mensaje de un lead de anuncio es siempre el prellenado, así que uno solo
+  // significa que nunca tecleó nada. Se comprobó contra el texto exacto del
+  // prellenado en los tres productos y coincidió 20/20, 13/13 y 25/25, así que
+  // se usa la forma de contar —que no depende de adivinar la redacción del
+  // anuncio, y sigue sirviendo cuando el dueño la cambie.
+  //
+  // ♻️ Se calcula sobre `convs`, que YA está en memoria desde la línea 146. NO
+  // se lee el disco otra vez: esa fue la regresión del PR #211 (de 13 a 54
+  // lecturas por render) y no se repite.
+  // ==========================================================================
   const porAnuncio = new Map();
+  const filaDeAnuncio = (k) => {
+    if (!porAnuncio.has(k)) {
+      porAnuncio.set(k, {
+        pedidos: 0,
+        total: 0,
+        origen: "",
+        charlas: 0,
+        sinEscribir: 0,
+        producto: "",
+      });
+    }
+    return porAnuncio.get(k);
+  };
+
+  Object.values(convs || {}).forEach((c) => {
+    const id = c && c.anuncio && c.anuncio.source_id;
+    if (!id) return; // sin atribución no se inventa de dónde vino
+    const a = filaDeAnuncio(String(id));
+    a.charlas += 1;
+    const delCliente = (c.messages || []).filter((m) => m.role === "user").length;
+    if (delCliente <= 1) a.sinEscribir += 1;
+    if (!a.origen) a.origen = c.anuncio.source_url || "";
+    if (!a.producto) {
+      try {
+        const pid = catalogo.productoDelAnuncio(c.anuncio);
+        a.producto = pid ? (catalogo.de(pid) || {}).nombreCorto || "" : "";
+      } catch {
+        /* si el catálogo no lo reconoce, la fila igual sirve */
+      }
+    }
+  });
+
   pedidos.forEach((p) => {
     const k = p.anuncio_id || "(sin dato)";
-    const a = porAnuncio.get(k) || { pedidos: 0, total: 0, origen: p.anuncio_origen || "" };
+    const a = filaDeAnuncio(k);
     a.pedidos += 1;
     a.total += Number(p.total) || 0;
-    porAnuncio.set(k, a);
+    if (!a.origen) a.origen = p.anuncio_origen || "";
   });
+  // Se ordena por charlas y no por pedidos: con un producto nuevo, las filas
+  // interesantes son justo las que todavía tienen 0 pedidos.
   const filasAnuncios = [...porAnuncio.entries()]
-    .sort((a, b) => b[1].pedidos - a[1].pedidos)
-    .map(
-      ([id, a]) => `<tr>
+    .sort((a, b) => b[1].charlas - a[1].charlas || b[1].pedidos - a[1].pedidos)
+    .map(([id, a]) => {
+      const pct = a.charlas ? Math.round((100 * a.sinEscribir) / a.charlas) : null;
+      // 🔴 arriba de 60% el anuncio trae clics que no quieren hablar. El umbral
+      // sale de la medición del 15-oct: V10 35% (sano) vs Q58 71% (no).
+      const clase = pct === null ? "" : pct >= 60 ? "mal" : pct >= 45 ? "medio" : "bien";
+      const cierre = a.charlas ? ((100 * a.pedidos) / a.charlas).toFixed(1) + "%" : "—";
+      return `<tr>
           <td class="nowrap" data-label="Anuncio">${id === "(sin dato)" ? '<span class="sub">(sin dato)</span>' : esc(id)}</td>
+          <td class="nowrap" data-label="Producto">${esc(a.producto || "")}</td>
           <td data-label="De dónde">${esc(a.origen || "")}</td>
+          <td class="nowrap" data-label="Charlas"><b>${a.charlas || 0}</b></td>
+          <td class="nowrap ${clase}" data-label="Se fueron sin escribir">${
+            pct === null ? "—" : `<b>${a.sinEscribir}</b> <span class="sub">(${pct}%)</span>`
+          }</td>
           <td class="nowrap" data-label="Pedidos"><b>${a.pedidos}</b></td>
+          <td class="nowrap" data-label="Cierre">${cierre}</td>
           <td class="nowrap" data-label="Vendido"><b>${esc(fmtCOP(a.total))}</b></td>
-        </tr>`
-    )
+        </tr>`;
+    })
     .join("");
-  const bloqueAnuncios = pedidos.length
-    ? `<h2>🎯 Pedidos por anuncio</h2>
-       <p class="sub">Cruzá el <b>id</b> con el gasto de ese anuncio en Meta Ads y tenés el costo real por venta.</p>
+  const bloqueAnuncios = porAnuncio.size
+    ? `<h2>🎯 Por anuncio: charlas, clics muertos y ventas</h2>
+       <p class="sub">Cruzá el <b>id</b> con el gasto de ese anuncio en Meta Ads y tenés el costo real por venta.<br>
+       <b>«Se fueron sin escribir»</b> son los que tocaron el botón del anuncio y nunca teclearon nada:
+       WhatsApp manda el saludo solo, y ahí se acabó. Arriba del 60% el problema está en el
+       <b>creativo</b>, no en el guion — el anuncio promete algo que al abrir el chat no engancha.</p>
        <div class="tabla"><table>
-         <tr><th>Anuncio</th><th>De dónde</th><th>Pedidos</th><th>Vendido</th></tr>
+         <tr><th>Anuncio</th><th>Producto</th><th>De dónde</th><th>Charlas</th>
+             <th>Se fueron sin escribir</th><th>Pedidos</th><th>Cierre</th><th>Vendido</th></tr>
          ${filasAnuncios}
        </table></div>`
     : "";
@@ -1130,6 +1211,9 @@ function render(aviso) {
   .resp button:hover{background:#158a51}
   .envio{margin-top:8px;font-size:13px;min-height:18px}
   .envio.ok{color:var(--verde)}.envio.mal{color:var(--rojo)}.envio.wait{color:#ffd479}
+  /* 🎯 Columna "se fueron sin escribir": el color es el que hace leer la tabla de
+     un vistazo. Rojo = el creativo trae clics que no quieren hablar. */
+  td.mal{color:var(--rojo);font-weight:700}td.medio{color:#ffd479}td.bien{color:var(--verde)}
   .resp button:disabled{opacity:.5;cursor:default}
   .pausa{margin-top:8px}
   .pausa button{
@@ -1414,8 +1498,8 @@ function render(aviso) {
     // La tabla de anuncios es de consulta, no de trabajo diario: también plegada.
     bloqueAnuncios
       ? `<details class="plegable">
-           <summary><b>📣 Pedidos por anuncio</b>
-             <span class="pista">de qué anuncio viene cada venta</span></summary>
+           <summary><b>📣 Por anuncio: charlas, clics muertos y ventas</b>
+             <span class="pista">cuál creativo trae gente que sí habla</span></summary>
            ${bloqueAnuncios}
          </details>`
       : ""

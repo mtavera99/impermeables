@@ -2598,17 +2598,77 @@ function tamanosEnDisco() {
   try {
     conversaciones = Object.keys(readJSON(CONV_FILE, {})).length;
   } catch {}
+
+  // ==========================================================================
+  // 📦 EL ARCHIVO HISTÓRICO — faltaba, y es el número que decide la ventana
+  //
+  // 🔴 DE DÓNDE SALE (16-oct). Al preguntar si bajar DIAS_CONVERSACIONES_ACTIVAS
+  // de 7 a 4 era seguro, no había forma de responderlo con datos: este archivo
+  // no se medía en ningún lado. Y es el que importa para esa decisión, porque el
+  // trato es justamente cambiar costo del archivo ACTIVO —que se lee en cada
+  // mensaje— por costo del HISTÓRICO, que se lee solo cuando un cliente viejo
+  // vuelve a escribir. Sin este tamaño, la mitad del trato era invisible.
+  //
+  // ⚠️ Y es el único archivo que CRECE PARA SIEMPRE: nunca se le borra nada, a
+  // propósito. Hoy eso está bien —se lee pocas veces— pero conviene verlo venir
+  // en vez de descubrirlo en un reinicio.
+  //
+  // 🔑 Se cuenta con statSync, que es gratis. El NÚMERO de conversaciones
+  // archivadas NO se cuenta acá: habría que parsear el archivo entero, y /health
+  // se consulta seguido. Justamente la clase de lectura que causó el problema.
+  // ==========================================================================
+  const archivo_kb = kb(ARCHIVO_FILE);
+
   return {
     conversaciones_kb,
     pedidos_kb,
     guias_kb: kb(GUIAS_FILE),
     planes_kb: kb(PLANES_FILE),
     conversaciones,
-    // Si esto se pone en rojo, el arreglo es dejar de leer el archivo entero en
-    // cada mensaje (o archivar las conversaciones viejas), no subir el plan.
+    archivo_kb,
+    // Cuántos días de inactividad aguanta una conversación antes de pasar al
+    // archivo. Se muestra para poder COMPROBAR que la variable de Render quedó
+    // puesta: sin esto, cambiarla y que no tome se ve exactamente igual que
+    // cambiarla y que funcione.
+    dias_activas: DIAS_ACTIVAS,
+    // ========================================================================
+    // ⚠️ ESTE AVISO DECÍA "ESE ES EL TECHO DE MEMORIA" Y ESO HIZO TOMAR UNA
+    //    DECISIÓN EQUIVOCADA (16-oct)
+    //
+    // Con el archivo en 15 MB, este aviso en rojo se leyó junto a
+    // `memoria.pico.proceso_mb: 263` y `memoria.heap_techo_mb: 268`, y se
+    // concluyó que faltaba un 2% para que Render tumbara el servicio. Era falso:
+    // esos dos números NO se comparan entre sí.
+    //
+    //   · `proceso_mb` es RSS, y va contra los 512 MB del contenedor de Render.
+    //   · `heap_techo_mb` es el límite del heap de V8, y lo que va contra él es
+    //     `heap_reservado_mb` — que en ese momento estaba en 46 MB. O sea 17%,
+    //     no 98%.
+    //
+    // Comparar RSS contra el techo del heap es comparar dos cosas distintas, y
+    // casi llevó a recortar la ventana de días sin ninguna necesidad.
+    //
+    // 🔑 Así que el aviso ahora dice qué mirar para decidir, en vez de afirmar
+    // una conclusión. Y pasa de 🔴 a 🟡: a 15 MB esto es una señal temprana. Los
+    // reinicios del 14-oct fueron con 33 MB y 11.000 conversaciones, que es el
+    // doble, y ahí sí el heap reservado se iba contra el techo.
+    // ========================================================================
     aviso:
       conversaciones_kb > 15000
-        ? "🔴 conversations.json pasa los 15 MB: cada mensaje lo lee y lo reescribe completo. Ese es el techo de memoria."
+        ? "🟡 conversations.json pasa los 15 MB: cada mensaje lo lee y lo reescribe completo. " +
+          "Es una señal TEMPRANA, no una emergencia. Para saber si aprieta de verdad, mirá " +
+          "memoria.pico.heap_reservado_mb contra memoria.heap_techo_mb — eso sí se compara. " +
+          "(El RSS, memoria.proceso_mb, va contra los 512 MB del contenedor de Render, que es otra cosa.) " +
+          "Los reinicios del 14-oct fueron con 33 MB y 11.000 conversaciones."
+        : null,
+    // El histórico no se lee por mensaje, así que puede ser mucho más grande sin
+    // molestar. Pero cuando un cliente archivado vuelve a escribir, se lee y se
+    // reescribe COMPLETO de una sola vez: ese es el pico que este número avisa.
+    aviso_archivo:
+      archivo_kb > 60000
+        ? "🟡 conversations-archivo.json pasa los 60 MB. No se lee por mensaje, pero cuando un " +
+          "cliente viejo vuelve a escribir se lee y se reescribe completo. Ese es un pico puntual " +
+          "grande. Si molesta, lo que toca es partirlo por mes, no bajar la ventana de días."
         : null,
   };
 }
