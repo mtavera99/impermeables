@@ -427,6 +427,71 @@ chequear(
   media.MEDIA.v10.base === "v10-producto" && media.MEDIA.v10_caja.base === "v10-caja"
 );
 
+// ============================================================================
+console.log("\n── 11. 🔑 PEDIR UNA FOTO QUE NO TENEMOS NO PUEDE DEJARLO SIN NADA ──");
+//
+// El dueño decidió lanzar con 4 fotos (equipo, pantalla, caja, contenido) y SIN
+// la del casco ni la del combo: *"sin la del casco, sin la foto de dos, con las
+// otras tenemos"*.
+//
+// 🔴 Y ahí había un agujero: la selección se quedaba con la primera de la lista
+// y recién después se filtraba por si existía. Un cliente que preguntaba *"¿cómo
+// se ve en el casco?"* —la pregunta que precede a la compra— se quedaba SIN
+// NINGUNA FOTO, teniendo cuatro buenas cargadas.
+// ============================================================================
+const { detectMediaIntent } = require("./src/agent");
+
+console.log("   Pide las que faltan → recibe la principal:");
+for (const texto of [
+  "como se ve en el casco?",
+  "me mandas una foto puesto?",
+  "como queda montado",
+  "tienes foto del combo de dos?",
+  "foto de los dos",
+]) {
+  const r = detectMediaIntent(texto, Q);
+  chequear(
+    `"${texto}" → manda la principal`,
+    r.length === 1 && r[0] === "q58",
+    `dio ${JSON.stringify(r)}. Si da [], el cliente se queda sin ninguna foto`
+  );
+}
+
+console.log("\n   Las que sí tenemos se mandan exactas:");
+for (const [texto, esperada] of [
+  ["mandame una foto", "q58"],
+  ["que trae la caja?", "q58_contenido"],
+  ["que modelo es?", "q58_caja"],
+  ["es original?", "q58_caja"],
+  ["tiene pantalla? mandame foto", "q58_pantalla"],
+]) {
+  chequear(`"${texto}" → ${esperada}`, detectMediaIntent(texto, Q)[0] === esperada);
+}
+
+console.log("\n   🔑 Y NUNCA una de otro producto:");
+for (const texto of ["como se ve en el casco?", "foto del combo", "mandame foto", "es original?"]) {
+  chequear(
+    `"${texto}" solo devuelve claves q58*`,
+    detectMediaIntent(texto, Q).every((k) => k.startsWith("q58")),
+    "mandar la del V10 o la del impermeable sería el producto equivocado"
+  );
+}
+
+console.log("\n   El V10 no cambió (tiene todas sus fotos):");
+for (const [texto, esperada] of [
+  ["como se ve puesto", "v10_puesto"],
+  ["foto del combo", "v10_combo"],
+  ["mandame una foto", "v10"],
+  ["que trae la caja", "v10_contenido"],
+]) {
+  chequear(`V10: "${texto}" → ${esperada}`, detectMediaIntent(texto, V)[0] === esperada);
+}
+
+console.log("\n   Y si no pidió ver nada, no manda nada:");
+for (const texto of ["cuanto vale el envio a cali", "tiene garantia?", "cuanto dura la bateria"]) {
+  chequear(`"${texto}" → ninguna foto`, detectMediaIntent(texto, Q).length === 0);
+}
+
 console.log(`\n${ok}/${ok + mal} correctos`);
 if (mal) {
   console.log(
