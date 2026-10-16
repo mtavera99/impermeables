@@ -224,11 +224,49 @@ function primerMensaje() {
 //  · ⛔ No dice "2x1" ni promete especificaciones que no tenemos.
 // ----------------------------------------------------------------------------
 // `ficha` entra por parámetro (15-oct): sirve para el V10 2X y el Q58 Max.
+//
+// ============================================================================
+// 🔴 POR QUÉ EL Q58 LLEVA UNA LÍNEA MÁS (16-oct) — MEDIDO EN LOS CHATS
+//
+// Al revisar la primera hora de pauta del Q58 apareció esto: de 60
+// conversaciones, 16 venían del anuncio del Q58. De las 8 que ya tenían más de
+// 20 minutos —tiempo de sobra para contestar—, **7 se murieron en el primer
+// turno**. Las del V10 en la misma ventana y con la misma antigüedad: 6 de 9
+// siguieron hablando. Y pedidos del Q58 desde que se encendió: CERO.
+//
+// La causa no es el bot fallando: contestó en el mismo minuto en los 16 casos.
+// Era LO QUE DECÍA. Este mensaje se compartía tal cual entre los dos productos,
+// cambiando solo el nombre y el precio, así que el cliente del Q58 leía:
+//
+//     "combo de 2 Q58 Max por $129.900"
+//     "para hablar de casco a casco, música, GPS y llamadas"
+//
+// O sea: la MISMA lista de beneficios del V10, que vale $99.900. Treinta mil
+// pesos más caro por lo que, leído así, es el mismo aparato. No había ninguna
+// razón para pagar la diferencia, y la pantalla, la radio FM, la luz LED y la
+// ranura de memoria —que son exactamente esa razón y ya estaban escritas en la
+// ficha del producto— no aparecían en ningún lado del primer mensaje.
+//
+// 🔑 EL MENSAJE DEL V10 NO SE TOCÓ, NI UN CARÁCTER. Es el mensaje de más
+// tráfico de la operación y lleva semanas vendiendo; el `if` es sobre el
+// producto, no sobre el texto de siempre. Hay una prueba que compara el texto
+// del V10 carácter por carácter justamente para que esto no se deslice.
+//
+// ⚠️ Se agrega UNA línea y no cuatro viñetas, por la misma regla de arriba: el
+// primer mensaje nombra el beneficio y hace UNA pregunta. La ficha completa ya
+// la da el guion si el cliente pregunta.
+// ============================================================================
 function primerMensajeV10(ficha) {
   const v10 = ficha || require("./catalogo").de("intercom_v10_2x");
+
+  // Lo que ESTE modelo tiene de más que el otro, si lo tiene. Sale de la ficha
+  // para no escribir dos veces la misma lista de funciones.
+  const deMas = v10.lineaQueJustificaElPrecio || null;
+
   return [
     `¡Hola! 👋 Claro que sí. Tenemos el combo de 2 intercomunicadores ${v10.nombreCorto} por ${fmt(v10.precios[2])} 🏍️`,
     "Sirven para hablar de casco a casco con tu acompañante, y también los usás para música, las indicaciones del GPS y llamadas 🎧",
+    ...(deMas ? [deMas] : []),
     `Ese precio es por los dos, y aparte el envío según tu ciudad. Pagás todo junto contraentrega cuando lo recibís 📦`,
     "¿Para qué ciudad o municipio sería? Así te doy el total exacto.",
   ].join("\n\n");

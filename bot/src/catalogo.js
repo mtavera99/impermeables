@@ -486,6 +486,30 @@ const PRODUCTOS = {
     // La publicidad empuja el combo, igual que en el V10.
     ofertaPrincipal: { unidades: 2, precio: 129900, nombre: "combo x2" },
 
+    // ------------------------------------------------------------------------
+    // 💬 LA LÍNEA QUE JUSTIFICA LOS $30.000 (16-oct) — la usa `primerMensajeV10`
+    //
+    // El V10 NO tiene este campo, y por eso su primer mensaje queda exactamente
+    // como estaba. Acá existe porque el Q58 arrancó la pauta pidiendo $129.900
+    // con la misma descripción del V10 de $99.900: casco a casco, música, GPS y
+    // llamadas. Nada que explicara la diferencia.
+    //
+    // Medido en la primera hora: de las 8 conversaciones del Q58 con más de 20
+    // minutos, 7 se murieron en el primer turno; las del V10 en la misma
+    // ventana siguieron hablando 6 de 9. Y cero pedidos del Q58.
+    //
+    // Son las cuatro funciones de `funciones` que el V10 no tiene, dichas en
+    // una sola línea y en el orden en que pesan para un motociclista: lo que se
+    // ve (pantalla), lo que ya conoce (radio), lo que le resuelve un problema
+    // (música sin gastar el celular) y lo visible de noche (LED).
+    //
+    // ⚠️ Es texto COMERCIAL. Si el dueño prefiere otra redacción, se cambia acá
+    // y no hay que tocar ni el guion ni el código.
+    // ------------------------------------------------------------------------
+    lineaQueJustificaElPrecio:
+      "Este trae además pantalla, radio FM, luz LED y ranura de memoria, " +
+      "para música sin gastar la batería del celular ✨",
+
     // 🎯 Ids de anuncio de Meta de ESTE producto. Ver `productoDelAnuncio`.
     // Se configuran en Render, no en el código: los anuncios los crea el dueño y
     // cambian con cada campaña.

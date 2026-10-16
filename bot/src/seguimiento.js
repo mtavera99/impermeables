@@ -166,12 +166,97 @@ const TEXTOS_POR_PRODUCTO = {
       "tienes en la mano, no antes 🏍️\n\n" +
       "¿Te los despacho? Si quieres dime tu ciudad y te confirmo el total exacto.",
   },
+
+  // ==========================================================================
+  // 🔴 EL Q58 FALTABA ACÁ, Y ESO REVIVIÓ EL BUG DE ARRIBA (16-oct)
+  //
+  // El arreglo del 29-sep puso un texto por producto, pero dejó el default en
+  // `impermeable`. El Q58 entró al catálogo el 15-oct SIN entrada propia, así
+  // que `textoDe("intercom_q58_max", 1)` caía en el default y a un lead de
+  // intercomunicadores le llegaba, dos horas después:
+  //
+  //     "¿Te quedó alguna duda con el impermeable? ... Si no te sirve la
+  //      talla, se cambia."
+  //
+  // Exactamente el mensaje que este bloque existe para evitar. Y no era
+  // teórico: la primera hora de pauta trajo 16 leads del Q58 y 14 se quedaron
+  // callados en el primer turno — o sea que CASI TODOS iban a recibir esto.
+  //
+  // 🔑 El esqueleto es el del V10 porque es el mismo tipo de producto y la
+  // redacción no nombra ningún modelo. En el paso 2 se agrega la razón del
+  // precio, que es el mismo hueco que se tapó en el primer mensaje: el Q58 vale
+  // $30.000 más que el V10 y hasta ahora nada lo explicaba.
+  //
+  // ⛔ No se promete ni un dato que no esté en `catalogo.datosConfirmados`.
+  // ==========================================================================
+  intercom_q58_max: {
+    1:
+      "¿Te quedó alguna duda con los intercomunicadores? 🏍️\n\n" +
+      "Te cuento lo que más preguntan: pagás *cuando los recibís*, no antes. Y el " +
+      "combo es por los DOS, no por uno.\n\n" +
+      "¿Te los despacho?",
+    2:
+      "Hola 👋 Te escribo por los intercomunicadores que estabas mirando.\n\n" +
+      "Siguen disponibles y es *contraentrega*: pagas cuando los tienes en la mano, " +
+      "no antes 🏍️\n\n" +
+      "Este modelo trae pantalla, radio FM y ranura de memoria, para música sin " +
+      "gastar la batería del celular ✨\n\n" +
+      "¿Te los despacho? Si quieres dime tu ciudad y te confirmo el total exacto.",
+  },
+};
+
+// ============================================================================
+// 🔑 EL DEFAULT YA NO ES EL IMPERMEABLE, Y ESA ES LA PARTE QUE IMPORTA
+//
+// Agregar la entrada del Q58 arregla el Q58. No arregla la TRAMPA: cualquier
+// producto que entre mañana al catálogo sin pasar por acá vuelve a recibir el
+// texto del impermeable, con talla y todo. Es el mismo bug dos veces, y la
+// segunda ya costó una noche de pauta.
+//
+// Así que el respaldo se elige por CATEGORÍA, no por "lo de siempre": si la
+// conversación es de un intercomunicador y ese modelo no tiene texto propio, se
+// usa el de intercomunicadores —que a propósito no nombra ningún modelo ni
+// ningún precio, así que sirve para cualquiera de ellos—. Y se grita en el log,
+// porque un respaldo silencioso es cómo se pierde una semana buscando esto.
+//
+// ⚠️ El del impermeable queda SOLO para productos de esa categoría. Su
+// redacción no se toca: está medida (268 enviados → 8 compras en el paso de 2h).
+// ============================================================================
+
+/** Texto genérico de la categoría, para cuando un modelo no trae el suyo. */
+const RESPALDO_POR_CATEGORIA = {
+  intercomunicador: TEXTOS_POR_PRODUCTO.intercom_v10_2x,
 };
 
 /** El texto del paso `n` para el producto de esa conversación. */
 function textoDe(productoId, n) {
-  const porProducto = TEXTOS_POR_PRODUCTO[productoId] || TEXTOS_POR_PRODUCTO.impermeable;
-  return porProducto[n] || TEXTOS_POR_PRODUCTO.impermeable[n];
+  const propio = TEXTOS_POR_PRODUCTO[productoId];
+  if (propio && propio[n]) return propio[n];
+
+  const ficha = catalogo.de(productoId);
+  const categoria = ficha && ficha.categoria;
+  const respaldo = categoria && RESPALDO_POR_CATEGORIA[categoria];
+  if (respaldo && respaldo[n]) {
+    console.error(
+      `🔴 SEGUIMIENTO SIN TEXTO PROPIO: el producto "${productoId}" no tiene texto para el ` +
+        `paso ${n} en TEXTOS_POR_PRODUCTO. Se usa el genérico de la categoría ` +
+        `"${categoria}", que no nombra ningún modelo. ` +
+        `⚠️ Escribile el suyo: sin esto el seguimiento le habla en general y pierde el gancho.`
+    );
+    return respaldo[n];
+  }
+
+  // Último recurso. Si acá llega un producto que NO es impermeable, el texto va
+  // a hablar de talla: se avisa fuerte, porque es el bug del 29-sep otra vez.
+  if (ficha && categoria && categoria !== "impermeable") {
+    console.error(
+      `🔴🔴 SEGUIMIENTO CON EL PRODUCTO EQUIVOCADO: "${productoId}" es de la categoría ` +
+        `"${categoria}" y no hay texto suyo ni respaldo para esa categoría en el paso ${n}. ` +
+        `Va a salir el texto del IMPERMEABLE (habla de talla). Agregá la categoría a ` +
+        `RESPALDO_POR_CATEGORIA en seguimiento.js.`
+    );
+  }
+  return TEXTOS_POR_PRODUCTO.impermeable[n];
 }
 
 // 🔴 LA PLANTILLA DEL V10 NO EXISTE TODAVÍA, Y ESO NO SE INVENTA.
