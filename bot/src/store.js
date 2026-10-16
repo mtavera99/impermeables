@@ -2598,17 +2598,53 @@ function tamanosEnDisco() {
   try {
     conversaciones = Object.keys(readJSON(CONV_FILE, {})).length;
   } catch {}
+
+  // ==========================================================================
+  // 📦 EL ARCHIVO HISTÓRICO — faltaba, y es el número que decide la ventana
+  //
+  // 🔴 DE DÓNDE SALE (16-oct). Al preguntar si bajar DIAS_CONVERSACIONES_ACTIVAS
+  // de 7 a 4 era seguro, no había forma de responderlo con datos: este archivo
+  // no se medía en ningún lado. Y es el que importa para esa decisión, porque el
+  // trato es justamente cambiar costo del archivo ACTIVO —que se lee en cada
+  // mensaje— por costo del HISTÓRICO, que se lee solo cuando un cliente viejo
+  // vuelve a escribir. Sin este tamaño, la mitad del trato era invisible.
+  //
+  // ⚠️ Y es el único archivo que CRECE PARA SIEMPRE: nunca se le borra nada, a
+  // propósito. Hoy eso está bien —se lee pocas veces— pero conviene verlo venir
+  // en vez de descubrirlo en un reinicio.
+  //
+  // 🔑 Se cuenta con statSync, que es gratis. El NÚMERO de conversaciones
+  // archivadas NO se cuenta acá: habría que parsear el archivo entero, y /health
+  // se consulta seguido. Justamente la clase de lectura que causó el problema.
+  // ==========================================================================
+  const archivo_kb = kb(ARCHIVO_FILE);
+
   return {
     conversaciones_kb,
     pedidos_kb,
     guias_kb: kb(GUIAS_FILE),
     planes_kb: kb(PLANES_FILE),
     conversaciones,
+    archivo_kb,
+    // Cuántos días de inactividad aguanta una conversación antes de pasar al
+    // archivo. Se muestra para poder COMPROBAR que la variable de Render quedó
+    // puesta: sin esto, cambiarla y que no tome se ve exactamente igual que
+    // cambiarla y que funcione.
+    dias_activas: DIAS_ACTIVAS,
     // Si esto se pone en rojo, el arreglo es dejar de leer el archivo entero en
     // cada mensaje (o archivar las conversaciones viejas), no subir el plan.
     aviso:
       conversaciones_kb > 15000
         ? "🔴 conversations.json pasa los 15 MB: cada mensaje lo lee y lo reescribe completo. Ese es el techo de memoria."
+        : null,
+    // El histórico no se lee por mensaje, así que puede ser mucho más grande sin
+    // molestar. Pero cuando un cliente archivado vuelve a escribir, se lee y se
+    // reescribe COMPLETO de una sola vez: ese es el pico que este número avisa.
+    aviso_archivo:
+      archivo_kb > 60000
+        ? "🟡 conversations-archivo.json pasa los 60 MB. No se lee por mensaje, pero cuando un " +
+          "cliente viejo vuelve a escribir se lee y se reescribe completo. Ese es un pico puntual " +
+          "grande. Si molesta, lo que toca es partirlo por mes, no bajar la ventana de días."
         : null,
   };
 }
