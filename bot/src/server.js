@@ -2033,6 +2033,38 @@ app.get("/health", (_req, res) => {
 // ============================================================================
 function detalleDeSalud() {
   return {
+    // ========================================================================
+    // 🎯 QUÉ ANUNCIO VENDE QUÉ PRODUCTO — 16-oct
+    //
+    // DE DÓNDE SALE. Con dos intercomunicadores en catálogo, un anuncio mal
+    // mapeado cotiza el producto equivocado: el combo del Q58 vale $129.900 y
+    // el del V10 $99.900, así que son $30.000 por venta y una guía con el
+    // producto que no pidió.
+    //
+    // 🔑 UN ENRUTAMIENTO QUE NO SE PUEDE VERIFICAR NO SIRVE. El dueño pega los
+    // ids en Render; si se le va un espacio, un dígito o la variable queda
+    // vacía, hoy se enteraría recién con el primer pedido mal despachado. Acá
+    // ve, en un segundo y sin desplegar, qué ids tiene cargados cada producto.
+    //
+    // Va detrás del token igual que el resto: son datos de las campañas.
+    // ========================================================================
+    anuncios: (() => {
+      try {
+        const catalogo = require("./catalogo");
+        return catalogo.anunciosConfigurados().map((a) => ({
+          producto: a.nombreCorto,
+          variable: a.variable,
+          cuantos: a.ids.length,
+          ids: a.ids,
+          // Lo que hay que mirar de un vistazo: si está en false, los leads de
+          // ese producto se resuelven por el TEXTO del anuncio, y si el texto
+          // no nombra el modelo caen al default de la categoría.
+          configurado: a.configurado,
+        }));
+      } catch {
+        return null;
+      }
+    })(),
     archivos: (() => {
       try {
         return store.tamanosEnDisco();
