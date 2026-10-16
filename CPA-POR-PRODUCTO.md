@@ -1,6 +1,6 @@
 # 🎯 CPA exacto por producto — BikerPro
 
-> **Ultima lectura: 2026-10-15 09:09 Bogota.** Ventana **2026-10-08 a 2026-10-14** (solo dias cerrados).
+> **Ultima lectura: 2026-10-16 08:56 Bogota.** Ventana **2026-10-09 a 2026-10-15** (solo dias cerrados).
 > Generado por `analisis/cpa-por-producto.py`. **Solo lectura** — regla 4-B.
 
 El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido guarda de que anuncio vino. No hay ninguna proporcion estimada en esta tabla.
@@ -9,37 +9,44 @@ El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido
 
 | producto | gasto | conv | pedidos | **CPA** | $/conv | cierre | recaudo |
 |---|---|---|---|---|---|---|---|
-| **V10** | $553,439 | 1602 | 80 | **$6,918** | $345 | 4.99% | $9,747,000 |
-| **IMPERMEABLE** | $1,063,365 | 2874 | 146 | **$7,283** | $370 | 5.08% | $13,073,000 |
+| **V10** | $556,866 | 1595 | 86 | **$6,475** | $349 | 5.39% | $10,443,000 |
+| **IMPERMEABLE** | $1,035,924 | 2804 | 136 | **$7,617** | $369 | 4.85% | $12,002,000 |
 
 ### 🔎 Cuanta confianza tienen estos numeros
 
 | | |
 |---|---|
-| gasto atribuido a un producto | **$1,616,804** (100.0%) |
-| gasto de anuncios sin pedidos en la ventana | $0 |
-| anuncios clasificados por la forma de sus pedidos | 12 |
+| gasto atribuido a un producto | **$1,592,790** (99.4%) |
+| gasto de anuncios sin pedidos en la ventana | $9,480 |
+| anuncios clasificados por la forma de sus pedidos | 14 |
 | anuncios con pedidos de los DOS productos | 1 ⚠️ |
-| pedidos resueltos por su anuncio (V10 de 1 unidad) | 2 |
+| pedidos resueltos por su anuncio (V10 de 1 unidad) | 3 |
 | pedidos que no se pudieron clasificar | 0 ✅ |
+
+Ese gasto **no se reparte entre los productos**: repartirlo seria volver a estimar, que es justo lo que este informe vino a eliminar. Si la cifra es grande, el CPA de arriba esta medido sobre menos gasto del real.
+
+| conjunto | gasto sin atribuir | conv |
+|---|---|---|
+| Motorizados - Q58 | $5,202 | 9 |
+| Domiciliarios - Expancion - Q58 | $4,278 | 5 |
 
 ### ⚠️ Anuncios con pedidos de los DOS productos
 
 Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio cambio de creativo, o hay pedidos mal atribuidos (el bug del 1-oct).
 
-- `120249619616140390` -> {'V10': 44, 'IMPERMEABLE': 1}
+- `120249619616140390` -> {'V10': 49, 'IMPERMEABLE': 1}
 
 ## Dia por dia
 
 | dia | gasto V10 | ped | CPA V10 | gasto imper | ped | CPA imper |
 |---|---|---|---|---|---|---|
-| 2026-10-08 | $78,985 | 12 | $6,582 | $151,678 | 23 | $6,595 |
 | 2026-10-09 | $78,333 | 13 | $6,026 | $142,644 | 20 | $7,132 |
 | 2026-10-10 | $65,830 | 7 | $9,404 | $119,454 | 13 | $9,189 |
 | 2026-10-11 | $83,039 | 11 | $7,549 | $152,706 | 12 | $12,726 |
 | 2026-10-12 | $86,217 | 11 | $7,838 | $178,038 | 24 | $7,418 |
 | 2026-10-13 | $74,834 | 12 | $6,236 | $172,071 | 29 | $5,933 |
-| 2026-10-14 | $86,201 | 14 | $6,157 | $146,774 | 25 | $5,871 |
+| 2026-10-14 | $86,407 | 14 | $6,172 | $147,124 | 24 | $6,130 |
+| 2026-10-15 | $82,206 | 18 | $4,567 | $123,887 | 14 | $8,849 |
 
 ## Cada producto contra SU propio equilibrio
 
@@ -47,10 +54,10 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 
 | producto | contrib/entregado | **CPA de equilibrio** | CPA real | colchon | utilidad |
 |---|---|---|---|---|---|
-| **V10** | $32,794 | **$24,608** | $6,918 | 🟢 3.6x | $1,415,239 |
-| **IMPERMEABLE** | $24,981 | **$18,577** | $7,283 | 🟡 2.6x | $1,648,850 |
+| **V10** | $32,810 | **$24,621** | $6,475 | 🟢 3.8x | $1,560,524 |
+| **IMPERMEABLE** | $24,866 | **$18,487** | $7,617 | 🟡 2.4x | $1,478,355 |
 
-**Utilidad de la ventana: $3,064,089** ($437,727/dia)
+**Utilidad de la ventana: $3,038,879** ($434,126/dia)
 
 ## Con que numeros se calculo
 
