@@ -494,6 +494,89 @@ app.get("/chat", (req, res) => {
 });
 
 // ============================================================================
+// 📷 GET /media?token=...&id=<mediaId> — VER LA FOTO QUE MANDÓ UN CLIENTE
+//
+// DE DÓNDE SALE (15-oct), textual del dueño: *"cuando una persona manda una
+// foto normalmente dice 'envío una foto' pero yo no la puedo ver... poner un
+// botón para que cuando yo necesite ver esa imagen la pueda ver sin necesidad
+// de que carguen todas... porque puede que sea un comprobante, puede que sea
+// algún dato importante"*.
+//
+// 🔑 LA FOTO NO SE GUARDA EN NINGÚN LADO, Y ESO ES A PROPÓSITO. Lo único que
+// queda en el historial es el `mediaId` —un texto corto— que ya se anota al
+// recibir el mensaje. La imagen vive en los servidores de Meta y se trae SOLO
+// cuando alguien toca el botón.
+//
+// Esto importa después del 14-oct: guardar las fotos en conversations.json
+// habría repetido exactamente el problema que nos tumbó el servicio nueve veces
+// en cuatro horas. Acá no se suma ni un byte al archivo que se reescribe en
+// cada mensaje.
+//
+// ⚠️ Y NO SE PUEDE REDIRIGIR AL NAVEGADOR a la URL de Meta: esa URL también
+// exige el token de WhatsApp, y mandárselo al navegador sería regalar la llave
+// de la cuenta. Por eso el servidor hace de intermediario.
+//
+// 🚰 Va de a pedazos (stream), no a memoria: una foto de 5 MB no se carga
+// entera para después soltarla. Con 512 MB de contenedor eso se nota.
+// ============================================================================
+app.get("/media", async (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) return res.status(403).send("Falta el token.");
+
+  const id = String(req.query.id || "").trim();
+  // Los id de Meta son largos y alfanuméricos. Se valida la FORMA para no
+  // convertir esta ruta en un "pedí lo que quieras con mi token".
+  if (!/^[A-Za-z0-9._=-]{5,300}$/.test(id)) {
+    return res.status(400).send("Id de medios inválido.");
+  }
+
+  const paginaDeError = (titulo, detalle) =>
+    `<!doctype html><meta charset="utf-8">` +
+    `<meta name="viewport" content="width=device-width, initial-scale=1">` +
+    `<body style="background:#0d1117;color:#e6edf3;font-family:system-ui;padding:24px;line-height:1.5">` +
+    `<h3>${esc(titulo)}</h3><p style="color:#8b98a9">${esc(detalle)}</p></body>`;
+
+  try {
+    const info = await audio.urlDeMedia(id);
+    if (!info.ok) {
+      anotarEvento({ tipo: "media-no-disponible", id: id.slice(0, 30), error: String(info.error).slice(0, 120) });
+      // 🗓️ Meta guarda los medios unos 30 días. Pasado eso ya no existe y no es
+      // un error nuestro: hay que decirlo con esas palabras en vez de un 500
+      // que manda a buscar un problema que no está.
+      return res
+        .status(info.expirado ? 410 : 502)
+        .send(
+          info.expirado
+            ? paginaDeError(
+                "😕 Esta foto ya no está disponible",
+                "WhatsApp guarda los archivos unos 30 días y este ya pasó ese plazo. " +
+                  "El mensaje sigue en el historial del chat, pero la imagen ya no se puede recuperar."
+              )
+            : paginaDeError("🔴 No se pudo traer la foto", String(info.error || "error desconocido"))
+        );
+    }
+
+    const bin = await fetch(info.url, { headers: { Authorization: `Bearer ${WA_TOKEN}` } });
+    if (!bin.ok || !bin.body) {
+      return res.status(502).send(paginaDeError("🔴 No se pudo descargar la foto", `HTTP ${bin.status}`));
+    }
+
+    res.set("Content-Type", info.mime || "application/octet-stream");
+    // `inline` para que se vea en el navegador en vez de descargarse.
+    res.set("Content-Disposition", "inline");
+    if (info.bytes) res.set("Content-Length", String(info.bytes));
+    // 🗂️ Que la cachee el NAVEGADOR: si el dueño recarga el chat, no se vuelve a
+    // bajar de Meta. `private` porque son datos de un cliente.
+    res.set("Cache-Control", "private, max-age=3600");
+
+    anotarEvento({ tipo: "media-vista", id: id.slice(0, 30), mime: info.mime, bytes: info.bytes });
+    require("stream").Readable.fromWeb(bin.body).pipe(res);
+  } catch (e) {
+    console.error(`🔴 /media falló para ${id.slice(0, 30)}: ${e.message}`);
+    if (!res.headersSent) res.status(500).send(paginaDeError("🔴 Error trayendo la foto", e.message));
+  }
+});
+
+// ============================================================================
 // GET /auditoria?token=...[&dia=2026-09-23]
 //
 // 🔍 ¿Entraron todos los chats? ¿Se perdió alguna venta por el camino?
@@ -2980,6 +3063,11 @@ async function handleWebhook(body) {
         if (!text && from && msg.type !== "text") {
           store.pushMsg(from, "user", `[el cliente mandó un ${msg.type}, que el bot no puede abrir]`, {
             tipo: msg.type,
+            // 📷 El id de medios TAMBIÉN para estos tipos. El bot no los procesa,
+            // pero con el id guardado el dueño puede abrirlos desde el panel —y
+            // un video o un sticker pueden traer el dato que falta igual que una
+            // foto. Es un texto corto: no pesa en el historial.
+            mediaId: msg[msg.type]?.id || null,
           });
           anotarEvento({ tipo: "no-soportado", de: from, clase: msg.type });
           console.log(`(${from}) mandó un ${msg.type}, que el bot todavía no procesa.`);

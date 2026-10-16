@@ -115,6 +115,41 @@ async function transcribir(buffer, mime) {
   return { ok: true, texto };
 }
 
+/**
+ * Solo el PRIMER paso: la URL temporal de un medio, su mime y su tamaño.
+ *
+ * 🔑 Se separa de descargarMedia() para poder VER una foto en el panel sin
+ * traerla a memoria. descargarMedia devuelve un Buffer —bien para mandárselo a
+ * Gemini—, pero para mostrarla en el navegador lo que hace falta es ir
+ * pasándola de a pedazos, y para eso se necesita la URL, no los bytes.
+ *
+ * ⚠️ La URL que devuelve Meta TAMBIÉN exige el token para descargarla, así que
+ * no se le puede pasar al navegador: hay que hacer de intermediario.
+ *
+ * @returns {{ok:boolean, url?:string, mime?:string, bytes?:number, error?:string}}
+ */
+async function urlDeMedia(mediaId) {
+  if (!WA_TOKEN) return { ok: false, error: "falta WHATSAPP_TOKEN" };
+  if (!mediaId) return { ok: false, error: "no hay id de medios" };
+  try {
+    const meta = await fetch(`${GRAPH}/${mediaId}`, {
+      headers: { Authorization: `Bearer ${WA_TOKEN}` },
+    });
+    const info = await meta.json().catch(() => ({}));
+    if (!meta.ok || !info.url) {
+      return {
+        ok: false,
+        // 404 casi siempre es que Meta ya borró el archivo: lo guarda ~30 días.
+        expirado: meta.status === 404,
+        error: `Meta respondió ${meta.status}: ${JSON.stringify(info).slice(0, 180)}`,
+      };
+    }
+    return { ok: true, url: info.url, mime: info.mime_type || null, bytes: Number(info.file_size) || null };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
 /** Atajo: de un media id de WhatsApp al texto de lo que dijo el cliente. */
 async function transcribirNotaDeVoz(mediaId) {
   if (!disponible()) {
@@ -129,4 +164,4 @@ async function transcribirNotaDeVoz(mediaId) {
   return transcribir(media.buffer, media.mime);
 }
 
-module.exports = { transcribirNotaDeVoz, disponible, descargarMedia };
+module.exports = { transcribirNotaDeVoz, disponible, descargarMedia, urlDeMedia, GRAPH };
