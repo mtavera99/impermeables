@@ -89,6 +89,22 @@ chequear(
   "cambió uno y no el otro: actualizá COSTO_V10_UNIDAD en analisis/cpa-por-producto.py"
 );
 
+// 🔴 19-oct: el Q58 Max entró al catálogo el 15-oct y el análisis no lo conocía.
+// Sus combos se contaban como V10, con el costo del V10. Ahora tiene su propia
+// constante y esta prueba la amarra a catalogo.js igual que las otras dos.
+const q58 = catalogo.de("intercom_q58_max");
+const costoQ58Py = constantePython("COSTO_Q58_UNIDAD");
+chequear(
+  "el costo del Q58 Max está declarado en el análisis",
+  costoQ58Py !== null,
+  "no encontré COSTO_Q58_UNIDAD en el .py"
+);
+chequear(
+  `🔑 Q58 Max: catalogo.js dice $${q58.costoUnitario.toLocaleString("es-CO")} y el análisis $${(costoQ58Py || 0).toLocaleString("es-CO")}`,
+  costoQ58Py === q58.costoUnitario,
+  "cambió uno y no el otro: actualizá COSTO_Q58_UNIDAD en analisis/cpa-por-producto.py"
+);
+
 console.log("\n── 2b. 🔑 Y las tablas de flete REAL también ──");
 //
 // 🔴 El envío es el que más fácil se olvida, y es el error que cometió el dueño

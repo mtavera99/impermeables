@@ -45,6 +45,8 @@ COMO SE SABE DE QUE PRODUCTO ES UN ANUNCIO: SE LO PREGUNTA A SUS PEDIDOS
 No por el nombre. Por la FORMA de los pedidos que trajo, que es un dato duro:
 
     el V10 ....... sin talla, sin color, combo de 2, total $113.000-$125.000
+    el Q58 Max ... sin talla, sin color, combo de 2, total $143.000-$155.000
+                   (o 1 unidad, $93.000-$105.000)
     el impermeable con talla y color, 1 unidad, total $73.000-$85.000
 
 Se comprobo contra 199 pedidos reales: esta firma y la del `anuncio_id`
@@ -105,6 +107,7 @@ COLUMNAS = ["estado", "dia_bogota", "talla", "color", "unidades", "total", "anun
 # ══════════════════════════════════════════════════════════════════════════════
 COSTO_IMPERMEABLE = 33000   # bot/src/fletes.js  -> COSTO_PRODUCTO
 COSTO_V10_UNIDAD = 32000    # bot/src/catalogo.js -> intercom_v10_2x.costoUnitario
+COSTO_Q58_UNIDAD = 45000    # bot/src/catalogo.js -> intercom_q58_max.costoUnitario
 
 # Lo que de verdad cuesta mandar el paquete, por banda. bot/src/fletes.js.
 # ⚠️ ES EL COSTO, NO LO QUE SE LE COBRA AL CLIENTE. La diferencia entre los dos es
@@ -118,7 +121,22 @@ ENVIO_REAL_2 = {"A": 23947, "B": 32597, "C": 38784, "D": 37832, "E": 45214}
 TOTAL_POR_BANDA = {
     "IMPERMEABLE": {"A": 73000, "B": 78000, "C": 82000, "D": 83000, "E": 85000},
     "V10": {"A": 113000, "B": 118000, "C": 122000, "D": 123000, "E": 125000},
+    # Q58 Max (15-oct): combo $129.900 + la MISMA tabla de envio del V10.
+    # Verificado contra los pedidos reales del 16 al 19-oct: 143/152/153/155 mil.
+    "Q58": {"A": 143000, "B": 148000, "C": 152000, "D": 153000, "E": 155000},
 }
+# El Q58 de UNA unidad ($79.900 + envio) cae en $93.000-$105.000: un rango que
+# ningun otro producto sin talla ocupa, asi que tambien se reconoce por la forma.
+TOTAL_Q58_UNIDAD = {"A": 93000, "B": 98000, "C": 102000, "D": 103000, "E": 105000}
+
+# 🔴 POR QUE ESTO IMPORTA (19-oct). Hasta hoy este script conocia DOS productos y
+# todo pedido sin talla de $110.000 o mas era "V10". El Q58 entro el 15-oct con
+# combos de $143.000-$155.000, asi que sus pedidos y el gasto de sus anuncios se
+# sumaban al V10, con el costo del V10 ($32.000 en vez de $45.000). Resultado: el
+# V10 salia con mas pedidos de los que tiene, y la utilidad inflada en ~$26.000
+# por cada combo Q58. El Q58 —ya ganador— no aparecia en ninguna fila.
+PRODUCTOS = ["V10", "Q58", "IMPERMEABLE"]
+COSTO_POR_UNIDAD = {"V10": COSTO_V10_UNIDAD, "Q58": COSTO_Q58_UNIDAD}
 
 # Costo de una devolucion LIQUIDADA: solo la prima del seguro. Regla 0-AY —
 # "nunca le cobraron ningun flete de devolucion" — y el producto vuelve y se
@@ -217,6 +235,10 @@ def producto_del_pedido(p):
         if "interc" in talla.lower() or "v10" in talla.lower():
             return "MAL_ATRIBUIDO"
         return "IMPERMEABLE"
+    # Q58: combo $143.000-$155.000, o una unidad $93.000-$105.000. Ningun otro
+    # producto sin talla cae ahi (el combo V10 tope $125.000, su unidad $85.000).
+    if total >= 138000 or 90000 <= total <= 108000:
+        return "Q58"
     if total >= 110000:
         return "V10"
     return None
@@ -225,6 +247,8 @@ def producto_del_pedido(p):
 def banda_del_total(total, producto):
     """La banda de envio, deducida del total que pago el cliente."""
     tabla = TOTAL_POR_BANDA.get(producto) or TOTAL_POR_BANDA["IMPERMEABLE"]
+    if producto == "Q58" and float(total or 0) < 120000:
+        tabla = TOTAL_Q58_UNIDAD
     return min(tabla, key=lambda b: abs(float(total or 0) - tabla[b]))
 
 
@@ -244,12 +268,12 @@ def contribucion(p, producto):
     except ValueError:
         uds = 1
     b = banda_del_total(total, producto)
-    if producto == "V10":
-        # Politica de paquete unico: 1 o 2 intercomunicadores van en un solo
-        # paquete chico, asi que pagan el flete de uno. catalogo.js lo marca
-        # `provisional: true` — se valida cuando haya facturas del producto.
+    if producto in COSTO_POR_UNIDAD:
+        # Politica de paquete unico (V10 y Q58): 1 o 2 intercomunicadores van en
+        # un solo paquete chico, asi que pagan el flete de uno. catalogo.js lo
+        # marca `provisional: true` — se valida cuando haya facturas del producto.
         envio = ENVIO_REAL_1[b]
-        costo = COSTO_V10_UNIDAD * uds
+        costo = COSTO_POR_UNIDAD[producto] * uds
     else:
         envio = ENVIO_REAL_2[b] if uds >= 2 else ENVIO_REAL_1[b]
         costo = COSTO_IMPERMEABLE * uds
@@ -316,7 +340,7 @@ def construir(dias):
                 prod = "SIN CLASIFICAR"
         ped[(d, prod)] = ped.get((d, prod), 0) + 1
         recaudo[(d, prod)] = recaudo.get((d, prod), 0) + float(p.get("total") or 0)
-        if prod in ("V10", "IMPERMEABLE"):
+        if prod in PRODUCTOS:
             contrib[(d, prod)] = contrib.get((d, prod), 0.0) + contribucion(p, prod)
 
     # ── gasto por dia y producto, segun el anuncio
@@ -334,7 +358,7 @@ def construir(dias):
         gasto[(a["dia"], prod)] = gasto.get((a["dia"], prod), 0.0) + a["gasto"]
         convs[(a["dia"], prod)] = convs.get((a["dia"], prod), 0) + a["conv"]
 
-    productos = ["V10", "IMPERMEABLE"]
+    productos = PRODUCTOS
     L = []
     L.append("# 🎯 CPA exacto por producto — BikerPro")
     L.append("")
@@ -376,10 +400,10 @@ def construir(dias):
     L.append(f"| gasto atribuido a un producto | **${gAtr:,.0f}** ({confianza:.1f}%) |")
     L.append(f"| gasto de anuncios sin pedidos en la ventana | ${gSin:,.0f} |")
     L.append(f"| anuncios clasificados por la forma de sus pedidos | {len(deAnuncio)} |")
-    L.append(f"| anuncios con pedidos de los DOS productos | {len(mezclados)} "
+    L.append(f"| anuncios con pedidos de MAS de un producto | {len(mezclados)} "
              f"{'✅' if not mezclados else '⚠️'} |")
     if porElAnuncio:
-        L.append(f"| pedidos resueltos por su anuncio (V10 de 1 unidad) | {porElAnuncio} |")
+        L.append(f"| pedidos resueltos por su anuncio (intercomunicador de 1 unidad) | {porElAnuncio} |")
     sinClasificar = sum(v for (d, p), v in ped.items() if p == "SIN CLASIFICAR")
     L.append(f"| pedidos que no se pudieron clasificar | {sinClasificar} "
              f"{'✅' if not sinClasificar else '⚠️'} |")
@@ -396,7 +420,7 @@ def construir(dias):
         L.append("")
 
     if mezclados:
-        L.append("### ⚠️ Anuncios con pedidos de los DOS productos")
+        L.append("### ⚠️ Anuncios con pedidos de mas de un producto")
         L.append("")
         L.append("Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio "
                  "cambio de creativo, o hay pedidos mal atribuidos (el bug del 1-oct).")
@@ -413,17 +437,18 @@ def construir(dias):
     # ── dia por dia
     L.append("## Dia por dia")
     L.append("")
-    L.append("| dia | gasto V10 | ped | CPA V10 | gasto imper | ped | CPA imper |")
-    L.append("|---|---|---|---|---|---|---|")
+    corto = {"V10": "V10", "Q58": "Q58", "IMPERMEABLE": "imper"}
+    L.append("| dia | " + " | ".join(
+        f"gasto {corto[p]} | ped | CPA {corto[p]}" for p in productos) + " |")
+    L.append("|---|" + "---|---|---|" * len(productos))
     d = desde
     while d <= hasta:
         k = d.isoformat()
-        gv, nv = gasto.get((k, "V10"), 0), ped.get((k, "V10"), 0)
-        gi, ni = gasto.get((k, "IMPERMEABLE"), 0), ped.get((k, "IMPERMEABLE"), 0)
-        L.append(
-            f"| {k} | ${gv:,.0f} | {nv} | {('$%s' % format(gv/nv, ',.0f')) if nv else '—'} "
-            f"| ${gi:,.0f} | {ni} | {('$%s' % format(gi/ni, ',.0f')) if ni else '—'} |"
-        )
+        celdas = []
+        for p in productos:
+            g, n = gasto.get((k, p), 0), ped.get((k, p), 0)
+            celdas.append(f"${g:,.0f} | {n} | {('$%s' % format(g/n, ',.0f')) if n else '—'}")
+        L.append(f"| {k} | " + " | ".join(celdas) + " |")
         d += dt.timedelta(days=1)
     L.append("")
 
@@ -468,13 +493,14 @@ def construir(dias):
     L.append("| | valor | de donde sale |")
     L.append("|---|---|---|")
     L.append(f"| costo impermeable | ${COSTO_IMPERMEABLE:,}/ud | `bot/src/fletes.js` COSTO_PRODUCTO |")
-    L.append(f"| costo intercomunicador | ${COSTO_V10_UNIDAD:,}/ud | `bot/src/catalogo.js` costoUnitario |")
+    L.append(f"| costo V10 | ${COSTO_V10_UNIDAD:,}/ud | `bot/src/catalogo.js` costoUnitario |")
+    L.append(f"| costo Q58 Max | ${COSTO_Q58_UNIDAD:,}/ud | `bot/src/catalogo.js` costoUnitario |")
     L.append(f"| tasa de devolucion | {TASA_DEVOLUCION*100:.1f}% | 386 guias, corte 30-sep (IC 16,8-30,2%) |")
     L.append(f"| costo de una devolucion | ${COSTO_DEVOLUCION:,} | solo la prima — regla 0-AY |")
     L.append("")
     L.append("⚠️ La tasa de devolucion es la de la cohorte del **impermeable**. El V10 empezo a "
-             "vender a fin de septiembre, asi que su tasa propia no madura hasta ~22-oct. "
-             "Mientras tanto, su colchon es el numero menos firme de este informe.")
+             "vender a fin de septiembre (su tasa propia madura ~22-oct) y el Q58 el 16-oct "
+             "(~7-nov). Mientras tanto, sus colchones son los numeros menos firmes de este informe.")
     L.append("")
     L.append(f"*Cuenta `{ACT}` · COP · America/Bogota*")
     return "\n".join(L) + "\n"
