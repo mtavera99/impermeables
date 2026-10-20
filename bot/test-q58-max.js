@@ -56,7 +56,9 @@ chequear(
   q.precios[1] === 79900,
   plata(q.precios[1])
 );
-chequear("costo $45.000 por unidad", q.costoUnitario === 45000, plata(q.costoUnitario));
+// 💰 $43.000 desde el 15-oct (el dueño lo confirmó en $45.000 y el proveedor lo
+// mejoró desde el primer día de venta).
+chequear("costo $43.000 por unidad", q.costoUnitario === 43000, plata(q.costoUnitario));
 chequear("se cotiza precio + envío", q.motorDePrecio === "producto_mas_envio");
 chequear("no pide talla ni color", q.pideTalla === false && q.pideColor === false);
 chequear("NO es el producto por defecto del sistema", q.porDefecto !== true);
@@ -362,7 +364,7 @@ console.log("\n── 9. Lo que ya funcionaba, sigue igual ──");
 chequear("el impermeable sigue siendo el producto por defecto", catalogo.PRODUCTO_POR_DEFECTO === I);
 chequear("el V10 sigue existiendo con sus precios", catalogo.de(V).precios[2] === 99900);
 chequear("el impermeable sigue sin lista de precios propia", !catalogo.de(I).precios);
-chequear("el costo del V10 no se tocó", catalogo.de(V).costoUnitario === 32000);
+chequear("el costo del V10 sigue en su valor vigente ($30.000 desde el 15-oct)", catalogo.de(V).costoUnitario === 30000);
 chequear("esV10 sigue respondiendo solo por el V10", catalogo.esV10(V) && !catalogo.esV10(Q));
 chequear("esProductoSimple cubre a los dos intercomunicadores", catalogo.esProductoSimple(V) && catalogo.esProductoSimple(Q));
 chequear("…y NO al impermeable", !catalogo.esProductoSimple(I));

@@ -106,8 +106,17 @@ COLUMNAS = ["estado", "dia_bogota", "talla", "color", "unidades", "total", "anun
 #      fletes.js y catalogo.js y FALLA si alguien cambia uno y no el otro.
 # ══════════════════════════════════════════════════════════════════════════════
 COSTO_IMPERMEABLE = 33000   # bot/src/fletes.js  -> COSTO_PRODUCTO
-COSTO_V10_UNIDAD = 32000    # bot/src/catalogo.js -> intercom_v10_2x.costoUnitario
-COSTO_Q58_UNIDAD = 45000    # bot/src/catalogo.js -> intercom_q58_max.costoUnitario
+COSTO_V10_UNIDAD = 30000    # bot/src/catalogo.js -> intercom_v10_2x.costoUnitario
+COSTO_Q58_UNIDAD = 43000    # bot/src/catalogo.js -> intercom_q58_max.costoUnitario
+
+# 💰 El proveedor bajo los dos intercomunicadores A PARTIR DEL 15-OCT (el dia que
+# se prendio el Q58): V10 $32.000 -> $30.000 y Q58 $45.000 -> $43.000. La ventana
+# del informe es de 7 dias, asi que durante una semana mezcla pedidos de antes y
+# de despues. Cada pedido se calcula con el costo de SU dia: aplicarle el costo
+# nuevo a un pedido viejo inflaria la utilidad igual que el error del 5-oct, pero
+# al reves. Pasado el 22-oct ya ningun pedido de la ventana usa el viejo.
+CAMBIO_COSTO_INTERCOM = "2026-10-15"
+COSTO_ANTES_DEL_CAMBIO = {"V10": 32000, "Q58": 45000}
 
 # Lo que de verdad cuesta mandar el paquete, por banda. bot/src/fletes.js.
 # ⚠️ ES EL COSTO, NO LO QUE SE LE COBRA AL CLIENTE. La diferencia entre los dos es
@@ -132,7 +141,7 @@ TOTAL_Q58_UNIDAD = {"A": 93000, "B": 98000, "C": 102000, "D": 103000, "E": 10500
 # 🔴 POR QUE ESTO IMPORTA (19-oct). Hasta hoy este script conocia DOS productos y
 # todo pedido sin talla de $110.000 o mas era "V10". El Q58 entro el 15-oct con
 # combos de $143.000-$155.000, asi que sus pedidos y el gasto de sus anuncios se
-# sumaban al V10, con el costo del V10 ($32.000 en vez de $45.000). Resultado: el
+# sumaban al V10, con el costo del V10 (entonces $32.000 vs $45.000). Resultado: el
 # V10 salia con mas pedidos de los que tiene, y la utilidad inflada en ~$26.000
 # por cada combo Q58. El Q58 —ya ganador— no aparecia en ninguna fila.
 PRODUCTOS = ["V10", "Q58", "IMPERMEABLE"]
@@ -252,6 +261,13 @@ def banda_del_total(total, producto):
     return min(tabla, key=lambda b: abs(float(total or 0) - tabla[b]))
 
 
+def costo_unitario(producto, dia):
+    """El costo de compra de un intercomunicador EL DIA del pedido."""
+    if dia and dia < CAMBIO_COSTO_INTERCOM:
+        return COSTO_ANTES_DEL_CAMBIO[producto]
+    return COSTO_POR_UNIDAD[producto]
+
+
 def contribucion(p, producto):
     """
     Lo que deja UN pedido si se entrega, antes de pauta.
@@ -273,7 +289,7 @@ def contribucion(p, producto):
         # un solo paquete chico, asi que pagan el flete de uno. catalogo.js lo
         # marca `provisional: true` — se valida cuando haya facturas del producto.
         envio = ENVIO_REAL_1[b]
-        costo = COSTO_POR_UNIDAD[producto] * uds
+        costo = costo_unitario(producto, p.get("dia_bogota", "")) * uds
     else:
         envio = ENVIO_REAL_2[b] if uds >= 2 else ENVIO_REAL_1[b]
         costo = COSTO_IMPERMEABLE * uds
@@ -493,8 +509,10 @@ def construir(dias):
     L.append("| | valor | de donde sale |")
     L.append("|---|---|---|")
     L.append(f"| costo impermeable | ${COSTO_IMPERMEABLE:,}/ud | `bot/src/fletes.js` COSTO_PRODUCTO |")
-    L.append(f"| costo V10 | ${COSTO_V10_UNIDAD:,}/ud | `bot/src/catalogo.js` costoUnitario |")
-    L.append(f"| costo Q58 Max | ${COSTO_Q58_UNIDAD:,}/ud | `bot/src/catalogo.js` costoUnitario |")
+    L.append(f"| costo V10 | ${COSTO_V10_UNIDAD:,}/ud desde el {CAMBIO_COSTO_INTERCOM} "
+             f"(antes ${COSTO_ANTES_DEL_CAMBIO['V10']:,}) | `bot/src/catalogo.js` costoUnitario |")
+    L.append(f"| costo Q58 Max | ${COSTO_Q58_UNIDAD:,}/ud desde el {CAMBIO_COSTO_INTERCOM} "
+             f"(antes ${COSTO_ANTES_DEL_CAMBIO['Q58']:,}) | `bot/src/catalogo.js` costoUnitario |")
     L.append(f"| tasa de devolucion | {TASA_DEVOLUCION*100:.1f}% | 386 guias, corte 30-sep (IC 16,8-30,2%) |")
     L.append(f"| costo de una devolucion | ${COSTO_DEVOLUCION:,} | solo la prima — regla 0-AY |")
     L.append("")

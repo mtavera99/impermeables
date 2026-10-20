@@ -11103,8 +11103,14 @@ Interrapidísimo.
 | producto | id en el bot | precio | costo/ud | envío | desde |
 |---|---|---|---|---|---|
 | **Impermeable** | `impermeable` | $59.900 · 2 por $110.000 + envío | $33.000 | por unidades (`fletes.js`) | jul |
-| **Intercomunicador V10** | `intercom_v10_2x` | unidad $59.900 · **combo x2 $99.900** + envío | $32.000 | paquete único (1-2 uds = 1 envío) | fin de sep |
-| **Intercomunicador Q58 Max** | `intercom_q58_max` | unidad $79.900 · **combo x2 $129.900** + envío | **$45.000** (el dueño quiere bajarlo) | paquete único, misma tabla del V10 | **15-oct** |
+| **Intercomunicador V10** | `intercom_v10_2x` | unidad $59.900 · **combo x2 $99.900** + envío | **$30.000** desde el 15-oct (antes $32.000; $35.000 de arranque) | paquete único (1-2 uds = 1 envío) | fin de sep |
+| **Intercomunicador Q58 Max** | `intercom_q58_max` | unidad $79.900 · **combo x2 $129.900** + envío | **$43.000** desde el 15-oct (se había confirmado en $45.000) | paquete único, misma tabla del V10 | **15-oct** |
+
+💰 **Baja de costo del proveedor, vigente desde el 15-oct** (el día que se prendió el Q58, avisada por
+el dueño el 19-oct): **V10 $32.000 → $30.000 · Q58 $45.000 → $43.000**. Son **+$4.000 por combo** en
+los dos. `analisis/cpa-por-producto.py` calcula cada pedido con el costo de **su día**
+(`CAMBIO_COSTO_INTERCOM`, `COSTO_ANTES_DEL_CAMBIO`): los V10 del 14-oct o antes siguen a $32.000.
+Ningún pedido del Q58 se pagó a $45.000.
 
 **Totales que paga el cliente por banda (A Bogotá · B · C Cali · D · E pueblos):**
 V10 combo $113/118/122/123/125 mil · **Q58 combo $143/148/152/153/155 mil** · **Q58 unidad
@@ -11133,8 +11139,10 @@ El 16-oct, en la primera hora, el 71% de los leads del Q58 no escribían y no ha
 | 19-oct *(hasta 18:53)* | **13** | 4 | 19 |
 
 - **42 pedidos en 4 días, los 42 combos de 2 unidades.** Ni una venta suelta.
-- Contribución por pedido entregado **~$36.500**, la más alta de los tres (V10 ~$32.900, impermeable
-  ~$25.100). Su CPA de equilibrio da **~$27.500**.
+- Contribución por pedido entregado **~$40.300** con el costo de $43.000 (era ~$36.300 con $45.000),
+  la más alta de los tres (V10 ~$36.900 con $30.000, impermeable ~$24.800). Su CPA de equilibrio pasa
+  de ~$27.300 a **~$30.400**. *(Estimado sumando $4.000 por combo; el número firme lo da
+  `CPA-POR-PRODUCTO.md`.)*
 - 9 de los 42 quedaron 🔴 REVISAR, casi todos porque la ciudad del pedido no coincide con la de la
   cotización: es lo mismo que pasa con los otros productos, no algo propio del Q58.
 - En Meta (`ESTADO-CUENTA.md`), **`Domiciliarios Q58 -` es el mejor conjunto de la cuenta**: $167-263
@@ -11147,13 +11155,13 @@ El 16-oct, en la primera hora, el 71% de los leads del Q58 no escribían y no ha
 
 `analisis/cpa-por-producto.py` conocía dos productos y trataba como "V10" todo pedido sin talla de
 $110.000 o más. Los combos del Q58 ($143-155 mil) caían ahí. Así que **los pedidos y el gasto de los
-anuncios del Q58 se sumaban al V10, calculados con el costo del V10** ($32.000 en vez de $45.000):
+anuncios del Q58 se sumaban al V10, calculados con el costo del V10** (entonces $32.000 en vez de $45.000):
 
 - el V10 salía con más pedidos de los que tiene, y la utilidad inflada en ~$26.000 por cada combo Q58;
 - **el Q58, ya ganador, no aparecía en ninguna fila.**
 
 **Arreglado el 19-oct:** el script reconoce tres productos (Q58 por la forma del pedido: combo ≥ $138.000
-o unidad $90-108 mil), tiene `COSTO_Q58_UNIDAD = 45000`, y `bot/test-costos-no-se-desincronizan.js` lo
+o unidad $90-108 mil), tiene `COSTO_Q58_UNIDAD` (hoy 43000), y `bot/test-costos-no-se-desincronizan.js` lo
 amarra a `catalogo.js` igual que a los otros dos. ⛔ **Todo `CPA-POR-PRODUCTO.md` anterior al arreglo
 tiene el V10 mezclado con el Q58** (por ejemplo el "V10 $7.110 · utilidad $4.384.111" del 19-oct).
 

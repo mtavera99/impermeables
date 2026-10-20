@@ -910,8 +910,8 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
   // =========================================================================
   console.log("\n── 24. 💰 PISO ECONÓMICO: el precio cubre costo + flete ──");
   //
-  // El costo de compra del V10 es $32.000 por unidad (bajó de $35.000 el 5-oct:
-  // los $35.000 eran el precio de arranque del proveedor).
+  // El costo de compra del V10 es $30.000 por unidad desde el 15-oct. Antes:
+  // $35.000 (precio de arranque), $32.000 desde el 5-oct.
   // Esta prueba es la que avisa si alguien baja el precio de venta o sube el costo
   // y el producto se empieza a vender en pérdida sin que nadie lo note.
   //
@@ -928,7 +928,7 @@ const nuevoTel = () => String(++tel); // un teléfono por caso: el store emparej
   {
     const fletes = require("./src/fletes");
     const v10 = catalogo.de(V);
-    chequear("el costo unitario está registrado y al día", v10.costoUnitario === 32000, String(v10.costoUnitario));
+    chequear("el costo unitario está registrado y al día", v10.costoUnitario === 30000, String(v10.costoUnitario));
 
     let peor = Infinity;
     for (const b of ["A", "B", "C", "D", "E"]) {

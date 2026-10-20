@@ -199,7 +199,12 @@ const PRODUCTOS = {
     // $35.000 la utilidad de los 6 días cerrados al 4-oct daba $2.331.065; con
     // $32.000 da $2.768.789. La diferencia —$437.724 en 6 días— es exactamente
     // el tamaño del error que se comete al decidir con un costo viejo.
-    costoUnitario: 32000,
+    //
+    // 💰 BAJÓ OTRA VEZ, DE $32.000 A $30.000, A PARTIR DEL 15-OCT (el día que se
+    // prendió el Q58 Max): el proveedor mejoró el precio de los dos
+    // intercomunicadores. `analisis/cpa-por-producto.py` usa $32.000 para los
+    // pedidos anteriores al 15-oct y $30.000 desde ese día.
+    costoUnitario: 30000,
 
     // ------------------------------------------------------------------------
     // 📦 POLÍTICA LOGÍSTICA — REGLA COMERCIAL INICIAL, NO UN COSTO MEDIDO
@@ -459,15 +464,16 @@ const PRODUCTOS = {
     // ⛔ Y NO ES UN "2x1": el combo son DOS unidades por $129.900, no una gratis.
     precios: { 1: 79900, 2: 129900 },
 
-    // Costo de compra por unidad, confirmado por el dueño el 15-oct. Él mismo
-    // dijo que va a intentar bajarlo, así que este número tiene fecha.
+    // Costo de compra por unidad. El dueño confirmó $45.000 el 15-oct y dijo que
+    // iba a intentar bajarlo: lo logró. 💰 El proveedor lo dejó en $43.000 A
+    // PARTIR DEL 15-OCT (o sea, desde el primer día de venta del Q58), junto con
+    // la baja del V10 a $30.000. Ningún pedido del Q58 se pagó a $45.000.
     //
-    // 🔑 Con este costo, el combo deja ~$4.900 MÁS que vender una sola unidad
-    // (en el V10 la diferencia es ~$8.000). O sea que acá la unidad suelta es
-    // casi el mismo negocio que el combo. No cambia nada del código: queda
+    // 🔑 Con este costo, el combo deja ~$7.000 MÁS que vender una sola unidad
+    // (en el V10 la diferencia es ~$10.000). No cambia nada del código: queda
     // anotado porque es la clase de dato con el que se decide dónde poner la
     // pauta, y sin esto no se ve.
-    costoUnitario: 45000,
+    costoUnitario: 43000,
 
     // Misma política que el V10, y por la misma razón física: 1 o 2
     // intercomunicadores caben en un paquete chico. El dueño lo pidió explícito:

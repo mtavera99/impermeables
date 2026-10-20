@@ -105,6 +105,30 @@ chequear(
   "cambió uno y no el otro: actualizá COSTO_Q58_UNIDAD en analisis/cpa-por-producto.py"
 );
 
+// 💰 15-oct: el proveedor bajó los dos intercomunicadores (V10 $32.000 → $30.000,
+// Q58 $45.000 → $43.000). El análisis calcula cada pedido con el costo de SU día,
+// así que tiene que saber desde cuándo rige el nuevo y cuánto valía antes.
+{
+  const fecha = /^CAMBIO_COSTO_INTERCOM\s*=\s*"(\d{4}-\d{2}-\d{2})"/m.exec(py);
+  chequear(
+    "el análisis sabe desde qué día rige el costo nuevo de los intercomunicadores",
+    fecha && fecha[1] === "2026-10-15",
+    fecha ? fecha[1] : "no encontré CAMBIO_COSTO_INTERCOM"
+  );
+  const antes = /^COSTO_ANTES_DEL_CAMBIO\s*=\s*\{([^}]*)\}/m.exec(py);
+  const viejo = (k) => {
+    const m = antes && new RegExp(`"${k}"\\s*:\\s*([0-9]+)`).exec(antes[1]);
+    return m ? Number(m[1]) : null;
+  };
+  chequear("el costo anterior del V10 es $32.000", viejo("V10") === 32000, String(viejo("V10")));
+  chequear("el costo anterior del Q58 es $45.000", viejo("Q58") === 45000, String(viejo("Q58")));
+  chequear(
+    "🔑 el costo vigente es MENOR que el anterior en los dos (fue una baja)",
+    v10.costoUnitario < viejo("V10") && q58.costoUnitario < viejo("Q58"),
+    `V10 ${viejo("V10")} → ${v10.costoUnitario} · Q58 ${viejo("Q58")} → ${q58.costoUnitario}`
+  );
+}
+
 console.log("\n── 2b. 🔑 Y las tablas de flete REAL también ──");
 //
 // 🔴 El envío es el que más fácil se olvida, y es el error que cometió el dueño
