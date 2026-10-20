@@ -4,14 +4,18 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-09-30 02:30 Bogotá** — 🆕 **sección 0-BI: los reinicios por memoria NO eran
+Última actualización: **2026-10-19 19:00 Bogotá** — 🆕🆕 **sección 0-BK (al final): ya son TRES productos
+(impermeable, V10, Q58 Max), el Q58 es ganador, y el informe de CPA contaba el Q58 como V10.
+EMPEZÁ POR AHÍ.**
+
+Actualización anterior: **2026-09-30 02:30 Bogotá** — **sección 0-BI: los reinicios por memoria NO eran
 el PDF ni V8, era el PANEL (821 MB por recarga, cada 45 segundos). Pico 478 → 183 MB, sin pagar más
 instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las plantillas de Meta y la
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LA SECCIÓN `0-BI`** (al final de este
-> archivo) **y después `TRASPASO-SESION-29SEP.md`.**
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LA SECCIÓN `0-BK`** (la última de este
+> archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
 > del repo y cómo trabajar con el dueño.
 > **El bot de WhatsApp ya reemplazó al agente de Meta y está en producción** —
@@ -36,6 +40,7 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BK** | 🎧 **TRES PRODUCTOS: impermeable · V10 · Q58 Max** (catálogo, precios, costos, totales por banda) · 📈 **el Q58 ya es ganador: 42 pedidos en 4 días, todos combos, ~$36.500 de contribución, el más alto** · `Domiciliarios Q58 -` es el mejor conjunto de la cuenta · 🔴 **error #28: el informe de CPA contaba el Q58 como V10**, con el costo del V10 → arreglado · **regla 33: un producto nuevo entra a los informes el mismo día** · PRs abiertos #214/#221/#222 | **19-oct** |
 | **0-BJ** | 📇 **CORRECCIONES DE DATOS: tres cosas de este archivo que eran falsas** · ✅ **la línea del 313 FUNCIONA** (SMS y llamadas; era el equipo, no el operador) → se retiran el riesgo del número reciclado, el pendiente con el operador y mi recomendación de mover los avisos · ✅ **las plantillas de Meta YA están aprobadas y en uso** (seis, con nombre por defecto) — lo que falta son 2 avisos AL DUEÑO, que es una decisión suya · 📮 **el número impreso en la etiqueta de 99 Envíos es el CELULAR DEL HERMANO del dueño**, dato que no estaba en ninguna parte y por eso `TELEFONO_REMITENTE` estuvo mal | **30-sep** |
 | **0-BI** | 🧠 **LOS REINICIOS POR MEMORIA: era el PANEL, no el PDF ni V8** · cada recarga costaba **821 MB para producir 358 KB de HTML**, y se recargaba **cada 45 s** aunque la pestaña estuviera en el fondo · 🔑 **la causa nº1 era `diaBogota()`**, que creaba un formateador de Intl nuevo por llamada (+77 MB / 2.184 ms por cada 50.000) · ⛔ **`heap_techo_mb` volvió 268: la bandera de V8 nunca habría servido** · ⛔ **las hojas del PDF pesan 2 MB, no 30** · **pico 478 → 183 MB, del 93% al 36% del límite, sin pagar más** · 🔧 y aparte: **pdfjs no devuelve 71 MB por lote** → se parsea en un proceso hijo · ⚠️ **`arranques` NO mide salud: el estado de cuenta se commitea a `main` cada hora y eso redespliega el bot** · **errores #25-27 · reglas 27-32** · PR **#189** | **30-sep** |
 | **0-BH** | 🔴 **CLIENTES SIN TELÉFONO: el bot no les contestaba y los mezclaba a TODOS en una conversación llamada `undefined`** · WhatsApp lanzó los nombres de usuario y Meta **oculta el teléfono** (BSUID `CO.1098…`, no se puede derivar) · el payload trae `from_user_id`, no `from` → el bot enviaba sin destino → **400, lead pagado en silencio: 1 de cada 4** · 🔴 **peor que no contestar: le respondía a un cliente nuevo con el historial de otro** (*"ya te he dado todos los detalles…"* en su PRIMER mensaje) · ⛔ **CORRIGE 0-BE: las 24h SÍ aplican ahora** que está en la Cloud API — **4 cosas ya necesitan la plantilla** · 🔒 **regla nueva: SIN CELULAR NO HAY DESPACHO**, blindada en código · **reglas 23-26** | **22-sep** |
@@ -11085,3 +11090,91 @@ cliente hay que reenviarle la guía buena.
 dígitos que empiezan en 3 por parecer celulares. **El caso peligroso es la etiqueta sin rótulo legible
 donde el teléfono esté impreso con el `57` adelante**: ahí son 12 dígitos, los mismos que una guía de
 Interrapidísimo.
+
+---
+
+## 0-BK · 🎧 TRES PRODUCTOS: EL Q58 MAX YA ES GANADOR · Y EL INFORME DE CPA LO CONTABA COMO V10 (lun 19-oct, 19:00 Bogotá)
+
+> 🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, ESTA ES LA FOTO VIGENTE.** Todo lo de arriba que hable de
+> un solo producto (o de "el tradicional" como toda la cuenta) es anterior a octubre.
+
+### El catálogo vigente (fuente de verdad: `bot/src/catalogo.js`)
+
+| producto | id en el bot | precio | costo/ud | envío | desde |
+|---|---|---|---|---|---|
+| **Impermeable** | `impermeable` | $59.900 · 2 por $110.000 + envío | $33.000 | por unidades (`fletes.js`) | jul |
+| **Intercomunicador V10** | `intercom_v10_2x` | unidad $59.900 · **combo x2 $99.900** + envío | $32.000 | paquete único (1-2 uds = 1 envío) | fin de sep |
+| **Intercomunicador Q58 Max** | `intercom_q58_max` | unidad $79.900 · **combo x2 $129.900** + envío | **$45.000** (el dueño quiere bajarlo) | paquete único, misma tabla del V10 | **15-oct** |
+
+**Totales que paga el cliente por banda (A Bogotá · B · C Cali · D · E pueblos):**
+V10 combo $113/118/122/123/125 mil · **Q58 combo $143/148/152/153/155 mil** · **Q58 unidad
+$93/98/102/103/105 mil** · impermeable $73/78/82/83/85 mil (2 uds: $133-155 mil, el mismo rango del
+combo Q58 — se distinguen porque el impermeable **siempre** lleva talla y color).
+
+🔑 **El bot elige el producto por el ID del anuncio** (`ANUNCIOS_V10`, `ANUNCIOS_Q58` en Render, no en
+el repo), no por la palabra "intercomunicador", que ahora nombra una categoría y no un producto. El
+Q58 tiene sus fotos (`docs/img/q58-*.jpg`), su línea que justifica los $30.000 de diferencia (pantalla,
+radio FM, micro SD, LED), su seguimiento propio y su plantilla (`SEGUIMIENTO_PLANTILLA_Q58`).
+Ficha confirmada por el dueño el 15-oct: **garantía 1 mes, alcance ~500 m**; el resto lleva
+"aproximadamente".
+
+**Anuncios del Q58 vistos en pedidos:** `120249894780890390` · `…900390` · `…910390` · `…920390`.
+
+### 📈 El Q58 vende: lo del arranque fue momentáneo
+
+El 16-oct, en la primera hora, el 71% de los leads del Q58 no escribían y no había pedidos (PR #222).
+**Eso fue el arranque, no el producto.** Contados desde `/pedidos.csv` (19-oct, 18:53):
+
+| día | Q58 | V10 | impermeable |
+|---|---|---|---|
+| 16-oct | 10 | 8 | 8 |
+| 17-oct | 11 | 10 | 30 |
+| 18-oct | 8 | 12 | 13 |
+| 19-oct *(hasta 18:53)* | **13** | 4 | 19 |
+
+- **42 pedidos en 4 días, los 42 combos de 2 unidades.** Ni una venta suelta.
+- Contribución por pedido entregado **~$36.500**, la más alta de los tres (V10 ~$32.900, impermeable
+  ~$25.100). Su CPA de equilibrio da **~$27.500**.
+- 9 de los 42 quedaron 🔴 REVISAR, casi todos porque la ciudad del pedido no coincide con la de la
+  cotización: es lo mismo que pasa con los otros productos, no algo propio del Q58.
+- En Meta (`ESTADO-CUENTA.md`), **`Domiciliarios Q58 -` es el mejor conjunto de la cuenta**: $167-263
+  por conversación, conv/mil 13-15. 🔴 En cambio `Domiciliarios - Expancion - Q58` ($751-1.788) y
+  `Motorizados - Q58` ($546-764, subiendo) están caros: hay que mirarlos.
+- El dueño lo confirmó en el panel: ventas y métricas de Meta van muy bien. **Es el tercer producto
+  ganador.**
+
+### 🔴 Error #28: el informe de CPA por producto contaba el Q58 como V10
+
+`analisis/cpa-por-producto.py` conocía dos productos y trataba como "V10" todo pedido sin talla de
+$110.000 o más. Los combos del Q58 ($143-155 mil) caían ahí. Así que **los pedidos y el gasto de los
+anuncios del Q58 se sumaban al V10, calculados con el costo del V10** ($32.000 en vez de $45.000):
+
+- el V10 salía con más pedidos de los que tiene, y la utilidad inflada en ~$26.000 por cada combo Q58;
+- **el Q58, ya ganador, no aparecía en ninguna fila.**
+
+**Arreglado el 19-oct:** el script reconoce tres productos (Q58 por la forma del pedido: combo ≥ $138.000
+o unidad $90-108 mil), tiene `COSTO_Q58_UNIDAD = 45000`, y `bot/test-costos-no-se-desincronizan.js` lo
+amarra a `catalogo.js` igual que a los otros dos. ⛔ **Todo `CPA-POR-PRODUCTO.md` anterior al arreglo
+tiene el V10 mezclado con el Q58** (por ejemplo el "V10 $7.110 · utilidad $4.384.111" del 19-oct).
+
+📌 **Regla 33: cada producto nuevo en `catalogo.js` tiene que entrar el mismo día en los informes de
+`analisis/`** (constantes de costo, totales por banda y la clasificación). Es la tercera vez que un
+producto nuevo hereda los valores por defecto de otro: el 29-sep con los seguimientos, el 16-oct con
+el texto del Q58 y ahora con el informe.
+
+### ⚠️ Lo que todavía no distingue productos
+
+- **`analisis/estado-cuenta.py`** mete todo el gasto que no es del colmena en "TRADICIONAL" y lo
+  compara con el equilibrio del impermeable ($2.402/conv). Para los intercomunicadores ese umbral
+  queda corto (su contribución es mayor), así que no da falsas alarmas, pero **no dice nada por
+  producto**. Pendiente: separar por conjunto (`… Q58`, `… INTER`) o por anuncio.
+- **La tasa de devolución propia** del V10 madura ~22-oct y la del Q58 ~7-nov. Hasta entonces se usa
+  la del impermeable (22,8%).
+
+### Lo último que quedó abierto (PRs)
+
+- **#222** (charlas y clics muertos por anuncio): **el código sigue siendo útil**, pero su diagnóstico
+  (*"el creativo del Q58 trae clics que no quieren hablar"*) **quedó superado**: era el arranque.
+- **#221** (medir el histórico de conversaciones; la memoria estaba en 56%, no al 98%).
+- **#214** (ficha del Q58, solo documentación): el conflicto del alcance ya lo resolvió el dueño
+  (500 m, 15-oct) y ya está en `catalogo.js`. **Se puede cerrar sin fusionar.**
