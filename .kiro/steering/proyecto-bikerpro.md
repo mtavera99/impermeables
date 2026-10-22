@@ -14,7 +14,7 @@ instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las 
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LA SECCIÓN `0-BK`** (la última de este
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BL` y `0-BK`** (las últimas de este
 > archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
 > del repo y cómo trabajar con el dueño.
@@ -40,6 +40,7 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BL** | 🔬 **AUDITORÍA POR ANUNCIO (30 días, pedidos reales)** · ranking de los 13 anuncios · 🔴 **error #29: TEST Creativos salía 🟢 en conversaciones y PERDÍA plata (cierre 1,6-2,0%, −$129.562 en 2 semanas)** · **el $/conv no elige ganadores: el cierre pesa igual** (SON DOS $594/conv vende a 8,1%) · escalón de intercom a $25.000: **V10 pagó, Q58 salió en equilibrio** · alarmas de CPA por anuncio | **22-oct** |
 | **0-BK** | 🎧 **TRES PRODUCTOS: impermeable · V10 · Q58 Max** (catálogo, precios, costos, totales por banda) · 📈 **el Q58 ya es ganador: 42 pedidos en 4 días, todos combos, ~$36.500 de contribución, el más alto** · `Domiciliarios Q58 -` es el mejor conjunto de la cuenta · 🔴 **error #28: el informe de CPA contaba el Q58 como V10**, con el costo del V10 → arreglado · **regla 33: un producto nuevo entra a los informes el mismo día** · PRs abiertos #214/#221/#222 | **19-oct** |
 | **0-BJ** | 📇 **CORRECCIONES DE DATOS: tres cosas de este archivo que eran falsas** · ✅ **la línea del 313 FUNCIONA** (SMS y llamadas; era el equipo, no el operador) → se retiran el riesgo del número reciclado, el pendiente con el operador y mi recomendación de mover los avisos · ✅ **las plantillas de Meta YA están aprobadas y en uso** (seis, con nombre por defecto) — lo que falta son 2 avisos AL DUEÑO, que es una decisión suya · 📮 **el número impreso en la etiqueta de 99 Envíos es el CELULAR DEL HERMANO del dueño**, dato que no estaba en ninguna parte y por eso `TELEFONO_REMITENTE` estuvo mal | **30-sep** |
 | **0-BI** | 🧠 **LOS REINICIOS POR MEMORIA: era el PANEL, no el PDF ni V8** · cada recarga costaba **821 MB para producir 358 KB de HTML**, y se recargaba **cada 45 s** aunque la pestaña estuviera en el fondo · 🔑 **la causa nº1 era `diaBogota()`**, que creaba un formateador de Intl nuevo por llamada (+77 MB / 2.184 ms por cada 50.000) · ⛔ **`heap_techo_mb` volvió 268: la bandera de V8 nunca habría servido** · ⛔ **las hojas del PDF pesan 2 MB, no 30** · **pico 478 → 183 MB, del 93% al 36% del límite, sin pagar más** · 🔧 y aparte: **pdfjs no devuelve 71 MB por lote** → se parsea en un proceso hijo · ⚠️ **`arranques` NO mide salud: el estado de cuenta se commitea a `main` cada hora y eso redespliega el bot** · **errores #25-27 · reglas 27-32** · PR **#189** | **30-sep** |
@@ -11186,3 +11187,83 @@ el texto del Q58 y ahora con el informe.
 - **#221** (medir el histórico de conversaciones; la memoria estaba en 56%, no al 98%).
 - **#214** (ficha del Q58, solo documentación): el conflicto del alcance ya lo resolvió el dueño
   (500 m, 15-oct) y ya está en `catalogo.js`. **Se puede cerrar sin fusionar.**
+
+---
+
+## 0-BL · 🔬 AUDITORÍA POR ANUNCIO, 30 DÍAS: QUIÉN VENDE DE VERDAD (jue 22-oct, 18:30 Bogotá)
+
+> PRs #214, #221, #222 y #223 quedaron cerrados o fusionados el 19-oct. **#224 (costos V10 $30.000 y Q58 $43.000
+> desde el 15-oct) se fusionó el 22-oct.**
+
+**Cómo se midió:** el gasto y las conversaciones por anuncio salen **exactos** de Meta (`DETALLE-META.md`, ventanas
+22-sep→21-oct y 8→21-oct). Los pedidos por anuncio salen del `anuncio_id` de `/pedidos.csv` (883 pedidos). La utilidad
+usa `contribucion()` de `cpa-por-producto.py` con costo por fecha y devolución 22,8%. Para ver semana por semana, el
+gasto de cada conjunto sale de la última foto horaria de `ESTADO-CUENTA.md` del día, **escalada al total diario exacto
+de Meta**: es una estimación, buena para tendencias. **Cada conjunto tiene un solo anuncio**, así que conjunto = anuncio.
+Hubo 29 pedidos sin anuncio (3,4%), que no entran en el cálculo.
+
+### Ranking de 30 días (22-sep a 21-oct): gasto $7,18 M · 821 pedidos · CPA $8.741
+
+| anuncio | conjunto | $/conv | cierre | CPA | equilibrio | utilidad 30 d |
+|---|---|---|---|---|---|---|
+| VIDEO INTERCOMUNICADORES | Domiciliarios VIDEO INTER - API | $461 | **7,9%** | **$5.861** | $25.962 | **$1.648.322** |
+| VIDEO - Copia | Domiciliarios VIDEO - API | $370 | 6,4% | $5.745 | $20.071 | $1.504.285 |
+| CANSADO DE GRITAR | Domiciliarios INTER - API | **$233** | 3,8% | $6.155 | $25.238 | $1.488.540 |
+| Fondo azul - Copia | Domiciliarios - API | $446 | 5,4% | $8.303 | $18.390 | $1.281.055 |
+| COMBO DOS | Domiciliarios - Expancion - INTER | $475 | 6,7% | $7.067 | $25.249 | $1.218.162 |
+| LA RUTA | Motorizados - INTER | $379 | 4,7% | $8.031 | $25.239 | $1.032.493 |
+| Fondo azul - Copia | Motorizados - API | $415 | 5,4% | $7.634 | $18.479 | $856.735 |
+| ACOMPAÑANTE *(Q58, desde 15-oct)* | Domiciliarios Q58 - | **$192** | 3,1% | $6.107 | $30.467 | $608.978 |
+| Fondo azul - API | Domiciliarios - Expancion - API | $529 | 4,0% | $13.203 | $18.924 | $526.401 |
+| SON DOS *(Q58)* | Domiciliarios VIDEO Q58 - | $594 | **8,1%** | $7.316 | $30.274 | $436.206 |
+| VERDE LIMA *(Q58)* | Motorizados - Q58 | $647 | 4,9% | $13.177 | $30.964 | $195.647 |
+| COMBO DOS *(Q58)* | Domiciliarios - Expancion - Q58 | $968 | 6,1% | $15.812 | $30.586 | $132.965 |
+| 🔴 **Prueba social +50 clientes** | **TEST Creativos - API** | $543 | **3,0%** | **$17.996** | $18.008 | **$844** |
+
+### 🔑 Lo que enseña
+
+1. **El $/conv NO elige ganadores. El cierre pesa igual.** `$/conv = CPM ÷ conv/mil`, y además `CPA = $/conv ÷ cierre`.
+   - Mensajes caros que venden: SON DOS ($594 a 8,1%) y VIDEO INTERCOMUNICADORES ($461 a 7,9%) tienen de los mejores CPA.
+   - Mensajes baratos que cierran poco: ACOMPAÑANTE ($192 a 3,1%) y CANSADO DE GRITAR ($233 a 3,8%) también son buenos,
+     pero por volumen. **Un conjunto no se apaga por $/conv. Se juzga por su CPA de 7 días o más contra el equilibrio de SU producto.**
+2. 🔴 **Error #29: TEST Creativos aparecía 🟢 en `ESTADO-CUENTA.md` (conv/mil 15, $379/conv) y estaba PERDIENDO plata.**
+   - El cierre semanal cayó 5,0% → 3,2% → 2,8% → 2,0% → 1,6%, y el CPA subió $15.199 → $17.083 → $16.626 → $22.370 → $34.771.
+   - En las últimas 2 semanas: CPA $22.955 contra un equilibrio de $17.556, o sea **−$129.562**. Es el conjunto de mayor
+     presupuesto ($40.000/día).
+   - Atrae conversaciones que no compran. **El termómetro de conversaciones no lo puede ver: hace falta el cruce con pedidos.**
+3. **Domiciliarios - Expancion - API se recuperó.** Perdía en septiembre (CPA $26.133) y desde el 6-oct está en ~$9.000-11.500,
+   con 2× de colchón.
+4. **Equilibrio en $/conv al cierre actual:** V10 ~$1.500 · Q58 ~$1.200 · impermeable ~$890.
+   ⚠️ **El "equilibrio $2.402" que usa `estado-cuenta.py` para "TRADICIONAL" es viejo y demasiado optimista para el
+   impermeable.** El 17-18% que muestra en realidad es ~50%.
+
+### 📈 La primera prueba de escalar intercomunicadores ($20.000 → $25.000 los 8 conjuntos, desde el 20-oct)
+
+Datos por día. ⚠️ **Solo 2 días cerrados (20-21 oct).** Regla: no se lee con menos de 3, y los pedidos llegan con atraso.
+
+| grupo | 15-19 oct | 20-21 oct | lectura |
+|---|---|---|---|
+| **V10** (4 conj.) | $82.792 gasto · 10,0 ped · CPA $8.279 · util $194.478 | **$110.136 · 14,0 ped · CPA $7.867 · util $276.603** | 🟢 el escalón **pagó**: CPA marginal ~$6.800 |
+| **Q58** (4 conj.) | $73.133 · 8,8 ped · CPA $8.311 · util $195.569 | $106.291 · 10,0 ped · **CPA $10.629** · util $198.325 | 🟡 **el extra salió en equilibrio**: +$33.000/día dio ~1,2 pedidos (CPA marginal ~$27.000) |
+| Impermeable sin TEST (control, sin cambios) | $117.314 · 16,0 ped · CPA $7.332 | $112.883 · 12,0 ped · CPA $9.407 | 🟠 cayó sin tocarlo. ¿Mitad de quincena, o **canibalización**? Misma segmentación y CPM de cuenta +13% |
+
+**Dentro del Q58, la subida la absorbieron bien ACOMPAÑANTE (CPA $6.109, sin cambio) y SON DOS ($7.429). La absorbieron
+mal COMBO DOS Expancion ($1.135/conv, 0 pedidos en 2 días) y VERDE LIMA (CPA $17.323).**
+
+### Recomendación entregada al dueño (22-oct). El dueño mueve los presupuestos, Kiro solo lee (regla 4-B)
+
+1. **TEST Creativos $40.000 → $20.000** ahora. Si en 3-4 días el CPA sigue arriba de ~$15.000, pausarlo o cambiar el creativo.
+2. **Q58: no subir más.**
+   - COMBO DOS Expancion Q58 y VERDE LIMA vuelven a $20.000.
+   - ACOMPAÑANTE y SON DOS se quedan en $25.000.
+3. **V10: mantener $25.000 hasta el sábado 24.** Si el CPA del V10 sigue bajo ~$10.000, el siguiente escalón es
+   **solo VIDEO INTERCOMUNICADORES $25.000 → $30.000**, el mejor anuncio de la cuenta.
+4. **Un cambio por vez, máximo +20%, leer a los 3 días o más.** No usar las recomendaciones de Meta y recargar por la mañana.
+
+**Alarmas por anuncio, CPA de 7 días:** mirar si pasa del 50% de su equilibrio (V10 >$12.500 · Q58 >$15.000 ·
+impermeable >$9.200). Cortar si pasa del 75% durante 7 días seguidos.
+
+⚠️ **Pendientes del método:**
+- la devolución propia de los intercomunicadores todavía no se conoce (se usa la del impermeable);
+- `estado-cuenta.py` debería cruzar pedidos por anuncio, que es lo que habría mostrado lo de TEST;
+- los scripts de esta auditoría corrieron fuera del repo, porque leen `/pedidos.csv`, que no se commitea (el repo es público).
