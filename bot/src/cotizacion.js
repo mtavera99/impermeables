@@ -588,7 +588,14 @@ const NO_ES_CIUDAD = new Set(
     // Interrapidísimo"—, que es exactamente la señal que se aceptaba. Ser un nombre
     // propio no lo vuelve un lugar a donde despachar.
     "interrapidisimo inter rapidisimo servientrega coordinadora envia deprisa " +
-    "saferbo tcc transportadora transportadoras")
+    "saferbo tcc transportadora transportadoras " +
+    // 🔴 24-oct (chat real de radios): "Me los puedes mandar para el lunes" se
+    // tomó como la respuesta a "¿para qué ciudad?" y el bot cotizó "envío gratis a
+    // el lunes". Los días y las palabras de tiempo no son municipios.
+    "lunes martes miercoles jueves viernes sabado domingo semana finde quincena " +
+    "tarde noche temprano urgente pronto rapido fecha dia dias mes " +
+    // Y lo que se pide del producto nuevo: "Tienes radios" se leyó como ciudad.
+    "radio radios walkie walkies baofeng tienes tiene tienen mandar manden envien")
     .split(/\s+/)
 );
 

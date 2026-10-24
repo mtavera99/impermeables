@@ -126,7 +126,15 @@ const casos = [
   ["8 radios", 4],
   ["un radio", null],
   ["3 radios", null],
-  ["quiero 2", null],
+  // 24-oct: el bot pregunta "¿cuántos RADIOS?", así que un número al principio son radios.
+  ["quiero 2", 1],
+  ["4", 2],
+  ["Los 4", 2],
+  ["6 para ráquira boyacá", 3],
+  ["unos 12", 6],
+  ["5", null],
+  ["3001234567", null],
+  ["calle 4 # 5-20", null],
   ["vivo en la calle 99 # 12-30", null],
   ["mi celular es 3001234567", null],
 ];
@@ -305,6 +313,15 @@ chequear(
   "y el detector de correcciones usa esa comparación (no solo minúsculas)",
   /mismoValorDeCampo\(campo, nuevo, viejo\)/.test(srcStore)
 );
+
+// 🔴 24-oct: "para el lunes" se tomó como el municipio de destino.
+for (const t of ["Me los puedes mandar para el lunes", "Tienes radios", "para mañana temprano"]) {
+  chequear(`"${t}" no es un municipio`, cotizacion.ciudadPlausible(t) === "", cotizacion.ciudadPlausible(t));
+}
+chequear("y 'Tierralta' sí", cotizacion.ciudadPlausible("Tierralta") === "Tierralta");
+const srcAgent = require("fs").readFileSync(require("path").join(__dirname, "src", "agent.js"), "utf8");
+chequear("el reemplazo del cuadro detecta su propio bucle", /BUCLE CORTADO \(cuadro\)/.test(srcAgent));
+chequear("y un 'te escribo en un momento' sin salida pasa al dueño", /loPuedePreguntar/.test(srcAgent));
 
 console.log(`\n${mal ? "🔴" : "🟢"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal ? 1 : 0);
