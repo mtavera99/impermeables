@@ -1687,6 +1687,21 @@ function cajasDeRadios(texto) {
   );
   // "solo uno", "solo una": una sola pieza. No existe: queda sin decidir.
   anotar(`\\bsolo\\s+(?:uno|una|1)\\b`, () => null);
+  // 🔴 24-oct (chat real, Quibdó): el bot pregunta "¿Cuántos radios necesitás?"
+  // y el cliente contesta "4", "Los 4", "unos 12", "6 para Ráquira". Ese número
+  // son RADIOS. No se leía y el bot quedó cotizando 1 caja ($99.000) mientras el
+  // cliente pedía 4; repitió el mismo mensaje cuatro veces.
+  // Solo cuenta si el número va al PRINCIPIO del mensaje (lo que contesta la
+  // pregunta) y no es una dirección, un teléfono ni un precio.
+  {
+    const m = new RegExp(
+      `^\\s*(?:(?:los|las|unos|unas|son|serian|necesito|quiero|como|mas\\s+o\\s+menos)\\s+)*${NUM}\\b(?!\\s*(?:mil|000|\\.\\d|cajas?|cajitas?|kits?|#|-|de\\s+(?:la|el)\\s+calle))`
+    ).exec(t);
+    if (m && !/\\b(calle|carrera|cra|cl|kr|avenida|av|barrio|mz|manzana|casa|apto|celular|cel|tel)\\b/.test(t)) {
+      const n = numeroDe(m[1]);
+      if (n && n <= 20) hallados.push({ i: m.index, cajas: desdeRadios(n), tipo: "respuesta" });
+    }
+  }
 
   if (!hallados.length) return null;
   // 🔑 Si el cliente nombró CAJAS, eso manda: en "dos cajas de 2 radios" el "2

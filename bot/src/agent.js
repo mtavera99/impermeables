@@ -783,7 +783,11 @@ async function generateReply(phone, userText) {
       const ultimaDelBot =
         [...conv.messages].reverse().find((m) => m && m.role === "assistant")?.content || "";
       const lineaCalculada = cot.ok ? cotizacion.lineaDePrecio(cot) : "";
-      const yaSalioEstaLinea = Boolean(lineaCalculada) && String(ultimaDelBot).trim() === lineaCalculada.trim();
+      // ⚠️ `includes` y no `===` (24-oct): el reemplazo del cuadro sale como la línea
+      // MÁS "¿Te parece bien y lo despacho?", y con la igualdad exacta el bucle no se
+      // detectaba nunca. Es como se repitió cuatro veces en el chat de Quibdó.
+      const yaSalioEstaLinea =
+        Boolean(lineaCalculada) && String(ultimaDelBot).trim().includes(lineaCalculada.trim());
       // ⚠️ "Esperar un precio" no es solo preguntarlo con palabras. Cuando el
       // cliente contesta la CIUDAD está pidiendo el total: es el paso siguiente del
       // flujo. Sin esto, la respuesta correcta —la línea de precio— se cambiaba por
@@ -851,6 +855,31 @@ async function generateReply(phone, userText) {
             `🧾 Se pedía confirmar sin cotización válida para ${phone} (${cot.motivo}): se aclara ` +
               "lo que falta en vez de mandar el cuadro sin total."
           );
+          // 🔴 24-oct (chat real, Leticia): el cliente dijo "Si perfecto", el bot
+          // contestó "te escribo en un momento"… y nadie le escribió. Cuando lo que
+          // falta NO es algo que el bot pueda preguntar (destino sin tarifa, total
+          // que no se pudo calcular), el chat pasa al dueño con aviso.
+          const loPuedePreguntar = ["sin_destino", "varios_destinos", "cantidad_ambigua", "ambiguo"].includes(
+            String(cot.motivo || "")
+          );
+          if (!loPuedePreguntar) {
+            revisionHumana = { motivo: "sin_cotizacion", detalle: String(cot.motivo || "") };
+          }
+        } else if (yaSalioEstaLinea) {
+          // 🔴 24-oct (chat real, Quibdó): el cliente pidió 4 radios y la cotización
+          // seguía en 1 caja. Este reemplazo salió CUATRO veces seguidas, igual,
+          // mientras el cliente decía "Los 4", "Si", "Si". Si la línea ya salió en el
+          // turno anterior, el bot no está avanzando: pasa a una persona.
+          reply =
+            "Dejame revisarlo bien para no darte un dato equivocado 🙏 Te escribo en unos minutos con " +
+            "la confirmación.";
+          console.warn(`🔁 BUCLE CORTADO (cuadro) para ${phone}: la línea de precio ya había salido.`);
+          revisionHumana = {
+            motivo: "bucle_de_precio",
+            detalle:
+              "el cuadro de confirmación no validaba y la misma línea de precio se iba a repetir: " +
+              (validacion.problemas || []).map((p) => p.detalle).join(" · "),
+          };
         } else {
           reply =
             `${lineaCalculada}\n\n¿Te parece bien y lo despacho? Confírmame y seguimos 🏍️`;
