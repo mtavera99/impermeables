@@ -217,7 +217,7 @@ const MEDIA = {
     env: "MEDIA_RADIO",
     caption:
       "📻 Los radios Baofeng BF-777S. Se comunican sin señal de celular, con linterna LED, base " +
-      "de carga y audífono manos libres. El par a $99.000 con envío gratis.",
+      "de carga, radio FM y audífono manos libres. El par a $99.000 con envío gratis.",
   },
   radio_puesto: {
     type: "image",
@@ -235,7 +235,7 @@ const MEDIA = {
     type: "image",
     base: "radio-contenido",
     env: "MEDIA_RADIO_CONTENIDO",
-    caption: "📦 Cada caja trae 2 radios, 2 bases de carga, 2 audífonos manos libres y el clip.",
+    caption: "📦 Cada caja trae 2 radios, 2 bases de carga con adaptador, 2 audífonos manos libres, clips, correas y manual.",
   },
   radio_caja: {
     type: "image",

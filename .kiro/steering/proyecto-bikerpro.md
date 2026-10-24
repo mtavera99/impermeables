@@ -11304,3 +11304,9 @@ Santiago, el dueño, lo lanzó desde BikerPro mientras resuelve la otra cuenta p
    - `test-costos-no-se-desincronizan.js` falla si un producto del catálogo no está en `ID_A_PRODUCTO`. Así se hace cumplir la regla 33.
 
 Pruebas: `bot/test-radios-bf777s.js`, con 96 chequeos.
+
+**24-oct:**
+- **IDs de los anuncios** que dio el dueño, para `ANUNCIOS_RADIO` en Render: `120250017817510390` (video UGC x2) · `120250016231990390` (megacombo x6 fincas) · `120250016232020390` (x2 moteros) · `120250016232010390` (x4 seguridad).
+- **Fotos reales:** `radio-producto`, `radio-contenido` y `radio-caja`.
+- **Ficha:** se agregó la **radio FM**, que dice la caja y confirmó el dueño. "Lo que trae la caja" ahora incluye las correas, el adaptador y el manual, que se ven en la foto.
+- **Homologación:** el CMIIT ID de la caja es la certificación china. El dueño dice que tienen el número colombiano.

@@ -836,6 +836,8 @@ const PRODUCTOS = {
       "batería recargable de litio de 1.500 mAh",
       "base de carga individual para cada radio, con luz indicadora",
       "linterna LED integrada",
+      // ✅ 24-oct: lo dice la caja ("FM Radio") y lo confirmó el dueño.
+      "radio FM para escuchar emisoras",
       "audífono manos libres con micrófono de solapa",
       "clip para el cinturón",
     ],
@@ -892,9 +894,12 @@ const PRODUCTOS = {
       },
       contenido: {
         pregunta: ["que trae", "qué trae", "que incluye", "qué incluye", "que viene", "qué viene", "contenido", "incluye", "viene con", "audifono", "audífono", "manos libres", "microfono", "micrófono"],
+        // ✅ 24-oct: verificado en la foto de la caja abierta (radio-contenido.jpg):
+        // además se ven las correas de mano, el adaptador de corriente y el manual.
         respuesta:
-          "Cada caja trae 2 radios, 2 bases de carga, 2 audífonos manos libres con micrófono de " +
-          "solapa y el clip para el cinturón 📦 Y cada radio tiene linterna LED.",
+          "Cada caja trae 2 radios, 2 bases de carga con su adaptador de corriente, 2 audífonos " +
+          "manos libres con micrófono de solapa, los clips para el cinturón, las correas de mano y " +
+          "el manual 📦 Y cada radio tiene linterna LED."
       },
       canales: {
         pregunta: ["canal", "canales", "frecuencia", "frecuencias", "uhf", "programar", "configurar", "configuracion", "configuración"],
@@ -917,6 +922,13 @@ const PRODUCTOS = {
           "Entre ellos se comunican sin problema. Con radios de otras marcas puede funcionar si " +
           "quedan en la misma frecuencia, pero eso no te lo puedo garantizar 🙌",
       },
+      radioFm: {
+        // ✅ 24-oct: lo dice la caja y lo confirmó el dueño.
+        // ⚠️ Sin la palabra "radio" en la lista: en esta conversación TODO es "radio"
+        // y esta respuesta saldría a cualquier pregunta.
+        pregunta: ["fm", "emisora", "emisoras", "musica", "música", "escuchar radio", "noticias", "partido"],
+        respuesta: "Sí 👍 También traen radio FM, así que puedes escuchar tus emisoras desde el mismo radio 📻",
+      },
       linterna: {
         pregunta: ["linterna", "luz", "led", "de noche", "oscuro"],
         respuesta: "Sí 👍 Cada radio trae una linterna LED integrada, muy útil de noche o en una emergencia 🔦",
@@ -933,7 +945,7 @@ const PRODUCTOS = {
         respuesta:
           "Claro 👍 Son los Baofeng BF-777S: 16 canales en UHF, potencia de unos 2 W, alcance " +
           "aproximado de 2 a 5 km en campo abierto, batería de litio de 1.500 mAh con base de " +
-          "carga individual, linterna LED y audífono manos libres. No necesitan señal de celular.",
+          "carga individual, linterna LED, radio FM y audífono manos libres. No necesitan señal de celular.",
       },
     },
 
