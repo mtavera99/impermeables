@@ -57,12 +57,17 @@ on:
           - /plantillas      # estado real de cada plantilla en Meta + fallos de entrega
           - /pedidos.csv     # TODOS los pedidos (el panel solo dibuja 60)
           - /health          # versión, disco, memoria y el mapa anuncio → producto (sin datos de clientes)
+          - /chats-de-producto  # conversaciones de un producto (extra: producto=radio_bf777s&horas=24). SALE CIFRADA
       id:
         description: "Solo para /chat — el número del cliente (ej. 573116093103)"
         required: false
         default: ""
       extra:
         description: "Parámetros extra, sin el ? inicial (ej. dia=2026-09-24)"
+        required: false
+        default: ""
+      clave:
+        description: "Clave pública RSA en base64. OBLIGATORIA para /chats-de-producto: la salida se cifra con ella"
         required: false
         default: ""
 
@@ -80,8 +85,18 @@ jobs:
           RUTA: ${{ inputs.ruta }}
           ID: ${{ inputs.id }}
           EXTRA: ${{ inputs.extra }}
+          CLAVE: ${{ inputs.clave }}
         run: |
           set -uo pipefail
+
+          # 🔒 /chats-de-producto trae lo que escribieron los clientes (nombres,
+          # direcciones). Este repo es PÚBLICO y sus logs también, así que esa
+          # ruta NUNCA se imprime en claro: se cifra con la clave pública que
+          # se pasa al lanzar el Action, y solo quien tiene la privada la lee.
+          if [ "$RUTA" = "/chats-de-producto" ] && [ -z "${CLAVE:-}" ]; then
+            echo "::error::/chats-de-producto necesita la clave pública (campo 'clave'). No se imprime en claro."
+            exit 1
+          fi
 
           if [ -z "${BOT_URL:-}" ] || [ -z "${BOT_TOKEN:-}" ]; then
             echo "::error::Faltan los secretos BOT_URL y/o BOT_VERIFY_TOKEN del repositorio."
@@ -109,6 +124,18 @@ jobs:
             # El cuerpo de un error no trae el token, así que se puede mostrar.
             head -c 2000 cruda.txt || true
             exit 1
+          fi
+
+          if [ "$RUTA" = "/chats-de-producto" ]; then
+            echo "$CLAVE" | base64 -d > pub.pem
+            openssl rand -out k.bin 32
+            openssl enc -aes-256-cbc -pbkdf2 -salt -in cruda.txt -out datos.enc -pass file:k.bin
+            openssl pkeyutl -encrypt -pubin -inkey pub.pem -pkeyopt rsa_padding_mode:oaep -in k.bin -out k.enc
+            rm -f k.bin cruda.txt
+            echo "===CLAVE==="; base64 -w0 k.enc; echo
+            echo "===DATOS==="; base64 -w0 datos.enc; echo
+            echo "===FIN==="
+            exit 0
           fi
 
           echo "─────────────────── ${RUTA} ───────────────────"

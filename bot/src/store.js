@@ -1996,7 +1996,11 @@ function saveOrder(order, contexto = {}) {
       for (const campo of ["nombre", "celular", "ciudad", "direccion", "color", "talla", "pago"]) {
         const nuevo = String(record[campo] == null ? "" : record[campo]).trim();
         const viejo = String(repetido[campo] == null ? "" : repetido[campo]).trim();
-        if (!nuevo || nuevo.toLowerCase() === viejo.toLowerCase()) continue;
+        // 🔴 24-oct: comparaba solo en minúsculas, así que "Oficina Interrapidisimo" y
+        // "Oficina Interrapidísimo" contaban como datos distintos y la primera venta de
+        // radios quedó en REVISAR por una tilde. Se usa la misma comparación por
+        // significado que el resto del archivo (sin tildes, sin signos, misma ciudad).
+        if (!nuevo || mismoValorDeCampo(campo, nuevo, viejo)) continue;
         diferencias.push(`${campo}: el pedido guardado dice "${viejo || "(vacío)"}" y el cliente ahora dice "${nuevo}"`);
       }
       if (j !== -1 && diferencias.length) {
