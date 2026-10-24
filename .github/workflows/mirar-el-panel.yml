@@ -56,6 +56,7 @@ on:
           - /eventos         # los últimos 60 eventos, con el motivo de cada fallo
           - /plantillas      # estado real de cada plantilla en Meta + fallos de entrega
           - /pedidos.csv     # TODOS los pedidos (el panel solo dibuja 60)
+          - /health          # versión, disco, memoria y el mapa anuncio → producto (sin datos de clientes)
       id:
         description: "Solo para /chat — el número del cliente (ej. 573116093103)"
         required: false
