@@ -255,7 +255,12 @@ function pedidosCSV() {
   //
   // ⚠️ La fila NO se borra: un pedido real con un número mal escrito sigue siendo
   // una venta, y esconderlo sería perderla. Se marca, no se oculta.
-  const cab = ["estado", "revisar_porque", "fecha", "dia_bogota", "nombre", "celular", "ciudad", "direccion", "talla", "color", "pago", "unidades", "unidades_origen", "total", "total_esperado", "anuncio_id", "anuncio_origen"];
+  const cab = ["estado", "revisar_porque", "fecha", "dia_bogota", "nombre", "celular", "ciudad", "direccion", "talla", "color", "pago", "unidades", "unidades_origen", "total", "total_esperado", "anuncio_id", "anuncio_origen", "producto", "banda"];
+  // 📻 `producto` y `banda` (23-oct) van AL FINAL para no correr ninguna columna existente.
+  // El informe de CPA clasificaba el producto por la FORMA del total, y los radios
+  // ($99.000 · $169.000 · $229.000) caen justo en los rangos del Q58. Con el id del
+  // producto ya no se adivina. La banda es la de la cotización: los radios tienen
+  // envío gratis, así que el total ya no dice a qué banda fue.
   const filas = pedidos.map((p) => {
     const q = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
     const revisar = store.textoDeRevision(p);
@@ -277,6 +282,8 @@ function pedidosCSV() {
       p.total_esperado == null ? "" : p.total_esperado,
       p.anuncio_id || "",
       p.anuncio_origen || "",
+      p.producto || "",
+      p.cotizacion_banda || "",
     ].map(q).join(",");
   });
   return [cab.join(","), ...filas].join("\n");

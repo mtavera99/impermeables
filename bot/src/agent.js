@@ -333,8 +333,9 @@ function detectMediaIntent(text, productoId) {
     // Y si pidió ver algo sin decir qué, la foto principal del producto.
     if (quiereVer && delV10.length === 0) delV10.push(pref);
     // Si nombró el producto y quiere verlo, también la principal.
-    if (quiereVer && has(["interco", "v10"]) && !delV10.includes(pref)) delV10.push(pref);
-    if (t.includes("video")) delV10.push("video");
+    if (quiereVer && has(["interco", "v10", "radio", "walkie"]) && !delV10.includes(pref)) delV10.push(pref);
+    // ⚠️ "video" es el del impermeable. A un cliente de radios no se le manda.
+    if (t.includes("video") && !catalogo.esRadio(productoId)) delV10.push("video");
     // 🔑 UNA SOLA FOTO POR MENSAJE. El dueño fue explícito con el tono: "no
     // bombardear con características", "mensajes relativamente cortos". Tres fotos
     // seguidas por una pregunta se leen como spam, no como un vendedor.
@@ -432,7 +433,8 @@ function cantidadDelProducto(productoId, conv, userText, previa) {
 
   // 1. Lo que dice ESTE turno manda: es el mecanismo del cambio de cantidad
   //    ("mejor uno", "mejor mándeme los dos").
-  const deAhora = catalogo.unidadesPedidas(userText);
+  // 📻 Con el producto: los radios se cuentan en cajas, no en piezas.
+  const deAhora = catalogo.unidadesPedidas(userText, productoId);
   if (deAhora != null) return { uds: deAhora, origen: "este turno" };
 
   // 2. Si no, lo último que pidió el CLIENTE en el hilo (lo que el bot ofrezca no
@@ -441,7 +443,7 @@ function cantidadDelProducto(productoId, conv, userText, previa) {
   for (let i = mensajes.length - 1; i >= Math.max(0, mensajes.length - 12); i--) {
     const m = mensajes[i];
     if (!m || m.role !== "user" || !m.content) continue;
-    const n = catalogo.unidadesPedidas(m.content);
+    const n = catalogo.unidadesPedidas(m.content, productoId);
     if (n != null) return { uds: n, origen: "lo que pidió antes en el hilo" };
   }
 
@@ -473,7 +475,11 @@ function cantidadDelProducto(productoId, conv, userText, previa) {
   //
   // Vender una sola sigue disponible en cualquier momento: basta que lo pida
   // ("solo uno", "¿cuánto vale uno?") y el paso 1 lo detecta.
-  return { uds: 2, origen: "el combo del anuncio, que es lo que se publicita" };
+  // 📻 Cada producto declara cuál es SU oferta del anuncio. En los radios es la
+  // caja de 2 radios ($99.000), o sea 1 unidad; en los intercomunicadores, el combo de 2.
+  const oferta = (catalogo.de(productoId) || {}).ofertaPrincipal;
+  const udsOferta = (oferta && Number(oferta.unidades)) || 2;
+  return { uds: udsOferta, origen: "el combo del anuncio, que es lo que se publicita" };
 }
 
 async function generateReply(phone, userText) {
@@ -516,7 +522,7 @@ async function generateReply(phone, userText) {
   // Por categoría: el log tiene que servir igual para el Q58. Con `esV10` las
   // conversaciones del Q58 no dejaban rastro de qué producto se eligió, que es
   // justo lo que hay que poder auditar cuando hay dos productos parecidos.
-  if (catalogo.esIntercom(productoId)) {
+  if (catalogo.esIntercom(productoId) || catalogo.esRadio(productoId)) {
     console.log(`🎧 ${phone}: la conversación es del ${ficha.nombreCorto} (${eleccion.porQue}).`);
   }
   // 🔒 Se FIJA el producto cuando la señal es fuerte: lo dijo el cliente en este

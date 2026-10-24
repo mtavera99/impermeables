@@ -40,6 +40,7 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BM** | 📻 **CUARTO PRODUCTO: RADIOS BF-777S** · $99.000 / $169.000 / $229.000 **con envío gratis** · costo $40.000/caja · **unidades = CAJAS** (1 caja = 2 radios) · "radio" singular no es señal (es la radio FM del Q58) · `/pedidos.csv` trae `producto` y `banda` y el CPA ya no adivina por el total · `ANUNCIOS_RADIO`, `SEGUIMIENTO_PLANTILLA_RADIO` | **23-oct** |
 | **0-BL** | 🔬 **AUDITORÍA POR ANUNCIO (30 días, pedidos reales)** · ranking de los 13 anuncios · 🔴 **error #29: TEST Creativos salía 🟢 en conversaciones y PERDÍA plata (cierre 1,6-2,0%, −$129.562 en 2 semanas)** · **el $/conv no elige ganadores: el cierre pesa igual** (SON DOS $594/conv vende a 8,1%) · escalón de intercom a $25.000: **V10 pagó, Q58 salió en equilibrio** · alarmas de CPA por anuncio | **22-oct** |
 | **0-BK** | 🎧 **TRES PRODUCTOS: impermeable · V10 · Q58 Max** (catálogo, precios, costos, totales por banda) · 📈 **el Q58 ya es ganador: 42 pedidos en 4 días, todos combos, ~$36.500 de contribución, el más alto** · `Domiciliarios Q58 -` es el mejor conjunto de la cuenta · 🔴 **error #28: el informe de CPA contaba el Q58 como V10**, con el costo del V10 → arreglado · **regla 33: un producto nuevo entra a los informes el mismo día** · PRs abiertos #214/#221/#222 | **19-oct** |
 | **0-BJ** | 📇 **CORRECCIONES DE DATOS: tres cosas de este archivo que eran falsas** · ✅ **la línea del 313 FUNCIONA** (SMS y llamadas; era el equipo, no el operador) → se retiran el riesgo del número reciclado, el pendiente con el operador y mi recomendación de mover los avisos · ✅ **las plantillas de Meta YA están aprobadas y en uso** (seis, con nombre por defecto) — lo que falta son 2 avisos AL DUEÑO, que es una decisión suya · 📮 **el número impreso en la etiqueta de 99 Envíos es el CELULAR DEL HERMANO del dueño**, dato que no estaba en ninguna parte y por eso `TELEFONO_REMITENTE` estuvo mal | **30-sep** |
@@ -11267,3 +11268,39 @@ impermeable >$9.200). Cortar si pasa del 75% durante 7 días seguidos.
 - la devolución propia de los intercomunicadores todavía no se conoce (se usa la del impermeable);
 - `estado-cuenta.py` debería cruzar pedidos por anuncio, que es lo que habría mostrado lo de TEST;
 - los scripts de esta auditoría corrieron fuera del repo, porque leen `/pedidos.csv`, que no se commitea (el repo es público).
+
+---
+
+## 0-BM · 📻 CUARTO PRODUCTO: RADIOS BAOFENG BF-777S (vie 23-oct)
+
+Santiago, el dueño, lo lanzó desde BikerPro mientras resuelve la otra cuenta publicitaria (Novika). La campaña es separada y apunta a varios públicos: fincas, seguridad, negocios y moteros.
+
+| | |
+|---|---|
+| id en el bot | `radio_bf777s` · categoría `radio` |
+| precios (**ya incluyen el envío, envío gratis**) | 1 caja (2 radios) **$99.000** · 2 cajas (4 radios) **$169.000** · 3 cajas (6 radios) **$229.000** |
+| costo | **$40.000 por caja** |
+| envío | 1, 2 o 3 cajas van en **un paquete de 1 kg**. El flete real es el de un paquete de su banda (`ENVIO_REAL_1`) y lo paga el negocio |
+| anuncios | `ANUNCIOS_RADIO` en Render. Sin esa variable, el bot enruta por el texto del anuncio o por lo que escriba el cliente |
+| seguimiento | `SEGUIMIENTO_PLANTILLA_RADIO`. Sin plantilla aprobada, el paso de 24 h **se salta** |
+| ficha | UHF 400-470 MHz · 16 canales · ~2 W · **alcance aprox. 2-5 km en campo abierto** · litio 1.500 mAh con base individual · linterna LED · audífono manos libres con micrófono de solapa · clip · garantía 1 mes |
+| licencia | el dueño confirmó el 23-oct que **tienen la licencia** y que se puede ofrecer. El texto está en `datosConfirmados.licencia` |
+| no confirmado | horas de batería · resistencia al agua · golpes · alcances de más de 5 km |
+
+**Contribución por pedido entregado, antes de pauta:** 1 caja ~$59.000 − flete ($14.906 en A a $28.697 en E). 2 cajas ~$89.000 − flete. 3 cajas ~$109.000 − flete.
+
+### 🔴 Las cuatro trampas que se cerraron en código
+
+1. **"Unidades" son CAJAS.**
+   - El cliente cuenta radios: "4 radios" son 2 cajas. Lo resuelve `catalogo.cajasDeRadios`.
+   - Los números impares, "un radio" y un "quiero 2" pelado quedan sin decidir, y el guion pregunta.
+   - `verificarPedido` manda a revisión un `##ORDER##` con 4 en vez de 2.
+2. **"Radio" en singular NO es señal del producto.** El Q58 vende *radio FM*. Las señales del producto son el plural ("los radios"), walkie, Baofeng, BF-777S y "radios para la finca/seguridad/…".
+3. **El envío gratis es verdad solo acá.** La política `gratis` y `envioIncluido: true` hacen que el validador deje decir "envío gratis" en radios y lo siga prohibiendo en el V10 y el Q58.
+4. **El informe de CPA ya no adivina el producto por el total.** Los totales de radios ($99.000, $169.000, $229.000) caen en los rangos del Q58.
+   - `/pedidos.csv` tiene ahora dos columnas al final: **`producto`** y **`banda`**.
+   - `cpa-por-producto.py` clasifica primero por `producto` y usa la forma del total solo como respaldo para pedidos viejos.
+   - Si falta la banda, usa la E, la más cara.
+   - `test-costos-no-se-desincronizan.js` falla si un producto del catálogo no está en `ID_A_PRODUCTO`. Así se hace cumplir la regla 33.
+
+Pruebas: `bot/test-radios-bf777s.js`, con 96 chequeos.

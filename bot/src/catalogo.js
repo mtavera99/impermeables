@@ -73,7 +73,16 @@ const fletes = require("./fletes");
  * · `paquete_unico` 1 o más unidades caben en el MISMO paquete chico, así que el
  *                   cargo no cambia con la cantidad.
  */
-const POLITICAS_DE_ENVIO = { POR_UNIDADES: "por_unidades", PAQUETE_UNICO: "paquete_unico" };
+// · `gratis`        el precio YA incluye el envío (radios BF-777S, 23-oct). El
+//                   cargo al cliente es $0; el flete real lo paga el negocio y
+//                   lo resta el informe de CPA.
+const POLITICAS_DE_ENVIO = { POR_UNIDADES: "por_unidades", PAQUETE_UNICO: "paquete_unico", GRATIS: "gratis" };
+
+/** ¿Este producto se vende con el envío incluido en el precio? */
+function envioEsGratis(productoId) {
+  const p = PRODUCTOS[productoId];
+  return Boolean(p && p.politicaDeEnvio && p.politicaDeEnvio.tipo === POLITICAS_DE_ENVIO.GRATIS);
+}
 
 /** El cargo de envío de un paquete individual en esa banda. */
 function envioDeUnPaquete(claveBanda) {
@@ -96,6 +105,14 @@ function envioDeUnPaquete(claveBanda) {
 function envioDe(productoId, claveBanda, uds) {
   const p = de(productoId);
   const politica = (p && p.politicaDeEnvio && p.politicaDeEnvio.tipo) || POLITICAS_DE_ENVIO.POR_UNIDADES;
+
+  if (politica === POLITICAS_DE_ENVIO.GRATIS) {
+    // Mismo tope que el paquete único: que 3 cajas quepan en 1 kg no dice nada
+    // de que quepan 8. Fuera del tope, null = "no se cotiza solo".
+    const tope = Number((p.politicaDeEnvio && p.politicaDeEnvio.hastaUnidades) || 0);
+    if (tope && Number(uds) > tope) return null;
+    return 0;
+  }
 
   if (politica === POLITICAS_DE_ENVIO.PAQUETE_UNICO) {
     // ⛔ `uds` se IGNORA a propósito: es el corazón de esta política. Las unidades
@@ -735,6 +752,206 @@ const PRODUCTOS = {
     envioIncluido: false,
     contraentrega: true,
   },
+
+  // ==========================================================================
+  // 📻 RADIOS BAOFENG BF-777S — cuarto producto, 23-oct
+  //
+  // El dueño (Santiago) lo pidió para probarlo desde BikerPro mientras se
+  // resuelve la otra cuenta publicitaria. Se vende por CAJA: cada caja trae
+  // DOS radios.
+  //
+  // 🔴 TRES COSAS QUE LO HACEN DISTINTO DE LOS INTERCOMUNICADORES:
+  //
+  //   1. ENVÍO GRATIS. El precio YA es el total que paga el cliente. Por eso
+  //      `politicaDeEnvio.tipo` es "gratis" y `envioIncluido: true`: así el
+  //      validador de cotizacion.js no le borra al bot la frase "envío gratis",
+  //      que en el V10 y el Q58 sí es mentira.
+  //   2. LA UNIDAD ES LA CAJA, NO EL RADIO. `unidades: 1` = 1 caja = 2 radios.
+  //      El anuncio dice "COMBO X 2", "X 4" y "X 6", o sea que el cliente cuenta
+  //      RADIOS. `unidadesPedidas` lo traduce (ver `cajasDeRadios`). Si se
+  //      confundiera, se despacharía el doble o la mitad.
+  //   3. TRES PRECIOS, no dos. Ningún código de este repo puede asumir que un
+  //      producto tiene solo 1 y 2 unidades (ver `preciosDe`).
+  //
+  // ⚠️ "radio" ya existía como palabra en el bot: el Q58 vende RADIO FM como
+  // función. Por eso las señales de este producto NO incluyen "radio" suelto en
+  // singular: piden plural ("los radios"), walkie, Baofeng o el uso ("radios
+  // para la finca"). Ver SENALES_DE_MODELO.
+  //
+  // ⚠️ El id no lleva "2", "3", "x2" ni "combo": `unidadesDelPedido` y
+  // `resumen.cantidadDe` leen el texto del producto buscando esos números.
+  // ==========================================================================
+  radio_bf777s: {
+    id: "radio_bf777s",
+    nombre: "Radios Baofeng BF-777S",
+    nombreCorto: "BF-777S",
+    etiquetaPanel: "📻 Radios BF-777S",
+    categoria: "radio",
+    porDefectoDeCategoria: true,
+    motorDePrecio: "producto_mas_envio",
+    pideTalla: false,
+    pideColor: false,
+    porDefecto: false,
+
+    // 💰 PRECIOS CONFIRMADOS POR EL DUEÑO (23-oct). YA INCLUYEN EL ENVÍO.
+    //   1 caja  (2 radios) $99.000  -> el gancho de la publicidad
+    //   2 cajas (4 radios) $169.000 -> ahorra $29.000 contra 2 cajas sueltas
+    //   3 cajas (6 radios) $229.000 -> ahorra $68.000, para fincas y seguridad
+    // ⛔ No hay precio para 4 cajas o más: `precioDe` lo marca fuera de tabla y
+    // el bot lo pasa a un asesor en vez de inventar un descuento.
+    precios: { 1: 99000, 2: 169000, 3: 229000 },
+    // Nombre de cada opción, como lo dice la publicidad.
+    nombresDeCombo: { 1: "combo x2 radios", 2: "combo x4 radios", 3: "megacombo x6 radios" },
+    // Cuántas piezas trae cada "unidad". Lo usa el guion y el cuadro de pedido.
+    radiosPorUnidad: 2,
+
+    // Costo de compra por CAJA (el par), confirmado por el dueño el 23-oct.
+    costoUnitario: 40000,
+
+    // 📦 ENVÍO GRATIS, y 1, 2 o 3 cajas van en el MISMO paquete de 1 kg (lo
+    // confirmó el dueño: "las tres opciones las puedo empacar en un paquete de
+    // 1 kg"). El flete lo paga el negocio, y el informe de CPA lo resta con el
+    // costo real de un paquete de su banda (`ENVIO_REAL_1`).
+    politicaDeEnvio: {
+      tipo: "gratis",
+      hastaUnidades: 3,
+      provisional: true,
+      porQue:
+        "precio con envío incluido; 1, 2 o 3 cajas van en un solo paquete de 1 kg (confirmado " +
+        "por el dueño el 23-oct)",
+      noHeredar: ["ENVIO_REAL_2", "FLETE_2_OBSERVADO", "PROMO_2_TOTAL", "RECARGO_UNIDAD_EXTRA"],
+      revisarCuando: "haya las primeras guías despachadas de este producto",
+    },
+
+    // La publicidad masiva empuja la caja de 2 radios a $99.000.
+    ofertaPrincipal: { unidades: 1, precio: 99000, nombre: "combo x2 radios" },
+
+    anunciosEnv: "ANUNCIOS_RADIO",
+    mediaPrefijo: "radio",
+    seguimientoPlantillaEnv: "SEGUIMIENTO_PLANTILLA_RADIO",
+
+    funciones: [
+      "comunicación por radio entre los dos equipos, sin señal de celular ni minutos",
+      "16 canales listos para usar desde que salen de la caja",
+      "batería recargable de litio de 1.500 mAh",
+      "base de carga individual para cada radio, con luz indicadora",
+      "linterna LED integrada",
+      "audífono manos libres con micrófono de solapa",
+      "clip para el cinturón",
+    ],
+
+    // Para qué lo compra la gente, según la investigación del dueño. El guion lo
+    // usa para hablarle a cada uno de lo suyo.
+    usos: [
+      "fincas y haciendas sin señal de celular (el mayordomo, los trabajadores)",
+      "seguridad privada, porterías y conjuntos residenciales",
+      "bodegas, restaurantes, parqueaderos, logística y eventos",
+      "caravanas y rodadas en moto",
+    ],
+
+    // ------------------------------------------------------------------------
+    // ✅ FICHA DEL BF-777S — la dio el dueño el 23-oct
+    //
+    // ⚠️ El alcance va como lo pidió el dueño: "aproximadamente 2 a 5 km en
+    // campo abierto", y diciendo que entre edificios o montaña es menos.
+    // Prometer un alcance como garantía es lo que vuelve como rechazo.
+    // ⚠️ La batería NO tiene horas confirmadas. Si preguntan cuánto dura, va a
+    // `sinDatoConfirmado`.
+    // ------------------------------------------------------------------------
+    datosConfirmados: {
+      garantia: {
+        pregunta: ["garantia", "garantía", "garantizado", "garantizan", "si sale malo", "si se daña", "si se dana"],
+        respuesta:
+          "Sí 👍 Tienen 1 mes de garantía directa por defectos de fábrica. Si te presentan algún " +
+          "problema en ese tiempo, nos escribes y lo revisamos.",
+      },
+      alcance: {
+        pregunta: ["alcance", "kilometro", "kilómetro", "km", "metros", "distancia", "rango", "que tan lejos", "qué tan lejos", "hasta donde", "hasta dónde", "cuanto alcanza", "cuánto alcanza"],
+        respuesta:
+          "En campo abierto, como una finca, alcanzan aproximadamente de 2 a 5 km 📡 Entre " +
+          "edificios, paredes o montaña la distancia es menor, porque los obstáculos frenan la señal.",
+      },
+      ciudad: {
+        pregunta: ["en la ciudad", "edificio", "conjunto residencial", "porteria", "portería", "torre", "bodega", "dentro de", "paredes"],
+        respuesta:
+          "Sí 👍 Funcionan muy bien en conjuntos, porterías, bodegas y negocios. Ahí la distancia es " +
+          "menor que en campo abierto por las paredes y los edificios, pero para comunicarse dentro " +
+          "del lugar van perfectos.",
+      },
+      senal: {
+        pregunta: ["sin señal", "sin senal", "señal de celular", "senal de celular", "minutos", "plan de datos", "internet", "simcard", "sim card", "chip", "recarga"],
+        respuesta:
+          "No necesitan señal de celular, ni internet, ni minutos 👍 Se comunican directo de radio a " +
+          "radio, por eso sirven en fincas y lugares donde el celular no entra.",
+      },
+      bateria: {
+        pregunta: ["bateria", "batería", "mah", "carga", "cargar", "cargador", "base"],
+        respuesta:
+          "Cada radio trae batería recargable de litio de 1.500 mAh 🔋 y su propia base de carga " +
+          "con luz que te indica cuándo está cargando y cuándo ya está lista.",
+      },
+      contenido: {
+        pregunta: ["que trae", "qué trae", "que incluye", "qué incluye", "que viene", "qué viene", "contenido", "incluye", "viene con", "audifono", "audífono", "manos libres", "microfono", "micrófono"],
+        respuesta:
+          "Cada caja trae 2 radios, 2 bases de carga, 2 audífonos manos libres con micrófono de " +
+          "solapa y el clip para el cinturón 📦 Y cada radio tiene linterna LED.",
+      },
+      canales: {
+        pregunta: ["canal", "canales", "frecuencia", "frecuencias", "uhf", "programar", "configurar", "configuracion", "configuración"],
+        respuesta:
+          "Traen 16 canales y vienen listos para usar de caja: los prendes, los pones en el mismo " +
+          "canal y ya se comunican 👍 Trabajan en UHF (400-470 MHz).",
+      },
+      licencia: {
+        // ✅ El dueño (23-oct): "Sí tenemos la licencia que hablas del gobierno,
+        // entonces la puedes ofrecer sin ningún tipo de problema". Es TEXTO
+        // COMERCIAL: si el dueño quiere otra redacción, se cambia solo acá.
+        pregunta: ["licencia", "permiso", "mintic", "legal", "legales", "homologado", "homologados", "ministerio", "es ilegal", "me pueden multar", "multa"],
+        respuesta:
+          "Sí, tranquilo 👍 Nuestros radios cuentan con su licencia, así que los puedes usar sin " +
+          "problema.",
+      },
+      compatibilidad: {
+        pregunta: ["otra marca", "otras marcas", "otros radios", "compatible", "compatibles", "con los que ya tengo", "motorola", "kenwood"],
+        respuesta:
+          "Entre ellos se comunican sin problema. Con radios de otras marcas puede funcionar si " +
+          "quedan en la misma frecuencia, pero eso no te lo puedo garantizar 🙌",
+      },
+      linterna: {
+        pregunta: ["linterna", "luz", "led", "de noche", "oscuro"],
+        respuesta: "Sí 👍 Cada radio trae una linterna LED integrada, muy útil de noche o en una emergencia 🔦",
+      },
+      moto: {
+        pregunta: ["moto", "casco", "caravana", "rodada", "motociclista", "motero"],
+        respuesta:
+          "Sí 👍 Para caravanas y rodadas funcionan muy bien con el audífono manos libres. Si lo " +
+          "que buscas es hablar de casco a casco con tu acompañante mientras manejas, para eso " +
+          "tenemos intercomunicadores para casco.",
+      },
+      especificaciones: {
+        pregunta: ["especificacion", "especificación", "caracteristica", "característica", "ficha tecnica", "ficha técnica", "potencia", "watts", "vatios", "como funciona", "cómo funciona"],
+        respuesta:
+          "Claro 👍 Son los Baofeng BF-777S: 16 canales en UHF, potencia de unos 2 W, alcance " +
+          "aproximado de 2 a 5 km en campo abierto, batería de litio de 1.500 mAh con base de " +
+          "carga individual, linterna LED y audífono manos libres. No necesitan señal de celular.",
+      },
+    },
+
+    // ⛔ LO QUE NO SE INVENTA. Una promesa de agua o de horas de batería que no
+    // se cumple es una devolución con motivo.
+    sinDatoConfirmado: [
+      "agua", "lluvia", "llueve", "moja", "mojar", "sumergible", "impermeable", "ip54", "ip67", "ipx",
+      "cuantas horas", "cuántas horas", "cuanto dura la bateria", "cuánto dura la batería",
+      "cuanto le dura", "cuánto le dura", "horas de uso", "autonomia", "autonomía",
+      "10 km", "10km", "20 km", "militar", "irrompible", "a prueba de golpes", "se cae",
+      "repetidora", "pantalla", "display",
+    ],
+
+    // 🔑 El envío SÍ está incluido. Con esto el validador de cotizacion.js deja
+    // decir "envío gratis", que es la oferta del anuncio.
+    envioIncluido: true,
+    contraentrega: true,
+  },
 };
 
 /** El producto que se asume cuando no hay ninguna señal. */
@@ -773,6 +990,12 @@ const esV10 = (id) => id === "intercom_v10_2x";
 const esProductoSimple = (id) => {
   const f = PRODUCTOS[id];
   return Boolean(f && f.motorDePrecio === "producto_mas_envio");
+};
+
+/** ¿Es un radio de comunicación? (hoy el BF-777S) */
+const esRadio = (id) => {
+  const f = PRODUCTOS[id];
+  return Boolean(f && f.categoria === "radio");
 };
 
 /** ¿Es un intercomunicador? (hoy el V10 2X y el Q58 Max) */
@@ -851,6 +1074,24 @@ const SENALES_DE_MODELO = [
   // escritura real y con `\b58\b` no pegaba.
   { producto: "intercom_q58_max", re: /\bq\s*-?\s*58/, confianza: "alta", senal: "dijo Q58" },
   { producto: "intercom_q58_max", re: /\bq\s*-?\s*58\s*-?\s*max\b/, confianza: "alta", senal: "dijo Q58 Max" },
+
+  // 📻 RADIOS BF-777S (23-oct). Hay un solo producto en la categoría, así que
+  // estas señales deciden solas.
+  //
+  // ⛔ "radio" SUELTO EN SINGULAR NO ES SEÑAL, a propósito: el Q58 vende "radio
+  // FM" y un cliente del Q58 que pregunta "¿tiene radio?" no puede terminar
+  // cotizando walkie-talkies. Lo que sí cuenta es lo que solo dice alguien que
+  // busca radios de comunicación: el plural ("los radios"), walkie, Baofeng, el
+  // modelo, o el uso ("radio para la finca").
+  { producto: "radio_bf777s", re: /\bbao\s*-?\s*feng\b/, confianza: "alta", senal: "dijo Baofeng" },
+  { producto: "radio_bf777s", re: /\bbf\s*-?\s*777|\b777\s*-?\s*s\b/, confianza: "alta", senal: "dijo BF-777S" },
+  { producto: "radio_bf777s", re: /\bwalk[iy]e?s?\b|\bwalkie\s*-?\s*talkies?\b|\bwok[iy]\s*-?\s*tok[iy]s?\b|\bboki\s*-?\s*tokis?\b|\bwalki\s*-?\s*talki/, confianza: "alta", senal: "dijo walkie-talkie" },
+  { producto: "radio_bf777s", re: /\bradio\s*-?\s*telefonos?\b/, confianza: "alta", senal: "dijo radioteléfono" },
+  { producto: "radio_bf777s", re: /\bradios?\s+(?:de\s+)?comunicaci/, confianza: "alta", senal: "dijo radios de comunicación" },
+  { producto: "radio_bf777s", re: /\bradios?\s+(?:para|pa)\s+(?:la\s+|el\s+|mi\s+|los\s+|una\s+|un\s+)?(?:finca|hacienda|seguridad|vigilan|celad|porteria|bodega|trabajo|empresa|negocio|restaurante|parqueadero|evento|obra|caravana|hablar|comunicar)/, confianza: "alta", senal: "radios para un uso de trabajo" },
+  // El plural, que es como se nombra el producto ("los radios", "6 radios").
+  // ⚠️ Sin "fm" ni "emisoras" detrás: "radios fm" sigue siendo del Q58.
+  { producto: "radio_bf777s", re: /\bradios\b(?!\s*(?:fm|am)\b)/, confianza: "alta", senal: "dijo radios" },
 ];
 
 /**
@@ -1319,7 +1560,11 @@ function productoDelAnuncio(atribucion) {
  *
  * @returns {number|null} null si el texto no habla de cantidad
  */
-function unidadesPedidas(texto) {
+function unidadesPedidas(texto, productoId) {
+  // 📻 Los radios se cuentan en CAJAS, y el cliente habla en RADIOS. Tiene su
+  // propio lector: "quiero 4 radios" son 2 cajas, no 4.
+  if (productoId && esRadio(productoId)) return cajasDeRadios(texto);
+
   const t = aplanar(texto);
   if (!t.trim()) return null;
 
@@ -1362,6 +1607,82 @@ function unidadesPedidas(texto) {
     if (n >= 1 && n <= 20) return n;
   }
   return null;
+}
+
+// ============================================================================
+// 📻 CUÁNTAS CAJAS DE RADIOS PIDE EL CLIENTE — 23-oct
+//
+// 🔴 EL RIESGO: la publicidad habla en RADIOS ("COMBO X 2", "X 4", "X 6") y el
+// pedido se guarda en CAJAS (1 caja = 2 radios). Un cliente que escribe
+// "quiero 4 radios" pide 2 cajas. Si se leyera "4" como 4 unidades, se le
+// cotizaría una cantidad que no existe o se le despacharía el doble.
+//
+// Reglas, en este orden:
+//   · "N cajas"                         -> N
+//   · "N radios", "x N", "combo de N"   -> N / 2 si N es par
+//   · el precio de una opción ($99, $169, $229) -> esa opción
+//   · "megacombo", "el de 6", "el de 4"  -> 3 / 2
+//   · "un radio", "3 radios", N impar    -> null: los radios vienen por par, y
+//     eso lo explica el guion. Redondear sería elegir por el cliente.
+//   · "quiero 2" pelado                  -> null: puede ser 2 radios o 2 cajas.
+//     Preguntar cuesta un mensaje; adivinar cuesta un despacho mal hecho.
+//
+// Si hay varias menciones, gana la ÚLTIMA: es la corrección ("quería 6, mejor 4").
+// ============================================================================
+const PALABRAS_NUMERO = {
+  un: 1, una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6,
+  siete: 7, ocho: 8, nueve: 9, diez: 10, doce: 12,
+};
+
+function numeroDe(s) {
+  const n = Number(s);
+  if (Number.isFinite(n)) return n;
+  return PALABRAS_NUMERO[s] || null;
+}
+
+function cajasDeRadios(texto) {
+  const t = aplanar(texto);
+  if (!t.trim()) return null;
+  const NUM = "(\\d{1,2}|un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce)";
+  const hallados = []; // { i, cajas, tipo }  (cajas null = impar: no se decide)
+  const anotar = (re, aCajas, tipo = "otro") => {
+    const r = new RegExp(re, "g");
+    let m;
+    while ((m = r.exec(t))) {
+      const c = aCajas(m);
+      if (c !== undefined) hallados.push({ i: m.index, cajas: c, tipo });
+    }
+  };
+  const desdeRadios = (n) => (n && n % 2 === 0 ? n / 2 : null);
+
+  // "2 cajas", "una caja", "tres cajitas"
+  anotar(`\\b${NUM}\\s+(?:cajas?|cajitas?|kits?)\\b`, (m) => numeroDe(m[1]) || undefined, "cajas");
+  // "4 radios", "seis radios", "2 walkies"
+  anotar(`\\b${NUM}\\s+(?:radios?|walk[iy]e?s?|equipos?|aparatos?)\\b`, (m) => desdeRadios(numeroDe(m[1])));
+  // "x4", "x 6", "combo de 4", "combo por 6", "el de 6", "los de 4", "pack de 2"
+  anotar(`(?:\\bx\\s*|\\bcombo\\s+(?:de\\s+|por\\s+|x\\s*)?|\\bpack\\s+(?:de\\s+)?|\\b(?:el|los)\\s+de\\s+)(2|4|6|dos|cuatro|seis)\\b(?!\\s*(?:mil|000|\\.000))`, (m) =>
+    desdeRadios(numeroDe(m[1]))
+  );
+  // "un par", "el par", "una pareja"
+  anotar(`\\b(?:un|el|una|la)\\s+(?:par|pareja)\\b(?!\\s+de\\s+(?:cajas|combos))`, () => 1);
+  // "megacombo"
+  anotar(`\\bmega\\s*-?\\s*combo\\b`, () => 3);
+  // El precio de la opción: "el de 99", "169 mil", "$229.000". ⚠️ Exige "mil",
+  // ".000" o "el de": un "99" suelto puede ser la "calle 99" de la dirección.
+  const PRECIO_A_CAJAS = { 99: 1, 169: 2, 229: 3 };
+  anotar(`\\b(?:el|la|los)\\s+de\\s+(99|169|229)\\b|\\b(99|169|229)(?:[.\\s]000|\\s*mil)\\b`, (m) =>
+    PRECIO_A_CAJAS[m[1] || m[2]]
+  );
+  // "solo uno", "solo una": una sola pieza. No existe: queda sin decidir.
+  anotar(`\\bsolo\\s+(?:uno|una|1)\\b`, () => null);
+
+  if (!hallados.length) return null;
+  // 🔑 Si el cliente nombró CAJAS, eso manda: en "dos cajas de 2 radios" el "2
+  // radios" describe la caja, no es otra cantidad.
+  const deCajas = hallados.filter((h) => h.tipo === "cajas");
+  const validos = deCajas.length ? deCajas : hallados;
+  validos.sort((a, b) => a.i - b.i);
+  return validos[validos.length - 1].cajas;
 }
 
 /** ¿El cliente pregunta por una sola unidad? Para responder "sí, sí vendemos". */
@@ -1456,6 +1777,9 @@ module.exports = {
   // 🎯 Enrutamiento de anuncios por producto (15-oct, para el Q58 Max).
   esProductoSimple,
   esIntercom,
+  esRadio,
+  envioEsGratis,
+  cajasDeRadios,
   anunciosConfigurados,
   idsDeAnuncioDe,
   productoPorDefectoDe,

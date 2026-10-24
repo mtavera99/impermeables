@@ -177,8 +177,10 @@ chequear(
 );
 
 console.log("\n   Y el mapa se puede revisar sin desplegar:");
-const mapa = catalogo.anunciosConfigurados();
-chequear("lista los dos productos con anuncios", mapa.length === 2);
+// 📻 Desde el 23-oct también están los radios (ANUNCIOS_RADIO): acá se miran
+// solo los dos intercomunicadores, que son los que esta prueba configuró.
+const mapa = catalogo.anunciosConfigurados().filter((m) => catalogo.esIntercom(m.producto));
+chequear("lista los dos intercomunicadores con anuncios", mapa.length === 2);
 chequear(
   "dice qué variable usa cada uno",
   mapa.some((m) => m.variable === "ANUNCIOS_Q58") && mapa.some((m) => m.variable === "ANUNCIOS_V10")

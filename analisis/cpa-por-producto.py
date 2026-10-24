@@ -90,7 +90,9 @@ SALIDA = os.path.join(RAIZ, "CPA-POR-PRODUCTO.md")
 ACT = "act_4330882710457791"
 
 # ── Las columnas del CSV que SI se cargan. Todo lo demas se descarta al leer.
-COLUMNAS = ["estado", "dia_bogota", "talla", "color", "unidades", "total", "anuncio_id"]
+# `producto` y `banda` (23-oct): los manda el bot desde que hay radios. Ninguna es
+# un dato personal: el id del producto y la letra de la banda de envio.
+COLUMNAS = ["estado", "dia_bogota", "talla", "color", "unidades", "total", "anuncio_id", "producto", "banda"]
 
 # ══════════════════════════════════════════════════════════════════════════════
 # COSTOS — LA FUENTE DE VERDAD ESTA EN EL CODIGO DEL BOT, NO ACA
@@ -108,6 +110,7 @@ COLUMNAS = ["estado", "dia_bogota", "talla", "color", "unidades", "total", "anun
 COSTO_IMPERMEABLE = 33000   # bot/src/fletes.js  -> COSTO_PRODUCTO
 COSTO_V10_UNIDAD = 30000    # bot/src/catalogo.js -> intercom_v10_2x.costoUnitario
 COSTO_Q58_UNIDAD = 43000    # bot/src/catalogo.js -> intercom_q58_max.costoUnitario
+COSTO_RADIO_CAJA = 40000    # bot/src/catalogo.js -> radio_bf777s.costoUnitario (la caja de 2)
 
 # 💰 El proveedor bajo los dos intercomunicadores A PARTIR DEL 15-OCT (el dia que
 # se prendio el Q58): V10 $32.000 -> $30.000 y Q58 $45.000 -> $43.000. La ventana
@@ -144,8 +147,23 @@ TOTAL_Q58_UNIDAD = {"A": 93000, "B": 98000, "C": 102000, "D": 103000, "E": 10500
 # sumaban al V10, con el costo del V10 (entonces $32.000 vs $45.000). Resultado: el
 # V10 salia con mas pedidos de los que tiene, y la utilidad inflada en ~$26.000
 # por cada combo Q58. El Q58 —ya ganador— no aparecia en ninguna fila.
-PRODUCTOS = ["V10", "Q58", "IMPERMEABLE"]
-COSTO_POR_UNIDAD = {"V10": COSTO_V10_UNIDAD, "Q58": COSTO_Q58_UNIDAD}
+PRODUCTOS = ["V10", "Q58", "RADIO", "IMPERMEABLE"]
+COSTO_POR_UNIDAD = {"V10": COSTO_V10_UNIDAD, "Q58": COSTO_Q58_UNIDAD, "RADIO": COSTO_RADIO_CAJA}
+
+# 📻 RADIOS (23-oct). Precio cerrado con envio GRATIS: $99.000 / $169.000 / $229.000
+# por 1, 2 o 3 cajas, y esos totales caen en los rangos del Q58. Por eso la
+# clasificacion ahora lee primero la columna `producto` del CSV, y la forma del
+# total queda solo para los pedidos viejos que no la traen.
+ID_A_PRODUCTO = {
+    "impermeable": "IMPERMEABLE",
+    "intercom_v10_2x": "V10",
+    "intercom_q58_max": "Q58",
+    "radio_bf777s": "RADIO",
+}
+# Productos con envio gratis: el flete real lo paga el negocio y la banda no se
+# puede deducir del total, asi que sale de la columna `banda`. Si falta, la E, que
+# es la mas cara: asi la utilidad nunca se sobreestima.
+ENVIO_GRATIS = {"RADIO"}
 
 # Costo de una devolucion LIQUIDADA: solo la prima del seguro. Regla 0-AY —
 # "nunca le cobraron ningun flete de devolucion" — y el producto vuelve y se
@@ -235,6 +253,10 @@ def producto_del_pedido(p):
     Esos los resuelve despues `clasificar_anuncios` mirando de que anuncio vino,
     que es un dato mas fuerte que el total.
     """
+    # 🔑 Si el bot dice el producto, eso manda: es el dato que eligio el guion y el precio.
+    deId = ID_A_PRODUCTO.get((p.get("producto") or "").strip())
+    if deId:
+        return deId
     talla = p.get("talla", "")
     color = p.get("color", "")
     total = float(p.get("total") or 0)
@@ -263,7 +285,7 @@ def banda_del_total(total, producto):
 
 def costo_unitario(producto, dia):
     """El costo de compra de un intercomunicador EL DIA del pedido."""
-    if dia and dia < CAMBIO_COSTO_INTERCOM:
+    if dia and dia < CAMBIO_COSTO_INTERCOM and producto in COSTO_ANTES_DEL_CAMBIO:
         return COSTO_ANTES_DEL_CAMBIO[producto]
     return COSTO_POR_UNIDAD[producto]
 
@@ -283,6 +305,12 @@ def contribucion(p, producto):
         uds = max(1, int(float(p.get("unidades") or 1)))
     except ValueError:
         uds = 1
+    if producto in ENVIO_GRATIS:
+        # 1, 2 o 3 cajas van en un paquete de 1 kg: se paga el flete de UNO.
+        b = (p.get("banda") or "").strip().upper()
+        envio = ENVIO_REAL_1.get(b, ENVIO_REAL_1["E"])
+        costo = costo_unitario(producto, p.get("dia_bogota", "")) * uds
+        return total - costo - envio
     b = banda_del_total(total, producto)
     if producto in COSTO_POR_UNIDAD:
         # Politica de paquete unico (V10 y Q58): 1 o 2 intercomunicadores van en
@@ -453,7 +481,7 @@ def construir(dias):
     # ── dia por dia
     L.append("## Dia por dia")
     L.append("")
-    corto = {"V10": "V10", "Q58": "Q58", "IMPERMEABLE": "imper"}
+    corto = {"V10": "V10", "Q58": "Q58", "RADIO": "radio", "IMPERMEABLE": "imper"}
     L.append("| dia | " + " | ".join(
         f"gasto {corto[p]} | ped | CPA {corto[p]}" for p in productos) + " |")
     L.append("|---|" + "---|---|---|" * len(productos))
@@ -513,6 +541,8 @@ def construir(dias):
              f"(antes ${COSTO_ANTES_DEL_CAMBIO['V10']:,}) | `bot/src/catalogo.js` costoUnitario |")
     L.append(f"| costo Q58 Max | ${COSTO_Q58_UNIDAD:,}/ud desde el {CAMBIO_COSTO_INTERCOM} "
              f"(antes ${COSTO_ANTES_DEL_CAMBIO['Q58']:,}) | `bot/src/catalogo.js` costoUnitario |")
+    L.append(f"| costo radios BF-777S | ${COSTO_RADIO_CAJA:,}/caja de 2 · envio gratis, se resta el "
+             f"flete real de 1 paquete | `bot/src/catalogo.js` costoUnitario |")
     L.append(f"| tasa de devolucion | {TASA_DEVOLUCION*100:.1f}% | 386 guias, corte 30-sep (IC 16,8-30,2%) |")
     L.append(f"| costo de una devolucion | ${COSTO_DEVOLUCION:,} | solo la prima — regla 0-AY |")
     L.append("")
