@@ -195,7 +195,9 @@ Mientras falten, el bot simplemente no las ofrece — **nunca manda las del V10 
 
 ### 📻 Radios Baofeng BF-777S (23-oct)
 
-Todavía no hay ninguna. El bot **no promete fotos** hasta que existan. En **JPG** (WhatsApp no acepta HEIC):
+✅ **24-oct: subidas tres** (`radio-producto.jpg`, `radio-contenido.jpg`, `radio-caja.jpg`), renombradas desde
+`WhatsApp Image 2026-10-23 at 11.03.06 PM*.jpeg`. Dos más eran la caja desde otro ángulo y se sacaron (quedan en el
+historial de git). **Faltan `radio-puesto` y `radio-combo`**; mientras falten, el bot manda la principal.
 
 | Archivo | Qué tiene que mostrar |
 |---|---|

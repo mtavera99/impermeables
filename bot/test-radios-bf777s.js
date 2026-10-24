@@ -278,5 +278,22 @@ if (res) {
   chequear("y un pedido viejo sin id se sigue clasificando por la forma", res[3][0] === "Q58");
 }
 
+// ============================================================================
+console.log("\n── 7. Fotos reales y radio FM (24-oct) ──");
+// ============================================================================
+const mediaR = require("./src/media");
+mediaR.olvidarCache && mediaR.olvidarCache();
+for (const k of ["radio", "radio_contenido", "radio_caja"]) {
+  chequear(`la foto ${k} existe y se ofrece`, mediaR.disponible(k));
+}
+chequear("el guion ya no dice que faltan fotos", !/TODAVÍA NO TENEMOS FOTOS/.test(prompt.buildSystemPrompt(R)));
+chequear("y nombra el marcador de la foto principal", /\[\[MEDIA:radio\]\]/.test(prompt.buildSystemPrompt(R)));
+const fm = catalogo.respuestaConfirmada("¿tienen radio fm?", R);
+chequear("'¿tienen radio fm?' en radios contesta que sí trae FM", fm && fm.clave === "radioFm", JSON.stringify(fm));
+const alc = catalogo.respuestaConfirmada("¿qué alcance tienen los radios?", R);
+chequear("y una pregunta cualquiera con 'radios' NO cae en la respuesta del FM", alc && alc.clave === "alcance", JSON.stringify(alc));
+const cont = catalogo.respuestaConfirmada("¿qué trae la caja?", R);
+chequear("lo que trae la caja incluye correas y adaptador (se ve en la foto)", cont && /correas/.test(cont.respuesta) && /adaptador/.test(cont.respuesta));
+
 console.log(`\n${mal ? "🔴" : "🟢"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal ? 1 : 0);

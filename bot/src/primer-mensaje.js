@@ -286,7 +286,7 @@ function primerMensajeRadio(ficha) {
   const p = ficha.precios;
   return [
     `¡Hola! 👋 Claro que sí. Tenemos los radios Baofeng BF-777S, el par a ${fmt(p[1])} con envío gratis 📻`,
-    "Se comunican de radio a radio sin señal de celular ni minutos, con alcance aproximado de 2 a 5 km en campo abierto. Traen base de carga, audífono manos libres y linterna 🔦",
+    "Se comunican de radio a radio sin señal de celular ni minutos, con alcance aproximado de 2 a 5 km en campo abierto. Traen base de carga, audífono manos libres, linterna y radio FM 🔦",
     `Si son para más personas: 4 radios a ${fmt(p[2])} o 6 radios a ${fmt(p[3])}, también con envío gratis. Pagás cuando los recibís 📦`,
     "¿Cuántos radios necesitás y para qué ciudad o municipio serían?",
   ].join("\n\n");
