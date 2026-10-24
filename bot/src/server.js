@@ -1599,6 +1599,44 @@ app.get("/limpiar-conversaciones-rotas", (req, res) => {
   res.json(out);
 });
 
+// ============================================================================
+// 💬 GET /chats-de-producto — las conversaciones de UN producto, para auditarlas
+//
+// 24-oct: para revisar los primeros chats de los radios sin abrir el panel una
+// conversación a la vez. Solo lectura. El teléfono sale enmascarado (últimos 4).
+// ⚠️ Los mensajes sí traen lo que escribió el cliente (nombre, dirección): por
+// eso el Action que lo lee CIFRA la salida y no la imprime en claro en el log.
+// ============================================================================
+app.get("/chats-de-producto", (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  try {
+    const producto = String(req.query.producto || "");
+    const horas = Math.min(24 * 14, Math.max(1, Number(req.query.horas) || 24));
+    const desde = Date.now() - horas * 3600 * 1000;
+    const catalogo = require("./catalogo");
+    const salida = [];
+    for (const [tel, c] of Object.entries(store.todasLasConversaciones())) {
+      const msgs = (c && c.messages) || [];
+      const ultimo = msgs.length ? msgs[msgs.length - 1].at || 0 : 0;
+      if (ultimo < desde) continue;
+      const delAnuncio = catalogo.productoDelAnuncio(c.anuncio || null);
+      const prod = c.productoActivo || delAnuncio || null;
+      if (producto && prod !== producto && delAnuncio !== producto) continue;
+      salida.push({
+        tel: "…" + String(tel).slice(-4),
+        producto: prod,
+        anuncio_id: (c.anuncio && (c.anuncio.source_id || c.anuncio.anuncio_id)) || "",
+        pausado: Boolean(c.paused),
+        mensajes: msgs.map((m) => ({ role: m.role, at: m.at, por: m.por || "", content: m.content })),
+      });
+    }
+    salida.sort((a, b) => (b.mensajes.at(-1)?.at || 0) - (a.mensajes.at(-1)?.at || 0));
+    res.json({ producto, horas, conversaciones: salida.length, chats: salida });
+  } catch (e) {
+    res.status(500).send("Error: " + esc(e.message));
+  }
+});
+
 // Pedidos en CSV, para tener una copia propia fuera de Render
 app.get("/pedidos.csv", (req, res) => {
   if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);

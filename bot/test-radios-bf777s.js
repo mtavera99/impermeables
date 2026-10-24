@@ -295,5 +295,16 @@ chequear("y una pregunta cualquiera con 'radios' NO cae en la respuesta del FM",
 const cont = catalogo.respuestaConfirmada("¿qué trae la caja?", R);
 chequear("lo que trae la caja incluye correas y adaptador (se ve en la foto)", cont && /correas/.test(cont.respuesta) && /adaptador/.test(cont.respuesta));
 
+// 🔴 24-oct: la primera venta de radios quedó en REVISAR por una tilde.
+chequear(
+  "'Oficina Interrapidisimo' y 'Oficina Interrapidísimo' son la misma dirección",
+  require("./src/store").mismoValorDeCampo("direccion", "Oficina Interrapidisimo", "Oficina Interrapidísimo")
+);
+const srcStore = require("fs").readFileSync(require("path").join(__dirname, "src", "store.js"), "utf8");
+chequear(
+  "y el detector de correcciones usa esa comparación (no solo minúsculas)",
+  /mismoValorDeCampo\(campo, nuevo, viejo\)/.test(srcStore)
+);
+
 console.log(`\n${mal ? "🔴" : "🟢"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal ? 1 : 0);
