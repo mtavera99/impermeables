@@ -127,14 +127,22 @@ jobs:
           fi
 
           if [ "$RUTA" = "/chats-de-producto" ]; then
-            echo "$CLAVE" | base64 -d > pub.pem
-            openssl rand -out k.bin 32
-            openssl enc -aes-256-cbc -pbkdf2 -salt -in cruda.txt -out datos.enc -pass file:k.bin
-            openssl pkeyutl -encrypt -pubin -inkey pub.pem -pkeyopt rsa_padding_mode:oaep -in k.bin -out k.enc
-            rm -f k.bin cruda.txt
-            echo "===CLAVE==="; base64 -w0 k.enc; echo
-            echo "===DATOS==="; base64 -w0 datos.enc; echo
-            echo "===FIN==="
+            # AES-256-GCM con una clave al azar, y esa clave cifrada con la RSA pública
+            # (OAEP-SHA256). Con Node, que ya viene en el runner: sin depender de flags
+            # de openssl que cambian entre versiones.
+            node -e '
+              const c = require("crypto"), fs = require("fs");
+              const pub = Buffer.from(process.env.CLAVE, "base64").toString("utf8");
+              const k = c.randomBytes(32), iv = c.randomBytes(12);
+              const ci = c.createCipheriv("aes-256-gcm", k, iv);
+              const datos = Buffer.concat([ci.update(fs.readFileSync("cruda.txt")), ci.final()]);
+              const ek = c.publicEncrypt({ key: pub, padding: c.constants.RSA_PKCS1_OAEP_PADDING, oaepHash: "sha256" }, k);
+              console.log("===CLAVE===\n" + ek.toString("base64"));
+              console.log("===IV===\n" + iv.toString("base64") + "." + ci.getAuthTag().toString("base64"));
+              console.log("===DATOS===\n" + datos.toString("base64"));
+              console.log("===FIN===");
+            '
+            rm -f cruda.txt
             exit 0
           fi
 
