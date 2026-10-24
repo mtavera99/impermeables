@@ -202,6 +202,47 @@ const MEDIA = {
     env: "MEDIA_Q58_PANTALLA",
     caption: "📺 Tiene pantalla, así que ves el volumen, la emisora y el estado del equipo.",
   },
+
+  // ==========================================================================
+  // 📻 FOTOS DE LOS RADIOS BF-777S — 23-oct
+  //
+  // Claves `radio*` porque la ficha declara `mediaPrefijo: "radio"`. Mientras
+  // no existan los archivos en docs/img/ (radio-producto.jpg, radio-puesto.jpg,
+  // radio-combo.jpg, radio-contenido.jpg, radio-caja.jpg), no se ofrecen y el
+  // guion le prohíbe al bot prometer fotos.
+  // ==========================================================================
+  radio: {
+    type: "image",
+    base: "radio-producto",
+    env: "MEDIA_RADIO",
+    caption:
+      "📻 Los radios Baofeng BF-777S. Se comunican sin señal de celular, con linterna LED, base " +
+      "de carga y audífono manos libres. El par a $99.000 con envío gratis.",
+  },
+  radio_puesto: {
+    type: "image",
+    base: "radio-puesto",
+    env: "MEDIA_RADIO_PUESTO",
+    caption: "📻 Así se usa, en la mano o en el cinturón con el audífono manos libres.",
+  },
+  radio_combo: {
+    type: "image",
+    base: "radio-combo",
+    env: "MEDIA_RADIO_COMBO",
+    caption: "📻📻 Para equipos más grandes: 4 radios a $169.000 o 6 radios a $229.000, con envío gratis.",
+  },
+  radio_contenido: {
+    type: "image",
+    base: "radio-contenido",
+    env: "MEDIA_RADIO_CONTENIDO",
+    caption: "📦 Cada caja trae 2 radios, 2 bases de carga, 2 audífonos manos libres y el clip.",
+  },
+  radio_caja: {
+    type: "image",
+    base: "radio-caja",
+    env: "MEDIA_RADIO_CAJA",
+    caption: "📦 Así vienen presentados, es el modelo Baofeng BF-777S.",
+  },
 };
 
 // ============================================================================

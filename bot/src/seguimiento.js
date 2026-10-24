@@ -203,6 +203,23 @@ const TEXTOS_POR_PRODUCTO = {
       "gastar la batería del celular ✨\n\n" +
       "¿Te los despacho? Si quieres dime tu ciudad y te confirmo el total exacto.",
   },
+
+  // 📻 RADIOS BF-777S (23-oct). Mismo esqueleto: quitar la duda y recordar que
+  // es contraentrega. El gancho propio es que el envío es GRATIS y que funcionan
+  // sin señal de celular. ⛔ Sin talla, sin "casco a casco", sin ningún dato que
+  // no esté en `catalogo.datosConfirmados`.
+  radio_bf777s: {
+    1:
+      "¿Te quedó alguna duda con los radios? 📻\n\n" +
+      "Te cuento lo que más preguntan: el envío es *gratis* y pagás *cuando los recibís*, " +
+      "no antes. Y funcionan sin señal de celular.\n\n" +
+      "¿Cuántos radios te despacho?",
+    2:
+      "Hola 👋 Te escribo por los radios que estabas mirando.\n\n" +
+      "Siguen disponibles, con envío gratis y *contraentrega*: pagas cuando los tienes en " +
+      "la mano 📦\n\n" +
+      "¿Te los despacho? Dime cuántos necesitas y tu ciudad.",
+  },
 };
 
 // ============================================================================
@@ -226,6 +243,7 @@ const TEXTOS_POR_PRODUCTO = {
 /** Texto genérico de la categoría, para cuando un modelo no trae el suyo. */
 const RESPALDO_POR_CATEGORIA = {
   intercomunicador: TEXTOS_POR_PRODUCTO.intercom_v10_2x,
+  radio: TEXTOS_POR_PRODUCTO.radio_bf777s,
 };
 
 /** El texto del paso `n` para el producto de esa conversación. */
@@ -474,7 +492,7 @@ async function correrSeguimientos() {
       saltados++;
       console.log(
         `[seguimiento ${paso.n}] ${phone} (${horas}h) SALTADO: ` +
-          (catalogo.esIntercom(productoId)
+          ((catalogo.de(productoId) || {}).seguimientoPlantillaEnv
             ? `la conversación es de ${(catalogo.de(productoId) || {}).nombreCorto || "intercomunicadores"} ` +
               "y no hay plantilla suya configurada. " +
               "⛔ NO se le manda la de otro producto: sería el equivocado. " +

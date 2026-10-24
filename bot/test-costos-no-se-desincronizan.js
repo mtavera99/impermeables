@@ -105,6 +105,27 @@ chequear(
   "cambió uno y no el otro: actualizá COSTO_Q58_UNIDAD en analisis/cpa-por-producto.py"
 );
 
+// 📻 23-oct: los radios BF-777S entran con su costo por caja. Regla 33 de la
+// memoria: un producto nuevo entra a los informes EL MISMO DÍA.
+const radio = catalogo.de("radio_bf777s");
+const costoRadioPy = constantePython("COSTO_RADIO_CAJA");
+chequear(
+  "el costo de los radios está declarado en el análisis",
+  costoRadioPy !== null,
+  "no encontré COSTO_RADIO_CAJA en el .py"
+);
+chequear(
+  `🔑 radios: catalogo.js dice $${radio.costoUnitario.toLocaleString("es-CO")} y el análisis $${(costoRadioPy || 0).toLocaleString("es-CO")}`,
+  costoRadioPy === radio.costoUnitario,
+  "cambió uno y no el otro: actualizá COSTO_RADIO_CAJA en analisis/cpa-por-producto.py"
+);
+chequear(
+  "🔑 el análisis reconoce el id de CADA producto del catálogo (si no, sus pedidos se clasifican por la forma del total)",
+  Object.keys(catalogo.PRODUCTOS).every((id) => new RegExp(`"${id}"\\s*:`).test(py)),
+  "falta algún id en ID_A_PRODUCTO de analisis/cpa-por-producto.py: " +
+    Object.keys(catalogo.PRODUCTOS).filter((id) => !new RegExp(`"${id}"\\s*:`).test(py)).join(", ")
+);
+
 // 💰 15-oct: el proveedor bajó los dos intercomunicadores (V10 $32.000 → $30.000,
 // Q58 $45.000 → $43.000). El análisis calcula cada pedido con el costo de SU día,
 // así que tiene que saber desde cuándo rige el nuevo y cuánto valía antes.

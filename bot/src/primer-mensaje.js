@@ -272,6 +272,26 @@ function primerMensajeV10(ficha) {
   ].join("\n\n");
 }
 
+// ============================================================================
+// 📻 EL PRIMER MENSAJE DE LOS RADIOS (23-oct)
+//
+// Mismo esqueleto que el del V10: nombra la oferta del anuncio, dice para qué
+// sirve en UNA línea y hace UNA pregunta. Dos diferencias obligadas:
+//   · el precio YA incluye el envío, así que se dice "envío gratis";
+//   · se nombran las tres opciones en una línea, porque el anuncio de fincas
+//     llega pidiendo el de 6 y el de negocios el de 4.
+// ⛔ No promete nada que no esté en la ficha (ni horas de batería, ni agua).
+// ============================================================================
+function primerMensajeRadio(ficha) {
+  const p = ficha.precios;
+  return [
+    `¡Hola! 👋 Claro que sí. Tenemos los radios Baofeng BF-777S, el par a ${fmt(p[1])} con envío gratis 📻`,
+    "Se comunican de radio a radio sin señal de celular ni minutos, con alcance aproximado de 2 a 5 km en campo abierto. Traen base de carga, audífono manos libres y linterna 🔦",
+    `Si son para más personas: 4 radios a ${fmt(p[2])} o 6 radios a ${fmt(p[3])}, también con envío gratis. Pagás cuando los recibís 📦`,
+    "¿Cuántos radios necesitás y para qué ciudad o municipio serían?",
+  ].join("\n\n");
+}
+
 /**
  * La unica funcion que usa el agente.
  * Devuelve el texto fijo, o null si este caso lo tiene que contestar la IA.
@@ -321,6 +341,10 @@ function respuestaDeArranque(messages, texto, productoId) {
   // 🎧 El prerrellenado del anuncio del intercomunicador entra por acá, porque es
   // más largo que el del impermeable y el corte de 8 palabras lo dejaba afuera.
   const cat = require("./catalogo");
+  // 📻 Los radios primero: también son "producto simple", pero su mensaje es otro.
+  if (cat.esRadio(productoId) && (esPedidoDeInfoDeProducto(texto) || esSaludoGenerico(texto))) {
+    return primerMensajeRadio(cat.de(productoId));
+  }
   if (cat.esProductoSimple(productoId) && esPedidoDeInfoDeProducto(texto)) {
     return primerMensajeV10(cat.de(productoId));
   }
@@ -339,5 +363,6 @@ module.exports = {
   esPrimerContacto,
   primerMensaje,
   primerMensajeV10,
+  primerMensajeRadio,
   limpiar,
 };

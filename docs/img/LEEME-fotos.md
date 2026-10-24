@@ -192,3 +192,15 @@ historial de git por si se quieren recuperar.
 | `q58-combo.jpg` | el anuncio empuja el combo de dos, y no hay ninguna foto que lo muestre |
 
 Mientras falten, el bot simplemente no las ofrece — **nunca manda las del V10 en su lugar**.
+
+### 📻 Radios Baofeng BF-777S (23-oct)
+
+Todavía no hay ninguna. El bot **no promete fotos** hasta que existan. En **JPG** (WhatsApp no acepta HEIC):
+
+| Archivo | Qué tiene que mostrar |
+|---|---|
+| `radio-producto.jpg` | el par de radios, la principal |
+| `radio-puesto.jpg` | un radio en uso, en la mano o el cinturón con el audífono |
+| `radio-combo.jpg` | los combos de 4 y 6 radios |
+| `radio-contenido.jpg` | lo que trae la caja: 2 radios, 2 bases, 2 audífonos, clip |
+| `radio-caja.jpg` | la caja cerrada, donde se lea BF-777S |

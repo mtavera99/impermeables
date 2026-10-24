@@ -1473,7 +1473,10 @@ function cotizarPorProductoMasEnvio({ producto, destino, uds, texto }) {
       preciosConocidos: { ...producto.precios },
       detalle:
         `Para ${uds} unidades no hay precio autorizado. Los que sí existen: ` +
-        `1 = ${fletes.fmt(producto.precios[1])} · 2 = ${fletes.fmt(producto.precios[2])}.`,
+        Object.entries(producto.precios)
+          .map(([n, v]) => `${n} = ${fletes.fmt(v)}`)
+          .join(" · ") +
+        `.`,
     };
   }
 
@@ -1490,7 +1493,9 @@ function cotizarPorProductoMasEnvio({ producto, destino, uds, texto }) {
 
   // Si la política no cubre esta cantidad, `envioDe` devuelve null a propósito en
   // vez de estirar la regla: que 2 quepan en un sobre no dice nada de que quepan 8.
-  if (!Number.isFinite(Number(envio)) || Number(envio) <= 0) {
+  // 📻 Con envío GRATIS (radios) el cargo es $0 de verdad, no un dato faltante.
+  const gratis = catalogo.envioEsGratis(producto.id);
+  if (!Number.isFinite(Number(envio)) || (Number(envio) <= 0 && !gratis)) {
     return { ...base, ok: false, motivo: "sin_total", uds };
   }
 
@@ -1509,7 +1514,13 @@ function cotizarPorProductoMasEnvio({ producto, destino, uds, texto }) {
     esOfertaPrincipal: precio.esOfertaPrincipal,
     // El ahorro del combo contra llevar dos sueltas. Con el mismo envío en los dos
     // casos, el ahorro es solo del producto: 2×$59.900 − $99.900 = $19.900.
-    ahorro: precio.uds === 2 ? producto.precios[1] * 2 - producto.precios[2] : null,
+    // 📻 Generalizado (23-oct): los radios tienen combo de 3. El ahorro es contra
+    // llevar esas mismas unidades a precio de una: 3 × $99.000 − $229.000.
+    ahorro:
+      precio.uds > 1 && producto.precios[1]
+        ? producto.precios[1] * precio.uds - precio.precio || null
+        : null,
+    envioGratis: gratis,
     // ⛔ El V10 NO tiene precio de negociación autorizado. El impermeable sí
     // (tope de $3.000 y precios de rescate por banda, todos aprobados con márgenes
     // medidos). Para el V10 no hay nada de eso, así que rebajar sería a ciegas.
@@ -1724,7 +1735,101 @@ const fmt = fletes.fmt;
  * Es la que se usa como reemplazo si el modelo dice algo que no valida. Nombra el
  * producto, separa producto y envío, y dice que se paga al recibir.
  */
+// ============================================================================
+// 📻 LOS RADIOS: PRECIO CERRADO CON ENVÍO GRATIS (23-oct)
+//
+// El precio de la tabla YA es el total. No hay "producto + envío": decirlo así
+// sería mostrar un "+ $0 de envío" que suena a error. La línea nombra la opción
+// en RADIOS (que es como lo dice el anuncio) y en cajas, para que el cliente
+// sepa exactamente qué le llega.
+// ============================================================================
+function opcionDeRadios(ficha, uds) {
+  const porCaja = ficha.radiosPorUnidad || 2;
+  const radios = uds * porCaja;
+  const nombre = (ficha.nombresDeCombo && ficha.nombresDeCombo[uds]) || `${radios} radios`;
+  const cajas = uds === 1 ? "1 caja" : `${uds} cajas`;
+  return { radios, nombre, cajas };
+}
+
+function lineaDePrecioRadio(cot) {
+  const ficha = catalogo.de(cot.productoId);
+  const o = opcionDeRadios(ficha, cot.uds);
+  return (
+    `El ${o.nombre} (${o.cajas}, ${o.radios} radios) te queda en ${fmt(cot.total)} con envío gratis ` +
+    `a ${cot.ciudad}` +
+    (cot.ahorro ? `, te ahorrás ${fmt(cot.ahorro)}` : "") +
+    `, y pagás cuando lo recibís 📦`
+  );
+}
+
+function bloqueDeDatosRadio(cot, contexto = {}) {
+  const ficha = catalogo.de((cot && cot.productoId) || contexto.producto);
+  if (!ficha) return "";
+  const opciones = Object.keys(ficha.precios)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .map((n) => {
+      const o = opcionDeRadios(ficha, n);
+      return `   · ${o.nombre} = ${o.cajas} = ${o.radios} radios → ${fmt(ficha.precios[n])}`;
+    })
+    .join("\n");
+  const base =
+    `✅ Precios de catálogo, que SÍ podés decir siempre. YA INCLUYEN EL ENVÍO (envío gratis):\n` +
+    opciones +
+    `\n`;
+
+  if (!cot || !cot.ok) {
+    const d = (cot && cot.destino) || {};
+    if (cot && cot.motivo === "cantidad_sin_precio") {
+      return (
+        `## PRECIO — ${cot.uds} CAJAS NO TIENEN PRECIO AUTORIZADO\n` +
+        `⛔ NO inventes un precio ni un descuento por cantidad: no existe.\n` +
+        base +
+        `→ Decile las opciones que sí existen y, si de verdad quiere más, pasalo a un asesor ` +
+        `(##HANDOFF##).`
+      );
+    }
+    if (cot && cot.motivo === "producto_en_zona_dificil") {
+      return (
+        `## PRECIO — DESTINO DE DIFÍCIL ACCESO\n` +
+        `${d.ciudad || "Ese destino"} es zona de difícil acceso y el envío ahí no está confirmado.\n` +
+        `⛔ NO confirmes envío gratis a ese destino ni des un total.\n` +
+        base +
+        `→ Decí que confirmás el envío a ese destino y le escribís en un momento.`
+      );
+    }
+    if (cot && cot.motivo === "ambiguo") {
+      return (
+        `## PRECIO — NOMBRE DE CIUDAD REPETIDO\n` +
+        `"${d.ciudad}" existe en: ${(d.preguntarDepartamento || []).join(", ")}.\n` +
+        `→ Preguntá de qué departamento es, para el despacho. Los precios no cambian.`
+      );
+    }
+    return (
+      `## PRECIO — TODAVÍA NO HAY CIUDAD\n` +
+      base +
+      `→ Podés decir el precio de cada opción con "envío gratis". Para tomar el pedido te falta la ` +
+      `ciudad o municipio: preguntala.\n` +
+      `⛔ No lo llames "total" hasta saber la ciudad.`
+    );
+  }
+
+  const o = opcionDeRadios(ficha, cot.uds);
+  return (
+    notaDelTurnoV10({ ...contexto, productoId: ficha.id }) +
+    `## PRECIO — YA CALCULADO, USALO TAL CUAL\n` +
+    `Producto: ${ficha.nombre} — ${o.nombre} = ${o.cajas} = ${o.radios} radios\n` +
+    `Destino: ${cot.ciudad}\n` +
+    `· **TOTAL a pagar al recibir: ${fmt(cot.total)}** (el envío es GRATIS, ya está incluido)\n` +
+    (cot.ahorro ? `· Ahorro contra comprar las cajas por separado: ${fmt(cot.ahorro)}\n` : "") +
+    `\n⛔ NO recalcules nada. NO sumes ningún envío: es gratis.\n` +
+    `⛔ No hay descuentos: no negociés el precio.\n` +
+    `✅ Podés decirlo así: "${lineaDePrecioRadio(cot)}"`
+  );
+}
+
 function lineaDePrecioV10(cot) {
+  if (catalogo.esRadio(cot.productoId)) return lineaDePrecioRadio(cot);
   const ficha = catalogo.de(cot.productoId);
   const nombre = ficha ? ficha.nombreCorto : "intercomunicador";
   if (cot.uds === 2) {
@@ -1930,6 +2035,8 @@ function bloqueDeDatos(cot, contexto = {}) {
   const fichaBloque = productoDelTurno(cot, contexto);
   // Por capacidad: si no, el Q58 caía al bloque del impermeable, que inyecta
   // literalmente $59.900 y $110.000 — el cruce de precios que no puede pasar.
+  // 📻 Los radios tienen su propio bloque: precio cerrado con envío gratis.
+  if (fichaBloque && catalogo.esRadio(fichaBloque.id)) return bloqueDeDatosRadio(cot, contexto);
   if (fichaBloque && catalogo.esProductoSimple(fichaBloque.id)) return bloqueDeDatosV10(cot, contexto);
 
   if (!cot.ok) {
@@ -2159,8 +2266,10 @@ function importesAutorizados(cot, contexto = {}) {
   if (ficha && ficha.precios) {
     // Producto con tabla de precios propia (el V10). Se autorizan SUS precios y
     // nada más: el combo de impermeables no existe en esta conversación.
-    poner(ficha.precios[1], `precio base de un ${ficha.nombreCorto}`);
-    poner(ficha.precios[2], `precio base de dos ${ficha.nombreCorto}`);
+    // 📻 Todos los precios de la tabla, no solo 1 y 2: los radios tienen 3.
+    for (const [n, v] of Object.entries(ficha.precios)) {
+      poner(v, `precio base de ${n} ${ficha.nombreCorto}`);
+    }
   } else {
     poner(fletes.PRECIO_PRODUCTO, "precio base del conjunto");
     poner(fletes.PROMO_2_UNIDADES, "precio base de dos conjuntos");
@@ -2241,7 +2350,7 @@ const ETIQUETAS_ROL = [
     // como TOTAL con envío incluido ("el combo queda en $137.000"), así que
     // etiquetarlo como producto marcaría en falso mensajes correctos del flujo
     // que ya funciona.
-    patron: /producto|conjuntos?|trajes?|impermeables?|prenda|cada uno|c\/u|precio base|intercomunicador(?:es)?|intercoms?|v10/g,
+    patron: /producto|conjuntos?|trajes?|impermeables?|prenda|cada uno|c\/u|precio base|intercomunicador(?:es)?|intercoms?|v10|radios?|walkies?|cajas?/g,
   },
   { rol: "total", patron: /total|todo junto|a pagar/g },
   { rol: "ahorro", patron: /ahorr\w*/g },
@@ -2391,7 +2500,7 @@ function valoresPorRol(cot, contexto = {}) {
   // al bot decir $99.900 y le permitía decir $110.000, las dos cosas mal.
   const preciosBase =
     ficha && ficha.precios
-      ? [ficha.precios[1], ficha.precios[2]].filter((n) => Number.isFinite(Number(n)))
+      ? Object.values(ficha.precios).filter((n) => Number.isFinite(Number(n)))
       : [fletes.PRECIO_PRODUCTO, fletes.PROMO_2_UNIDADES];
 
   const mapa = new Map([
@@ -2517,7 +2626,7 @@ function validarRespuesta(texto, cot, contexto = {}) {
   const fichaRoles = productoDelTurno(cot, contexto);
   const basesDelProducto =
     fichaRoles && fichaRoles.precios
-      ? [Number(fichaRoles.precios[1]), Number(fichaRoles.precios[2])]
+      ? Object.values(fichaRoles.precios).map(Number)
       : [Number(fletes.PRECIO_PRODUCTO), Number(fletes.PROMO_2_UNIDADES)];
 
   const importes = importesCrudos.map((imp) =>
@@ -2593,7 +2702,7 @@ function validarRespuesta(texto, cot, contexto = {}) {
     const fichaTurno = productoDelTurno(cot, contexto);
     const basesPermitidas =
       fichaTurno && fichaTurno.precios
-        ? [Number(fichaTurno.precios[1]), Number(fichaTurno.precios[2])]
+        ? Object.values(fichaTurno.precios).map(Number)
         : [fletes.PRECIO_PRODUCTO, fletes.PROMO_2_UNIDADES];
     for (const imp of importes) {
       const esPrecioBase = basesPermitidas.includes(imp.valor);
