@@ -249,6 +249,27 @@ chequear("y ese total aparece en el panel", html.includes(String(directo.total))
 try { fs.rmSync(DIR, { recursive: true, force: true }); } catch {}
 
 console.log(`\n${"─".repeat(62)}`);
+// 🔴 26-oct (el panel dio 502 en Render): resumen.delDia() volvía a leer
+// conversations.json en cada llamada, y el panel lo llama para hoy y para ayer.
+// Eran 3 lecturas del archivo completo por apertura. Tiene que ser UNA.
+{
+  const fs2 = require("fs");
+  const real = fs2.readFileSync;
+  let n = 0;
+  const panelM = require("./src/panel");
+  panelM.render("");
+  fs2.readFileSync = function (f, ...a) {
+    if (String(f).endsWith("conversations.json")) n++;
+    return real.call(this, f, ...a);
+  };
+  try {
+    panelM.render("");
+  } finally {
+    fs2.readFileSync = real;
+  }
+  chequear("🔑 el panel lee conversations.json UNA sola vez por apertura (no una por día del resumen)", n === 1, `lo leyó ${n} veces`);
+}
+
 console.log(`${ok} bien · ${mal} mal`);
 if (mal > 0) {
   console.log("🔴 HAY FALLAS");

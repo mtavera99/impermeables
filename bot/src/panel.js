@@ -375,8 +375,10 @@ function render(aviso) {
   const enHumano = chatsPendientes.length;
 
   // ---- Números del día, en hora de Bogotá, comparados contra ayer ----
-  const hoy = resumen.delDia(resumen.hoyBogota());
-  const ayer = resumen.delDia(resumen.ayerBogota());
+  // ♻ Con los datos que ya están en memoria: antes cada una de estas dos
+  // llamadas releía conversations.json completo (26-oct, el 502 del panel).
+  const hoy = resumen.delDia(resumen.hoyBogota(), { convs, pedidos });
+  const ayer = resumen.delDia(resumen.ayerBogota(), { convs, pedidos });
 
   const delta = (a, b) => {
     if (!b) return "";

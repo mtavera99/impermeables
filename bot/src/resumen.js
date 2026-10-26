@@ -137,9 +137,15 @@ function unidadesDe(p) {
  * Arma el resumen de un día.
  * @param {string} dia YYYY-MM-DD en Bogotá. Por defecto, hoy.
  */
-function delDia(dia = hoyBogota()) {
-  const pedidos = store.todosLosPedidos().filter((p) => diaBogota(new Date(p.fecha).getTime()) === dia);
-  const convs = store.todasLasConversaciones();
+// 🔴 26-oct (el panel dio 502): el panel llama a esto DOS veces (hoy y ayer) y
+// cada llamada volvía a leer y parsear conversations.json COMPLETO. Con 6.000
+// conversaciones (20 MB) eran 3 lecturas por apertura del panel y el pico de
+// memoria llegaba a ~400 MB de los 512 de Render. Quien ya los tiene cargados los
+// pasa en `datos` y no se vuelve a leer nada.
+function delDia(dia = hoyBogota(), datos = null) {
+  const todos = (datos && datos.pedidos) || store.todosLosPedidos();
+  const pedidos = todos.filter((p) => diaBogota(new Date(p.fecha).getTime()) === dia);
+  const convs = (datos && datos.convs) || store.todasLasConversaciones();
 
   let conversaciones = 0;
   let esperandoHumano = 0;
@@ -195,8 +201,10 @@ function delDia(dia = hoyBogota()) {
 
 /** Texto corto para mandar por WhatsApp. Pensado para leerse en el celular. */
 function textoCierre(dia = hoyBogota()) {
-  const r = delDia(dia);
-  const ayer = delDia(ayerBogota());
+  // Una sola lectura para los dos días (ver `delDia`).
+  const datos = { convs: store.todasLasConversaciones(), pedidos: store.todosLosPedidos() };
+  const r = delDia(dia, datos);
+  const ayer = delDia(ayerBogota(), datos);
 
   const flecha = (hoy, antes) => {
     if (!antes) return "";
