@@ -410,9 +410,38 @@ function cajonDeEnvio(p, conv, token) {
          <b>plantilla aprobada</b> (la de seguimiento trae botones, y cuando el cliente toca uno
          se reabren las 24 h y ahí sí le podés escribir).</div>`;
 
+  // 📨 27-oct: con la ventana cerrada, el único camino es una plantilla aprobada.
+  // Se ofrece la de seguimiento del PRODUCTO de esta conversación (la misma que
+  // usa el toque automático de 44h), nunca la de otro producto.
+  let botonPlantilla = "";
+  if (!v.abierta) {
+    let plantilla = "";
+    try {
+      const catalogo = require("./catalogo");
+      const seguimiento = require("./seguimiento");
+      const prod =
+        (conv && conv.productoActivo) ||
+        catalogo.productoDelAnuncio((conv && conv.anuncio) || null) ||
+        catalogo.PRODUCTO_POR_DEFECTO;
+      plantilla = seguimiento.plantillaDe(prod, process.env.SEGUIMIENTO_PLANTILLA_3 || "seguimiento_impermeable");
+    } catch {
+      plantilla = "";
+    }
+    botonPlantilla = plantilla
+      ? `<form method="post" action="/enviar-plantilla" class="plantilla"
+           onsubmit="return confirm('¿Mandarle la plantilla ${esc(plantilla)}? Es un mensaje de marketing y no se puede deshacer.')">
+           <input type="hidden" name="token" value="${esc(token || "")}">
+           <input type="hidden" name="to" value="${esc(p.telefono_chat)}">
+           <input type="hidden" name="plantilla" value="${esc(plantilla)}">
+           <button type="submit" class="enviarbtn">📨 Mandar plantilla «${esc(plantilla)}»</button>
+         </form>`
+      : `<p class="nota">⚠️ Este producto no tiene plantilla de seguimiento configurada.</p>`;
+  }
+
   return `<div class="enviar">
       <h3>✍️ Escribirle a ${esc(p.nombre || "este cliente")}</h3>
       ${aviso}
+      ${botonPlantilla}
       <div class="rapidos">${botones}</div>
       <form method="post" action="/responder">
         <input type="hidden" name="token" value="${esc(token || "")}">
