@@ -1760,6 +1760,52 @@ app.post("/responder", async (req, res) => {
 });
 
 // ============================================================================
+// 📨 POST /enviar-plantilla — reabrir una conversación con la ventana cerrada
+//
+// 27-oct: clientes de radios que dieron sus datos y quedaron sin respuesta
+// pasaron las 72h del seguimiento automático. Pasadas las 24h, Meta solo deja
+// mandar una plantilla aprobada. Este botón manda la de seguimiento del producto.
+//
+// 🔒 Solo acepta plantillas de SEGUIMIENTO que el bot ya tiene configuradas
+// (las de cada producto + las generales): no se puede mandar cualquier plantilla
+// a cualquier número desde un formulario.
+// ============================================================================
+app.post("/enviar-plantilla", async (req, res) => {
+  if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const to = idDestino(req.body?.to);
+  const plantilla = String(req.body?.plantilla || "").trim();
+  const catalogo = require("./catalogo");
+  const seguimiento = require("./seguimiento");
+  const permitidas = new Set(
+    [
+      process.env.SEGUIMIENTO_PLANTILLA_2 || "seguimiento_impermeable",
+      process.env.SEGUIMIENTO_PLANTILLA_3 || "seguimiento_impermeable",
+      ...Object.values(catalogo.PRODUCTOS)
+        .filter((f) => f.seguimientoPlantillaEnv)
+        .map((f) => seguimiento.plantillaDe(f.id, "")),
+    ].filter(Boolean)
+  );
+  const volver = (r) =>
+    res.redirect(
+      `/chat?token=${encodeURIComponent(PANEL_TOKEN)}&id=${encodeURIComponent(to || "")}&r=${encodeURIComponent(r)}`
+    );
+  if (!to || !plantilla) return volver("Falta el número o la plantilla.");
+  if (!permitidas.has(plantilla)) return volver(`La plantilla "${plantilla}" no es una de seguimiento configurada.`);
+  if (esDuplicado(to, "plantilla:" + plantilla)) return volver("Ya se mandó hace un momento: no se repite.");
+
+  const envio = await sendTemplate(to, plantilla, PLANTILLA_IDIOMA);
+  if (envio && envio.ok) {
+    store.pushMsg(to, "assistant", `[plantilla ${plantilla} enviada desde el panel]`, { por: "humano" });
+    anotarEvento({ tipo: "plantilla-manual", para: to, plantilla, messageId: envio.messageId });
+    console.log(`📨 Plantilla ${plantilla} enviada a ${to} desde el panel`);
+    return volver("ok");
+  }
+  const detalle = JSON.stringify((envio && (envio.body?.error || envio.body)) || "sin respuesta").slice(0, 200);
+  anotarEvento({ tipo: "plantilla-manual-fallida", para: to, plantilla, error: detalle });
+  return volver(`Meta rechazó la plantilla: ${detalle}`);
+});
+
+// ============================================================================
 // POST /anular y POST /reactivar — quitar de las ventas un pedido que no existe
 //
 // DE DÓNDE SALE (23-sep): el bot tomó como venta nueva a un cliente que ya tenía
