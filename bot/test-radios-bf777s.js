@@ -323,5 +323,18 @@ const srcAgent = require("fs").readFileSync(require("path").join(__dirname, "src
 chequear("el reemplazo del cuadro detecta su propio bucle", /BUCLE CORTADO \(cuadro\)/.test(srcAgent));
 chequear("y un 'te escribo en un momento' sin salida pasa al dueño", /loPuedePreguntar/.test(srcAgent));
 
+// 🔴 27-oct: pedidos de radios en REVISAR porque la cotización tomó "enviar unpar" como ciudad.
+{
+  const cotRaro = { ...cot("Cali", 1), ciudad: "enviar unpar" };
+  const v = cotizacion.verificarPedido({ ciudad: "Fundación, Magdalena", total: 99000, unidades: 1 }, cotRaro, { messages: [] });
+  chequear("radios: ciudad distinta con el total correcto NO va a revisión (el envío es gratis)", v.ok, JSON.stringify(v.problemas));
+  const vMal = cotizacion.verificarPedido({ ciudad: "Fundación, Magdalena", total: 85000, unidades: 1 }, cotRaro, { messages: [] });
+  chequear("pero un total equivocado sí", !vMal.ok);
+  const vDif = cotizacion.verificarPedido({ ciudad: "Mitú", total: 99000, unidades: 1 }, cotRaro, { messages: [] });
+  chequear("y un destino de difícil acceso sí, para confirmar cobertura", !vDif.ok && vDif.problemas.some((p) => p.tipo === "destino_dificil"), JSON.stringify(vDif.problemas));
+  const vV10 = cotizacion.verificarPedido({ ciudad: "Pasto", total: 122000, unidades: 2 }, cotizacion.calcular("Cali", "", { producto: V, cantidad: { uds: 2 } }), { messages: [] });
+  chequear("en el V10 una ciudad distinta SIGUE yendo a revisión (el envío cambia el total)", !vV10.ok);
+}
+
 console.log(`\n${mal ? "🔴" : "🟢"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal ? 1 : 0);
