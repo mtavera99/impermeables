@@ -682,6 +682,24 @@ function configuracionEfectiva() {
         : "🟡 SALTADO — falta SEGUIMIENTO_PLANTILLA_V10. ⛔ NO se le manda la del " +
           "impermeable: sería el producto equivocado. Recibe los toques de 2h y 20h, " +
           "que sí hablan de intercomunicadores.",
+    // 📻 27-oct: el toque de 44h de CADA producto que declara su plantilla
+    // (V10, Q58, radios). Antes solo se veía el del V10, así que no había forma
+    // de confirmar SEGUIMIENTO_PLANTILLA_RADIO sin entrar a Render.
+    toque_44h_por_producto: Object.fromEntries(
+      Object.values(catalogo.PRODUCTOS)
+        .filter((f) => f.seguimientoPlantillaEnv)
+        .map((f) => {
+          const nombre = plantillaDe(f.id, "");
+          return [
+            f.nombreCorto,
+            !PASO_44H_ACTIVO
+              ? "🔴 APAGADO para todos"
+              : nombre
+                ? `🟢 "${nombre}" (${f.seguimientoPlantillaEnv})`
+                : `🟡 SALTADO — falta ${f.seguimientoPlantillaEnv}`,
+          ];
+        })
+    ),
     // De dónde viene cada uno, para no volver a confundirse.
     origen: {
       plantilla_2: process.env.SEGUIMIENTO_PLANTILLA_2 ? "variable de entorno" : "default del código",
