@@ -3367,7 +3367,22 @@ function verificarPedido(order, cot, contexto = {}) {
   const mismaCiudad =
     mismoDestino(order.ciudad, cot.ciudad) ||
     elHiloResolvioElDestino(contexto.messages, order.ciudad, cot.ciudad);
-  if (!mismaCiudad) {
+  // 📻 27-oct: 6 de los 7 pedidos de radios en REVISAR eran esto, con la
+  // cotización "para" cosas como "enviar unpar", "el departamento" o el nombre
+  // del cliente. Con ENVÍO GRATIS el precio no depende del destino, así que una
+  // ciudad distinta no cambia el total: no es un problema de precio. Lo único que
+  // sí importa es que el destino REAL tenga cobertura, y eso se mira aparte.
+  const fichaPed = catalogo.de(cot.productoId);
+  const precioCerrado = Boolean(fichaPed && catalogo.envioEsGratis(fichaPed.id));
+  if (!mismaCiudad && precioCerrado) {
+    const real = resolverDestino(String(order.ciudad || ""));
+    if (real && (real.estado === "dificil_sin_tarifa" || real.estado === "dificil_con_tarifa")) {
+      problemas.push({
+        tipo: "destino_dificil",
+        detalle: `el pedido va a "${order.ciudad}", que es zona de difícil acceso: confirmá cobertura antes de despachar`,
+      });
+    }
+  } else if (!mismaCiudad) {
     problemas.push({
       tipo: "ciudad_distinta",
       detalle: `el pedido va a "${order.ciudad}" y la cotización era para "${cot.ciudad}"`,
