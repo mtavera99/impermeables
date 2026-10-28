@@ -35,6 +35,30 @@ chequear("chat del V10: ofrece la del intercomunicador, NO la de radios", /«seg
 const h3 = panelChat.render({ id: "573000000003", token: "tk" });
 chequear("con la ventana abierta NO aparece el botón (se escribe libre)", !/Mandar plantilla/.test(h3));
 
+// 🔴 27-oct: abrir un chat leía también el archivo de conversaciones viejas
+// (43 MB en producción). Eso, repetido tras cada envío, tumbó el bot.
+fs.writeFileSync(path.join(DIR, "conversations-archivo.json"), JSON.stringify({ "573999999999": { messages: [{ role: "user", content: "viejo", at: VIEJO }], ultimoDelCliente: VIEJO } }));
+{
+  const real = fs.readFileSync;
+  let leyoArchivo = 0;
+  fs.readFileSync = function (f, ...a) {
+    if (String(f).endsWith("conversations-archivo.json")) leyoArchivo++;
+    return real.call(this, f, ...a);
+  };
+  try {
+    panelChat.render({ id: "573000000001", token: "tk", resultado: "ok" });
+    chequear("🔑 abrir un chat activo NO lee el archivo de conversaciones viejas", leyoArchivo === 0, `lo leyó ${leyoArchivo} veces`);
+    leyoArchivo = 0;
+    const viejo = panelChat.render({ id: "573999999999", token: "tk" });
+    chequear("pero un chat archivado se sigue encontrando", leyoArchivo > 0 && /viejo/.test(viejo));
+    leyoArchivo = 0;
+    panelChat.render({ q: "0001", token: "tk" });
+    chequear("y buscar algo que está en las activas tampoco lo lee", leyoArchivo === 0, `lo leyó ${leyoArchivo} veces`);
+  } finally {
+    fs.readFileSync = real;
+  }
+}
+
 const srv = fs.readFileSync(path.join(__dirname, "src", "server.js"), "utf8");
 chequear("el endpoint solo acepta plantillas de seguimiento configuradas", /permitidas\.has\(plantilla\)/.test(srv));
 chequear("y tiene candado antiduplicado", /esDuplicado\(to, "plantilla:"/.test(srv));

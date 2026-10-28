@@ -626,7 +626,19 @@ function cajonDeVenta(p, token, pedidosPrevios) {
  */
 function render({ id, q, token, resultado, venta } = {}) {
   let encontrados = buscar({ id, q });
-  const conversaciones = store.todasLasConversaciones({ incluirArchivo: true });
+  // 🔴 27-oct (el bot se cayó otra vez): esta pantalla leía SIEMPRE las
+  // conversaciones activas + el archivo (20 MB + 43 MB en producción), incluso
+  // para abrir un chat por su id. El botón "Mandar plantilla" vuelve a esta
+  // pantalla después de cada envío, así que cinco envíos seguidos eran cinco
+  // lecturas de ~63 MB y el contenedor de 512 MB se quedaba sin memoria.
+  // Ahora el archivo se lee SOLO si lo que se busca no está en las activas.
+  let conversaciones = store.todasLasConversaciones();
+  const enActivas = id
+    ? Boolean(conversaciones[id])
+    : q
+      ? buscarChats({ q, conversaciones }).length > 0 || encontrados.length > 0
+      : true;
+  if (!enActivas) conversaciones = store.todasLasConversaciones({ incluirArchivo: true });
 
   // 🔎 Si lo que se buscó no tiene PEDIDO, se busca en los CHATS antes de
   // rendirse. Un cliente sin pedido es el que más falta leer (ver buscarChats).
