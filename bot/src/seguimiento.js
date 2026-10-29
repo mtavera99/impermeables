@@ -735,6 +735,8 @@ module.exports = {
   // impermeable. Ahora el texto depende del producto de la conversación.
   textoDe,
   plantillaDe,
+  // Lo reusa recordatorio-entrega.js: el mismo filtro contra el dedazo en Render.
+  nombreDePlantilla,
   TEXTOS_POR_PRODUCTO,
   PASOS,
 };
