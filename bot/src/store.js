@@ -2533,6 +2533,80 @@ function anotarGuiaEnPedido(refPedido, guia) {
 }
 
 // ============================================================================
+// 🚚 RECORDATORIO PRE-ENTREGA (29-oct) — ver recordatorio-entrega.js
+//
+// La marca vive EN EL PEDIDO (`recordatorio_entrega`) y no en la conversación,
+// porque un mismo cliente puede tener dos pedidos con dos guías, y cada guía
+// merece su recordatorio.
+//
+// 🔒 Se reclama ANTES de mandar, igual que `reclamarSeguimiento`: si el reloj y
+// un clic en /recordatorio-entrega/correr se cruzan, el segundo se retira en vez
+// de escribirle dos veces al cliente por el mismo paquete.
+// ============================================================================
+function reclamarRecordatorioEntrega(refPedido) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, refPedido);
+    if (i === -1) return false;
+    if (orders[i].recordatorio_entrega) return false; // ya se reclamó: no se repite
+    orders[i] = { ...orders[i], recordatorio_entrega: { reclamado: new Date().toISOString() } };
+    writeJSON(ORDERS_FILE, orders);
+    return true;
+  } catch (e) {
+    console.error(`🔴 No se pudo reclamar el recordatorio de entrega: ${e.message}`);
+    return false;
+  }
+}
+
+/** Anota cómo salió el recordatorio (vía, ok, error, messageId). */
+function anotarRecordatorioEntrega(refPedido, datos) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, refPedido);
+    if (i === -1) return null;
+    orders[i] = {
+      ...orders[i],
+      recordatorio_entrega: { ...(orders[i].recordatorio_entrega || {}), ...datos },
+    };
+    writeJSON(ORDERS_FILE, orders);
+    return orders[i];
+  } catch (e) {
+    console.error(`🔴 No se pudo anotar el recordatorio de entrega: ${e.message}`);
+    return null;
+  }
+}
+
+/**
+ * Marca que el cliente contestó el recordatorio con algo que pone en riesgo la
+ * entrega (no tiene la plata, no va a estar, cambió de dirección, cancela).
+ *
+ * @returns {boolean} true si es un riesgo NUEVO para ese pedido: solo ahí se le
+ *   avisa al dueño. Si el cliente repite "no tengo la plata" tres veces, el
+ *   dueño recibe un aviso, no tres.
+ */
+function marcarRiesgoDeEntrega(refPedido, riesgo) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, refPedido);
+    if (i === -1) return false;
+    const previos = Array.isArray(orders[i].riesgo_entrega) ? orders[i].riesgo_entrega : [];
+    if (previos.some((r) => r && r.tipo === riesgo.tipo)) return false;
+    orders[i] = {
+      ...orders[i],
+      riesgo_entrega: [...previos, { ...riesgo, fecha: new Date().toISOString() }],
+    };
+    writeJSON(ORDERS_FILE, orders);
+    return true;
+  } catch (e) {
+    console.error(`🔴 No se pudo marcar el riesgo de entrega: ${e.message}`);
+    return false;
+  }
+}
+
+// ============================================================================
 // 💾 ¿LOS DATOS SE GUARDAN DE VERDAD? — COMPROBARLO, NO SUPONERLO
 //
 // El panel decía "los pedidos se guardan en disco persistente" con solo mirar
@@ -2743,4 +2817,6 @@ module.exports = {
   marcarDespachadoAMano, desmarcarDespachado,
   // 🔎 Cruce entre guias-enviadas.json y orders.json, que se pueden contradecir.
   guiaEnviadaAlCliente, conciliarGuiasConPedidos, indiceDeGuiasPorTelefono,
+  // 🚚 Recordatorio pre-entrega: una vez por pedido, y el riesgo que contesta el cliente.
+  reclamarRecordatorioEntrega, anotarRecordatorioEntrega, marcarRiesgoDeEntrega,
 };

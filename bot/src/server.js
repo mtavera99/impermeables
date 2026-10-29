@@ -11,6 +11,7 @@ const {
 const { MEDIA, resolver: resolverMedia } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
+const recordatorioEntrega = require("./recordatorio-entrega");
 const panel = require("./panel");
 const panelGuias = require("./panel-guias");
 const guias = require("./guias");
@@ -3228,6 +3229,34 @@ async function handleWebhook(body) {
         }
 
         // ====================================================================
+        // 🚚 ¿CONTESTÓ EL RECORDATORIO PRE-ENTREGA CON UN PROBLEMA? (29-oct)
+        //
+        // "No tengo la plata", "no voy a estar", "me cambié de dirección",
+        // "cancelen": cada una es una devolución que todavía se puede evitar si
+        // el dueño se entera HOY. Va antes de la pausa por lo mismo que el pago
+        // declarado: no puede depender de que alguien esté mirando el chat.
+        //
+        // ⚠️ Solo marca y avisa. La respuesta del bot sigue su camino normal.
+        // ====================================================================
+        try {
+          const riesgo = recordatorioEntrega.revisarRespuesta(from, text);
+          if (riesgo) {
+            store.fijarCategoria(from, "posventa", `riesgo de devolución: ${riesgo.etiqueta}`);
+            anotarEvento({ tipo: "riesgo-entrega", de: from, riesgo: riesgo.tipo, nuevo: riesgo.nuevo });
+            console.log(`⚠️ ${from} contestó el recordatorio de entrega: ${riesgo.etiqueta}`);
+            if (riesgo.nuevo) {
+              if (OWNER) {
+                await sendText(OWNER, recordatorioEntrega.avisoParaElDueno(from, text, riesgo));
+              } else {
+                console.error("🔴 RIESGO DE DEVOLUCIÓN SIN A QUIÉN AVISAR: OWNER_WHATSAPP no está configurado.");
+              }
+            }
+          }
+        } catch (e) {
+          console.error(`🔴 No se pudo revisar la respuesta al recordatorio de entrega: ${e.message}`);
+        }
+
+        // ====================================================================
         // 💸 PAGO ANTICIPADO DETECTADO POR TEXTO
         //
         // Pedido textual del dueño después del caso del 8-oct: "me gustaría que
@@ -3531,6 +3560,27 @@ app.get("/seguimiento/correr", async (req, res) => {
   }
 });
 
+// 🚚 Recordatorio pre-entrega: qué haría, a quién le toca, y cómo van los riesgos.
+// No manda nada. Igual que /seguimiento, pide el token del panel.
+app.get("/recordatorio-entrega", (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  res.json({
+    ...recordatorioEntrega.configuracionEfectiva(),
+    estado: recordatorioEntrega.diagnostico(),
+  });
+});
+
+// Dispara una pasada AHORA. Respeta todas las reglas, incluido el horario.
+// 🔒 Manda mensajes a clientes: sin token, no.
+app.get("/recordatorio-entrega/correr", async (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  try {
+    res.json(await recordatorioEntrega.correr());
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ============================================================================
 // 🔴 LOS ERRORES QUE NO TIRA NUESTRO CÓDIGO SALÍAN COMO HTML (3-oct)
 //
@@ -3600,4 +3650,5 @@ app.listen(PORT, () => {
 
   subscribeWaba();      // auto-suscribe la WABA al arrancar
   seguimiento.arrancar(); // reloj del seguimiento de 72h (solo si esta activo)
+  recordatorioEntrega.arrancar(); // recordatorio pre-entrega 24-48h (solo si esta activo)
 });
