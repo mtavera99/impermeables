@@ -127,6 +127,42 @@ cd bot && node test-guias.js     # 8 casos: teléfono distinto, empates, guía a
 
 ---
 
+## 🚚 Recordatorio pre-entrega (para bajar devoluciones)
+
+Entre **24 y 48 horas después de cargar la guía**, el bot le escribe **una vez** al
+cliente de contraentrega: el paquete está cerca, el valor exacto en efectivo, y que
+deje el dinero encargado si no va a estar. Solo de 8:00 a 19:00 (Colombia).
+
+Si el cliente contesta *"no tengo la plata"*, *"no voy a estar"*, *"me cambié de
+dirección"* o *"cancelen"*, el pedido queda marcado, el chat sale como posventa en el
+panel y **te llega un aviso por WhatsApp** con la guía y qué hacer.
+
+### Cómo se prende
+1. **Crear la plantilla en Meta** (WhatsApp Manager → Plantillas):
+   - Nombre: `recordatorio_entrega` · Categoría: **Utilidad** · Idioma: **Spanish (COL)**
+   - Cuerpo:
+     ```
+     ¡Hola {{1}}! 👋 Tu pedido BikerPro ({{2}}) con guía #{{3}} de {{4}} ya está muy cerca de tu dirección en {{5}}. 🚚📦
+
+     ⚠️ Te recordamos tener listo el valor exacto de *{{6}} COP en efectivo* para entregárselo al mensajero cuando llegue a tu puerta.
+
+     👉 Si no vas a estar en casa en estos días, por favor déjale el dinero encargado a un familiar, vecino o en portería para recibir tu paquete sin contratiempos. ¡Muchas gracias!
+     ```
+   - Ejemplos: `Carolina` · `Impermeable` · `240099887766` · `Interrapidísimo` · `Pereira` · `$125.000`
+2. En Render → Environment: `RECORDATORIO_ENTREGA_PLANTILLA=recordatorio_entrega` y
+   `RECORDATORIO_ENTREGA_ACTIVO=1`.
+3. Revisar `/recordatorio-entrega?token=TU_TOKEN`: dice si está prendido, la plantilla
+   que toma, cuántos pedidos tocan ahora y cuántos riesgos contestaron.
+
+> Sin plantilla, solo les llega a los que escribieron en las últimas 24h (texto libre).
+> A los demás se les salta **sin gastarles el turno**: les llega apenas la plantilla exista.
+
+```bash
+cd bot && node test-recordatorio-entrega.js
+```
+
+---
+
 ## 🕵️ Clientes SIN número de teléfono (username de WhatsApp)
 
 WhatsApp dejó que los clientes usen un **nombre de usuario** y le **oculten el teléfono**
