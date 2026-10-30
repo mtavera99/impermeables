@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-10-30 16:05 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-10-30 17:28 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,14 +9,14 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$237,087** |
-| gastado hoy (hasta las 16h) | $192,159 |
-| presupuesto activo | $428,000/día |
-| cierre proyectado del día | $363,585 |
-| saldo proyectado a medianoche | $65,661 |
-| objetivo (cubrir un día de 143% + colchón) | $632,040 |
+| **saldo ahora** | **$206,490** |
+| gastado hoy (hasta las 17h) | $223,460 |
+| presupuesto activo | $444,000/día |
+| cierre proyectado del día | $371,352 |
+| saldo proyectado a medianoche | $58,598 |
+| objetivo (cubrir un día de 143% + colchón) | $654,920 |
 
-### 🟠 Recargar $202,794 para cubrir un día malo
+### 🟠 Recargar $224,970 para cubrir un día malo
 
 Hoy aguanta, pero no cubre un día de sobre-entrega alta.
 
@@ -24,31 +24,31 @@ Hoy aguanta, pero no cubre un día de sobre-entrega alta.
 
 ---
 
-## 📈 Hoy contra los días anteriores — mismo tramo 00:00–16:59
+## 📈 Hoy contra los días anteriores — mismo tramo 00:00–17:59
 
 *(Comparar medio día contra un día completo es el error #10. Acá va el mismo tramo.)*
 
 | día | gasto | conv | $/conv | CPM | conv/mil |
 |---|---|---|---|---|---|
-| 2026-10-26 | $302,780 | 620 | **$488** | $3,360 | 6.88 |
-| 2026-10-27 | $229,556 | 504 | **$455** | $3,812 | 8.37 |
-| 2026-10-28 | $242,801 | 439 | **$553** | $3,724 | 6.73 |
-| 2026-10-29 | $291,208 | 551 | **$529** | $3,553 | 6.72 |
-| 2026-10-30 **HOY** | $193,146 | 373 | **$518** | $4,016 | 7.76 |
+| 2026-10-26 | $331,993 | 672 | **$494** | $3,345 | 6.77 |
+| 2026-10-27 | $252,772 | 546 | **$463** | $3,840 | 8.29 |
+| 2026-10-28 | $271,466 | 488 | **$556** | $3,717 | 6.68 |
+| 2026-10-29 | $309,762 | 584 | **$530** | $3,568 | 6.73 |
+| 2026-10-30 **HOY** | $223,460 | 414 | **$540** | $4,043 | 7.49 |
 
-🟢 **Hoy va mejor que ayer a la misma hora** ($518 vs $529).
+🟠 Hoy va 2% más caro que ayer a la misma hora ($540 vs $530).
 
 ### La descomposición — dónde está el problema
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$   518  =  $ 4,016  ÷  7.76
+$   540  =  $ 4,043  ÷  7.49
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $4,016 | ~$3.615 | 🟢 normal |
-| **conv/mil** (la calidad de la audiencia) | 7.76 | 5,33 | 🟢 |
+| **CPM** (el precio de la subasta) | $4,043 | ~$3.615 | 🟢 normal |
+| **conv/mil** (la calidad de la audiencia) | 7.49 | 5,33 | 🟢 |
 
 
 ---
@@ -57,23 +57,23 @@ $   518  =  $ 4,016  ÷  7.76
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
-| RADIO - Broad | $10,000 | $25,605 | 256% | 16 | $1,600 | 4.77 |
-| Domiciliarios - API | $35,000 | $14,404 | 41% | 37 | $389 | 12.34 |
-| Domiciliarios VIDEO INTER - API | $30,000 | $13,799 | 46% | 19 | $726 | 7.21 |
-| Domiciliarios VIDEO Q58 - | $25,000 | $13,215 | 53% | 21 | $629 | 6.58 |
-| Domiciliarios - Expancion - API | $30,000 | $12,773 | 43% | 22 | $581 | 7.88 |
-| Domiciliarios - Expancion - INTER | $25,000 | $12,746 | 51% | 27 | $472 | 7.32 |
-| RADIO - Moteros | $35,000 | $11,282 | 32% | 9 | $1,254 | 3.00 |
-| Motorizados - Q58 | $24,000 | $10,878 | 45% | 21 | $518 | 5.81 |
-| RADIO - Seguridad / Negocios | $40,000 | $10,613 | 27% | 8 | $1,327 | 3.09 |
-| Domiciliarios Q58 - | $25,000 | $10,395 | 42% | 59 | $176 | 13.21 |
-| Motorizados - INTER | $25,000 | $9,553 | 38% | 10 | $955 | 7.26 |
-| Domiciliarios - Expancion - Q58 | $24,000 | $9,116 | 38% | 37 | $246 | 10.59 |
-| Domiciliarios INTER - API | $20,000 | $8,957 | 45% | 36 | $249 | 15.66 |
-| Motorizados - API | $20,000 | $8,297 | 41% | 14 | $593 | 6.99 |
-| Domiciliarios VIDEO - API | $20,000 | $8,019 | 40% | 19 | $422 | 8.03 |
-| RADIO - Fincas | $20,000 | $8,000 | 40% | 6 | $1,333 | 2.64 |
-| TEST Creativos - API | $20,000 | $5,449 | 27% | 11 | $495 | 5.72 |
+| RADIO - Broad | $10,000 | $26,707 | 267% | 16 | $1,669 | 4.59 |
+| Domiciliarios - API | $35,000 | $16,035 | 46% | 37 | $433 | 11.07 |
+| Domiciliarios VIDEO INTER - API | $36,000 | $16,024 | 45% | 21 | $763 | 6.86 |
+| RADIO - Seguridad / Negocios | $40,000 | $15,171 | 38% | 10 | $1,517 | 2.75 |
+| RADIO - Moteros | $35,000 | $14,917 | 43% | 14 | $1,066 | 3.68 |
+| Domiciliarios - Expancion - API | $30,000 | $14,515 | 48% | 26 | $558 | 8.37 |
+| Domiciliarios VIDEO Q58 - | $25,000 | $14,515 | 58% | 23 | $631 | 6.53 |
+| Domiciliarios - Expancion - INTER | $25,000 | $13,843 | 55% | 32 | $433 | 7.94 |
+| Motorizados - Q58 | $29,000 | $12,332 | 43% | 21 | $587 | 5.20 |
+| Domiciliarios Q58 - | $25,000 | $12,164 | 49% | 65 | $187 | 12.64 |
+| Motorizados - INTER | $25,000 | $11,496 | 46% | 13 | $884 | 8.04 |
+| Domiciliarios - Expancion - Q58 | $29,000 | $10,993 | 38% | 43 | $256 | 10.34 |
+| Domiciliarios INTER - API | $20,000 | $10,371 | 52% | 40 | $259 | 15.37 |
+| RADIO - Fincas | $20,000 | $10,005 | 50% | 8 | $1,251 | 2.92 |
+| Motorizados - API | $20,000 | $9,194 | 46% | 15 | $613 | 6.77 |
+| Domiciliarios VIDEO - API | $20,000 | $8,771 | 44% | 19 | $462 | 7.39 |
+| TEST Creativos - API | $20,000 | $6,407 | 32% | 12 | $534 | 5.45 |
 
 ### Cada producto contra SU propio equilibrio
 
@@ -81,12 +81,12 @@ $   518  =  $ 4,016  ÷  7.76
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
-| **TRADICIONAL** | $193,101 | 372 | **$519** | $2,402 | **22%** 🟢 |
+| **TRADICIONAL** | $223,460 | 415 | **$538** | $2,402 | **22%** 🟢 |
 
 | | |
 |---|---|
-| CPA implícito (cierre 5.4%) | **$9,542**/pedido |
-| utilidad estimada de lo que va del día | **$404,054** |
+| CPA implícito (cierre 5.4%) | **$9,898**/pedido |
+| utilidad estimada de lo que va del día | **$442,720** |
 
 ---
 
@@ -98,45 +98,45 @@ $   518  =  $ 4,016  ÷  7.76
 
 | conjunto | 10-25 | 10-26 | 10-27 | 10-28 | 10-29 | 10-30 | |
 |---|---|---|---|---|---|---|---|
-| RADIO - Broad | — | — | $1,440 | $1,612 | $1,305 | $1,600 | 🔴 |
-| Domiciliarios - API | $434 | $459 | $371 | $379 | $543 | $391 | 🟢 |
-| Domiciliarios VIDEO INTER - API | $661 | $519 | $642 | $547 | $500 | $726 | 🔴 |
-| Domiciliarios VIDEO Q58 - | $829 | $870 | $691 | $913 | $732 | $629 | 🟢 |
-| Domiciliarios - Expancion - API | $518 | $576 | $671 | $746 | $465 | $581 | 🔴 |
-| Domiciliarios - Expancion - INTER | $526 | $747 | $499 | $643 | $685 | $472 | 🟢 |
-| RADIO - Moteros | $926 | $1,068 | $1,162 | $1,514 | $1,347 | $1,254 | 🟢 |
-| Motorizados - Q58 | $836 | $769 | $607 | $631 | $633 | $520 | 🟢 |
-| RADIO - Seguridad / Negocios | $750 | $1,000 | $1,001 | $736 | $770 | $1,327 | 🔴 |
-| Domiciliarios Q58 - | $185 | $211 | $202 | $199 | $193 | $176 | 🟢 |
-| Motorizados - INTER | $838 | $543 | $532 | $547 | $496 | $955 | 🔴 |
-| Domiciliarios - Expancion - Q58 | $286 | $241 | $250 | $326 | $251 | $246 | 🟡 |
-| Domiciliarios INTER - API | $366 | $332 | $319 | $322 | $322 | $249 | 🟢 |
-| Motorizados - API | $431 | $426 | $359 | $459 | $523 | $595 | 🟡 |
-| Domiciliarios VIDEO - API | $332 | $389 | $308 | $355 | $422 | $422 | 🟡 |
-| RADIO - Fincas | $434 | $707 | $751 | $752 | $1,543 | $1,333 | 🟢 |
-| TEST Creativos - API | $526 | $490 | $387 | $574 | $508 | $495 | 🟡 |
+| RADIO - Broad | — | — | $1,440 | $1,612 | $1,307 | $1,669 | 🔴 |
+| Domiciliarios - API | $434 | $459 | $371 | $379 | $543 | $433 | 🟢 |
+| Domiciliarios VIDEO INTER - API | $661 | $519 | $642 | $547 | $500 | $763 | 🔴 |
+| RADIO - Seguridad / Negocios | $750 | $1,000 | $1,001 | $736 | $770 | $1,517 | 🔴 |
+| RADIO - Moteros | $926 | $1,068 | $1,162 | $1,514 | $1,348 | $1,066 | 🟢 |
+| Domiciliarios - Expancion - API | $518 | $576 | $671 | $746 | $465 | $558 | 🔴 |
+| Domiciliarios VIDEO Q58 - | $829 | $870 | $691 | $913 | $732 | $631 | 🟢 |
+| Domiciliarios - Expancion - INTER | $526 | $747 | $499 | $643 | $685 | $433 | 🟢 |
+| Motorizados - Q58 | $836 | $769 | $607 | $631 | $633 | $587 | 🟢 |
+| Domiciliarios Q58 - | $185 | $211 | $202 | $199 | $193 | $187 | 🟡 |
+| Motorizados - INTER | $838 | $543 | $532 | $547 | $496 | $884 | 🔴 |
+| Domiciliarios - Expancion - Q58 | $286 | $241 | $250 | $326 | $252 | $256 | 🟡 |
+| Domiciliarios INTER - API | $366 | $332 | $319 | $322 | $322 | $259 | 🟢 |
+| RADIO - Fincas | $434 | $707 | $751 | $752 | $1,543 | $1,251 | 🟢 |
+| Motorizados - API | $431 | $426 | $359 | $459 | $524 | $613 | 🔴 |
+| Domiciliarios VIDEO - API | $332 | $389 | $308 | $355 | $422 | $462 | 🟡 |
+| TEST Creativos - API | $526 | $490 | $387 | $574 | $508 | $534 | 🟡 |
 
 ### conv/mil por día *(la calidad de la audiencia de cada uno)*
 
 | conjunto | 10-25 | 10-26 | 10-27 | 10-28 | 10-29 | 10-30 | |
 |---|---|---|---|---|---|---|---|
-| RADIO - Broad | — | — | 4.76 | 3.50 | 5.20 | 4.77 | 🟡 |
-| Domiciliarios - API | 10.50 | 9.11 | 13.28 | 12.74 | 7.95 | 12.28 | 🟢 |
-| Domiciliarios VIDEO INTER - API | 6.02 | 8.12 | 7.83 | 8.47 | 8.22 | 7.21 | 🟡 |
-| Domiciliarios VIDEO Q58 - | 4.81 | 3.70 | 5.31 | 4.28 | 5.08 | 6.58 | 🟢 |
-| Domiciliarios - Expancion - API | 8.50 | 7.03 | 6.89 | 5.97 | 8.78 | 7.88 | 🟡 |
-| Domiciliarios - Expancion - INTER | 5.97 | 3.66 | 5.15 | 4.81 | 4.37 | 7.32 | 🟢 |
-| RADIO - Moteros | 4.15 | 3.02 | 3.39 | 2.80 | 3.09 | 3.00 | 🟡 |
-| Motorizados - Q58 | 3.66 | 4.17 | 4.49 | 3.47 | 4.69 | 5.79 | 🟢 |
-| RADIO - Seguridad / Negocios | 5.50 | 4.36 | 5.10 | 6.39 | 6.47 | 3.09 | 🔴 |
-| Domiciliarios Q58 - | 11.43 | 9.12 | 10.98 | 10.83 | 10.40 | 13.21 | 🟢 |
-| Motorizados - INTER | 6.52 | 10.17 | 13.22 | 11.22 | 10.88 | 7.26 | 🔴 |
-| Domiciliarios - Expancion - Q58 | 8.73 | 9.37 | 10.69 | 7.51 | 9.45 | 10.59 | 🟢 |
-| Domiciliarios INTER - API | 8.11 | 7.76 | 8.52 | 9.99 | 10.97 | 15.66 | 🟢 |
-| Motorizados - API | 9.54 | 8.76 | 12.17 | 9.23 | 7.42 | 6.96 | 🟡 |
-| Domiciliarios VIDEO - API | 9.93 | 7.54 | 12.62 | 10.10 | 7.79 | 8.03 | 🟡 |
-| RADIO - Fincas | 9.35 | 5.16 | 5.51 | 4.83 | 2.48 | 2.64 | 🟢 |
-| TEST Creativos - API | 6.95 | 9.25 | 12.47 | 6.05 | 6.13 | 5.72 | 🟡 |
+| RADIO - Broad | — | — | 4.76 | 3.50 | 5.20 | 4.59 | 🟡 |
+| Domiciliarios - API | 10.50 | 9.11 | 13.28 | 12.74 | 7.95 | 11.07 | 🟢 |
+| Domiciliarios VIDEO INTER - API | 6.02 | 8.12 | 7.83 | 8.47 | 8.22 | 6.86 | 🔴 |
+| RADIO - Seguridad / Negocios | 5.50 | 4.36 | 5.10 | 6.39 | 6.46 | 2.75 | 🔴 |
+| RADIO - Moteros | 4.15 | 3.02 | 3.39 | 2.80 | 3.09 | 3.68 | 🟢 |
+| Domiciliarios - Expancion - API | 8.50 | 7.03 | 6.89 | 5.97 | 8.78 | 8.37 | 🟡 |
+| Domiciliarios VIDEO Q58 - | 4.81 | 3.70 | 5.31 | 4.28 | 5.08 | 6.53 | 🟢 |
+| Domiciliarios - Expancion - INTER | 5.97 | 3.66 | 5.15 | 4.81 | 4.37 | 7.94 | 🟢 |
+| Motorizados - Q58 | 3.66 | 4.17 | 4.49 | 3.47 | 4.69 | 5.20 | 🟢 |
+| Domiciliarios Q58 - | 11.43 | 9.12 | 10.98 | 10.83 | 10.40 | 12.64 | 🟢 |
+| Motorizados - INTER | 6.52 | 10.17 | 13.22 | 11.22 | 10.87 | 8.04 | 🔴 |
+| Domiciliarios - Expancion - Q58 | 8.73 | 9.37 | 10.69 | 7.51 | 9.44 | 10.34 | 🟢 |
+| Domiciliarios INTER - API | 8.11 | 7.76 | 8.52 | 9.99 | 10.97 | 15.37 | 🟢 |
+| RADIO - Fincas | 9.35 | 5.16 | 5.51 | 4.83 | 2.48 | 2.92 | 🟢 |
+| Motorizados - API | 9.54 | 8.76 | 12.17 | 9.23 | 7.42 | 6.77 | 🟡 |
+| Domiciliarios VIDEO - API | 9.93 | 7.54 | 12.62 | 10.10 | 7.79 | 7.39 | 🟡 |
+| TEST Creativos - API | 6.95 | 9.25 | 12.47 | 6.05 | 6.13 | 5.45 | 🟡 |
 
 🔑 **Un conjunto con conv/mil alto y uso de presupuesto bajo está perdiendo la subasta contra sus propios hermanos** (0-AB: *Meta no reparte entre anuncios, elige*). Eso es canibalización, y se arregla diferenciando la segmentación.
 
@@ -151,7 +151,7 @@ $   518  =  $ 4,016  ÷  7.76
 | 2026-10-26 | $485,261 | 1022 | $475 | $3,300 | 6.95 | $1,155,309 |
 | 2026-10-27 | $398,322 | 865 | $460 | $3,864 | 8.39 | $990,223 |
 | 2026-10-28 | $438,535 | 819 | $535 | $3,719 | 6.95 | $876,168 |
-| 2026-10-29 | $438,326 | 870 | $504 | $3,673 | 7.29 | $958,245 |
+| 2026-10-29 | $438,477 | 870 | $504 | $3,673 | 7.29 | $958,094 |
 
 ---
 
