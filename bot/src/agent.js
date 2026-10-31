@@ -482,6 +482,45 @@ function cantidadDelProducto(productoId, conv, userText, previa) {
   return { uds: udsOferta, origen: "el combo del anuncio, que es lo que se publicita" };
 }
 
+// ============================================================================
+// 🪖 "NO INCLUYE CASCOS" — 28-oct, pedido del dueño para frenar devoluciones
+//
+// Algunos clientes de intercomunicadores esperaban recibir cascos y devolvían el
+// paquete. El dueño pidió aclararlo SOLO en el cuadro final de confirmación (no
+// antes: no se agrega ninguna pregunta ni fricción en la venta).
+//
+// 🔑 Se agrega en código y no en el guion, porque una instrucción al modelo no
+// es un candado: el cuadro lo redacta la IA y podría omitirla. Así sale siempre.
+//
+// ⚠️ El texto del dueño dice "Este combo incluye los 2 dispositivos". Para un
+// pedido de UNA unidad eso sería falso (y causaría otra devolución), así que la
+// variante de una unidad dice "1 dispositivo". Todo lo demás es su texto exacto.
+// ============================================================================
+const ACLARACION_CASCOS = {
+  2:
+    "ℹ️ Recuerda: Este combo incluye los 2 dispositivos intercomunicadores con sus auriculares, " +
+    "micrófonos y accesorios de instalación universal para tus cascos actuales (no incluye cascos " +
+    "de protección física).",
+  1:
+    "ℹ️ Recuerda: Tu pedido incluye 1 dispositivo intercomunicador con su auricular, micrófono y " +
+    "accesorios de instalación universal para tu casco actual (no incluye cascos de protección física).",
+};
+
+function conAclaracionDeCascos(reply, productoId, uds) {
+  if (!reply || !catalogo.esIntercom(productoId)) return reply;
+  if (!cotizacion.pideConfirmacion(reply)) return reply; // solo el cuadro final
+  if (/no incluye cascos/i.test(reply)) return reply; // ya está, no se repite
+  const texto = Number(uds) === 1 ? ACLARACION_CASCOS[1] : ACLARACION_CASCOS[2];
+  // Antes de la línea que pide "SÍ CONFIRMO", para que la lea antes de confirmar.
+  const lineas = String(reply).split("\n");
+  const i = lineas.findIndex((l) => /s[ií]\s*confirmo/i.test(l));
+  if (i > 0) {
+    lineas.splice(i, 0, texto, "");
+    return lineas.join("\n");
+  }
+  return `${reply}\n\n${texto}`;
+}
+
 async function generateReply(phone, userText) {
   store.pushMsg(phone, "user", userText);
   const conv = store.getConv(phone);
@@ -1441,6 +1480,10 @@ async function generateReply(phone, userText) {
   // que un ##HANDOFF##: el dueño tiene que cerrar esa venta a mano.
   if (handoff || revisionHumana) store.setPaused(phone, true);
 
+  // 🪖 Aclaración de cascos en el cuadro de confirmación de intercomunicadores.
+  // La pone el CÓDIGO, no el modelo: ver `conAclaracionDeCascos`.
+  reply = conAclaracionDeCascos(reply, productoId, cot && cot.uds);
+
   store.pushMsg(phone, "assistant", reply);
   // 🛟 `posventaSoporte` sale para que server.js pueda avisarle al dueño. NO entra
   // en la condición de `setPaused` de arriba: marcar el caso es seguro, callar al
@@ -1546,6 +1589,8 @@ function revisarTelefono(order, chatId) {
 // necesita hacerle UNA pregunta corta al modelo sin pasar por el guion de ventas
 // ni escribirle nada al cliente.
 module.exports = {
+  conAclaracionDeCascos,
+  ACLARACION_CASCOS,
   generateReply, pidioUnaCorreccion, revisarTelefono, celularValido, extractOrder,
   rescatarPedido, callIA,
   // 📸 Se exporta para poder probar QUÉ FOTO se elige sin llamar a la IA. Es
