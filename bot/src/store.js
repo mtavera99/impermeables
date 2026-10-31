@@ -75,6 +75,42 @@ const CONV_FILE = path.join(DIR, "conversations.json");
 // ============================================================================
 const ARCHIVO_FILE = path.join(DIR, "conversations-archivo.json");
 
+// ============================================================================
+// 🔴 31-OCT: LA CAUSA DEL CICLO DE "OUT OF MEMORY"
+//
+// `getConv` de un número que NO está en las activas —o sea, CADA LEAD NUEVO—
+// leía y parseaba el archivo histórico COMPLETO (~45-60 MB) solo para descubrir
+// que ese número no estaba ahí. El archivo crece para siempre, así que cada
+// semana el primer mensaje de un cliente nuevo costaba más memoria. Al arrancar
+// después de una caída, WhatsApp entrega juntos los mensajes acumulados y
+// varios leads nuevos a la vez superaban los 512 MB: caída, más mensajes
+// acumulados, caída otra vez.
+//
+// 🔑 Un ÍNDICE con solo los números archivados (unos KB). Se consulta en memoria;
+// el archivo pesado se lee únicamente si el número de verdad está archivado.
+// ============================================================================
+const INDICE_FILE = path.join(DIR, "conversations-archivo-indice.json");
+let indiceArchivo = null;
+function archivados() {
+  if (indiceArchivo) return indiceArchivo;
+  const guardado = readJSON(INDICE_FILE, null);
+  if (Array.isArray(guardado)) {
+    indiceArchivo = new Set(guardado);
+  } else {
+    // Primera vez: se arma UNA sola vez desde el archivo y se guarda.
+    indiceArchivo = new Set(Object.keys(readJSON(ARCHIVO_FILE, {})));
+    guardarIndice();
+  }
+  return indiceArchivo;
+}
+function guardarIndice() {
+  try {
+    writeJSON(INDICE_FILE, [...(indiceArchivo || [])]);
+  } catch (e) {
+    console.error(`🔴 No se pudo guardar el índice del archivo: ${e.message}`);
+  }
+}
+
 // Cuántos días de inactividad antes de archivar. Se puede subir sin tocar
 // código si hace falta más historia en caliente, pero cada día son ~315
 // conversaciones más en el archivo que se reescribe por mensaje.
@@ -187,6 +223,8 @@ function ultimaActividad(c) {
  */
 function recuperarDelArchivo(phone, activasYaLeidas) {
   try {
+    // 🔑 Si no está en el índice, no se toca el archivo pesado (ver INDICE_FILE).
+    if (!archivados().has(String(phone))) return null;
     const archivo = readJSON(ARCHIVO_FILE, {});
     const c = archivo[phone];
     if (!c) return null;
@@ -198,6 +236,8 @@ function recuperarDelArchivo(phone, activasYaLeidas) {
     // siempre. Al revés se perdería.
     writeJSON(CONV_FILE, activas);
     writeJSON(ARCHIVO_FILE, archivo);
+    archivados().delete(String(phone));
+    guardarIndice();
     console.log(`🔙 ${phone} volvió a escribir: su conversación se recuperó del archivo.`);
     return c;
   } catch (e) {
@@ -287,11 +327,14 @@ function borrarConversacion(phone) {
   writeJSON(CONV_FILE, all);
   // También del archivo: si no, una conversación de prueba archivada volvería a
   // aparecer al recuperarse y la prueba siguiente arrancaría con historial.
+  if (!archivados().has(String(phone))) return;
   const archivo = readJSON(ARCHIVO_FILE, {});
   if (archivo[phone]) {
     delete archivo[phone];
     writeJSON(ARCHIVO_FILE, archivo);
   }
+  archivados().delete(String(phone));
+  guardarIndice();
 }
 
 // ---------------------------------------------------------------------------
@@ -611,6 +654,11 @@ function archivarConversacionesViejas(dias) {
       delete activas[tel];
       movidas++;
     }
+    // El archivo ya está en memoria: se aprovecha para armar el índice si falta.
+    if (!indiceArchivo) {
+      indiceArchivo = new Set(Object.keys(archivo));
+      guardarIndice();
+    }
     if (!movidas) {
       return { movidas: 0, activas: Object.keys(activas).length, archivadas: Object.keys(archivo).length };
     }
@@ -619,6 +667,8 @@ function archivarConversacionesViejas(dias) {
     // activa—, así que no se pierde. Al revés se perdería.
     writeJSON(ARCHIVO_FILE, archivo);
     writeJSON(CONV_FILE, activas);
+    indiceArchivo = new Set(Object.keys(archivo));
+    guardarIndice();
     console.log(
       `📦 ${movidas} conversación(es) sin actividad en ${Math.round(ventana / 86400000)} días pasaron al ` +
         `archivo. Activas: ${Object.keys(activas).length} · archivadas: ${Object.keys(archivo).length}. ` +
