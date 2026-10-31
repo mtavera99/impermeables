@@ -46,12 +46,15 @@ function chequear(nombre, condicion, detalle) {
 
 const DIA = 24 * 60 * 60 * 1000;
 const activas = () => Object.keys(store.todasLasConversaciones()).length;
+// 1-nov: el histórico vive en lotes + índice ({tel: lote}), no en un archivo único.
 const archivoCrudo = () => {
-  try {
-    return JSON.parse(fs.readFileSync(path.join(DIR, "conversations-archivo.json"), "utf8"));
-  } catch {
-    return {};
+  let idx = {};
+  try { idx = JSON.parse(fs.readFileSync(path.join(DIR, "conversations-archivo-indice.json"), "utf8")) || {}; } catch { idx = {}; }
+  const out = {};
+  for (const [tel, lote] of Object.entries(idx)) {
+    try { const d = JSON.parse(fs.readFileSync(path.join(DIR, "conversaciones-archivo", lote), "utf8")); if (d[tel]) out[tel] = d[tel]; } catch { /* sin lote */ }
   }
+  return out;
 };
 
 // ── Montar el escenario ────────────────────────────────────────────────────

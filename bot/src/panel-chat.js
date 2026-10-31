@@ -639,6 +639,12 @@ function render({ id, q, token, resultado, venta } = {}) {
       ? buscarChats({ q, conversaciones }).length > 0 || encontrados.length > 0
       : true;
   if (!enActivas) conversaciones = store.todasLasConversaciones({ incluirArchivo: true });
+  // El histórico viene resumido (último mensaje). Para MOSTRAR un chat archivado
+  // se lee completo, solo ese, desde su lote.
+  if (id && conversaciones[id] && conversaciones[id].archivada) {
+    const completa = store.leerArchivada(id);
+    if (completa) conversaciones = { ...conversaciones, [id]: completa };
+  }
 
   // 🔎 Si lo que se buscó no tiene PEDIDO, se busca en los CHATS antes de
   // rendirse. Un cliente sin pedido es el que más falta leer (ver buscarChats).
