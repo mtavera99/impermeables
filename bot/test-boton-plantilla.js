@@ -50,7 +50,7 @@ fs.writeFileSync(path.join(DIR, "conversations-archivo.json"), JSON.stringify({ 
     chequear("🔑 abrir un chat activo NO lee el archivo de conversaciones viejas", leyoArchivo === 0, `lo leyó ${leyoArchivo} veces`);
     leyoArchivo = 0;
     const viejo = panelChat.render({ id: "573999999999", token: "tk" });
-    chequear("pero un chat archivado se sigue encontrando", leyoArchivo > 0 && /viejo/.test(viejo));
+    chequear("pero un chat archivado se sigue encontrando", /viejo/.test(viejo));
     leyoArchivo = 0;
     panelChat.render({ q: "0001", token: "tk" });
     chequear("y buscar algo que está en las activas tampoco lo lee", leyoArchivo === 0, `lo leyó ${leyoArchivo} veces`);

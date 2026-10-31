@@ -90,25 +90,158 @@ const ARCHIVO_FILE = path.join(DIR, "conversations-archivo.json");
 // el archivo pesado se lee únicamente si el número de verdad está archivado.
 // ============================================================================
 const INDICE_FILE = path.join(DIR, "conversations-archivo-indice.json");
-let indiceArchivo = null;
-function archivados() {
-  if (indiceArchivo) return indiceArchivo;
-  const guardado = readJSON(INDICE_FILE, null);
-  if (Array.isArray(guardado)) {
-    indiceArchivo = new Set(guardado);
-  } else {
-    // Primera vez: se arma UNA sola vez desde el archivo y se guarda.
-    indiceArchivo = new Set(Object.keys(readJSON(ARCHIVO_FILE, {})));
-    guardarIndice();
+// ============================================================================
+// 🔴 1-NOV: EL ARCHIVO ÚNICO YA NO SE PUEDE LEER ENTERO
+//
+// El bot se caía por memoria a los 20 s de arrancar, cuando el archivado leía
+// conversations-archivo.json completo (~60 MB). Parsear eso en el heap de 268 MB
+// de Render ya no cabe. Solución: el histórico pasa a LOTES chicos en una
+// carpeta, y nada vuelve a leerlo entero:
+//   · archivar  → escribe UN lote nuevo con lo que se mueve (no lee nada viejo)
+//   · índice    → { teléfono: lote } — dice dónde está cada uno, sin abrir nada
+//   · recuperar → lee SOLO el lote de ese teléfono
+//   · el archivo único viejo se parte en lotes UNA vez, leyéndolo por pedazos
+//     (sin JSON.parse del total), y se deja renombrado como respaldo.
+// ============================================================================
+const LOTES_DIR = path.join(DIR, "conversaciones-archivo");
+const POR_LOTE = 800;
+let indiceArchivo = null; // { tel: "lote-....json" }
+
+function nombreDeLote() {
+  return `lote-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.json`;
+}
+function escribirLote(objeto) {
+  if (!fs.existsSync(LOTES_DIR)) fs.mkdirSync(LOTES_DIR, { recursive: true });
+  const nombre = nombreDeLote();
+  const file = path.join(LOTES_DIR, nombre);
+  const tmp = `${file}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(objeto));
+  fs.renameSync(tmp, file);
+  return nombre;
+}
+function leerLote(nombre) {
+  return readJSON(path.join(LOTES_DIR, nombre), {});
+}
+
+/**
+ * Parte el archivo único viejo en lotes SIN parsearlo entero: lo lee de a 1 MB
+ * y recorre el JSON a mano, separando cada conversación de primer nivel. En
+ * memoria solo hay un pedazo del archivo y un lote a la vez.
+ */
+function migrarArchivoUnico() {
+  if (!fs.existsSync(ARCHIVO_FILE)) return 0;
+  const { StringDecoder } = require("string_decoder");
+  const fd = fs.openSync(ARCHIVO_FILE, "r");
+  const buf = Buffer.alloc(1024 * 1024);
+  const dec = new StringDecoder("utf8");
+  let profundidad = 0, enCadena = false, escape = false;
+  let clave = null, capturandoClave = false, claveCruda = "";
+  let valor = null; // pedazos del valor actual
+  let lote = {}, enLote = 0, total = 0;
+  const vaciar = () => {
+    if (!enLote) return;
+    const nombre = escribirLote(lote);
+    for (const t of Object.keys(lote)) indiceArchivo[t] = nombre;
+    lote = {};
+    enLote = 0;
+  };
+  let n;
+  while ((n = fs.readSync(fd, buf, 0, buf.length, null)) > 0) {
+    const txt = dec.write(buf.subarray(0, n));
+    let desde = valor ? 0 : -1;
+    for (let i = 0; i < txt.length; i++) {
+      const ch = txt[i];
+      if (enCadena) {
+        if (capturandoClave && !(ch === '"' && !escape)) claveCruda += ch;
+        if (escape) escape = false;
+        else if (ch === "\\") escape = true;
+        else if (ch === '"') {
+          enCadena = false;
+          if (capturandoClave) {
+            capturandoClave = false;
+            clave = JSON.parse('"' + claveCruda + '"');
+          }
+        }
+        continue;
+      }
+      if (ch === '"') {
+        enCadena = true;
+        if (profundidad === 1 && !valor && clave === null) {
+          capturandoClave = true;
+          claveCruda = "";
+        }
+        continue;
+      }
+      if (ch === "{" || ch === "[") {
+        profundidad++;
+        if (profundidad === 2 && clave !== null && !valor) {
+          valor = [];
+          desde = i;
+        }
+      } else if (ch === "}" || ch === "]") {
+        profundidad--;
+        if (profundidad === 1 && valor) {
+          valor.push(txt.slice(desde, i + 1));
+          try {
+            lote[clave] = JSON.parse(valor.join(""));
+            enLote++;
+            total++;
+          } catch (e) {
+            console.error(`🔴 Migración del archivo: no se pudo leer ${clave}: ${e.message}`);
+          }
+          valor = null;
+          clave = null;
+          desde = -1;
+          if (enLote >= POR_LOTE) vaciar();
+        }
+      }
+    }
+    if (valor && desde >= 0) valor.push(txt.slice(desde));
   }
+  fs.closeSync(fd);
+  vaciar();
+  fs.renameSync(ARCHIVO_FILE, `${ARCHIVO_FILE}.migrado-${Date.now()}`);
+  console.log(`📦 Archivo histórico partido en lotes: ${total} conversaciones. El original quedó como respaldo.`);
+  return total;
+}
+
+function archivados() {
+  // existsSync es barato: si apareció un archivo único (restaurado de un
+  // respaldo, o una versión vieja del bot escribió uno), se vuelve a partir.
+  if (indiceArchivo && !fs.existsSync(ARCHIVO_FILE)) return indiceArchivo;
+  if (!indiceArchivo) {
+    const guardado = readJSON(INDICE_FILE, null);
+    // Un índice de la versión del 31-oct era una lista: se descarta y se rearma.
+    indiceArchivo = guardado && !Array.isArray(guardado) && typeof guardado === "object" ? guardado : {};
+  }
+  if (fs.existsSync(ARCHIVO_FILE)) {
+    try {
+      migrarArchivoUnico();
+    } catch (e) {
+      console.error(`🔴 No se pudo partir el archivo histórico: ${e.message}`);
+    }
+  }
+  guardarIndice();
   return indiceArchivo;
+}
+function estaArchivado(phone) {
+  return Object.prototype.hasOwnProperty.call(archivados(), String(phone));
 }
 function guardarIndice() {
   try {
-    writeJSON(INDICE_FILE, [...(indiceArchivo || [])]);
+    const tmp = `${INDICE_FILE}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(indiceArchivo || {}));
+    fs.renameSync(tmp, INDICE_FILE);
   } catch (e) {
     console.error(`🔴 No se pudo guardar el índice del archivo: ${e.message}`);
   }
+}
+
+/** Una conversación archivada, leyendo SOLO su lote. null si no está. */
+function leerArchivada(phone) {
+  const lote = archivados()[String(phone)];
+  if (!lote) return null;
+  return leerLote(lote)[String(phone)] || null;
 }
 
 // Cuántos días de inactividad antes de archivar. Se puede subir sin tocar
@@ -223,20 +356,16 @@ function ultimaActividad(c) {
  */
 function recuperarDelArchivo(phone, activasYaLeidas) {
   try {
-    // 🔑 Si no está en el índice, no se toca el archivo pesado (ver INDICE_FILE).
-    if (!archivados().has(String(phone))) return null;
-    const archivo = readJSON(ARCHIVO_FILE, {});
-    const c = archivo[phone];
+    // 🔑 Sin índice no se abre nada; con índice, solo el lote de ese teléfono.
+    if (!estaArchivado(phone)) return null;
+    const c = leerArchivada(phone);
     if (!c) return null;
-    delete archivo[phone];
     const activas = activasYaLeidas || readJSON(CONV_FILE, {});
     activas[phone] = c;
-    // Primero el archivo activo: si falla la segunda escritura, el peor caso es
-    // que la conversación quede DUPLICADA en los dos archivos, y el activo gana
-    // siempre. Al revés se perdería.
+    // Primero el activo; después se saca del índice. Si falla en el medio, queda
+    // en los dos lados y el activo gana: no se pierde nada.
     writeJSON(CONV_FILE, activas);
-    writeJSON(ARCHIVO_FILE, archivo);
-    archivados().delete(String(phone));
+    delete archivados()[String(phone)];
     guardarIndice();
     console.log(`🔙 ${phone} volvió a escribir: su conversación se recuperó del archivo.`);
     return c;
@@ -327,13 +456,8 @@ function borrarConversacion(phone) {
   writeJSON(CONV_FILE, all);
   // También del archivo: si no, una conversación de prueba archivada volvería a
   // aparecer al recuperarse y la prueba siguiente arrancaría con historial.
-  if (!archivados().has(String(phone))) return;
-  const archivo = readJSON(ARCHIVO_FILE, {});
-  if (archivo[phone]) {
-    delete archivo[phone];
-    writeJSON(ARCHIVO_FILE, archivo);
-  }
-  archivados().delete(String(phone));
+  if (!estaArchivado(phone)) return;
+  delete archivados()[String(phone)];
   guardarIndice();
 }
 
@@ -622,7 +746,32 @@ function todasLasConversaciones(opciones) {
   if (!opciones || !opciones.incluirArchivo) return activas;
   // Las activas MANDAN sobre las archivadas: si por un fallo a mitad de camino
   // una quedó en los dos lados, la buena es la del archivo activo.
-  return { ...readJSON(ARCHIVO_FILE, {}), ...activas };
+  // ⚠️ 1-nov: el histórico ya NO se carga completo. Para el buscador alcanza un
+  // RESUMEN de cada archivada (nombre, último mensaje, fechas), armado lote por
+  // lote. La conversación completa se pide con `leerArchivada(tel)`.
+  const resumen = {};
+  const idx = archivados();
+  const porLote = {};
+  for (const [tel, lote] of Object.entries(idx)) (porLote[lote] = porLote[lote] || []).push(tel);
+  for (const [lote, tels] of Object.entries(porLote)) {
+    const datos = leerLote(lote);
+    for (const tel of tels) {
+      const c = datos[tel];
+      if (!c) continue;
+      const msgs = c.messages || [];
+      resumen[tel] = {
+        perfil: c.perfil,
+        ultimoDelCliente: c.ultimoDelCliente,
+        esperaComprobante: c.esperaComprobante,
+        comprobanteRecibidoEl: c.comprobanteRecibidoEl,
+        productoActivo: c.productoActivo,
+        anuncio: c.anuncio,
+        archivada: true,
+        messages: msgs.slice(-1),
+      };
+    }
+  }
+  return { ...resumen, ...activas };
 }
 
 /**
@@ -641,40 +790,39 @@ function archivarConversacionesViejas(dias) {
     const ventana = Math.max(1, Number(dias) || DIAS_ACTIVAS) * 24 * 60 * 60 * 1000;
     const corte = Date.now() - ventana;
     const activas = readJSON(CONV_FILE, {});
-    const archivo = readJSON(ARCHIVO_FILE, {});
+    const idx = archivados(); // la primera vez parte el archivo viejo, por pedazos
 
+    // 🔑 NO SE LEE NINGÚN LOTE VIEJO: lo que se mueve va a lotes NUEVOS.
+    const movidasObj = {};
     let movidas = 0;
     for (const [tel, c] of Object.entries(activas)) {
-      // ⚠️ Una conversación SIN ninguna marca de tiempo no se archiva. Podría
-      // ser un registro recién creado al que todavía no se le puso la hora, y
-      // archivar algo activo es el error caro.
+      // ⚠ Una conversación SIN ninguna marca de tiempo no se archiva.
       const cuando = ultimaActividad(c);
       if (!cuando || cuando >= corte) continue;
-      archivo[tel] = c;
-      delete activas[tel];
+      movidasObj[tel] = c;
       movidas++;
     }
-    // El archivo ya está en memoria: se aprovecha para armar el índice si falta.
-    if (!indiceArchivo) {
-      indiceArchivo = new Set(Object.keys(archivo));
-      guardarIndice();
-    }
     if (!movidas) {
-      return { movidas: 0, activas: Object.keys(activas).length, archivadas: Object.keys(archivo).length };
+      return { movidas: 0, activas: Object.keys(activas).length, archivadas: Object.keys(idx).length };
     }
-    // 🔑 EL ARCHIVO PRIMERO. Si falla la segunda escritura, la conversación
-    // queda en los DOS lados —y todasLasConversaciones() hace ganar a la
-    // activa—, así que no se pierde. Al revés se perdería.
-    writeJSON(ARCHIVO_FILE, archivo);
-    writeJSON(CONV_FILE, activas);
-    indiceArchivo = new Set(Object.keys(archivo));
+    // 🔑 LOS LOTES PRIMERO. Si falla después, la conversación queda en los dos
+    // lados y la activa gana. Al revés se perdería.
+    const tels = Object.keys(movidasObj);
+    for (let i = 0; i < tels.length; i += POR_LOTE) {
+      const parte = {};
+      for (const t of tels.slice(i, i + POR_LOTE)) parte[t] = movidasObj[t];
+      const nombre = escribirLote(parte);
+      for (const t of Object.keys(parte)) idx[t] = nombre;
+    }
     guardarIndice();
+    for (const t of tels) delete activas[t];
+    writeJSON(CONV_FILE, activas);
     console.log(
       `📦 ${movidas} conversación(es) sin actividad en ${Math.round(ventana / 86400000)} días pasaron al ` +
-        `archivo. Activas: ${Object.keys(activas).length} · archivadas: ${Object.keys(archivo).length}. ` +
+        `archivo. Activas: ${Object.keys(activas).length} · archivadas: ${Object.keys(idx).length}. ` +
         `No se borró nada: si vuelven a escribir, se recuperan solas.`
     );
-    return { movidas, activas: Object.keys(activas).length, archivadas: Object.keys(archivo).length };
+    return { movidas, activas: Object.keys(activas).length, archivadas: Object.keys(idx).length };
   } catch (e) {
     console.error(`🔴 No se pudo archivar conversaciones viejas: ${e.message}`);
     return { movidas: 0, activas: 0, archivadas: 0 };
@@ -2748,7 +2896,14 @@ function tamanosEnDisco() {
   // archivadas NO se cuenta acá: habría que parsear el archivo entero, y /health
   // se consulta seguido. Justamente la clase de lectura que causó el problema.
   // ==========================================================================
-  const archivo_kb = kb(ARCHIVO_FILE);
+  let archivo_kb = kb(ARCHIVO_FILE);
+  try {
+    if (fs.existsSync(LOTES_DIR)) {
+      for (const f of fs.readdirSync(LOTES_DIR)) archivo_kb += kb(path.join(LOTES_DIR, f));
+    }
+  } catch {
+    /* solo es una medida */
+  }
 
   return {
     conversaciones_kb,
@@ -2849,7 +3004,7 @@ module.exports = {
   marcarComprado, registrarSeguimiento, reclamarSeguimiento,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
   // 📦 Archivo de conversaciones viejas: baja el costo de cada mensaje sin borrar nada.
-  archivarConversacionesViejas, recuperarDelArchivo, ultimaActividad, DIAS_ACTIVAS,
+  archivarConversacionesViejas, recuperarDelArchivo, leerArchivada, migrarArchivoUnico, ultimaActividad, DIAS_ACTIVAS,
   guardarPerfil, guardarAtribucion, atribucionDe, fijarProductoActivo, fijarCategoria,
   reemplazarPedidos,
   todosLosPedidos,

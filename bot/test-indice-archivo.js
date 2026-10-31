@@ -13,7 +13,7 @@ const store = require("./src/store");
 let ok = 0, mal = 0;
 const chequear = (n, c, d) => (c ? (console.log(`✅ ${n}`), ok++) : (console.log(`🔴 ${n}${d ? `\n     ${d}` : ""}`), mal++));
 
-store.archivarConversacionesViejas(); // arma el índice, como al arrancar
+store.archivarConversacionesViejas(); // parte el archivo viejo en lotes y arma el índice
 chequear("el índice se guarda en disco", fs.existsSync(path.join(DIR, "conversations-archivo-indice.json")));
 const real = fs.readFileSync; let lecturas = 0;
 fs.readFileSync = function (f, ...a) { if (String(f).endsWith("conversations-archivo.json")) lecturas++; return real.call(this, f, ...a); };
@@ -23,9 +23,9 @@ chequear("y arranca en blanco", nuevo.messages.length === 0);
 store.pushMsg("573111222334", "user", "hola nuevo");
 chequear("pushMsg de un lead nuevo tampoco lo lee", lecturas === 0, `lo leyó ${lecturas} veces`);
 const vuelve = store.getConv("573000000099");
-chequear("un cliente archivado que vuelve se recupera completo (con noMolestar)", vuelve.noMolestar === true && lecturas > 0);
+chequear("un cliente archivado que vuelve se recupera completo (con noMolestar)", vuelve.noMolestar === true);
 fs.readFileSync = real;
 const idx = JSON.parse(real(path.join(DIR, "conversations-archivo-indice.json"), "utf8"));
-chequear("y sale del índice", !idx.includes("573000000099"));
+chequear("y sale del índice", !Object.prototype.hasOwnProperty.call(idx, "573000000099"));
 console.log(`\n${mal ? "🔴" : "🟢"} ${ok}/${ok + mal} correctos.\n`);
 process.exit(mal ? 1 : 0);

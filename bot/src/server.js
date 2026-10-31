@@ -419,7 +419,10 @@ function archivarViejas() {
     console.error(`🔴 Falló el archivado de conversaciones: ${e.message}`);
   }
 }
-const PRIMER_ARCHIVADO = setTimeout(archivarViejas, 20 * 1000);
+// 🔴 1-nov: 20 s → 5 min. El primer archivado parte el archivo histórico viejo
+// en lotes (una sola vez); que no compita con la avalancha de mensajes que
+// llega justo al arrancar después de una caída.
+const PRIMER_ARCHIVADO = setTimeout(archivarViejas, 5 * 60 * 1000);
 if (PRIMER_ARCHIVADO.unref) PRIMER_ARCHIVADO.unref();
 const RELOJ_ARCHIVO = setInterval(archivarViejas, 60 * 60 * 1000);
 if (RELOJ_ARCHIVO.unref) RELOJ_ARCHIVO.unref();
