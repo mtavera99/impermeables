@@ -78,7 +78,10 @@ const ARCHIVO_FILE = path.join(DIR, "conversations-archivo.json");
 // Cuántos días de inactividad antes de archivar. Se puede subir sin tocar
 // código si hace falta más historia en caliente, pero cada día son ~315
 // conversaciones más en el archivo que se reescribe por mensaje.
-const DIAS_ACTIVAS = Math.max(1, Number(process.env.DIAS_CONVERSACIONES_ACTIVAS) || 7);
+// 🔴 31-oct: 7 → 4 días por defecto. El bot cayó en un ciclo de "out of memory"
+// y el archivo activo es lo que cada mensaje lee entero. El seguimiento más largo
+// es a 44-47 h y la ventana de plantilla a 72 h: 4 días no corta ninguno.
+const DIAS_ACTIVAS = Math.max(1, Number(process.env.DIAS_CONVERSACIONES_ACTIVAS) || 4);
 const ORDERS_FILE = path.join(DIR, "orders.json");
 const GUIAS_FILE = path.join(DIR, "guias-enviadas.json");
 const FALLOS_FILE = path.join(DIR, "fallos-entrega.json");

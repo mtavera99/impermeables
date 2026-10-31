@@ -106,6 +106,44 @@ function esperar(ms) {
  * @param {() => Promise<T>} tarea
  * @returns {Promise<T>}
  */
+// ============================================================================
+// 🔴 31-OCT: EL BOT ENTRÓ EN UN CICLO DE CAÍDAS POR MEMORIA (512 MB)
+//
+// Render: "Ran out of memory" a las 11:54, 12:00 y 12:06, cada vez a ~1 minuto
+// de volver a arrancar. El ciclo se alimenta solo: mientras el bot está caído,
+// WhatsApp acumula los mensajes y los reintenta; al arrancar llegan TODOS juntos.
+// Cada cliente tiene su propia fila, así que mensajes de clientes distintos se
+// atendían EN PARALELO, y cada turno lee y retiene conversations.json completo
+// (~20 MB en disco, ~100 MB en memoria). Diez a la vez no caben en 512 MB.
+//
+// 🔑 Un tope GLOBAL de turnos simultáneos. La fila por cliente se mantiene (el
+// orden de un cliente no cambia); solo se limita cuántos clientes se atienden a
+// la vez. Con tráfico normal casi nunca se nota; con una avalancha, esperan en
+// fila en vez de tumbar el servidor.
+// ============================================================================
+const SIMULTANEOS = Math.max(1, Number(process.env.TURNOS_SIMULTANEOS) || 2);
+let enCurso = 0;
+const espera = [];
+function tomarCupo() {
+  if (enCurso < SIMULTANEOS) {
+    enCurso++;
+    return Promise.resolve();
+  }
+  return new Promise((r) => espera.push(r));
+}
+function soltarCupo() {
+  const siguiente = espera.shift();
+  if (siguiente) siguiente();
+  else enCurso = Math.max(0, enCurso - 1);
+}
+function conCupo(tarea) {
+  return tomarCupo().then(() =>
+    Promise.resolve()
+      .then(tarea)
+      .finally(soltarCupo)
+  );
+}
+
 function enFila(clave, tarea) {
   const k = String(clave || "sin-clave");
   const fila = FILAS.get(k) || { cola: Promise.resolve(), pendientes: 0 };
@@ -123,7 +161,7 @@ function enFila(clave, tarea) {
   let terminado = false;
 
   // Lo que ve quien llamó: su tarea, con su resultado y su error.
-  const mio = fila.cola.then(() => tarea());
+  const mio = fila.cola.then(() => conCupo(tarea));
 
   // Lo que ve el SIGUIENTE de la fila: lo mismo, pero sin poder fallar y con
   // el tope de tiempo. Son dos promesas distintas a propósito.
@@ -185,4 +223,4 @@ function _reiniciar() {
   METRICAS.destrabados = 0;
 }
 
-module.exports = { enFila, esperandoTurno, estado, _reiniciar, LIMITE_MS };
+module.exports = { enFila, esperandoTurno, estado, _reiniciar, LIMITE_MS, SIMULTANEOS, _cupos: () => ({ enCurso, esperando: espera.length }) };
