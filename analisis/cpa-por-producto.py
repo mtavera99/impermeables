@@ -419,7 +419,7 @@ def seccion_por_anuncio(anuncios, pedidos, deAnuncio, equilibrio, desde, hasta):
             pctTxt = f"{marca} {pct:.0f}%"
         else:
             pctTxt = "🔴 sin pedidos" if not n else "—"
-        conj = (f["conjunto"] or "(sin conjunto)").replace("|", chr(92) + "|")
+        conj = (f"{f['conjunto'] or '(sin conjunto)'} · _{f['anuncio'] or ad}_").replace("|", chr(92) + "|")
         pc = [f"${f['g'][i]/f['c'][i]:,.0f}" if f["c"][i] else "—" for i in (0, 1)]
         L.append(
             f"| {prod} | {conj} | ${g:,.0f} | {c} | {n} | **{cpa(g, n)}** | {cierre(n, c)} | {pctTxt} | "
@@ -427,6 +427,39 @@ def seccion_por_anuncio(anuncios, pedidos, deAnuncio, equilibrio, desde, hasta):
             f"{cierre(f['n'][0], f['c'][0])} → {cierre(f['n'][1], f['c'][1])} | "
             f"{pc[0]} → {pc[1]} |"
         )
+    L.append("")
+
+    # ── los ultimos 7 dias, dia por dia: un quiebre de un dia se ve aca y no en las mitades
+    ult = [(hasta - dt.timedelta(days=i)).isoformat() for i in range(6, -1, -1)]
+    porDia = {}
+    for a in anuncios:
+        if a["dia"] in ult:
+            k = porDia.setdefault((a["ad_id"], a["dia"]), [0.0, 0, 0])
+            k[0] += a["gasto"]
+            k[1] += a["conv"]
+    for p in pedidos:
+        if p.get("estado") == "ANULADO" or p.get("dia_bogota") not in ult:
+            continue
+        k = porDia.get((p.get("anuncio_id", ""), p.get("dia_bogota")))
+        if k is not None:
+            k[2] += 1
+    L.append("### Ultimos 7 dias por conjunto: `$/conv · pedidos · CPA`")
+    L.append("")
+    L.append("| conjunto | " + " | ".join(d[5:] for d in ult) + " |")
+    L.append("|---|" + "---|" * len(ult))
+    for ad, f in orden:
+        if sum(porDia.get((ad, d), [0])[0] for d in ult) < 1:
+            continue
+        celdas = []
+        for d in ult:
+            g, c, n = porDia.get((ad, d), [0.0, 0, 0])
+            if g < 1:
+                celdas.append("—")
+                continue
+            pcv = f"${g/c:,.0f}" if c else "sin conv"
+            celdas.append(f"{pcv} · {n} · {('$%s' % format(g/n, ',.0f')) if n else '—'}")
+        nom = (f"{deAnuncio.get(ad) or 'SIN PEDIDOS'} · {f['conjunto']}").replace("|", chr(92) + "|")
+        L.append(f"| {nom} | " + " | ".join(celdas) + " |")
     L.append("")
     return L
 
