@@ -1,6 +1,6 @@
 # 🎯 CPA exacto por producto — BikerPro
 
-> **Ultima lectura: 2026-11-03 03:17 Bogota.** Ventana **2026-10-20 a 2026-11-02** (solo dias cerrados).
+> **Ultima lectura: 2026-11-03 03:18 Bogota.** Ventana **2026-10-20 a 2026-11-02** (solo dias cerrados).
 > Generado por `analisis/cpa-por-producto.py`. **Solo lectura** — regla 4-B.
 
 El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido guarda de que anuncio vino. No hay ninguna proporcion estimada en esta tabla.
@@ -74,26 +74,28 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 
 *Mitad 1: 2026-10-20 a 2026-10-26 · mitad 2: 2026-10-27 a 2026-11-02. El semaforo mira el CPA de la ventana entera contra el equilibrio de SU producto: 🟢 menos del 50% · 🟡 50-75% · 🔴 mas del 75% (alarmas de 0-BL). Los pedidos llegan con atraso: los ultimos 1-2 dias de la mitad 2 suelen estar cortos.*
 
-| producto | conjunto | gasto | conv | ped | **CPA** | cierre | % del equilibrio | CPA mitad 1 → 2 | cierre mitad 1 → 2 | $/conv mitad 1 → 2 |
-|---|---|---|---|---|---|---|---|---|---|---|
-| IMPERMEABLE | Domiciliarios - Expancion - API · _Fondo azul sin personaje - API_ | $499,918 | 909 | 29 | **$17,239** | 3.2% | 🔴 90% | $14,163 → $24,073 | 3.7% → 2.4% | $524 → $589 |
-| IMPERMEABLE | Domiciliarios - API · _Fondo azul sin personaje - Copia_ | $487,563 | 1103 | 44 | **$11,081** | 4.0% | 🟡 58% | $11,253 → $10,909 | 3.8% → 4.3% | $422 → $464 |
-| IMPERMEABLE | TEST Creativos - API · _Prueba social +50 clientes - Copia_ | $343,835 | 694 | 24 | **$14,326** | 3.5% | 🔴 75% | $15,891 → $12,478 | 3.0% → 4.2% | $477 → $526 |
-| IMPERMEABLE | Domiciliarios VIDEO - API · _VIDEO - Copia_ | $278,229 | 813 | 44 | **$6,323** | 5.4% | 🟢 33% | $5,845 → $6,897 | 5.6% → 5.2% | $328 → $358 |
-| IMPERMEABLE | Motorizados - API · _Fondo azul sin personaje - Copia_ | $278,228 | 614 | 29 | **$9,594** | 4.7% | 🟡 50% | $8,292 → $11,439 | 5.2% → 4.2% | $432 → $477 |
-| Q58 | Domiciliarios VIDEO Q58 - · _SON DOS_ | $350,855 | 455 | 39 | **$8,996** | 8.6% | 🟢 29% | $9,500 → $8,517 | 8.4% → 8.7% | $802 → $741 |
-| Q58 | Domiciliarios Q58 - · _ACOMPAÑANTE_ | $350,173 | 1435 | 41 | **$8,541** | 2.9% | 🟢 28% | $7,199 → $10,637 | 2.7% → 3.2% | $193 → $338 |
-| Q58 | Motorizados - Q58 · _VERDE LIMA_ | $348,907 | 532 | 28 | **$12,461** | 5.3% | 🟢 41% | $8,932 → $18,813 | 7.3% → 3.5% | $654 → $658 |
-| Q58 | Domiciliarios - Expancion - Q58 · _ACOMPAÑANTE - Copia_ | $251,588 | 936 | 27 | **$9,318** | 2.9% | 🟢 30% | $10,634 → $8,942 | 2.8% → 2.9% | $300 → $260 |
-| Q58 | Domiciliarios - Expancion - Q58 · _COMBO DOS_ | $104,664 | 100 | 3 | **$34,888** | 3.0% | 🔴 114% | $34,888 → — | 3.0% → — | $1,047 → — |
-| RADIO | RADIO - Seguridad / Negocios · _ANUNCIO 1 - COMBO X4 SEGURIDAD ($169.000)_ | $302,726 | 320 | 18 | **$16,818** | 5.6% | 🟢 47% | $22,268 → $15,728 | 4.3% → 6.0% | $954 → $944 |
-| RADIO | RADIO - Moteros · _ANUNCIO 1 - COMBO X2 MOTEROS ($99.000)_ | $253,315 | 194 | 15 | **$16,888** | 7.7% | 🟢 47% | $19,533 → $16,226 | 4.9% → 9.0% | $961 → $1,464 |
-| RADIO | RADIO - Broad · _VIDEO RADIO_ | $208,242 | 143 | 4 | **$52,060** | 2.8% | 🔴 144% | — → $52,060 | — → 2.8% | — → $1,456 |
-| RADIO | RADIO - Fincas · _ANUNCIO 1 - MEGACOMBO X6 FINCAS ($229.000)_ | $199,939 | 241 | 7 | **$28,563** | 2.9% | 🔴 79% | $18,030 → $36,462 | 3.3% → 2.6% | $601 → $966 |
-| V10 | Domiciliarios VIDEO INTER - API · _VIDEO INTERCOMUNICADORES_ | $410,133 | 678 | 58 | **$7,071** | 8.6% | 🟢 25% | $6,274 → $7,868 | 9.6% → 7.7% | $603 → $607 |
-| V10 | Motorizados - INTER · _LA RUTA_ | $353,504 | 617 | 30 | **$11,783** | 4.9% | 🟢 42% | $10,586 → $13,350 | 5.6% → 4.2% | $592 → $554 |
-| V10 | Domiciliarios - Expancion - INTER · _COMBO DOS_ | $353,134 | 552 | 32 | **$11,035** | 5.8% | 🟢 40% | $12,242 → $9,971 | 5.2% → 6.5% | $635 → $645 |
-| V10 | Domiciliarios INTER - API · _CANSADO DE GRITAR_ | $331,580 | 985 | 36 | **$9,211** | 3.7% | 🟢 33% | $14,098 → $6,448 | 2.4% → 5.1% | $341 → $332 |
+*El equilibrio de cada fila sale de la contribucion de LOS PEDIDOS DE ESE ANUNCIO (un combo x6 deja mas que una caja), con la misma devolucion que el resto del informe.*
+
+| producto | conjunto | gasto | conv | ped | **CPA** | cierre | su equilibrio | % del equilibrio | CPA mitad 1 → 2 | cierre mitad 1 → 2 | $/conv mitad 1 → 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| IMPERMEABLE | Domiciliarios - Expancion - API · _Fondo azul sin personaje - API_ | $499,918 | 909 | 29 | **$17,239** | 3.2% | $18,031 | 🔴 96% | $14,163 → $24,073 | 3.7% → 2.4% | $524 → $589 |
+| IMPERMEABLE | Domiciliarios - API · _Fondo azul sin personaje - Copia_ | $487,563 | 1103 | 44 | **$11,081** | 4.0% | $19,169 | 🟡 58% | $11,253 → $10,909 | 3.8% → 4.3% | $422 → $464 |
+| IMPERMEABLE | TEST Creativos - API · _Prueba social +50 clientes - Copia_ | $343,835 | 694 | 24 | **$14,326** | 3.5% | $19,529 | 🟡 73% | $15,891 → $12,478 | 3.0% → 4.2% | $477 → $526 |
+| IMPERMEABLE | Domiciliarios VIDEO - API · _VIDEO - Copia_ | $278,229 | 813 | 44 | **$6,323** | 5.4% | $20,245 | 🟢 31% | $5,845 → $6,897 | 5.6% → 5.2% | $328 → $358 |
+| IMPERMEABLE | Motorizados - API · _Fondo azul sin personaje - Copia_ | $278,228 | 614 | 29 | **$9,594** | 4.7% | $18,743 | 🟡 51% | $8,292 → $11,439 | 5.2% → 4.2% | $432 → $477 |
+| Q58 | Domiciliarios VIDEO Q58 - · _SON DOS_ | $350,855 | 455 | 39 | **$8,996** | 8.6% | $31,016 | 🟢 29% | $9,500 → $8,517 | 8.4% → 8.7% | $802 → $741 |
+| Q58 | Domiciliarios Q58 - · _ACOMPAÑANTE_ | $350,173 | 1435 | 41 | **$8,541** | 2.9% | $30,535 | 🟢 28% | $7,199 → $10,637 | 2.7% → 3.2% | $193 → $338 |
+| Q58 | Motorizados - Q58 · _VERDE LIMA_ | $348,907 | 532 | 28 | **$12,461** | 5.3% | $30,723 | 🟢 41% | $8,932 → $18,813 | 7.3% → 3.5% | $654 → $658 |
+| Q58 | Domiciliarios - Expancion - Q58 · _ACOMPAÑANTE - Copia_ | $251,588 | 936 | 27 | **$9,318** | 2.9% | $30,493 | 🟢 31% | $10,634 → $8,942 | 2.8% → 2.9% | $300 → $260 |
+| Q58 | Domiciliarios - Expancion - Q58 · _COMBO DOS_ | $104,664 | 100 | 3 | **$34,888** | 3.0% | $25,567 | 🔴 136% | $34,888 → — | 3.0% → — | $1,047 → — |
+| RADIO | RADIO - Seguridad / Negocios · _ANUNCIO 1 - COMBO X4 SEGURIDAD ($169.000)_ | $302,726 | 320 | 18 | **$16,818** | 5.6% | $43,209 | 🟢 39% | $22,268 → $15,728 | 4.3% → 6.0% | $954 → $944 |
+| RADIO | RADIO - Moteros · _ANUNCIO 1 - COMBO X2 MOTEROS ($99.000)_ | $253,315 | 194 | 15 | **$16,888** | 7.7% | $26,523 | 🟡 64% | $19,533 → $16,226 | 4.9% → 9.0% | $961 → $1,464 |
+| RADIO | RADIO - Broad · _VIDEO RADIO_ | $208,242 | 143 | 4 | **$52,060** | 2.8% | $28,475 | 🔴 183% | — → $52,060 | — → 2.8% | — → $1,456 |
+| RADIO | RADIO - Fincas · _ANUNCIO 1 - MEGACOMBO X6 FINCAS ($229.000)_ | $199,939 | 241 | 7 | **$28,563** | 2.9% | $40,073 | 🟡 71% | $18,030 → $36,462 | 3.3% → 2.6% | $601 → $966 |
+| V10 | Domiciliarios VIDEO INTER - API · _VIDEO INTERCOMUNICADORES_ | $410,133 | 678 | 58 | **$7,071** | 8.6% | $28,517 | 🟢 25% | $6,274 → $7,868 | 9.6% → 7.7% | $603 → $607 |
+| V10 | Motorizados - INTER · _LA RUTA_ | $353,504 | 617 | 30 | **$11,783** | 4.9% | $27,701 | 🟢 43% | $10,586 → $13,350 | 5.6% → 4.2% | $592 → $554 |
+| V10 | Domiciliarios - Expancion - INTER · _COMBO DOS_ | $353,134 | 552 | 32 | **$11,035** | 5.8% | $27,696 | 🟢 40% | $12,242 → $9,971 | 5.2% → 6.5% | $635 → $645 |
+| V10 | Domiciliarios INTER - API · _CANSADO DE GRITAR_ | $331,580 | 985 | 36 | **$9,211** | 3.7% | $28,394 | 🟢 32% | $14,098 → $6,448 | 2.4% → 5.1% | $341 → $332 |
 
 ### Ultimos 7 dias por conjunto: `$/conv · pedidos · CPA`
 
