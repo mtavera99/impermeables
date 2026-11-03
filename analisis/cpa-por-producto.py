@@ -388,6 +388,14 @@ def seccion_por_anuncio(anuncios, pedidos, deAnuncio, equilibrio, desde, hasta):
         if t is None or f is None:
             continue
         f["n"][t] += 1
+        # 🔑 El equilibrio de un anuncio sale de SUS pedidos, no del promedio del
+        # producto: RADIO - Fincas vende el megacombo x6 ($229.000) y deja casi el
+        # doble que una caja. Con el promedio parecia perder plata y no la perdia.
+        prod = producto_del_pedido(p)
+        if prod in (None, "MAL_ATRIBUIDO"):
+            prod = deAnuncio.get(p.get("anuncio_id", ""))
+        if prod in PRODUCTOS:
+            f.setdefault("contrib", []).append(contribucion(p, prod))
 
     def cpa(g, n):
         return f"${g/n:,.0f}" if n else ("—" if g < 1 else "sin pedidos")
@@ -403,16 +411,24 @@ def seccion_por_anuncio(anuncios, pedidos, deAnuncio, equilibrio, desde, hasta):
              "🟢 menos del 50% · 🟡 50-75% · 🔴 mas del 75% (alarmas de 0-BL). "
              "Los pedidos llegan con atraso: los ultimos 1-2 dias de la mitad 2 suelen estar cortos.*")
     L.append("")
-    L.append("| producto | conjunto | gasto | conv | ped | **CPA** | cierre | % del equilibrio | "
+    L.append("*El equilibrio de cada fila sale de la contribucion de LOS PEDIDOS DE ESE ANUNCIO "
+             "(un combo x6 deja mas que una caja), con la misma devolucion que el resto del informe.*")
+    L.append("")
+    L.append("| producto | conjunto | gasto | conv | ped | **CPA** | cierre | su equilibrio | % del equilibrio | "
              "CPA mitad 1 → 2 | cierre mitad 1 → 2 | $/conv mitad 1 → 2 |")
-    L.append("|---|---|---|---|---|---|---|---|---|---|---|")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
     orden = sorted(filas.items(), key=lambda x: (deAnuncio.get(x[0]) or "~", -sum(x[1]["g"])))
     for ad, f in orden:
         prod = deAnuncio.get(ad) or "SIN PEDIDOS"
         g, c, n = sum(f["g"]), sum(f["c"]), sum(f["n"])
         if g < 1:
             continue
-        eq = equilibrio.get(prod)
+        cs = f.get("contrib") or []
+        if cs:
+            eq = (sum(cs) / len(cs)) * (1 - TASA_DEVOLUCION) - TASA_DEVOLUCION * COSTO_DEVOLUCION
+        else:
+            eq = equilibrio.get(prod)
+        f["eq"] = eq
         if eq and n:
             pct = (g / n) / eq * 100
             marca = "🟢" if pct < 50 else "🟡" if pct <= 75 else "🔴"
@@ -422,7 +438,8 @@ def seccion_por_anuncio(anuncios, pedidos, deAnuncio, equilibrio, desde, hasta):
         conj = (f"{f['conjunto'] or '(sin conjunto)'} · _{f['anuncio'] or ad}_").replace("|", chr(92) + "|")
         pc = [f"${f['g'][i]/f['c'][i]:,.0f}" if f["c"][i] else "—" for i in (0, 1)]
         L.append(
-            f"| {prod} | {conj} | ${g:,.0f} | {c} | {n} | **{cpa(g, n)}** | {cierre(n, c)} | {pctTxt} | "
+            f"| {prod} | {conj} | ${g:,.0f} | {c} | {n} | **{cpa(g, n)}** | {cierre(n, c)} | "
+            f"{('$%s' % format(eq, ',.0f')) if eq else '—'} | {pctTxt} | "
             f"{cpa(f['g'][0], f['n'][0])} → {cpa(f['g'][1], f['n'][1])} | "
             f"{cierre(f['n'][0], f['c'][0])} → {cierre(f['n'][1], f['c'][1])} | "
             f"{pc[0]} → {pc[1]} |"
