@@ -346,6 +346,91 @@ def clasificar_anuncios(pedidos):
     return salida, mezclados
 
 
+def seccion_por_anuncio(anuncios, pedidos, deAnuncio, equilibrio, desde, hasta):
+    """
+    CPA de CADA anuncio contra el equilibrio de SU producto, en dos mitades.
+
+    POR QUE (0-BL, error #29): TEST Creativos salia 🟢 en conversaciones y perdia
+    plata, porque su cierre se habia derrumbado. El $/conv no lo puede ver; hace
+    falta el cruce con pedidos, anuncio por anuncio. Y la ventana va partida en
+    dos mitades para que una tendencia no quede tapada por el promedio.
+
+    Cada conjunto tiene un solo anuncio (0-BL), asi que anuncio = conjunto.
+    """
+    mitad = desde + (hasta - desde) // 2
+    m1, m2 = desde.isoformat(), mitad.isoformat()
+    fin = hasta.isoformat()
+
+    def tramo(dia):
+        if m1 <= dia <= m2:
+            return 0
+        if m2 < dia <= fin:
+            return 1
+        return None
+
+    filas = {}
+    for a in anuncios:
+        t = tramo(a["dia"])
+        if t is None:
+            continue
+        f = filas.setdefault(a["ad_id"], {
+            "conjunto": a["adset_name"], "anuncio": a["ad_name"],
+            "g": [0.0, 0.0], "c": [0, 0], "n": [0, 0], "imp": [0, 0],
+        })
+        f["g"][t] += a["gasto"]
+        f["c"][t] += a["conv"]
+        f["imp"][t] += a["impresiones"]
+    for p in pedidos:
+        if p.get("estado") == "ANULADO":
+            continue
+        t = tramo(p.get("dia_bogota", ""))
+        f = filas.get(p.get("anuncio_id", ""))
+        if t is None or f is None:
+            continue
+        f["n"][t] += 1
+
+    def cpa(g, n):
+        return f"${g/n:,.0f}" if n else ("—" if g < 1 else "sin pedidos")
+
+    def cierre(n, c):
+        return f"{n/c*100:.1f}%" if c else "—"
+
+    L = []
+    L.append("## Por anuncio (= por conjunto)")
+    L.append("")
+    L.append(f"*Mitad 1: {m1} a {m2} · mitad 2: {(mitad + dt.timedelta(days=1)).isoformat()} a {fin}. "
+             "El semaforo mira el CPA de la ventana entera contra el equilibrio de SU producto: "
+             "🟢 menos del 50% · 🟡 50-75% · 🔴 mas del 75% (alarmas de 0-BL). "
+             "Los pedidos llegan con atraso: los ultimos 1-2 dias de la mitad 2 suelen estar cortos.*")
+    L.append("")
+    L.append("| producto | conjunto | gasto | conv | ped | **CPA** | cierre | % del equilibrio | "
+             "CPA mitad 1 → 2 | cierre mitad 1 → 2 | $/conv mitad 1 → 2 |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|")
+    orden = sorted(filas.items(), key=lambda x: (deAnuncio.get(x[0]) or "~", -sum(x[1]["g"])))
+    for ad, f in orden:
+        prod = deAnuncio.get(ad) or "SIN PEDIDOS"
+        g, c, n = sum(f["g"]), sum(f["c"]), sum(f["n"])
+        if g < 1:
+            continue
+        eq = equilibrio.get(prod)
+        if eq and n:
+            pct = (g / n) / eq * 100
+            marca = "🟢" if pct < 50 else "🟡" if pct <= 75 else "🔴"
+            pctTxt = f"{marca} {pct:.0f}%"
+        else:
+            pctTxt = "🔴 sin pedidos" if not n else "—"
+        conj = (f["conjunto"] or "(sin conjunto)").replace("|", chr(92) + "|")
+        pc = [f"${f['g'][i]/f['c'][i]:,.0f}" if f["c"][i] else "—" for i in (0, 1)]
+        L.append(
+            f"| {prod} | {conj} | ${g:,.0f} | {c} | {n} | **{cpa(g, n)}** | {cierre(n, c)} | {pctTxt} | "
+            f"{cpa(f['g'][0], f['n'][0])} → {cpa(f['g'][1], f['n'][1])} | "
+            f"{cierre(f['n'][0], f['c'][0])} → {cierre(f['n'][1], f['c'][1])} | "
+            f"{pc[0]} → {pc[1]} |"
+        )
+    L.append("")
+    return L
+
+
 def construir(dias):
     hoy = ahora_bogota().date()
     # Solo dias CERRADOS: un dia a medias mezcla medio gasto con pedidos completos.
@@ -504,6 +589,7 @@ def construir(dias):
     L.append("| producto | contrib/entregado | **CPA de equilibrio** | CPA real | colchon | utilidad |")
     L.append("|---|---|---|---|---|---|")
     utilTotal = 0.0
+    equilibrio = {}
     for prod in productos:
         t = tot[prod]
         if not t["ped"]:
@@ -514,6 +600,7 @@ def construir(dias):
         # olvida el flete y infla la utilidad al doble.
         contribProm = t["contrib"] / t["ped"]
         eq = contribProm * (1 - TASA_DEVOLUCION) - TASA_DEVOLUCION * COSTO_DEVOLUCION
+        equilibrio[prod] = eq
         cpa = t["gasto"] / t["ped"]
         util = (eq - cpa) * t["ped"]
         utilTotal += util
@@ -526,6 +613,8 @@ def construir(dias):
     L.append(f"**Utilidad de la ventana: ${utilTotal:,.0f}** "
              f"(${utilTotal/dias:,.0f}/dia)")
     L.append("")
+
+    L.extend(seccion_por_anuncio(anuncios, pedidos, deAnuncio, equilibrio, desde, hasta))
 
     # ── los supuestos, impresos. Una constante vieja tiene que VERSE.
     L.append("## Con que numeros se calculo")
