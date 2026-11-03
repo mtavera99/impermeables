@@ -4,7 +4,8 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-11-03 03:00 Bogotá** — 🆕🆕 **sección 0-BN (al final): PRs #231-#241 del 24 al
+Última actualización: **2026-11-03 03:30 Bogotá** — 🆕🆕 **sección 0-BO (al final): diagnóstico por anuncio de Q58
+y radios, con las recomendaciones del 3-nov.** Antes, la **sección 0-BN: PRs #231-#241 del 24 al
 31-oct (radios, plantilla desde el panel, anti-devolución con recordatorio pre-entrega y "no incluye cascos", y el
 ciclo de out-of-memory del 31-oct). Regla 34: este archivo se actualiza y se sube al final de cada sesión.
 EMPEZÁ POR AHÍ.**
@@ -18,7 +19,7 @@ instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las 
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
 > últimas de este archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
 > 📌 **Regla 34:** al final de cada sesión o avance relevante, actualizar este archivo y hacer commit + push (PR propio).
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
@@ -45,6 +46,7 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BO** | 🔬 **Q58 y radios por anuncio, 14 días** · los dos Q58 "caros" (`Domiciliarios Q58 -`, `VIDEO Q58 -`) **están sanos** (28-29% del equilibrio): es el error #29 al revés · 🔴 **el que se rompió es Motorizados - Q58** (cierre 7,3% → 3,5% al subirlo a $29.000) · 🔴 **RADIO - Broad pierde** ($52.060/pedido vs $28.475) · 🥇 RADIO - Seguridad es el mejor · 🔴 Expancion - API recayó (96%) · el informe de CPA ya trae **tabla por anuncio con el equilibrio de sus propios pedidos** | **3-nov** |
 | **0-BN** | 🧠 **PRs #231-#241 (24 al 31-oct)** · radios: cantidad suelta, bucle de precio, "el lunes" no es ciudad, sin REVISAR por ciudad · panel: **«Mandar plantilla»** con la ventana cerrada · 🛡️ **anti-devolución (25,8% auditado en 99 Envíos):** recordatorio pre-entrega 24-48 h (**viene apagado**) y **"no incluye cascos"** en V10/Q58 · 🔴 **ciclo de OOM del 31-oct: cada lead nuevo leía el histórico de ~60 MB** → índice + lotes de 800 · triaje 142 → 46 · **reglas 34-35** | **3-nov** |
 | **0-BM** | 📻 **CUARTO PRODUCTO: RADIOS BF-777S** · $99.000 / $169.000 / $229.000 **con envío gratis** · costo $40.000/caja · **unidades = CAJAS** (1 caja = 2 radios) · "radio" singular no es señal (es la radio FM del Q58) · `/pedidos.csv` trae `producto` y `banda` y el CPA ya no adivina por el total · `ANUNCIOS_RADIO`, `SEGUIMIENTO_PLANTILLA_RADIO` | **23-oct** |
 | **0-BL** | 🔬 **AUDITORÍA POR ANUNCIO (30 días, pedidos reales)** · ranking de los 13 anuncios · 🔴 **error #29: TEST Creativos salía 🟢 en conversaciones y PERDÍA plata (cierre 1,6-2,0%, −$129.562 en 2 semanas)** · **el $/conv no elige ganadores: el cierre pesa igual** (SON DOS $594/conv vende a 8,1%) · escalón de intercom a $25.000: **V10 pagó, Q58 salió en equilibrio** · alarmas de CPA por anuncio | **22-oct** |
@@ -11420,3 +11422,95 @@ conjuntos. 🔴 El 3-nov a las 2 a.m. el saldo era $108.822 y el informe pedía 
 
 **Lo siguiente en la sesión:** diagnóstico de `Domiciliarios Q58 -` y `Domiciliarios VIDEO Q58 -` (se encarecieron desde
 el 31-oct) y de los radios BF-777S (`RADIO - Moteros` en $1.400-2.000/conv).
+
+---
+
+## 0-BO · 🔬 Q58 Y RADIOS POR ANUNCIO, 14 DÍAS: LOS DOS Q58 "CAROS" ESTÁN BIEN, EL QUE SE ROMPIÓ ES MOTORIZADOS - Q58 · Y RADIO - BROAD PIERDE (mar 3-nov, 03:30 Bogotá)
+
+> **Fuente:** `CPA-POR-PRODUCTO.md` con la tabla nueva **"Por anuncio"** (`cpa-por-producto.py`, ventana 20-oct → 2-nov,
+> 14 días cerrados, mitades 20-26 y 27-oct → 2-nov). Gasto y conversaciones exactos de Meta por anuncio; pedidos del
+> `anuncio_id` de `/pedidos.csv`. Presupuestos tomados de la última foto horaria del día en `ESTADO-CUENTA.md`.
+> 🆕 **Cada anuncio se compara contra el equilibrio de SUS pedidos**, no el del producto: RADIO - Fincas vende el x6 de
+> $229.000 (equilibrio $40.073) y RADIO - Moteros el x2 de $99.000 ($26.523). Con el promedio del producto, Fincas
+> parecía perder plata y Moteros parecía más sano de lo que es.
+
+### Q58: lo que se veía caro no era lo que estaba mal
+
+| conjunto · anuncio | presup. | CPA 14 d | cierre | % de su equilibrio | mitad 1 → 2 | veredicto |
+|---|---|---|---|---|---|---|
+| Domiciliarios VIDEO Q58 - · SON DOS | $25.000 | $8.996 | **8,6%** | 🟢 29% | $9.500 → $8.517 | **sano.** El 🔴 de `ESTADO-CUENTA.md` es por conv/mil: es el mejor que cierra del Q58. No tocar |
+| Domiciliarios Q58 - · ACOMPAÑANTE | $25.000 | $8.541 | 2,9% | 🟢 28% | $7.199 → $10.637 | **sano, con una rareza** (abajo). No tocar |
+| Domiciliarios - Expancion - Q58 · ACOMPAÑANTE - Copia | $29.000 | $9.318 | 2,9% | 🟢 31% | $10.634 → $8.942 | sano |
+| 🔴 **Motorizados - Q58 · VERDE LIMA** | **$29.000** | $12.461 | 5,3% | 🟢 41% | **$8.932 → $18.813** | **el que se rompió**: el cierre cayó 7,3% → 3,5% con el $/conv plano ($654 → $658). Del 31-oct al 2-nov: ~$23.300/pedido = **76% del equilibrio**, ya en la alarma de corte |
+| Domiciliarios - Expancion - Q58 · COMBO DOS | — | $34.888 | 3,0% | 🔴 136% | — | sin gasto en la mitad 2: ya está apagado |
+
+**La rareza de ACOMPAÑANTE:** desde el **31-oct** las conversaciones cayeron de ~110-170/día a **10-22/día** con el mismo
+gasto, y el $/conv saltó de ~$190 a $1.379-1.927. **Pero los pedidos no cayeron igual:** 31-oct → 2-nov fueron 6 pedidos
+por ~$72.700 = **~$12.100 por pedido (40% del equilibrio)**. O sea que las ~140 conversaciones diarias que "desaparecieron"
+casi no compraban (su cierre era 2,7%). Puede ser un cambio en cómo Meta cuenta la conversación, un cambio en el anuncio
+o en el mensaje prellenado. **No se sabe: preguntarle al dueño si tocó algo el 31-oct (regla 8)** y mirar en el bot las
+charlas reales de ese anuncio (#222). Mientras el CPA siga bajo ~$15.000, no se toca.
+
+🔑 **Es el error #29 al revés.** En 0-BL un conjunto salía 🟢 en conversaciones y perdía plata. Acá dos conjuntos salen 🔴 en
+conversaciones y son de los más rentables. **El termómetro de `ESTADO-CUENTA.md` no sirve para decidir cortes**; decide
+el CPA por anuncio contra su equilibrio.
+
+📌 **VERDE LIMA y el presupuesto:** 0-BL (22-oct) recomendó bajarlo a $20.000. Estuvo en $20.000 del 22 al 27-oct; después
+subió a **$24.000 (28-oct) y $29.000 (30-oct)**, y la caída del cierre coincide con esas subidas.
+
+### Radios: dos anuncios dan plata, uno pierde, uno se está yendo
+
+Radios en 14 días: **$964.222 de gasto · 49 pedidos · CPA $19.678 · colchón 1,8×**.
+
+| conjunto · anuncio | presup. | gasto | ped | CPA | cierre | su equilibrio | % | mitad 1 → 2 | veredicto |
+|---|---|---|---|---|---|---|---|---|---|
+| RADIO - Seguridad / Negocios · COMBO X4 ($169.000) | $40.000 (era $25.000) | $302.726 | 18 | $16.818 | 5,6% | $43.209 | 🟢 39% | $22.268 → $15.728 | 🥇 **el mejor de radios**, absorbió bien la subida. ~+$475.000 en 14 días |
+| RADIO - Moteros · COMBO X2 ($99.000) | $35.000 (era $20.000) | $253.315 | 15 | $16.888 | **7,7%** | $26.523 | 🟡 64% | $19.533 → $16.226 | el $/conv subió ($961 → $1.464) pero **el cierre subió más** (4,9% → 9,0%). Deja poco por pedido porque vende el x2. **No subir más** |
+| RADIO - Fincas · MEGACOMBO X6 ($229.000) | $20.000 | $199.939 | 7 | $28.563 | 2,9% | $40.073 | 🟡 71% | $18.030 → **$36.462** | se está yendo: en la mitad 2 está al 91% del equilibrio. 2 pedidos del 29-oct al 2-nov |
+| 🔴 **RADIO - Broad · VIDEO RADIO** | $10.000 (arrancó en $40.000 el 28-oct) | $208.242 | **4** | **$52.060** | 2,8% | $28.475 | 🔴 **183%** | — → $52.060 | **pierde ~$94.000** en 6 días. **0 pedidos del 30-oct al 2-nov** |
+
+🔑 **El video UGC de radios (Broad) no vende y los estáticos por público sí.** Seguridad y Moteros juntos son 33 de los 49
+pedidos con el 58% del gasto.
+
+### Impermeable: lo que no se preguntó, pero apareció
+
+🔴 **Domiciliarios - Expancion - API** (Fondo azul, $30.000/día): CPA 14 d **$17.239 = 96% de su equilibrio**, mitad 2
+**$24.073 > $18.031** → en la última semana pierde ~$6.000 por pedido. 0-BL decía que se había recuperado; **recayó**.
+TEST Creativos, ya en $20.000, mejoró: $15.891 → $12.478 (🟡 73%).
+
+### El fin de semana del 31-oct al 2-nov fue flojo en toda la cuenta
+
+V10 y Q58 pasaron de ~$6.000-9.000 a $13.000-15.700 por pedido el 31-oct y el 1-nov, **en todos los conjuntos a la vez**
+(regla 12: es la demanda o la subasta, no un conjunto). Fue **puente festivo** (lunes 2-nov, Todos los Santos) más
+Halloween. Además los pedidos del 2-nov todavía pueden subir (llegan con atraso). **No se decide nada por esos tres días
+solos**; las recomendaciones de abajo se apoyan en la mitad entera.
+
+### Recomendación entregada al dueño (3-nov). Él mueve los presupuestos; Kiro solo lee (regla 4-B)
+
+1. 🔴 **Pausar RADIO - Broad** (VIDEO RADIO). $52.060 por pedido contra $28.475 de equilibrio, y 0 pedidos en 4 días.
+2. 🔴 **Motorizados - Q58 (VERDE LIMA) de $29.000 a $20.000**, el nivel en el que vendía bien. Si a los 3-4 días el CPA
+   sigue arriba de ~$20.000, pausarlo.
+3. 🔴 **Domiciliarios - Expancion - API de $30.000 a $20.000.** Mismo criterio: leer a los 3-4 días.
+4. 🟡 **RADIO - Fincas se queda en $20.000** con fecha: si del 3 al 5-nov sigue arriba de ~$30.000 por pedido, pausarlo o
+   cambiarle el creativo.
+5. 🟢 **No tocar** Domiciliarios Q58 -, Domiciliarios VIDEO Q58 -, RADIO - Seguridad ni RADIO - Moteros. Moteros no sube
+   más: con el x2 su equilibrio es el más bajo de radios.
+6. Lo de siempre: un cambio por conjunto, leer a los 3 días o más, recargar en la mañana, no aplicar recomendaciones de Meta.
+
+⚠️ **Con la devolución de 25,8% que auditó el dueño** (los informes usan 22,8%) los equilibrios bajan ~4%. Broad, VERDE
+LIMA y Expancion - API quedan peor, no mejor: las recomendaciones no cambian.
+
+### Lo que cambió en el código
+
+`analisis/cpa-por-producto.py` agrega a `CPA-POR-PRODUCTO.md`:
+- la tabla **"Por anuncio (= por conjunto)"**: gasto, conversaciones, pedidos, CPA, cierre, **equilibrio de sus propios
+  pedidos**, semáforo 🟢 <50% · 🟡 50-75% · 🔴 >75% (las alarmas de 0-BL) y las dos mitades de la ventana;
+- **"Últimos 7 días por conjunto"**, con `$/conv · pedidos · CPA` por día.
+
+Solo lee: los mismos dos GET de antes. Cierra el pendiente de 0-BL de que el informe cruce pedidos por anuncio, que es lo
+que habría mostrado lo de TEST Creativos. El informe de todos los días sigue mirando 7 días; para 14:
+`gh api -X POST repos/mtavera99/impermeables/actions/workflows/cpa-por-producto.yml/dispatches -f ref=main -f 'inputs[dias]=14'`.
+
+📌 **Trampa del repo corregida:** un `workflow_dispatch` **sí** se puede lanzar en una rama (`-f ref=<rama>`) vía la API
+REST, siempre que el workflow exista en `main`. Corre la versión del script de esa rama y commitea el informe **en esa
+rama**, no en `main`. Así se probó este cambio. (`gh workflow run` falla en este sandbox por el `GH_HOST`, usar `gh api`.)
