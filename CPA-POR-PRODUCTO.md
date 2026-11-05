@@ -1,6 +1,6 @@
 # 🎯 CPA exacto por producto — BikerPro
 
-> **Ultima lectura: 2026-11-04 12:12 Bogota.** Ventana **2026-10-28 a 2026-11-03** (solo dias cerrados).
+> **Ultima lectura: 2026-11-05 12:22 Bogota.** Ventana **2026-10-29 a 2026-11-04** (solo dias cerrados).
 > Generado por `analisis/cpa-por-producto.py`. **Solo lectura** — regla 4-B.
 
 El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido guarda de que anuncio vino. No hay ninguna proporcion estimada en esta tabla.
@@ -9,30 +9,33 @@ El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido
 
 | producto | gasto | conv | pedidos | **CPA** | $/conv | cierre | recaudo |
 |---|---|---|---|---|---|---|---|
-| **V10** | $728,429 | 1421 | 91 | **$8,005** | $513 | 6.40% | $11,101,000 |
-| **Q58** | $740,055 | 1713 | 70 | **$10,572** | $432 | 4.09% | $10,542,000 |
-| **RADIO** | $804,484 | 692 | 36 | **$22,347** | $1,163 | 5.20% | $4,994,000 |
-| **IMPERMEABLE** | $862,883 | 1745 | 74 | **$11,661** | $494 | 4.24% | $6,439,000 |
+| **V10** | $725,658 | 1391 | 84 | **$8,639** | $522 | 6.04% | $10,253,000 |
+| **Q58** | $724,341 | 1594 | 66 | **$10,975** | $454 | 4.14% | $9,904,000 |
+| **RADIO** | $765,722 | 652 | 33 | **$23,204** | $1,174 | 5.06% | $4,567,000 |
+| **IMPERMEABLE** | $845,806 | 1701 | 77 | **$10,984** | $497 | 4.53% | $6,698,000 |
 
 ### 🔎 Cuanta confianza tienen estos numeros
 
 | | |
 |---|---|
-| gasto atribuido a un producto | **$3,135,851** (100.0%) |
+| gasto atribuido a un producto | **$3,061,527** (100.0%) |
 | gasto de anuncios sin pedidos en la ventana | $0 |
 | anuncios clasificados por la forma de sus pedidos | 23 |
-| anuncios con pedidos de MAS de un producto | 6 ⚠️ |
+| anuncios con pedidos de MAS de un producto | 8 ⚠️ |
+| pedidos resueltos por su anuncio (intercomunicador de 1 unidad) | 1 |
 | pedidos que no se pudieron clasificar | 0 ✅ |
 
 ### ⚠️ Anuncios con pedidos de mas de un producto
 
 Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio cambio de creativo, o hay pedidos mal atribuidos (el bug del 1-oct).
 
+- `120249894780890390` -> {'Q58': 60, 'V10': 1}
+- `120249619616140390` -> {'V10': 139, 'IMPERMEABLE': 1}
 - `120249619832930390` -> {'V10': 99, 'Q58': 3}
-- `120249619616140390` -> {'V10': 135, 'IMPERMEABLE': 1}
-- `120249894780890390` -> {'Q58': 56, 'V10': 1}
+- `120250016232010390` -> {'RADIO': 19, 'Q58': 1}
+- `120250016231990390` -> {'Q58': 1, 'RADIO': 8}
+- `120250027970510390` -> {'Q58': 30, 'IMPERMEABLE': 1}
 - `120249619720720390` -> {'V10': 111, 'Q58': 1}
-- `120250027970510390` -> {'Q58': 29, 'IMPERMEABLE': 1}
 - `120249894780910390` -> {'V10': 1, 'Q58': 10}
 
 🔴 **2 pedido(s) con la talla nombrando otro producto.** Son los del bug de atribucion: no entran en ningun producto para no contaminar el calculo, y hay que corregirlos a mano en el panel.
@@ -41,13 +44,13 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 
 | dia | gasto V10 | ped | CPA V10 | gasto Q58 | ped | CPA Q58 | gasto radio | ped | CPA radio | gasto imper | ped | CPA imper |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2026-10-28 | $94,312 | 18 | $5,240 | $99,725 | 13 | $7,671 | $130,549 | 5 | $26,110 | $113,949 | 8 | $14,244 |
 | 2026-10-29 | $101,984 | 17 | $5,999 | $98,491 | 11 | $8,954 | $115,529 | 7 | $16,504 | $122,771 | 11 | $11,161 |
 | 2026-10-30 | $96,282 | 12 | $8,024 | $85,791 | 9 | $9,532 | $116,586 | 3 | $38,862 | $109,421 | 6 | $18,237 |
 | 2026-10-31 | $96,994 | 7 | $13,856 | $107,037 | 8 | $13,380 | $98,241 | 3 | $32,747 | $120,140 | 8 | $15,018 |
 | 2026-11-01 | $109,984 | 7 | $15,712 | $104,520 | 7 | $14,931 | $111,380 | 11 | $10,125 | $131,600 | 12 | $10,967 |
 | 2026-11-02 | $128,060 | 10 | $12,806 | $132,917 | 10 | $13,292 | $128,053 | 4 | $32,013 | $142,020 | 16 | $8,876 |
-| 2026-11-03 | $100,813 | 20 | $5,041 | $111,574 | 12 | $9,298 | $104,146 | 3 | $34,715 | $122,982 | 13 | $9,460 |
+| 2026-11-03 | $101,134 | 18 | $5,619 | $111,763 | 12 | $9,314 | $104,529 | 3 | $34,843 | $123,281 | 13 | $9,483 |
+| 2026-11-04 | $91,220 | 13 | $7,017 | $83,822 | 9 | $9,314 | $91,404 | 2 | $45,702 | $96,573 | 11 | $8,779 |
 
 ## Cada producto contra SU propio equilibrio
 
@@ -55,12 +58,12 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 
 | producto | contrib/entregado | **CPA de equilibrio** | CPA real | colchon | utilidad |
 |---|---|---|---|---|---|
-| **V10** | $36,824 | **$27,719** | $8,005 | 🟢 3.5x | $1,794,038 |
-| **Q58** | $40,813 | **$30,798** | $10,572 | 🟡 2.9x | $1,415,838 |
-| **RADIO** | $48,311 | **$36,587** | $22,347 | 🟡 1.6x | $512,644 |
-| **IMPERMEABLE** | $25,314 | **$18,834** | $11,661 | 🟡 1.6x | $530,806 |
+| **V10** | $36,799 | **$27,700** | $8,639 | 🟢 3.2x | $1,601,171 |
+| **Q58** | $40,907 | **$30,871** | $10,975 | 🟡 2.8x | $1,313,170 |
+| **RADIO** | $48,432 | **$36,681** | $23,204 | 🟡 1.6x | $444,750 |
+| **IMPERMEABLE** | $25,223 | **$18,764** | $10,984 | 🟡 1.7x | $598,990 |
 
-**Utilidad de la ventana: $4,253,326** ($607,618/dia)
+**Utilidad de la ventana: $3,958,081** ($565,440/dia)
 
 ## Con que numeros se calculo
 
