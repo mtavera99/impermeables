@@ -10,18 +10,20 @@ const catalogo = require("./catalogo");
 
 // Construye la sección de medios de pago anticipado a partir de variables de entorno
 // (así los números no quedan en el código público).
+// 🔴 10-nov: el bot le inventó a una clienta una cuenta Bancolombia, un titular y
+// un NIT. El candado de verdad está en código (`datos-de-pago.js`, sobre el texto
+// final); esto es solo para que el modelo no lo intente.
+const PROHIBIDO_INVENTAR_PAGO =
+  "⛔ NUNCA inventes datos de pago: ni números de cuenta, ni bancos, ni titulares, ni NIT. " +
+  "Si un dato no está escrito arriba, NO EXISTE. No hay cuenta de ahorros ni corriente salvo que aparezca arriba.";
+
 function pagoAnticipadoInfo() {
-  const nequi = process.env.PAGO_NEQUI;
-  const banco = process.env.PAGO_BANCOLOMBIA;
-  const davi = process.env.PAGO_DAVIPLATA;
-  const breb = process.env.PAGO_BREB;
-  const lines = [];
-  if (nequi) lines.push(`- Nequi: ${nequi}`);
-  if (banco) lines.push(`- Bancolombia: ${banco}`);
-  if (davi) lines.push(`- Daviplata: ${davi}`);
-  if (breb) lines.push(`- Llave Bre-B: ${breb}`);
+  const lines = require("./datos-de-pago")
+    .mediosConfigurados()
+    .map((m) => `- ${m.etiqueta}: ${m.valor}`);
   if (lines.length === 0) {
-    return `Si el cliente elige PAGO ANTICIPADO, dile con amabilidad que un asesor le comparte los datos de pago enseguida y agrega la línea ##HANDOFF##.`;
+    return `Si el cliente elige PAGO ANTICIPADO, dile con amabilidad que un asesor le comparte los datos de pago enseguida y agrega la línea ##HANDOFF##.
+${PROHIBIDO_INVENTAR_PAGO}`;
   }
   // ==========================================================================
   // 🔴 ESTA INSTRUCCIÓN DECÍA "CUANDO LO MANDE, CONFIRMAS Y SE DESPACHA" (8-oct)
@@ -44,6 +46,7 @@ function pagoAnticipadoInfo() {
   // ==========================================================================
   return `Medios de PAGO ANTICIPADO (compártelos SOLO si el cliente elige pagar antes):
 ${lines.join("\n")}
+Copia esos datos EXACTOS, sin cambiar un dígito. ${PROHIBIDO_INVENTAR_PAGO}
 Pídele que envíe el comprobante de pago por este chat (una captura sirve).
 Cuando lo mande: dile que YA LO RECIBISTE y que el equipo está verificando que el pago entró,
 y que en cuanto se confirme se despacha y le llega el número de guía por ahí mismo.

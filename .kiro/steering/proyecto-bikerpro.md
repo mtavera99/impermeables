@@ -4,9 +4,15 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-10-19 19:00 Bogotá** — 🆕🆕 **sección 0-BK (al final): ya son TRES productos
-(impermeable, V10, Q58 Max), el Q58 es ganador, y el informe de CPA contaba el Q58 como V10.
+Última actualización: **2026-11-10 14:30 Bogotá** — 🆕🆕 **sección 0-BP (al final): el bot inventó datos de pago; candado
+en código y `PAGO_LLAVE` en Render.** Antes, la **sección 0-BO: diagnóstico por anuncio de Q58
+y radios, con las recomendaciones del 3-nov.** Antes, la **sección 0-BN: PRs #231-#241 del 24 al
+31-oct (radios, plantilla desde el panel, anti-devolución con recordatorio pre-entrega y "no incluye cascos", y el
+ciclo de out-of-memory del 31-oct). Regla 34: este archivo se actualiza y se sube al final de cada sesión.
 EMPEZÁ POR AHÍ.**
+
+Actualización anterior: **2026-10-19 19:00 Bogotá** — sección 0-BK: ya son TRES productos
+(impermeable, V10, Q58 Max), el Q58 es ganador, y el informe de CPA contaba el Q58 como V10.
 
 Actualización anterior: **2026-09-30 02:30 Bogotá** — **sección 0-BI: los reinicios por memoria NO eran
 el PDF ni V8, era el PANEL (821 MB por recarga, cada 45 segundos). Pico 478 → 183 MB, sin pagar más
@@ -14,8 +20,9 @@ instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las 
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BL` y `0-BK`** (las últimas de este
-> archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
+> últimas de este archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
+> 📌 **Regla 34:** al final de cada sesión o avance relevante, actualizar este archivo y hacer commit + push (PR propio).
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
 > del repo y cómo trabajar con el dueño.
 > **El bot de WhatsApp ya reemplazó al agente de Meta y está en producción** —
@@ -40,6 +47,9 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BP** | 💸 **el bot inventó una cuenta Bancolombia, un titular y un NIT** (caso Angie) · el único medio real es **un número = llave Bre-B/Nequi/Daviplata**, en Render como **`PAGO_LLAVE`** (nunca en el repo) · candado en código `datos-de-pago.js` (PR #244) · **regla 36: ningún dato que mueva plata sale del modelo** | **10-nov** |
+| **0-BO** | 🔬 **Q58 y radios por anuncio, 14 días** · los dos Q58 "caros" (`Domiciliarios Q58 -`, `VIDEO Q58 -`) **están sanos** (28-29% del equilibrio): es el error #29 al revés · 🔴 **el que se rompió es Motorizados - Q58** (cierre 7,3% → 3,5% al subirlo a $29.000) · 🔴 **RADIO - Broad pierde** ($52.060/pedido vs $28.475) · 🥇 RADIO - Seguridad es el mejor · 🔴 Expancion - API recayó (96%) · el informe de CPA ya trae **tabla por anuncio con el equilibrio de sus propios pedidos** | **3-nov** |
+| **0-BN** | 🧠 **PRs #231-#241 (24 al 31-oct)** · radios: cantidad suelta, bucle de precio, "el lunes" no es ciudad, sin REVISAR por ciudad · panel: **«Mandar plantilla»** con la ventana cerrada · 🛡️ **anti-devolución (25,8% auditado en 99 Envíos):** recordatorio pre-entrega 24-48 h (**viene apagado**) y **"no incluye cascos"** en V10/Q58 · 🔴 **ciclo de OOM del 31-oct: cada lead nuevo leía el histórico de ~60 MB** → índice + lotes de 800 · triaje 142 → 46 · **reglas 34-35** | **3-nov** |
 | **0-BM** | 📻 **CUARTO PRODUCTO: RADIOS BF-777S** · $99.000 / $169.000 / $229.000 **con envío gratis** · costo $40.000/caja · **unidades = CAJAS** (1 caja = 2 radios) · "radio" singular no es señal (es la radio FM del Q58) · `/pedidos.csv` trae `producto` y `banda` y el CPA ya no adivina por el total · `ANUNCIOS_RADIO`, `SEGUIMIENTO_PLANTILLA_RADIO` | **23-oct** |
 | **0-BL** | 🔬 **AUDITORÍA POR ANUNCIO (30 días, pedidos reales)** · ranking de los 13 anuncios · 🔴 **error #29: TEST Creativos salía 🟢 en conversaciones y PERDÍA plata (cierre 1,6-2,0%, −$129.562 en 2 semanas)** · **el $/conv no elige ganadores: el cierre pesa igual** (SON DOS $594/conv vende a 8,1%) · escalón de intercom a $25.000: **V10 pagó, Q58 salió en equilibrio** · alarmas de CPA por anuncio | **22-oct** |
 | **0-BK** | 🎧 **TRES PRODUCTOS: impermeable · V10 · Q58 Max** (catálogo, precios, costos, totales por banda) · 📈 **el Q58 ya es ganador: 42 pedidos en 4 días, todos combos, ~$36.500 de contribución, el más alto** · `Domiciliarios Q58 -` es el mejor conjunto de la cuenta · 🔴 **error #28: el informe de CPA contaba el Q58 como V10**, con el costo del V10 → arreglado · **regla 33: un producto nuevo entra a los informes el mismo día** · PRs abiertos #214/#221/#222 | **19-oct** |
@@ -11310,3 +11320,250 @@ Pruebas: `bot/test-radios-bf777s.js`, con 96 chequeos.
 - **Fotos reales:** `radio-producto`, `radio-contenido` y `radio-caja`.
 - **Ficha:** se agregó la **radio FM**, que dice la caja y confirmó el dueño. "Lo que trae la caja" ahora incluye las correas, el adaptador y el manual, que se ven en la foto.
 - **Homologación:** el CMIIT ID de la caja es la certificación china. El dueño dice que tienen el número colombiano.
+
+---
+
+## 0-BN · 🧠 DEL 24 AL 31-OCT: RADIOS EN LA CALLE, PLANTILLA DESDE EL PANEL, ANTI-DEVOLUCIÓN Y EL CICLO DE OUT-OF-MEMORY (escrito mar 3-nov, 03:00 Bogotá)
+
+> **Por qué existe esta sección:** la memoria se cortó el 24-oct (0-BM) y después se fusionaron **11 PRs (#231 a #241)**
+> que no quedaron escritos en ningún lado más que en GitHub. La cuenta de Kiro rotó el 2-nov y la sesión nueva tuvo que
+> reconstruirlos desde los PRs. **Eso es justo lo que la regla 34 (abajo) evita.**
+
+### 📻 Radios: lo que se rompió con los primeros chats reales (#231, #233)
+
+Salió de revisar los **42 chats de radios** de las primeras 30 horas.
+
+| problema | ejemplo real | arreglo |
+|---|---|---|
+| un número suelto no se leía como cantidad | el bot pregunta "¿cuántos radios?", el cliente dice "4" (Quibdó) y el bot sigue cotizando 1 caja a $99.000 | "4", "los 4", "6 para Ráquira" ya son radios |
+| bucle de precio | la misma línea de precio **4 veces** mientras el cliente decía "Si". El detector comparaba texto exacto y nunca coincidía | a la 2ª repetición el chat **pasa al dueño** |
+| "te escribo en un momento" y nadie escribía | Leticia, zona sin tarifa | pasa al dueño con aviso |
+| un día tomado como ciudad | Tierralta: *"envío gratis a el lunes"* | días, palabras de tiempo y "tienes radios" no son municipio |
+| **#233:** 6 de 7 radios en REVISAR eran `ciudad_distinta` | cotización "para" *"enviar unpar"*, *"el departamento"*, el nombre del cliente | con envío gratis la ciudad no cambia el total → **ya no va a REVISAR por ciudad**. Sí sigue marcando total equivocado o destino de difícil acceso. V10, Q58 e impermeable sin cambios |
+
+### 📨 Plantilla de seguimiento desde el panel (#234, #235, #236)
+
+- **#234:** `/seguimiento` muestra `toque_44h_por_producto`: qué plantilla de 44 h toma cada producto. Sirve para
+  confirmar `SEGUIMIENTO_PLANTILLA_RADIO` y la del Q58 **sin entrar a Render**. Solo lectura.
+- **#235:** cuando el cliente escribió hace más de 24 h, el chat del panel ofrece **«Mandar plantilla»** con la plantilla
+  de seguimiento **de su producto** (radios, V10, Q58 o impermeable). Pide confirmación, solo acepta plantillas de
+  seguimiento ya configuradas y tiene candado antiduplicado.
+- **#236:** ese botón vuelve a `/chat` después de cada envío, y `/chat` leía siempre las activas **más el archivo**
+  (~20 MB + ~43 MB). Varios envíos seguidos tumbaban el contenedor. Ahora el archivo se lee solo si el chat buscado no
+  está entre las activas.
+
+### 🛡️ La estrategia anti-devolución (#237, #238)
+
+**El disparador:** el dueño auditó en 99 Envíos una devolución del **25,8%**.
+⚠️ **Los informes (`estado-cuenta.py`, `cpa-por-producto.py`) todavía usan 22,8%** (386 guías, corte 30-sep). Con 25,8% los
+equilibrios bajan un poco y los colchones de radios e impermeable (1,8×) son los que más lo sienten. **Pendiente:**
+actualizar la constante cuando el dueño confirme la ventana y el n de esa auditoría.
+
+**#238 · "no incluye cascos" (28-oct, pedido del dueño).** En el cuadro final de confirmación del V10 y del Q58 (y **solo
+ahí**, `agent.js` ~línea 486) se agrega antes de «SÍ CONFIRMO» que son micrófonos y accesorios para los cascos del
+cliente y que **no incluye cascos**. Para 1 unidad hay una variante con «1 dispositivo». No se repite si ya está.
+Prueba: `test-aclaracion-cascos.js`.
+
+**#237 · recordatorio pre-entrega (`src/recordatorio-entrega.js`).**
+
+- Entre **24 y 48 h después de `guiaEnviadaEl`**, el bot le escribe **una vez** al cliente de contraentrega: el paquete
+  está cerca, el **valor exacto en efectivo**, y que lo deje encargado si no va a estar. Solo de **8:00 a 19:00** Bogotá,
+  revisión cada 30 min.
+- Ventana abierta → texto libre · cerrada → plantilla · cerrada y sin plantilla → **se salta sin gastar el turno**
+  (le llega apenas exista la plantilla). El turno se reclama antes de enviar: nunca llega dos veces.
+- No va a anulados, sin confirmar, sin guía, `SIN-NÚMERO`, pagados por adelantado ni `noMolestar`.
+- Si el cliente contesta en las **72 h** siguientes, se clasifica en **`cancelar` · `sin_dinero` · `cambio_direccion` ·
+  `cambio_fecha`** → el pedido queda con `riesgo_entrega`, el chat pasa a posventa y el dueño recibe aviso (uno por tipo y
+  pedido) con la acción sugerida.
+- Endpoints con token del panel: `GET /recordatorio-entrega` (diagnóstico) y `GET /recordatorio-entrega/correr`.
+- **Viene APAGADO.** Para prenderlo: plantilla `recordatorio_entrega` en Meta (**Utilidad**, Spanish COL, 6 variables, texto
+  en `bot/README.md`) y en Render `RECORDATORIO_ENTREGA_PLANTILLA=recordatorio_entrega` + `RECORDATORIO_ENTREGA_ACTIVO=1`.
+- ❓ **Sin confirmar al 3-nov si el dueño ya lo prendió.** Se verifica con `/recordatorio-entrega?token=…` (dice si está
+  prendido, qué plantilla toma, cuántos pedidos tocan y cuántos riesgos contestaron).
+
+### 🔴 El ciclo de out-of-memory del 31-oct (#232, #239, #240, #241)
+
+**El síntoma:** Render reportó *"Ran out of memory (used over 512MB)"* a las 11:54, 12:00 y 12:06, cada vez ~1 min
+después de arrancar. **Era un ciclo:** mientras el bot está caído, WhatsApp acumula mensajes; al arrancar llegan todos
+juntos, se atienden en paralelo, y la memoria revienta otra vez.
+
+Se arregló en capas, cada una porque la anterior no alcanzó:
+
+| PR | causa | arreglo |
+|---|---|---|
+| **#232** (26-oct, panel 502) | `resumen.delDia()` re-parseaba `conversations.json` (~20 MB, 6.000 conv.) dos veces, más el render: **3 lecturas por apertura**, pico 402 de 512 MB | 1 lectura por apertura: 45 → 15 MB leídos, pico de banco 329 → 221 MB. `test-memoria-del-panel.js` falla si vuelve a leerlo más de una vez |
+| **#239** | cada turno retiene `conversations.json` completo, y los clientes distintos corrían en paralelo | tope global **`TURNOS_SIMULTANEOS` = 2** (mantiene el orden por cliente) · **`DIAS_CONVERSACIONES_ACTIVAS` 7 → 4** por defecto, sin cortar seguimientos |
+| **#240** — 🎯 **la causa** | `getConv`/`pushMsg` de un número que no está en las activas —**o sea, cada lead nuevo**— parseaban `conversations-archivo.json` completo (45-60 MB y creciendo para siempre) solo para ver que no estaba | **índice** de solo los números archivados (KB); el archivo se lee solo si el número está ahí |
+| **#241** — el último | igual se caía a los **20 s**: `archivarConversacionesViejas()` hacía `readJSON` del archivo entero (~60 MB) | el histórico vive en **lotes de 800 conversaciones** en `data/conversaciones-archivo/` + índice `{teléfono: lote}`. Archivar escribe un lote nuevo sin leer los viejos; recuperar lee solo el lote del teléfono. El archivo único viejo se parte **una vez, leyéndolo de a 1 MB**, y queda renombrado como respaldo. El primer archivado pasa de 20 s a 5 min. **Probado con 71 MB y heap 268 MB: RSS 112 MB**, 2.001 conversaciones idénticas. Batería 70/70 |
+
+🔑 **El patrón es el mismo de 0-BI:** un archivo que solo crece, leído entero en un camino caliente. En 0-BI era el panel
+cada 45 s; acá era cada lead nuevo. **Regla 35 (abajo).**
+
+⚠️ **No verificado desde el sandbox:** `/health` no responde desde acá (sin salida a internet). El indicador bueno es
+`pico.proceso_mb` contra 512, no `arranques` (regla 31: sube ~24/día por los commits horarios a `main`).
+
+### 📲 Triaje de WhatsApp (2-nov, hecho por el dueño)
+
+Chats represados en el bot: **142 → 46 pendientes**. Se confirmaron pedidos y quedaron **18 casos delicados para gestión
+manual**: garantías, prendas descosidas y guías para cancelar en 99 Envíos. Las prendas descosidas son reclamos de
+**calidad del impermeable**: si se repiten, son un costo de devolución que el modelo de margen no tiene.
+
+### 📌 Reglas nuevas
+
+34. **Al final de cada sesión o avance relevante, actualizar este archivo y hacer commit + push a GitHub** (pedido
+    explícito del dueño, 3-nov). La cuenta de Kiro puede rotar sin aviso; lo que no está en el repo se pierde. Se cumple
+    con un PR propio, respetando `como-no-perder-commits.md`.
+35. **Ningún camino que corre por mensaje o por recarga puede leer un archivo que solo crece.** Si hace falta saber si
+    algo está ahí, va un índice chico. Van dos veces: el panel (0-BI) y el archivo histórico (#240/#241).
+
+### Estado del negocio al abrir la sesión del 3-nov
+
+CPA de la semana 26-oct → 1-nov (`CPA-POR-PRODUCTO.md`): **V10 $7.882 (3,6×) · Q58 $9.397 (3,3×) · radios $19.690 (1,8×) ·
+impermeable $10.823 (1,8×)**. Utilidad **$4,73 M en 7 días ($676.001/día)**. Presupuesto activo **$444.000/día** en 17
+conjuntos. 🔴 El 3-nov a las 2 a.m. el saldo era $108.822 y el informe pedía recargar $538.528 antes de las 8:00.
+
+**Lo siguiente en la sesión:** diagnóstico de `Domiciliarios Q58 -` y `Domiciliarios VIDEO Q58 -` (se encarecieron desde
+el 31-oct) y de los radios BF-777S (`RADIO - Moteros` en $1.400-2.000/conv).
+
+---
+
+## 0-BO · 🔬 Q58 Y RADIOS POR ANUNCIO, 14 DÍAS: LOS DOS Q58 "CAROS" ESTÁN BIEN, EL QUE SE ROMPIÓ ES MOTORIZADOS - Q58 · Y RADIO - BROAD PIERDE (mar 3-nov, 03:30 Bogotá)
+
+> **Fuente:** `CPA-POR-PRODUCTO.md` con la tabla nueva **"Por anuncio"** (`cpa-por-producto.py`, ventana 20-oct → 2-nov,
+> 14 días cerrados, mitades 20-26 y 27-oct → 2-nov). Gasto y conversaciones exactos de Meta por anuncio; pedidos del
+> `anuncio_id` de `/pedidos.csv`. Presupuestos tomados de la última foto horaria del día en `ESTADO-CUENTA.md`.
+> 🆕 **Cada anuncio se compara contra el equilibrio de SUS pedidos**, no el del producto: RADIO - Fincas vende el x6 de
+> $229.000 (equilibrio $40.073) y RADIO - Moteros el x2 de $99.000 ($26.523). Con el promedio del producto, Fincas
+> parecía perder plata y Moteros parecía más sano de lo que es.
+
+### Q58: lo que se veía caro no era lo que estaba mal
+
+| conjunto · anuncio | presup. | CPA 14 d | cierre | % de su equilibrio | mitad 1 → 2 | veredicto |
+|---|---|---|---|---|---|---|
+| Domiciliarios VIDEO Q58 - · SON DOS | $25.000 | $8.996 | **8,6%** | 🟢 29% | $9.500 → $8.517 | **sano.** El 🔴 de `ESTADO-CUENTA.md` es por conv/mil: es el mejor que cierra del Q58. No tocar |
+| Domiciliarios Q58 - · ACOMPAÑANTE | $25.000 | $8.541 | 2,9% | 🟢 28% | $7.199 → $10.637 | **sano, con una rareza** (abajo). No tocar |
+| Domiciliarios - Expancion - Q58 · ACOMPAÑANTE - Copia | $29.000 | $9.318 | 2,9% | 🟢 31% | $10.634 → $8.942 | sano |
+| 🔴 **Motorizados - Q58 · VERDE LIMA** | **$29.000** | $12.461 | 5,3% | 🟢 41% | **$8.932 → $18.813** | **el que se rompió**: el cierre cayó 7,3% → 3,5% con el $/conv plano ($654 → $658). Del 31-oct al 2-nov: ~$23.300/pedido = **76% del equilibrio**, ya en la alarma de corte |
+| Domiciliarios - Expancion - Q58 · COMBO DOS | — | $34.888 | 3,0% | 🔴 136% | — | sin gasto en la mitad 2: ya está apagado |
+
+**La rareza de ACOMPAÑANTE:** desde el **31-oct** las conversaciones cayeron de ~110-170/día a **10-22/día** con el mismo
+gasto, y el $/conv saltó de ~$190 a $1.379-1.927. **Pero los pedidos no cayeron igual:** 31-oct → 2-nov fueron 6 pedidos
+por ~$72.700 = **~$12.100 por pedido (40% del equilibrio)**. O sea que las ~140 conversaciones diarias que "desaparecieron"
+casi no compraban (su cierre era 2,7%). Puede ser un cambio en cómo Meta cuenta la conversación, un cambio en el anuncio
+o en el mensaje prellenado. **No se sabe: preguntarle al dueño si tocó algo el 31-oct (regla 8)** y mirar en el bot las
+charlas reales de ese anuncio (#222). Mientras el CPA siga bajo ~$15.000, no se toca.
+
+🔑 **Es el error #29 al revés.** En 0-BL un conjunto salía 🟢 en conversaciones y perdía plata. Acá dos conjuntos salen 🔴 en
+conversaciones y son de los más rentables. **El termómetro de `ESTADO-CUENTA.md` no sirve para decidir cortes**; decide
+el CPA por anuncio contra su equilibrio.
+
+📌 **VERDE LIMA y el presupuesto:** 0-BL (22-oct) recomendó bajarlo a $20.000. Estuvo en $20.000 del 22 al 27-oct; después
+subió a **$24.000 (28-oct) y $29.000 (30-oct)**, y la caída del cierre coincide con esas subidas.
+
+### Radios: dos anuncios dan plata, uno pierde, uno se está yendo
+
+Radios en 14 días: **$964.222 de gasto · 49 pedidos · CPA $19.678 · colchón 1,8×**.
+
+| conjunto · anuncio | presup. | gasto | ped | CPA | cierre | su equilibrio | % | mitad 1 → 2 | veredicto |
+|---|---|---|---|---|---|---|---|---|---|
+| RADIO - Seguridad / Negocios · COMBO X4 ($169.000) | $40.000 (era $25.000) | $302.726 | 18 | $16.818 | 5,6% | $43.209 | 🟢 39% | $22.268 → $15.728 | 🥇 **el mejor de radios**, absorbió bien la subida. ~+$475.000 en 14 días |
+| RADIO - Moteros · COMBO X2 ($99.000) | $35.000 (era $20.000) | $253.315 | 15 | $16.888 | **7,7%** | $26.523 | 🟡 64% | $19.533 → $16.226 | el $/conv subió ($961 → $1.464) pero **el cierre subió más** (4,9% → 9,0%). Deja poco por pedido porque vende el x2. **No subir más** |
+| RADIO - Fincas · MEGACOMBO X6 ($229.000) | $20.000 | $199.939 | 7 | $28.563 | 2,9% | $40.073 | 🟡 71% | $18.030 → **$36.462** | se está yendo: en la mitad 2 está al 91% del equilibrio. 2 pedidos del 29-oct al 2-nov |
+| 🔴 **RADIO - Broad · VIDEO RADIO** | $10.000 (arrancó en $40.000 el 28-oct) | $208.242 | **4** | **$52.060** | 2,8% | $28.475 | 🔴 **183%** | — → $52.060 | **pierde ~$94.000** en 6 días. **0 pedidos del 30-oct al 2-nov** |
+
+🔑 **El video UGC de radios (Broad) no vende y los estáticos por público sí.** Seguridad y Moteros juntos son 33 de los 49
+pedidos con el 58% del gasto.
+
+### Impermeable: lo que no se preguntó, pero apareció
+
+🔴 **Domiciliarios - Expancion - API** (Fondo azul, $30.000/día): CPA 14 d **$17.239 = 96% de su equilibrio**, mitad 2
+**$24.073 > $18.031** → en la última semana pierde ~$6.000 por pedido. 0-BL decía que se había recuperado; **recayó**.
+TEST Creativos, ya en $20.000, mejoró: $15.891 → $12.478 (🟡 73%).
+
+### El fin de semana del 31-oct al 2-nov fue flojo en toda la cuenta
+
+V10 y Q58 pasaron de ~$6.000-9.000 a $13.000-15.700 por pedido el 31-oct y el 1-nov, **en todos los conjuntos a la vez**
+(regla 12: es la demanda o la subasta, no un conjunto). Fue **puente festivo** (lunes 2-nov, Todos los Santos) más
+Halloween. Además los pedidos del 2-nov todavía pueden subir (llegan con atraso). **No se decide nada por esos tres días
+solos**; las recomendaciones de abajo se apoyan en la mitad entera.
+
+### Recomendación entregada al dueño (3-nov). Él mueve los presupuestos; Kiro solo lee (regla 4-B)
+
+1. 🔴 **Pausar RADIO - Broad** (VIDEO RADIO). $52.060 por pedido contra $28.475 de equilibrio, y 0 pedidos en 4 días.
+2. 🔴 **Motorizados - Q58 (VERDE LIMA) de $29.000 a $20.000**, el nivel en el que vendía bien. Si a los 3-4 días el CPA
+   sigue arriba de ~$20.000, pausarlo.
+3. 🔴 **Domiciliarios - Expancion - API de $30.000 a $20.000.** Mismo criterio: leer a los 3-4 días.
+4. 🟡 **RADIO - Fincas se queda en $20.000** con fecha: si del 3 al 5-nov sigue arriba de ~$30.000 por pedido, pausarlo o
+   cambiarle el creativo.
+5. 🟢 **No tocar** Domiciliarios Q58 -, Domiciliarios VIDEO Q58 -, RADIO - Seguridad ni RADIO - Moteros. Moteros no sube
+   más: con el x2 su equilibrio es el más bajo de radios.
+6. Lo de siempre: un cambio por conjunto, leer a los 3 días o más, recargar en la mañana, no aplicar recomendaciones de Meta.
+
+⚠️ **Con la devolución de 25,8% que auditó el dueño** (los informes usan 22,8%) los equilibrios bajan ~4%. Broad, VERDE
+LIMA y Expancion - API quedan peor, no mejor: las recomendaciones no cambian.
+
+### Lo que cambió en el código
+
+`analisis/cpa-por-producto.py` agrega a `CPA-POR-PRODUCTO.md`:
+- la tabla **"Por anuncio (= por conjunto)"**: gasto, conversaciones, pedidos, CPA, cierre, **equilibrio de sus propios
+  pedidos**, semáforo 🟢 <50% · 🟡 50-75% · 🔴 >75% (las alarmas de 0-BL) y las dos mitades de la ventana;
+- **"Últimos 7 días por conjunto"**, con `$/conv · pedidos · CPA` por día.
+
+Solo lee: los mismos dos GET de antes. Cierra el pendiente de 0-BL de que el informe cruce pedidos por anuncio, que es lo
+que habría mostrado lo de TEST Creativos. El informe de todos los días sigue mirando 7 días; para 14:
+`gh api -X POST repos/mtavera99/impermeables/actions/workflows/cpa-por-producto.yml/dispatches -f ref=main -f 'inputs[dias]=14'`.
+
+📌 **Trampa del repo corregida:** un `workflow_dispatch` **sí** se puede lanzar en una rama (`-f ref=<rama>`) vía la API
+REST, siempre que el workflow exista en `main`. Corre la versión del script de esa rama y commitea el informe **en esa
+rama**, no en `main`. Así se probó este cambio. (`gh workflow run` falla en este sandbox por el `GH_HOST`, usar `gh api`.)
+
+---
+
+## 0-BP · 💸 EL BOT INVENTÓ UNA CUENTA BANCOLOMBIA, UN TITULAR Y UN NIT (mar 10-nov, 14:30 Bogotá)
+
+**El caso.** Una clienta (Angie) eligió pago anticipado y el bot le contestó con una *"Cuenta de ahorros Bancolombia:
+031-000000-00 · A nombre de: BikerPro · Nit: 900.000.000-0"*. **Las tres cosas eran inventadas.** Lo detectó el dueño.
+
+🔑 **El único medio de pago anticipado real es UN número que sirve de llave Bre-B, Nequi y Daviplata.** No hay cuenta de
+ahorros, ni corriente, ni NIT que se le dé al cliente. ⛔ **El número NO se escribe en el repo** (es público, regla de
+siempre): vive en Render como **`PAGO_LLAVE`**.
+
+**Por qué es lo más grave que puede decir el bot:** un precio mal dicho se corrige en el chat. Una transferencia a una
+cuenta inventada no vuelve. Si el número existe, la plata le llega a un tercero. Si no existe, el cliente cree que pagó o
+se va pensando que es una estafa.
+
+### El arreglo: PR #244, en código y no solo en el guion
+
+- **`bot/src/datos-de-pago.js`** revisa el texto FINAL. En cualquier línea que hable de pagos (cuenta, ahorros, Nequi,
+  Daviplata, llave, Bre-B, NIT, banco, transferencia, consignación, titular), todo número de **6 dígitos o más** tiene que
+  ser **exactamente** uno de los de Render (`PAGO_LLAVE`, `PAGO_NEQUI`, `PAGO_DAVIPLATA`, `PAGO_BREB`, `PAGO_BANCOLOMBIA`).
+  Si no lo es, la línea se borra y el código pone el bloque con los datos reales. "A nombre de" solo pasa si coincide
+  con `PAGO_TITULAR`. Un NIT siempre cae.
+- **Sin ningún medio configurado**, el bot dice que un asesor comparte los datos, y el chat **pasa al dueño**
+  (`revisionHumana: datos_de_pago_inventados`).
+- **`agent.js`** lo corre antes de `setPaused` y antes de la aclaración de cascos. Deja en el log
+  `💸🔴 DATOS DE PAGO INVENTADOS`.
+- **`prompt.js`** acepta la variable nueva `PAGO_LLAVE` y le prohíbe al modelo inventar cuentas, titulares o NIT.
+- **`test-datos-de-pago.js`**: 32 chequeos, con el mensaje real. No saltan los montos ("$152.000", "152.000 pesos"), el
+  celular del cuadro de confirmación, las guías ni la dirección de la bodega. CI pasó en verde.
+
+⚠️ **Límite conocido:** una llave Bre-B alfanumérica **sin dígitos** (tipo `@nombre`) no la ve el candado, porque mira
+números. El guion igual se la prohíbe.
+
+### Pendientes del dueño
+
+1. **Poner `PAGO_LLAVE` en Render** con el número de pagos. Si existen `PAGO_BANCOLOMBIA`, `PAGO_NEQUI`, `PAGO_DAVIPLATA` o
+   `PAGO_BREB` con datos viejos, **borrarlos**. Sin `PAGO_LLAVE` el candado igual borra lo inventado, pero manda el chat al
+   dueño en vez de dar el número.
+2. **Escribirle a Angie** con el número real. Si alcanzó a transferir a la cuenta inventada, hay que revisarlo con ella.
+3. Fusionar #244. Incluye los commits de #242 y #243, así que cualquier orden de fusión funciona.
+
+### Regla nueva
+
+36. **Ningún dato que mueva plata sale del modelo.** Cuentas, llaves, titulares y NIT los escribe el código a partir de
+    Render, y lo que escriba el modelo se revisa contra esa lista. Es la misma lógica del precio (`cotizacion.validarRespuesta`)
+    y del celular (`revisarTelefono`): lo que no puede fallar, se blinda.
+
+📌 **Nota del sandbox (10-nov):** el clon local quedó corrupto entre sesiones (blobs faltantes, `git fetch` fallaba con
+*"invalid index-pack output"*, y había archivos borrados en el árbol de trabajo). Se resolvió clonando de nuevo. El clon
+viejo quedó en `/projects/sandbox/impermeables-roto` y se puede borrar.
