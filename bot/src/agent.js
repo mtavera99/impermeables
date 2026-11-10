@@ -8,6 +8,7 @@ const store = require("./store");
 const cotizacion = require("./cotizacion");
 const promesas = require("./promesas");
 const comercial = require("./comercial");
+const datosDePago = require("./datos-de-pago");
 const posventa = require("./posventa");
 const catalogo = require("./catalogo");
 const mediaCatalogo = require("./media");
@@ -1473,6 +1474,24 @@ async function generateReply(phone, userText) {
       );
       reply = cotizacion.respuestaEnRevision(bloqueado);
       revisionHumana = { motivo: "cierre_sobre_pedido_en_revision", detalle: motivos };
+    }
+  }
+
+  // ==========================================================================
+  // 💸 CANDADO DE DATOS DE PAGO (10-nov). El bot le inventó a una clienta una
+  // cuenta Bancolombia, un titular y un NIT. Cualquier número de pago que no sea
+  // uno de los de Render se borra y se ponen los reales. Si no hay ninguno
+  // configurado, el chat pasa al dueño. Ver datos-de-pago.js.
+  // ==========================================================================
+  {
+    const pago = datosDePago.corregir(reply);
+    if (pago.corregido) {
+      const detalle = pago.problemas.map((x) => x.motivo).join(" · ");
+      console.warn(`💸🔴 DATOS DE PAGO INVENTADOS para ${phone}: ${detalle}. Se reemplazan por los reales.`);
+      reply = pago.texto;
+      if (pago.sinDatosReales && !revisionHumana) {
+        revisionHumana = { motivo: "datos_de_pago_inventados", detalle };
+      }
     }
   }
 
