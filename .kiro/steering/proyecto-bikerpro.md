@@ -4,7 +4,8 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-11-03 03:30 Bogotá** — 🆕🆕 **sección 0-BO (al final): diagnóstico por anuncio de Q58
+Última actualización: **2026-11-10 14:30 Bogotá** — 🆕🆕 **sección 0-BP (al final): el bot inventó datos de pago; candado
+en código y `PAGO_LLAVE` en Render.** Antes, la **sección 0-BO: diagnóstico por anuncio de Q58
 y radios, con las recomendaciones del 3-nov.** Antes, la **sección 0-BN: PRs #231-#241 del 24 al
 31-oct (radios, plantilla desde el panel, anti-devolución con recordatorio pre-entrega y "no incluye cascos", y el
 ciclo de out-of-memory del 31-oct). Regla 34: este archivo se actualiza y se sube al final de cada sesión.
@@ -19,7 +20,7 @@ instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las 
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
 > últimas de este archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
 > 📌 **Regla 34:** al final de cada sesión o avance relevante, actualizar este archivo y hacer commit + push (PR propio).
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
@@ -46,6 +47,7 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BP** | 💸 **el bot inventó una cuenta Bancolombia, un titular y un NIT** (caso Angie) · el único medio real es **un número = llave Bre-B/Nequi/Daviplata**, en Render como **`PAGO_LLAVE`** (nunca en el repo) · candado en código `datos-de-pago.js` (PR #244) · **regla 36: ningún dato que mueva plata sale del modelo** | **10-nov** |
 | **0-BO** | 🔬 **Q58 y radios por anuncio, 14 días** · los dos Q58 "caros" (`Domiciliarios Q58 -`, `VIDEO Q58 -`) **están sanos** (28-29% del equilibrio): es el error #29 al revés · 🔴 **el que se rompió es Motorizados - Q58** (cierre 7,3% → 3,5% al subirlo a $29.000) · 🔴 **RADIO - Broad pierde** ($52.060/pedido vs $28.475) · 🥇 RADIO - Seguridad es el mejor · 🔴 Expancion - API recayó (96%) · el informe de CPA ya trae **tabla por anuncio con el equilibrio de sus propios pedidos** | **3-nov** |
 | **0-BN** | 🧠 **PRs #231-#241 (24 al 31-oct)** · radios: cantidad suelta, bucle de precio, "el lunes" no es ciudad, sin REVISAR por ciudad · panel: **«Mandar plantilla»** con la ventana cerrada · 🛡️ **anti-devolución (25,8% auditado en 99 Envíos):** recordatorio pre-entrega 24-48 h (**viene apagado**) y **"no incluye cascos"** en V10/Q58 · 🔴 **ciclo de OOM del 31-oct: cada lead nuevo leía el histórico de ~60 MB** → índice + lotes de 800 · triaje 142 → 46 · **reglas 34-35** | **3-nov** |
 | **0-BM** | 📻 **CUARTO PRODUCTO: RADIOS BF-777S** · $99.000 / $169.000 / $229.000 **con envío gratis** · costo $40.000/caja · **unidades = CAJAS** (1 caja = 2 radios) · "radio" singular no es señal (es la radio FM del Q58) · `/pedidos.csv` trae `producto` y `banda` y el CPA ya no adivina por el total · `ANUNCIOS_RADIO`, `SEGUIMIENTO_PLANTILLA_RADIO` | **23-oct** |
@@ -11514,3 +11516,54 @@ que habría mostrado lo de TEST Creativos. El informe de todos los días sigue m
 📌 **Trampa del repo corregida:** un `workflow_dispatch` **sí** se puede lanzar en una rama (`-f ref=<rama>`) vía la API
 REST, siempre que el workflow exista en `main`. Corre la versión del script de esa rama y commitea el informe **en esa
 rama**, no en `main`. Así se probó este cambio. (`gh workflow run` falla en este sandbox por el `GH_HOST`, usar `gh api`.)
+
+---
+
+## 0-BP · 💸 EL BOT INVENTÓ UNA CUENTA BANCOLOMBIA, UN TITULAR Y UN NIT (mar 10-nov, 14:30 Bogotá)
+
+**El caso.** Una clienta (Angie) eligió pago anticipado y el bot le contestó con una *"Cuenta de ahorros Bancolombia:
+031-000000-00 · A nombre de: BikerPro · Nit: 900.000.000-0"*. **Las tres cosas eran inventadas.** Lo detectó el dueño.
+
+🔑 **El único medio de pago anticipado real es UN número que sirve de llave Bre-B, Nequi y Daviplata.** No hay cuenta de
+ahorros, ni corriente, ni NIT que se le dé al cliente. ⛔ **El número NO se escribe en el repo** (es público, regla de
+siempre): vive en Render como **`PAGO_LLAVE`**.
+
+**Por qué es lo más grave que puede decir el bot:** un precio mal dicho se corrige en el chat. Una transferencia a una
+cuenta inventada no vuelve. Si el número existe, la plata le llega a un tercero. Si no existe, el cliente cree que pagó o
+se va pensando que es una estafa.
+
+### El arreglo: PR #244, en código y no solo en el guion
+
+- **`bot/src/datos-de-pago.js`** revisa el texto FINAL. En cualquier línea que hable de pagos (cuenta, ahorros, Nequi,
+  Daviplata, llave, Bre-B, NIT, banco, transferencia, consignación, titular), todo número de **6 dígitos o más** tiene que
+  ser **exactamente** uno de los de Render (`PAGO_LLAVE`, `PAGO_NEQUI`, `PAGO_DAVIPLATA`, `PAGO_BREB`, `PAGO_BANCOLOMBIA`).
+  Si no lo es, la línea se borra y el código pone el bloque con los datos reales. "A nombre de" solo pasa si coincide
+  con `PAGO_TITULAR`. Un NIT siempre cae.
+- **Sin ningún medio configurado**, el bot dice que un asesor comparte los datos, y el chat **pasa al dueño**
+  (`revisionHumana: datos_de_pago_inventados`).
+- **`agent.js`** lo corre antes de `setPaused` y antes de la aclaración de cascos. Deja en el log
+  `💸🔴 DATOS DE PAGO INVENTADOS`.
+- **`prompt.js`** acepta la variable nueva `PAGO_LLAVE` y le prohíbe al modelo inventar cuentas, titulares o NIT.
+- **`test-datos-de-pago.js`**: 32 chequeos, con el mensaje real. No saltan los montos ("$152.000", "152.000 pesos"), el
+  celular del cuadro de confirmación, las guías ni la dirección de la bodega. CI pasó en verde.
+
+⚠️ **Límite conocido:** una llave Bre-B alfanumérica **sin dígitos** (tipo `@nombre`) no la ve el candado, porque mira
+números. El guion igual se la prohíbe.
+
+### Pendientes del dueño
+
+1. **Poner `PAGO_LLAVE` en Render** con el número de pagos. Si existen `PAGO_BANCOLOMBIA`, `PAGO_NEQUI`, `PAGO_DAVIPLATA` o
+   `PAGO_BREB` con datos viejos, **borrarlos**. Sin `PAGO_LLAVE` el candado igual borra lo inventado, pero manda el chat al
+   dueño en vez de dar el número.
+2. **Escribirle a Angie** con el número real. Si alcanzó a transferir a la cuenta inventada, hay que revisarlo con ella.
+3. Fusionar #244. Incluye los commits de #242 y #243, así que cualquier orden de fusión funciona.
+
+### Regla nueva
+
+36. **Ningún dato que mueva plata sale del modelo.** Cuentas, llaves, titulares y NIT los escribe el código a partir de
+    Render, y lo que escriba el modelo se revisa contra esa lista. Es la misma lógica del precio (`cotizacion.validarRespuesta`)
+    y del celular (`revisarTelefono`): lo que no puede fallar, se blinda.
+
+📌 **Nota del sandbox (10-nov):** el clon local quedó corrupto entre sesiones (blobs faltantes, `git fetch` fallaba con
+*"invalid index-pack output"*, y había archivos borrados en el árbol de trabajo). Se resolvió clonando de nuevo. El clon
+viejo quedó en `/projects/sandbox/impermeables-roto` y se puede borrar.
