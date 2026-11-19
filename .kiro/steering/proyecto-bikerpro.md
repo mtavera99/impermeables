@@ -4,8 +4,9 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-11-10 14:30 Bogotá** — 🆕🆕 **sección 0-BP (al final): el bot inventó datos de pago; candado
-en código y `PAGO_LLAVE` en Render.** Antes, la **sección 0-BO: diagnóstico por anuncio de Q58
+Última actualización: **2026-11-19 16:30 Bogotá** — 🆕🆕 **sección 0-BQ (al final): auditoría de Meta por anuncio y
+plan de presupuestos en fases.** Antes, 0-BP: el bot inventó datos de pago; candado en código y `PAGO_LLAVE` en Render.
+Antes, la **sección 0-BO: diagnóstico por anuncio de Q58
 y radios, con las recomendaciones del 3-nov.** Antes, la **sección 0-BN: PRs #231-#241 del 24 al
 31-oct (radios, plantilla desde el panel, anti-devolución con recordatorio pre-entrega y "no incluye cascos", y el
 ciclo de out-of-memory del 31-oct). Regla 34: este archivo se actualiza y se sube al final de cada sesión.
@@ -20,7 +21,7 @@ instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las 
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BQ`, `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
 > últimas de este archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
 > 📌 **Regla 34:** al final de cada sesión o avance relevante, actualizar este archivo y hacer commit + push (PR propio).
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
@@ -47,6 +48,7 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BQ** | 🔬 **auditoría de Meta 30/14/7 días** ([`AUDITORIA-META-19NOV.md`](../../AUDITORIA-META-19NOV.md)) · 🔴 **ACOMPAÑANTE - Copia, #1 del Excel por mensaje, cierra 1% y pierde** · VIDEO INTER (#11 del Excel) es el mejor de la cuenta · pausar 3, recortar 5, +20% a 5 (4 son video) · $444.000 → $364.000 en fase 1 · **60-80 pedidos/día no salen de mover presupuesto** · **regla 37** | **19-nov** |
 | **0-BP** | 💸 **el bot inventó una cuenta Bancolombia, un titular y un NIT** (caso Angie) · el único medio real es **un número = llave Bre-B/Nequi/Daviplata**, en Render como **`PAGO_LLAVE`** (nunca en el repo) · candado en código `datos-de-pago.js` (PR #244) · **regla 36: ningún dato que mueva plata sale del modelo** | **10-nov** |
 | **0-BO** | 🔬 **Q58 y radios por anuncio, 14 días** · los dos Q58 "caros" (`Domiciliarios Q58 -`, `VIDEO Q58 -`) **están sanos** (28-29% del equilibrio): es el error #29 al revés · 🔴 **el que se rompió es Motorizados - Q58** (cierre 7,3% → 3,5% al subirlo a $29.000) · 🔴 **RADIO - Broad pierde** ($52.060/pedido vs $28.475) · 🥇 RADIO - Seguridad es el mejor · 🔴 Expancion - API recayó (96%) · el informe de CPA ya trae **tabla por anuncio con el equilibrio de sus propios pedidos** | **3-nov** |
 | **0-BN** | 🧠 **PRs #231-#241 (24 al 31-oct)** · radios: cantidad suelta, bucle de precio, "el lunes" no es ciudad, sin REVISAR por ciudad · panel: **«Mandar plantilla»** con la ventana cerrada · 🛡️ **anti-devolución (25,8% auditado en 99 Envíos):** recordatorio pre-entrega 24-48 h (**viene apagado**) y **"no incluye cascos"** en V10/Q58 · 🔴 **ciclo de OOM del 31-oct: cada lead nuevo leía el histórico de ~60 MB** → índice + lotes de 800 · triaje 142 → 46 · **reglas 34-35** | **3-nov** |
@@ -11567,3 +11569,57 @@ números. El guion igual se la prohíbe.
 📌 **Nota del sandbox (10-nov):** el clon local quedó corrupto entre sesiones (blobs faltantes, `git fetch` fallaba con
 *"invalid index-pack output"*, y había archivos borrados en el árbol de trabajo). Se resolvió clonando de nuevo. El clon
 viejo quedó en `/projects/sandbox/impermeables-roto` y se puede borrar.
+
+---
+
+## 0-BQ · 🔬 AUDITORÍA DE META, 30/14/7 DÍAS: EL "MEJOR" ANUNCIO DEL EXCEL ES EL QUE PIERDE (jue 19-nov, 16:30 Bogotá)
+
+> **Documento completo para Santiago: [`AUDITORIA-META-19NOV.md`](../../AUDITORIA-META-19NOV.md).** Esta sección es el resumen.
+
+**El pedido:** auditoría completa de los 17 conjuntos, con la meta de pasar de 40-50 a 60-80 pedidos/día. Llegó con los
+Excels de Meta ordenados por **costo por mensaje**, que el Excel llama "CPA".
+
+**Cómo se midió:** `cpa-por-producto.py` en 30, 14 y 7 días cerrados, corrido por el workflow en la rama `auditoria-19nov`.
+El 100% del gasto quedó atribuido y no hubo pedidos sin clasificar.
+
+### 🔴 Error #29 por tercera vez: el ranking por mensaje está al revés
+
+- **ACOMPAÑANTE - Copia** (Domiciliarios - Expancion - Q58) era el **#1 del Excel ($288/mensaje)**. En 14 días cierra
+  **1,0%**, CPA **$29.577 = 97%** de su equilibrio, y en 7 días **113%**: pierde plata.
+- **VIDEO INTERCOMUNICADORES** era el **#11 del Excel ($648)**. Cierra **10,9%**, CPA **$6.361 = 23%**: es el mejor de la cuenta.
+- SON DOS (#13) y COMBO X4 SEGURIDAD (#15) también están entre los que más ganan.
+
+📌 **Regla 37:** el "CPA" de los Excels de Meta es costo por mensaje. **Toda decisión de presupuesto sale de
+`CPA-POR-PRODUCTO.md` (tabla por anuncio).** Si llega un ranking por mensaje, se traduce antes de opinar.
+
+### Foto (7 días vs 30)
+
+36 pedidos/día atribuidos (39,4 en 30 d) con más gasto ($461.600 vs $427.856/día). Utilidad **$560.475/día** (30 d:
+$639.221). **Q58 cayó a colchón 1,7×** (CPA 7 d $18.359) e **impermeable a 1,6×**. V10 sigue 3,2× y radios mejoró a 2,4×.
+
+### Recomendación entregada (Santiago ejecuta, regla 4-B)
+
+- ⛔ **Pausar:** Expancion - Q58 (ACOMPAÑANTE - Copia) · Expancion - API (Fondo azul impermeable, 92/94/114%, tercera vez
+  que aparece) · RADIO - Broad (143% en 30 d).
+- ✂️ **Recortar:** TEST $20.000 → $10.000 · RADIO - Moteros $35.000 → $20.000 (vende el x2: equilibrio $30.000) ·
+  Domiciliarios Q58 - $25.000 → $20.000 · Motorizados - INTER $25.000 → $20.000 · Motorizados - Q58 $29.000 → $24.000.
+- 🟢 **+20%:** VIDEO INTER $36.000 → $43.000 · Expancion - INTER $25.000 → $30.000 · RADIO - Seguridad $40.000 → $48.000 ·
+  VIDEO Q58 $25.000 → $30.000 · VIDEO impermeable $20.000 → $24.000. **Cuatro de los cinco ganadores son video.**
+- Total **$444.000 → $364.000** (fase 1). Fase 2 (22-23 nov) y fase 3 (~26-nov): otro +20% a los ganadores que sigan
+  debajo del 50% de su equilibrio, hasta volver a ~$440.000.
+- 🔑 **60-80 pedidos/día no se alcanzan moviendo presupuesto:** con elasticidad 0,63 haría falta ~3× la pauta. Las
+  palancas reales son re-contacto, cierre, devolución y creativos nuevos ganadores (sección 6 del documento).
+
+### Lo que quedó abierto
+
+1. Las recomendaciones del **3-nov (0-BO) no se aplicaron**: Broad, VERDE LIMA y Expancion - API siguieron igual.
+   Preguntarle a Santiago si fue una decisión.
+2. ACOMPAÑANTE original: el $/conv se cuadruplicó desde el 31-oct. La causa sigue sin saberse.
+3. Brecha entre pedidos atribuidos (~36-40/día) y despachados (40-50): venta orgánica o manual, no medida.
+4. Devolución: el dueño la estima en 22-25%. Los informes usan 22,8%.
+5. Creativos a crear, en orden: video Q58 tipo SON DOS · ACOMPAÑANTE con precio · radios Seguridad en video · x4 para
+   moteros · segundo video de impermeable. Cada uno en su propio conjunto a $10.000-15.000, veredicto a 7 días por CPA por
+   pedido, y el ID en `ANUNCIOS_*` de Render el mismo día.
+
+📌 **Sandbox:** el clon local volvió a aparecer corrupto (blobs faltantes) entre sesiones. **Al arrancar una sesión,
+si `git pull` falla con "unable to read tree", clonar de nuevo** en vez de intentar repararlo.
