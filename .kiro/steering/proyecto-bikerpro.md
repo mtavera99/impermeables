@@ -4,8 +4,9 @@
 > Léelo entero antes de trabajar. Si se pierde un chat, aquí está TODO para continuar sin empezar de cero.
 > Cada vez que haya avances, actualízalo y súbelo a GitHub.
 
-Última actualización: **2026-11-10 14:30 Bogotá** — 🆕🆕 **sección 0-BP (al final): el bot inventó datos de pago; candado
-en código y `PAGO_LLAVE` en Render.** Antes, la **sección 0-BO: diagnóstico por anuncio de Q58
+Última actualización: **2026-11-19 20:30 Bogotá** — 🆕🆕 **sección 0-BR (al final): embudo de cierre del bot con 1.501 chats
+reales y las 8 fugas.** Antes, 0-BQ: auditoría de Meta por anuncio y plan de presupuestos en fases. Antes, 0-BP: el bot inventó datos de pago; candado en código y `PAGO_LLAVE` en Render.
+Antes, la **sección 0-BO: diagnóstico por anuncio de Q58
 y radios, con las recomendaciones del 3-nov.** Antes, la **sección 0-BN: PRs #231-#241 del 24 al
 31-oct (radios, plantilla desde el panel, anti-devolución con recordatorio pre-entrega y "no incluye cascos", y el
 ciclo de out-of-memory del 31-oct). Regla 34: este archivo se actualiza y se sube al final de cada sesión.
@@ -20,7 +21,7 @@ instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las 
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BT`, `0-BS`, `0-BR`, `0-BQ`, `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
 > últimas de este archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
 > 📌 **Regla 34:** al final de cada sesión o avance relevante, actualizar este archivo y hacer commit + push (PR propio).
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
@@ -47,6 +48,10 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BT** | 💸 **descuento de rescate** solo si objeta el precio o se va ("no gracias", "lo voy a pensar"): Q58 combo y radios x4/x6 $5.000 · radios x2 $3.000 · V10 y Q58 unidad nada · impermeable igual que siempre · 🧪 **A/B del cierre**: último dígito par = "¿te sirve?", impar = "¿a nombre de quién te lo envío?" · `AB_CIERRE_ASUMIDO=0` lo apaga | **19-nov** |
+| **0-BS** | 🛑 **"no gracias" ya corta el seguimiento** (`rechazo.js` familia 5, con guardas: compró / oferta extra / pero / posventa) · 50 de 2.423 chats reales · el bot ya no puede decir "estamos en Medellín" · 📋 **decisiones del dueño:** Interrapidísimo deja abrir el paquete, despacho programado sí, descuento de último recurso, catálogo sí, casco ya resuelto en anuncios | **19-nov** |
+| **0-BR** | 💬 **embudo de cierre del bot** ([`ANALISIS-CIERRE-BOT-19NOV.md`](../../ANALISIS-CIERRE-BOT-19NOV.md)) · 1.501 chats: cierre **5,3%** · 🔴 **la fuga es total → cuadro (16%)**, el cuadro confirma 83% · "¿te sirve ese total?" 33% de abandono vs 21% pidiendo datos · cotiza envíos a "Siii"/"Muy caros" (~8%) · 🔴 `rechazo.js` no detecta "no gracias" → el seguimiento insiste e insultan · 3% cree que el intercom trae casco · dijo Medellín 4 veces · **regla 38** | **19-nov** |
+| **0-BQ** | 🔬 **auditoría de Meta 30/14/7 días** ([`AUDITORIA-META-19NOV.md`](../../AUDITORIA-META-19NOV.md)) · 🔴 **ACOMPAÑANTE - Copia, #1 del Excel por mensaje, cierra 1% y pierde** · VIDEO INTER (#11 del Excel) es el mejor de la cuenta · pausar 3, recortar 5, +20% a 5 (4 son video) · $444.000 → $364.000 en fase 1 · **60-80 pedidos/día no salen de mover presupuesto** · **regla 37** | **19-nov** |
 | **0-BP** | 💸 **el bot inventó una cuenta Bancolombia, un titular y un NIT** (caso Angie) · el único medio real es **un número = llave Bre-B/Nequi/Daviplata**, en Render como **`PAGO_LLAVE`** (nunca en el repo) · candado en código `datos-de-pago.js` (PR #244) · **regla 36: ningún dato que mueva plata sale del modelo** | **10-nov** |
 | **0-BO** | 🔬 **Q58 y radios por anuncio, 14 días** · los dos Q58 "caros" (`Domiciliarios Q58 -`, `VIDEO Q58 -`) **están sanos** (28-29% del equilibrio): es el error #29 al revés · 🔴 **el que se rompió es Motorizados - Q58** (cierre 7,3% → 3,5% al subirlo a $29.000) · 🔴 **RADIO - Broad pierde** ($52.060/pedido vs $28.475) · 🥇 RADIO - Seguridad es el mejor · 🔴 Expancion - API recayó (96%) · el informe de CPA ya trae **tabla por anuncio con el equilibrio de sus propios pedidos** | **3-nov** |
 | **0-BN** | 🧠 **PRs #231-#241 (24 al 31-oct)** · radios: cantidad suelta, bucle de precio, "el lunes" no es ciudad, sin REVISAR por ciudad · panel: **«Mandar plantilla»** con la ventana cerrada · 🛡️ **anti-devolución (25,8% auditado en 99 Envíos):** recordatorio pre-entrega 24-48 h (**viene apagado**) y **"no incluye cascos"** en V10/Q58 · 🔴 **ciclo de OOM del 31-oct: cada lead nuevo leía el histórico de ~60 MB** → índice + lotes de 800 · triaje 142 → 46 · **reglas 34-35** | **3-nov** |
@@ -11567,3 +11572,207 @@ números. El guion igual se la prohíbe.
 📌 **Nota del sandbox (10-nov):** el clon local quedó corrupto entre sesiones (blobs faltantes, `git fetch` fallaba con
 *"invalid index-pack output"*, y había archivos borrados en el árbol de trabajo). Se resolvió clonando de nuevo. El clon
 viejo quedó en `/projects/sandbox/impermeables-roto` y se puede borrar.
+
+---
+
+## 0-BQ · 🔬 AUDITORÍA DE META, 30/14/7 DÍAS: EL "MEJOR" ANUNCIO DEL EXCEL ES EL QUE PIERDE (jue 19-nov, 16:30 Bogotá)
+
+> **Documento completo para Santiago: [`AUDITORIA-META-19NOV.md`](../../AUDITORIA-META-19NOV.md).** Esta sección es el resumen.
+
+**El pedido:** auditoría completa de los 17 conjuntos, con la meta de pasar de 40-50 a 60-80 pedidos/día. Llegó con los
+Excels de Meta ordenados por **costo por mensaje**, que el Excel llama "CPA".
+
+**Cómo se midió:** `cpa-por-producto.py` en 30, 14 y 7 días cerrados, corrido por el workflow en la rama `auditoria-19nov`.
+El 100% del gasto quedó atribuido y no hubo pedidos sin clasificar.
+
+### 🔴 Error #29 por tercera vez: el ranking por mensaje está al revés
+
+- **ACOMPAÑANTE - Copia** (Domiciliarios - Expancion - Q58) era el **#1 del Excel ($288/mensaje)**. En 14 días cierra
+  **1,0%**, CPA **$29.577 = 97%** de su equilibrio, y en 7 días **113%**: pierde plata.
+- **VIDEO INTERCOMUNICADORES** era el **#11 del Excel ($648)**. Cierra **10,9%**, CPA **$6.361 = 23%**: es el mejor de la cuenta.
+- SON DOS (#13) y COMBO X4 SEGURIDAD (#15) también están entre los que más ganan.
+
+📌 **Regla 37:** el "CPA" de los Excels de Meta es costo por mensaje. **Toda decisión de presupuesto sale de
+`CPA-POR-PRODUCTO.md` (tabla por anuncio).** Si llega un ranking por mensaje, se traduce antes de opinar.
+
+### Foto (7 días vs 30)
+
+36 pedidos/día atribuidos (39,4 en 30 d) con más gasto ($461.600 vs $427.856/día). Utilidad **$560.475/día** (30 d:
+$639.221). **Q58 cayó a colchón 1,7×** (CPA 7 d $18.359) e **impermeable a 1,6×**. V10 sigue 3,2× y radios mejoró a 2,4×.
+
+### Recomendación entregada (Santiago ejecuta, regla 4-B)
+
+- ⛔ **Pausar:** Expancion - Q58 (ACOMPAÑANTE - Copia) · Expancion - API (Fondo azul impermeable, 92/94/114%, tercera vez
+  que aparece) · RADIO - Broad (143% en 30 d).
+- ✂️ **Recortar:** TEST $20.000 → $10.000 · RADIO - Moteros $35.000 → $20.000 (vende el x2: equilibrio $30.000) ·
+  Domiciliarios Q58 - $25.000 → $20.000 · Motorizados - INTER $25.000 → $20.000 · Motorizados - Q58 $29.000 → $24.000.
+- 🟢 **+20%:** VIDEO INTER $36.000 → $43.000 · Expancion - INTER $25.000 → $30.000 · RADIO - Seguridad $40.000 → $48.000 ·
+  VIDEO Q58 $25.000 → $30.000 · VIDEO impermeable $20.000 → $24.000. **Cuatro de los cinco ganadores son video.**
+- Total **$444.000 → $364.000** (fase 1). Fase 2 (22-23 nov) y fase 3 (~26-nov): otro +20% a los ganadores que sigan
+  debajo del 50% de su equilibrio, hasta volver a ~$440.000.
+- 🔑 **60-80 pedidos/día no se alcanzan moviendo presupuesto:** con elasticidad 0,63 haría falta ~3× la pauta. Las
+  palancas reales son re-contacto, cierre, devolución y creativos nuevos ganadores (sección 6 del documento).
+
+### Lo que quedó abierto
+
+1. Las recomendaciones del **3-nov (0-BO) no se aplicaron**: Broad, VERDE LIMA y Expancion - API siguieron igual.
+   Preguntarle a Santiago si fue una decisión.
+2. ACOMPAÑANTE original: el $/conv se cuadruplicó desde el 31-oct. La causa sigue sin saberse.
+3. Brecha entre pedidos atribuidos (~36-40/día) y despachados (40-50): venta orgánica o manual, no medida.
+4. Devolución: el dueño la estima en 22-25%. Los informes usan 22,8%.
+5. Creativos a crear, en orden: video Q58 tipo SON DOS · ACOMPAÑANTE con precio · radios Seguridad en video · x4 para
+   moteros · segundo video de impermeable. Cada uno en su propio conjunto a $10.000-15.000, veredicto a 7 días por CPA por
+   pedido, y el ID en `ANUNCIOS_*` de Render el mismo día.
+
+📌 **Sandbox:** el clon local volvió a aparecer corrupto (blobs faltantes) entre sesiones. **Al arrancar una sesión,
+si `git pull` falla con "unable to read tree", clonar de nuevo** en vez de intentar repararlo.
+
+---
+
+## 0-BR · 💬 EL EMBUDO DE CIERRE DEL BOT: LA VENTA SE PIERDE ENTRE EL TOTAL Y EL CUADRO (jue 19-nov, 20:30 Bogotá)
+
+> **Documento completo: [`ANALISIS-CIERRE-BOT-19NOV.md`](../../ANALISIS-CIERRE-BOT-19NOV.md).** Scripts en
+> `analisis/cierre-del-bot-19nov/` (sin datos; cómo bajar los chats cifrados en su `LEEME.md`).
+
+**El pedido:** Santiago ve el cierre en ~4% y quiere saber cómo subirlo sin exagerar.
+
+**Cómo se midió:** 2.423 chats activos bajados con `/chats-de-producto` (cifrados con RSA+AES en el Action y
+descifrados fuera del repo, en `/projects/sandbox/privado/`, que **no se commitea**). Para el cierre se usan los 1.501
+que nacieron entre 24 y 90 h antes. Venta = vio el cuadro y contestó sí/ok/confirmo. Da **5,3%**, igual que el cruce de
+`CPA-POR-PRODUCTO.md`, así que el proxy está calibrado.
+
+### El embudo
+
+contestan el 1er mensaje **55,6%** → reciben el total **39,2%** → ven el cuadro **6,3%** → confirman **5,3%**.
+🔴 **Total → cuadro es 16%: se pierden 494 de 589.** El cuadro confirma 83%. Q58 cierra 2,9% (en parte por el anuncio:
+ACOMPAÑANTE - Copia). La latencia no es problema: 2,5 s de mediana.
+
+### Las fugas (en orden de plata)
+
+1. **"¿Te sirve ese total?"** al final del total: el 33% no vuelve a escribir. Pidiendo los datos directamente: 21%.
+   Proponer **cierre asumido** ("¿a nombre de quién te lo envío?"), con prueba A/B. Es correlación, no prueba.
+2. **Pedir todos los datos juntos:** solo el 37% de 250 manda alguno. El impermeable pide 5 cosas en un mensaje.
+   Pedir de a uno, empezando por talla y color.
+3. **Cotiza a no-ciudades** ("Siii", "Presio", "Muy caros", "Pagos contraentregas", "Hay otros colorez", "Maneja addi",
+   "Cantones" por "cansones"): ~8% de los chats con total. `bandaDe()` devuelve `null` igual para Teorama y para "Siii",
+   y `resolverDestino` cae en `predeterminada` (banda E). **Falta la lista DANE de 1.122 municipios.**
+   Dato aparte: 36% de los totales salen con banda E por defecto (Girardot, Fusagasugá, Tuluá…), pero esos chats
+   cierran 19% y Bogotá 8%: el envío caro no frena en los pueblos.
+4. **Aplazamientos por plata** ("quincena", "la otra semana"): el bot suelta la venta. Con contraentrega no se paga hoy.
+   Propuesta: decirlo y ofrecer **despacho programado** (necesita OK de Santiago).
+5. 🔴 **`rechazo.evaluar()` no detecta "no gracias", "no estoy interesado", "ya lo compré", "ya dije que no".** El toque de
+   2 h les llega igual y contestan con insultos ("joda dije que no", "no sean fastidiosos…"). 42 chats en 4 días (2,8%),
+   1 compró. **Riesgo de reportes de spam y de la calidad del número.**
+6. **Cascos:** 11% de los chats de intercomunicadores habla de cascos y 3% cree que vienen incluidos (1 de 38 compró).
+   La aclaración de #238 está solo en el cuadro final. Ponerla también en el primer mensaje.
+7. **Sede:** dijo Bogotá 57 veces y **Medellín 4**. Es un dato inventado. Fijarlo en el guion y en el validador.
+8. **44% no contesta:** probar la foto del combo en el primer mensaje (A/B). Los que piden foto cierran 8,5% vs 5,0%,
+   pero puede ser autoselección.
+
+**Seguimiento (`/seguimiento`, acumulado):** 2 h 3.264 enviados → 2,6% compran · 20 h 2.464 → 2,1% · 44 h 1.580 → 2,6%.
+178 compras. ⚠️ Esos mensajes **no se guardan en el historial** (`seguimiento.js` no llama a `pushMsg`).
+
+**Meta realista:** 5,3% → ~6,5% en 3-4 semanas, unos 7 pedidos/día más sin tocar la pauta. **Un cambio por vez.**
+Orden propuesto: 5 y 7 (protegen, sin riesgo) → 1 con A/B → 2 → 3, 4 y 6.
+
+### Preguntas abiertas para Santiago
+¿Despacho programado? · ¿Se puede abrir el paquete antes de pagar? · ¿Descuento de cierre de $3.000 (0-U)? · ¿Hay catálogo?
+
+📌 **Regla 38:** el cierre se mide paso a paso con los chats reales (`/chats-de-producto`), nunca solo con el
+promedio. Un 5% puede esconder un paso que convierte al 83% y otro al 16%. Arreglar el que ya funciona no mueve nada.
+
+---
+
+## 0-BS · 🛑 "NO GRACIAS" CORTA EL SEGUIMIENTO · LA SEDE ES BOGOTÁ · DECISIONES DEL DUEÑO SOBRE EL CIERRE (jue 19-nov, 21:30 Bogotá)
+
+### Arreglos (fugas 5 y 7 de 0-BR)
+
+**1. `rechazo.js`, familia 5 ("desinterés").** Ahora marca `noMolestar` con "no gracias" (solo si es todo el mensaje,
+más cortesías), "no estoy interesado", "no me interesan", "ya lo compré / conseguí", "ya tengo uno", "ya (les) dije
+q(ue) no", "son muy aburridos / cansones / fastidiosos", "no sean fastidiosos", "no joda" e insultos.
+
+Lleva guardas, porque estas frases son más ambiguas que las de antes:
+- **Si ya compró** (`conv.compro`) **o tiene cualquier pedido no anulado** con ese teléfono, no se marca. Marcarlo le
+  apagaría el recordatorio pre-entrega, que respeta `noMolestar`.
+- **Si el bot acababa de ofrecer algo extra** ("¿querés agregar otro?"), un "no gracias" suelto es a eso.
+- **"pero"**, **condiciones** ("si no los puedo destapar…") y **posventa** (pregunta, guía, no funciona, no he podido,
+  conectar, bloqueado, daño) no se marcan.
+- Las familias de siempre ("no me escriban") siguen cortando aunque haya comprado.
+
+`rechazo.contextoDe(conv)` arma el contexto, y `server.js` se lo pasa a `evaluar`.
+
+**Medido contra los 2.423 chats:** marca 67 mensajes en **50 chats**. Ninguno de esos chats llegó después al cuadro.
+
+**2. `atencion.js` no se tocó.** Probé que `noMolestar` no tapara un caso de posventa en el panel, pero
+`test-posventa-soporte.js` defiende a propósito lo contrario (*"no molestar le gana a posventa"*). Se respetó esa
+decisión. Por eso las guardas de la familia 5 no marcan a quien compró ni frases de posventa.
+
+**3. `promesas.js`: sede.** `ciudadAfirmada()` es una sola función que usan `revisar` y `corregir`. Ve "estamos ubicados
+en", "despachamos desde" y "nuestra tienda queda en". Para no confundir "estamos en contacto" con una ciudad, la ciudad
+dicha tiene que estar en el tarifario. El reemplazo es *"Estamos en Bogotá y despachamos a todo el país 📦"*. El
+guion no se tocó, porque tiene techo de tokens.
+
+Prueba: `bot/test-rechazo-desinteres.js` (53 chequeos, frases textuales). `test-rechazo-y-promesas.js` sigue 154/154.
+
+### 📋 Decisiones del dueño (19-nov), para los próximos cambios del cierre
+
+| tema | decisión |
+|---|---|
+| **casco** | ✅ ya resuelto: se corrigieron los anuncios y la aclaración va en el último mensaje. **No tocar.** |
+| **abrir el paquete antes de pagar** | ✅ **sí, si va por Interrapidísimo.** Es la respuesta a la objeción "si no lo puedo destapar no me interesa" |
+| **despacho programado** (quincena) | ✅ **sí se puede.** Pendiente de diseñar: el bot toma los datos hoy y el pedido sale en la fecha |
+| **descuento de último recurso** | ✅ aprobado, **solo para recuperar una venta que se cae**. Hasta **$5.000** en los productos caros: combos grandes de radios, combo de 2 impermeables, combo Q58. ⛔ **NO** en el V10 ni en el impermeable suelto. ❓ falta confirmar si el combo x2 de radios ($99.000) entra, y si los $3.000 de 0-U siguen para algo |
+| **catálogo** | ✅ sí. Armarlo con las fotos de `docs/img` |
+| **los que no contestan el 1er mensaje (44%)** | ✅ le interesa: mandarles **la foto del producto que preguntaron + un mensaje que invite a comprar**. Es la base del toque de 2 h |
+
+Sobre el **cierre asumido**: el dueño no entendió la propuesta del A/B. Se le explicó en lenguaje simple. Pendiente su OK.
+
+---
+
+## 0-BT · 💸 DESCUENTO DE RESCATE Y 🧪 PRUEBA A/B DEL CIERRE (jue 19-nov, 23:00 Bogotá)
+
+### Decisión final del dueño sobre descuentos
+
+> *"La idea es que eso se aplique cuando ya el cliente literalmente dijo no gracias o cuando ya está muy caído…
+> que sea un filtro para solamente mejorar la tasa de conversión."*
+
+| producto | descuento de rescate |
+|---|---|
+| Q58 combo | **$5.000** |
+| radios x4 y x6 | **$5.000** |
+| radios x2 ($99.000) | **$3.000** (el producto barato) |
+| impermeable de 1 | $3.000 (`TOPE_DESCUENTO_1_UNIDAD`, igual que siempre) |
+| impermeable combo de 2 | **sin cambios:** sigue el precio de rescate por banda de `fletes.PROMO_2_RESCATE` (~$10.000). ❓ El dueño habló de $5.000 para este combo; no se tocó, hay que confirmarlo |
+| V10 (unidad y combo) | ⛔ **nada**: la utilidad es baja |
+| Q58 unidad | ⛔ nada (no se mencionó) |
+
+**Cómo está hecho:**
+- Los montos viven en `descuentoDeRescate` de `catalogo.js`.
+- `cotizarPorProductoMasEnvio` calcula `rescate = total − descuento`.
+- El modelo solo lo puede decir cuando `objecionDePrecio` está en true, que ahora también se activa con
+  `cotizacion.seEstaYendo()`: "no gracias", "no estoy interesado", "lo voy a pensar", "después te aviso", "voy a
+  esperar", "por ahora no". "Ya lo compré" no la activa.
+- `instruccionDeRescate` le pone el texto en el bloque de PRECIO: una sola vez, *"Para no dejarte ir, te hago un
+  descuento de $X: te queda en $Y en total"*.
+- El validador acepta el total rebajado y el monto de la rebaja **solo** con esa condición. Un descuento más grande
+  no pasa.
+- 🔑 **Se combina con 0-BS:** el "no gracias" marca `noMolestar` (se cortan los toques), pero la respuesta de ese
+  mismo turno ya puede llevar la oferta. Queda **una última oferta y después silencio**.
+- `seEstaYendo` también libera el rescate del impermeable, que antes solo salía con una queja de precio.
+
+Prueba: `bot/test-descuento-de-rescate.js` (35 chequeos).
+
+### 🧪 La prueba A/B del cierre después del total (aprobada)
+
+- **A** (último dígito del número PAR): el microcierre de siempre, *"¿Te sirve ese total?"*.
+- **B** (IMPAR): *"¿A nombre de quién te lo envío?"*, y después los datos de a uno.
+- Solo intercomunicadores y radios. El impermeable ya cerraba pidiendo los datos.
+- Va en el bloque de PRECIO (`instruccionDeCierre`), no en el guion. Se apaga con **`AB_CIERRE_ASUMIDO=0`** en Render.
+- Prueba: `bot/test-ab-cierre.js` (15). Medición: `analisis/cierre-del-bot-19nov/ab_cierre.py <desde>`.
+
+⚠️ **LA LÍNEA BASE YA DA DISTINTO.** Con los chats de ANTES del cambio (15 al 19-nov, A/A), los impares cierran 6,4% y
+los pares 5,2%: **1,2 puntos de diferencia sin haber cambiado nada.** Es el ruido de la muestra. **El veredicto es la
+diferencia B − A después del cambio, MENOS esa diferencia de antes**, y con ~150 chats con total por grupo como mínimo
+(~1 semana).
+
+📅 **Leer el A/B el ~27-nov.** Ojo: Black Friday (27-nov) mueve todo; si se puede, leer la semana 20-26.

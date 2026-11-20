@@ -1528,10 +1528,14 @@ function cotizarPorProductoMasEnvio({ producto, destino, uds, texto }) {
         ? producto.precios[1] * precio.uds - precio.precio || null
         : null,
     envioGratis: gratis,
-    // ⛔ El V10 NO tiene precio de negociación autorizado. El impermeable sí
-    // (tope de $3.000 y precios de rescate por banda, todos aprobados con márgenes
-    // medidos). Para el V10 no hay nada de eso, así que rebajar sería a ciegas.
-    rescate: null,
+    // 💸 El precio de rescate sale de `descuentoDeRescate` en catalogo.js (19-nov:
+    // Q58 combo $5.000, radios x2 $3.000 y x4/x6 $5.000). ⛔ El V10 no tiene: su
+    // utilidad es baja y el dueño lo excluyó. Solo se puede DECIR cuando el
+    // cliente objetó el precio o se está yendo (`objecionDePrecio` en el contexto).
+    rescate: (() => {
+      const d = Number((producto.descuentoDeRescate || {})[precio.uds]);
+      return Number.isFinite(d) && d > 0 && d < total ? total - d : null;
+    })(),
     comboDeRescate: null,
     politica: POLITICA_VERSION,
     creado: Date.now(),
@@ -1830,8 +1834,9 @@ function bloqueDeDatosRadio(cot, contexto = {}) {
     `· **TOTAL a pagar al recibir: ${fmt(cot.total)}** (el envío es GRATIS, ya está incluido)\n` +
     (cot.ahorro ? `· Ahorro contra comprar las cajas por separado: ${fmt(cot.ahorro)}\n` : "") +
     `\n⛔ NO recalcules nada. NO sumes ningún envío: es gratis.\n` +
-    `⛔ No hay descuentos: no negociés el precio.\n` +
-    `✅ Podés decirlo así: "${lineaDePrecioRadio(cot)}"`
+    instruccionDeRescate(cot, contexto) +
+    `✅ Podés decirlo así: "${lineaDePrecioRadio(cot)}"` +
+    instruccionDeCierre(cot, contexto)
   );
 }
 
@@ -1949,6 +1954,101 @@ function haySenalDeCompra(texto) {
   return RE_SENAL_DE_COMPRA.test(String(texto || ""));
 }
 
+// ============================================================================
+// 💸 EL DESCUENTO DE RESCATE DE INTERCOMUNICADORES Y RADIOS (19-nov)
+//
+// Pedido del dueño: un descuento chico SOLO "cuando el cliente literalmente dijo
+// no gracias o ya está muy caído", como filtro para no perder la venta. Nunca de
+// entrada: ofrecerlo a quien iba a comprar igual es regalar la plata.
+//
+//   Q58 combo ......... $5.000     radios x4 y x6 ... $5.000
+//   radios x2 ......... $3.000     V10 y Q58 unidad . nada
+//
+// El monto vive en `descuentoDeRescate` de catalogo.js. Acá solo se decide si el
+// modelo lo puede nombrar en este turno, con las mismas reglas del impermeable.
+// ============================================================================
+function instruccionDeRescate(cot, contexto = {}) {
+  if (!cot || !cot.rescate) return `⛔ No hay descuentos para este producto: no negociés el precio.\n`;
+  if (!contexto.objecionDePrecio) {
+    return `⛔ NO ofrezcas ni menciones ningún descuento: el cliente no objetó el precio ni se está yendo.\n`;
+  }
+  const rebaja = Number(cot.total) - Number(cot.rescate);
+  return (
+    `\n💬 ÚLTIMO RECURSO: el cliente objetó el precio o se está yendo. Podés ofrecer UNA sola vez ` +
+    `un descuento de ${fmt(rebaja)}: el total queda en **${fmt(cot.rescate)}**, contraentrega, ` +
+    `condicionado a dejar el pedido listo ahora.\n` +
+    `✅ Decilo así: "Para no dejarte ir, te hago un descuento de ${fmt(rebaja)}: te queda en ` +
+    `${fmt(cot.rescate)} en total y pagás al recibir. ¿Te lo despacho?"\n` +
+    `⛔ Si ya lo ofreciste en esta conversación, NO lo repitas ni ofrezcas otro precio. Si lo ` +
+    `rechaza, despedite con amabilidad y no insistas.\n`
+  );
+}
+
+// ============================================================================
+// 🚪 ¿EL CLIENTE SE ESTÁ YENDO? (19-nov)
+//
+// La otra mitad de la condición del rescate. La objeción de precio ya se
+// detectaba; esto suma al que se despide sin hablar de plata: "no gracias",
+// "no estoy interesado", "lo voy a pensar", "después te aviso". Son los
+// clientes "muy caídos" de los que habló el dueño.
+//
+// ⚠ "Ya lo compré" NO entra: ese ya compró en otro lado y un descuento no
+// cambia nada. Y una corrección ("no gracias, el negro mejor") tampoco.
+// ============================================================================
+const RE_SE_ESTA_YENDO =
+  /^\W*no+[\s,.!]*(muchas |mil |muy )?gracias\W*$|\bno (estoy|estamos) interesad|\b(lo|la|los) (voy a |vamos a )?pens(ar|amos|o)\b|\blo pienso\b|\b(despues|luego|mas tarde|otro dia|mas adelante) (te|les|le) (aviso|escribo|confirmo|digo)\b|\b(te|les) (aviso|confirmo) (despues|luego|mas tarde|mas adelante)\b|\bvoy a esperar\b|\bpor ahora no\b|\bahorita no\b|\bpor el momento no\b/;
+
+function seEstaYendo(mensajes) {
+  const plano = (s) =>
+    String(s || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  return (mensajes || []).some((m) => m && m.role === "user" && RE_SE_ESTA_YENDO.test(plano(m.content)));
+}
+
+// ============================================================================
+// 🧪 PRUEBA A/B DEL CIERRE DESPUÉS DEL TOTAL (19-nov, aprobada por el dueño)
+//
+// En 1.501 chats, cuando el mensaje del total terminaba en "¿Te sirve ese
+// total?" el 33% no volvió a escribir; cuando terminaba pidiendo un dato, el 21%
+// (ANALISIS-CIERRE-BOT-19NOV.md). Eso es una correlación: los chats no eran
+// iguales. Para saber si la frase es la causa, se reparte al azar:
+//
+//   A (control) ... el microcierre de siempre: "¿Te sirve ese total?"
+//   B (asumido) ... da el total y pide UN dato: "¿A nombre de quién te lo envío?"
+//
+// 🔑 El grupo sale del ÚLTIMO DÍGITO del número del chat: par = A, impar = B.
+// Es estable (el cliente no cambia de grupo entre mensajes) y se puede medir con
+// `/chats-de-producto`, que muestra los últimos 4 dígitos. Sin dígito = A.
+//
+// Solo intercomunicadores y radios: el impermeable ya cierra pidiendo los datos.
+// Se apaga con AB_CIERRE_ASUMIDO=0 en Render (todos vuelven a A).
+// ============================================================================
+function varianteDeCierre(phone) {
+  const apagado = ["0", "no", "off", "false", "apagado"].includes(
+    String(process.env.AB_CIERRE_ASUMIDO ?? "1").trim().toLowerCase()
+  );
+  if (apagado) return "A";
+  const m = String(phone || "").match(/(\d)\D*$/);
+  if (!m) return "A";
+  return Number(m[1]) % 2 === 0 ? "A" : "B";
+}
+
+function instruccionDeCierre(cot, contexto = {}) {
+  if (!cot || !cot.ok || varianteDeCierre(contexto.phone) !== "B") return "";
+  return (
+    `\n## 🧪 CÓMO TERMINAR EL MENSAJE DEL TOTAL (esta conversación)\n` +
+    `En ESTA conversación NO uses el microcierre ("¿Te sirve ese total?", "¿Te parece bien?"). ` +
+    `Ignorá esa sección del guion.\n` +
+    `✅ Dá el total y terminá pidiendo UN solo dato, como algo natural del proceso: ` +
+    `"¿A nombre de quién te lo envío?" Cuando lo dé, pedí el siguiente (celular, después la dirección).\n` +
+    `⚠ Solo en el mensaje donde das el total o cuando el cliente acepta. Si hace una pregunta ` +
+    `informativa, respondela y nada más: no lo persigas con datos.\n`
+  );
+}
+
 function bloqueDeDatosV10(cot, contexto = {}) {
   // 🔴 ANTES ESTE FALLBACK ERA `catalogo.de("intercom_v10_2x")`, y era una
   // bomba: si la ficha no resolvía, imprimía los PRECIOS DEL V10 en el bloque
@@ -2027,8 +2127,9 @@ function bloqueDeDatosV10(cot, contexto = {}) {
     `\n⛔ NO recalcules nada. NO sumes ni redondeés.\n` +
     `⛔ ${fmt(cot.producto)} es SOLO el producto: no lo presentes como el total.\n` +
     `⛔ El envío NO está incluido en el precio del producto, y NO es gratis.\n` +
-    `⛔ No hay descuentos para este producto: no negociés el precio.\n` +
-    `✅ Podés decirlo así: "${lineaDePrecioV10(cot)}"`
+    instruccionDeRescate(cot, contexto) +
+    `✅ Podés decirlo así: "${lineaDePrecioV10(cot)}"` +
+    instruccionDeCierre(cot, contexto)
   );
 }
 
@@ -2529,6 +2630,8 @@ function valoresPorRol(cot, contexto = {}) {
   if (Number.isFinite(Number(cot.ahorro)) && cot.ahorro) mapa.get("ahorro").add(Number(cot.ahorro));
   if (contexto.objecionDePrecio && cot.rescate) {
     mapa.get("descuento").add(Number(cot.rescate));
+    // Y el monto de la rebaja ("te hago un descuento de $5.000").
+    if (Number(cot.total) > Number(cot.rescate)) mapa.get("descuento").add(Number(cot.total) - Number(cot.rescate));
     // Un precio de negociación también se dice como total ("te queda en X").
     mapa.get("total").add(Number(cot.rescate));
   }
@@ -3558,6 +3661,10 @@ function hayObjecionDePrecio(mensajes, opciones = {}) {
 
 module.exports = {
   POLITICA_VERSION,
+  varianteDeCierre,
+  instruccionDeCierre,
+  seEstaYendo,
+  instruccionDeRescate,
   TOPE_DESCUENTO_1_UNIDAD,
   resolverDestino,
   resolverConDepartamento,
