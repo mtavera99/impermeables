@@ -21,7 +21,7 @@ instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las 
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BS`, `0-BR`, `0-BQ`, `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BT`, `0-BS`, `0-BR`, `0-BQ`, `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
 > últimas de este archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
 > 📌 **Regla 34:** al final de cada sesión o avance relevante, actualizar este archivo y hacer commit + push (PR propio).
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
@@ -48,6 +48,7 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BT** | 💸 **descuento de rescate** solo si objeta el precio o se va ("no gracias", "lo voy a pensar"): Q58 combo y radios x4/x6 $5.000 · radios x2 $3.000 · V10 y Q58 unidad nada · impermeable igual que siempre · 🧪 **A/B del cierre**: último dígito par = "¿te sirve?", impar = "¿a nombre de quién te lo envío?" · `AB_CIERRE_ASUMIDO=0` lo apaga | **19-nov** |
 | **0-BS** | 🛑 **"no gracias" ya corta el seguimiento** (`rechazo.js` familia 5, con guardas: compró / oferta extra / pero / posventa) · 50 de 2.423 chats reales · el bot ya no puede decir "estamos en Medellín" · 📋 **decisiones del dueño:** Interrapidísimo deja abrir el paquete, despacho programado sí, descuento de último recurso, catálogo sí, casco ya resuelto en anuncios | **19-nov** |
 | **0-BR** | 💬 **embudo de cierre del bot** ([`ANALISIS-CIERRE-BOT-19NOV.md`](../../ANALISIS-CIERRE-BOT-19NOV.md)) · 1.501 chats: cierre **5,3%** · 🔴 **la fuga es total → cuadro (16%)**, el cuadro confirma 83% · "¿te sirve ese total?" 33% de abandono vs 21% pidiendo datos · cotiza envíos a "Siii"/"Muy caros" (~8%) · 🔴 `rechazo.js` no detecta "no gracias" → el seguimiento insiste e insultan · 3% cree que el intercom trae casco · dijo Medellín 4 veces · **regla 38** | **19-nov** |
 | **0-BQ** | 🔬 **auditoría de Meta 30/14/7 días** ([`AUDITORIA-META-19NOV.md`](../../AUDITORIA-META-19NOV.md)) · 🔴 **ACOMPAÑANTE - Copia, #1 del Excel por mensaje, cierra 1% y pierde** · VIDEO INTER (#11 del Excel) es el mejor de la cuenta · pausar 3, recortar 5, +20% a 5 (4 son video) · $444.000 → $364.000 en fase 1 · **60-80 pedidos/día no salen de mover presupuesto** · **regla 37** | **19-nov** |
@@ -11725,3 +11726,53 @@ Prueba: `bot/test-rechazo-desinteres.js` (53 chequeos, frases textuales). `test-
 | **los que no contestan el 1er mensaje (44%)** | ✅ le interesa: mandarles **la foto del producto que preguntaron + un mensaje que invite a comprar**. Es la base del toque de 2 h |
 
 Sobre el **cierre asumido**: el dueño no entendió la propuesta del A/B. Se le explicó en lenguaje simple. Pendiente su OK.
+
+---
+
+## 0-BT · 💸 DESCUENTO DE RESCATE Y 🧪 PRUEBA A/B DEL CIERRE (jue 19-nov, 23:00 Bogotá)
+
+### Decisión final del dueño sobre descuentos
+
+> *"La idea es que eso se aplique cuando ya el cliente literalmente dijo no gracias o cuando ya está muy caído…
+> que sea un filtro para solamente mejorar la tasa de conversión."*
+
+| producto | descuento de rescate |
+|---|---|
+| Q58 combo | **$5.000** |
+| radios x4 y x6 | **$5.000** |
+| radios x2 ($99.000) | **$3.000** (el producto barato) |
+| impermeable de 1 | $3.000 (`TOPE_DESCUENTO_1_UNIDAD`, igual que siempre) |
+| impermeable combo de 2 | **sin cambios:** sigue el precio de rescate por banda de `fletes.PROMO_2_RESCATE` (~$10.000). ❓ El dueño habló de $5.000 para este combo; no se tocó, hay que confirmarlo |
+| V10 (unidad y combo) | ⛔ **nada**: la utilidad es baja |
+| Q58 unidad | ⛔ nada (no se mencionó) |
+
+**Cómo está hecho:**
+- Los montos viven en `descuentoDeRescate` de `catalogo.js`.
+- `cotizarPorProductoMasEnvio` calcula `rescate = total − descuento`.
+- El modelo solo lo puede decir cuando `objecionDePrecio` está en true, que ahora también se activa con
+  `cotizacion.seEstaYendo()`: "no gracias", "no estoy interesado", "lo voy a pensar", "después te aviso", "voy a
+  esperar", "por ahora no". "Ya lo compré" no la activa.
+- `instruccionDeRescate` le pone el texto en el bloque de PRECIO: una sola vez, *"Para no dejarte ir, te hago un
+  descuento de $X: te queda en $Y en total"*.
+- El validador acepta el total rebajado y el monto de la rebaja **solo** con esa condición. Un descuento más grande
+  no pasa.
+- 🔑 **Se combina con 0-BS:** el "no gracias" marca `noMolestar` (se cortan los toques), pero la respuesta de ese
+  mismo turno ya puede llevar la oferta. Queda **una última oferta y después silencio**.
+- `seEstaYendo` también libera el rescate del impermeable, que antes solo salía con una queja de precio.
+
+Prueba: `bot/test-descuento-de-rescate.js` (35 chequeos).
+
+### 🧪 La prueba A/B del cierre después del total (aprobada)
+
+- **A** (último dígito del número PAR): el microcierre de siempre, *"¿Te sirve ese total?"*.
+- **B** (IMPAR): *"¿A nombre de quién te lo envío?"*, y después los datos de a uno.
+- Solo intercomunicadores y radios. El impermeable ya cerraba pidiendo los datos.
+- Va en el bloque de PRECIO (`instruccionDeCierre`), no en el guion. Se apaga con **`AB_CIERRE_ASUMIDO=0`** en Render.
+- Prueba: `bot/test-ab-cierre.js` (15). Medición: `analisis/cierre-del-bot-19nov/ab_cierre.py <desde>`.
+
+⚠️ **LA LÍNEA BASE YA DA DISTINTO.** Con los chats de ANTES del cambio (15 al 19-nov, A/A), los impares cierran 6,4% y
+los pares 5,2%: **1,2 puntos de diferencia sin haber cambiado nada.** Es el ruido de la muestra. **El veredicto es la
+diferencia B − A después del cambio, MENOS esa diferencia de antes**, y con ~150 chats con total por grupo como mínimo
+(~1 semana).
+
+📅 **Leer el A/B el ~27-nov.** Ojo: Black Friday (27-nov) mueve todo; si se puede, leer la semana 20-26.
