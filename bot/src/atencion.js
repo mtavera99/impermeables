@@ -240,7 +240,10 @@ function evaluar(tel, c) {
   }
 
   // 9. Pidió que no le escriban: no es urgencia, es para NO tocarlo.
-  if (c.noMolestar) {
+  // ⚠ 19-nov: salvo que sea un caso de posventa. "Ya compré un Q58 y se quedó
+  // bloqueado" es un cliente con un problema; que no quiera más ofertas no
+  // significa que su reclamo deba desaparecer del panel.
+  if (c.noMolestar && !soporte.necesita) {
     return { nivel: null, puntos: 0, motivos: ["pidió no ser contactado"] };
   }
 

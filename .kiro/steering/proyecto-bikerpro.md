@@ -21,7 +21,7 @@ instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las 
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BR`, `0-BQ`, `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BS`, `0-BR`, `0-BQ`, `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
 > últimas de este archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
 > 📌 **Regla 34:** al final de cada sesión o avance relevante, actualizar este archivo y hacer commit + push (PR propio).
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
@@ -48,6 +48,7 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BS** | 🛑 **"no gracias" ya corta el seguimiento** (`rechazo.js` familia 5, con guardas: compró / oferta extra / pero / posventa) · 50 de 2.423 chats reales · el bot ya no puede decir "estamos en Medellín" · 📋 **decisiones del dueño:** Interrapidísimo deja abrir el paquete, despacho programado sí, descuento de último recurso, catálogo sí, casco ya resuelto en anuncios | **19-nov** |
 | **0-BR** | 💬 **embudo de cierre del bot** ([`ANALISIS-CIERRE-BOT-19NOV.md`](../../ANALISIS-CIERRE-BOT-19NOV.md)) · 1.501 chats: cierre **5,3%** · 🔴 **la fuga es total → cuadro (16%)**, el cuadro confirma 83% · "¿te sirve ese total?" 33% de abandono vs 21% pidiendo datos · cotiza envíos a "Siii"/"Muy caros" (~8%) · 🔴 `rechazo.js` no detecta "no gracias" → el seguimiento insiste e insultan · 3% cree que el intercom trae casco · dijo Medellín 4 veces · **regla 38** | **19-nov** |
 | **0-BQ** | 🔬 **auditoría de Meta 30/14/7 días** ([`AUDITORIA-META-19NOV.md`](../../AUDITORIA-META-19NOV.md)) · 🔴 **ACOMPAÑANTE - Copia, #1 del Excel por mensaje, cierra 1% y pierde** · VIDEO INTER (#11 del Excel) es el mejor de la cuenta · pausar 3, recortar 5, +20% a 5 (4 son video) · $444.000 → $364.000 en fase 1 · **60-80 pedidos/día no salen de mover presupuesto** · **regla 37** | **19-nov** |
 | **0-BP** | 💸 **el bot inventó una cuenta Bancolombia, un titular y un NIT** (caso Angie) · el único medio real es **un número = llave Bre-B/Nequi/Daviplata**, en Render como **`PAGO_LLAVE`** (nunca en el repo) · candado en código `datos-de-pago.js` (PR #244) · **regla 36: ningún dato que mueva plata sale del modelo** | **10-nov** |
@@ -11678,3 +11679,48 @@ Orden propuesto: 5 y 7 (protegen, sin riesgo) → 1 con A/B → 2 → 3, 4 y 6.
 
 📌 **Regla 38:** el cierre se mide paso a paso con los chats reales (`/chats-de-producto`), nunca solo con el
 promedio. Un 5% puede esconder un paso que convierte al 83% y otro al 16%. Arreglar el que ya funciona no mueve nada.
+
+---
+
+## 0-BS · 🛑 "NO GRACIAS" CORTA EL SEGUIMIENTO · LA SEDE ES BOGOTÁ · DECISIONES DEL DUEÑO SOBRE EL CIERRE (jue 19-nov, 21:30 Bogotá)
+
+### Arreglos (fugas 5 y 7 de 0-BR)
+
+**1. `rechazo.js`, familia 5 ("desinterés").** Ahora marca `noMolestar` con "no gracias" (solo si es todo el mensaje,
+más cortesías), "no estoy interesado", "no me interesan", "ya lo compré / conseguí", "ya tengo uno", "ya (les) dije
+q(ue) no", "son muy aburridos / cansones / fastidiosos", "no sean fastidiosos", "no joda" e insultos.
+
+Lleva guardas, porque estas frases son más ambiguas que las de antes:
+- **Si ya compró** (`conv.compro`) **o tiene cualquier pedido no anulado** con ese teléfono, no se marca. Marcarlo le
+  apagaría el recordatorio pre-entrega, que respeta `noMolestar`.
+- **Si el bot acababa de ofrecer algo extra** ("¿querés agregar otro?"), un "no gracias" suelto es a eso.
+- **"pero"**, **condiciones** ("si no los puedo destapar…") y **posventa** (pregunta, guía, no funciona, no he podido,
+  conectar, bloqueado, daño) no se marcan.
+- Las familias de siempre ("no me escriban") siguen cortando aunque haya comprado.
+
+`rechazo.contextoDe(conv)` arma el contexto, y `server.js` se lo pasa a `evaluar`.
+
+**Medido contra los 2.423 chats:** marca 67 mensajes en **50 chats**. Ninguno de esos chats llegó después al cuadro.
+
+**2. `atencion.js`:** `noMolestar` ya **no tapa un caso de posventa** en el panel ("ya compré un Q58 y se quedó
+bloqueado" tiene que seguir visible).
+
+**3. `promesas.js`: sede.** `ciudadAfirmada()` es una sola función que usan `revisar` y `corregir`. Ve "estamos ubicados
+en", "despachamos desde" y "nuestra tienda queda en". Para no confundir "estamos en contacto" con una ciudad, la ciudad
+dicha tiene que estar en el tarifario. El reemplazo es *"Estamos en Bogotá y despachamos a todo el país 📦"*. El
+guion no se tocó, porque tiene techo de tokens.
+
+Prueba: `bot/test-rechazo-desinteres.js` (54 chequeos, frases textuales). `test-rechazo-y-promesas.js` sigue 154/154.
+
+### 📋 Decisiones del dueño (19-nov), para los próximos cambios del cierre
+
+| tema | decisión |
+|---|---|
+| **casco** | ✅ ya resuelto: se corrigieron los anuncios y la aclaración va en el último mensaje. **No tocar.** |
+| **abrir el paquete antes de pagar** | ✅ **sí, si va por Interrapidísimo.** Es la respuesta a la objeción "si no lo puedo destapar no me interesa" |
+| **despacho programado** (quincena) | ✅ **sí se puede.** Pendiente de diseñar: el bot toma los datos hoy y el pedido sale en la fecha |
+| **descuento de último recurso** | ✅ aprobado, **solo para recuperar una venta que se cae**. Hasta **$5.000** en los productos caros: combos grandes de radios, combo de 2 impermeables, combo Q58. ⛔ **NO** en el V10 ni en el impermeable suelto. ❓ falta confirmar si el combo x2 de radios ($99.000) entra, y si los $3.000 de 0-U siguen para algo |
+| **catálogo** | ✅ sí. Armarlo con las fotos de `docs/img` |
+| **los que no contestan el 1er mensaje (44%)** | ✅ le interesa: mandarles **la foto del producto que preguntaron + un mensaje que invite a comprar**. Es la base del toque de 2 h |
+
+Sobre el **cierre asumido**: el dueño no entendió la propuesta del A/B. Se le explicó en lenguaje simple. Pendiente su OK.
