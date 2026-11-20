@@ -11702,15 +11702,16 @@ Lleva guardas, porque estas frases son más ambiguas que las de antes:
 
 **Medido contra los 2.423 chats:** marca 67 mensajes en **50 chats**. Ninguno de esos chats llegó después al cuadro.
 
-**2. `atencion.js`:** `noMolestar` ya **no tapa un caso de posventa** en el panel ("ya compré un Q58 y se quedó
-bloqueado" tiene que seguir visible).
+**2. `atencion.js` no se tocó.** Probé que `noMolestar` no tapara un caso de posventa en el panel, pero
+`test-posventa-soporte.js` defiende a propósito lo contrario (*"no molestar le gana a posventa"*). Se respetó esa
+decisión. Por eso las guardas de la familia 5 no marcan a quien compró ni frases de posventa.
 
 **3. `promesas.js`: sede.** `ciudadAfirmada()` es una sola función que usan `revisar` y `corregir`. Ve "estamos ubicados
 en", "despachamos desde" y "nuestra tienda queda en". Para no confundir "estamos en contacto" con una ciudad, la ciudad
 dicha tiene que estar en el tarifario. El reemplazo es *"Estamos en Bogotá y despachamos a todo el país 📦"*. El
 guion no se tocó, porque tiene techo de tokens.
 
-Prueba: `bot/test-rechazo-desinteres.js` (54 chequeos, frases textuales). `test-rechazo-y-promesas.js` sigue 154/154.
+Prueba: `bot/test-rechazo-desinteres.js` (53 chequeos, frases textuales). `test-rechazo-y-promesas.js` sigue 154/154.
 
 ### 📋 Decisiones del dueño (19-nov), para los próximos cambios del cierre
 

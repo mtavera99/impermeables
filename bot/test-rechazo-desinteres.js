@@ -94,10 +94,6 @@ const srv = fs.readFileSync(path.join(__dirname, "src", "server.js"), "utf8");
 chequear("server.js le pasa el contexto del chat", /rechazo\.evaluar\(text, ctxRechazo\)/.test(srv));
 chequear("server.js no marca noMolestar a quien tiene un pedido", /tienePedido[\s\S]{0,400}rechaza: false/.test(srv));
 
-// ── un caso de posventa no desaparece del panel aunque tenga noMolestar
-const at = fs.readFileSync(path.join(__dirname, "src", "atencion.js"), "utf8");
-chequear("atencion: noMolestar no tapa un caso de posventa", /c\.noMolestar && !soporte\.necesita/.test(at));
-
 // ── sede: "Estamos ubicados en Medellín" (4 veces en 4 días)
 const medellin = "Estamos ubicados en Medellín, desde donde despachamos todos nuestros pedidos a nivel nacional 📦\n\n¿Te parece bien el total de $152.000?";
 chequear("revisar ve 'Estamos ubicados en Medellín'",
