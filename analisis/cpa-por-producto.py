@@ -92,7 +92,8 @@ ACT = "act_4330882710457791"
 # ── Las columnas del CSV que SI se cargan. Todo lo demas se descarta al leer.
 # `producto` y `banda` (23-oct): los manda el bot desde que hay radios. Ninguna es
 # un dato personal: el id del producto y la letra de la banda de envio.
-COLUMNAS = ["estado", "dia_bogota", "talla", "color", "unidades", "total", "anuncio_id", "producto", "banda"]
+# `ciudad` sola no identifica a nadie: la usa la sección por departamento (geo_por_departamento.py).
+COLUMNAS = ["estado", "dia_bogota", "talla", "color", "unidades", "total", "anuncio_id", "producto", "banda", "ciudad"]
 
 # ══════════════════════════════════════════════════════════════════════════════
 # COSTOS — LA FUENTE DE VERDAD ESTA EN EL CODIGO DEL BOT, NO ACA
@@ -665,6 +666,16 @@ def construir(dias):
     L.append("")
 
     L.extend(seccion_por_anuncio(anuncios, pedidos, deAnuncio, equilibrio, desde, hasta))
+
+    # 🗺 Por departamento (21-nov). Si falla, el informe sale igual, sin esta sección.
+    try:
+        sys.path.insert(0, BASE)
+        import geo_por_departamento as geo
+        L.extend(geo.seccion(lector, ACT, desde.isoformat(), hasta.isoformat(), pedidos, deAnuncio, equilibrio, conv_de))
+    except SystemExit as e:
+        L.extend(["## 🗺 Por departamento", "", f"⚠️ No se pudo armar: {str(e)[:200]}", ""])
+    except Exception as e:
+        L.extend(["## 🗺 Por departamento", "", f"⚠️ No se pudo armar: {type(e).__name__}: {str(e)[:200]}", ""])
 
     # ── los supuestos, impresos. Una constante vieja tiene que VERSE.
     L.append("## Con que numeros se calculo")
