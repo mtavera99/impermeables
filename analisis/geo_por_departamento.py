@@ -70,10 +70,38 @@ def mapa_dane():
     return {"mun": mun, "deptos": deptos}, None
 
 
+# Respaldo para las ciudades que más piden, por si la fuente externa falla en ellas.
+CIUDADES_FIJAS = {
+    "medellin": "antioquia", "bello": "antioquia", "itagui": "antioquia", "envigado": "antioquia",
+    "rionegro": "antioquia", "sabaneta": "antioquia", "apartado": "antioquia", "caucasia": "antioquia",
+    "cartagena": "bolivar", "barranquilla": "atlantico", "soledad": "atlantico", "monteria": "cordoba",
+    "montelibano": "cordoba", "sahagun": "cordoba", "santa marta": "magdalena", "cienaga": "magdalena",
+    "valledupar": "cesar", "sincelejo": "sucre", "riohacha": "la guajira", "maicao": "la guajira",
+    "neiva": "huila", "pitalito": "huila", "ibague": "tolima", "armenia": "quindio", "pereira": "risaralda",
+    "dosquebradas": "risaralda", "manizales": "caldas", "cali": "valle del cauca", "palmira": "valle del cauca",
+    "tulua": "valle del cauca", "buga": "valle del cauca", "cartago": "valle del cauca", "jamundi": "valle del cauca",
+    "buenaventura": "valle del cauca", "villavicencio": "meta", "yopal": "casanare", "tunja": "boyaca",
+    "duitama": "boyaca", "sogamoso": "boyaca", "chia": "cundinamarca", "soacha": "cundinamarca",
+    "zipaquira": "cundinamarca", "fusagasuga": "cundinamarca", "girardot": "cundinamarca", "facatativa": "cundinamarca",
+    "bucaramanga": "santander", "floridablanca": "santander", "giron": "santander", "piedecuesta": "santander",
+    "barrancabermeja": "santander", "cucuta": "norte de santander", "pasto": "narino", "ipiales": "narino",
+    "tumaco": "narino", "popayan": "cauca", "florencia": "caqueta", "mocoa": "putumayo", "quibdo": "choco",
+    "arauca": "arauca", "leticia": "amazonas", "san jose del guaviare": "guaviare",
+}
+ALIAS_DEPTO = {"valle": "valle del cauca", "norte santander": "norte de santander", "guajira": "la guajira"}
+
+
 def depto_de_ciudad(ciudad, m):
     p = plano(ciudad)
     if not p:
         return None
+    for alias, d in ALIAS_DEPTO.items():
+        if re.search(rf"\b{alias}\b", p) and d not in p:
+            p = re.sub(rf"\b{alias}\b", d, p)
+    palabras0 = p.split()
+    for n in range(min(4, len(palabras0)), 0, -1):
+        if " ".join(palabras0[:n]) in CIUDADES_FIJAS:
+            return CIUDADES_FIJAS[" ".join(palabras0[:n])]
     # 1. el cliente nombró el departamento ("Pitalito Huila", "Teorama norte de santander")
     for d in sorted(m["deptos"], key=len, reverse=True):
         if d != "bogota" and re.search(rf"\b{re.escape(d)}\b", p):
@@ -275,7 +303,7 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
             f"{prods} | {sets_txt.replace('|', chr(92)+'|')} |"
         )
     if no_ubicadas:
-        top = sorted(no_ubicadas.items(), key=lambda kv: -kv[1])[:25]
+        top = sorted(no_ubicadas.items(), key=lambda kv: -kv[1])[:40]
         L.append("Ciudades que no se ubicaron (las más repetidas): " + ", ".join(f"{k} ({v})" for k, v in top))
         L.append("")
 
