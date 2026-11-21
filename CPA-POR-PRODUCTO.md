@@ -1,6 +1,6 @@
 # 🎯 CPA exacto por producto — BikerPro
 
-> **Ultima lectura: 2026-11-21 14:58 Bogota.** Ventana **2026-10-22 a 2026-11-20** (solo dias cerrados).
+> **Ultima lectura: 2026-11-21 15:01 Bogota.** Ventana **2026-10-22 a 2026-11-20** (solo dias cerrados).
 > Generado por `analisis/cpa-por-producto.py`. **Solo lectura** — regla 4-B.
 
 El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido guarda de que anuncio vino. No hay ninguna proporcion estimada en esta tabla.
@@ -11,14 +11,14 @@ El gasto se atribuye **por anuncio**, no por el nombre del conjunto: cada pedido
 |---|---|---|---|---|---|---|---|
 | **V10** | $3,142,813 | 5971 | 379 | **$8,292** | $526 | 6.35% | $46,108,000 |
 | **Q58** | $3,098,503 | 6324 | 263 | **$11,781** | $490 | 4.16% | $39,615,900 |
-| **RADIO** | $2,832,089 | 2402 | 148 | **$19,136** | $1,179 | 6.16% | $21,812,000 |
-| **IMPERMEABLE** | $3,819,213 | 7007 | 374 | **$10,212** | $545 | 5.34% | $34,505,900 |
+| **RADIO** | $2,832,096 | 2402 | 148 | **$19,136** | $1,179 | 6.16% | $21,812,000 |
+| **IMPERMEABLE** | $3,819,228 | 7007 | 374 | **$10,212** | $545 | 5.34% | $34,505,900 |
 
 ### 🔎 Cuanta confianza tienen estos numeros
 
 | | |
 |---|---|
-| gasto atribuido a un producto | **$12,892,618** (100.0%) |
+| gasto atribuido a un producto | **$12,892,640** (100.0%) |
 | gasto de anuncios sin pedidos en la ventana | $0 |
 | anuncios clasificados por la forma de sus pedidos | 26 |
 | anuncios con pedidos de MAS de un producto | 11 ⚠️ |
@@ -76,7 +76,7 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 | 2026-11-17 | $88,569 | 14 | $6,326 | $86,816 | 6 | $14,469 | $84,553 | 7 | $12,079 | $95,098 | 10 | $9,510 |
 | 2026-11-18 | $113,342 | 15 | $7,556 | $117,926 | 7 | $16,847 | $117,433 | 6 | $19,572 | $143,002 | 8 | $17,875 |
 | 2026-11-19 | $101,395 | 14 | $7,242 | $90,524 | 8 | $11,316 | $94,314 | 5 | $18,863 | $110,120 | 8 | $13,765 |
-| 2026-11-20 | $108,811 | 9 | $12,090 | $78,759 | 6 | $13,126 | $88,111 | 2 | $44,056 | $112,427 | 9 | $12,492 |
+| 2026-11-20 | $108,811 | 9 | $12,090 | $78,759 | 6 | $13,126 | $88,118 | 2 | $44,059 | $112,442 | 9 | $12,494 |
 
 ## Cada producto contra SU propio equilibrio
 
@@ -86,10 +86,10 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 |---|---|---|---|---|---|
 | **V10** | $36,908 | **$27,784** | $8,292 | 🟢 3.4x | $7,387,271 |
 | **Q58** | $41,053 | **$30,984** | $11,781 | 🟡 2.6x | $5,050,209 |
-| **RADIO** | $51,969 | **$39,411** | $19,136 | 🟡 2.1x | $3,000,745 |
-| **IMPERMEABLE** | $25,414 | **$18,911** | $10,212 | 🟡 1.9x | $3,253,350 |
+| **RADIO** | $51,969 | **$39,411** | $19,136 | 🟡 2.1x | $3,000,738 |
+| **IMPERMEABLE** | $25,414 | **$18,911** | $10,212 | 🟡 1.9x | $3,253,335 |
 
-**Utilidad de la ventana: $18,691,576** ($623,053/dia)
+**Utilidad de la ventana: $18,691,554** ($623,052/dia)
 
 ## Por anuncio (= por conjunto)
 
@@ -99,7 +99,7 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 
 | producto | conjunto | gasto | conv | ped | **CPA** | cierre | su equilibrio | % del equilibrio | CPA mitad 1 → 2 | cierre mitad 1 → 2 | $/conv mitad 1 → 2 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| IMPERMEABLE | Domiciliarios - API · _Fondo azul sin personaje - Copia_ | $1,045,837 | 1950 | 108 | **$9,684** | 5.5% | $17,452 | 🟡 55% | $10,081 → $9,315 | 4.5% → 7.0% | $456 → $652 |
+| IMPERMEABLE | Domiciliarios - API · _Fondo azul sin personaje - Copia_ | $1,045,852 | 1950 | 108 | **$9,684** | 5.5% | $17,452 | 🟡 55% | $10,081 → $9,315 | 4.5% → 7.0% | $456 → $652 |
 | IMPERMEABLE | Domiciliarios - Expancion - API · _Fondo azul sin personaje - API_ | $944,585 | 1438 | 56 | **$16,868** | 3.9% | $18,264 | 🔴 92% | $16,970 → $16,749 | 3.4% → 4.8% | $571 → $796 |
 | IMPERMEABLE | TEST Creativos - API · _Prueba social +50 clientes - Copia_ | $627,649 | 1078 | 43 | **$14,596** | 4.0% | $19,292 | 🔴 76% | $14,414 → $14,806 | 3.5% → 4.9% | $498 → $719 |
 | IMPERMEABLE | Domiciliarios VIDEO - API · _VIDEO - Copia_ | $604,011 | 1414 | 82 | **$7,366** | 5.8% | $20,854 | 🟢 35% | $6,736 → $8,096 | 5.3% → 6.5% | $356 → $530 |
@@ -109,7 +109,7 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 | Q58 | Domiciliarios Q58 - · _ACOMPAÑANTE_ | $741,301 | 1539 | 53 | **$13,987** | 3.4% | $30,828 | 🟢 45% | $11,561 → $17,683 | 2.7% → 6.1% | $309 → $1,083 |
 | Q58 | Domiciliarios - Expancion - Q58 · _ACOMPAÑANTE - Copia_ | $735,350 | 2546 | 45 | **$16,341** | 1.8% | $30,512 | 🟡 54% | $10,524 → $30,661 | 2.6% → 1.0% | $269 → $308 |
 | Q58 | Domiciliarios - Expancion - Q58 · _COMBO DOS_ | $56,188 | 56 | 3 | **$18,729** | 5.4% | $25,567 | 🟡 73% | $18,729 → — | 5.4% → — | $1,003 → — |
-| RADIO | RADIO - Seguridad / Negocios · _ANUNCIO 1 - COMBO X4 SEGURIDAD ($169.000)_ | $1,030,548 | 971 | 72 | **$14,313** | 7.4% | $43,916 | 🟢 33% | $19,086 → $12,213 | 5.0% → 9.5% | $950 → $1,154 |
+| RADIO | RADIO - Seguridad / Negocios · _ANUNCIO 1 - COMBO X4 SEGURIDAD ($169.000)_ | $1,030,555 | 971 | 72 | **$14,313** | 7.4% | $43,916 | 🟢 33% | $19,086 → $12,213 | 5.0% → 9.5% | $950 → $1,154 |
 | RADIO | RADIO - Moteros · _ANUNCIO 1 - COMBO X2 MOTEROS ($99.000)_ | $871,087 | 552 | 37 | **$23,543** | 6.7% | $30,279 | 🔴 78% | $21,019 → $25,688 | 6.8% → 6.6% | $1,429 → $1,701 |
 | RADIO | RADIO - Fincas · _ANUNCIO 1 - MEGACOMBO X6 FINCAS ($229.000)_ | $556,169 | 619 | 24 | **$23,174** | 3.9% | $45,153 | 🟡 51% | $26,140 → $21,055 | 3.2% → 4.6% | $825 → $976 |
 | RADIO | RADIO - Broad · _VIDEO RADIO_ | $374,285 | 260 | 10 | **$37,428** | 3.8% | $25,874 | 🔴 145% | $59,483 → $22,726 | 2.4% → 6.4% | $1,433 → $1,451 |
@@ -122,7 +122,7 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 
 | conjunto | 11-14 | 11-15 | 11-16 | 11-17 | 11-18 | 11-19 | 11-20 |
 |---|---|---|---|---|---|---|---|
-| IMPERMEABLE · Domiciliarios - API | $779 · 3 · $12,460 | $736 · 5 · $7,062 | $895 · 7 · $6,520 | $879 · 1 · $26,373 | $834 · 5 · $8,338 | $659 · 3 · $10,098 | $662 · 6 · $5,406 |
+| IMPERMEABLE · Domiciliarios - API | $779 · 3 · $12,460 | $736 · 5 · $7,062 | $895 · 7 · $6,520 | $879 · 1 · $26,373 | $834 · 5 · $8,338 | $659 · 3 · $10,098 | $662 · 6 · $5,408 |
 | IMPERMEABLE · Domiciliarios - Expancion - API | $1,193 · 1 · $32,210 | $1,162 · 1 · $30,213 | $1,056 · 6 · $6,686 | $834 · 1 · $21,675 | $879 · 1 · $34,265 | $859 · 3 · $8,021 | $1,010 · 1 · $19,181 |
 | IMPERMEABLE · TEST Creativos - API | $622 · 2 · $10,580 | $930 · 2 · $11,158 | $824 · 0 · — | $689 · 2 · $7,918 | $762 · 2 · $10,280 | $716 · 1 · $18,612 | $1,259 · 1 · $17,631 |
 | IMPERMEABLE · Domiciliarios VIDEO - API | $657 · 4 · $5,424 | $691 · 3 · $6,448 | $525 · 0 · — | $746 · 4 · $3,917 | $691 · 1 · $23,480 | $680 · 0 · — | $577 · 1 · $24,253 |
@@ -131,7 +131,7 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 | Q58 · Domiciliarios VIDEO Q58 - | $709 · 4 · $6,208 | $1,015 · 3 · $8,800 | $1,119 · 3 · $10,814 | $773 · 2 · $10,430 | $1,101 · 2 · $13,208 | $891 · 0 · — | $1,034 · 1 · $28,961 |
 | Q58 · Domiciliarios Q58 - | $1,913 · 0 · — | $1,204 · 1 · $27,681 | $1,195 · 0 · — | $1,035 · 2 · $9,311 | $1,137 · 2 · $14,206 | $1,133 · 2 · $11,334 | $1,364 · 3 · $7,728 |
 | Q58 · Domiciliarios - Expancion - Q58 | $372 · 0 · — | $331 · 1 · $33,383 | $303 · 1 · $36,954 | $319 · 0 · — | $298 · 2 · $15,353 | $326 · 0 · — | — |
-| RADIO · RADIO - Seguridad / Negocios | $1,219 · 2 · $18,279 | $1,185 · 1 · $40,278 | $1,584 · 5 · $11,406 | $1,322 · 2 · $15,858 | $1,114 · 4 · $11,136 | $1,121 · 4 · $9,806 | $2,170 · 1 · $47,750 |
+| RADIO · RADIO - Seguridad / Negocios | $1,219 · 2 · $18,279 | $1,185 · 1 · $40,278 | $1,584 · 5 · $11,406 | $1,322 · 2 · $15,858 | $1,114 · 4 · $11,136 | $1,121 · 4 · $9,806 | $2,171 · 1 · $47,757 |
 | RADIO · RADIO - Moteros | $1,535 · 2 · $16,882 | $2,037 · 0 · — | $1,613 · 2 · $22,577 | $1,801 · 5 · $5,763 | $1,565 · 1 · $39,114 | $1,834 · 1 · $31,173 | $1,890 · 0 · — |
 | RADIO · RADIO - Fincas | $1,038 · 0 · — | $887 · 0 · — | $1,274 · 3 · $8,919 | $1,080 · 0 · — | $1,358 · 1 · $23,094 | $756 · 0 · — | $608 · 0 · — |
 | RADIO · RADIO - Broad | $1,649 · 2 · $4,122 | $1,970 · 1 · $11,817 | $831 · 0 · — | $1,996 · 0 · — | $1,780 · 0 · — | $4,251 · 0 · — | — |
@@ -165,8 +165,8 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 
 | departamento | gasto | % del gasto | conv | $/conv | pedidos | % de pedidos | CPA aprox. | pedidos por producto | dónde gasta (conjunto: % del gasto del depto) |
 |---|---|---|---|---|---|---|---|---|---|
-| Antioquia | $5,092,013 | 39.4% | 0 | — | 85 | 11.0% | $59,906 | IMPERMEABLE 33, V10 19, Q58 18, RADIO 13, impermeable 1, radio_bf777s 1 | Domiciliarios - API: 15%; RADIO - Seguridad / Negocios: 14%; Domiciliarios VIDEO INTER - API: 12% |
-| Distrito Especial | $4,364,327 | 33.8% | 0 | — | 0 | 0.0% | sin pedidos | — | RADIO - Moteros: 17%; Motorizados - Q58: 14%; Motorizados - INTER: 14% |
+| Antioquia | $5,092,031 | 39.4% | 0 | — | 85 | 11.0% | $59,906 | IMPERMEABLE 33, V10 19, Q58 18, RADIO 13, impermeable 1, radio_bf777s 1 | Domiciliarios - API: 15%; RADIO - Seguridad / Negocios: 14%; Domiciliarios VIDEO INTER - API: 12% |
+| Distrito Especial | $4,364,331 | 33.8% | 0 | — | 118 | 15.3% | $36,986 | V10 38, Q58 36, IMPERMEABLE 33, intercom_v10_2x 4, RADIO 3, intercom_q58_max 2, radio_bf777s 2 | RADIO - Moteros: 17%; Motorizados - Q58: 14%; Motorizados - INTER: 14% |
 | Valle del Cauca | $1,398,239 | 10.8% | 0 | — | 103 | 13.4% | $13,575 | IMPERMEABLE 40, V10 34, Q58 13, RADIO 9, intercom_v10_2x 4, impermeable 3 | Domiciliarios - Expancion - API: 37%; Domiciliarios - Expancion - Q58: 22%; RADIO - Fincas: 21% |
 | Santander | $397,437 | 3.1% | 0 | — | 42 | 5.4% | $9,463 | V10 16, Q58 10, IMPERMEABLE 7, RADIO 5, intercom_v10_2x 3, impermeable 1 | Domiciliarios - Expancion - Q58: 35%; Domiciliarios - Expancion - INTER: 33%; Domiciliarios - Expancion - API: 17% |
 | Cundinamarca | $382,090 | 3.0% | 0 | — | 65 | 8.4% | $5,878 | V10 26, Q58 18, IMPERMEABLE 12, RADIO 6, impermeable 2, intercom_q58_max 1 | Domiciliarios VIDEO INTER - API: 20%; Domiciliarios VIDEO Q58 -: 17%; Domiciliarios Q58 -: 14% |
@@ -189,22 +189,22 @@ Un anuncio deberia vender un solo producto. Si aparece mezclado, o el anuncio ca
 | Sucre | $22 | 0.0% | 0 | — | 5 | 0.6% | $4 | V10 3, IMPERMEABLE 2 | RADIO - Moteros: 32%; Domiciliarios - API: 18%; Motorizados - API: 14% |
 | Arauca | $19 | 0.0% | 0 | — | 9 | 1.2% | $2 | Q58 2, V10 2, RADIO 2, IMPERMEABLE 1, radio_bf777s 1, intercom_v10_2x 1 | RADIO - Moteros: 42%; Motorizados - INTER: 37%; Domiciliarios INTER - API: 16% |
 | La Guajira | $14 | 0.0% | 0 | — | 10 | 1.3% | $1 | RADIO 3, V10 3, Q58 2, radio_bf777s 1, IMPERMEABLE 1 | Domiciliarios VIDEO - API: 57%; Motorizados - INTER: 21%; Domiciliarios VIDEO Q58 -: 21% |
-| Choco | $13 | 0.0% | 0 | — | 10 | 1.3% | $1 | RADIO 5, Q58 2, V10 2, IMPERMEABLE 1 | RADIO - Moteros: 85%; RADIO - Broad: 15% |
 | Boyaca | $13 | 0.0% | 0 | — | 28 | 3.6% | $0 | V10 12, RADIO 6, IMPERMEABLE 5, Q58 3, radio_bf777s 1, intercom_v10_2x 1 | Domiciliarios - Expancion - Q58: 38%; RADIO - Moteros: 23%; Domiciliarios VIDEO INTER - API: 15% |
+| Choco | $13 | 0.0% | 0 | — | 10 | 1.3% | $1 | RADIO 5, Q58 2, V10 2, IMPERMEABLE 1 | RADIO - Moteros: 85%; RADIO - Broad: 15% |
 | Caqueta | $10 | 0.0% | 0 | — | 4 | 0.5% | $2 | IMPERMEABLE 3, Q58 1 | Domiciliarios - Expancion - Q58: 100% |
 | Putumayo | $7 | 0.0% | 0 | — | 5 | 0.6% | $1 | RADIO 3, IMPERMEABLE 1, V10 1 | Motorizados - API: 43%; Domiciliarios - Expancion - Q58: 29%; Domiciliarios VIDEO INTER - API: 14% |
-| San Andres y Providencia | $1 | 0.0% | 0 | — | 0 | 0.0% | sin pedidos | — | RADIO - Seguridad / Negocios: 100% |
 | Guaviare | $1 | 0.0% | 0 | — | 2 | 0.3% | $0 | V10 1, RADIO 1 | Domiciliarios Q58 -: 100%; Domiciliarios VIDEO INTER - API: 0% |
-| bogota | $0 | 0.0% | 0 | — | 118 | 15.3% | $0 | V10 38, Q58 36, IMPERMEABLE 33, intercom_v10_2x 4, RADIO 3, intercom_q58_max 2, radio_bf777s 2 | — |
-| Vichada | $0 | 0.0% | 0 | — | 4 | 0.5% | $0 | RADIO 2, V10 1, Q58 1 | — |
+| San Andres y Providencia | $1 | 0.0% | 0 | — | 0 | 0.0% | sin pedidos | — | RADIO - Seguridad / Negocios: 100% |
 | Amazonas | $0 | 0.0% | 0 | — | 1 | 0.1% | $0 | RADIO 1 | — |
+| Vichada | $0 | 0.0% | 0 | — | 4 | 0.5% | $0 | RADIO 2, V10 1, Q58 1 | — |
+Ciudades que no se ubicaron (las más repetidas): medellin (126), cartagena (25), monteria (9), neiva (9), bello (9), ibague (9), santa marta (9), armenia (7), la union  valle (7), villavicencio (6), yopal (5), montelibano (5), chia (5), palmira (5), rionegro (5), soledad (5), cucuta (5), sincelejo (5), florencia (4), puerto gaitan (4), la virginia (3), popayan (3), guadalajara de buga (3), arjona (2), don matias (2)
 
 ### Dónde gasta de verdad cada conjunto (top 5 departamentos)
 
 | conjunto | gasto | departamentos (% de su gasto) |
 |---|---|---|
-| Domiciliarios - API | $1,045,837 | Antioquia 74%, Distrito Especial 21%, Cundinamarca 4%, Atlantico 0%, Narino 0% |
-| RADIO - Seguridad / Negocios | $1,030,548 | Antioquia 67%, Distrito Especial 30%, Cundinamarca 4%, Meta 0%, Magdalena 0% |
+| Domiciliarios - API | $1,045,852 | Antioquia 74%, Distrito Especial 21%, Cundinamarca 4%, Atlantico 0%, Narino 0% |
+| RADIO - Seguridad / Negocios | $1,030,555 | Antioquia 67%, Distrito Especial 30%, Cundinamarca 4%, Meta 0%, Magdalena 0% |
 | Domiciliarios VIDEO INTER - API | $1,008,185 | Antioquia 61%, Distrito Especial 31%, Cundinamarca 8%, Meta 0%, Atlantico 0% |
 | Domiciliarios - Expancion - API | $944,585 | Valle del Cauca 56%, Risaralda 12%, Caldas 8%, Santander 7%, Quindio 6% |
 | RADIO - Moteros | $871,087 | Distrito Especial 84%, Antioquia 16%, Santander 0%, Unknown 0%, Narino 0% |
