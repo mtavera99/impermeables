@@ -254,6 +254,7 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
     # ── 3. pedidos por departamento (de la ciudad de entrega)
     sin_mapa = 0
     no_ubicadas = {}
+    sin_anuncio = {}
     ped = {}
     if m:
         for p in pedidos:
@@ -268,6 +269,8 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
             prod = deAnuncio.get(p.get("anuncio_id", "")) or (p.get("producto") or "?")
             x = ped.setdefault(d, {})
             x[prod] = x.get(prod, 0) + 1
+            if not p.get("anuncio_id"):
+                sin_anuncio[d] = sin_anuncio.get(d, 0) + 1
 
     tot_g = sum(x["g"] for x in por_depto.values()) or 1
     hay_conv = any(x["c"] for x in por_depto.values())
@@ -286,9 +289,9 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
         L.append("ℹ️ Meta no entrega las conversaciones desglosadas por departamento (solo gasto e impresiones), "
                  "así que la columna conv sale vacía. La señal que sirve es gasto contra pedidos.")
         L.append("")
-    L.append("| departamento | gasto | % del gasto | conv | $/conv | pedidos | % de pedidos | CPA aprox. | "
+    L.append("| departamento | gasto | % del gasto | conv | $/conv | pedidos | de ellos sin anuncio | % de pedidos | CPA aprox. | "
              "pedidos por producto | dónde gasta (conjunto: % del gasto del depto) |")
-    L.append("|---|---|---|---|---|---|---|---|---|---|")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|")
     claves = set(por_depto) | set(ped)
     for d in sorted(claves, key=lambda k: -(por_depto.get(k, {}).get("g", 0))):
         x = por_depto.get(d, {"g": 0.0, "c": 0, "sets": {}})
@@ -298,7 +301,7 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
         prods = ", ".join(f"{k} {v}" for k, v in sorted(ped.get(d, {}).items(), key=lambda kv: -kv[1])) or "—"
         L.append(
             f"| {NOMBRE_BONITO.get(d, d)} | ${x['g']:,.0f} | {x['g']/tot_g*100:.1f}% | {x['c']} | "
-            f"{('$%s' % format(x['g']/x['c'], ',.0f')) if x['c'] else '—'} | {n} | "
+            f"{('$%s' % format(x['g']/x['c'], ',.0f')) if x['c'] else '—'} | {n} | {sin_anuncio.get(d, 0)} | "
             f"{(n/tot_p*100 if tot_p else 0):.1f}% | {('$%s' % format(x['g']/n, ',.0f')) if n else ('sin pedidos' if x['g'] else '—')} | "
             f"{prods} | {sets_txt.replace('|', chr(92)+'|')} |"
         )
