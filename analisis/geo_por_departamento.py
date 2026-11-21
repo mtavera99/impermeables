@@ -95,6 +95,34 @@ def depto_de_ciudad(ciudad, m):
     return None
 
 
+def mapa_por_meta(lector, ciudades):
+    """
+    Plan B si DIVIPOLA no baja: la búsqueda de ubicaciones de Meta
+    (`search?type=adgeolocation`) devuelve el departamento de cada ciudad. Es un
+    GET de lectura, con el mismo token. Una consulta por ciudad distinta.
+    """
+    mun, deptos = {}, set()
+    for c in sorted(ciudades)[:700]:
+        q = plano(c)
+        if len(q) < 3:
+            continue
+        try:
+            d = lector.get("search", {"type": "adgeolocation", "location_types": json.dumps(["city"]),
+                                      "q": q, "country_code": "CO", "limit": 5})
+        except SystemExit:
+            continue
+        for x in d.get("data", []):
+            if x.get("country_code") != "CO" or not x.get("region"):
+                continue
+            k = depto_canon(x["region"])
+            NOMBRE_BONITO.setdefault(k, x["region"])
+            deptos.add(k)
+            mun.setdefault(plano(x.get("name", "")), set()).add(k)
+    for k in list(NOMBRE_BONITO):
+        deptos.add(k)
+    return {"mun": mun, "deptos": deptos}
+
+
 def leer_todo(lector, path, params):
     filas, after = [], None
     for _ in range(30):
@@ -151,7 +179,8 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
         "fields": "name,effective_status,daily_budget,targeting",
         "limit": 100,
     })
-    activos = [a for a in adsets if a.get("effective_status") == "ACTIVE"]
+    APAGADO = {"PAUSED", "CAMPAIGN_PAUSED", "ARCHIVED", "DELETED", "ADSET_PAUSED"}
+    activos = [a for a in adsets if a.get("effective_status") not in APAGADO]
     L.append(f"### A quién le apunta cada conjunto activo ({len(activos)})")
     L.append("")
     L.append("| conjunto | presup. | geografía | edad | género | intereses | Advantage+ audiencia |")
@@ -159,7 +188,8 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
     for a in sorted(activos, key=lambda x: x.get("name", "")):
         r = resumen_targeting(a.get("targeting"))
         pres = int(a.get("daily_budget") or 0)
-        L.append(f"| {a.get('name','').replace('|', chr(92)+'|')} | ${pres:,} | {r['geo']} | {r['edad']} | "
+        st = a.get("effective_status", "")
+        L.append(f"| {a.get('name','').replace('|', chr(92)+'|')}{'' if st == 'ACTIVE' else ' (' + st + ')'} | ${pres:,} | {r['geo']} | {r['edad']} | "
                  f"{r['genero']} | {r['intereses'] or '—'} | {r['advantage']} |")
     L.append("")
 
@@ -172,6 +202,13 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
         "limit": 500,
     })
     m, err = mapa_dane()
+    if not m:
+        ciudades = {p.get("ciudad", "") for p in pedidos if desde <= p.get("dia_bogota", "") <= hasta}
+        m = mapa_por_meta(lector, ciudades)
+        err = None if m["mun"] else err + " y la búsqueda de Meta no devolvió nada"
+        fuente = "la búsqueda de ubicaciones de Meta"
+    else:
+        fuente = "DIVIPOLA"
     por_depto, por_set = {}, {}
     for f in filas:
         d = depto_canon(f.get("region", ""))
@@ -201,6 +238,7 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
             x[prod] = x.get(prod, 0) + 1
 
     tot_g = sum(x["g"] for x in por_depto.values()) or 1
+    hay_conv = any(x["c"] for x in por_depto.values())
     tot_p = sum(sum(v.values()) for v in ped.values())
     L.append(f"### Gasto, conversaciones y pedidos por departamento ({desde} a {hasta})")
     L.append("")
@@ -208,9 +246,13 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
         L.append(f"⚠️ Los pedidos no se pudieron ubicar por departamento: {err}. Solo va el gasto.")
         L.append("")
     else:
-        L.append(f"*{tot_p} pedidos ubicados · {sin_mapa} con una ciudad que no se pudo ubicar. "
+        L.append(f"*Departamento de cada pedido según {fuente}. {tot_p} pedidos ubicados · {sin_mapa} con una ciudad que no se pudo ubicar. "
                  "El CPA de esta tabla es gasto del departamento ÷ pedidos entregados ahí: una persona puede "
                  "ver el anuncio en un departamento y pedir a otro, así que es aproximado.*")
+        L.append("")
+    if not hay_conv:
+        L.append("ℹ️ Meta no entrega las conversaciones desglosadas por departamento (solo gasto e impresiones), "
+                 "así que la columna conv sale vacía. La señal que sirve es gasto contra pedidos.")
         L.append("")
     L.append("| departamento | gasto | % del gasto | conv | $/conv | pedidos | % de pedidos | CPA aprox. | "
              "pedidos por producto | dónde gasta (conjunto: % del gasto del depto) |")
