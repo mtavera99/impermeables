@@ -21,7 +21,7 @@ instancia. Y tres datos de este archivo que eran falsos: la línea del 313, las 
 causa del reinicio.** *(ojo: verificar siempre la fecha en
 `TZ=America/Bogota`; el sandbox corre en UTC y puede marcar el día siguiente)*
 
-> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BT`, `0-BS`, `0-BR`, `0-BQ`, `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
+> 🚀🚀 **SI ESTÁS ARRANCANDO UNA SESIÓN NUEVA, EMPEZÁ POR LAS SECCIONES `0-BU`, `0-BT`, `0-BS`, `0-BR`, `0-BQ`, `0-BP`, `0-BO`, `0-BN`, `0-BM`, `0-BL` y `0-BK`** (las
 > últimas de este archivo), **después `0-BI`/`0-BJ` y `TRASPASO-SESION-29SEP.md`.**
 > 📌 **Regla 34:** al final de cada sesión o avance relevante, actualizar este archivo y hacer commit + push (PR propio).
 > `TRASPASO-SESION-24SEP.md` sigue siendo la mejor referencia de precios, números ya medidos, trampas
@@ -48,6 +48,7 @@ causa del reinicio.** *(ojo: verificar siempre la fecha en
 
 | Sección | Qué hay ahí | Fecha |
 |---|---|---|
+| **0-BU** | 🗺 **expansión geográfica** ([`EXPANSION-GEOGRAFICA-21NOV.md`](../../EXPANSION-GEOGRAFICA-21NOV.md)) · **~30% de los pedidos (10/día) se entregan en departamentos con $0 de pauta** (Costa 5,6/día, Llanos 2,5, sur 2,0) · Meta llama a Bogotá "Distrito Especial" · 9 conjuntos sobre Bogotá+Medellín · plan: 3 conjuntos de $20.000 (Costa V10 video, Llanos radios x4, sur impermeable video), exclusión por departamento, lanzar lun 23 6:00 · **regla 39** | **21-nov** |
 | **0-BT** | 💸 **descuento de rescate** solo si objeta el precio o se va ("no gracias", "lo voy a pensar"): Q58 combo y radios x4/x6 $5.000 · radios x2 $3.000 · V10 y Q58 unidad nada · impermeable igual que siempre · 🧪 **A/B del cierre**: último dígito par = "¿te sirve?", impar = "¿a nombre de quién te lo envío?" · `AB_CIERRE_ASUMIDO=0` lo apaga | **19-nov** |
 | **0-BS** | 🛑 **"no gracias" ya corta el seguimiento** (`rechazo.js` familia 5, con guardas: compró / oferta extra / pero / posventa) · 50 de 2.423 chats reales · el bot ya no puede decir "estamos en Medellín" · 📋 **decisiones del dueño:** Interrapidísimo deja abrir el paquete, despacho programado sí, descuento de último recurso, catálogo sí, casco ya resuelto en anuncios | **19-nov** |
 | **0-BR** | 💬 **embudo de cierre del bot** ([`ANALISIS-CIERRE-BOT-19NOV.md`](../../ANALISIS-CIERRE-BOT-19NOV.md)) · 1.501 chats: cierre **5,3%** · 🔴 **la fuga es total → cuadro (16%)**, el cuadro confirma 83% · "¿te sirve ese total?" 33% de abandono vs 21% pidiendo datos · cotiza envíos a "Siii"/"Muy caros" (~8%) · 🔴 `rechazo.js` no detecta "no gracias" → el seguimiento insiste e insultan · 3% cree que el intercom trae casco · dijo Medellín 4 veces · **regla 38** | **19-nov** |
@@ -11776,3 +11777,50 @@ diferencia B − A después del cambio, MENOS esa diferencia de antes**, y con ~
 (~1 semana).
 
 📅 **Leer el A/B el ~27-nov.** Ojo: Black Friday (27-nov) mueve todo; si se puede, leer la semana 20-26.
+
+---
+
+## 0-BU · 🗺 EXPANSIÓN GEOGRÁFICA: YA SE VENDE DONDE NO SE PAUTA (sáb 21-nov, 15:30 Bogotá)
+
+> **Documento: [`EXPANSION-GEOGRAFICA-21NOV.md`](../../EXPANSION-GEOGRAFICA-21NOV.md).** Código nuevo:
+> `analisis/geo_por_departamento.py`. Agrega la sección "🗺 Por departamento" a `CPA-POR-PRODUCTO.md` todos los días:
+> targeting real de cada conjunto, gasto por departamento (breakdown `region`) y pedidos por departamento según la
+> ciudad de entrega.
+
+**El pedido:** escalar duplicando conjuntos hacia la Costa, los Llanos, el sur y ángulos nuevos, sin solapar subastas.
+
+### Hallazgos (30 días, 22-oct → 20-nov)
+- **~30% de los pedidos ubicados (320 de 1.057, ~10/día) se entregan en departamentos donde la cuenta gasta $0**: Costa
+  169 (5,6/día), Boyacá/Meta/Casanare/Arauca 75 (2,5/día), Cauca/Nariño/Putumayo/Caquetá 59 (2,0/día). Casi todos
+  traen `anuncio_id`: los ven en Bogotá o Medellín y piden para allá.
+  → **El CPA por departamento de Bogotá ($37.000) o de Antioquia ($22.000) NO juzga esos conjuntos**: venden a todo el país.
+- Meta llama a Bogotá D.C. **"Distrito Especial"** en el desglose por región.
+- **9 conjuntos** sobre Bogotá +40 km y Medellín +40 km con los mismos intereses, incluido RADIO - Seguridad, que usa
+  los intereses de Rappi. Además 3 Motorizados y RADIO - Moteros sobre Bogotá D.C. Los Motorizados gastan 17-35% en
+  Antioquia aunque solo apunten a Bogotá D.C.: **revisarlo**.
+- La API devolvió el targeting de **10 de 16** conjuntos encendidos (falta entender por qué).
+- **Meta no entrega conversaciones por departamento**, solo gasto. Y DIVIPOLA (datos.gov.co) devuelve 403 desde
+  Actions. El mapa ciudad → departamento usa la búsqueda de ubicaciones de Meta (`search?type=adgeolocation`) más un
+  respaldo de ~60 ciudades principales. Así quedan sin ubicar 109 de 1.166 pedidos.
+- Se corrigió el brief: el "Q58 a $303/chat" es ACOMPAÑANTE - Copia (cierra 1%, no duplicar); el clúster 1 es 20-65 de
+  todos los géneros, no hombres 20-55; ❓ "impermeable combo $89.000" no existe en el bot.
+
+### Plan entregado (Santiago ejecuta)
+| zona | departamentos | duplicar | producto |
+|---|---|---|---|
+| 1 Costa | Atlántico, Bolívar, Magdalena, Cesar, Córdoba, Sucre, La Guajira | Domiciliarios VIDEO INTER - API | V10 video |
+| 2 Llanos-Boyacá | Boyacá, Meta, Casanare, Arauca | RADIO - Seguridad / Negocios | radios x4 |
+| 3 Sur | Cauca, Nariño, Putumayo, Caquetá | Domiciliarios VIDEO - API | impermeable video |
+
+- $20.000 cada uno, sin intereses, 20-65, Advantage+ audiencia encendido.
+- "Personas que **viven** en esta ubicación" si el Administrador lo ofrece (por los viajeros de diciembre).
+- No tocar los originales. ID del anuncio en `ANUNCIOS_V10` y `ANUNCIOS_RADIO` el mismo día.
+- Lanzar el **lun 23-nov 6:00**. Lectura de 72 h el jue 26 (antes de Black Friday). Del 27 al 29 no se lee.
+- Veredicto entre el 30-nov y el 3-dic: CPA por anuncio < 50% del equilibrio **y** pedidos de la zona entera por
+  encima de la base (5,6 · 2,5 · 2,0 por día).
+- No se recomiendan: Cundinamarca sin Bogotá (ya vende a $5.400) y Antioquia sin Medellín (después, con exclusión
+  de radio). Los ángulos copiloto y marca de moto son **creativos**, no públicos.
+- Expectativa: **+3 a +6 pedidos/día netos.** Cartagena devolvió 57% en sep (0-AV): mirar la devolución por ciudad.
+
+📌 **Regla 39: antes de abrir una zona, medir cuántos pedidos ya llegan de ahí sin pautarla.** Esa es la base, y un
+conjunto nuevo se juzga por cuánto sube la zona entera, no por lo que se atribuye él.
