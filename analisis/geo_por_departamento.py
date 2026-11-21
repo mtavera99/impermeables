@@ -36,7 +36,8 @@ def depto_canon(nombre):
     p = plano(nombre)
     p = re.sub(r"\b(departamento( de)?|d c|dc|distrito capital)\b", " ", p)
     p = re.sub(r"\s+", " ", p).strip()
-    if "bogota" in p:
+    # Meta llama a Bogotá D.C. "Distrito Especial" en el desglose por región.
+    if "bogota" in p or p == "distrito especial":
         return "bogota"
     if "san andres" in p:
         return "san andres"
@@ -212,7 +213,7 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
     por_depto, por_set = {}, {}
     for f in filas:
         d = depto_canon(f.get("region", ""))
-        NOMBRE_BONITO.setdefault(d, f.get("region", ""))
+        NOMBRE_BONITO.setdefault(d, "Bogotá D.C." if d == "bogota" else f.get("region", ""))
         g = float(f.get("spend") or 0)
         c = conv_de(f)
         x = por_depto.setdefault(d, {"g": 0.0, "c": 0, "imp": 0, "sets": {}})
@@ -224,6 +225,7 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
 
     # ── 3. pedidos por departamento (de la ciudad de entrega)
     sin_mapa = 0
+    no_ubicadas = {}
     ped = {}
     if m:
         for p in pedidos:
@@ -232,6 +234,8 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
             d = depto_de_ciudad(p.get("ciudad", ""), m)
             if not d:
                 sin_mapa += 1
+                k = plano(p.get("ciudad", ""))[:30] or "(vacía)"
+                no_ubicadas[k] = no_ubicadas.get(k, 0) + 1
                 continue
             prod = deAnuncio.get(p.get("anuncio_id", "")) or (p.get("producto") or "?")
             x = ped.setdefault(d, {})
@@ -270,7 +274,10 @@ def seccion(lector, act, desde, hasta, pedidos, deAnuncio, equilibrio, conv_de):
             f"{(n/tot_p*100 if tot_p else 0):.1f}% | {('$%s' % format(x['g']/n, ',.0f')) if n else ('sin pedidos' if x['g'] else '—')} | "
             f"{prods} | {sets_txt.replace('|', chr(92)+'|')} |"
         )
-    L.append("")
+    if no_ubicadas:
+        top = sorted(no_ubicadas.items(), key=lambda kv: -kv[1])[:25]
+        L.append("Ciudades que no se ubicaron (las más repetidas): " + ", ".join(f"{k} ({v})" for k, v in top))
+        L.append("")
 
     # ── 4. cada conjunto: en qué departamentos gasta de verdad
     L.append("### Dónde gasta de verdad cada conjunto (top 5 departamentos)")
