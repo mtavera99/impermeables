@@ -1,6 +1,6 @@
 # 📊 Estado de la cuenta — BikerPro
 
-> **Última lectura: 2026-11-22 16:50 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
+> **Última lectura: 2026-11-22 17:50 Bogotá.** Se actualiza **cada hora**. Para un dato urgente usá el botón manual del Action.
 > Generado por `analisis/estado-cuenta.py`. **Solo lectura** — regla 4-B.
 
 ---
@@ -9,14 +9,14 @@
 
 | | |
 |---|---|
-| **saldo ahora** | **$189,534** |
-| gastado hoy (hasta las 16h) | $313,173 |
+| **saldo ahora** | **$152,906** |
+| gastado hoy (hasta las 17h) | $349,224 |
 | presupuesto activo | $483,000/día |
-| cierre proyectado del día | $500,058 |
-| saldo proyectado a medianoche | $2,649 |
+| cierre proyectado del día | $513,238 |
+| saldo proyectado a medianoche | $-11,108 |
 | objetivo (cubrir un día de 143% + colchón) | $710,690 |
 
-### 🔴 RECARGAR $207,983 — entra en zona de freno a las 22:00
+### 🔴 RECARGAR $208,560 — entra en zona de freno a las 21:00
 
 Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin saldo ahí es la fuga más cara que tiene la operación.
 
@@ -24,31 +24,31 @@ Las 18h a 23h son el bloque donde las conversaciones se abaratan. Quedarse sin s
 
 ---
 
-## 📈 Hoy contra los días anteriores — mismo tramo 00:00–16:59
+## 📈 Hoy contra los días anteriores — mismo tramo 00:00–17:59
 
 *(Comparar medio día contra un día completo es el error #10. Acá va el mismo tramo.)*
 
 | día | gasto | conv | $/conv | CPM | conv/mil |
 |---|---|---|---|---|---|
-| 2026-11-18 | $283,476 | 349 | **$812** | $4,184 | 5.15 |
-| 2026-11-19 | $213,490 | 305 | **$700** | $3,849 | 5.50 |
-| 2026-11-20 | $203,181 | 289 | **$703** | $3,963 | 5.64 |
-| 2026-11-21 | $243,589 | 353 | **$690** | $3,977 | 5.76 |
-| 2026-11-22 **HOY** | $313,173 | 449 | **$697** | $3,628 | 5.20 |
+| 2026-11-18 | $319,447 | 412 | **$775** | $4,134 | 5.33 |
+| 2026-11-19 | $244,504 | 326 | **$750** | $3,817 | 5.09 |
+| 2026-11-20 | $231,652 | 325 | **$713** | $3,973 | 5.57 |
+| 2026-11-21 | $260,970 | 375 | **$696** | $3,926 | 5.64 |
+| 2026-11-22 **HOY** | $349,224 | 488 | **$716** | $3,642 | 5.09 |
 
-🟠 Hoy va 1% más caro que ayer a la misma hora ($697 vs $690).
+🟠 Hoy va 3% más caro que ayer a la misma hora ($716 vs $696).
 
 ### La descomposición — dónde está el problema
 
 ```
 $/conv  =  CPM  ÷  conv-por-mil
-$   697  =  $ 3,628  ÷  5.20
+$   716  =  $ 3,642  ÷  5.09
 ```
 
 | | valor | referencia sana | |
 |---|---|---|---|
-| **CPM** (el precio de la subasta) | $3,628 | ~$3.615 | 🟢 normal |
-| **conv/mil** (la calidad de la audiencia) | 5.20 | 5,33 | 🟢 |
+| **CPM** (el precio de la subasta) | $3,642 | ~$3.615 | 🟢 normal |
+| **conv/mil** (la calidad de la audiencia) | 5.09 | 5,33 | 🟢 |
 
 
 ---
@@ -57,23 +57,23 @@ $   697  =  $ 3,628  ÷  5.20
 
 | conjunto | presup | gastado | uso | conv | $/conv | conv/mil |
 |---|---|---|---|---|---|---|
-| [EXP] Llanos y Boyacá · Radios Baofeng | $48,000 | $31,650 | 66% | 21 | $1,507 | 1.52 |
-| RADIO - Seguridad / Negocios | $48,000 | $27,102 | 56% | 27 | $1,004 | 3.89 |
-| Domiciliarios - API | $35,000 | $25,954 | 74% | 26 | $998 | 5.62 |
-| Domiciliarios - Expancion - Q58 | $30,000 | $24,184 | 81% | 66 | $366 | 8.20 |
-| Motorizados - INTER | $30,000 | $22,286 | 74% | 36 | $619 | 8.80 |
-| Domiciliarios INTER - API | $25,000 | $18,425 | 74% | 51 | $361 | 8.14 |
-| Domiciliarios - Expancion - INTER | $30,000 | $16,982 | 57% | 20 | $849 | 3.26 |
-| Domiciliarios VIDEO - API | $24,000 | $16,687 | 70% | 44 | $379 | 11.35 |
-| [EXP] Sur Lluvioso · Impermeable Tradicional | $24,000 | $16,485 | 69% | 16 | $1,030 | 3.99 |
-| TEST Creativos - API | $20,000 | $15,784 | 79% | 20 | $789 | 8.83 |
-| [EXP] Costa Caribe · V10 Intercomunicadores | $20,000 | $15,671 | 78% | 39 | $402 | 8.03 |
-| RADIO - Moteros | $25,000 | $14,551 | 58% | 7 | $2,079 | 2.51 |
-| Motorizados - Q58 | $29,000 | $13,893 | 48% | 15 | $926 | 2.92 |
-| Domiciliarios VIDEO Q58 - | $30,000 | $13,787 | 46% | 16 | $862 | 4.46 |
-| Domiciliarios Q58 - | $25,000 | $13,523 | 54% | 10 | $1,352 | 2.46 |
-| RADIO - Fincas | $20,000 | $13,330 | 67% | 12 | $1,111 | 3.75 |
-| Motorizados - API | $20,000 | $12,879 | 64% | 23 | $560 | 8.77 |
+| [EXP] Llanos y Boyacá · Radios Baofeng | $48,000 | $35,879 | 75% | 23 | $1,560 | 1.50 |
+| RADIO - Seguridad / Negocios | $48,000 | $30,407 | 63% | 28 | $1,086 | 3.58 |
+| Domiciliarios - API | $35,000 | $28,239 | 81% | 30 | $941 | 5.93 |
+| Domiciliarios - Expancion - Q58 | $30,000 | $26,788 | 89% | 72 | $372 | 8.04 |
+| Motorizados - INTER | $30,000 | $24,380 | 81% | 39 | $625 | 8.73 |
+| Domiciliarios INTER - API | $25,000 | $20,330 | 81% | 55 | $370 | 8.10 |
+| Domiciliarios - Expancion - INTER | $30,000 | $18,666 | 62% | 22 | $848 | 3.25 |
+| Domiciliarios VIDEO - API | $24,000 | $18,329 | 76% | 48 | $382 | 11.26 |
+| [EXP] Sur Lluvioso · Impermeable Tradicional | $24,000 | $18,079 | 75% | 18 | $1,004 | 4.10 |
+| TEST Creativos - API | $20,000 | $17,151 | 86% | 24 | $715 | 9.61 |
+| [EXP] Costa Caribe · V10 Intercomunicadores | $20,000 | $17,005 | 85% | 41 | $415 | 7.83 |
+| Domiciliarios Q58 - | $25,000 | $16,839 | 67% | 12 | $1,403 | 2.50 |
+| RADIO - Moteros | $25,000 | $16,396 | 66% | 7 | $2,342 | 2.27 |
+| Domiciliarios VIDEO Q58 - | $30,000 | $15,590 | 52% | 17 | $917 | 4.10 |
+| Motorizados - Q58 | $29,000 | $15,575 | 54% | 15 | $1,038 | 2.63 |
+| RADIO - Fincas | $20,000 | $15,185 | 76% | 13 | $1,168 | 3.59 |
+| Motorizados - API | $20,000 | $14,386 | 72% | 24 | $599 | 8.12 |
 | Domiciliarios - Expancion - API | $0 | $0 | — | 0 | — | 0.00 |
 | Domiciliarios VIDEO INTER - API | $0 | $0 | — | 0 | — | 0.00 |
 
@@ -83,12 +83,12 @@ $   697  =  $ 3,628  ÷  5.20
 
 | producto | gasto | conv | $/conv | su equilibrio | |
 |---|---|---|---|---|---|
-| **TRADICIONAL** | $313,173 | 449 | **$697** | $2,402 | **29%** 🟢 |
+| **TRADICIONAL** | $349,224 | 488 | **$716** | $2,402 | **30%** 🟢 |
 
 | | |
 |---|---|
-| CPA implícito (cierre 5.4%) | **$12,822**/pedido |
-| utilidad estimada de lo que va del día | **$407,586** |
+| CPA implícito (cierre 5.4%) | **$13,155**/pedido |
+| utilidad estimada de lo que va del día | **$434,140** |
 
 ---
 
@@ -100,23 +100,23 @@ $   697  =  $ 3,628  ÷  5.20
 
 | conjunto | 11-17 | 11-18 | 11-19 | 11-20 | 11-21 | 11-22 | |
 |---|---|---|---|---|---|---|---|
-| [EXP] Llanos y Boyacá · Radios Baofeng | — | — | — | — | $1,294 | $1,507 | 🔴 |
-| RADIO - Seguridad / Negocios | $1,322 | $1,114 | $1,121 | $2,176 | $1,408 | $1,004 | 🟢 |
-| Domiciliarios - API | $879 | $834 | $659 | $663 | $830 | $998 | 🔴 |
-| Domiciliarios - Expancion - Q58 | $319 | $298 | $326 | $240 | $362 | $366 | 🟡 |
-| Motorizados - INTER | $532 | $573 | $475 | $515 | $519 | $619 | 🔴 |
-| Domiciliarios INTER - API | $267 | $311 | $339 | $327 | $311 | $361 | 🔴 |
-| Domiciliarios - Expancion - INTER | $640 | $611 | $728 | $633 | $661 | $849 | 🔴 |
-| Domiciliarios VIDEO - API | $746 | $691 | $680 | $578 | $649 | $379 | 🟢 |
-| [EXP] Sur Lluvioso · Impermeable Tradicional | — | — | — | — | $821 | $1,030 | 🔴 |
-| TEST Creativos - API | $689 | $762 | $716 | $1,259 | $581 | $789 | 🔴 |
-| [EXP] Costa Caribe · V10 Intercomunicadores | — | — | — | — | $360 | $402 | 🟡 |
-| RADIO - Moteros | $1,801 | $1,565 | $1,834 | $1,894 | $1,928 | $2,079 | 🟡 |
-| Motorizados - Q58 | $744 | $589 | $664 | $739 | $784 | $926 | 🔴 |
-| Domiciliarios VIDEO Q58 - | $773 | $1,101 | $891 | $1,035 | $947 | $862 | 🟢 |
-| Domiciliarios Q58 - | $1,035 | $1,137 | $1,133 | $1,364 | $1,112 | $1,352 | 🔴 |
-| RADIO - Fincas | $1,080 | $1,358 | $756 | $609 | $1,208 | $1,111 | 🟢 |
-| Motorizados - API | $972 | $697 | $697 | $997 | $517 | $560 | 🟡 |
+| [EXP] Llanos y Boyacá · Radios Baofeng | — | — | — | — | $1,296 | $1,560 | 🔴 |
+| RADIO - Seguridad / Negocios | $1,322 | $1,114 | $1,121 | $2,176 | $1,409 | $1,086 | 🟢 |
+| Domiciliarios - API | $879 | $834 | $659 | $663 | $830 | $941 | 🟡 |
+| Domiciliarios - Expancion - Q58 | $319 | $298 | $326 | $240 | $362 | $372 | 🟡 |
+| Motorizados - INTER | $532 | $573 | $475 | $515 | $519 | $625 | 🔴 |
+| Domiciliarios INTER - API | $267 | $311 | $339 | $327 | $311 | $370 | 🔴 |
+| Domiciliarios - Expancion - INTER | $640 | $611 | $728 | $633 | $661 | $848 | 🔴 |
+| Domiciliarios VIDEO - API | $746 | $691 | $680 | $578 | $649 | $382 | 🟢 |
+| [EXP] Sur Lluvioso · Impermeable Tradicional | — | — | — | — | $821 | $1,004 | 🔴 |
+| TEST Creativos - API | $689 | $762 | $716 | $1,259 | $581 | $715 | 🔴 |
+| [EXP] Costa Caribe · V10 Intercomunicadores | — | — | — | — | $360 | $415 | 🔴 |
+| Domiciliarios Q58 - | $1,035 | $1,137 | $1,133 | $1,364 | $1,112 | $1,403 | 🔴 |
+| RADIO - Moteros | $1,801 | $1,565 | $1,834 | $1,894 | $1,932 | $2,342 | 🔴 |
+| Domiciliarios VIDEO Q58 - | $773 | $1,101 | $891 | $1,035 | $947 | $917 | 🟡 |
+| Motorizados - Q58 | $744 | $589 | $664 | $739 | $784 | $1,038 | 🔴 |
+| RADIO - Fincas | $1,080 | $1,358 | $756 | $609 | $1,208 | $1,168 | 🟡 |
+| Motorizados - API | $972 | $697 | $697 | $997 | $517 | $599 | 🔴 |
 | Domiciliarios - Expancion - API | $834 | $879 | $859 | $1,010 | $755 | — | 🟢 |
 | Domiciliarios VIDEO INTER - API | $919 | $1,018 | $1,067 | $860 | $781 | — | 🟢 |
 
@@ -124,23 +124,23 @@ $   697  =  $ 3,628  ÷  5.20
 
 | conjunto | 11-17 | 11-18 | 11-19 | 11-20 | 11-21 | 11-22 | |
 |---|---|---|---|---|---|---|---|
-| [EXP] Llanos y Boyacá · Radios Baofeng | — | — | — | — | 1.41 | 1.52 | 🟢 |
-| RADIO - Seguridad / Negocios | 2.50 | 2.89 | 2.81 | 1.60 | 2.48 | 3.89 | 🟢 |
-| Domiciliarios - API | 5.57 | 7.12 | 10.08 | 8.90 | 7.43 | 5.62 | 🔴 |
-| Domiciliarios - Expancion - Q58 | 8.95 | 9.95 | 9.76 | 13.35 | 6.40 | 8.20 | 🟢 |
-| Motorizados - INTER | 10.22 | 10.80 | 11.41 | 11.01 | 8.75 | 8.80 | 🟡 |
-| Domiciliarios INTER - API | 12.39 | 11.19 | 9.66 | 10.56 | 7.02 | 8.14 | 🟢 |
-| Domiciliarios - Expancion - INTER | 4.15 | 3.73 | 2.61 | 3.27 | 2.99 | 3.26 | 🟢 |
-| Domiciliarios VIDEO - API | 5.55 | 7.69 | 8.19 | 9.22 | 7.40 | 11.35 | 🟢 |
-| [EXP] Sur Lluvioso · Impermeable Tradicional | — | — | — | — | 4.88 | 3.99 | 🔴 |
-| TEST Creativos - API | 12.23 | 9.79 | 9.48 | 4.74 | 9.16 | 8.83 | 🟡 |
-| [EXP] Costa Caribe · V10 Intercomunicadores | — | — | — | — | 7.59 | 8.03 | 🟢 |
-| RADIO - Moteros | 3.67 | 4.30 | 2.70 | 2.81 | 2.29 | 2.51 | 🟢 |
-| Motorizados - Q58 | 3.35 | 4.00 | 3.74 | 3.51 | 2.76 | 2.92 | 🟢 |
-| Domiciliarios VIDEO Q58 - | 3.16 | 2.18 | 2.51 | 2.47 | 2.37 | 4.46 | 🟢 |
-| Domiciliarios Q58 - | 3.11 | 2.38 | 2.14 | 1.78 | 2.38 | 2.46 | 🟡 |
-| RADIO - Fincas | 3.70 | 3.45 | 5.76 | 7.92 | 2.55 | 3.75 | 🟢 |
-| Motorizados - API | 4.49 | 6.97 | 8.35 | 5.71 | 10.37 | 8.77 | 🔴 |
+| [EXP] Llanos y Boyacá · Radios Baofeng | — | — | — | — | 1.41 | 1.50 | 🟢 |
+| RADIO - Seguridad / Negocios | 2.50 | 2.89 | 2.81 | 1.60 | 2.48 | 3.58 | 🟢 |
+| Domiciliarios - API | 5.57 | 7.12 | 10.08 | 8.90 | 7.43 | 5.93 | 🔴 |
+| Domiciliarios - Expancion - Q58 | 8.95 | 9.95 | 9.76 | 13.35 | 6.40 | 8.04 | 🟢 |
+| Motorizados - INTER | 10.22 | 10.80 | 11.41 | 11.01 | 8.75 | 8.73 | 🟡 |
+| Domiciliarios INTER - API | 12.39 | 11.19 | 9.66 | 10.56 | 7.02 | 8.10 | 🟢 |
+| Domiciliarios - Expancion - INTER | 4.15 | 3.73 | 2.61 | 3.27 | 2.99 | 3.25 | 🟢 |
+| Domiciliarios VIDEO - API | 5.55 | 7.69 | 8.19 | 9.22 | 7.40 | 11.26 | 🟢 |
+| [EXP] Sur Lluvioso · Impermeable Tradicional | — | — | — | — | 4.88 | 4.10 | 🔴 |
+| TEST Creativos - API | 12.23 | 9.79 | 9.48 | 4.74 | 9.15 | 9.61 | 🟢 |
+| [EXP] Costa Caribe · V10 Intercomunicadores | — | — | — | — | 7.59 | 7.83 | 🟡 |
+| Domiciliarios Q58 - | 3.11 | 2.38 | 2.14 | 1.78 | 2.38 | 2.50 | 🟡 |
+| RADIO - Moteros | 3.67 | 4.30 | 2.70 | 2.81 | 2.29 | 2.27 | 🟡 |
+| Domiciliarios VIDEO Q58 - | 3.16 | 2.18 | 2.51 | 2.47 | 2.37 | 4.10 | 🟢 |
+| Motorizados - Q58 | 3.35 | 4.00 | 3.74 | 3.51 | 2.76 | 2.63 | 🟡 |
+| RADIO - Fincas | 3.70 | 3.45 | 5.76 | 7.92 | 2.55 | 3.59 | 🟢 |
+| Motorizados - API | 4.49 | 6.97 | 8.35 | 5.71 | 10.37 | 8.12 | 🔴 |
 | Domiciliarios - Expancion - API | 6.25 | 7.27 | 7.74 | 6.75 | 9.27 | — | 🟢 |
 | Domiciliarios VIDEO INTER - API | 5.38 | 5.03 | 4.30 | 5.30 | 5.69 | — | 🟢 |
 
@@ -156,8 +156,8 @@ $   697  =  $ 3,628  ÷  5.20
 | 2026-11-17 | $355,036 | 497 | $714 | $3,836 | 5.37 | $442,775 |
 | 2026-11-18 | $491,703 | 674 | $730 | $3,893 | 5.34 | $590,238 |
 | 2026-11-19 | $396,366 | 543 | $730 | $3,642 | 4.99 | $475,287 |
-| 2026-11-20 | $404,923 | 543 | $746 | $3,732 | 5.00 | $466,730 |
-| 2026-11-21 | $415,617 | 584 | $712 | $3,109 | 4.37 | $521,851 |
+| 2026-11-20 | $404,933 | 543 | $746 | $3,732 | 5.00 | $466,720 |
+| 2026-11-21 | $415,717 | 584 | $712 | $3,109 | 4.37 | $521,751 |
 
 ---
 
