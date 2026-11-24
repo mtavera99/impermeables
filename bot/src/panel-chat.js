@@ -483,8 +483,14 @@ function cajonDeEnvio(p, conv, token) {
 // El total es OPCIONAL: si se deja vacío lo calcula el tarifario con la ciudad.
 // A las 3 de la mañana nadie se acuerda de la banda de Sahagún.
 // ============================================================================
-function cajonDeVenta(p, token, pedidosPrevios) {
+function cajonDeVenta(p, token, pedidosPrevios, conv) {
   const tel = String(p.telefono_chat || "");
+  const catalogo = require("./catalogo");
+  const prodActual =
+    (p && p.producto) ||
+    (conv && conv.productoActivo) ||
+    catalogo.productoDelAnuncio((conv && conv.anuncio) || null) ||
+    "impermeable";
   // Si escribe desde un teléfono, ese mismo sirve de celular de despacho. Si usa
   // nombre de usuario de WhatsApp (BSUID) no hay número y hay que pedírselo.
   const celular = /^\d+$/.test(tel) ? tel.replace(/^57/, "") : "";
@@ -523,18 +529,33 @@ function cajonDeVenta(p, token, pedidosPrevios) {
         <label>Dirección
           <input name="direccion" value="${esc(p.direccion || "")}" autocomplete="off"></label>
         <div class="dos">
+          <label>Producto
+            <select name="producto">
+              <option value="impermeable"${prodActual === "impermeable" ? " selected" : ""}>🧥 Impermeable 4 piezas</option>
+              <option value="intercom_v10_2x"${prodActual === "intercom_v10_2x" ? " selected" : ""}>🎧 Intercomunicador V10 2X</option>
+              <option value="intercom_q58_max"${prodActual === "intercom_q58_max" ? " selected" : ""}>🎧 Intercomunicador Q58 Max</option>
+              <option value="radio_bf777s"${prodActual === "radio_bf777s" ? " selected" : ""}>📻 Radios Baofeng BF-777S</option>
+            </select>
+          </label>
+          <label>Unidades
+            <select name="unidades">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+            </select>
+          </label>
+        </div>
+        <div class="dos">
           <label>Talla
             <input name="talla" value="${esc(p.talla || "")}" autocomplete="off"></label>
           <label>Color
             <input name="color" value="${esc(p.color || "")}" autocomplete="off"></label>
         </div>
-        <div class="dos">
-          <label>Unidades
-            <select name="unidades"><option value="1">1</option><option value="2">2</option></select></label>
-          <label>Total
-            <input name="total" inputmode="numeric" placeholder="se calcula solo">
-            <small>Dejalo vacío y lo saca del tarifario.</small></label>
-        </div>
+        <label>Total
+          <input name="total" inputmode="numeric" placeholder="se calcula solo">
+          <small>Dejalo vacío y lo saca del tarifario/catálogo.</small></label>
         <label>Pago
           <select name="pago">
             <option value="contraentrega">Contraentrega</option>
@@ -705,7 +726,7 @@ function render({ id, q, token, resultado, venta } = {}) {
           : `<p class="nota">No hay mensajes guardados.</p>`
       }</div>` +
       cajonDeEnvio(p, conv, token) +
-      cajonDeVenta(p, token, 0);
+      cajonDeVenta(p, token, 0, conv);
   } else if (chatsSugeridos.length) {
     // 💬 Varios chats coinciden. Se listan para elegir, sin pedido de por medio.
     cuerpo =
@@ -774,7 +795,8 @@ function render({ id, q, token, resultado, venta } = {}) {
     // que es el que tiene los datos de despacho más frescos.
     // ======================================================================
     const ultimo = encontrados[encontrados.length - 1];
-    cuerpo += cajonDeVenta(ultimo, token, encontrados.length);
+    const convUltimo = conversaciones && ultimo ? conversaciones[ultimo.telefono_chat] : null;
+    cuerpo += cajonDeVenta(ultimo, token, encontrados.length, convUltimo);
   }
 
   return `<!doctype html><html lang="es"><head>

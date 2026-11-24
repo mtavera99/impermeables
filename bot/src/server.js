@@ -2015,15 +2015,32 @@ app.post("/pedido-manual", async (req, res) => {
   }
 
   const unidades = Math.max(1, Number(b.unidades) || 1);
+  const productoId = String(b.producto || "").trim() || undefined;
+  const catalogo = require("./catalogo");
   // El total es opcional: si no se pone, se calcula con el tarifario. Así no hay
   // que acordarse de la banda de cada ciudad a las 3 de la mañana.
   let total = Number(String(b.total || "").replace(/[^\d]/g, "")) || 0;
   let totalCalculado = false;
   if (!total) {
-    const q = fletes.cotizar(ciudad, unidades);
-    if (q && q.total) {
-      total = q.total;
-      totalCalculado = true;
+    if (!productoId || productoId === "impermeable") {
+      const q = fletes.cotizar(ciudad, unidades);
+      if (q && q.total) {
+        total = q.total;
+        totalCalculado = true;
+      }
+    } else {
+      const ficha = catalogo.de(productoId);
+      if (ficha) {
+        const q = fletes.cotizar(ciudad, 1);
+        if (q && q.banda) {
+          const precioBase = catalogo.precioDe(productoId, unidades);
+          const fleteVal = catalogo.envioDe(productoId, q.banda, unidades);
+          if (precioBase && fleteVal != null) {
+            total = precioBase + fleteVal;
+            totalCalculado = true;
+          }
+        }
+      }
     }
   }
   if (!total) {
@@ -2049,6 +2066,8 @@ app.post("/pedido-manual", async (req, res) => {
     pago: String(b.pago || "contraentrega").trim(),
     total,
     telefono_chat: chat,
+    producto: productoId,
+    unidades,
     // Queda marcado para siempre: una venta cargada a mano no se puede
     // confundir con una que el bot cerró solo, o el cierre del bot se infla.
     origen: "manual",
