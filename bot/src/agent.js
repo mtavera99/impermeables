@@ -35,7 +35,8 @@ const PROVIDER = (process.env.AI_PROVIDER || "gemini").toLowerCase();
 
 // Gemini
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-lite";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash";
+const GEMINI_BASE = (process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com").replace(/\/$/, "");
 
 // Compatible con OpenAI (DeepSeek, Groq, OpenAI, Together...)
 const AI_KEY = process.env.AI_API_KEY;
@@ -66,7 +67,7 @@ async function callGemini(systemPrompt, messages, retries = 2) {
     parts: [{ text: m.content }]
   }));
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
+  const url = `${GEMINI_BASE}/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

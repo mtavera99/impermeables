@@ -38,7 +38,8 @@
 
 const audio = require("./audio");
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-lite";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash";
+const GEMINI_BASE = (process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com").replace(/\/$/, "");
 
 // Una captura de pantalla de Nequi o Bancolombia no pesa más que esto. El tope
 // protege la cuota y evita que una imagen enorme cuelgue el webhook.
@@ -200,7 +201,7 @@ async function leerImagen(buffer, mime) {
   if (buffer.length > MAX_BYTES) return { ok: false, error: "imagen demasiado grande" };
 
   const limpio = mimeLimpio(mime, "image/jpeg");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
+  const url = `${GEMINI_BASE}/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
   try {
     const res = await fetch(url, {
       method: "POST",

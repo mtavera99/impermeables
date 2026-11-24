@@ -23,7 +23,8 @@
 const GRAPH = "https://graph.facebook.com/v21.0";
 const WA_TOKEN = process.env.WHATSAPP_TOKEN;
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-lite";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash";
+const GEMINI_BASE = (process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com").replace(/\/$/, "");
 
 // Tope de seguridad: una nota de voz de venta no dura más que esto. Si llega
 // algo enorme, no se procesa (protege la cuota y evita cuelgues).
@@ -77,7 +78,7 @@ async function transcribir(buffer, mime) {
   // WhatsApp manda ogg/opus; Gemini lo acepta, pero el mime a veces trae
   // parámetros extra ("audio/ogg; codecs=opus") que hay que limpiar.
   const mimeLimpio = String(mime || "audio/ogg").split(";")[0].trim();
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
+  const url = `${GEMINI_BASE}/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
