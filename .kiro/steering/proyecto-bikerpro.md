@@ -11567,3 +11567,23 @@ números. El guion igual se la prohíbe.
 📌 **Nota del sandbox (10-nov):** el clon local quedó corrupto entre sesiones (blobs faltantes, `git fetch` fallaba con
 *"invalid index-pack output"*, y había archivos borrados en el árbol de trabajo). Se resolvió clonando de nuevo. El clon
 viejo quedó en `/projects/sandbox/impermeables-roto` y se puede borrar.
+
+---
+
+## 0-BV · 🧠 EL CONTADOR DE "SALDO IA" ESTABA CONGELADO EN $100 (25-nov)
+
+`bot/src/saldo-ia.js` (lo agregó Santiago el 24-nov, commit `0dea338`) lee `/v1/dashboard/billing/subscription` y
+`/usage` del proxy VNAI Pro (NewAPI). `/health` en producción daba `totalUsd 100 · usadoUsd 0` fijo. Comparado contra
+`controller/billing.go` de QuantumNous/new-api:
+
+1. **`hard_limit_usd = 100000000` es la marca de "clave con cuota ilimitada"**, no "$100 en micro-unidades". Con una
+   clave ilimitada la API **no puede** decir cuánto saldo queda.
+2. **`total_usage` viene siempre en centavos de USD** (uso × 100). El código dividía por 1.000.000 todo lo que pasara de
+   1.000, así que cualquier gasto de más de $10 se mostraba como $0,00.
+3. El uso es el acumulado de la clave. NewAPI ignora las fechas, así que el `start/end_date` del mes no hacía nada.
+
+**Arreglo:** el uso se divide siempre por 100. Si la clave es ilimitada, el panel muestra *"no se puede leer (clave sin
+cuota) · usado $X"* en vez de un saldo falso. Prueba: `bot/test-saldo-ia.js`.
+
+**Para ver el saldo de verdad:** en el panel de VNAI, editar la clave (token) que usa el bot y **ponerle una cuota
+igual al saldo comprado**, en vez de "ilimitada". Así `hard_limit_usd` = cuota real y el semáforo funciona.

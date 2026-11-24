@@ -32,24 +32,44 @@ async function consultarServidor() {
       return { ok: false, error: `HTTP ${resSub.status}` };
     }
     const dataSub = await resSub.json();
-    const hardLimit = Number(dataSub.hard_limit_usd || dataSub.system_hard_limit_usd || 0);
-    // En NewAPI hard_limit_usd suele venir en micro-unidades (100000000 = $100.00 USD)
-    const totalUsd = hardLimit > 10000 ? hardLimit / 1000000 : hardLimit;
-
-    // 2. Consultar uso en el mes actual
-    const hoy = new Date();
-    const pDia = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-01`;
-    const uDia = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-28`;
-    const resUsage = await fetch(
-      `${baseUrl}/v1/dashboard/billing/usage?start_date=${pDia}&end_date=${uDia}`,
-      { headers: { Authorization: `Bearer ${apiKey}` } }
-    );
+    // ========================================================================
+    // 🔴 25-nov: el panel mostraba "$100 restantes de $100 (100%)" fijo. Dos
+    // errores de lectura, confirmados contra controller/billing.go de new-api:
+    //
+    //  1. hard_limit_usd = 100000000 NO es "$100 en micro-unidades": es la marca
+    //     que pone NewAPI cuando la clave tiene CUOTA ILIMITADA. Con eso no se
+    //     puede saber el saldo: hay que darle a la clave una cuota en el panel
+    //     del proveedor (o leer el saldo de la cuenta allá).
+    //  2. total_usage viene SIEMPRE en centavos de USD (uso × 100). El código
+    //     dividía por un millón todo lo que pasara de 1.000 (o sea, más de $10
+    //     gastados), así que el uso daba $0,00.
+    //
+    // Y el uso es el acumulado de la clave, no el del mes: NewAPI ignora las
+    // fechas. Como el límite también es acumulado (restante + usado), la resta
+    // da el saldo correcto.
+    // ========================================================================
+    const hardLimit = Number(dataSub.hard_limit_usd ?? dataSub.system_hard_limit_usd ?? 0);
+    const resUsage = await fetch(`${baseUrl}/v1/dashboard/billing/usage`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
     let usadoUsd = 0;
     if (resUsage.ok) {
       const dataUsage = await resUsage.json();
-      const rawUsage = Number(dataUsage.total_usage || 0);
-      usadoUsd = rawUsage > 1000 ? rawUsage / 1000000 : rawUsage > 0 ? rawUsage / 100 : 0;
+      usadoUsd = Number(dataUsage.total_usage || 0) / 100;
     }
+    if (hardLimit >= 100000000) {
+      return {
+        ok: true,
+        tipo: "proxy_prepago",
+        ilimitada: true,
+        proveedor: "VNAI Pro / NewAPI",
+        usadoUsd: Number(usadoUsd.toFixed(2)),
+        nivel: "amarillo",
+        alerta: false,
+        actualizadoAt: Date.now(),
+      };
+    }
+    const totalUsd = hardLimit;
 
     const restanteUsd = Math.max(0, totalUsd - usadoUsd);
     const porcentaje = totalUsd > 0 ? Math.round((restanteUsd / totalUsd) * 100) : 100;

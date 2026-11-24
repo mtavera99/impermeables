@@ -151,7 +151,12 @@ function render(aviso) {
   const saldo = saldoIA.obtener();
   let bloqueSaldoIA = "";
   let alertaSaldoBanner = "";
-  if (saldo && saldo.ok) {
+  if (saldo && saldo.ok && saldo.ilimitada) {
+    // La clave no tiene cuota propia: el proveedor no dice cuánto queda.
+    bloqueSaldoIA = `<div class="badge-saldo amarillo" title="La clave de IA tiene cuota ilimitada: el saldo real se ve en el panel del proveedor">
+      <span>🟡</span> <b>Saldo IA:</b> no se puede leer (clave sin cuota) · usado $${saldo.usadoUsd} USD
+    </div>`;
+  } else if (saldo && saldo.ok) {
     const semaforo = saldo.nivel === "verde" ? "🟢" : saldo.nivel === "amarillo" ? "🟡" : "🔴";
     bloqueSaldoIA = `<div class="badge-saldo ${saldo.nivel}" title="Saldo en tu API de IA (${esc(saldo.proveedor)})">
       <span>${semaforo}</span> <b>Saldo IA:</b> $${saldo.restanteUsd} USD restantes de $${saldo.totalUsd} (${saldo.porcentaje}%)
