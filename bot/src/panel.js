@@ -34,6 +34,7 @@ const catalogo = require("./catalogo");
 const resumen = require("./resumen");
 const atencion = require("./atencion");
 const embudo = require("./embudo");
+const saldoIA = require("./saldo-ia");
 
 const esc = (s) =>
   String(s == null ? "" : s)
@@ -145,6 +146,23 @@ function render(aviso) {
   const numBot = numeroDelBot();
   const convs = store.todasLasConversaciones();
   const pedidos = store.todosLosPedidos();
+
+  // 🧠 Saldo de la API de IA (prepago / VNAI Pro)
+  const saldo = saldoIA.obtener();
+  let bloqueSaldoIA = "";
+  let alertaSaldoBanner = "";
+  if (saldo && saldo.ok) {
+    const semaforo = saldo.nivel === "verde" ? "🟢" : saldo.nivel === "amarillo" ? "🟡" : "🔴";
+    bloqueSaldoIA = `<div class="badge-saldo ${saldo.nivel}" title="Saldo en tu API de IA (${esc(saldo.proveedor)})">
+      <span>${semaforo}</span> <b>Saldo IA:</b> $${saldo.restanteUsd} USD restantes de $${saldo.totalUsd} (${saldo.porcentaje}%)
+    </div>`;
+    if (saldo.alerta) {
+      alertaSaldoBanner = `<div class="alerta-saldo-ia">
+        ⚠️ <b>ALERTA SALDO IA:</b> Te quedan solo <b>$${saldo.restanteUsd} USD</b> (${saldo.porcentaje}%). 
+        Comprá o rotá la clave pronto antes de que se agote y el bot se pause.
+      </div>`;
+    }
+  }
 
   // 📋 Pendientes de despachar vs ya despachados. Se calcula acá arriba porque
   // la tarjeta de "pendientes" va en los KPIs, antes de las tablas.
@@ -1103,6 +1121,11 @@ function render(aviso) {
   }
   h1{margin:0;font-size:17px;letter-spacing:-.01em}
   .sub2{color:var(--gris);font-size:12px;margin-top:2px}
+  .badge-saldo{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;margin-top:6px;border:1px solid var(--linea)}
+  .badge-saldo.verde{background:rgba(61,220,132,.12);color:#3ddc84;border-color:rgba(61,220,132,.3)}
+  .badge-saldo.amarillo{background:rgba(255,176,32,.12);color:#ffb020;border-color:rgba(255,176,32,.3)}
+  .badge-saldo.rojo{background:rgba(255,107,107,.15);color:#ff6b6b;border-color:rgba(255,107,107,.4)}
+  .alerta-saldo-ia{background:#42161a;border:1px solid #ff6b6b;color:#ffb3b8;padding:12px 16px;border-radius:12px;font-size:14px;margin-bottom:14px}
   main{padding:16px;max-width:920px;margin:0 auto}
   /* scroll-margin-top deja el título visible cuando se salta a una sección:
      sin esto la cabecera fija (sticky) le tapa la primera línea. */
@@ -1413,8 +1436,10 @@ function render(aviso) {
 <header>
   <h1>🏍️ BikerPro · panel del bot</h1>
   <div class="sub2">${esc(numBot || "poné BOT_WHATSAPP en Render para ver acá el número del bot")} · se refresca cada 45 s (nunca mientras escribís)</div>
+  ${bloqueSaldoIA}
 </header>
 <main id="arriba">
+  ${alertaSaldoBanner}
   <!-- 🧭 ATAJOS. Barra pegada arriba: de acá se salta directo a lo que se usa,
        sobre todo a las conversaciones, que están al final de la página porque
        arriba van los números y los pendientes. Antes había que deslizar por los

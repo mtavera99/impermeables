@@ -30,6 +30,7 @@ const plantillas = require("./plantillas");
 const audio = require("./audio");
 const comprobante = require("./comprobante");
 const resumen = require("./resumen");
+const saldoIA = require("./saldo-ia");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 // 🔴 Normalizar un destinatario SIN romper a los clientes con username.
@@ -2172,6 +2173,7 @@ app.get("/health", (_req, res) => {
     // Para poder confirmar que la nota comercial quedó APAGADA sin entrar a Render.
     nota_comercial: String(process.env.NOTA_COMERCIAL ?? "0").trim() === "1" ? "ENCENDIDA" : "apagada",
     disco: disco ? { configurado: disco.configurado, aparte: disco.discoAparte, arranques: disco.arranques } : null,
+    saldo_ia: saldoIA.obtener() || null,
     // ======================================================================
     // 🔐 EL DETALLE VA CON TOKEN, EL RESTO NO.
     //
