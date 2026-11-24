@@ -667,10 +667,14 @@ async function generateReply(phone, userText) {
   // venía por dos y retrocedió a una después de ver el total, eso es una objeción
   // aunque no use ninguna palabra de la lista. Es el caso de Jorge (27-sep), donde
   // el rescate del combo existía y nunca se ofreció. Ver `retrocedioDeDosAUno`.
-  const objecionDePrecio = cotizacion.hayObjecionDePrecio(conv.messages, {
-    previaUds: previa && previa.uds,
-    userText,
-  });
+  // 💸 19-nov: también cuenta el cliente que se está yendo ("no gracias", "lo voy a
+  // pensar"). Es la condición que pidió el dueño para el descuento de rescate de
+  // intercomunicadores y radios, y libera igual el del impermeable.
+  const objecionDePrecio =
+    cotizacion.hayObjecionDePrecio(conv.messages, {
+      previaUds: previa && previa.uds,
+      userText,
+    }) || cotizacion.seEstaYendo([...(conv.messages || []), { role: "user", content: userText }]);
   // ⚠️ `messages` viaja en el contexto porque `verificarPedido` necesita el hilo
   // para resolver el destino cuando la conversación ya estableció que dos
   // escrituras son el mismo sitio (typo corregido, corregimiento). Ver
@@ -682,6 +686,9 @@ async function generateReply(phone, userText) {
     cotizacion.yaSeOfrecioElRescate(conv.messages, cot.comboDeRescate.rescate);
   const contextoPrecio = {
     objecionDePrecio,
+    // 🧪 El número del chat decide el grupo de la prueba A/B del cierre. Ver
+    // `varianteDeCierre` en cotizacion.js.
+    phone,
     messages: conv.messages,
     rescateYaOfrecido,
     // 🔑 El producto viaja en el contexto y no solo en la cotización, porque el

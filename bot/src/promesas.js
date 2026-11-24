@@ -35,6 +35,8 @@ const aplanar = (s) =>
 
 // La ciudad donde SÍ está la bodega, confirmada por el dueño el 24-sep.
 const CIUDAD_BODEGA = "bogota";
+// Diferido: fletes.js es grande y este módulo se prueba solo.
+const fletes = () => require("./fletes");
 
 const REGLAS = [
   {
@@ -152,6 +154,28 @@ const REGLAS = [
  * @param {string} [contexto.ciudadBodega]  por si algún día se muda
  * @returns {{ok:boolean, hallazgos:Array<{clave,porQue,queHacerEnLugar,fragmento}>}}
  */
+// ============================================================================
+// 🏠 ¿EL TEXTO DICE QUE ESTAMOS EN UNA CIUDAD QUE NO ES LA DE LA BODEGA?
+//
+// 19-nov: el bot dijo 4 veces "Estamos ubicados en Medellín" (57 veces Bogotá,
+// que es lo correcto). El patrón de antes pedía "estamos en" pegado, así que
+// "estamos ubicados en", "despachamos desde" y "nuestra tienda queda en" se
+// escapaban. Y para no confundir "estamos en contacto" o "somos de confianza"
+// con una ciudad, lo dicho tiene que ser un municipio que el tarifario conoce.
+// Lo usan `revisar` y `corregir`, para que nunca vuelvan a pensar distinto.
+// ============================================================================
+const RE_AFIRMA_CIUDAD =
+  /\b(?:(?:estamos|quedamos|somos)(?: ubicados| radicados)?|nuestra (?:bodega|tienda|sede|oficina) (?:esta|queda)(?: ubicada)?|la bodega (?:esta|queda)|despachamos(?: todo| los pedidos| nuestros pedidos)? desde|enviamos desde) (?:en |de |desde )?(?:la ciudad de )?([a-z ]{3,22})\b/;
+
+function ciudadAfirmada(plano, bodega) {
+  const m = String(plano || "").match(RE_AFIRMA_CIUDAD);
+  if (!m) return null;
+  const dicha = aplanar(m[1]).split(/\s+/)[0];
+  if (!dicha || dicha.length < 4 || bodega.includes(dicha) || dicha.includes(bodega)) return null;
+  if (!(fletes().bandaDe(dicha) || fletes().zonaDificilDe(dicha))) return null;
+  return { ciudad: dicha, fragmento: m[0] };
+}
+
 function revisar(texto, contexto = {}) {
   const t = aplanar(texto);
   const hallazgos = [];
@@ -192,12 +216,13 @@ function revisar(texto, contexto = {}) {
   }
 
   const bodega = aplanar(contexto.ciudadBodega || CIUDAD_BODEGA);
-  const afirmaCiudad = t.match(
-    /\b(estamos|quedamos|nuestra bodega esta|la bodega esta|somos) (en|de) ([a-z ]{3,22})\b/
-  );
-  if (afirmaCiudad) {
-    const dicha = aplanar(afirmaCiudad[3]).split(/\s+/)[0];
-    if (dicha && dicha.length >= 4 && !bodega.includes(dicha) && !dicha.includes(bodega)) {
+  // 🔴 19-nov: ver `ciudadAfirmada`. El bot dijo 4 veces "Estamos ubicados en
+  // Medellín" y el patrón de antes no lo veía.
+  {
+    const af = ciudadAfirmada(t, bodega);
+    if (af) {
+      const afirmaCiudad = [af.fragmento];
+      const dicha = af.ciudad;
       hallazgos.push({
         clave: "ubicacion_equivocada",
         porQue: `dice que estamos en "${dicha}" y la bodega documentada está en ${bodega}.`,
@@ -252,7 +277,7 @@ const REEMPLAZOS = {
     "Te lo enviamos para recoger en oficina de Interrapidísimo en tu ciudad. Cuando tengamos la guía, te compartimos la oficina asignada",
   promesa_de_la_transportadora:
     "En cuanto tengamos el número de guía te lo paso por acá para que le hagas seguimiento",
-  ubicacion_equivocada: "Nuestra bodega está en Bogotá",
+  ubicacion_equivocada: "Estamos en Bogotá y despachamos a todo el país 📦",
 };
 
 // ============================================================================
@@ -417,14 +442,8 @@ function corregir(texto, contexto = {}) {
       };
     }
 
-    const afirma = plano.match(
-      /\b(estamos|quedamos|nuestra bodega esta|la bodega esta|somos) (en|de) ([a-z ]{3,22})\b/
-    );
-    if (afirma) {
-      const dicha = aplanar(afirma[3]).split(/\s+/)[0];
-      if (dicha && dicha.length >= 4 && !bodega.includes(dicha) && !dicha.includes(bodega)) {
-        return { clave: "ubicacion_equivocada", reemplazo: REEMPLAZOS.ubicacion_equivocada };
-      }
+    if (ciudadAfirmada(plano, bodega)) {
+      return { clave: "ubicacion_equivocada", reemplazo: REEMPLAZOS.ubicacion_equivocada };
     }
     return null;
   };

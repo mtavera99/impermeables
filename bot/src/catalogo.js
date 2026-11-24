@@ -480,6 +480,10 @@ const PRODUCTOS = {
     //
     // ⛔ Y NO ES UN "2x1": el combo son DOS unidades por $129.900, no una gratis.
     precios: { 1: 79900, 2: 129900 },
+    // 💸 DESCUENTO DE RESCATE (19-nov, aprobado por el dueño). Solo como ÚLTIMO
+    // RECURSO, cuando el cliente objeta el precio o se está yendo ("no gracias",
+    // "lo voy a pensar"). Una sola vez. Combo $5.000. La unidad no tiene.
+    descuentoDeRescate: { 2: 5000 },
 
     // Costo de compra por unidad. El dueño confirmó $45.000 el 15-oct y dijo que
     // iba a intentar bajarlo: lo logró. 💰 El proveedor lo dejó en $43.000 A
@@ -800,6 +804,10 @@ const PRODUCTOS = {
     // ⛔ No hay precio para 4 cajas o más: `precioDe` lo marca fuera de tabla y
     // el bot lo pasa a un asesor en vez de inventar un descuento.
     precios: { 1: 99000, 2: 169000, 3: 229000 },
+    // 💸 DESCUENTO DE RESCATE (19-nov, aprobado por el dueño). Solo como ÚLTIMO
+    // RECURSO, cuando el cliente objeta el precio o se está yendo. Una sola vez.
+    // El x2 ($99.000) es el producto barato: $3.000. El x4 y el x6: $5.000.
+    descuentoDeRescate: { 1: 3000, 2: 5000, 3: 5000 },
     // Nombre de cada opción, como lo dice la publicidad.
     nombresDeCombo: { 1: "combo x2 radios", 2: "combo x4 radios", 3: "megacombo x6 radios" },
     // Cuántas piezas trae cada "unidad". Lo usa el guion y el cuadro de pedido.
