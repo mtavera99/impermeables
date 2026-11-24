@@ -95,6 +95,52 @@ const SENALES_CORRECCION = [
   /\bno (me )?(ha )?(llegado|lleg[oó]|recibido)\b/,
 ];
 
+// ---------------------------------------------------------------------------
+// 🛑 5. "NO GRACIAS" — EL RECHAZO DE TODOS LOS DÍAS (19-nov)
+//
+// El análisis de 1.501 chats (ANALISIS-CIERRE-BOT-19NOV.md) encontró que las
+// cuatro familias de arriba no veían el rechazo más común: "no gracias", "no
+// estoy interesado", "ya lo compré", "ya dije q no". El toque de 2 horas les
+// llegaba igual y contestaban con insultos ("joda dije que no", "no sean
+// fastidiosos…"). 42 chats en 4 días, y solo 1 compró después.
+//
+// ⚠ Estas frases son más ambiguas que las de arriba, así que llevan dos guardas
+// que las otras no necesitan (ver `evaluar`):
+//   · si el cliente YA COMPRÓ, "no gracias" o "ya lo compré" es posventa o un
+//     upsell rechazado, no un rechazo. Marcarlo apagaría el recordatorio
+//     pre-entrega, que respeta noMolestar.
+//   · si el bot acababa de ofrecer algo extra ("¿querés agregar otro?"), un
+//     "no gracias" es a ESO, no a la compra.
+// ---------------------------------------------------------------------------
+// Lo que puede venir después de "no gracias" sin cambiarle el sentido.
+const CORTESIA =
+  "(muy amable|que amable|igual|de todas formas|de todos modos|por la informacion|por la info|por todo|" +
+  "por ahora|por el momento|feliz (dia|tarde|noche)|buen dia|buena tarde|buenas (tardes|noches)|bendiciones|" +
+  "que esten bien|dios (le|les) pague|no estoy interesad[oa]|no me interesa)";
+const SENALES_DESINTERES = [
+  // "No gracias", "No, muchas gracias", "No gracias muy amable". Solo si es TODO
+  // el mensaje: "no gracias, el negro mejor" está eligiendo color.
+  new RegExp(`^(no+[\\s,.!]*)+(muchas |mil |muy )?gracias[\\s,.!]*(${CORTESIA}[\\s,.!]*)*$`),
+  /\bno (estoy|estamos|estaria) interesad/,
+  /\bno me interesan\b/,
+  /\bya (lo |los |la |las |me )?(compre|consegui|adquiri)\b/,
+  /\bya (tengo|tenemos) (uno|unos|una|el mio|los mios)\b/,
+  /\b(ya )?(les |le )?dije (q|que) no\b/,
+  /\b(ustedes )?(son|que|tan) (muy )?(aburridos|cansones|fastidiosos|intensos|pesados|jodones)\b/,
+  /\bno (sean|sea) (tan )?(fastidios|cansones|intensos|pesados|jodones)/,
+  /\bno joda\b|\bhijuep|\bhp\b/,
+];
+// Señales de que el bot acaba de ofrecer algo extra: el "no gracias" es a eso.
+const RE_OFRECIO_EXTRA =
+  /(agregar|anadir|sumar|llevar (otro|otra|el combo|uno mas)|algo mas|tambien te|te gustaria (llevar|agregar)|otro (conjunto|par|color)|otra (caja|talla))/;
+// Preguntas o posventa: "ya compré, ¿cuándo llega?" no es un rechazo.
+const RE_POSVENTA =
+  /\?|\b(cuando llega|guia|pedido|llego|lleg[oó]|no funciona|no sirve|no prende|no he podido|no puedo|garantia|devolu|cambio|bloquead|conect|emparej|dan(o|ado|ada)|roto|rota)\w*/;
+// "Ya los conseguí, PERO necesito otra cosa" y "SI no los puedo destapar, no me
+// interesan" no son un no: uno pide algo más y el otro pone una condición que se
+// puede resolver (Interrapidísimo deja abrir el paquete).
+const RE_NO_ES_UN_NO = /\bpero\b|^si\b|\bsi no (los |lo |la |me )?(puedo|pueden|dejan)/;
+
 /**
  * ¿Está corrigiendo o aclarando algo del pedido? Si sí, NO es rechazo.
  * Se evalúa primero y manda sobre la detección de rechazo.
@@ -107,9 +153,13 @@ function esCorreccion(texto) {
 /**
  * ¿Pidió que dejen de contactarlo?
  *
+ * @param {string} texto lo que escribió el cliente
+ * @param {{compro?:boolean, ultimoDelBot?:string}} [ctx] contexto del chat, para
+ *   las frases ambiguas de la familia 5. Sin contexto se asume un lead que no
+ *   compró y que no acaba de recibir una oferta extra.
  * @returns {{rechaza:boolean, motivo:string|null, esCorreccion:boolean}}
  */
-function evaluar(texto) {
+function evaluar(texto, ctx = {}) {
   const t = aplanar(texto);
   if (!t) return { rechaza: false, motivo: null, esCorreccion: false };
 
@@ -125,6 +175,17 @@ function evaluar(texto) {
       return { rechaza: true, motivo: re.source.slice(0, 48), esCorreccion: false };
     }
   }
+
+  // Familia 5, con sus guardas.
+  if (!ctx.compro && !RE_POSVENTA.test(t) && !RE_NO_ES_UN_NO.test(t)) {
+    const ofrecioExtra = RE_OFRECIO_EXTRA.test(aplanar(ctx.ultimoDelBot));
+    for (const [i, re] of SENALES_DESINTERES.entries()) {
+      if (i === 0 && ofrecioExtra) continue; // "no gracias" a la oferta extra
+      if (re.test(t)) {
+        return { rechaza: true, motivo: "desinteres: " + re.source.slice(0, 40), esCorreccion: false };
+      }
+    }
+  }
   return { rechaza: false, motivo: null, esCorreccion: false };
 }
 
@@ -133,4 +194,22 @@ function esRechazo(texto) {
   return evaluar(texto).rechaza;
 }
 
-module.exports = { evaluar, esRechazo, esCorreccion, SENALES_RECHAZO, SENALES_CORRECCION };
+/** El contexto que necesita `evaluar` para la familia 5, sacado de la conversación. */
+function contextoDe(conv) {
+  const msgs = (conv && conv.messages) || [];
+  let ultimoDelBot = "";
+  for (let i = msgs.length - 1; i >= 0; i--) {
+    if (msgs[i] && msgs[i].role === "assistant") { ultimoDelBot = msgs[i].content || ""; break; }
+  }
+  return { compro: Boolean(conv && conv.compro), ultimoDelBot };
+}
+
+module.exports = {
+  evaluar,
+  esRechazo,
+  esCorreccion,
+  contextoDe,
+  SENALES_RECHAZO,
+  SENALES_CORRECCION,
+  SENALES_DESINTERES,
+};

@@ -3225,7 +3225,34 @@ async function handleWebhook(body) {
         //
         // Ahora una corrección del pedido gana sobre el rechazo. Ver rechazo.js.
         // ====================================================================
-        const evalRechazo = rechazo.evaluar(text);
+        // 19-nov: con el contexto del chat se detecta también el "no gracias" de
+        // todos los días, sin cortarle el seguimiento a quien ya compró o a quien
+        // solo rechazó una oferta extra. Ver la familia 5 de rechazo.js.
+        let ctxRechazo = {};
+        try {
+          ctxRechazo = rechazo.contextoDe(store.getConv(from));
+        } catch (e) {
+          console.warn(`(${from}) no se pudo leer el contexto para el rechazo: ${e.message}`);
+        }
+        let evalRechazo = rechazo.evaluar(text, ctxRechazo);
+        // Un "no gracias" o un "ya compré" de alguien que TIENE un pedido con
+        // nosotros (aunque `compro` no esté marcado, por ejemplo uno tomado a
+        // mano) no lo saca de todo: le apagaría el recordatorio pre-entrega de su
+        // propio paquete. Se mira solo cuando hace falta: es una lectura del
+        // archivo de pedidos y pasa en ~3% de los chats.
+        if (evalRechazo.rechaza && String(evalRechazo.motivo || "").startsWith("desinteres")) {
+          try {
+            const tienePedido = store
+              .todosLosPedidos()
+              .some((o) => o && String(o.telefono_chat || "") === String(from) && !o.anulado);
+            if (tienePedido) {
+              console.log(`(${from}) dijo "${text.slice(0, 40)}" pero tiene un pedido: NO se marca noMolestar.`);
+              evalRechazo = { rechaza: false, motivo: null, esCorreccion: false };
+            }
+          } catch (e) {
+            console.warn(`(${from}) no se pudieron leer los pedidos para el rechazo: ${e.message}`);
+          }
+        }
         if (evalRechazo.rechaza) {
           store.marcarNoMolestar(from);
           console.log(`(${from}) pidio no ser contactado (${evalRechazo.motivo}). Marcado como noMolestar.`);
