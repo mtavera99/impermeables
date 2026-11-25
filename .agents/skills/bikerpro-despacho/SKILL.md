@@ -31,14 +31,19 @@ python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py audit
 ```
 Devuelve el listado completo separado en `limpios`, `con_alertas` y `duplicados_telefono`. Razona **únicamente** los que están en `con_alertas` revisando su chat/imagen.
 
-### 2. Dividir PDFs multi-etiqueta (1 guía por página)
+### 3. Generar guías y manifiestos originales para imprimir
+Después de crear los preenvíos en 99 Envíos 2.0:
+1. Emitir/generar las guías en **Despachos → Pendientes de Impresión** y descargar el **PDF original de guías** (Media Carta / Stickers) sin recortar, listo para imprimir.
+2. Descargar también los **manifiestos originales** de 99 Envíos (**Despachos → Manifiestos**) correspondientes al corte del día.
+3. **Entregar ambos PDFs originales directamente en el chat** (enlazados con su ruta absoluta o como archivos listos para descargar) para que Santiago pueda enviarlos a imprimir de inmediato.
+
+### 4. Dividir PDF, enviar a clientes por WhatsApp y conciliar
 ```bash
-python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py split-pdf --inputs /ruta/pdf1.pdf /ruta/pdf2.pdf --out /Users/santiagotavera/Downloads/guias_individuales.pdf
+python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py split-pdf --inputs /ruta/pdf1.pdf /ruta/pdf2.pdf --out /tmp/guias_individuales.pdf
 ```
 Detecta automáticamente páginas de **Coordinadora** (`612x264`, 2 o 3 por hoja) e **Interrapidísimo** (`612x396`, 2 por hoja) y verifica que todas las páginas tengan texto legible.
 
-### 3. Subir a BikerPro, enviar por WhatsApp y conciliar
 ```bash
-python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py dispatch-pdf --pdf /Users/santiagotavera/Downloads/guias_individuales.pdf
+python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py dispatch-pdf --pdf /tmp/guias_individuales.pdf
 ```
-Sube el PDF a `/guias/revisar`, valida emparejamiento, envía las guías por `/guias/enviar` en lotes seguros y ejecuta `POST /conciliar-guias`.
+Sube el PDF dividido a `/guias/revisar`, valida emparejamiento, envía las guías por `/guias/enviar` en lotes seguros y ejecuta `POST /conciliar-guias`.
