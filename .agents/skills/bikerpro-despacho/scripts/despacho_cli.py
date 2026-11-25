@@ -151,6 +151,26 @@ def cmd_dispatch_pdf(pdf_path, batch_size):
     }, indent=2, ensure_ascii=False))
 
 
+def cmd_send_doc(pdf_path, to_numbers, caption):
+    import urllib.parse
+    require_token()
+    data = open(pdf_path, "rb").read()
+    filename = os.path.basename(pdf_path)
+    qs = urllib.parse.urlencode({
+        "token": PANEL_TOKEN,
+        "to": ",".join(to_numbers),
+        "filename": filename,
+        "caption": caption,
+    })
+    req = urllib.request.Request(
+        f"{BASE_URL}/enviar-documento?{qs}",
+        data=data,
+        headers={"Content-Type": "application/pdf"},
+    )
+    res = json.loads(urllib.request.urlopen(req, context=SSL_CTX, timeout=60).read().decode("utf-8"))
+    print(json.dumps(res, indent=2, ensure_ascii=False))
+
+
 def main():
     parser = argparse.ArgumentParser(description="BikerPro Despacho CLI")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -161,6 +181,10 @@ def main():
     dp = sub.add_parser("dispatch-pdf", help="Sube PDF dividido, envía por WhatsApp y concilia")
     dp.add_argument("--pdf", required=True)
     dp.add_argument("--batch-size", type=int, default=20)
+    sd = sub.add_parser("send-doc", help="Envía un PDF original/manifiesto a uno o más WhatsApp")
+    sd.add_argument("--pdf", required=True)
+    sd.add_argument("--to", nargs="+", required=True, help="Números destino (ej. 573001234567)")
+    sd.add_argument("--caption", default="Guías y manifiesto para impresión 📦")
     args = parser.parse_args()
 
     if args.cmd == "audit":
@@ -169,6 +193,8 @@ def main():
         cmd_split_pdf(args.inputs, args.out)
     elif args.cmd == "dispatch-pdf":
         cmd_dispatch_pdf(args.pdf, args.batch_size)
+    elif args.cmd == "send-doc":
+        cmd_send_doc(args.pdf, args.to, args.caption)
 
 
 if __name__ == "__main__":

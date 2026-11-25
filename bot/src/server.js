@@ -1690,6 +1690,47 @@ function esDuplicado(to, texto) {
   return false;
 }
 
+// ============================================================================
+// POST /enviar-documento — envía un PDF crudo por WhatsApp a uno o más números
+// (útil para enviar guías originales y manifiestos directo al dueño/bodega).
+// ============================================================================
+app.post("/enviar-documento", express.raw({ type: "application/pdf", limit: "40mb" }), async (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  if (!Buffer.isBuffer(req.body) || !req.body.length) {
+    return res.status(400).json({ ok: false, error: "Falta el PDF en el cuerpo." });
+  }
+  const rawTo = String(req.query.to || "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (!rawTo.length) {
+    return res.status(400).json({ ok: false, error: "Falta el parámetro ?to=573..." });
+  }
+  const filename = String(req.query.filename || "documento.pdf").replace(/[^\w.\-() ]+/g, "_");
+  const caption = String(req.query.caption || "").trim();
+
+  const resultados = [];
+  for (const num of rawTo) {
+    const to = idDestino(num);
+    if (!to) {
+      resultados.push({ to: num, ok: false, error: "número inválido" });
+      continue;
+    }
+    const conv = store.getConv(to);
+    const ultimo = (conv && conv.ultimoDelCliente) || 0;
+    const ventanaAbierta = ultimo > 0 && Date.now() - ultimo < 24 * 60 * 60 * 1000;
+    const envio = ventanaAbierta
+      ? await sendPdf(to, req.body, filename, caption)
+      : await sendPdfPorPlantilla(to, req.body, filename, PLANTILLA_GUIA, PLANTILLA_IDIOMA);
+    resultados.push({
+      to,
+      ok: Boolean(envio.ok),
+      porPlantilla: Boolean(envio.porPlantilla),
+      messageId: envio.messageId || null,
+      error: envio.ok ? null : motivoDeEnvio(envio),
+    });
+  }
+  const enviadas = resultados.filter((r) => r.ok).length;
+  res.json({ ok: enviadas > 0, enviadas, total: resultados.length, resultados });
+});
+
 app.post("/responder", async (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) {
     return res.sendStatus(403);
