@@ -14,4 +14,5 @@ Para ahorrar contexto y créditos, **no explores ni re-escribas scripts desde ce
 
 ## Variables de entorno requeridas (no guardar secretos en Git)
 - `BIKERPRO_PANEL_TOKEN`: Token del panel de BikerPro en Render.
+- `BIKERPRO_PRINT_PHONES`: Números de WhatsApp separados por coma para enviar guías originales y manifiestos a imprimir.
 - `N99_TOKEN` (o `N99_EMAIL`, `N99_PASSWORD`, `N99_2FA_CODE`): Acceso a `api.99envios.co`.

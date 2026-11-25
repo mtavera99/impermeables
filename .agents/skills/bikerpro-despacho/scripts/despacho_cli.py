@@ -154,11 +154,17 @@ def cmd_dispatch_pdf(pdf_path, batch_size):
 def cmd_send_doc(pdf_path, to_numbers, caption):
     import urllib.parse
     require_token()
+    targets = [n.strip() for n in (to_numbers or []) if n.strip()]
+    if not targets:
+        env_phones = os.environ.get("BIKERPRO_PRINT_PHONES", "").strip()
+        targets = [p.strip() for p in env_phones.split(",") if p.strip()]
+    if not targets:
+        raise RuntimeError("Faltan números destino (--to o variable BIKERPRO_PRINT_PHONES).")
     data = open(pdf_path, "rb").read()
     filename = os.path.basename(pdf_path)
     qs = urllib.parse.urlencode({
         "token": PANEL_TOKEN,
-        "to": ",".join(to_numbers),
+        "to": ",".join(targets),
         "filename": filename,
         "caption": caption,
     })
@@ -183,7 +189,7 @@ def main():
     dp.add_argument("--batch-size", type=int, default=20)
     sd = sub.add_parser("send-doc", help="Envía un PDF original/manifiesto a uno o más WhatsApp")
     sd.add_argument("--pdf", required=True)
-    sd.add_argument("--to", nargs="+", required=True, help="Números destino (ej. 573001234567)")
+    sd.add_argument("--to", nargs="*", default=[], help="Números destino (opcional si existe BIKERPRO_PRINT_PHONES)")
     sd.add_argument("--caption", default="Guías y manifiesto para impresión 📦")
     args = parser.parse_args()
 

@@ -31,11 +31,15 @@ python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py audit
 ```
 Devuelve el listado completo separado en `limpios`, `con_alertas` y `duplicados_telefono`. Razona **únicamente** los que están en `con_alertas` revisando su chat/imagen.
 
-### 3. Generar guías y manifiestos originales para imprimir
+### 3. Generar guías y manifiestos originales y enviarlos por WhatsApp para imprimir
 Después de crear los preenvíos en 99 Envíos 2.0:
-1. Emitir/generar las guías en **Despachos → Pendientes de Impresión** y descargar el **PDF original de guías** (Media Carta / Stickers) sin recortar, listo para imprimir.
+1. Emitir/generar las guías en **Despachos → Pendientes de Impresión** y descargar el **PDF original de guías** (Media Carta / Stickers) sin recortar.
 2. Descargar también los **manifiestos originales** de 99 Envíos (**Despachos → Manifiestos**) correspondientes al corte del día.
-3. **Entregar ambos PDFs originales directamente en el chat** (enlazados con su ruta absoluta o como archivos listos para descargar) para que Santiago pueda enviarlos a imprimir de inmediato.
+3. **Enviar ambos PDFs automáticamente por WhatsApp** a los números configurados en `BIKERPRO_PRINT_PHONES` (y dejarlos también enlazados en el chat):
+   ```bash
+   python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py send-doc --pdf /ruta/guias_original.pdf --caption "Guías originales para imprimir 📦"
+   python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py send-doc --pdf /ruta/manifiesto.pdf --caption "Manifiesto original 99 Envíos 📋"
+   ```
 
 ### 4. Dividir PDF, enviar a clientes por WhatsApp y conciliar
 ```bash
