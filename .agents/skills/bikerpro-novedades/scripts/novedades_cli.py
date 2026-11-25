@@ -15,46 +15,50 @@ PANEL_TOKEN = os.environ.get("BIKERPRO_PANEL_TOKEN", "").strip()
 SSL_CTX = ssl._create_unverified_context()
 
 
-def build_99_opener():
+def get_99_token() -> str:
+    token = os.environ.get("N99_TOKEN", "").strip()
+    if token:
+        return token
+
     email = os.environ.get("N99_EMAIL", "").strip()
     password = os.environ.get("N99_PASSWORD", "").strip()
+    code = os.environ.get("N99_2FA_CODE", "").strip()
     if not email or not password:
-        raise RuntimeError("Faltan variables de entorno N99_EMAIL y N99_PASSWORD.")
+        raise RuntimeError("Falta N99_TOKEN o (N99_EMAIL y N99_PASSWORD).")
 
-    cj = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(
-        urllib.request.HTTPCookieProcessor(cj),
-        urllib.request.HTTPSHandler(context=SSL_CTX),
-    )
+    body = {"email": email, "password": password}
+    if code:
+        body.update({"code": code, "totp_code": code, "two_factor_code": code})
+
     req = urllib.request.Request(
         f"{API_99}/auth/login",
-        data=json.dumps({"email": email, "password": password}).encode("utf-8"),
+        data=json.dumps(body).encode("utf-8"),
         headers={"Content-Type": "application/json", "Origin": "https://www.99envios.co"},
     )
-    resp = json.loads(opener.open(req, timeout=20).read().decode("utf-8"))
-    if not resp.get("success", True):
+    resp = json.loads(urllib.request.urlopen(req, context=SSL_CTX, timeout=20).read().decode("utf-8"))
+    if not resp.get("access_token"):
         raise RuntimeError(f"Login 99 Envíos falló: {resp}")
-    return opener
+    return resp["access_token"]
 
 
-def fetch_99_json(opener, path: str) -> dict:
+def fetch_99_json(token: str, path: str) -> dict:
     req = urllib.request.Request(
         f"{API_99}{path}",
-        headers={"Origin": "https://www.99envios.co"},
+        headers={"Authorization": f"Bearer {token}", "Origin": "https://www.99envios.co"},
     )
-    return json.loads(opener.open(req, timeout=25).read().decode("utf-8"))
+    return json.loads(urllib.request.urlopen(req, context=SSL_CTX, timeout=25).read().decode("utf-8"))
 
 
 def cmd_fetch_v2(days: int):
-    opener = build_99_opener()
+    token = get_99_token()
     now = datetime.now(timezone.utc)
     start = (now - timedelta(days=days)).strftime("%Y-%m-%dT00:00:00Z")
     end = now.strftime("%Y-%m-%dT23:59:59.999999Z")
     qs_base = f"start_date={urllib.parse.quote(start)}&end_date={urllib.parse.quote(end)}"
 
-    oficina = fetch_99_json(opener, f"/dashboard/shipments?{qs_base}&status=RECLAME_OFICINA&page=1&page_size=100").get("data", [])
-    novedades = fetch_99_json(opener, f"/dashboard/shipments?{qs_base}&status=NOVEDAD&page=1&page_size=100").get("data", [])
-    auto_raw = fetch_99_json(opener, "/shipping/shipments/novelties?status=ACTIVA")
+    oficina = fetch_99_json(token, f"/dashboard/shipments?{qs_base}&status=RECLAME_OFICINA&page=1&page_size=100").get("data", [])
+    novedades = fetch_99_json(token, f"/dashboard/shipments?{qs_base}&status=NOVEDAD&page=1&page_size=100").get("data", [])
+    auto_raw = fetch_99_json(token, "/shipping/shipments/novelties?status=ACTIVA")
     autogestion = auto_raw if isinstance(auto_raw, list) else (auto_raw.get("results") or auto_raw.get("data") or [])
 
     # Deduplicar por número de guía
