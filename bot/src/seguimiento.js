@@ -445,7 +445,7 @@ function elegible(phone, c, ahora) {
   // ventana contenga la edad actual. El que se perdió el toque de 2h igual recibe
   // el de 20h y el de 44h: dos en vez de tres, pero no cero.
   // ==========================================================================
-  return pasoQueCorresponde(hechos, edad);
+  return pasoQueCorresponde(hechos, edad, c);
 }
 
 /**
@@ -457,10 +457,16 @@ function elegible(phone, c, ahora) {
  * "esperandoPaso2: 0" mientras el envío sí lo tomaba: una pantalla que contradice
  * lo que hace el bot es peor que no tenerla.
  */
-function pasoQueCorresponde(hechos, edad) {
+function pasoQueCorresponde(hechos, edad, c) {
   for (let i = hechos; i < PASOS.length; i++) {
     const p = PASOS[i];
-    if (edad >= p.desde && edad <= p.hasta) return p;
+    if (edad >= p.desde && edad <= p.hasta) {
+      // 📋 24-nov: si a los 20 min ya le llegó el rescate del cuadro y no volvió a
+      // escribir, el toque de 2 h sobra: serían dos mensajes en dos horas. Los
+      // de 20 h y 44 h siguen. Ver rescate-cuadro.js.
+      if (p.n === 1 && c && require("./rescate-cuadro").rescatadoSinRespuesta(c)) return null;
+      return p;
+    }
   }
   return null;
 }
@@ -602,7 +608,7 @@ function diagnostico() {
       if (hechos === 0) r.sinSeguimientoYVencidos++;
       continue;
     }
-    const paso = pasoQueCorresponde(hechos, edad);
+    const paso = pasoQueCorresponde(hechos, edad, c);
     if (paso) r[`esperandoPaso${paso.n}`]++;
     else r.enEspera++;
   }

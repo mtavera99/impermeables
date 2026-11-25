@@ -11587,3 +11587,42 @@ cuota) · usado $X"* en vez de un saldo falso. Prueba: `bot/test-saldo-ia.js`.
 
 **Para ver el saldo de verdad:** en el panel de VNAI, editar la clave (token) que usa el bot y **ponerle una cuota
 igual al saldo comprado**, en vez de "ilimitada". Así `hard_limit_usd` = cuota real y el semáforo funciona.
+
+---
+
+## 0-BW · 📋 RESCATE DEL CUADRO SIN RESPONDER, Y EL "219 / 32" QUE NO ERA (mar 24-nov, 20:30 Bogotá)
+
+**El pedido:** /auditoria del 24-nov mostró *739 chats · 671 cotizados · 219 con cuadro · 32 confirmaron*. Se pidió un
+rescate rápido para los que quedan en el cuadro sin decir "sí", dentro de la ventana de 24 h.
+
+### 🔴 Primero: el número estaba mal contado
+- `panel-auditoria.js` contaba `conCuadro` si el chat **alguna vez** tuvo un cuadro, pero `confirmaron` solo si el SÍ
+  era **de hoy**. Un cliente que confirmó ayer y hoy pregunta por la guía contaba como "llegó al cuadro y no confirmó".
+- **En los chats reales (988, últimas 30 h):** 194 vieron el cuadro, **149 confirmaron (77%)**, 39 contestaron otra cosa
+  y **solo 6 nunca contestaron**. Los que confirman lo hacen en una **mediana de 0,7 min, y el 92% en menos de 15 min**.
+- **Arreglo:** el cuadro también tiene que ser de hoy para contar.
+
+### El rescate (`bot/src/rescate-cuadro.js`)
+- **Quién entra:** el último cuadro no tiene SÍ ni NO después; el cliente está callado (el último mensaje es del bot, de
+  hace **20 a 100 min**); el cuadro es de las últimas 6 h. Después del cuadro se acepta como mucho una pregunta
+  contestada, y la respuesta del bot no puede pedir datos ni pasar a un asesor.
+- **Quién no entra:** pausado, `noMolestar`, o con un **pedido confirmado** desde el cuadro (se mira en `orders.json`,
+  no en el texto: un "Okey" ya confirma).
+- 🔑 **`c.compro` se respeta, salvo que los únicos pedidos desde el cuadro sean `sin_confirmar`.** `server.js` prende
+  `compro` con cualquier `##ORDER##`, también el prematuro que viene junto al cuadro. Respetarlo a ciegas habría
+  excluido justo a los que hay que rescatar. ⚠️ **Pendiente:** ese mismo `compro` también los saca del seguimiento
+  normal. Es un arreglo aparte.
+- **Horario** 7:00-21:59 Bogotá. **Una vez por cuadro:** `store.reclamarRescateCuadro` (comparar y guardar) antes de enviar.
+- **Mensaje:** *"Ana, ¿quedó todo bien en el resumen de tu pedido? 🙌 Si está correcto, respondeme SÍ CONFIRMO y lo
+  paso a despacho, y pagás cuando te llegue 📦 Si hay que cambiar algo (dirección, celular o cantidad), decime y lo
+  ajusto."* No dice "Confirmemos tu pedido" (sería un cuadro nuevo para `confirmacion.js`) ni promete "hoy".
+  Queda en el historial con `por: "rescate_cuadro"`.
+- **Con el seguimiento:** si se mandó el rescate y el cliente no volvió a escribir, **se salta el toque de 2 h**
+  (`pasoQueCorresponde(hechos, edad, c)`). Los toques de 20 h y 44 h siguen.
+- **Interruptor:** anda si `SEGUIMIENTO_ACTIVO=1`, y `RESCATE_CUADRO=0` lo apaga. Reloj cada 10 min. Lee los pedidos
+  solo si hay candidatos (por la memoria).
+- **Medición:** `/seguimiento` → `rescate_cuadro` {enviados, contestaron, confirmaron, tasaConfirmacion}.
+- Prueba: `bot/test-rescate-cuadro.js` (41).
+
+**Simulado sobre los chats reales del 23-24 nov:** ~12 rescates en 30 h, o sea **~10 por día**. Varios de esos clientes
+volvieron solos horas después. **Ganancia realista: +2 a +4 pedidos/día**, no los 187 que sugería el panel.

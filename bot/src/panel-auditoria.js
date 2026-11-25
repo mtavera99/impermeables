@@ -171,7 +171,14 @@ function auditar(dia) {
 
     if (embudo.dioTotal(textoBot)) cuenta.cotizadas++;
 
-    const mandoCuadro = RE_CUADRO.test(textoBot);
+    // 🔴 24-nov: antes bastaba con que el chat hubiera tenido un cuadro ALGUNA
+    // vez. Un cliente que confirmó ayer y hoy pregunta por su guía contaba como
+    // "llegó al cuadro y no confirmó", porque la confirmación sí se exige de hoy.
+    // Ese día salió "219 con cuadro / 32 confirmaron"; en los chats, de los que
+    // vieron el cuadro, confirmaron 3 de cada 4. Ahora el cuadro también es de hoy.
+    const mandoCuadro = delBot.some(
+      (m) => RE_CUADRO.test(String(m.content || "")) && Number.isFinite(m.at) && diaBogota(m.at) === hoy
+    );
     if (mandoCuadro) cuenta.conCuadro++;
 
     // ¿El cliente confirmó DESPUÉS de ver el cuadro, y HOY?

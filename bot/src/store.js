@@ -558,6 +558,24 @@ function reclamarSeguimiento(phone, esperados, paso) {
   return true;
 }
 
+/**
+ * 📋 Reserva el rescate de ESTE cuadro de confirmación (24-nov). Comparar y
+ * guardar, igual que `reclamarSeguimiento`: si ya hay un rescate anotado para
+ * el mismo cuadro, otra pasada se adelantó y esta no manda. Ver rescate-cuadro.js.
+ * @returns {boolean} true si quedó reservado para nosotros
+ */
+function reclamarRescateCuadro(phone, cuadroAt) {
+  ensure();
+  const all = readJSON(CONV_FILE, {});
+  const c = all[phone];
+  if (!c) return false;
+  if (c.rescateCuadro && Number(c.rescateCuadro.cuadroAt) === Number(cuadroAt)) return false;
+  c.rescateCuadro = { cuadroAt: Number(cuadroAt), enviadoAt: Date.now() };
+  all[phone] = c;
+  writeJSON(CONV_FILE, all);
+  return true;
+}
+
 /** Anota que este cliente compró después del paso N de seguimiento. */
 function marcarCompraDeSeguimiento(phone, paso) {
   ensure();
@@ -3001,7 +3019,7 @@ module.exports = {
   anotarFalloEntrega, fallosDeEntrega,
   guardarPlan, leerPlan, borrarPlan, limpiarPlanesGuardados,
   registrarArranque, estadoDelDisco, tamanosEnDisco,
-  marcarComprado, registrarSeguimiento, reclamarSeguimiento,
+  marcarComprado, registrarSeguimiento, reclamarSeguimiento, reclamarRescateCuadro,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
   // 📦 Archivo de conversaciones viejas: baja el costo de cada mensaje sin borrar nada.
   archivarConversacionesViejas, recuperarDelArchivo, leerArchivada, migrarArchivoUnico, ultimaActividad, DIAS_ACTIVAS,

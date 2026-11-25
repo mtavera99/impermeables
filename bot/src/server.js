@@ -12,6 +12,7 @@ const { MEDIA, resolver: resolverMedia } = require("./media");
 const store = require("./store");
 const seguimiento = require("./seguimiento");
 const recordatorioEntrega = require("./recordatorio-entrega");
+const rescateCuadro = require("./rescate-cuadro");
 const panel = require("./panel");
 const panelGuias = require("./panel-guias");
 const guias = require("./guias");
@@ -3563,6 +3564,9 @@ app.get("/seguimiento", (req, res) => {
     // compraron. Es la única forma de saber cuál de los tres toques paga.
     porPaso: store.estadisticasSeguimiento(),
     estado: seguimiento.diagnostico(),
+    // 📋 El rescate del cuadro sin responder (24-nov): cuántos se mandaron y
+    // cuántos terminaron con el pedido confirmado.
+    rescate_cuadro: rescateCuadro.diagnostico(),
   });
 });
 
@@ -3675,4 +3679,5 @@ app.listen(PORT, () => {
   subscribeWaba();      // auto-suscribe la WABA al arrancar
   seguimiento.arrancar(); // reloj del seguimiento de 72h (solo si esta activo)
   recordatorioEntrega.arrancar(); // recordatorio pre-entrega 24-48h (solo si esta activo)
+  rescateCuadro.arrancar(); // rescate del cuadro sin responder a los 20 min (va con el seguimiento)
 });
