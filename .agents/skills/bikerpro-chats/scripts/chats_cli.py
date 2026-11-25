@@ -10,8 +10,13 @@ import sys
 import urllib.request
 
 BASE_URL = os.environ.get("BIKERPRO_BASE_URL", "https://bikerpro-bot.onrender.com").rstrip("/")
-PANEL_TOKEN = os.environ.get("BIKERPRO_PANEL_TOKEN", "biker_panel_1023979300_2026")
+PANEL_TOKEN = os.environ.get("BIKERPRO_PANEL_TOKEN", "").strip()
 SSL_CTX = ssl._create_unverified_context()
+
+
+def require_token():
+    if not PANEL_TOKEN:
+        raise RuntimeError("Falta la variable de entorno BIKERPRO_PANEL_TOKEN.")
 
 MANUAL_KEYWORDS = (
     "posible comprobante",
