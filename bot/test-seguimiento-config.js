@@ -402,7 +402,9 @@ function seguir() {
 
   const src = fs.readFileSync(`${__dirname}/src/seguimiento.js`, "utf8");
   for (const [que, patron] of [
-    ["los que ya compraron", /if \(c\.compro\) return null/],
+    // 24-nov: "ya compró" ahora mira los pedidos (un sin_confirmar no es compra).
+    // Ver test-compro-sin-confirmar.js.
+    ["los que ya compraron", /if \(cuentaComoCompra\(phone, c, porTel\)\) return null/],
     ["los que pidieron no molestar", /if \(c\.noMolestar\) return null/],
     ["los chats que tomó un humano", /if \(c\.paused\) return null/],
     ["los que ya recibieron 3", /hechos >= 3/],

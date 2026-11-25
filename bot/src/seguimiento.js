@@ -415,9 +415,58 @@ const PASOS = [
 //
 // 🔑 La redacción de los dos, por producto, está en TEXTOS_POR_PRODUCTO arriba.
 
+// ============================================================================
+// 🛒 ¿YA COMPRÓ DE VERDAD? (24-nov, sección 0-BW)
+//
+// `c.compro` lo prende server.js con CUALQUIER pedido guardado, también con el
+// `##ORDER##` prematuro que el modelo emite junto al cuadro de confirmación y que
+// se guarda `sin_confirmar`. Ese cliente NO compró —no dijo sí— y aun así quedaba
+// fuera de los toques de 2 h, 20 h y 44 h: justo el más cerca de cerrar.
+//
+// La regla, de menos a más conservadora:
+//   · sin `compro` → no compró;
+//   · con `compro` y TODOS sus pedidos vigentes y `sin_confirmar` → no compró,
+//     sigue en el seguimiento;
+//   · con `compro` y algún pedido confirmado, o ANULADO (canceló: no se le
+//     insiste), o sin ningún pedido a la vista (venta a mano, archivo) → compró.
+//
+// ⚠ No cambia `c.compro` en sí: el panel, la atención y el resto lo siguen leyendo
+// igual. Solo cambia a quién le escribe el seguimiento.
+// ============================================================================
+function resumenDePedidos(pedidos) {
+  const porTel = new Map();
+  for (const p of pedidos || []) {
+    if (!p || !p.telefono_chat) continue;
+    const k = String(p.telefono_chat);
+    const r = porTel.get(k) || { total: 0, sinConfirmar: 0 };
+    r.total++;
+    if (p.sin_confirmar && !p.anulado) r.sinConfirmar++;
+    porTel.set(k, r);
+  }
+  return porTel;
+}
+
+function pedidosPorTelefono() {
+  try {
+    // Con los ANULADOS: un pedido cancelado tiene que seguir frenando el seguimiento.
+    return resumenDePedidos(store.todosLosPedidos({ incluirAnulados: true }));
+  } catch (e) {
+    // Sin pedidos legibles se vuelve a la regla de siempre: `compro` manda.
+    console.warn(`[seguimiento] no se pudieron leer los pedidos (${e.message}): se usa solo c.compro`);
+    return null;
+  }
+}
+
+function cuentaComoCompra(phone, c, porTel) {
+  if (!c || !c.compro) return false;
+  const r = porTel && porTel.get(String(phone));
+  if (!r || r.total === 0) return true;
+  return !(r.sinConfirmar === r.total);
+}
+
 /** Un cliente entra al seguimiento solo si cumple TODO esto. */
-function elegible(phone, c, ahora) {
-  if (c.compro) return null;                       // ya compro
+function elegible(phone, c, ahora, porTel) {
+  if (cuentaComoCompra(phone, c, porTel)) return null; // ya compro (de verdad: ver cuentaComoCompra)
   if (c.noMolestar) return null;                   // pidio que no le escriban
   if (c.paused) return null;                       // un humano tomo el chat
   if (!c.ultimoDelCliente) return null;            // nunca escribio
@@ -478,9 +527,10 @@ async function correrSeguimientos() {
   const todas = store.todasLasConversaciones();
   const ahora = Date.now();
   let enviados = 0, saltados = 0;
+  const porTel = pedidosPorTelefono();
 
   for (const [phone, c] of Object.entries(todas)) {
-    const paso = elegible(phone, c, ahora);
+    const paso = elegible(phone, c, ahora, porTel);
     if (!paso) continue;
 
     const horas = ((ahora - c.ultimoDelCliente) / H).toFixed(1);
@@ -586,8 +636,12 @@ function diagnostico() {
     esperandoPaso3: 0, enEspera: 0, sinSeguimientoYVencidos: 0,
     // 🔑 La prueba de que se mandó: cuántos llevan 1, 2 o 3 seguimientos.
     recibieron1: 0, recibieron2: 0, recibieron3: 0, mensajesEnviados: 0,
+    // 🛒 Con `compro` prendido por un pedido sin confirmar, y que SÍ siguen en el
+    // seguimiento (ver cuentaComoCompra).
+    sinConfirmarEnSeguimiento: 0,
   };
-  for (const [, c] of Object.entries(todas)) {
+  const porTel = pedidosPorTelefono();
+  for (const [phone, c] of Object.entries(todas)) {
     r.total++;
     // 🔑 Se cuenta ACÁ ARRIBA, antes de cualquier `continue`, porque si no los
     // que ya recibieron seguimientos y además compraron (o pidieron no molestar)
@@ -596,7 +650,8 @@ function diagnostico() {
     if (recibidos >= 1) r[`recibieron${recibidos}`]++;
     r.mensajesEnviados += recibidos;
 
-    if (c.compro) { r.compraron++; continue; }
+    if (cuentaComoCompra(phone, c, porTel)) { r.compraron++; continue; }
+    if (c.compro) r.sinConfirmarEnSeguimiento++;
     if (c.noMolestar) { r.noMolestar++; continue; }
     if (c.paused) { r.enPausa++; continue; }
     if (!c.ultimoDelCliente) continue;
@@ -734,6 +789,9 @@ function configuracionEfectiva() {
 
 module.exports = {
   arrancar,
+  cuentaComoCompra,
+  resumenDePedidos,
+  elegible,
   correrSeguimientos,
   diagnostico,
   configuracionEfectiva,

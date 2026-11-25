@@ -11611,7 +11611,7 @@ rescate rápido para los que quedan en el cuadro sin decir "sí", dentro de la v
 - 🔑 **`c.compro` se respeta, salvo que los únicos pedidos desde el cuadro sean `sin_confirmar`.** `server.js` prende
   `compro` con cualquier `##ORDER##`, también el prematuro que viene junto al cuadro. Respetarlo a ciegas habría
   excluido justo a los que hay que rescatar. ⚠️ **Pendiente:** ese mismo `compro` también los saca del seguimiento
-  normal. Es un arreglo aparte.
+  normal. ✅ **Arreglado en el PR siguiente (#252), ver abajo.**
 - **Horario** 7:00-21:59 Bogotá. **Una vez por cuadro:** `store.reclamarRescateCuadro` (comparar y guardar) antes de enviar.
 - **Mensaje:** *"Ana, ¿quedó todo bien en el resumen de tu pedido? 🙌 Si está correcto, respondeme SÍ CONFIRMO y lo
   paso a despacho, y pagás cuando te llegue 📦 Si hay que cambiar algo (dirección, celular o cantidad), decime y lo
@@ -11626,3 +11626,20 @@ rescate rápido para los que quedan en el cuadro sin decir "sí", dentro de la v
 
 **Simulado sobre los chats reales del 23-24 nov:** ~12 rescates en 30 h, o sea **~10 por día**. Varios de esos clientes
 volvieron solos horas después. **Ganancia realista: +2 a +4 pedidos/día**, no los 187 que sugería el panel.
+
+### ✅ Y el arreglo del pendiente: un pedido `sin_confirmar` ya no saca del seguimiento (#252)
+
+`seguimiento.js` ya no usa `c.compro` a secas. Usa `cuentaComoCompra(phone, c, porTel)`:
+- **sin `compro`** → sigue en el seguimiento;
+- **`compro` y TODOS sus pedidos vigentes son `sin_confirmar`** → sigue en el seguimiento (no dijo sí);
+- **`compro` con algún pedido confirmado, o ANULADO** (canceló: no se le insiste), **o sin pedidos a la vista** (venta a
+  mano, archivo) → compró, queda fuera como siempre.
+
+Los pedidos se leen **una vez por pasada** (`todosLosPedidos({ incluirAnulados: true })`). Si no se pueden leer, vuelve la
+regla de siempre. `elegible` y `diagnostico` usan la misma función.
+
+⚠️ **`c.compro` no se tocó:** el panel, `atencion.js` y el resto lo siguen leyendo igual. Solo cambia a quién le escribe
+el seguimiento.
+
+`/seguimiento` → `estado.sinConfirmarEnSeguimiento` dice cuántos volvieron a entrar. Prueba:
+`bot/test-compro-sin-confirmar.js` (21). `test-seguimiento-config.js` se ajustó al nuevo patrón.
