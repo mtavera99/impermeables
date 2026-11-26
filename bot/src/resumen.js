@@ -163,7 +163,10 @@ function delDia(dia = hoyBogota(), datos = null) {
     if (c.paused) esperandoHumano++;
   }
 
-  const ingresos = pedidos.reduce((s, p) => s + Number(p.total || 0), 0);
+  // 🔴 25-nov: un solo total que no es número ("[object Object]25100") volvía NaN
+  // la suma entera y el panel mostraba $0 de recaudo. Lo que no es número no suma;
+  // ese pedido sale marcado para revisar (motivo `total_invalido` en store.js).
+  const ingresos = pedidos.reduce((s, p) => s + (Number.isFinite(Number(p.total)) ? Number(p.total) : 0), 0);
   const unidades = pedidos.reduce((s, p) => s + unidadesDe(p), 0);
 
   // Ciudades, para ver dónde se está vendiendo

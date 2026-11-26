@@ -2075,9 +2075,13 @@ app.post("/pedido-manual", async (req, res) => {
       if (ficha) {
         const q = fletes.cotizar(ciudad, 1);
         if (q && q.banda) {
-          const precioBase = catalogo.precioDe(productoId, unidades);
-          const fleteVal = catalogo.envioDe(productoId, q.banda, unidades);
-          if (precioBase && fleteVal != null) {
+          // 🔴 25-nov: `precioDe` devuelve un OBJETO ({precio, uds, ...}), no un
+          // número. Sumarlo al flete daba "[object Object]25100" como total, y
+          // ese texto hacía NaN el recaudo del día entero en el panel ($0).
+          const precio = catalogo.precioDe(productoId, unidades);
+          const precioBase = precio && !precio.fueraDeTabla ? Number(precio.precio) : NaN;
+          const fleteVal = Number(catalogo.envioDe(productoId, q.banda, unidades));
+          if (Number.isFinite(precioBase) && precioBase > 0 && Number.isFinite(fleteVal) && fleteVal >= 0) {
             total = precioBase + fleteVal;
             totalCalculado = true;
           }
@@ -2085,6 +2089,7 @@ app.post("/pedido-manual", async (req, res) => {
       }
     }
   }
+  if (!Number.isFinite(Number(total))) total = 0; // nunca se guarda un total que no es número
   if (!total) {
     return res.status(400).json({
       ok: false,
@@ -3721,4 +3726,11 @@ app.listen(PORT, () => {
   seguimiento.arrancar(); // reloj del seguimiento de 72h (solo si esta activo)
   recordatorioEntrega.arrancar(); // recordatorio pre-entrega 24-48h (solo si esta activo)
   rescateCuadro.arrancar(); // rescate del cuadro sin responder a los 20 min (va con el seguimiento)
+  // 🔧 25-nov: repara los totales "[object Object]N" que dejó el bug de /pedido-manual.
+  try {
+    const r = store.repararTotalesRotos();
+    if (r.reparados) console.log(`🔧 Totales reparados: ${JSON.stringify(r)}`);
+  } catch (e) {
+    console.error(`🔧 No se pudieron reparar los totales: ${e.message}`);
+  }
 });
