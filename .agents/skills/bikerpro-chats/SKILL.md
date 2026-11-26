@@ -25,7 +25,8 @@ Esto descarga `/panel` y agrupa las conversaciones en:
 - `manuales`: posibles comprobantes de pago (`imagen: posible comprobante`), garantías/fallas posventa, reclamos de devolución o cambios de dirección en pedidos ya despachados.
 
 ### 2. Recuperar pedidos perdidos + ejecutar limpieza y respuestas
-1. Revisa primero `posibles_ventas_perdidas`: si el cliente ya dio **nombre, celular, ciudad, dirección** y confirmó (`sí`, `okey`, `listo`, `dale`), **regístrale el pedido de inmediato** usando `recover_orders` (`POST /pedido-manual`) y respóndele confirmando el despacho.
+1. Revisa primero `posibles_ventas_perdidas`: si el cliente ya dio **nombre, celular, ciudad, dirección** y confirmó (`sí`, `okey`, `listo`, `dale`, `está bien`), **NO te limites a responderle**: **regístrale obligatoriamente la venta dentro del panel** usando `recover_orders` (`POST /pedido-manual`) para que aparezca en **Pendientes de despachar**, y envíale la confirmación de despacho.
+   - En tu reporte final al usuario, **separa siempre** los **pedidos registrados en el panel vía `/pedido-manual`** de los simples **mensajes de seguimiento/cotización** (no llames "venta recuperada" a un chat si todavía no quedó guardado como pedido en el panel).
 2. Revisa los chats en `razonar` y redacta respuestas exactas según el catálogo BikerPro:
    - **V10 2X:** combo x2 `$99.900` + envío (Bogotá/Medellín/principales `$122.000`, intermedios `$125.000`). Accesorios: unidad principal, parlantes, micrófono, soportes/velcro de montaje, cable de carga y manual.
    - **Q58 Max:** combo x2 `$129.900` + envío (`$143.000` Bogotá, `$152.000`–`$155.000` otras ciudades) · 1 unidad `$79.900` + envío. Accesorios: unidad principal, micrófono rígido/blando, parlantes, base/clip de montaje, cable USB-C y manual.
