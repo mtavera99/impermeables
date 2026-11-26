@@ -19,13 +19,35 @@ def require_token():
         raise RuntimeError("Falta la variable de entorno BIKERPRO_PANEL_TOKEN.")
 
 
+HOMONYM_CITIES = (
+    "restrepo", "la unión", "la union", "ciudad bolívar", "ciudad bolivar",
+    "rionegro", "granada", "san antonio", "san bernardo", "santa rosa", "armenia",
+)
+
+
 def clean(s: str) -> str:
     s = re.sub(r"<br\s*/?>", " | ", s)
     s = re.sub(r"<[^>]+>", " ", s)
     return re.sub(r"\s+", " ", html_lib.unescape(s)).strip()
 
 
-def cmd_audit():
+def fetch_full_chat(chat_url: str):
+    if not chat_url:
+        return []
+    full_url = chat_url if chat_url.startswith("http") else f"{BASE_URL}{chat_url}"
+    html = urllib.request.urlopen(full_url, context=SSL_CTX, timeout=20).read().decode("utf-8", errors="replace")
+    msgs = re.findall(r'<div class="msg ([^"]+)">\s*<div class="txt">(.*?)</div>', html, re.S)
+    if not msgs:
+        msgs = re.findall(r'<div class="msg ([^"]+)">(.*?)</div>\s*</div>', html, re.S)
+    out = []
+    for cls, mhtml in msgs:
+        who = "BOT" if ("out" in cls or "bot" in cls or "yo" in cls) else "CLI"
+        out.append([who, clean(mhtml)])
+    return out
+
+
+def cmd_audit(full_chats: bool = False):
+    require_token()
     raw = urllib.request.urlopen(f"{BASE_URL}/panel?token={PANEL_TOKEN}", context=SSL_CTX, timeout=25).read().decode("utf-8", errors="replace")
     m = re.search(r'<h2 id="pendientes">.*?<table>(.*?)</table>', raw, re.S)
     if not m:
@@ -49,6 +71,10 @@ def cmd_audit():
         if ph_m:
             phones.append(ph_m.group(1))
 
+        dir_low = direccion.lower()
+        is_homonym = any(h in dir_low for h in HOMONYM_CITIES)
+        has_flag = "🔴" in cliente or "🔴" in direccion or "📦" in cliente or "💸" in cliente
+
         item = {
             "idx": idx,
             "fecha": fecha,
@@ -57,8 +83,11 @@ def cmd_audit():
             "producto": producto,
             "total": total,
             "chat_url": chat_url,
+            "ciudad_homonima": is_homonym,
         }
-        if "🔴" in cliente or "🔴" in direccion or "📦" in cliente or "💸" in cliente:
+        if has_flag or is_homonym:
+            if full_chats and chat_url:
+                item["chat_completo"] = fetch_full_chat(chat_url)
             alertas.append(item)
         else:
             limpios.append(item)
@@ -180,7 +209,8 @@ def cmd_send_doc(pdf_path, to_numbers, caption):
 def main():
     parser = argparse.ArgumentParser(description="BikerPro Despacho CLI")
     sub = parser.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("audit", help="Audita pedidos pendientes")
+    au = sub.add_parser("audit", help="Audita pedidos pendientes")
+    au.add_argument("--full-chats", action="store_true", help="Descarga el historial completo de chats con alertas o ciudades homónimas")
     sp = sub.add_parser("split-pdf", help="Recorta PDFs multi-etiqueta")
     sp.add_argument("--inputs", nargs="+", required=True)
     sp.add_argument("--out", required=True)
@@ -194,7 +224,7 @@ def main():
     args = parser.parse_args()
 
     if args.cmd == "audit":
-        cmd_audit()
+        cmd_audit(full_chats=args.full_chats)
     elif args.cmd == "split-pdf":
         cmd_split_pdf(args.inputs, args.out)
     elif args.cmd == "dispatch-pdf":

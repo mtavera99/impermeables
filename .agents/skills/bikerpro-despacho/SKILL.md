@@ -26,20 +26,20 @@ description: >-
 
 ## Flujo de Trabajo
 
-### 1. Auditar pedidos pendientes
+### 1. Auditar pedidos pendientes (con historial completo de chat)
 ```bash
-python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py audit
+python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py audit --full-chats
 ```
-Devuelve el listado completo separado en `limpios`, `con_alertas` y `duplicados_telefono`. Razona **únicamente** los que están en `con_alertas` revisando su chat/imagen.
+Devuelve el listado completo separado en `limpios`, `con_alertas` (incluyendo ciudades homónimas) y `duplicados_telefono`, trayendo **`chat_completo` desde el mensaje #1** para cada alerta/ciudad homónima. Léelo completo de principio a fin antes de excluir o escribirle al cliente.
 
 ### 3. Generar guías y manifiestos originales y enviarlos por WhatsApp para imprimir
 Después de crear los preenvíos en 99 Envíos 2.0:
 1. Emitir/generar las guías en **Despachos → Pendientes de Impresión** y descargar el **PDF original de guías** (Media Carta / Stickers) sin recortar.
-2. Generar y cerrar los **Manifiestos Oficiales de 99 Envíos 2.0** (uno por transportadora: Interrapidísimo y Coordinadora — nunca entregar un `.md` en lugar del manifiesto oficial) y **unirlos en un solo PDF** (`manifiestos.pdf`) listo para imprimir.
-3. **Enviar ambos PDFs automáticamente por WhatsApp** a los números configurados en `BIKERPRO_PRINT_PHONES` (y dejarlos también enlazados en el chat):
+2. Generar y cerrar los **Manifiestos Oficiales de 99 Envíos 2.0** (uno por transportadora: Interrapidísimo y Coordinadora). **Nunca inventes un PDF adaptado o `.md` haciéndolo pasar por el manifiesto original**: el manifiesto original se descarga/imprime desde **Despacho → Manifiestos → Reimprimir** en 99 Envíos 2.0 (si estás en remoto sin navegador y `pdf_url` viene vacío en la API, dilo explícitamente con el número `MAN-...` ya cerrado para que Santiago lo imprima directo de 99 Envíos).
+3. **Ejecutar obligatoriamente `send-doc`** para enviar los PDFs originales por WhatsApp a los 3 números configurados en `BIKERPRO_PRINT_PHONES` (y confirmar en tu reporte el `"ok": true` real de cada número):
    ```bash
    python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py send-doc --pdf /ruta/guias_original.pdf --caption "Guías originales para imprimir 📦"
-   python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py send-doc --pdf /ruta/manifiestos.pdf --caption "Manifiesto oficial 99 Envíos 📋"
+   python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py send-doc --pdf /ruta/manifiestos_oficiales.pdf --caption "Manifiesto oficial 99 Envíos 📋"
    ```
 
 ### 4. Dividir PDF, enviar a clientes por WhatsApp y conciliar
