@@ -576,6 +576,34 @@ function reclamarRescateCuadro(phone, cuadroAt) {
   return true;
 }
 
+/**
+ * 🔧 Repara los totales "[object Object]N" que guardó /pedido-manual (bug del
+ * 24-nov: sumaba el objeto de `precioDe` con el flete N). El total correcto es
+ * el precio del producto para esas unidades + N. Solo toca ese patrón exacto, y
+ * deja anotado qué tenía antes.
+ */
+function repararTotalesRotos() {
+  ensure();
+  const orders = readJSON(ORDERS_FILE, []);
+  const catalogo = require("./catalogo");
+  let reparados = 0;
+  const detalle = [];
+  for (const o of orders) {
+    const m = String((o && o.total) ?? "").match(/^\[object Object\](\d+)$/);
+    if (!m) continue;
+    const uds = Math.max(1, Number(o.unidades) || 1);
+    const precio = catalogo.precioDe(o.producto, uds);
+    const base = precio && !precio.fueraDeTabla ? Number(precio.precio) : NaN;
+    if (!Number.isFinite(base)) continue; // sin precio conocido queda para revisar a mano
+    o.total_antes_de_reparar = o.total;
+    o.total = base + Number(m[1]);
+    reparados++;
+    detalle.push({ id: o.id, total: o.total });
+  }
+  if (reparados) writeJSON(ORDERS_FILE, orders);
+  return { reparados, detalle };
+}
+
 /** Anota que este cliente compró después del paso N de seguimiento. */
 function marcarCompraDeSeguimiento(phone, paso) {
   ensure();
@@ -992,6 +1020,14 @@ const MOTIVOS_REVISION = [
       }
       return "todavía no mandó el comprobante";
     },
+  },
+  {
+    // 🔴 25-nov: un total que no es un número no se puede despachar: la guía
+    // saldría con un recaudo inventado o en cero.
+    clave: "total_invalido",
+    cuando: (o) => !(Number.isFinite(Number(o.total)) && Number(o.total) > 0),
+    etiqueta: "el total del pedido no es un número",
+    detalle: (o) => `quedó guardado como "${String(o.total).slice(0, 40)}"`,
   },
   {
     clave: "precio_no_cuadra",
@@ -3019,7 +3055,7 @@ module.exports = {
   anotarFalloEntrega, fallosDeEntrega,
   guardarPlan, leerPlan, borrarPlan, limpiarPlanesGuardados,
   registrarArranque, estadoDelDisco, tamanosEnDisco,
-  marcarComprado, registrarSeguimiento, reclamarSeguimiento, reclamarRescateCuadro,
+  marcarComprado, registrarSeguimiento, reclamarSeguimiento, reclamarRescateCuadro, repararTotalesRotos,
   estadisticasSeguimiento, marcarCompraDeSeguimiento, marcarNoMolestar, todasLasConversaciones,
   // 📦 Archivo de conversaciones viejas: baja el costo de cada mensaje sin borrar nada.
   archivarConversacionesViejas, recuperarDelArchivo, leerArchivada, migrarArchivoUnico, ultimaActividad, DIAS_ACTIVAS,

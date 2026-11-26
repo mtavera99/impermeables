@@ -186,8 +186,8 @@ function render(aviso) {
   // de los listos: la venta existe aunque falte revisarla, y descontarla de acá
   // haría parecer que hay menos por cobrar del que hay. Lo que cambia es que
   // ahora se ve, aparte, cuántos no se pueden despachar todavía.
-  const totalPendiente = pendientes.reduce((s, p) => s + Number(p.total || 0), 0);
-  const totalPorRevisar = paraRevisar.reduce((s, p) => s + Number(p.total || 0), 0);
+  const totalPendiente = pendientes.reduce((s, p) => s + (Number.isFinite(Number(p.total)) ? Number(p.total) : 0), 0);
+  const totalPorRevisar = paraRevisar.reduce((s, p) => s + (Number.isFinite(Number(p.total)) ? Number(p.total) : 0), 0);
   const sinCelularCuantos = pendientes.filter((p) => !String(p.celular || "").trim()).length;
   // 💸 PAGOS ANTICIPADOS ESPERANDO QUE ALGUIEN MIRE EL BANCO (8-oct).
   // Su propia tarjeta porque es una cola de trabajo distinta: acá no falta un

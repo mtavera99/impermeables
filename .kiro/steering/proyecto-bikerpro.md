@@ -11643,3 +11643,26 @@ el seguimiento.
 
 `/seguimiento` → `estado.sinConfirmarEnSeguimiento` dice cuántos volvieron a entrar. Prueba:
 `bot/test-compro-sin-confirmar.js` (21). `test-seguimiento-config.js` se ajustó al nuevo patrón.
+
+---
+
+## 0-BX · 💰 EL RECAUDO DEL DÍA EN $0: UN PEDIDO A MANO CON TOTAL "[object Object]25100" (mié 25-nov, 19:45 Bogotá)
+
+**Síntoma:** a las 19:27 el panel pasó a mostrar "recaudo hoy" en $0.
+**Causa:** un pedido cargado con el formulario de **pedido a mano** (V10, 1 unidad, sin escribir el total) quedó
+guardado con `total: "[object Object]25100"`. `/pedido-manual` (commit `e43a86a` del 24-nov) calcula
+`precioBase + fleteVal`, pero `catalogo.precioDe()` devuelve un **objeto** `{precio, uds, esOfertaPrincipal}`, no un
+número. En JavaScript, `objeto + 25100` concatena texto. Después, `resumen.delDia` sumaba `Number(p.total)`: un solo
+NaN vuelve NaN todo el día, y el panel lo muestra como $0. **Peor:** ese pedido salía como "LISTO" para despachar.
+
+**Arreglo:**
+- `/pedido-manual` usa `precio.precio`, y nunca guarda un total que no sea número.
+- Las sumas de `resumen.delDia` y del panel ignoran lo que no es número.
+- `MOTIVOS_REVISION` tiene `total_invalido`: un total que no es número positivo queda en 🔴 REVISAR.
+- `store.repararTotalesRotos()` corre al arrancar. Solo toca el patrón `"[object Object]N"`: recalcula precio + N y deja
+  `total_antes_de_reparar`. El pedido de hoy queda en **$85.000** (59.900 + 25.100).
+
+Prueba: `bot/test-total-pedido-manual.js` (14).
+
+📌 **Regla 40: `catalogo.precioDe()` devuelve un objeto. Siempre `.precio`.** Y todo total que se guarda o se suma pasa
+por `Number.isFinite`.
