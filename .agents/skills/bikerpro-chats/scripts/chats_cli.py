@@ -9,6 +9,17 @@ import ssl
 import sys
 import urllib.request
 
+def load_dotenv():
+    env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", ".env"))
+    if os.path.isfile(env_path):
+        for line in open(env_path, encoding="utf-8"):
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
+load_dotenv()
 BASE_URL = os.environ.get("BIKERPRO_BASE_URL", "https://bikerpro-bot.onrender.com").rstrip("/")
 PANEL_TOKEN = os.environ.get("BIKERPRO_PANEL_TOKEN", "").strip()
 SSL_CTX = ssl._create_unverified_context()

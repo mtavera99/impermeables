@@ -9,6 +9,17 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
+def load_dotenv():
+    env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", ".env"))
+    if os.path.isfile(env_path):
+        for line in open(env_path, encoding="utf-8"):
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
+load_dotenv()
 API_99 = "https://api.99envios.co/api/v2"
 BIKERPRO_URL = os.environ.get("BIKERPRO_BASE_URL", "https://bikerpro-bot.onrender.com").rstrip("/")
 PANEL_TOKEN = os.environ.get("BIKERPRO_PANEL_TOKEN", "").strip()
