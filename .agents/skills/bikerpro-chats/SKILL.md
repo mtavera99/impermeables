@@ -31,7 +31,7 @@ Esto descarga `/panel` y agrupa las conversaciones en:
    - **Q58 Max:** combo x2 `$129.900` + envío (`$143.000` Bogotá, `$152.000`–`$155.000` otras ciudades) · 1 unidad `$79.900` + envío. Accesorios: unidad principal, micrófono rígido/blando, parlantes, base/clip de montaje, cable USB-C y manual.
    - **Radios Baofeng BF-777S:** par (2 radios) `$99.000` **envío gratis** · Megacombo x4 `$169.000` · x6 `$229.000` · x8 `$310.000` · x10 `$375.000` · x12 `$440.000` (todos envío gratis).
    - **Impermeable 4 piezas:** 1 conjunto `$59.900` + envío (`$73.000`–`$85.000`) · 2 conjuntos `$110.000` + envío (`$135.000`–`$148.000`).
-   - **Regla dura — Tienda 100% Virtual:** Somos tienda virtual y **NO atendemos público ni entregamos pedidos presencialmente en bodega** (nunca des la dirección de Carbonata / Calle 62bis para que el cliente vaya a recoger). Todos los pedidos van por transportadora con pago contraentrega (o a oficina Interrapidísimo / Coordinadora).
+   - **Regla de Bodega / Punto Físico en Bogotá:** Cuando un cliente pregunte si hay punto físico o si puede recoger personalmente en Bogotá, **sí se le puede dar la dirección de la bodega** (`Calle 62bis #67-12, Bogotá`) y se le debe indicar que **antes de pasar debe comunicarse al `304-663-0407`** para que la persona encargada de la bodega esté pendiente y le pueda despachar/entregar su producto.
 3. Envía pedidos recuperados, respuestas y cierres en lote usando un JSON temporal:
    ```bash
    python3 .agents/skills/bikerpro-chats/scripts/chats_cli.py apply --plan /tmp/chats_plan.json
