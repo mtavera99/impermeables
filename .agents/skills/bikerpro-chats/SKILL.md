@@ -33,4 +33,20 @@ Esto descarga `/panel` y agrupa las conversaciones en:
    - **Impermeable 4 piezas:** 1 conjunto `$59.900` + envío (`$73.000`–`$85.000`) · 2 conjuntos `$110.000` + envío (`$135.000`–`$148.000`).
 3. Envía pedidos recuperados, respuestas y cierres en lote usando un JSON temporal:
    ```bash
-   python3 .agents/skills/bikerpro-chats/scripts/chats_cli.py apply --pla
+   python3 .agents/skills/bikerpro-chats/scripts/chats_cli.py apply --plan /tmp/chats_plan.json
+   ```
+   Formato de `/tmp/chats_plan.json`:
+   ```json
+   {
+     "recover_orders": [{"telefono_chat": "573...", "nombre": "...", "celular": "3...", "ciudad": "...", "direccion": "...", "producto": "v10", "unidades": 2, "total": 122000}],
+     "reply_and_close": [{"to": "573...", "texto": "..."}],
+     "close_only": ["573...", "CO...."]
+   }
+   ```
+4. Si el panel mostraba tope de 60 chats, vuelve a correr `fetch` hasta que solo queden los `manuales`.
+
+### 3. Regla de oro (qué NO cerrar nunca)
+Nunca marques como atendido ni respondas automáticamente sin verificar:
+- Chats con `posible comprobante de pago` (sin haber visto la imagen).
+- Garantías, productos defectuosos o reclamos de envío/devolución.
+- Solicitudes de cambio de dirección/oficina en pedidos ya comprados.
