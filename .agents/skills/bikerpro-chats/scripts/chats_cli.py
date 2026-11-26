@@ -64,7 +64,7 @@ def fetch_chats():
     raw = urllib.request.urlopen(url, context=SSL_CTX, timeout=25).read().decode("utf-8", errors="replace")
     convs = re.findall(r'<details class="conv[^"]*" id="c([^"]+)">(.*?)</details>', raw, re.S)
 
-    triviales, razonar, manuales = [], [], []
+    triviales, razonar, manuales, posibles_ventas = [], [], [], []
     for cid, body in convs:
         sum_m = re.search(r"<summary>(.*?)</summary>", body, re.S)
         summary = clean_html(sum_m.group(1)) if sum_m else ""
@@ -75,20 +75,29 @@ def fetch_chats():
         pq_m = re.search(r'<div class="porque">(.*?)</div>', body, re.S)
         porque = clean_html(pq_m.group(1)) if pq_m else ""
         msgs_raw = re.findall(r'<div class="msg ([^"]+)">\s*<div class="txt">(.*?)</div>', body, re.S)
-        msgs = [(cls.strip().upper(), clean_html(mh)) for cls, mh in msgs_raw[-4:]]
+        msgs = [(cls.strip().upper(), clean_html(mh)) for cls, mh in msgs_raw[-6:]]
 
         item = {
             "id": cid,
             "summary": summary,
             "porque": porque,
-            "ultimos": msgs[-2:],
+            "ultimos": msgs[-3:],
         }
 
         blob = (porque + " " + " ".join(m[1] for m in msgs)).lower()
         last_cli = next((m[1].lower() for m in reversed(msgs) if m[0] == "CLI"), "")
+        ya_compro = "compró" in low_sum or "compro" in low_sum
+        tiene_datos_o_cuadro = (
+            "confirmemos tu pedido" in blob
+            or "lista para despacho" in blob
+            or "queda confirmado" in blob
+            or ("dirección" in blob and bool(re.search(r"3\d{9}", blob)))
+        )
 
         if any(k in blob for k in MANUAL_KEYWORDS):
             manuales.append(item)
+        elif not ya_compro and tiene_datos_o_cuadro:
+            posibles_ventas.append(item)
         elif "revisar" in low_sum and "atender" not in low_sum:
             triviales.append(item)
         elif any(last_cli == t or last_cli.startswith(t + " ") for t in TRIVIAL_CLIENT_MSGS):
@@ -97,7 +106,8 @@ def fetch_chats():
             razonar.append(item)
 
     out = {
-        "total_pendientes_visibles": len(triviales) + len(razonar) + len(manuales),
+        "total_pendientes_visibles": len(triviales) + len(razonar) + len(manuales) + len(posibles_ventas),
+        "posibles_ventas_perdidas": posibles_ventas,
         "triviales": triviales,
         "razonar": razonar,
         "manuales": manuales,
@@ -117,7 +127,14 @@ def post_json(path: str, payload: dict) -> dict:
 
 def apply_plan(plan_path: str):
     plan = json.load(open(plan_path, encoding="utf-8"))
-    replied, closed, errors = 0, 0, []
+    replied, closed, recovered, errors = 0, 0, 0, []
+
+    for order in plan.get("recover_orders", []):
+        r_ord = post_json("/pedido-manual", order)
+        if r_ord.get("ok"):
+            recovered += 1
+        else:
+            errors.append({"pedido_manual": order.get("telefono_chat"), "res": r_ord})
 
     for entry in plan.get("reply_and_close", []):
         r1 = post_json("/responder", {"to": entry["to"], "texto": entry["texto"]})
@@ -134,26 +151,4 @@ def apply_plan(plan_path: str):
     for tel in plan.get("close_only", []):
         r = post_json("/atendido", {"tel": tel})
         if r.get("ok"):
-            closed += 1
-        else:
-            errors.append({"atendido": tel, "res": r})
-
-    print(json.dumps({"replied": replied, "closed": closed, "errors": errors}, indent=2, ensure_ascii=False))
-
-
-def main():
-    parser = argparse.ArgumentParser(description="BikerPro Chats CLI")
-    sub = parser.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("fetch", help="Descarga y pre-clasifica chats pendientes")
-    ap = sub.add_parser("apply", help="Aplica respuestas y cierres desde un JSON")
-    ap.add_argument("--plan", required=True, help="Ruta al JSON con reply_and_close y close_only")
-    args = parser.parse_args()
-
-    if args.cmd == "fetch":
-        fetch_chats()
-    elif args.cmd == "apply":
-        apply_plan(args.plan)
-
-
-if __name__ == "__main__":
-    main()
+            clo
