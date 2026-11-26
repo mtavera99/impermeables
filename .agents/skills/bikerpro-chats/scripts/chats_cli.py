@@ -162,4 +162,26 @@ def apply_plan(plan_path: str):
     for tel in plan.get("close_only", []):
         r = post_json("/atendido", {"tel": tel})
         if r.get("ok"):
-            clo
+            closed += 1
+        else:
+            errors.append({"atendido": tel, "res": r})
+
+    print(json.dumps({"recovered": recovered, "replied": replied, "closed": closed, "errors": errors}, indent=2, ensure_ascii=False))
+
+
+def main():
+    parser = argparse.ArgumentParser(description="BikerPro Chats CLI")
+    sub = parser.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("fetch", help="Descarga y pre-clasifica chats pendientes")
+    ap = sub.add_parser("apply", help="Aplica recuperaciones, respuestas y cierres desde un JSON")
+    ap.add_argument("--plan", required=True, help="Ruta al JSON con recover_orders, reply_and_close y close_only")
+    args = parser.parse_args()
+
+    if args.cmd == "fetch":
+        fetch_chats()
+    elif args.cmd == "apply":
+        apply_plan(args.plan)
+
+
+if __name__ == "__main__":
+    main()
