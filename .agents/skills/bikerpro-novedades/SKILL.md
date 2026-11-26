@@ -12,9 +12,10 @@ Extraer todas las novedades activas (Reclame en Oficina, Destinatario Ausente, D
 
 ## Reglas de Trabajo
 1. **Deduplicación estricta:** Consolidar siempre por número de guía única (un cliente no debe recibir 2 avisos por la misma guía).
-2. **Plazo claro en oficina:** Indicar siempre la fecha límite real de retiro en oficina de Interrapidísimo/Coordinadora (ej. 2 días hábiles adelante) para evitar devolución regional.
-3. **Envío en lotes seguros:** Enviar máximo **20 guías por lote** a `POST /novedades/enviar` para evitar timeouts en Render.
-4. **Casos especiales manuales:** Separar para gestión humana directa los casos de **incautación/retención (Seguro PLUS)**, clientes que exigen otra transportadora o paquetes ya en **devolución regional**.
+2. **Cruzar detalle completo en Autogestión:** Si una guía en `NOVEDAD` viene sin motivo detallado, consultar el campo `novelty_description` en `/shipping/shipments/novelties?status=ACTIVA` (Autogestión) antes de clasificarla como "sin motivo".
+3. **Plazo claro en oficina:** Indicar siempre la fecha límite real de retiro en oficina de Interrapidísimo/Coordinadora (ej. 2 días hábiles adelante) para evitar devolución regional.
+4. **Envío en lotes seguros:** Enviar máximo **20 guías por lote** a `POST /novedades/enviar` para evitar timeouts en Render.
+5. **Casos especiales manuales:** Separar para gestión humana directa los casos de **incautación/retención (Seguro PLUS)**, clientes que exigen otra transportadora o paquetes ya en **devolución regional**.
 
 ## Extracción directa en la nube (sin Chrome)
 ```bash

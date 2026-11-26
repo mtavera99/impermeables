@@ -9,7 +9,8 @@ description: >-
 # Agente de Auditoría, Guías y Despacho — BikerPro
 
 ## Reglas de Negocio
-1. **Nunca despachar a ciegas pedidos con alertas:** revisar su chat (`/chat?token=...&id=...`) antes de incluirlos:
+1. **Nunca despachar a ciegas pedidos con alertas:** revisar su chat (`/chat?token=...&id=...`) **completo desde el primer mensaje** antes de incluirlos o preguntar al cliente:
+   - **Ciudades homónimas** (`Restrepo` Meta/Valle, `La Unión` Ant./Valle/Nariño, `Ciudad Bolívar` Ant./Bogotá, `Rionegro` Ant./Santander, `Granada` Meta/Ant./Cund.): **leer todo el historial del chat desde el inicio** antes de decir que falta el departamento (muchas veces el cliente ya lo escribió al principio).
    - `🔴 falta celular`: no se puede generar guía; dejar pendiente y pedir celular.
    - `🔴 PRECIO NO CUADRA` / `🔴 SIN CONFIRMAR`: leer el chat para validar producto, unidades y confirmación real.
    - `📦 GUÍA YA ENVIADA`: verificar si es pedido repetido o una compra nueva.
@@ -34,11 +35,11 @@ Devuelve el listado completo separado en `limpios`, `con_alertas` y `duplicados_
 ### 3. Generar guías y manifiestos originales y enviarlos por WhatsApp para imprimir
 Después de crear los preenvíos en 99 Envíos 2.0:
 1. Emitir/generar las guías en **Despachos → Pendientes de Impresión** y descargar el **PDF original de guías** (Media Carta / Stickers) sin recortar.
-2. Descargar también los **manifiestos originales** de 99 Envíos (**Despachos → Manifiestos**) correspondientes al corte del día.
+2. Generar y cerrar los **Manifiestos Oficiales de 99 Envíos 2.0** (uno por transportadora: Interrapidísimo y Coordinadora — nunca entregar un `.md` en lugar del manifiesto oficial) y **unirlos en un solo PDF** (`manifiestos.pdf`) listo para imprimir.
 3. **Enviar ambos PDFs automáticamente por WhatsApp** a los números configurados en `BIKERPRO_PRINT_PHONES` (y dejarlos también enlazados en el chat):
    ```bash
    python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py send-doc --pdf /ruta/guias_original.pdf --caption "Guías originales para imprimir 📦"
-   python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py send-doc --pdf /ruta/manifiesto.pdf --caption "Manifiesto original 99 Envíos 📋"
+   python3 .agents/skills/bikerpro-despacho/scripts/despacho_cli.py send-doc --pdf /ruta/manifiestos.pdf --caption "Manifiesto oficial 99 Envíos 📋"
    ```
 
 ### 4. Dividir PDF, enviar a clientes por WhatsApp y conciliar
