@@ -1934,8 +1934,9 @@ app.get("/meta-capi/estado", (req, res) => {
   if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   const cfg = metaCapi.getConfig();
   const pedidos = store.todosLosPedidos();
+  const convs = store.todasLasConversaciones();
   const despachados = pedidos.filter((p) => p && p.guia && !p.anulado);
-  const conClid = despachados.filter((p) => p.ctwa_clid || store.atribucionDe(p.telefono_chat)?.ctwa_clid);
+  const conClid = despachados.filter((p) => p.ctwa_clid || convs[p.telefono_chat]?.anuncio?.ctwa_clid);
   const enviados = despachados.filter((p) => p.capiEnviado);
   res.json({
     ok: true,
