@@ -32,6 +32,7 @@ const audio = require("./audio");
 const comprobante = require("./comprobante");
 const resumen = require("./resumen");
 const saldoIA = require("./saldo-ia");
+const metaCapi = require("./meta-capi");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 // 🔴 Normalizar un destinatario SIN romper a los clientes con username.
@@ -1304,7 +1305,10 @@ async function mandarHojaDeGuia(fila, pedido, { aMano = false, certeza = null } 
     aMano,
   });
   const refPedido = pedido.id || pedido.fecha;
-  if (refPedido) store.anotarGuiaEnPedido(refPedido, fila.guia);
+  if (refPedido) {
+    store.anotarGuiaEnPedido(refPedido, fila.guia);
+    dispararCapiSiAplica(refPedido);
+  }
   store.pushMsg(to, "assistant", caption);
   anotarEvento({ tipo: "guia-enviada", para: to, guia: fila.guia, certeza: fila.certeza, aMano });
   console.log(
@@ -1908,9 +1912,47 @@ app.post("/anular", (req, res) => {
 // ⚠️ No le escribe nada a ningún cliente, y solo toca pedidos SIN guía a los
 // que les encuentra una guía ya enviada. No puede marcar algo que no salió.
 // ============================================================================
+function dispararCapiSiAplica(refPedido) {
+  if (!refPedido || !metaCapi.estaActivo()) return;
+  try {
+    const pedido = store.todosLosPedidos().find((p) => p && (p.id === refPedido || p.fecha === refPedido));
+    if (!pedido || pedido.capiEnviado || pedido.anulado) return;
+    const ctwaClid = pedido.ctwa_clid || store.atribucionDe(pedido.telefono_chat)?.ctwa_clid || null;
+    if (!ctwaClid) return;
+    metaCapi
+      .enviarPurchase(pedido, {
+        ctwaClid,
+        onResult: (r) => store.marcarCapiEnviado(pedido.id || pedido.fecha, r),
+      })
+      .catch(() => {});
+  } catch (e) {
+    console.warn(`⚠️  Error preparando CAPI para ${refPedido}: ${e.message}`);
+  }
+}
+
+app.get("/meta-capi/estado", (req, res) => {
+  if (req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
+  const cfg = metaCapi.getConfig();
+  const pedidos = store.todosLosPedidos();
+  const despachados = pedidos.filter((p) => p && p.guia && !p.anulado);
+  const conClid = despachados.filter((p) => p.ctwa_clid || store.atribucionDe(p.telefono_chat)?.ctwa_clid);
+  const enviados = despachados.filter((p) => p.capiEnviado);
+  res.json({
+    ok: true,
+    activo: metaCapi.estaActivo(),
+    datasetId: cfg.datasetId || null,
+    modoPrueba: Boolean(cfg.testEventCode),
+    version: cfg.version,
+    despachados: despachados.length,
+    conCtwaClid: conClid.length,
+    capiEnviados: enviados.length,
+  });
+});
+
 app.post("/conciliar-guias", (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   const arreglados = store.conciliarGuiasConPedidos();
+  for (const a of arreglados) dispararCapiSiAplica(a.id || a.fecha);
   const aviso = arreglados.length
     ? `🔄 ${arreglados.length} pedido(s) salieron de la cola porque su guía ya se había enviado: ` +
       arreglados.map((a) => `${a.nombre} (${a.guia})`).join(", ")
@@ -1923,6 +1965,7 @@ app.post("/marcar-despachado", (req, res) => {
   if (req.body?.token !== PANEL_TOKEN && req.query.token !== PANEL_TOKEN) return res.sendStatus(403);
   const ref = String(req.body?.fecha || req.body?.id || "");
   const r = store.marcarDespachadoAMano(ref, req.body?.guia);
+  if (r) dispararCapiSiAplica(r.id || r.fecha);
   const aviso = r
     ? `✅ ${r.nombre || "El pedido"} salió de la cola de despacho (guía ${r.guia}). No se le escribió al cliente.`
     : "No se encontró ese pedido.";

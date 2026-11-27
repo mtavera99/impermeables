@@ -1947,6 +1947,7 @@ function saveOrder(order, contexto = {}) {
       record.anuncio_id = anuncio.source_id;
       record.anuncio_origen = anuncio.source_url || null;
       record.anuncio_tipo = anuncio.source_type || null;
+      record.ctwa_clid = anuncio.ctwa_clid || null;
     }
   } catch (e) {
     console.error(`⚠️  No se pudo leer la atribución del anuncio: ${e.message}`);
@@ -2651,7 +2652,12 @@ function conciliarGuiasConPedidos() {
         // Queda explícito que esto lo cerró la conciliación, no el envío.
         guia_conciliada: true,
       };
-      arreglados.push({ nombre: o.nombre || "?", guia: String(g.guia) });
+      arreglados.push({
+        nombre: o.nombre || "?",
+        guia: String(g.guia),
+        id: o.id || null,
+        fecha: o.fecha || null,
+      });
     }
     if (arreglados.length) {
       writeJSON(ORDERS_FILE, orders);
@@ -2783,6 +2789,34 @@ function anotarGuiaEnPedido(refPedido, guia) {
     return true;
   } catch (e) {
     console.error(`🔴 No se pudo anotar la guía en el pedido: ${e.message}`);
+    return false;
+  }
+}
+
+function marcarCapiEnviado(refPedido, resultado = {}) {
+  try {
+    ensure();
+    const orders = readJSON(ORDERS_FILE, []);
+    const i = indiceDePedido(orders, refPedido);
+    if (i === -1) return false;
+    if (resultado.ok) {
+      orders[i] = {
+        ...orders[i],
+        capiEnviado: true,
+        capiEnviadoEl: new Date().toISOString(),
+        capiEventId: resultado.eventId || orders[i].id || orders[i].fecha || null,
+        capiError: null,
+      };
+    } else if (!orders[i].capiEnviado) {
+      orders[i] = {
+        ...orders[i],
+        capiError: String(resultado.error || "error").slice(0, 200),
+      };
+    }
+    writeJSON(ORDERS_FILE, orders);
+    return true;
+  } catch (e) {
+    console.error(`⚠️  No se pudo guardar estado CAPI en el pedido: ${e.message}`);
     return false;
   }
 }
@@ -3074,7 +3108,7 @@ module.exports = {
   mismoPedido,
   pedidoSospechoso,
   VENTANA_PEDIDO_DUPLICADO_MS,
-  guiaYaEnviada, registrarGuiaEnviada, todasLasGuiasEnviadas, anotarGuiaEnPedido,
+  guiaYaEnviada, registrarGuiaEnviada, todasLasGuiasEnviadas, anotarGuiaEnPedido, marcarCapiEnviado,
   // ✅ "esa guía ya la mandé yo": saca el pedido de la cola sin escribirle al cliente.
   marcarDespachadoAMano, desmarcarDespachado,
   // 🔎 Cruce entre guias-enviadas.json y orders.json, que se pueden contradecir.
